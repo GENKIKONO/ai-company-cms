@@ -13,7 +13,7 @@ interface OrganizationFormProps {
 
 export function OrganizationForm({ organization, onSuccess }: OrganizationFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [false, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<string[]>([]);
   
@@ -389,9 +389,9 @@ export function OrganizationForm({ organization, onSuccess }: OrganizationFormPr
         </Button>
         <Button
           type="submit"
-          disabled={loading}
+          disabled={false}
         >
-          {loading ? '保存中...' : organization ? '更新' : '作成'}
+          {false ? '保存中...' : organization ? '更新' : '作成'}
         </Button>
       </div>
     </form>

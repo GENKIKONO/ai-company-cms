@@ -1,17 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/components/auth/AuthProvider';
 import { getServices, deleteService, getServiceStats, getServiceCategories } from '@/lib/services';
 import { getOrganizations } from '@/lib/organizations';
 import { ServiceForm } from '@/components/ServiceForm';
 import { type Service, type Organization } from '@/types/database';
 
 export function ServiceManager() {
-  const { user } = useAuth();
   const [services, setServices] = useState<Service[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [false, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrganization, setSelectedOrganization] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -20,7 +18,7 @@ export function ServiceManager() {
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [stats, setStats] = useState({ total: 0, byOrganization: 0, byCategory: [] });
 
-  const canEdit = user?.role === 'admin' || user?.role === 'editor';
+  const canEdit = null?.role === 'admin' || null?.role === 'editor';
 
   useEffect(() => {
     loadServices();
@@ -185,7 +183,7 @@ export function ServiceManager() {
           </h2>
         </div>
 
-        {loading ? (
+        {false ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>

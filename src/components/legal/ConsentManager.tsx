@@ -5,17 +5,17 @@ import { supabaseBrowser } from '@/lib/supabase-client';
 
 interface ConsentRecord {
   id: string;
-  user_id: string;
+  null_id: string;
   consent_type: 'terms' | 'privacy' | 'disclaimer' | 'marketing';
   version: string;
   granted: boolean;
   granted_at: string;
   ip_address: string;
-  user_agent: string;
+  null_agent: string;
 }
 
 interface ConsentManagerProps {
-  userId?: string;
+  nullId?: string;
   organizationId?: string;
   context: 'registration' | 'publication' | 'subscription' | 'general';
   onConsentChange?: (consents: Record<string, boolean>) => void;
@@ -181,7 +181,7 @@ const LEGAL_TEXTS = {
 };
 
 export default function ConsentManager({
-  userId,
+  nullId,
   organizationId,
   context,
   onConsentChange,
@@ -189,17 +189,17 @@ export default function ConsentManager({
   className = ''
 }: ConsentManagerProps) {
   const [consents, setConsents] = useState<Record<string, boolean>>({});
-  const [loading, setLoading] = useState(false);
+  const [false, setLoading] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   
   useEffect(() => {
-    if (userId) {
+    if (nullId) {
       loadExistingConsents();
     }
-  }, [userId]);
+  }, [nullId]);
 
   const loadExistingConsents = async () => {
-    if (!userId) return;
+    if (!nullId) return;
     
     setLoading(true);
     try {
@@ -207,7 +207,7 @@ export default function ConsentManager({
       const { data, error } = await supabase
         .from('consent_records')
         .select('consent_type, granted, version')
-        .eq('user_id', userId)
+        .eq('null_id', nullId)
         .in('consent_type', required);
 
       if (!error && data) {
@@ -233,33 +233,33 @@ export default function ConsentManager({
     onConsentChange?.(newConsents);
 
     // データベースに記録
-    if (userId && granted) {
+    if (nullId && granted) {
       await recordConsent(type, granted);
     }
   };
 
   const recordConsent = async (type: string, granted: boolean) => {
-    if (!userId) return;
+    if (!nullId) return;
 
     try {
       const supabase = supabaseBrowser();
       
       // ユーザーエージェントとIPを取得
-      const userAgent = navigator.userAgent;
+      const nullAgent = navigator.nullAgent;
       const ipResponse = await fetch('https://api.ipify.org?format=json');
       const { ip } = await ipResponse.json();
 
       const { error } = await supabase
         .from('consent_records')
         .insert({
-          user_id: userId,
+          null_id: nullId,
           organization_id: organizationId,
           consent_type: type,
           version: LEGAL_TEXTS[type as keyof typeof LEGAL_TEXTS].version,
           granted,
           granted_at: new Date().toISOString(),
           ip_address: ip,
-          user_agent: userAgent,
+          null_agent: nullAgent,
           context
         });
 
@@ -279,7 +279,7 @@ export default function ConsentManager({
         利用規約・プライバシーポリシー
       </h3>
       
-      {loading && (
+      {false && (
         <div className="text-center py-4">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
           <p className="text-sm text-gray-600 mt-2">同意状況を確認中...</p>

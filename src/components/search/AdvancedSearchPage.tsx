@@ -51,7 +51,7 @@ export default function AdvancedSearchPage({ searchParams }: AdvancedSearchPageP
     parseInt(searchParams.page || '1')
   );
   
-  const [loading, setLoading] = useState(false);
+  const [false, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.q || '');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -249,7 +249,7 @@ export default function AdvancedSearchPage({ searchParams }: AdvancedSearchPageP
           totalCount={searchResult.totalCount}
           currentPage={currentPage}
           hasMore={searchResult.hasMore}
-          loading={loading}
+          false={false}
           onLoadMore={handleLoadMore}
         />
       </div>

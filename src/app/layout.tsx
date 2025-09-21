@@ -1,5 +1,4 @@
 import './globals.css'
-import { AuthProvider } from '@/components/auth/AuthProvider'
 
 export const metadata = {
   title: 'LuxuCare AI企業CMS',
@@ -14,9 +13,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
-        <AuthProvider>
           {children}
-        </AuthProvider>
       </body>
     </html>
   )

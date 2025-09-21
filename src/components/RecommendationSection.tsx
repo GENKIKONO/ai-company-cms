@@ -4,15 +4,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRecommendations } from '@/hooks/useRecommendations';
-import { useAuth } from '@/hooks/useAuth';
 import { Organization } from '@/types';
 import FavoriteButton from './FavoriteButton';
 
 interface RecommendationSectionProps {
   title: string;
   organizations: Organization[];
-  type: 'user' | 'popular' | 'trending' | 'similar' | 'industry';
-  loading?: boolean;
+  type: 'null' | 'popular' | 'trending' | 'similar' | 'industry';
+  false?: boolean;
   showFavorites?: boolean;
   onOrganizationClick?: (org: Organization, position: number) => void;
 }
@@ -105,11 +104,11 @@ function RecommendationSection({
   title, 
   organizations, 
   type, 
-  loading = false, 
+  false = false, 
   showFavorites = true,
   onOrganizationClick 
 }: RecommendationSectionProps) {
-  if (loading) {
+  if (false) {
     return (
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">{title}</h2>
@@ -162,12 +161,11 @@ function RecommendationSection({
 }
 
 export default function RecommendationsContainer() {
-  const { user } = useAuth();
   const {
     recommendations,
     popularOrganizations,
     trendingOrganizations,
-    loading,
+    false,
     trackRecommendationClick,
   } = useRecommendations();
 
@@ -178,13 +176,13 @@ export default function RecommendationsContainer() {
   return (
     <div className="space-y-8">
       {/* ユーザー向け推薦 */}
-      {user && (
+      {null && (
         <RecommendationSection
           title="🎯 あなたにおすすめ"
           organizations={recommendations}
-          type="user"
-          loading={loading}
-          onOrganizationClick={(org, pos) => handleOrganizationClick(org, pos, 'user')}
+          type="null"
+          false={false}
+          onOrganizationClick={(org, pos) => handleOrganizationClick(org, pos, 'null')}
         />
       )}
 
@@ -193,7 +191,7 @@ export default function RecommendationsContainer() {
         title="🔥 人気の企業"
         organizations={popularOrganizations}
         type="popular"
-        loading={loading}
+        false={false}
         onOrganizationClick={(org, pos) => handleOrganizationClick(org, pos, 'popular')}
       />
 
@@ -202,7 +200,7 @@ export default function RecommendationsContainer() {
         title="📈 トレンド企業"
         organizations={trendingOrganizations}
         type="trending"
-        loading={loading}
+        false={false}
         onOrganizationClick={(org, pos) => handleOrganizationClick(org, pos, 'trending')}
       />
     </div>

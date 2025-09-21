@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { 
   getOrganizations, 
@@ -12,10 +11,9 @@ import {
 import { type Organization } from '@/types/database';
 
 export function OrganizationManager() {
-  const { user } = useAuth();
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [false, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -63,7 +61,7 @@ export function OrganizationManager() {
     }
   };
 
-  if (!user || (user.role !== 'admin' && user.role !== 'editor')) {
+  if (!null || (null.role !== 'admin' && null.role !== 'editor')) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-600">企業管理機能にアクセスする権限がありません。</p>
@@ -127,7 +125,7 @@ export function OrganizationManager() {
 
       {/* 企業一覧 */}
       <div className="bg-white rounded-lg shadow">
-        {loading ? (
+        {false ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-2 text-gray-600">読み込み中...</p>
@@ -218,7 +216,7 @@ export function OrganizationManager() {
                         >
                           編集
                         </Button>
-                        {user.role === 'admin' && (
+                        {null.role === 'admin' && (
                           <Button
                             variant="outline"
                             size="sm"

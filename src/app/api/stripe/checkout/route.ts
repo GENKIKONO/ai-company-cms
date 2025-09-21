@@ -61,12 +61,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Stripe商品を取得
-    const products = await getLuxuCareProducts();
+    // 固定の価格IDを使用（実際の環境では環境変数で管理）
+    const SETUP_PRICE_ID = process.env.STRIPE_SETUP_PRICE_ID || 'price_setup_example';
+    const MONTHLY_PRICE_ID = process.env.STRIPE_MONTHLY_PRICE_ID || 'price_monthly_example';
     
-    if (!products || products.length === 0) {
+    if (!SETUP_PRICE_ID || !MONTHLY_PRICE_ID) {
       return NextResponse.json(
-        { error: 'Stripe商品が設定されていません' },
+        { error: 'Stripe価格IDが設定されていません' },
         { status: 500 }
       );
     }
@@ -85,8 +86,7 @@ export async function POST(request: NextRequest) {
     } else {
       const customer = await createStripeCustomer(
         organization.email || user.email || '',
-        organization.name,
-        organizationId
+        organization.name
       );
       customerId = customer.id;
 
@@ -106,11 +106,11 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: products.setupPrice.id,
+          price: SETUP_PRICE_ID,
           quantity: 1,
         },
         {
-          price: products.monthlyPrice.id,
+          price: MONTHLY_PRICE_ID,
           quantity: 1,
         },
       ],

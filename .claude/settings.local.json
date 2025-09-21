@@ -33,7 +33,8 @@
       "Bash(npm run test:production:*)",
       "Bash(lsof:*)",
       "Bash(node:*)",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

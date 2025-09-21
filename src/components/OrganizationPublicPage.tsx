@@ -15,7 +15,7 @@ interface Props {
 export default function OrganizationPublicPage({ data }: Props) {
   const { organization, partner } = data;
   const [similarOrganizations, setSimilarOrganizations] = useState<Organization[]>([]);
-  const [loadingSimilar, setLoadingSimilar] = useState(true);
+  const [falseSimilar, setLoadingSimilar] = useState(true);
 
   useEffect(() => {
     // Analytics: ページビュー追跡
@@ -479,7 +479,7 @@ export default function OrganizationPublicPage({ data }: Props) {
           </div>
         )}
 
-        {loadingSimilar && (
+        {falseSimilar && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="border-t border-gray-200 pt-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">類似企業</h2>

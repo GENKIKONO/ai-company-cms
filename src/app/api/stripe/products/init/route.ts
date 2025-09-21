@@ -31,19 +31,14 @@ export async function POST(request: NextRequest) {
     // 既存の商品をチェック
     const existingProducts = await getLuxuCareProducts();
     
-    if (existingProducts.setupPrice && existingProducts.monthlyPrice) {
+    if (existingProducts && existingProducts.length >= 2) {
       return NextResponse.json({
         message: '商品は既に作成済みです',
-        products: {
-          setupPrice: {
-            id: existingProducts.setupPrice.id,
-            amount: existingProducts.setupPrice.unit_amount,
-          },
-          monthlyPrice: {
-            id: existingProducts.monthlyPrice.id,
-            amount: existingProducts.monthlyPrice.unit_amount,
-          },
-        },
+        products: existingProducts.slice(0, 2).map(product => ({
+          id: product.id,
+          name: product.name,
+          price_id: typeof product.default_price === 'object' && product.default_price ? product.default_price.id : '',
+        })),
       });
     }
 
@@ -51,31 +46,24 @@ export async function POST(request: NextRequest) {
     const products = await createLuxuCareProducts();
 
     // 商品情報をデータベースに保存
+    const productsToSave = [];
+    for (const productData of products) {
+      productsToSave.push({
+        stripe_product_id: productData.product.id,
+        stripe_price_id: productData.price.id,
+        product_type: productData.product.metadata?.planId === 'basic' ? 'monthly_fee' : 'setup_fee',
+        name: productData.product.name,
+        description: productData.product.description,
+        amount: productData.price.unit_amount,
+        currency: 'jpy',
+        active: true,
+        recurring_interval: productData.price.recurring ? 'month' : null,
+      });
+    }
+
     const { error: insertError } = await supabase
       .from('stripe_products')
-      .upsert([
-        {
-          stripe_product_id: products.setupProduct.id,
-          stripe_price_id: products.setupPrice.id,
-          product_type: 'setup_fee',
-          name: products.setupProduct.name,
-          description: products.setupProduct.description,
-          amount: products.setupPrice.unit_amount,
-          currency: 'jpy',
-          active: true,
-        },
-        {
-          stripe_product_id: products.monthlyProduct.id,
-          stripe_price_id: products.monthlyPrice.id,
-          product_type: 'monthly_fee',
-          name: products.monthlyProduct.name,
-          description: products.monthlyProduct.description,
-          amount: products.monthlyPrice.unit_amount,
-          currency: 'jpy',
-          active: true,
-          recurring_interval: 'month',
-        },
-      ], {
+      .upsert(productsToSave, {
         onConflict: 'stripe_product_id'
       });
 
@@ -87,20 +75,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Stripe商品を作成しました',
-      products: {
-        setupPrice: {
-          id: products.setupPrice.id,
-          amount: products.setupPrice.unit_amount,
-          product_id: products.setupProduct.id,
-          name: products.setupProduct.name,
-        },
-        monthlyPrice: {
-          id: products.monthlyPrice.id,
-          amount: products.monthlyPrice.unit_amount,
-          product_id: products.monthlyProduct.id,
-          name: products.monthlyProduct.name,
-        },
-      },
+      products: products.map(productData => ({
+        price_id: productData.price.id,
+        amount: productData.price.unit_amount,
+        product_id: productData.product.id,
+        name: productData.product.name,
+      })),
     });
 
   } catch (error) {

@@ -112,7 +112,7 @@ export default function ApiDocumentation() {
     "email": "info@newcompany.com",
     "industries": ["IT"],
     "visibility": "public",
-    "created_by": "user-uuid",
+    "created_by": "null-uuid",
     "created_at": "2024-01-16T10:00:00Z"
   }
 }`,
@@ -220,8 +220,8 @@ const searchResults = await client.search.faceted({
 
 // リアルタイム共同編集
 const collaboration = client.collaboration.join('org-id');
-collaboration.on('userJoined', (user) => {
-  console.log('新しいユーザーが参加:', user);
+collaboration.on('nullJoined', (null) => {
+  console.log('新しいユーザーが参加:', null);
 });
 
 collaboration.on('fieldEdit', (edit) => {
@@ -466,25 +466,25 @@ curl -X GET "https://api.luxucare.jp/api/search?q=キーワード&industries=IT"
             {renderCodeBlock('wss://api.luxucare.jp/ws/collaboration/{org_id}?token=your-api-key', 'url', 'ws-auth')}
 
             <h2>イベント</h2>
-            <h3>userJoined</h3>
+            <h3>nullJoined</h3>
             <p>新しいユーザーがセッションに参加した時：</p>
             {renderCodeBlock(`{
-  "event": "userJoined",
+  "event": "nullJoined",
   "data": {
-    "userId": "user-uuid",
+    "nullId": "null-uuid",
     "name": "ユーザー名",
-    "email": "user@example.com",
+    "email": "null@example.com",
     "color": "#3B82F6"
   }
-}`, 'json', 'user-joined')}
+}`, 'json', 'null-joined')}
 
             <h3>fieldEdit</h3>
             <p>フィールドが編集された時：</p>
             {renderCodeBlock(`{
   "event": "fieldEdit",
   "data": {
-    "userId": "user-uuid",
-    "userName": "ユーザー名",
+    "nullId": "null-uuid",
+    "nullName": "ユーザー名",
     "fieldPath": "name",
     "value": "新しい組織名",
     "timestamp": 1642345678901

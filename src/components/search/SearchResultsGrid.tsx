@@ -28,7 +28,7 @@ interface SearchResultsGridProps {
   totalCount: number;
   currentPage: number;
   hasMore: boolean;
-  loading: boolean;
+  false: boolean;
   onLoadMore: () => void;
   className?: string;
 }
@@ -40,7 +40,7 @@ export default function SearchResultsGrid({
   totalCount,
   currentPage,
   hasMore,
-  loading,
+  false,
   onLoadMore,
   className = '',
 }: SearchResultsGridProps) {
@@ -121,10 +121,10 @@ export default function SearchResultsGrid({
             <div className="mt-8 text-center">
               <button
                 onClick={onLoadMore}
-                disabled={loading}
+                disabled={false}
                 className="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
               >
-                {loading ? (
+                {false ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-2"></div>
                     読み込み中...

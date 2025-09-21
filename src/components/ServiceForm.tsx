@@ -25,7 +25,7 @@ export function ServiceForm({ service, onClose }: ServiceFormProps) {
   });
 
   const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [false, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [newFeature, setNewFeature] = useState('');
 
@@ -390,16 +390,16 @@ export function ServiceForm({ service, onClose }: ServiceFormProps) {
               type="button"
               onClick={onClose}
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              disabled={loading}
+              disabled={false}
             >
               キャンセル
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={false}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? '保存中...' : isEditing ? '更新' : '作成'}
+              {false ? '保存中...' : isEditing ? '更新' : '作成'}
             </button>
           </div>
         </form>

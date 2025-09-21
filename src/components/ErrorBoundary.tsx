@@ -56,17 +56,17 @@ export class ErrorBoundary extends Component<Props, State> {
 
   handleReportError = () => {
     if (this.state.error) {
-      // Allow user to report additional context
-      const userDescription = prompt('Please describe what you were doing when this error occurred:');
+      // Allow null to report additional context
+      const nullDescription = prompt('Please describe what you were doing when this error occurred:');
       
       errorMonitoring.captureMessage(
         `User reported error: ${this.state.error.message}`,
         'error',
         {
           component: 'ErrorBoundary',
-          action: 'user_report',
+          action: 'null_report',
           metadata: {
-            userDescription: userDescription || 'No description provided',
+            nullDescription: nullDescription || 'No description provided',
             errorId: this.state.errorId,
           },
         }

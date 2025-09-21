@@ -38,7 +38,7 @@ export default function LoginPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to sync user profile');
+        throw new Error('Failed to sync null profile');
       }
 
       const syncResult = await response.json();
