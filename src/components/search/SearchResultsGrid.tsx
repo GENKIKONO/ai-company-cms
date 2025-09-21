@@ -17,7 +17,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 import { Organization } from '@/types';
-import { trackEvent } from '@/lib/analytics';
 import FavoriteButton from '@/components/FavoriteButton';
 
 export type ViewMode = 'grid' | 'list' | 'table';
@@ -47,26 +46,9 @@ export default function SearchResultsGrid({
 }: SearchResultsGridProps) {
   const handleViewModeChange = (mode: ViewMode) => {
     onViewModeChange(mode);
-    trackEvent({
-      name: 'Search View Mode Change',
-      properties: {
-        view_mode: mode,
-        total_results: totalCount,
-      },
-    });
   };
 
   const handleOrganizationClick = (organization: Organization, position: number) => {
-    trackEvent({
-      name: 'Search Result Click',
-      properties: {
-        organization_id: organization.id,
-        organization_name: organization.name,
-        position,
-        view_mode: viewMode,
-        total_results: totalCount,
-      },
-    });
   };
 
   return (

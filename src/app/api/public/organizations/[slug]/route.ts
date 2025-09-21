@@ -101,8 +101,7 @@ export async function GET(
         return data;
       },
       apiLogger,
-      { slug },
-      requestId
+      { slug }
     );
 
     if (!organization) {
@@ -142,7 +141,7 @@ export async function GET(
           .from('organizations')
           .update({ 
             last_accessed: new Date().toISOString(),
-            view_count: organization.view_count ? organization.view_count + 1 : 1
+            // view_count: organization.view_count ? organization.view_count + 1 : 1
           })
           .eq('id', organization.id);
       } catch (error) {

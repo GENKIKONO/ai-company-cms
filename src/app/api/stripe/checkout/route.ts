@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-server';
 import { stripe, getLuxuCareProducts, createStripeCustomer } from '@/lib/stripe';
 
 export async function POST(request: NextRequest) {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = supabaseServer();
+    const supabase = supabaseAdmin();
 
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     // Stripe商品を取得
     const products = await getLuxuCareProducts();
     
-    if (!products.setupPrice || !products.monthlyPrice) {
+    if (!products || products.length === 0) {
       return NextResponse.json(
         { error: 'Stripe商品が設定されていません' },
         { status: 500 }

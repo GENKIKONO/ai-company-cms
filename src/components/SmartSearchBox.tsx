@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { smartSearchEngine } from '@/lib/smart-search';
-import { trackEvent } from '@/lib/analytics';
 
 interface SmartSearchBoxProps {
   placeholder?: string;
@@ -74,16 +73,6 @@ export default function SmartSearchBox({
     const parsed = smartSearchEngine.parseQuery(searchQuery);
     
     // Analytics追跡
-    trackEvent({
-      name: 'Smart Search',
-      properties: {
-        query: searchQuery,
-        parsed_intent: parsed.parsed.intent,
-        industries_detected: parsed.parsed.industries,
-        locations_detected: parsed.parsed.locations,
-        has_filters: Object.keys(parsed.filters).length > 0,
-      },
-    });
 
     // フィルターをURLパラメータに変換
     const params = new URLSearchParams();

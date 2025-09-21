@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import { trackEvent } from '@/lib/analytics';
+import { supabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,6 +13,7 @@ export async function GET(request: NextRequest) {
 
     const offset = (page - 1) * limit;
 
+    const supabase = supabaseAdmin();
     let query = supabase
       .from('organizations')
       .select('*', { count: 'exact' })
@@ -52,15 +52,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Track API usage
-    trackEvent({
-      name: 'API Organizations List',
-      properties: {
-        page,
-        limit,
-        total_results: count || 0,
-        has_filters: !!(industry || region || size || search),
-      },
-    });
 
     return NextResponse.json({
       data: data || [],
@@ -113,6 +104,7 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
+    const supabase = supabaseAdmin();
     const { data, error } = await supabase
       .from('organizations')
       .insert([organizationData])
@@ -128,14 +120,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Track creation
-    trackEvent({
-      name: 'API Organization Created',
-      properties: {
-        organization_id: data.id,
-        organization_name: data.name,
-        visibility: data.visibility,
-      },
-    });
 
     return NextResponse.json({ data }, { status: 201 });
 

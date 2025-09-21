@@ -7,7 +7,6 @@ import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from '@heroicons/react
 import { SearchFilters, facetedSearchService, SearchResult } from '@/lib/faceted-search';
 import FacetedSearchPanel from './FacetedSearchPanel';
 import SearchResultsGrid, { ViewMode } from './SearchResultsGrid';
-import { trackEvent } from '@/lib/analytics';
 
 interface AdvancedSearchPageProps {
   searchParams: {
@@ -122,20 +121,6 @@ export default function AdvancedSearchPage({ searchParams }: AdvancedSearchPageP
         setSearchResult(result);
       }
       
-      trackEvent({
-        name: 'Advanced Search Performed',
-        properties: {
-          query: searchFilters.query || '',
-          total_filters: Object.keys(searchFilters).filter(key => {
-            const value = searchFilters[key as keyof SearchFilters];
-            return value !== undefined && value !== null && value !== '';
-          }).length,
-          total_results: result.totalCount,
-          search_time: result.searchTime,
-          page,
-          load_more: loadMore,
-        },
-      });
       
     } catch (error) {
       console.error('Search error:', error);

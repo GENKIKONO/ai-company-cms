@@ -4,8 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Organization } from '@/types';
 import { collaborationService, FieldEdit } from '@/lib/collaboration';
-import { supabase } from '@/lib/supabase';
-import { trackEvent } from '@/lib/analytics';
+import { supabaseClient } from '@/lib/supabase-client';
 import CollaborativeInput from './CollaborativeInput';
 import UserPresenceIndicators from './UserPresenceIndicators';
 import ConflictResolutionModal from './ConflictResolutionModal';
@@ -58,13 +57,6 @@ export default function CollaborativeOrganizationForm({
         });
 
         // Track collaboration start
-        trackEvent({
-          name: 'Collaboration Session Started',
-          properties: {
-            organization_id: organization.id,
-            organization_name: organization.name,
-          },
-        });
 
       } catch (error) {
         console.error('Failed to initialize collaboration:', error);
@@ -104,14 +96,6 @@ export default function CollaborativeOrganizationForm({
       setSaveStatus('saved');
       
       // Track save event
-      trackEvent({
-        name: 'Organization Updated',
-        properties: {
-          organization_id: organization.id,
-          collaboration_enabled: isCollaborationReady,
-          fields_updated: Object.keys(formData).length,
-        },
-      });
 
       // Show success briefly then reset
       setTimeout(() => setSaveStatus('idle'), 2000);

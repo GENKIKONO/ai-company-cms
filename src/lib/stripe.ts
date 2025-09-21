@@ -1,10 +1,16 @@
-// Stripe configuration for future subscription implementation
+// Stripe configuration for subscription implementation
 import { loadStripe } from '@stripe/stripe-js';
+import Stripe from 'stripe';
 
 // Initialize Stripe.js with publishable key
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
+
+// Initialize server-side Stripe
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2023-10-16',
+});
 
 export { stripePromise };
 
@@ -98,6 +104,73 @@ export interface StripeWebhookEvent {
     object: any;
   };
 }
+
+// Helper functions for Stripe operations
+export const getLuxuCareProducts = async () => {
+  try {
+    const products = await stripe.products.list({
+      active: true,
+      expand: ['data.default_price'],
+    });
+    return products.data;
+  } catch (error) {
+    console.error('Error fetching LuxuCare products:', error);
+    return [];
+  }
+};
+
+export const createLuxuCareProducts = async () => {
+  try {
+    const products = [];
+    
+    for (const [planId, plan] of Object.entries(SUBSCRIPTION_PLANS)) {
+      if (planId === 'FREE') continue; // Skip free plan
+      
+      const product = await stripe.products.create({
+        name: plan.name,
+        description: plan.features.join(', '),
+        metadata: {
+          planId: planId.toLowerCase(),
+        },
+      });
+      
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: plan.price * 100, // Convert to cents
+        currency: 'jpy',
+        recurring: {
+          interval: 'month',
+        },
+        metadata: {
+          planId: planId.toLowerCase(),
+        },
+      });
+      
+      products.push({ product, price });
+    }
+    
+    return products;
+  } catch (error) {
+    console.error('Error creating LuxuCare products:', error);
+    throw error;
+  }
+};
+
+export const createStripeCustomer = async (email: string, name?: string) => {
+  try {
+    const customer = await stripe.customers.create({
+      email,
+      name,
+      metadata: {
+        source: 'luxucare_cms',
+      },
+    });
+    return customer;
+  } catch (error) {
+    console.error('Error creating Stripe customer:', error);
+    throw error;
+  }
+};
 
 // Future API routes structure
 /*

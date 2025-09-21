@@ -1,89 +1,43 @@
 import { MetadataRoute } from 'next'
 import { supabaseServer } from '@/lib/supabase-server'
-import { seoI18n } from '@/lib/seo-i18n'
-import { locales } from '@/i18n'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = supabaseServer()
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luxucare.example.com'
   
-  // Generate internationalized basic pages
-  const staticPages: MetadataRoute.Sitemap = []
-  
-  // Add home pages for each locale
-  locales.forEach(locale => {
-    const alternateLanguages: Record<string, string> = {}
-    locales.forEach(altLocale => {
-      alternateLanguages[altLocale] = `${baseUrl}/${altLocale}`
-    })
-    
-    staticPages.push({
-      url: `${baseUrl}/${locale}`,
+  // Generate basic pages
+  const staticPages: MetadataRoute.Sitemap = [
+    {
+      url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
-      alternates: {
-        languages: alternateLanguages,
-      },
-    })
-  })
-  
-  // Add directory pages for each locale
-  locales.forEach(locale => {
-    const alternateLanguages: Record<string, string> = {}
-    locales.forEach(altLocale => {
-      alternateLanguages[altLocale] = `${baseUrl}/${altLocale}/directory`
-    })
-    
-    staticPages.push({
-      url: `${baseUrl}/${locale}/directory`,
+    },
+    {
+      url: `${baseUrl}/organizations`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
-      alternates: {
-        languages: alternateLanguages,
-      },
-    })
-  })
-  
-  // Add search pages for each locale
-  locales.forEach(locale => {
-    const alternateLanguages: Record<string, string> = {}
-    locales.forEach(altLocale => {
-      alternateLanguages[altLocale] = `${baseUrl}/${altLocale}/search`
-    })
-    
-    staticPages.push({
-      url: `${baseUrl}/${locale}/search`,
+    },
+    {
+      url: `${baseUrl}/search`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,
-      alternates: {
-        languages: alternateLanguages,
-      },
-    })
-  })
-
-  // Add additional pages for each locale
-  const additionalPages = ['/favorites', '/compare', '/dashboard', '/api/docs']
-  additionalPages.forEach(page => {
-    locales.forEach(locale => {
-      const alternateLanguages: Record<string, string> = {}
-      locales.forEach(altLocale => {
-        alternateLanguages[altLocale] = `${baseUrl}/${altLocale}${page}`
-      })
-      
-      staticPages.push({
-        url: `${baseUrl}/${locale}${page}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly',
-        priority: page === '/api/docs' ? 0.6 : 0.5,
-        alternates: {
-          languages: alternateLanguages,
-        },
-      })
-    })
-  })
+    },
+    {
+      url: `${baseUrl}/favorites`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/dashboard`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.5,
+    },
+  ]
 
   try {
     // 公開企業の動的ページ
@@ -93,25 +47,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .eq('status', 'published')
       .order('updated_at', { ascending: false })
 
-    // Add organization pages for each locale
+    // Add organization pages
     const organizationPages: MetadataRoute.Sitemap = []
     
     organizations?.forEach((org) => {
-      locales.forEach(locale => {
-        const alternateLanguages: Record<string, string> = {}
-        locales.forEach(altLocale => {
-          alternateLanguages[altLocale] = `${baseUrl}/${altLocale}/o/${org.slug}`
-        })
-        
-        organizationPages.push({
-          url: `${baseUrl}/${locale}/o/${org.slug}`,
-          lastModified: new Date(org.updated_at),
-          changeFrequency: 'weekly' as const,
-          priority: 0.8,
-          alternates: {
-            languages: alternateLanguages,
-          },
-        })
+      organizationPages.push({
+        url: `${baseUrl}/o/${org.slug}`,
+        lastModified: new Date(org.updated_at),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
       })
     })
 

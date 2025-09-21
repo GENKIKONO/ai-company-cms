@@ -294,3 +294,34 @@ export const favorites = {
     return !!data;
   },
 };
+
+// ユーザー設定管理
+export const preferences = {
+  // 設定取得
+  get: async (userId: string) => {
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data || {};
+  },
+
+  // 設定更新
+  update: async (userId: string, preferences: Record<string, any>) => {
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .upsert({
+        user_id: userId,
+        preferences,
+        updated_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+};

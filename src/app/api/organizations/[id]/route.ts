@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import { trackEvent } from '@/lib/analytics';
+import { supabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const supabase = supabaseAdmin();
     const { data, error } = await supabase
       .from('organizations')
       .select('*')
@@ -39,14 +39,6 @@ export async function GET(
     }
 
     // Track API usage
-    trackEvent({
-      name: 'API Organization Retrieved',
-      properties: {
-        organization_id: data.id,
-        organization_name: data.name,
-        visibility: data.visibility,
-      },
-    });
 
     return NextResponse.json({ data });
 
@@ -78,6 +70,7 @@ export async function PUT(
     const { id, created_at, created_by, ...updateData } = body;
     updateData.updated_at = new Date().toISOString();
 
+    const supabase = supabaseAdmin();
     const { data, error } = await supabase
       .from('organizations')
       .update(updateData)
@@ -100,14 +93,6 @@ export async function PUT(
     }
 
     // Track update
-    trackEvent({
-      name: 'API Organization Updated',
-      properties: {
-        organization_id: data.id,
-        organization_name: data.name,
-        fields_updated: Object.keys(updateData).length,
-      },
-    });
 
     return NextResponse.json({ data });
 
@@ -134,6 +119,7 @@ export async function DELETE(
     }
 
     // First, get the organization to track the deletion
+    const supabase = supabaseAdmin();
     const { data: org } = await supabase
       .from('organizations')
       .select('id, name')
@@ -155,13 +141,6 @@ export async function DELETE(
 
     // Track deletion
     if (org) {
-      trackEvent({
-        name: 'API Organization Deleted',
-        properties: {
-          organization_id: org.id,
-          organization_name: org.name,
-        },
-      });
     }
 
     return NextResponse.json({ 

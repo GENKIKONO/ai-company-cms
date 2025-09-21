@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronDownIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { FacetGroup, FacetOption, SearchFilters, facetedSearchService } from '@/lib/faceted-search';
-import { trackEvent } from '@/lib/analytics';
 
 interface FacetedSearchPanelProps {
   facets: FacetGroup[];
@@ -28,39 +27,18 @@ export default function FacetedSearchPanel({
     const newFilters = facetedSearchService.toggleFilter(filters, facetKey, value);
     onFiltersChange(newFilters);
 
-    trackEvent({
-      name: 'Facet Filter Toggle',
-      properties: {
-        facet_group: facetKey,
-        filter_value: value,
-        total_active_filters: countActiveFilters(newFilters),
-      },
-    });
   };
 
   const handleClearFacetGroup = (facetKey: string) => {
     const newFilters = facetedSearchService.clearFacetGroup(filters, facetKey);
     onFiltersChange(newFilters);
 
-    trackEvent({
-      name: 'Facet Group Clear',
-      properties: {
-        facet_group: facetKey,
-        total_active_filters: countActiveFilters(newFilters),
-      },
-    });
   };
 
   const handleClearAllFilters = () => {
     const newFilters = facetedSearchService.clearFilters();
     onFiltersChange(newFilters);
 
-    trackEvent({
-      name: 'All Filters Clear',
-      properties: {
-        previous_filter_count: countActiveFilters(filters),
-      },
-    });
   };
 
   const toggleFacetCollapse = (facetKey: string) => {

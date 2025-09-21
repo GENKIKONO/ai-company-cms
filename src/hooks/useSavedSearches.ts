@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { savedSearches, SavedSearch } from '@/lib/auth';
-import { trackEvent } from '@/lib/analytics';
 
 export function useSavedSearches() {
   const { user } = useAuth();
@@ -45,14 +44,6 @@ export function useSavedSearches() {
       const newSearch = await savedSearches.save(user.id, name, searchParams);
       setSearches(prev => [newSearch, ...prev]);
       
-      trackEvent({
-        name: 'Saved Search Create',
-        properties: {
-          user_id: user.id,
-          search_name: name,
-          filters_count: Object.keys(searchParams).filter(key => searchParams[key as keyof typeof searchParams]).length,
-        },
-      });
 
       return newSearch;
     } catch (err) {
@@ -75,14 +66,6 @@ export function useSavedSearches() {
         search.id === id ? updatedSearch : search
       ));
       
-      trackEvent({
-        name: 'Saved Search Update',
-        properties: {
-          user_id: user.id,
-          search_id: id,
-          fields_updated: Object.keys(updates),
-        },
-      });
 
       return updatedSearch;
     } catch (err) {
@@ -103,13 +86,6 @@ export function useSavedSearches() {
       await savedSearches.delete(id);
       setSearches(prev => prev.filter(search => search.id !== id));
       
-      trackEvent({
-        name: 'Saved Search Delete',
-        properties: {
-          user_id: user.id,
-          search_id: id,
-        },
-      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete search');
       throw err;
@@ -126,14 +102,6 @@ export function useSavedSearches() {
     try {
       const duplicatedSearch = await saveSearch(name, originalSearch.search_params);
       
-      trackEvent({
-        name: 'Saved Search Duplicate',
-        properties: {
-          user_id: user.id,
-          original_search_id: originalSearch.id,
-          new_search_id: duplicatedSearch.id,
-        },
-      });
 
       return duplicatedSearch;
     } catch (err) {
@@ -142,14 +110,6 @@ export function useSavedSearches() {
   };
 
   const applySearch = (search: SavedSearch) => {
-    trackEvent({
-      name: 'Saved Search Apply',
-      properties: {
-        user_id: user?.id,
-        search_id: search.id,
-        search_name: search.name,
-      },
-    });
 
     // URLSearchParamsを構築
     const params = new URLSearchParams();

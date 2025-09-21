@@ -1,6 +1,6 @@
 'use client';
 
-import { supabase } from '@/lib/auth';
+import { supabaseClient } from '@/lib/auth';
 import { Organization } from '@/types';
 
 export interface RecommendationScore {

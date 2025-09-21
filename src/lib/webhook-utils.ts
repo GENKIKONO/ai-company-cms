@@ -1,4 +1,4 @@
-import { supabaseAdmin } from './supabase-server';
+import { supabaseClient } from './supabase-server';
 
 export interface WebhookEvent {
   id: string;
@@ -16,7 +16,7 @@ export class WebhookProcessor {
   private readonly baseRetryDelay = 60000; // 1分
 
   async processFailedEvents(): Promise<{ processed: number; failed: number }> {
-    const supabase = supabaseAdmin();
+    const supabase = supabaseClient();
     
     // 失敗したイベントを取得（リトライ回数が最大に達していないもの）
     const { data: failedEvents, error } = await supabase
@@ -68,7 +68,7 @@ export class WebhookProcessor {
   }
 
   private async retryWebhookEvent(event: WebhookEvent): Promise<boolean> {
-    const supabase = supabaseAdmin();
+    const supabase = supabaseClient();
     
     try {
       // リトライ回数を増加
@@ -157,7 +157,7 @@ export class WebhookProcessor {
   // 以下のメソッドはwebhook route.tsの関数と同じ実装
   private async handleSubscriptionChange(subscription: any): Promise<boolean> {
     try {
-      const supabase = supabaseAdmin();
+      const supabase = supabaseClient();
       const organizationId = subscription.metadata.organization_id;
 
       if (!organizationId) {
@@ -220,7 +220,7 @@ export class WebhookProcessor {
 
   private async handleSubscriptionDeleted(subscription: any): Promise<boolean> {
     try {
-      const supabase = supabaseAdmin();
+      const supabase = supabaseClient();
       const organizationId = subscription.metadata.organization_id;
 
       if (!organizationId) {
@@ -257,7 +257,7 @@ export class WebhookProcessor {
 
   private async handlePaymentFailed(invoice: any): Promise<boolean> {
     try {
-      const supabase = supabaseAdmin();
+      const supabase = supabaseClient();
       
       if (typeof invoice.customer === 'string') {
         const { data: customer } = await supabase

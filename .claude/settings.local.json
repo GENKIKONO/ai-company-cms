@@ -30,7 +30,10 @@
       "Bash(vercel env add:*)",
       "Bash(nslookup:*)",
       "Bash(dig:*)",
-      "Bash(npm run test:production:*)"
+      "Bash(npm run test:production:*)",
+      "Bash(lsof:*)",
+      "Bash(node:*)",
+      "Bash(xargs sed:*)"
     ],
     "deny": [],
     "ask": []

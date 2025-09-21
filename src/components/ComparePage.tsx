@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { trackPageView, trackEvent } from '@/lib/analytics';
 import { Organization } from '@/types';
 
 interface CandidateOrganization {
@@ -35,13 +34,6 @@ export default function ComparePage({ organizations, candidates, selectedIds }: 
       title: '企業比較',
     });
 
-    trackEvent({
-      name: 'Compare Page View',
-      properties: {
-        organizations_count: organizations.length,
-        has_selected_organizations: organizations.length > 0,
-      },
-    });
   }, [organizations.length]);
 
   useEffect(() => {
@@ -64,13 +56,6 @@ export default function ComparePage({ organizations, candidates, selectedIds }: 
     const params = new URLSearchParams({ ids: newIds.join(',') });
     router.push(`/compare?${params.toString()}`);
 
-    trackEvent({
-      name: 'Add to Compare',
-      properties: {
-        organization_id: organizationId,
-        total_comparing: newIds.length,
-      },
-    });
   };
 
   const removeFromCompare = (organizationId: string) => {
@@ -82,13 +67,6 @@ export default function ComparePage({ organizations, candidates, selectedIds }: 
       router.push('/compare');
     }
 
-    trackEvent({
-      name: 'Remove from Compare',
-      properties: {
-        organization_id: organizationId,
-        remaining_comparing: newIds.length,
-      },
-    });
   };
 
   const formatFoundedYear = (founded?: string) => {

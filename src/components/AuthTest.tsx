@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase-client';
 import { getCurrentUser, auth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,7 +34,7 @@ export default function AuthTest() {
       
       if (currentUser) {
         // ロール情報を取得
-        const supabase = createClient();
+        const supabase = supabaseClient;
         const { data: userData } = await supabase
           .from('users')
           .select('role, full_name')
@@ -78,7 +78,7 @@ export default function AuthTest() {
   const testPermissions = async () => {
     if (!user) return;
     
-    const supabase = createClient();
+    const supabase = supabaseClient;
     const results: Record<string, string> = {};
     
     // Test: View organizations

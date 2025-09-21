@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase-client';
 import { type Organization, type Service, type CaseStudy } from '@/types/database';
 
-const supabase = createClient();
+const supabase = supabaseClient;
 
 export interface SearchOptions {
   query?: string;

@@ -16,7 +16,6 @@ import {
   MLInsights, 
   PredictiveModels 
 } from '@/lib/advanced-analytics';
-import { trackEvent } from '@/lib/analytics';
 
 export default function AnalyticsDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'insights' | 'models'>('overview');
@@ -33,13 +32,6 @@ export default function AnalyticsDashboard() {
 
   useEffect(() => {
     // Track analytics dashboard usage
-    trackEvent({
-      name: 'Analytics Dashboard Viewed',
-      properties: {
-        tab: activeTab,
-        time_range: timeRange,
-      },
-    });
   }, [activeTab, timeRange]);
 
   const loadDashboardData = async () => {

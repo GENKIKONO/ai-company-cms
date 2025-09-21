@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase-client';
 import { type Service, type ServiceFormData } from '@/types/database';
 
-const supabase = createClient();
+const supabase = supabaseClient;
 
 export interface GetServicesOptions {
   search?: string;

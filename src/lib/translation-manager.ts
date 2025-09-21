@@ -1,6 +1,6 @@
 'use client';
 
-import { supabase } from '@/lib/supabase';
+import { supabaseClient } from '@/lib/supabase-client';
 import { type Locale, locales } from '@/i18n';
 
 export interface TranslatableContent {

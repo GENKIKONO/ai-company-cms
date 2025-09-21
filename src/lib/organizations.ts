@@ -1,6 +1,6 @@
 'use client';
 
-import { supabase } from '@/lib/auth';
+import { supabaseClient } from '@/lib/auth';
 import { type Organization, type OrganizationFormData } from '@/types/database';
 
 // 企業一覧取得

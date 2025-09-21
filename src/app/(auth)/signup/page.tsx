@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabaseBrowser } from '@/lib/supabase';
+import { supabaseBrowser } from '@/lib/supabase-client';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -32,7 +32,7 @@ export default function SignupPage() {
     }
 
     try {
-      const supabase = supabaseBrowser();
+      const supabase = supabaseBrowser;
       
       const { error: signUpError } = await supabase.auth.signUp({
         email,

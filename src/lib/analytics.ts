@@ -47,36 +47,14 @@ export function trackPageView(data: PageViewEvent) {
 }
 
 // カスタムイベント追跡
-export function trackEvent(event: AnalyticsEvent) {
-  if (typeof window === 'undefined' || !window.plausible) return;
-
-  window.plausible(event.name, {
-    props: event.properties
-  });
 }
 
 // 企業ページアクセス追跡
 export function trackOrganizationView(organizationSlug: string, organizationName: string) {
-  trackEvent({
-    name: 'Organization View',
-    properties: {
-      organization_slug: organizationSlug,
-      organization_name: organizationName,
-      timestamp: Date.now().toString()
-    }
-  });
 }
 
 // 企業情報アクション追跡
 export function trackOrganizationAction(action: string, organizationSlug: string, metadata?: Record<string, string | number>) {
-  trackEvent({
-    name: 'Organization Action',
-    properties: {
-      action,
-      organization_slug: organizationSlug,
-      ...metadata
-    }
-  });
 }
 
 // パフォーマンス指標の追跡
@@ -90,62 +68,24 @@ export function trackPerformanceMetrics() {
   window.addEventListener('load', () => {
     const loadTime = performance.now();
     if (loadTime > 0) {
-      trackEvent({
-        name: 'Page Load Time',
-        properties: {
-          load_time: Math.round(loadTime),
-          page: window.location.pathname
-        }
-      });
     }
   });
 }
 
 // 検索・フィルタリング追跡
 export function trackSearch(query: string, results: number, filters?: Record<string, string>) {
-  trackEvent({
-    name: 'Search',
-    properties: {
-      query,
-      results_count: results,
-      ...filters
-    }
-  });
 }
 
 // フォーム送信追跡
 export function trackFormSubmission(formType: string, success: boolean, errorMessage?: string) {
-  trackEvent({
-    name: 'Form Submission',
-    properties: {
-      form_type: formType,
-      success: success ? 1 : 0,
-      ...(errorMessage && { error_message: errorMessage })
-    }
-  });
 }
 
 // ダウンロード追跡
 export function trackDownload(fileType: string, fileName: string, organizationSlug?: string) {
-  trackEvent({
-    name: 'Download',
-    properties: {
-      file_type: fileType,
-      file_name: fileName,
-      ...(organizationSlug && { organization_slug: organizationSlug })
-    }
-  });
 }
 
 // 外部リンククリック追跡
 export function trackExternalLink(url: string, organizationSlug?: string) {
-  trackEvent({
-    name: 'External Link Click',
-    properties: {
-      url,
-      ...(organizationSlug && { organization_slug: organizationSlug })
-    }
-  });
 }
 
 // デバイスタイプ判定
@@ -167,39 +107,14 @@ function getDeviceType(): 'desktop' | 'mobile' | 'tablet' {
 
 // エラー追跡
 export function trackError(error: Error, context?: string) {
-  trackEvent({
-    name: 'Error',
-    properties: {
-      error_message: error.message,
-      error_stack: error.stack?.substring(0, 500) || '',
-      context: context || 'unknown',
-      page: typeof window !== 'undefined' ? window.location.pathname : ''
-    }
-  });
 }
 
 // A/Bテスト追跡
 export function trackABTest(testName: string, variant: string, organizationSlug?: string) {
-  trackEvent({
-    name: 'AB Test',
-    properties: {
-      test_name: testName,
-      variant,
-      ...(organizationSlug && { organization_slug: organizationSlug })
-    }
-  });
 }
 
 // コンバージョン追跡
 export function trackConversion(type: string, value?: number, organizationSlug?: string) {
-  trackEvent({
-    name: 'Conversion',
-    properties: {
-      conversion_type: type,
-      ...(value && { value }),
-      ...(organizationSlug && { organization_slug: organizationSlug })
-    }
-  });
 }
 
 // セッション情報の追跡
@@ -214,10 +129,6 @@ export function trackSessionInfo() {
     device_type: getDeviceType()
   };
 
-  trackEvent({
-    name: 'Session Info',
-    properties: sessionData
-  });
 }
 
 // Plausible Analytics の設定

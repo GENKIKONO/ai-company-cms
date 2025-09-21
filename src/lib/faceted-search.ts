@@ -1,7 +1,7 @@
 'use client';
 
 import { Organization } from '@/types';
-import { supabase } from '@/lib/supabase';
+import { supabaseClient } from '@/lib/supabase-client';
 
 export interface FacetOption {
   value: string;

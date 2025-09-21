@@ -1,6 +1,6 @@
 'use client';
 
-import { supabase } from '@/lib/supabase';
+import { supabaseClient } from '@/lib/supabase-client';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface CollaborationUser {

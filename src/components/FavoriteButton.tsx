@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useFavorites } from '@/hooks/useFavorites';
-import { trackEvent } from '@/lib/analytics';
 
 interface Props {
   organization: {
@@ -44,14 +43,6 @@ export default function FavoriteButton({
     setTimeout(() => setIsAnimating(false), 300);
     
     // Analytics追跡
-    trackEvent({
-      name: wasFavorite ? 'Remove from Favorites' : 'Add to Favorites',
-      properties: {
-        organization_id: organization.id,
-        organization_name: organization.name,
-        action: wasFavorite ? 'remove' : 'add',
-      },
-    });
   };
 
   if (!isClient) {

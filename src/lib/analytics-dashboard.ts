@@ -1,6 +1,6 @@
 'use client';
 
-import { supabase } from '@/lib/auth';
+import { supabaseClient } from '@/lib/auth';
 
 export interface AnalyticsMetrics {
   // 基本統計

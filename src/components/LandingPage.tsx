@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { trackPageView, trackEvent } from '@/lib/analytics';
 import { Organization } from '@/types';
 
 interface Stats {
@@ -26,35 +25,12 @@ export default function LandingPage({ stats }: Props) {
       title: 'LuxuCare - AI企業ディレクトリ',
     });
 
-    trackEvent({
-      name: 'Landing Page View',
-      properties: {
-        total_organizations: stats.totalOrganizations,
-        total_partners: stats.totalPartners,
-        total_industries: stats.totalIndustries,
-      },
-    });
   }, [stats]);
 
   const handleCTAClick = (action: string) => {
-    trackEvent({
-      name: 'Landing Page CTA Click',
-      properties: {
-        action,
-        organizations_count: stats.totalOrganizations,
-      },
-    });
   };
 
   const handleOrganizationClick = (organization: Organization) => {
-    trackEvent({
-      name: 'Featured Organization Click',
-      properties: {
-        organization_id: organization.id,
-        organization_name: organization.name,
-        from_section: 'featured_organizations',
-      },
-    });
   };
 
   return (

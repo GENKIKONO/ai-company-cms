@@ -36,3 +36,5 @@ export const supabaseAdmin = () =>
       },
     }
   );
+
+export const supabaseClient = supabaseServer;

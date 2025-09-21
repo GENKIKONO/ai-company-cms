@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { facetedSearchService, SearchFilters } from '@/lib/faceted-search';
-import { trackEvent } from '@/lib/analytics';
 
 export async function GET(request: NextRequest) {
   try {
@@ -70,20 +69,6 @@ export async function GET(request: NextRequest) {
     );
 
     // Track search API usage
-    trackEvent({
-      name: 'API Faceted Search',
-      properties: {
-        query: filters.query || '',
-        total_filters: Object.keys(filters).filter(key => {
-          const value = filters[key as keyof SearchFilters];
-          return value !== undefined && value !== null && value !== '';
-        }).length,
-        total_results: searchResult.totalCount,
-        search_time: searchResult.searchTime,
-        page,
-        limit,
-      },
-    });
 
     return NextResponse.json({
       data: {

@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase-client';
 import { type CaseStudy, type CaseStudyFormData } from '@/types/database';
 
-const supabase = createClient();
+const supabase = supabaseClient;
 
 export interface GetCaseStudiesOptions {
   search?: string;
