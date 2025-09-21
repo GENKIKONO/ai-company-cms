@@ -1,17 +1,18 @@
 import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import DirectoryPage from '@/components/DirectoryPage';
+import { generateMetadata as generateLocalizedMetadata } from '@/lib/metadata';
+import { Locale } from '@/i18n';
 
-export const metadata: Metadata = {
-  title: '企業ディレクトリ | LuxuCare',
-  description: 'LuxuCareに登録されている企業の一覧です。業界、地域、企業規模で検索・フィルタリングができます。',
-  keywords: '企業ディレクトリ, 企業一覧, 企業検索, ビジネス, LuxuCare',
-  openGraph: {
-    title: '企業ディレクトリ | LuxuCare',
-    description: 'LuxuCareに登録されている企業の一覧です。業界、地域、企業規模で検索・フィルタリングができます。',
-    type: 'website',
-  },
-};
+export async function generateMetadata({ params: { locale } }: { params: { locale: Locale } }): Promise<Metadata> {
+  const t = await getTranslations();
+  return generateLocalizedMetadata(
+    locale,
+    `${t('navigation.directory')} | LuxuCare`,
+    t('directory.meta.description')
+  );
+}
 
 interface SearchParams {
   q?: string;
@@ -27,10 +28,14 @@ interface SearchParams {
 }
 
 interface Props {
+  params: {
+    locale: Locale;
+  };
   searchParams: SearchParams;
 }
 
-export default async function DirectoryIndexPage({ searchParams }: Props) {
+export default async function DirectoryIndexPage({ params: { locale }, searchParams }: Props) {
+  const t = await getTranslations();
   const supabase = supabaseServer();
   
   // 検索パラメータの処理
@@ -193,8 +198,8 @@ export default async function DirectoryIndexPage({ searchParams }: Props) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">エラーが発生しました</h1>
-          <p className="text-gray-600">企業情報の取得に失敗しました。</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('common.error')}</h1>
+          <p className="text-gray-600">{t('directory.error.fetchFailed')}</p>
         </div>
       </div>
     );
@@ -204,14 +209,15 @@ export default async function DirectoryIndexPage({ searchParams }: Props) {
 
   return (
     <DirectoryPage
+      locale={locale}
       organizations={organizations || []}
       filters={{
         industries,
         regions,
         sizes: [
-          { value: 'small', label: '小企業（50名以下）' },
-          { value: 'medium', label: '中企業（51-300名）' },
-          { value: 'large', label: '大企業（301名以上）' },
+          { value: 'small', label: t('directory.filters.size.small') },
+          { value: 'medium', label: t('directory.filters.size.medium') },
+          { value: 'large', label: t('directory.filters.size.large') },
         ],
       }}
       currentFilters={{

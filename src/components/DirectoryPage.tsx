@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { trackPageView, trackEvent } from '@/lib/analytics';
 import { Organization } from '@/types';
+import { Locale } from '@/i18n';
 import FavoriteButton from '@/components/FavoriteButton';
 import UserMenu from '@/components/auth/UserMenu';
 import AuthModal from '@/components/auth/AuthModal';
@@ -34,6 +36,7 @@ interface Pagination {
 }
 
 interface Props {
+  locale: Locale;
   organizations: Organization[];
   filters: FilterOptions;
   currentFilters: CurrentFilters;
@@ -41,11 +44,13 @@ interface Props {
 }
 
 export default function DirectoryPage({
+  locale,
   organizations,
   filters,
   currentFilters,
   pagination,
 }: Props) {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
@@ -97,7 +102,7 @@ export default function DirectoryPage({
       params.delete('page');
     }
 
-    router.push(`/directory?${params.toString()}`);
+    router.push(`/${locale}/directory?${params.toString()}`);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -274,7 +279,7 @@ export default function DirectoryPage({
                   }}
                   className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="">すべての業界</option>
+                  <option value="">{t('directory.filters.industry.all')}</option>
                   {filters.industries.map((industry) => (
                     <option key={industry} value={industry}>
                       {industry}
@@ -297,7 +302,7 @@ export default function DirectoryPage({
                   }}
                   className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="">すべての地域</option>
+                  <option value="">{t('directory.filters.region.all')}</option>
                   {filters.regions.map((region) => (
                     <option key={region} value={region}>
                       {region}
@@ -320,7 +325,7 @@ export default function DirectoryPage({
                   }}
                   className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="">すべての規模</option>
+                  <option value="">{t('directory.filters.size.all')}</option>
                   {filters.sizes.map((size) => (
                     <option key={size.value} value={size.value}>
                       {size.label}
