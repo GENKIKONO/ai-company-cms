@@ -1,7 +1,3 @@
-const createNextIntlPlugin = require('next-intl/plugin');
-
-const withNextIntl = createNextIntlPlugin();
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // 画像最適化設定
@@ -38,16 +34,16 @@ const nextConfig = {
     return [
       {
         source: '/org/:slug',
-        destination: '/o/:slug',
+        destination: '/organizations/:slug',
         permanent: true,
       },
     ];
   },
 
-  // 実験的機能（Next.js 14では不要になったappDirを削除）
+  // 実験的機能
   experimental: {
     serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
 };
 
-module.exports = withNextIntl(nextConfig);
+module.exports = nextConfig;
