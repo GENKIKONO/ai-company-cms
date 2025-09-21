@@ -1,0 +1,90 @@
+{
+  "common": {
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "create": "Créer",
+    "update": "Mettre à jour",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "close": "Fermer",
+    "submit": "Soumettre",
+    "copy": "Copier",
+    "copied": "Copié",
+    "retry": "Réessayer"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "directory": "Répertoire",
+    "search": "Recherche Avancée",
+    "api": "API",
+    "favorites": "Favoris",
+    "compare": "Comparer",
+    "dashboard": "Tableau de bord",
+    "analytics": "Analyses",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "homepage": {
+    "title": "Système de Gestion d'Entreprise alimenté par l'IA",
+    "subtitle": "CMS d'entreprise optimisé SEO avec support de données structurées JSON-LD. Extraction de texte alimentée par l'IA pour une création de contenu efficace.",
+    "searchPlaceholder": "Rechercher des entreprises avec l'IA (ex: entreprises IT de Paris, nouvelles startups)",
+    "viewDirectory": "📁 Voir le Répertoire d'Entreprises",
+    "loginDashboard": "🚀 Se connecter au Tableau de bord",
+    "mainFeatures": "Fonctionnalités Principales",
+    "recommendedCompanies": "Entreprises Recommandées",
+    "viewAllCompanies": "Voir Toutes les Entreprises",
+    "techStack": "Stack Technologique",
+    "getStarted": "Commencer Aujourd'hui",
+    "demoDescription": "Explorez notre démo pour voir les fonctionnalités en action"
+  },
+  "search": {
+    "advancedSearch": "Recherche Avancée",
+    "filters": "Filtres",
+    "results": "résultats",
+    "noResults": "Aucun résultat trouvé",
+    "searchTime": "Temps de recherche",
+    "clearFilters": "Effacer les filtres",
+    "industry": "Industrie",
+    "region": "Région",
+    "size": "Taille d'Entreprise",
+    "technologies": "Stack Technologique",
+    "features": "Fonctionnalités Disponibles",
+    "status": "Statut"
+  },
+  "organization": {
+    "basicInfo": "Informations de Base",
+    "contactInfo": "Informations de Contact",
+    "additionalInfo": "Informations Supplémentaires",
+    "name": "Nom de l'Organisation",
+    "description": "Description",
+    "website": "Site Web",
+    "email": "Adresse Email",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "industry": "Industrie",
+    "technologies": "Stack Technologique",
+    "services": "Services",
+    "employeeCount": "Nombre d'Employés",
+    "foundedYear": "Année de Fondation"
+  },
+  "errors": {
+    "notFound": "Page non trouvée",
+    "serverError": "Erreur du serveur",
+    "unauthorized": "Accès refusé",
+    "networkError": "Erreur réseau",
+    "validationError": "Entrée invalide",
+    "sessionExpired": "Session expirée"
+  },
+  "footer": {
+    "description": "Système de Gestion d'Information d'Entreprise alimenté par l'IA",
+    "copyright": "© 2024 LuxuCare. Construit avec Next.js, Supabase et Stripe."
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "common": {
+    "search": "Suchen",
+    "loading": "Lädt...",
+    "error": "Ein Fehler ist aufgetreten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "view": "Anzeigen",
+    "create": "Erstellen",
+    "update": "Aktualisieren",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Vorherige",
+    "close": "Schließen",
+    "submit": "Senden",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "retry": "Wiederholen"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "directory": "Verzeichnis",
+    "search": "Erweiterte Suche",
+    "api": "API",
+    "favorites": "Favoriten",
+    "compare": "Vergleichen",
+    "dashboard": "Dashboard",
+    "analytics": "Analysen",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "homepage": {
+    "title": "KI-gestütztes Unternehmens-Informationssystem",
+    "subtitle": "SEO-optimiertes Unternehmens-CMS mit JSON-LD strukturierten Daten. KI-gestützte Textextraktion für effiziente Inhaltserstellung.",
+    "searchPlaceholder": "Unternehmen mit KI suchen (z.B.: IT-Unternehmen in Berlin, neue Startups)",
+    "viewDirectory": "📁 Unternehmensverzeichnis anzeigen",
+    "loginDashboard": "🚀 Zum Dashboard anmelden",
+    "mainFeatures": "Hauptfunktionen",
+    "recommendedCompanies": "Empfohlene Unternehmen",
+    "viewAllCompanies": "Alle Unternehmen anzeigen",
+    "techStack": "Technologie-Stack",
+    "getStarted": "Heute beginnen",
+    "demoDescription": "Erkunden Sie unsere Demo, um die Funktionen in Aktion zu sehen"
+  },
+  "search": {
+    "advancedSearch": "Erweiterte Suche",
+    "filters": "Filter",
+    "results": "Ergebnisse",
+    "noResults": "Keine Suchergebnisse gefunden",
+    "searchTime": "Suchzeit",
+    "clearFilters": "Filter löschen",
+    "industry": "Branche",
+    "region": "Region",
+    "size": "Unternehmensgröße",
+    "technologies": "Technologie-Stack",
+    "features": "Verfügbare Funktionen",
+    "status": "Status"
+  },
+  "organization": {
+    "basicInfo": "Grundinformationen",
+    "contactInfo": "Kontaktinformationen",
+    "additionalInfo": "Zusätzliche Informationen",
+    "name": "Organisationsname",
+    "description": "Beschreibung",
+    "website": "Website",
+    "email": "E-Mail-Adresse",
+    "phone": "Telefonnummer",
+    "address": "Adresse",
+    "industry": "Branche",
+    "technologies": "Technologie-Stack",
+    "services": "Dienstleistungen",
+    "employeeCount": "Mitarbeiterzahl",
+    "foundedYear": "Gründungsjahr"
+  },
+  "errors": {
+    "notFound": "Seite nicht gefunden",
+    "serverError": "Serverfehler aufgetreten",
+    "unauthorized": "Zugriff verweigert",
+    "networkError": "Netzwerkfehler aufgetreten",
+    "validationError": "Ungültige Eingabe",
+    "sessionExpired": "Sitzung abgelaufen"
+  },
+  "footer": {
+    "description": "KI-gestütztes Unternehmens-Informationssystem",
+    "copyright": "© 2024 LuxuCare. Erstellt mit Next.js, Supabase und Stripe."
+  }
+}

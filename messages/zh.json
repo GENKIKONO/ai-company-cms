@@ -1,0 +1,127 @@
+{
+  "common": {
+    "search": "搜索",
+    "loading": "加载中...",
+    "error": "发生错误",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "view": "查看",
+    "create": "创建",
+    "update": "更新",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "close": "关闭",
+    "submit": "提交",
+    "copy": "复制",
+    "copied": "已复制",
+    "retry": "重试"
+  },
+  "navigation": {
+    "home": "首页",
+    "directory": "企业目录",
+    "search": "高级搜索",
+    "api": "API",
+    "favorites": "收藏夹",
+    "compare": "企业对比",
+    "dashboard": "仪表板",
+    "analytics": "分析",
+    "profile": "个人资料",
+    "settings": "设置",
+    "logout": "退出"
+  },
+  "homepage": {
+    "title": "AI驱动的企业信息管理系统",
+    "subtitle": "支持JSON-LD结构化数据的SEO优化企业CMS。AI驱动的文本提取功能，实现高效内容创建。",
+    "searchPlaceholder": "使用AI搜索企业（例如：东京IT企业，新兴创业公司）",
+    "viewDirectory": "📁 查看企业目录",
+    "loginDashboard": "🚀 登录仪表板",
+    "mainFeatures": "主要功能",
+    "recommendedCompanies": "推荐企业",
+    "viewAllCompanies": "查看所有企业",
+    "techStack": "技术栈",
+    "getStarted": "立即开始",
+    "demoDescription": "探索我们的演示以查看功能实际操作"
+  },
+  "features": {
+    "organizationManagement": {
+      "title": "企业信息管理",
+      "description": "集中管理企业信息、服务、案例研究和常见问题。支持实时预览编辑功能。"
+    },
+    "seoOptimization": {
+      "title": "SEO优化",
+      "description": "自动生成JSON-LD结构化数据，支持OGP，创建搜索引擎优化页面。"
+    },
+    "aiAssistance": {
+      "title": "AI输入辅助",
+      "description": "从PDF和URL自动提取文本，生成候选数据以实现一键输入。"
+    },
+    "subscription": {
+      "title": "订阅管理",
+      "description": "通过Stripe集成实现安全支付处理。通过活跃订阅进行发布管理。"
+    },
+    "approvalFlow": {
+      "title": "审批流程",
+      "description": "基于电子邮件通知的审批系统。简化合作伙伴确认和审批流程。"
+    },
+    "monitoring": {
+      "title": "监控与分析",
+      "description": "性能监控、错误通知和访问分析，支持持续改进。"
+    }
+  },
+  "search": {
+    "advancedSearch": "高级搜索",
+    "filters": "筛选器",
+    "results": "个结果",
+    "noResults": "未找到搜索结果",
+    "searchTime": "搜索时间",
+    "clearFilters": "清除筛选器",
+    "industry": "行业",
+    "region": "地区",
+    "size": "企业规模",
+    "technologies": "技术栈",
+    "features": "可用功能",
+    "status": "状态",
+    "websiteAvailable": "有网站",
+    "logoAvailable": "有标志",
+    "servicesAvailable": "有服务信息",
+    "caseStudiesAvailable": "有案例研究",
+    "verified": "已验证",
+    "recentlyUpdated": "最近更新"
+  },
+  "organization": {
+    "basicInfo": "基本信息",
+    "contactInfo": "联系信息",
+    "additionalInfo": "附加信息",
+    "name": "组织名称",
+    "description": "描述",
+    "website": "网站",
+    "email": "电子邮件",
+    "phone": "电话号码",
+    "address": "地址",
+    "industry": "行业",
+    "technologies": "技术栈",
+    "services": "服务",
+    "employeeCount": "员工人数",
+    "foundedYear": "成立年份",
+    "realtimeEdit": "实时编辑",
+    "saveChanges": "保存更改",
+    "saving": "保存中...",
+    "saved": "已保存",
+    "saveError": "保存错误"
+  },
+  "errors": {
+    "notFound": "页面未找到",
+    "serverError": "服务器错误",
+    "unauthorized": "访问被拒绝",
+    "networkError": "网络错误",
+    "validationError": "输入无效",
+    "sessionExpired": "会话已过期"
+  },
+  "footer": {
+    "description": "AI驱动的企业信息管理系统",
+    "copyright": "© 2024 LuxuCare. 使用 Next.js、Supabase 和 Stripe 构建。"
+  }
+}

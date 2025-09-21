@@ -1,0 +1,184 @@
+{
+  "common": {
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "create": "Create",
+    "update": "Update",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "submit": "Submit",
+    "copy": "Copy",
+    "copied": "Copied",
+    "retry": "Retry"
+  },
+  "navigation": {
+    "home": "Home",
+    "directory": "Directory",
+    "search": "Advanced Search",
+    "api": "API",
+    "favorites": "Favorites",
+    "compare": "Compare",
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "homepage": {
+    "title": "AI-Powered Enterprise Information Management",
+    "subtitle": "SEO-optimized enterprise CMS with JSON-LD structured data support. AI-powered text extraction for efficient content creation.",
+    "searchPlaceholder": "Search companies with AI (e.g., Tokyo IT companies, new startups)",
+    "viewDirectory": "📁 View Company Directory",
+    "loginDashboard": "🚀 Login to Dashboard",
+    "mainFeatures": "Key Features",
+    "recommendedCompanies": "Recommended Companies",
+    "viewAllCompanies": "View All Companies",
+    "techStack": "Technology Stack",
+    "getStarted": "Get Started Today",
+    "demoDescription": "Explore our demo to see the features in action"
+  },
+  "features": {
+    "organizationManagement": {
+      "title": "Organization Management",
+      "description": "Centrally manage company information, services, case studies, and FAQs. Edit with real-time preview capabilities."
+    },
+    "seoOptimization": {
+      "title": "SEO Optimization",
+      "description": "Automatic JSON-LD structured data generation, OGP support, and search engine optimized page creation."
+    },
+    "aiAssistance": {
+      "title": "AI Input Assistance",
+      "description": "Automatic text extraction from PDFs and URLs, generating candidate data for one-click input."
+    },
+    "subscription": {
+      "title": "Subscription Management",
+      "description": "Secure payment processing via Stripe integration. Publication management through active subscriptions."
+    },
+    "approvalFlow": {
+      "title": "Approval Workflow",
+      "description": "Email notification-based approval system. Streamlined partner confirmation and approval processes."
+    },
+    "monitoring": {
+      "title": "Monitoring & Analytics",
+      "description": "Performance monitoring, error notifications, and access analytics for continuous improvement."
+    }
+  },
+  "search": {
+    "advancedSearch": "Advanced Search",
+    "filters": "Filters",
+    "results": "results",
+    "noResults": "No search results found",
+    "searchTime": "Search time",
+    "clearFilters": "Clear filters",
+    "industry": "Industry",
+    "region": "Region",
+    "size": "Company Size",
+    "technologies": "Technology Stack",
+    "features": "Available Features",
+    "status": "Status",
+    "websiteAvailable": "Website Available",
+    "logoAvailable": "Logo Available",
+    "servicesAvailable": "Services Available",
+    "caseStudiesAvailable": "Case Studies Available",
+    "verified": "Verified",
+    "recentlyUpdated": "Recently Updated"
+  },
+  "organization": {
+    "basicInfo": "Basic Information",
+    "contactInfo": "Contact Information",
+    "additionalInfo": "Additional Information",
+    "name": "Organization Name",
+    "description": "Description",
+    "website": "Website",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "address": "Address",
+    "industry": "Industry",
+    "technologies": "Technology Stack",
+    "services": "Services",
+    "employeeCount": "Employee Count",
+    "foundedYear": "Founded Year",
+    "realtimeEdit": "Real-time Edit",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "saveError": "Save Error"
+  },
+  "collaboration": {
+    "editingInProgress": "Editing in progress... Changes are shared in real-time with other users",
+    "userEditing": "{userName} is editing",
+    "updatedBy": "Updated by {userName}",
+    "viewersOnline": "{count} viewers online",
+    "conflictDetected": "Edit conflict detected",
+    "conflictDescription": "Multiple users are editing the same field simultaneously. Please select which changes to apply.",
+    "selectChanges": "Apply selected changes",
+    "applyLatest": "Apply all latest versions",
+    "latest": "Latest",
+    "realtimeCollaboration": "Real-time collaboration is enabled",
+    "initializingCollaboration": "Initializing real-time collaboration..."
+  },
+  "analytics": {
+    "dashboard": "Analytics Dashboard",
+    "advancedDashboard": "Advanced Analytics Dashboard",
+    "platformStats": "LuxuCare Platform Statistics",
+    "mlInsights": "Machine Learning Predictive Analytics and Insights",
+    "overview": "Overview",
+    "insights": "ML Insights",
+    "models": "Predictive Models",
+    "totalOrganizations": "Total Organizations",
+    "activeOrganizations": "Active Organizations",
+    "totalSearches": "Total Searches",
+    "avgResponseTime": "Average Response Time",
+    "dailyActiveUsers": "Daily Active Users",
+    "averageSessionTime": "Average Session Duration",
+    "bounceRate": "Bounce Rate",
+    "marketTrends": "Market Trends",
+    "industryPredictions": "Industry Predictions",
+    "searchPatterns": "Search Pattern Analysis",
+    "anomalies": "Anomaly Detection",
+    "highImpact": "High Impact",
+    "mediumImpact": "Medium Impact",
+    "lowImpact": "Low Impact",
+    "confidence": "Confidence",
+    "predictedGrowth": "Predicted Growth",
+    "timeframe": "Timeframe",
+    "3months": "3 months",
+    "6months": "6 months",
+    "1year": "1 year",
+    "modelPerformance": "Model Performance Trends"
+  },
+  "api": {
+    "documentation": "API Documentation",
+    "overview": "Overview",
+    "authentication": "Authentication",
+    "organizationsApi": "Organizations API",
+    "searchApi": "Search API",
+    "realtimeApi": "Real-time API",
+    "sdk": "SDK",
+    "baseUrl": "Base URL",
+    "rateLimit": "Rate Limiting",
+    "errorHandling": "Error Handling",
+    "codeExamples": "Code Examples",
+    "tryIt": "Try It"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "serverError": "Server error occurred",
+    "unauthorized": "Access denied",
+    "networkError": "Network error occurred",
+    "validationError": "Invalid input",
+    "sessionExpired": "Session expired"
+  },
+  "footer": {
+    "description": "AI-Powered Enterprise Information Management System",
+    "copyright": "© 2024 LuxuCare. Built with Next.js, Supabase, and Stripe."
+  }
+}
