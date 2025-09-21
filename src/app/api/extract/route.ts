@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { JSDOM } from 'jsdom';
-import pdfParse from 'pdf-parse';
 
 interface ExtractionResult {
   title?: string;
@@ -95,33 +94,8 @@ async function extractFromURL(url: string): Promise<ExtractionResult> {
 }
 
 async function extractFromPDF(buffer: Buffer): Promise<ExtractionResult> {
-  try {
-    const data = await pdfParse(buffer);
-    const text = data.text;
-    
-    const lines = text.split('\n').filter(line => line.trim().length > 0);
-    const title = lines.find(line => line.length > 5 && line.length < 100) || lines[0];
-    
-    const phones = extractPhoneNumbers(text);
-    const emails = extractEmails(text);
-    const addresses = extractAddresses(text);
-    
-    // Extract potential description (first paragraph-like content)
-    const paragraphs = text.split('\n\n').filter(p => p.trim().length > 50);
-    const description = paragraphs[0]?.substring(0, 300);
-    
-    return {
-      title: title?.trim(),
-      description: description?.trim(),
-      content: text.substring(0, 1000),
-      telephone: phones[0],
-      email: emails[0],
-      address: addresses[0]
-    };
-  } catch (error) {
-    console.error('PDF extraction error:', error);
-    throw new Error('PDFからの情報抽出に失敗しました');
-  }
+  // PDF解析は一時的に無効化（ライブラリの問題により）
+  throw new Error('PDF解析機能は現在メンテナンス中です。URLからの抽出をご利用ください。');
 }
 
 export async function POST(request: NextRequest) {
