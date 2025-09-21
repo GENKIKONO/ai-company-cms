@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export default function HomePage() {
   return (
@@ -14,11 +13,11 @@ export default function HomePage() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/auth/login">
-                <Button variant="outline">ログイン</Button>
+              <Link href="/auth/login" className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                ログイン
               </Link>
-              <Link href="/auth/signup">
-                <Button>無料で始める</Button>
+              <Link href="/auth/signup" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                無料で始める
               </Link>
             </div>
           </div>
@@ -40,15 +39,11 @@ export default function HomePage() {
                 検索機能やデータ分析で、ビジネスの成長をサポートします。
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/auth/signup">
-                  <Button size="lg" className="w-full sm:w-auto">
-                    無料で始める
-                  </Button>
+                <Link href="/auth/signup" className="px-8 py-3 bg-blue-600 text-white text-lg rounded-lg hover:bg-blue-700 text-center">
+                  無料で始める
                 </Link>
-                <Link href="/organizations">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                    企業ディレクトリを見る
-                  </Button>
+                <Link href="/organizations" className="px-8 py-3 border border-gray-300 text-gray-700 text-lg rounded-lg hover:bg-gray-50 text-center">
+                  企業ディレクトリを見る
                 </Link>
               </div>
             </div>
@@ -155,10 +150,8 @@ export default function HomePage() {
             <p className="text-xl text-blue-100 mb-8">
               無料プランでLuxuCare AI企業CMSの機能をお試しください
             </p>
-            <Link href="/auth/signup">
-              <Button size="lg" variant="secondary">
-                無料アカウント作成
-              </Button>
+            <Link href="/auth/signup" className="px-8 py-3 bg-white text-blue-600 text-lg rounded-lg hover:bg-gray-100">
+              無料アカウント作成
             </Link>
           </div>
         </section>

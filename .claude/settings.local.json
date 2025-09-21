@@ -29,7 +29,8 @@
       "Bash(pkill:*)",
       "Bash(vercel env add:*)",
       "Bash(nslookup:*)",
-      "Bash(dig:*)"
+      "Bash(dig:*)",
+      "Bash(npm run test:production:*)"
     ],
     "deny": [],
     "ask": []
