@@ -27,7 +27,9 @@
       "Bash(git commit:*)",
       "Bash(openssl rand:*)",
       "Bash(pkill:*)",
-      "Bash(vercel env add:*)"
+      "Bash(vercel env add:*)",
+      "Bash(nslookup:*)",
+      "Bash(dig:*)"
     ],
     "deny": [],
     "ask": []
