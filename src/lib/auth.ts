@@ -1,47 +1,48 @@
 'use client';
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { User } from '@supabase/supabase-js';
+import { type AppUser, type UserRole } from '@/types/database';
 
-export const supabase = createClientComponentClient();
+export const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-export interface UserProfile {
-  id: string;
-  email: string;
-  full_name?: string;
-  avatar_url?: string;
-  created_at: string;
-  updated_at: string;
+// ユーザーの権限をチェック
+export function hasPermission(userRole: UserRole, requiredRole: UserRole): boolean {
+  const roleHierarchy: Record<UserRole, number> = {
+    viewer: 1,
+    editor: 2,
+    admin: 3
+  }
+
+  return roleHierarchy[userRole] >= roleHierarchy[requiredRole]
 }
 
-export interface SavedSearch {
-  id: string;
-  user_id: string;
-  name: string;
-  search_params: {
-    query?: string;
-    industry?: string;
-    region?: string;
-    size?: string;
-    founded?: string;
-    has_url?: boolean;
-    has_logo?: boolean;
-    has_services?: boolean;
-    has_case_studies?: boolean;
-  };
-  created_at: string;
-  updated_at: string;
-}
+// 現在のユーザー情報を取得
+export async function getCurrentUser(): Promise<AppUser | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) return null
 
-export interface UserPreferences {
-  id: string;
-  user_id: string;
-  email_notifications: boolean;
-  favorite_industries: string[];
-  default_search_filters: SavedSearch['search_params'];
-  language: 'ja' | 'en';
-  created_at: string;
-  updated_at: string;
+    const { data: profile, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (error) {
+      console.error('Error fetching user profile:', error)
+      return null
+    }
+
+    return profile
+  } catch (error) {
+    console.error('Error getting current user:', error)
+    return null
+  }
 }
 
 // 認証関連の関数
@@ -59,6 +60,23 @@ export const auth = {
     });
 
     if (error) throw error;
+
+    // プロフィール情報を作成
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from('users')
+        .insert({
+          id: data.user.id,
+          email: data.user.email!,
+          full_name: fullName,
+          role: 'viewer'
+        })
+
+      if (profileError) {
+        console.error('Error creating user profile:', profileError)
+      }
+    }
+
     return data;
   },
 
@@ -108,6 +126,20 @@ export const auth = {
     return user;
   },
 
+  // プロフィール更新
+  updateProfile: async (updates: Partial<AppUser>) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) throw new Error('Not authenticated')
+
+    const { error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', user.id)
+
+    if (error) throw error
+  },
+
   // 認証状態の監視
   onAuthStateChange: (callback: (event: string, session: any) => void) => {
     return supabase.auth.onAuthStateChange(callback);
@@ -117,9 +149,9 @@ export const auth = {
 // プロフィール管理
 export const profile = {
   // プロフィール取得
-  get: async (userId: string): Promise<UserProfile | null> => {
+  get: async (userId: string): Promise<AppUser | null> => {
     const { data, error } = await supabase
-      .from('user_profiles')
+      .from('users')
       .select('*')
       .eq('id', userId)
       .single();
@@ -133,14 +165,14 @@ export const profile = {
   },
 
   // プロフィール更新
-  update: async (userId: string, updates: Partial<UserProfile>) => {
+  update: async (userId: string, updates: Partial<AppUser>) => {
     const { data, error } = await supabase
-      .from('user_profiles')
-      .upsert({
-        id: userId,
+      .from('users')
+      .update({
         ...updates,
         updated_at: new Date().toISOString(),
       })
+      .eq('id', userId)
       .select()
       .single();
 
@@ -152,9 +184,9 @@ export const profile = {
 // 保存された検索条件管理
 export const savedSearches = {
   // 検索条件一覧取得
-  list: async (userId: string): Promise<SavedSearch[]> => {
+  list: async (userId: string) => {
     const { data, error } = await supabase
-      .from('saved_searches')
+      .from('user_saved_searches')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
@@ -164,9 +196,9 @@ export const savedSearches = {
   },
 
   // 検索条件保存
-  save: async (userId: string, name: string, searchParams: SavedSearch['search_params']) => {
+  save: async (userId: string, name: string, searchParams: Record<string, any>) => {
     const { data, error } = await supabase
-      .from('saved_searches')
+      .from('user_saved_searches')
       .insert({
         user_id: userId,
         name,
@@ -180,9 +212,9 @@ export const savedSearches = {
   },
 
   // 検索条件更新
-  update: async (id: string, updates: Partial<SavedSearch>) => {
+  update: async (id: string, updates: any) => {
     const { data, error } = await supabase
-      .from('saved_searches')
+      .from('user_saved_searches')
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
@@ -198,7 +230,7 @@ export const savedSearches = {
   // 検索条件削除
   delete: async (id: string) => {
     const { error } = await supabase
-      .from('saved_searches')
+      .from('user_saved_searches')
       .delete()
       .eq('id', id);
 
@@ -206,32 +238,30 @@ export const savedSearches = {
   },
 };
 
-// ユーザー設定管理
-export const preferences = {
-  // 設定取得
-  get: async (userId: string): Promise<UserPreferences | null> => {
+// お気に入り管理
+export const favorites = {
+  // お気に入り一覧取得
+  list: async (userId: string) => {
     const { data, error } = await supabase
-      .from('user_preferences')
-      .select('*')
+      .from('user_favorites')
+      .select(`
+        *,
+        organization:organizations(*)
+      `)
       .eq('user_id', userId)
-      .single();
+      .order('created_at', { ascending: false });
 
-    if (error) {
-      if (error.code === 'PGRST116') return null; // レコードが見つからない
-      throw error;
-    }
-
-    return data;
+    if (error) throw error;
+    return data || [];
   },
 
-  // 設定更新
-  update: async (userId: string, updates: Partial<UserPreferences>) => {
+  // お気に入りに追加
+  add: async (userId: string, organizationId: string) => {
     const { data, error } = await supabase
-      .from('user_preferences')
-      .upsert({
+      .from('user_favorites')
+      .insert({
         user_id: userId,
-        ...updates,
-        updated_at: new Date().toISOString(),
+        organization_id: organizationId,
       })
       .select()
       .single();
@@ -240,16 +270,27 @@ export const preferences = {
     return data;
   },
 
-  // デフォルト設定作成
-  createDefault: async (userId: string) => {
-    const defaultPreferences: Partial<UserPreferences> = {
-      user_id: userId,
-      email_notifications: true,
-      favorite_industries: [],
-      default_search_filters: {},
-      language: 'ja',
-    };
+  // お気に入りから削除
+  remove: async (userId: string, organizationId: string) => {
+    const { error } = await supabase
+      .from('user_favorites')
+      .delete()
+      .eq('user_id', userId)
+      .eq('organization_id', organizationId);
 
-    return await preferences.update(userId, defaultPreferences);
+    if (error) throw error;
+  },
+
+  // お気に入り状態確認
+  check: async (userId: string, organizationId: string) => {
+    const { data, error } = await supabase
+      .from('user_favorites')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('organization_id', organizationId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return !!data;
   },
 };

@@ -21,7 +21,11 @@
       "Bash(git init:*)",
       "Bash(git add:*)",
       "Bash(git remote add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git branch:*)",
+      "Bash(git pull:*)",
+      "Bash(git commit:*)",
+      "Bash(openssl rand:*)"
     ],
     "deny": [],
     "ask": []

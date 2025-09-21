@@ -1,8 +1,9 @@
 import './globals.css'
+import { AuthProvider } from '@/components/auth/AuthProvider'
 
 export const metadata = {
-  title: 'LuxuCare API',
-  description: 'API documentation and authentication pages',
+  title: 'LuxuCare AI企業CMS',
+  description: 'AI-powered enterprise CMS for company directory and service management',
 }
 
 export default function RootLayout({
@@ -11,9 +12,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <body>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )

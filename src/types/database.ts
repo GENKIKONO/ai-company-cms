@@ -1,33 +1,32 @@
 // データベース型定義
 
+export type UserRole = 'admin' | 'editor' | 'viewer';
+export type OrganizationStatus = 'draft' | 'published' | 'archived';
+export type PartnershipType = 'strategic' | 'technology' | 'distribution' | 'investment';
+
 export interface AppUser {
   id: string;
   email: string;
-  role: 'admin' | 'partner_admin' | 'org_owner';
-  partner_id?: string;
-  name?: string;
+  full_name?: string;
   avatar_url?: string;
+  role: UserRole;
+  organization_id?: string;
   created_at: string;
   updated_at: string;
-  last_login?: string;
 }
 
 export interface Partner {
   id: string;
   name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  website?: string;
+  description?: string;
+  website_url?: string;
   logo_url?: string;
   brand_logo_url?: string;
-  description?: string;
-  commission_rate: number;
-  status: 'active' | 'inactive' | 'pending';
-  contract_start?: string;
-  contract_end?: string;
-  billing_info?: Record<string, any>;
-  settings?: Record<string, any>;
+  contact_email?: string;
+  partnership_type?: PartnershipType;
+  contract_start_date?: string;
+  contract_end_date?: string;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -36,7 +35,7 @@ export interface Organization {
   id: string;
   name: string;
   slug: string;
-  description: string;
+  description?: string;
   legal_form?: string;
   representative_name?: string;
   founded?: string;
@@ -45,8 +44,8 @@ export interface Organization {
   address_country: string;
   address_region?: string;
   address_locality?: string;
-  street_address?: string;
-  postal_code?: string;
+  address_postal_code?: string;
+  address_street?: string;
   telephone?: string;
   email?: string;
   email_public: boolean;
@@ -54,12 +53,14 @@ export interface Organization {
   logo_url?: string;
   same_as?: string[];
   industries?: string[];
-  status: 'draft' | 'waiting_approval' | 'published' | 'paused' | 'archived';
+  status: OrganizationStatus;
   partner_id?: string;
+  created_by?: string;
   created_at: string;
   updated_at: string;
-  last_accessed?: string;
-  view_count?: number;
+  meta_title?: string;
+  meta_description?: string;
+  meta_keywords?: string[];
   services?: Service[];
   case_studies?: CaseStudy[];
   faqs?: FAQ[];
@@ -67,69 +68,106 @@ export interface Organization {
 
 export interface Service {
   id: string;
-  org_id: string;
+  organization_id: string;
   name: string;
-  description: string;
+  description?: string;
   features?: string[];
+  categories?: string[];
   price_range?: string;
   url?: string;
-  category?: string;
-  status: 'active' | 'inactive';
+  logo_url?: string;
+  screenshots?: string[];
+  supported_platforms?: string[];
+  api_available: boolean;
+  free_trial: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export interface CaseStudy {
   id: string;
-  org_id: string;
+  organization_id: string;
+  service_id?: string;
   title: string;
   problem?: string;
   solution?: string;
   outcome?: string;
-  metrics?: Record<string, string | number>;
+  metrics?: Record<string, any>;
   client_name?: string;
   client_industry?: string;
+  client_size?: string;
   is_anonymous: boolean;
-  status: 'draft' | 'published';
+  published_date?: string;
+  url?: string;
+  thumbnail_url?: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface FAQ {
   id: string;
-  org_id: string;
+  organization_id: string;
+  service_id?: string;
   question: string;
   answer: string;
   category?: string;
-  order_index?: number;
-  status: 'active' | 'inactive';
+  order_index: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface AnalyticsEvent {
   id: string;
-  event_name: string;
-  organization_id?: string;
-  partner_id?: string;
   user_id?: string;
-  properties?: Record<string, any>;
-  timestamp: string;
+  session_id?: string;
+  event_name: string;
+  event_properties?: Record<string, any>;
+  page_url?: string;
   user_agent?: string;
   ip_address?: string;
-  referrer?: string;
+  created_at: string;
 }
 
-export interface Revenue {
+export interface Partnership {
   id: string;
-  partner_id: string;
+  organization_a_id: string;
+  organization_b_id: string;
+  partnership_type: PartnershipType;
+  description?: string;
+  started_at?: string;
+  ended_at?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface News {
+  id: string;
   organization_id: string;
-  amount: number;
-  commission_amount: number;
-  commission_rate: number;
-  period_start: string;
-  period_end: string;
-  status: 'pending' | 'paid' | 'cancelled';
+  title: string;
+  content?: string;
+  summary?: string;
+  category?: string;
+  published_date?: string;
+  url?: string;
+  image_url?: string;
+  is_featured: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserFavorite {
+  id: string;
+  user_id: string;
+  organization_id: string;
+  created_at: string;
+}
+
+export interface UserSavedSearch {
+  id: string;
+  user_id: string;
+  name: string;
+  search_params: Record<string, any>;
   created_at: string;
   updated_at: string;
 }
@@ -177,23 +215,24 @@ export interface OrganizationFormData {
 
 export interface PartnerFormData {
   name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  website?: string;
   description?: string;
-  commission_rate: number;
-  contract_start?: string;
-  contract_end?: string;
+  website_url?: string;
+  contact_email?: string;
+  partnership_type?: PartnershipType;
+  contract_start_date?: string;
+  contract_end_date?: string;
 }
 
 export interface ServiceFormData {
   name: string;
-  description: string;
+  description?: string;
   features?: string[];
+  categories?: string[];
   price_range?: string;
   url?: string;
-  category?: string;
+  supported_platforms?: string[];
+  api_available: boolean;
+  free_trial: boolean;
 }
 
 export interface CaseStudyFormData {
@@ -201,10 +240,13 @@ export interface CaseStudyFormData {
   problem?: string;
   solution?: string;
   outcome?: string;
-  metrics?: Record<string, string | number>;
+  metrics?: Record<string, any>;
   client_name?: string;
   client_industry?: string;
+  client_size?: string;
   is_anonymous: boolean;
+  published_date?: string;
+  url?: string;
 }
 
 export interface FAQFormData {
