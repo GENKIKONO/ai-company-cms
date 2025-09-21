@@ -1,6 +1,6 @@
 'use client';
 
-import { supabaseClient } from '@/lib/auth';
+import { supabaseBrowserBrowser } from '@/lib/supabase-client';
 import { type Organization, type OrganizationFormData } from '@/types/database';
 
 // 企業一覧取得
@@ -12,7 +12,7 @@ export async function getOrganizations(options: {
   offset?: number;
 } = {}) {
   try {
-    let query = supabase
+    let query = supabaseBrowserBrowser
       .from('organizations')
       .select(`
         *,
@@ -56,7 +56,7 @@ export async function getOrganizations(options: {
 // 企業詳細取得
 export async function getOrganization(id: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .select(`
         *,
@@ -79,13 +79,13 @@ export async function getOrganization(id: string) {
 // 企業作成
 export async function createOrganization(organizationData: OrganizationFormData) {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseBrowser.auth.getUser();
     
     if (!user) {
       throw new Error('Not authenticated');
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .insert({
         ...organizationData,
@@ -106,7 +106,7 @@ export async function createOrganization(organizationData: OrganizationFormData)
 // 企業更新
 export async function updateOrganization(id: string, organizationData: Partial<OrganizationFormData>) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .update(organizationData)
       .eq('id', id)
@@ -124,7 +124,7 @@ export async function updateOrganization(id: string, organizationData: Partial<O
 // 企業削除
 export async function deleteOrganization(id: string) {
   try {
-    const { error } = await supabase
+    const { error } = await supabaseBrowser
       .from('organizations')
       .delete()
       .eq('id', id);
@@ -140,7 +140,7 @@ export async function deleteOrganization(id: string) {
 // 企業ステータス更新
 export async function updateOrganizationStatus(id: string, status: 'draft' | 'published' | 'archived') {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .update({ status })
       .eq('id', id)
@@ -158,7 +158,7 @@ export async function updateOrganizationStatus(id: string, status: 'draft' | 'pu
 // 企業統計取得
 export async function getOrganizationStats() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .select('status');
 
@@ -181,7 +181,7 @@ export async function getOrganizationStats() {
 // スラッグから企業取得（公開ページ用）
 export async function getOrganizationBySlug(slug: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .select(`
         *,
@@ -204,7 +204,7 @@ export async function getOrganizationBySlug(slug: string) {
 // 業界一覧取得
 export async function getIndustries() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .select('industries')
       .not('industries', 'is', null);

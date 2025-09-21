@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase-client';
 import { type Service, type ServiceFormData } from '@/types/database';
 
-const supabase = supabaseClient;
+import { supabaseBrowserBrowser } from "@/lib/supabase-client"; const supabaseBrowser = supabaseBrowserBrowser;
 
 export interface GetServicesOptions {
   search?: string;
@@ -13,7 +13,7 @@ export interface GetServicesOptions {
 }
 
 export async function getServices(options: GetServicesOptions = {}) {
-  let query = supabase
+  let query = supabaseBrowserBrowser
     .from('services')
     .select(`
       *,
@@ -54,7 +54,7 @@ export async function getServices(options: GetServicesOptions = {}) {
 }
 
 export async function getService(id: string) {
-  return await supabase
+  return await supabaseBrowser
     .from('services')
     .select(`
       *,
@@ -71,7 +71,7 @@ export async function getService(id: string) {
 }
 
 export async function getServiceBySlug(organizationSlug: string, serviceSlug: string) {
-  return await supabase
+  return await supabaseBrowser
     .from('services')
     .select(`
       *,
@@ -89,7 +89,7 @@ export async function getServiceBySlug(organizationSlug: string, serviceSlug: st
 }
 
 export async function createService(data: ServiceFormData) {
-  const { data: service, error } = await supabase
+  const { data: service, error } = await supabaseBrowser
     .from('services')
     .insert([data])
     .select()
@@ -99,7 +99,7 @@ export async function createService(data: ServiceFormData) {
 }
 
 export async function updateService(id: string, data: Partial<ServiceFormData>) {
-  const { data: service, error } = await supabase
+  const { data: service, error } = await supabaseBrowser
     .from('services')
     .update(data)
     .eq('id', id)
@@ -110,14 +110,14 @@ export async function updateService(id: string, data: Partial<ServiceFormData>) 
 }
 
 export async function deleteService(id: string) {
-  return await supabase
+  return await supabaseBrowser
     .from('services')
     .delete()
     .eq('id', id);
 }
 
 export async function getServiceCategories() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseBrowser
     .from('services')
     .select('category')
     .not('category', 'is', null);
@@ -129,7 +129,7 @@ export async function getServiceCategories() {
 }
 
 export async function getPriceRanges() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseBrowser
     .from('services')
     .select('price_range')
     .not('price_range', 'is', null);
@@ -141,7 +141,7 @@ export async function getPriceRanges() {
 }
 
 export async function getServicesByOrganization(organizationId: string) {
-  return await supabase
+  return await supabaseBrowser
     .from('services')
     .select('*')
     .eq('organization_id', organizationId)
@@ -150,14 +150,14 @@ export async function getServicesByOrganization(organizationId: string) {
 
 export async function getServiceStats() {
   const [totalResult, byOrganizationResult, byCategoryResult] = await Promise.all([
-    supabase
+    supabaseBrowser
       .from('services')
       .select('id', { count: 'exact', head: true }),
-    supabase
+    supabaseBrowser
       .from('services')
       .select('organization_id', { count: 'exact' })
       .group('organization_id'),
-    supabase
+    supabaseBrowser
       .from('services')
       .select('category', { count: 'exact' })
       .not('category', 'is', null)
@@ -182,7 +182,7 @@ export async function generateServiceSlug(name: string, organizationId: string):
   let counter = 1;
 
   while (true) {
-    const { data } = await supabase
+    const { data } = await supabaseBrowser
       .from('services')
       .select('id')
       .eq('slug', slug)

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { supabaseBrowserServer } from '@/lib/supabase-server';
 import { sendApprovalEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = supabaseServer();
+    const supabaseBrowser = supabaseBrowserServer();
 
     // 組織情報を取得
-    const { data: organization, error: orgError } = await supabase
+    const { data: organization, error: orgError } = await supabaseBrowser
       .from('organizations')
       .select(`
         id,
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 申請者情報を取得
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ステータスを承認待ちに更新
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseBrowser
       .from('organizations')
       .update({
         status: 'waiting_approval',
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 承認履歴を記録
-    const { error: historyError } = await supabase
+    const { error: historyError } = await supabaseBrowser
       .from('approval_history')
       .insert({
         organization_id: organizationId,

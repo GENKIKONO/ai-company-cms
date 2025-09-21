@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
-export const supabaseServer = () => {
+export const supabaseBrowserServer = () => {
   const cookieStore = cookies();
   
   return createClient(
@@ -25,7 +25,7 @@ export const supabaseServer = () => {
   );
 };
 
-export const supabaseAdmin = () =>
+export const supabaseBrowserAdmin = () =>
   createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -37,4 +37,4 @@ export const supabaseAdmin = () =>
     }
   );
 
-export const supabaseClient = supabaseServer;
+export const supabaseBrowserBrowser = supabaseBrowserServer;

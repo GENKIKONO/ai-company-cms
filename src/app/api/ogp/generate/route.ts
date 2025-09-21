@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { supabaseBrowserServer } from '@/lib/supabase-server';
 import sharp from 'sharp';
 
 const OGP_WIDTH = 1200;
@@ -131,10 +131,10 @@ async function generateOGPImage(options: OGPGenerationOptions): Promise<Buffer> 
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = supabaseServer();
+    const supabaseBrowser = supabaseBrowserServer();
     
     // ユーザー認証確認
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { stripe, getLuxuCareProducts, createStripeCustomer } from '@/lib/stripe';
 
 export async function POST(request: NextRequest) {
@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = supabaseAdmin();
+    const supabaseBrowser = supabaseBrowserAdmin();
 
     // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 組織情報を取得
-    const { data: organization, error: orgError } = await supabase
+    const { data: organization, error: orgError } = await supabaseBrowser
       .from('organizations')
       .select('id, name, owner_user_id, email, status')
       .eq('id', organizationId)
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 既存のサブスクリプションがないかチェック
-    const { data: existingSubscription } = await supabase
+    const { data: existingSubscription } = await supabaseBrowser
       .from('subscriptions')
       .select('id, status')
       .eq('org_id', organizationId)
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     // Stripe顧客を作成または取得
     let customerId: string;
     
-    const { data: existingCustomer } = await supabase
+    const { data: existingCustomer } = await supabaseBrowser
       .from('stripe_customers')
       .select('stripe_customer_id')
       .eq('organization_id', organizationId)
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       customerId = customer.id;
 
       // 顧客情報をデータベースに保存
-      await supabase
+      await supabaseBrowser
         .from('stripe_customers')
         .insert({
           organization_id: organizationId,

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = supabaseAdmin();
-    const { data, error } = await supabase
+    const supabaseBrowser = supabaseBrowserAdmin();
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .select('*')
       .eq('id', params.id)
@@ -70,8 +70,8 @@ export async function PUT(
     const { id, created_at, created_by, ...updateData } = body;
     updateData.updated_at = new Date().toISOString();
 
-    const supabase = supabaseAdmin();
-    const { data, error } = await supabase
+    const supabaseBrowser = supabaseBrowserAdmin();
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .update(updateData)
       .eq('id', params.id)
@@ -119,14 +119,14 @@ export async function DELETE(
     }
 
     // First, get the organization to track the deletion
-    const supabase = supabaseAdmin();
-    const { data: org } = await supabase
+    const supabaseBrowser = supabaseBrowserAdmin();
+    const { data: org } = await supabaseBrowser
       .from('organizations')
       .select('id, name')
       .eq('id', params.id)
       .single();
 
-    const { error } = await supabase
+    const { error } = await supabaseBrowser
       .from('organizations')
       .delete()
       .eq('id', params.id);

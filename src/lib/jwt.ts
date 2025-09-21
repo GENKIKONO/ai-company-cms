@@ -27,7 +27,7 @@ export async function signApprovalToken(payload: Omit<ApprovalTokenPayload, 'iat
 export async function verifyApprovalToken(token: string): Promise<ApprovalTokenPayload> {
   try {
     const { payload } = await jwtVerify(token, secret);
-    return payload as ApprovalTokenPayload;
+    return payload as unknown as ApprovalTokenPayload;
   } catch (error) {
     throw new Error('無効または期限切れのトークンです');
   }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
-@// import { trackOrganizationView } from '@/lib/analytics';
+import { supabaseBrowserServer } from '@/lib/supabase-server';
+// import { trackOrganizationView } from '@/lib/analytics';
 import { createError, errorToResponse } from '@/lib/error-handler';
 import { apiLogger, PerformanceMonitor } from '@/lib/logger';
 import crypto from 'crypto';
@@ -25,14 +25,14 @@ export async function GET(
       throw createError.validation('スラグが指定されていません', { slug });
     }
 
-    const supabase = supabaseServer();
+    const supabaseBrowser = supabaseBrowserServer();
 
     // 公開中の企業情報を取得（パフォーマンス監視付き）
     const organization = await PerformanceMonitor.monitor(
       'database',
       'fetch organization',
       async () => {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseBrowser
           .from('organizations')
           .select(`
             id,
@@ -111,7 +111,7 @@ export async function GET(
     // パートナー情報も取得（表示用）
     let partner = null;
     if (organization.partner_id) {
-      const { data: partnerData } = await supabase
+      const { data: partnerData } = await supabaseBrowser
         .from('partners')
         .select('id, name, brand_logo_url')
         .eq('id', organization.partner_id)
@@ -137,7 +137,7 @@ export async function GET(
     // 最終アクセス時間を更新（非同期）
     setTimeout(async () => {
       try {
-        await supabase
+        await supabaseBrowser
           .from('organizations')
           .update({ 
             last_accessed: new Date().toISOString(),
@@ -198,10 +198,10 @@ export async function HEAD(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const supabase = supabaseServer();
+    const supabaseBrowser = supabaseBrowserServer();
     const slug = params.slug;
 
-    const { data: organization, error } = await supabase
+    const { data: organization, error } = await supabaseBrowser
       .from('organizations')
       .select('id, name, updated_at')
       .eq('slug', slug)

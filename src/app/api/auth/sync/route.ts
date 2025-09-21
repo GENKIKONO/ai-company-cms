@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { supabaseBrowserServer } from '@/lib/supabase-server';
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = supabaseServer();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const supabaseBrowser = supabaseBrowserServer();
+    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 既存のapp_userをチェック
-    const { data: existingUser } = await supabase
+    const { data: existingUser } = await supabaseBrowser
       .from('app_users')
       .select('*')
       .eq('id', user.id)
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     if (!existingUser) {
       // 新規ユーザーの場合、初期ロールをorg_ownerとして作成
-      const { error: insertError } = await supabase
+      const { error: insertError } = await supabaseBrowser
         .from('app_users')
         .insert({
           id: user.id,

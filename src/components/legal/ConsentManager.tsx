@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowserBrowser } from '@/lib/supabase-client';
 
 interface ConsentRecord {
   id: string;
@@ -203,8 +203,8 @@ export default function ConsentManager({
     
     setLoading(true);
     try {
-      const supabase = supabaseBrowser;
-      const { data, error } = await supabase
+      const supabaseBrowser = supabaseBrowserBrowser;
+      const { data, error } = await supabaseBrowser
         .from('consent_records')
         .select('consent_type, granted, version')
         .eq('null_id', nullId)
@@ -242,14 +242,14 @@ export default function ConsentManager({
     if (!nullId) return;
 
     try {
-      const supabase = supabaseBrowser;
+      const supabaseBrowser = supabaseBrowserBrowser;
       
       // ユーザーエージェントとIPを取得
       const userAgent = navigator.userAgent;
       const ipResponse = await fetch('https://api.ipify.org?format=json');
       const { ip } = await ipResponse.json();
 
-      const { error } = await supabase
+      const { error } = await supabaseBrowser
         .from('consent_records')
         .insert({
           null_id: nullId,

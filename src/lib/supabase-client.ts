@@ -2,12 +2,12 @@
 
 import { createBrowserClient } from '@supabase/ssr';
 
-export const supabaseClient = createBrowserClient(
+export const supabaseBrowserBrowser = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export const supabaseBrowser = supabaseClient;
-export const createClient = () => supabaseClient;
+export const supabaseBrowserClient = supabaseBrowserBrowser;
+export const createClient = () => supabaseBrowserBrowser;
 
-export default supabaseClient;
+export default supabaseBrowserBrowser;

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Component, ReactNode, ErrorInfo } from 'react';
-import { errorMonitoring, ErrorBoundary as ErrorBoundaryError } from '@/lib/error-monitoring';
+// import { errorMonitoring, ErrorBoundary as ErrorBoundaryError } from '@/lib/error-monitoring';
 import { ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 interface Props {
@@ -32,17 +32,17 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Report error to monitoring service
-    errorMonitoring.captureException(
-      new ErrorBoundaryError(error.message, errorInfo.componentStack || ''),
-      {
-        component: 'ErrorBoundary',
-        action: 'component_error',
-        metadata: {
-          componentStack: errorInfo.componentStack || '',
-          errorBoundary: true,
-        },
-      }
-    );
+    // errorMonitoring.captureException(
+    //   new ErrorBoundaryError(error.message, errorInfo.componentStack || ''),
+    //   {
+    //     component: 'ErrorBoundary',
+    //     action: 'component_error',
+    //     metadata: {
+    //       componentStack: errorInfo.componentStack || '',
+    //       errorBoundary: true,
+    //     },
+    //   }
+    // );
 
     // Call custom error handler if provided
     this.props.onError?.(error, errorInfo);
@@ -59,18 +59,18 @@ export class ErrorBoundary extends Component<Props, State> {
       // Allow null to report additional context
       const nullDescription = prompt('Please describe what you were doing when this error occurred:');
       
-      errorMonitoring.captureMessage(
-        `User reported error: ${this.state.error.message}`,
-        'error',
-        {
-          component: 'ErrorBoundary',
-          action: 'null_report',
-          metadata: {
-            nullDescription: nullDescription || 'No description provided',
-            errorId: this.state.errorId,
-          },
-        }
-      );
+      // errorMonitoring.captureMessage(
+      //   `User reported error: ${this.state.error.message}`,
+      //   'error',
+      //   {
+      //     component: 'ErrorBoundary',
+      //     action: 'null_report',
+      //     metadata: {
+      //       nullDescription: nullDescription || 'No description provided',
+      //       errorId: this.state.errorId,
+      //     },
+      //   }
+      // );
 
       alert('Thank you for the report! Our team will investigate this issue.');
     }
@@ -184,13 +184,13 @@ export function SimpleErrorBoundary({
         )
       }
       onError={(error, errorInfo) => {
-        errorMonitoring.captureException(error, {
-          component: componentName,
-          action: 'simple_error_boundary',
-          metadata: {
-            componentStack: errorInfo.componentStack || '',
-          },
-        });
+        // errorMonitoring.captureException(error, {
+        //   component: componentName,
+        //   action: 'simple_error_boundary',
+        //   metadata: {
+        //     componentStack: errorInfo.componentStack || '',
+        //   },
+        // });
       }}
     >
       {children}

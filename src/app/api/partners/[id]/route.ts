@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { supabaseBrowserServer } from '@/lib/supabase-server';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = supabaseServer();
+    const supabaseBrowser = supabaseBrowserServer();
     const partnerId = params.id;
 
     // ユーザー認証確認
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -19,7 +19,7 @@ export async function GET(
     }
 
     // ユーザーロール確認
-    const { data: appUser, error: userError } = await supabase
+    const { data: appUser, error: userError } = await supabaseBrowser
       .from('app_users')
       .select('role, partner_id')
       .eq('id', user.id)
@@ -41,7 +41,7 @@ export async function GET(
     }
 
     // パートナー詳細情報取得
-    const { data: partner, error: partnerError } = await supabase
+    const { data: partner, error: partnerError } = await supabaseBrowser
       .from('partners')
       .select(`
         *,
@@ -127,11 +127,11 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = supabaseServer();
+    const supabaseBrowser = supabaseBrowserServer();
     const partnerId = params.id;
 
     // ユーザー認証確認
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -140,7 +140,7 @@ export async function PUT(
     }
 
     // ユーザーロール確認
-    const { data: appUser, error: userError } = await supabase
+    const { data: appUser, error: userError } = await supabaseBrowser
       .from('app_users')
       .select('role, partner_id')
       .eq('id', user.id)
@@ -186,7 +186,7 @@ export async function PUT(
     }
 
     // パートナー情報更新
-    const { data: updatedPartner, error: updateError } = await supabase
+    const { data: updatedPartner, error: updateError } = await supabaseBrowser
       .from('partners')
       .update(filteredUpdateData)
       .eq('id', partnerId)
@@ -220,11 +220,11 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = supabaseServer();
+    const supabaseBrowser = supabaseBrowserServer();
     const partnerId = params.id;
 
     // ユーザー認証確認
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -233,7 +233,7 @@ export async function DELETE(
     }
 
     // ユーザーロール確認（削除は管理者のみ）
-    const { data: appUser, error: userError } = await supabase
+    const { data: appUser, error: userError } = await supabaseBrowser
       .from('app_users')
       .select('role')
       .eq('id', user.id)
@@ -247,7 +247,7 @@ export async function DELETE(
     }
 
     // 関連する組織の存在確認
-    const { data: organizations, error: orgCheckError } = await supabase
+    const { data: organizations, error: orgCheckError } = await supabaseBrowser
       .from('organizations')
       .select('id')
       .eq('partner_id', partnerId);
@@ -271,7 +271,7 @@ export async function DELETE(
     }
 
     // パートナー削除
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await supabaseBrowser
       .from('partners')
       .delete()
       .eq('id', partnerId);

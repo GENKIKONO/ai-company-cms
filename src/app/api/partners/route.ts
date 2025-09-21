@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { supabaseBrowserServer } from '@/lib/supabase-server';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = supabaseServer();
+    const supabaseBrowser = supabaseBrowserServer();
 
     // ユーザー認証確認
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     // ユーザーロール確認
-    const { data: appUser, error: userError } = await supabase
+    const { data: appUser, error: userError } = await supabaseBrowser
       .from('app_users')
       .select('role, partner_id')
       .eq('id', user.id)
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     // パートナー一覧取得（統計情報込み）
-    const { data: partners, error: partnersError } = await supabase
+    const { data: partners, error: partnersError } = await supabaseBrowser
       .from('partners')
       .select(`
         *,
@@ -97,10 +97,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = supabaseServer();
+    const supabaseBrowser = supabaseBrowserServer();
 
     // ユーザー認証確認
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ユーザーロール確認
-    const { data: appUser, error: userError } = await supabase
+    const { data: appUser, error: userError } = await supabaseBrowser
       .from('app_users')
       .select('role')
       .eq('id', user.id)
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
     }
 
     // サブドメインの重複チェック
-    const { data: existingPartner, error: checkError } = await supabase
+    const { data: existingPartner, error: checkError } = await supabaseBrowser
       .from('partners')
       .select('id')
       .eq('subdomain', subdomain)
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
     }
 
     // パートナー作成
-    const { data: newPartner, error: insertError } = await supabase
+    const { data: newPartner, error: insertError } = await supabaseBrowser
       .from('partners')
       .insert({
         name,

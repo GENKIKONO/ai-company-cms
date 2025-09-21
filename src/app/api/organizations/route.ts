@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
 
     const offset = (page - 1) * limit;
 
-    const supabase = supabaseAdmin();
-    let query = supabase
+    const supabaseBrowser = supabaseBrowserAdmin();
+    let query = supabaseBrowser
       .from('organizations')
       .select('*', { count: 'exact' })
       .eq('visibility', 'public');
@@ -104,8 +104,8 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    const supabase = supabaseAdmin();
-    const { data, error } = await supabase
+    const supabaseBrowser = supabaseBrowserAdmin();
+    const { data, error } = await supabaseBrowser
       .from('organizations')
       .insert([organizationData])
       .select()

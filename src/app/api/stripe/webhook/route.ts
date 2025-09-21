@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { webhookRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
 
@@ -20,11 +20,11 @@ interface WebhookProcessingResult {
 }
 
 async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessingResult> {
-  const supabase = supabaseAdmin();
+  const supabaseBrowser = supabaseBrowserAdmin();
 
   try {
     // イベントの冪等性チェック
-    const { data: existingEvent, error: checkError } = await supabase
+    const { data: existingEvent, error: checkError } = await supabaseBrowser
       .from('webhook_events')
       .select('id, processed, retry_count')
       .eq('stripe_event_id', event.id)
@@ -44,7 +44,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
     // イベントレコードを挿入または更新
     const retryCount = existingEvent?.retry_count || 0;
     
-    const { error: upsertError } = await supabase
+    const { error: upsertError } = await supabaseBrowser
       .from('webhook_events')
       .upsert({
         stripe_event_id: event.id,
@@ -91,7 +91,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
 
     if (processingSuccess) {
       // 処理成功をマーク
-      await supabase
+      await supabaseBrowser
         .from('webhook_events')
         .update({
           processed: true,
@@ -103,7 +103,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
     } else {
       // リトライ回数を増加
       const newRetryCount = retryCount + 1;
-      await supabase
+      await supabaseBrowser
         .from('webhook_events')
         .update({
           retry_count: newRetryCount,
@@ -113,7 +113,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
 
       // 最大リトライ回数チェック
       if (newRetryCount >= 3) {
-        await supabase
+        await supabaseBrowser
           .from('webhook_events')
           .update({
             processed: true, // 失敗として処理完了扱い
@@ -137,7 +137,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
 
 async function handleSubscriptionChange(subscription: Stripe.Subscription): Promise<boolean> {
   try {
-    const supabase = supabaseAdmin();
+    const supabaseBrowser = supabaseBrowserAdmin();
     const organizationId = subscription.metadata.organization_id;
 
     if (!organizationId) {
@@ -163,7 +163,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription): Prom
     }
 
     // サブスクリプション情報を更新
-    const { error } = await supabase
+    const { error } = await supabaseBrowser
       .from('subscriptions')
       .upsert({
         org_id: organizationId,
@@ -184,13 +184,13 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription): Prom
 
     // 組織のステータスも更新
     if (status === 'active') {
-      await supabase
+      await supabaseBrowser
         .from('organizations')
         .update({ status: 'published' })
         .eq('id', organizationId)
         .in('status', ['draft', 'paused']); // draft または paused の場合のみ published に変更
     } else if (status === 'paused') {
-      await supabase
+      await supabaseBrowser
         .from('organizations')
         .update({ status: 'paused' })
         .eq('id', organizationId)
@@ -208,7 +208,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription): Prom
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Promise<boolean> {
   try {
-    const supabase = supabaseAdmin();
+    const supabaseBrowser = supabaseBrowserAdmin();
     const organizationId = subscription.metadata.organization_id;
 
     if (!organizationId) {
@@ -217,7 +217,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
     }
 
     // サブスクリプションを無効化
-    const { error: subError } = await supabase
+    const { error: subError } = await supabaseBrowser
       .from('subscriptions')
       .update({
         status: 'cancelled',
@@ -232,7 +232,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
     }
 
     // 組織を一時停止状態に変更
-    await supabase
+    await supabaseBrowser
       .from('organizations')
       .update({ status: 'paused' })
       .eq('id', organizationId);
@@ -261,11 +261,11 @@ async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
   try {
     console.log(`Payment failed for invoice ${invoice.id}`);
     
-    const supabase = supabaseAdmin();
+    const supabaseBrowser = supabaseBrowserAdmin();
     
     // 顧客からorganization_idを取得
     if (typeof invoice.customer === 'string') {
-      const { data: customer } = await supabase
+      const { data: customer } = await supabaseBrowser
         .from('stripe_customers')
         .select('organization_id')
         .eq('stripe_customer_id', invoice.customer)
@@ -273,7 +273,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
 
       if (customer) {
         // 支払い失敗の場合、組織を一時停止に
-        await supabase
+        await supabaseBrowser
           .from('organizations')
           .update({ status: 'paused' })
           .eq('id', customer.organization_id);
