@@ -13,7 +13,7 @@ interface OrganizationFormProps {
 
 export function OrganizationForm({ organization, onSuccess }: OrganizationFormProps) {
   const router = useRouter();
-  const [false, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<string[]>([]);
   

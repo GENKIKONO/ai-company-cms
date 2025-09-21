@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
-import { trackOrganizationView } from '@/lib/analytics';
+@// import { trackOrganizationView } from '@/lib/analytics';
 import { createError, errorToResponse } from '@/lib/error-handler';
 import { apiLogger, PerformanceMonitor } from '@/lib/logger';
 import crypto from 'crypto';

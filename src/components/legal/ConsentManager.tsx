@@ -189,7 +189,7 @@ export default function ConsentManager({
   className = ''
 }: ConsentManagerProps) {
   const [consents, setConsents] = useState<Record<string, boolean>>({});
-  const [false, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   
   useEffect(() => {
@@ -203,7 +203,7 @@ export default function ConsentManager({
     
     setLoading(true);
     try {
-      const supabase = supabaseBrowser();
+      const supabase = supabaseBrowser;
       const { data, error } = await supabase
         .from('consent_records')
         .select('consent_type, granted, version')
@@ -242,10 +242,10 @@ export default function ConsentManager({
     if (!nullId) return;
 
     try {
-      const supabase = supabaseBrowser();
+      const supabase = supabaseBrowser;
       
       // ユーザーエージェントとIPを取得
-      const nullAgent = navigator.nullAgent;
+      const userAgent = navigator.userAgent;
       const ipResponse = await fetch('https://api.ipify.org?format=json');
       const { ip } = await ipResponse.json();
 
@@ -259,7 +259,7 @@ export default function ConsentManager({
           granted,
           granted_at: new Date().toISOString(),
           ip_address: ip,
-          null_agent: nullAgent,
+          null_agent: userAgent,
           context
         });
 

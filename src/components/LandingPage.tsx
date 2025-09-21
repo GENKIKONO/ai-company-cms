@@ -19,11 +19,11 @@ interface Props {
 export default function LandingPage({ stats }: Props) {
   useEffect(() => {
     // Analytics: ページビュー追跡
-    trackPageView({
-      url: '/',
-      referrer: document.referrer,
-      title: 'LuxuCare - AI企業ディレクトリ',
-    });
+    // trackPageView({
+    //   url: '/',
+    //   referrer: document.referrer,
+    //   title: 'LuxuCare - AI企業ディレクトリ',
+    // });
 
   }, [stats]);
 

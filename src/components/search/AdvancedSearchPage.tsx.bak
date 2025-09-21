@@ -6,7 +6,6 @@ import { debounce } from 'lodash';
 import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import { SearchFilters, facetedSearchService, SearchResult } from '@/lib/faceted-search';
 import FacetedSearchPanel from './FacetedSearchPanel';
-import SearchResultsGrid, { ViewMode } from './SearchResultsGrid';
 
 interface AdvancedSearchPageProps {
   searchParams: {
@@ -51,7 +50,7 @@ export default function AdvancedSearchPage({ searchParams }: AdvancedSearchPageP
     parseInt(searchParams.page || '1')
   );
   
-  const [false, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.q || '');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -242,7 +241,6 @@ export default function AdvancedSearchPage({ searchParams }: AdvancedSearchPageP
 
       {/* Search Results */}
       <div className="lg:col-span-3">
-        <SearchResultsGrid
           organizations={searchResult.organizations}
           viewMode={viewMode}
           onViewModeChange={handleViewModeChange}

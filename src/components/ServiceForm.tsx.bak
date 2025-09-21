@@ -25,7 +25,7 @@ export function ServiceForm({ service, onClose }: ServiceFormProps) {
   });
 
   const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [false, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [newFeature, setNewFeature] = useState('');
 

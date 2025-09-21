@@ -33,12 +33,12 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Report error to monitoring service
     errorMonitoring.captureException(
-      new ErrorBoundaryError(error.message, errorInfo.componentStack),
+      new ErrorBoundaryError(error.message, errorInfo.componentStack || ''),
       {
         component: 'ErrorBoundary',
         action: 'component_error',
         metadata: {
-          componentStack: errorInfo.componentStack,
+          componentStack: errorInfo.componentStack || '',
           errorBoundary: true,
         },
       }
@@ -188,7 +188,7 @@ export function SimpleErrorBoundary({
           component: componentName,
           action: 'simple_error_boundary',
           metadata: {
-            componentStack: errorInfo.componentStack,
+            componentStack: errorInfo.componentStack || '',
           },
         });
       }}
