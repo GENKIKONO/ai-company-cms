@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { verifyApprovalToken } from '@/lib/jwt';
 import { redirect } from 'next/navigation';
 import { approvalRateLimit } from '@/lib/rate-limit';
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
 
     // 組織情報を取得
     const { data: organization, error: orgError } = await supabaseBrowser

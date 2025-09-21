@@ -119,16 +119,16 @@ export class StructuredDataGenerator {
     }
 
     // Contact information
-    if (organization.contact_email || organization.contact_phone) {
+    if (organization.email || organization.telephone) {
       data.contactPoint = {
         '@type': 'ContactPoint',
       };
 
-      if (organization.contact_email) {
-        data.contactPoint.email = organization.contact_email;
+      if (organization.email) {
+        data.contactPoint.email = organization.email;
       }
-      if (organization.contact_phone) {
-        data.contactPoint.telephone = organization.contact_phone;
+      if (organization.telephone) {
+        data.contactPoint.telephone = organization.telephone;
       }
     }
 

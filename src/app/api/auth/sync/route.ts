@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server';
 
 export async function POST(req: NextRequest) {
   try {
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     
     if (authError || !user) {

@@ -34,7 +34,8 @@
       "Bash(lsof:*)",
       "Bash(node:*)",
       "Bash(xargs sed:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

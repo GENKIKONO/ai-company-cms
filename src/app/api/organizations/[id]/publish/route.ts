@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { runComprehensivePreflight } from '@/lib/validation';
 import { trackBusinessEvent, notifyError, withErrorHandling } from '@/lib/monitoring';
 
@@ -11,11 +11,11 @@ interface PublishGateResult {
 }
 
 async function checkPublishGate(organizationId: string): Promise<PublishGateResult> {
-  const supabaseBrowser = supabaseBrowserServer();
+  const supabase = supabaseServer();
 
   try {
     // 組織とその関連データを取得
-    const { data: org, error: orgError } = await supabaseBrowser
+    const { data: org, error: orgError } = await supabase
       .from('organizations')
       .select(`
         *,
@@ -128,10 +128,10 @@ export const POST = withErrorHandling(async (request: NextRequest, { params }: {
       );
     }
 
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabase = supabaseServer();
 
     // 認証チェック
-    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -140,7 +140,7 @@ export const POST = withErrorHandling(async (request: NextRequest, { params }: {
     }
 
     // 組織の所有者またはパートナーかチェック
-    const { data: org, error: orgError } = await supabaseBrowser
+    const { data: org, error: orgError } = await supabase
       .from('organizations')
       .select('owner_user_id, partner_id')
       .eq('id', organizationId)
@@ -153,7 +153,7 @@ export const POST = withErrorHandling(async (request: NextRequest, { params }: {
       );
     }
 
-    const { data: appUser, error: userError } = await supabaseBrowser
+    const { data: appUser, error: userError } = await supabase
       .from('app_users')
       .select('role, partner_id')
       .eq('id', user.id)
@@ -198,7 +198,7 @@ export const POST = withErrorHandling(async (request: NextRequest, { params }: {
       }
 
       // Publish Gateを通過した場合、公開処理を実行
-      const { error: updateError } = await supabaseBrowser
+      const { error: updateError } = await supabase
         .from('organizations')
         .update({
           status: 'published',
@@ -216,7 +216,7 @@ export const POST = withErrorHandling(async (request: NextRequest, { params }: {
       }
 
       // 公開履歴を記録
-      await supabaseBrowser
+      await supabase
         .from('approval_history')
         .insert({
           organization_id: organizationId,

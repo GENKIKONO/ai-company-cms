@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { JSDOM } from 'jsdom';
 import pdfParse from 'pdf-parse';
 
@@ -126,7 +126,7 @@ async function extractFromPDF(buffer: Buffer): Promise<ExtractionResult> {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
     
     // ユーザー認証確認
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();

@@ -280,8 +280,8 @@ export function evaluateTextQuality(text: string): {
 }
 
 // 候補データの信頼度評価
-export function evaluateCandidateReliability(candidates: ExtractedCandidates): Record<keyof ExtractedCandidates, number> {
-  const reliability: Record<keyof ExtractedCandidates, number> = {};
+export function evaluateCandidateReliability(candidates: ExtractedCandidates): Partial<Record<keyof ExtractedCandidates, number>> {
+  const reliability: Partial<Record<keyof ExtractedCandidates, number>> = {};
 
   // 企業名の信頼度
   if (candidates.name) {

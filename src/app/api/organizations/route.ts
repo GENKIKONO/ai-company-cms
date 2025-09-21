@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
 
     const offset = (page - 1) * limit;
 
-    const supabaseBrowser = supabaseBrowserAdmin();
-    let query = supabaseBrowser
+    const supabase = supabaseBrowserAdmin();
+    let query = supabase
       .from('organizations')
       .select('*', { count: 'exact' })
       .eq('visibility', 'public');
@@ -104,8 +104,8 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    const supabaseBrowser = supabaseBrowserAdmin();
-    const { data, error } = await supabaseBrowser
+    const supabase = supabaseBrowserAdmin();
+    const { data, error } = await supabase
       .from('organizations')
       .insert([organizationData])
       .select()

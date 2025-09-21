@@ -1,6 +1,6 @@
 'use client';
 
-import { supabaseBrowserBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase-client';
 import { type Organization, type OrganizationFormData } from '@/types/database';
 
 // 企業一覧取得
@@ -12,7 +12,7 @@ export async function getOrganizations(options: {
   offset?: number;
 } = {}) {
   try {
-    let query = supabaseBrowserBrowser
+    let query = supabaseBrowser
       .from('organizations')
       .select(`
         *,

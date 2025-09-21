@@ -34,7 +34,7 @@ export interface AnalyticsPageView {
   title?: string;
 }
 
-export interface AnalyticsEvent {
+export interface AnalyticsEventPayload {
   name: string;
   properties?: Record<string, any>;
 }

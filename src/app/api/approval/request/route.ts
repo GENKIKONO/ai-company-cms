@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { sendApprovalEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
 
     // 組織情報を取得
     const { data: organization, error: orgError } = await supabaseBrowser

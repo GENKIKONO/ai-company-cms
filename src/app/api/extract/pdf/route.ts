@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { extractionRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent } from '@/lib/monitoring';
 
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 認証チェック
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     
     if (authError || !user) {

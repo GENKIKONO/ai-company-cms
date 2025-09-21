@@ -1,13 +1,8 @@
 'use client';
 
-import { createBrowserClient } from '@supabase/ssr';
+import { supabaseBrowser } from '@/lib/supabase-client';
 import { User } from '@supabase/supabase-js';
 import { type AppUser, type UserRole } from '@/types/database';
-
-export const supabaseBrowser = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 // ユーザーの権限をチェック
 export function hasPermission(userRole: UserRole, requiredRole: UserRole): boolean {

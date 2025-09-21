@@ -25,7 +25,7 @@ export function checkRateLimit(
   const key = `rate_limit:${identifier}`;
   
   // 古いエントリをクリーンアップ
-  for (const [mapKey, data] of rateLimitStore.entries()) {
+  for (const [mapKey, data] of Array.from(rateLimitStore.entries())) {
     if (data.resetTime < now) {
       rateLimitStore.delete(mapKey);
     }

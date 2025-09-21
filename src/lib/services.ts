@@ -1,7 +1,5 @@
-import { createClient } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase-client';
 import { type Service, type ServiceFormData } from '@/types/database';
-
-import { supabaseBrowserBrowser } from "@/lib/supabase-client"; const supabaseBrowser = supabaseBrowserBrowser;
 
 export interface GetServicesOptions {
   search?: string;
@@ -13,7 +11,7 @@ export interface GetServicesOptions {
 }
 
 export async function getServices(options: GetServicesOptions = {}) {
-  let query = supabaseBrowserBrowser
+  let query = supabaseBrowser
     .from('services')
     .select(`
       *,
@@ -124,7 +122,7 @@ export async function getServiceCategories() {
 
   if (error) return { data: [], error };
 
-  const categories = [...new Set(data.map(item => item.category))].filter(Boolean);
+  const categories = Array.from(new Set(data.map(item => item.category))).filter(Boolean);
   return { data: categories, error: null };
 }
 
@@ -136,7 +134,7 @@ export async function getPriceRanges() {
 
   if (error) return { data: [], error };
 
-  const priceRanges = [...new Set(data.map(item => item.price_range))].filter(Boolean);
+  const priceRanges = Array.from(new Set(data.map(item => item.price_range))).filter(Boolean);
   return { data: priceRanges, error: null };
 }
 
@@ -149,25 +147,37 @@ export async function getServicesByOrganization(organizationId: string) {
 }
 
 export async function getServiceStats() {
-  const [totalResult, byOrganizationResult, byCategoryResult] = await Promise.all([
+  const [totalResult, organizationsResult, categoriesResult] = await Promise.all([
     supabaseBrowser
       .from('services')
       .select('id', { count: 'exact', head: true }),
     supabaseBrowser
       .from('services')
-      .select('organization_id', { count: 'exact' })
-      .group('organization_id'),
+      .select('organization_id')
+      .not('organization_id', 'is', null),
     supabaseBrowser
       .from('services')
-      .select('category', { count: 'exact' })
+      .select('category')
       .not('category', 'is', null)
-      .group('category')
   ]);
+
+  // Count unique organizations and categories
+  const uniqueOrganizations = organizationsResult.data 
+    ? Array.from(new Set(organizationsResult.data.map(item => item.organization_id))).length
+    : 0;
+  
+  const categoryStats = categoriesResult.data 
+    ? Array.from(new Set(categoriesResult.data.map(item => item.category)))
+        .map(category => ({
+          category,
+          count: categoriesResult.data!.filter(item => item.category === category).length
+        }))
+    : [];
 
   return {
     total: totalResult.count || 0,
-    byOrganization: byOrganizationResult.data?.length || 0,
-    byCategory: byCategoryResult.data || []
+    byOrganization: uniqueOrganizations,
+    byCategory: categoryStats
   };
 }
 

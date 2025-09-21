@@ -111,7 +111,10 @@ export class SmartSearchEngine {
     
     // 特徴フィルター
     features.forEach(feature => {
-      filters[feature as keyof typeof filters] = true;
+      const featureKey = feature as keyof SmartSearchQuery['filters'];
+      if (featureKey in filters && typeof filters[featureKey] !== 'string') {
+        (filters as any)[featureKey] = true;
+      }
     });
 
     return {

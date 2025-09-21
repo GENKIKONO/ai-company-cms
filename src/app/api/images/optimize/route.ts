@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server';
 import sharp from 'sharp';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -15,7 +15,7 @@ interface OptimizationOptions {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
     
     // ユーザー認証確認
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();

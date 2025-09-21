@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
     const partnerId = params.id;
 
     // ユーザー認証確認
@@ -127,7 +127,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
     const partnerId = params.id;
 
     // ユーザー認証確認
@@ -220,7 +220,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
     const partnerId = params.id;
 
     // ユーザー認証確認

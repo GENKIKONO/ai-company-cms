@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { createLuxuCareProducts, getLuxuCareProducts } from '@/lib/stripe';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = supabaseBrowserServer();
+    const supabaseBrowser = supabaseServer();
 
     // 管理者権限チェック
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
