@@ -38,6 +38,7 @@
       "Bash(cat:*)",
       "Bash(npm run lint)",
       "Bash(PORT=3000 npm run dev)",
+<<<<<<< Updated upstream
       "Bash(npx vercel:*)",
       "Bash(vercel env rm:*)",
       "WebFetch(domain:luxucare-id8fteyrp-genkis-projects-03a72983.vercel.app)",
@@ -52,6 +53,10 @@
       "Bash(chmod:*)",
       "Bash(gh pr create:*)",
       "Bash(npm run:*)"
+=======
+      "Bash(git merge:*)",
+      "Bash(git stash:*)"
+>>>>>>> Stashed changes
     ],
     "deny": [],
     "ask": []
