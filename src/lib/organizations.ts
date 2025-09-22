@@ -223,3 +223,123 @@ export async function getIndustries() {
     return { data: [], error };
   }
 }
+
+// 横断検索（企業・サービス・事例）
+export async function globalSearch(options: {
+  query?: string;
+  type?: 'all' | 'organizations' | 'services' | 'case_studies';
+  industries?: string[];
+  regions?: string[];
+  categories?: string[];
+  limit?: number;
+  offset?: number;
+} = {}) {
+  try {
+    const results = {
+      organizations: [],
+      services: [],
+      case_studies: [],
+      total: 0
+    };
+
+    // 企業検索
+    if (options.type === 'all' || options.type === 'organizations') {
+      let orgQuery = supabaseBrowser
+        .from('organizations')
+        .select(`
+          *,
+          services(count),
+          case_studies(count)
+        `)
+        .eq('status', 'published');
+
+      if (options.query) {
+        orgQuery = orgQuery.or(`name.ilike.%${options.query}%,description.ilike.%${options.query}%`);
+      }
+
+      if (options.industries && options.industries.length > 0) {
+        orgQuery = orgQuery.overlaps('industries', options.industries);
+      }
+
+      if (options.regions && options.regions.length > 0) {
+        orgQuery = orgQuery.or(
+          options.regions.map(region => 
+            `address_region.ilike.%${region}%,address_locality.ilike.%${region}%`
+          ).join(',')
+        );
+      }
+
+      const { data: orgs } = await orgQuery.limit(options.limit || 20);
+      results.organizations = (orgs || []) as any;
+    }
+
+    // サービス検索
+    if (options.type === 'all' || options.type === 'services') {
+      let serviceQuery = supabaseBrowser
+        .from('services')
+        .select(`
+          *,
+          organization:organizations!inner(id, name, slug, status)
+        `)
+        .eq('organization.status', 'published');
+
+      if (options.query) {
+        serviceQuery = serviceQuery.or(`name.ilike.%${options.query}%,description.ilike.%${options.query}%`);
+      }
+
+      if (options.categories && options.categories.length > 0) {
+        serviceQuery = serviceQuery.overlaps('categories', options.categories);
+      }
+
+      const { data: services } = await serviceQuery.limit(options.limit || 20);
+      results.services = (services || []) as any;
+    }
+
+    // 事例検索
+    if (options.type === 'all' || options.type === 'case_studies') {
+      let caseQuery = supabaseBrowser
+        .from('case_studies')
+        .select(`
+          *,
+          organization:organizations!inner(id, name, slug, status)
+        `)
+        .eq('organization.status', 'published');
+
+      if (options.query) {
+        caseQuery = caseQuery.or(`title.ilike.%${options.query}%,problem.ilike.%${options.query}%,solution.ilike.%${options.query}%,outcome.ilike.%${options.query}%`);
+      }
+
+      const { data: cases } = await caseQuery.limit(options.limit || 20);
+      results.case_studies = (cases || []) as any;
+    }
+
+    results.total = results.organizations.length + results.services.length + results.case_studies.length;
+
+    return { data: results, error: null };
+  } catch (error) {
+    console.error('Error performing global search:', error);
+    return { data: null, error };
+  }
+}
+
+// サービスカテゴリ一覧取得
+export async function getServiceCategories() {
+  try {
+    const { data, error } = await supabaseBrowser
+      .from('services')
+      .select('categories')
+      .not('categories', 'is', null);
+
+    if (error) throw error;
+
+    const allCategories = data
+      .flatMap(service => service.categories || [])
+      .filter((category, index, self) => self.indexOf(category) === index)
+      .sort();
+
+    return { data: allCategories, error: null };
+  } catch (error) {
+    console.error('Error fetching service categories:', error);
+    return { data: [], error };
+  }
+}

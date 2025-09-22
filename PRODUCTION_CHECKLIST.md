@@ -54,6 +54,8 @@ NEXT_PUBLIC_APP_URL=https://aiohub.jp
 STRIPE_SECRET_KEY=[実際のキー]
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=[実際のキー]
 STRIPE_WEBHOOK_SECRET=[実際のキー]
+STRIPE_MONTHLY_PRICE_ID=[月額プランの価格ID]
+STRIPE_SETUP_FEE_PRODUCT_ID=[初期費用商品のID]
 
 # JWT
 APPROVAL_JWT_SECRET=[32文字以上のランダム文字列]
@@ -88,9 +90,17 @@ APPROVAL_JWT_SECRET=[32文字以上のランダム文字列]
   - テストカード決済
   - 成功時のリダイレクト
 
+- [ ] **初期費用付きサブスクリプション**
+  - `/dashboard/billing/new-session` へのアクセス（admin のみ）
+  - 初期費用ありプランの作成
+  - 初期費用なしプランの作成
+  - 初期費用情報の表示確認
+
 - [ ] **Webhook動作確認**
+  - `checkout.session.completed` イベント処理
   - 決済完了時の組織ステータス更新
   - サブスクリプション情報の保存
+  - 初期費用情報の保存
   - 支払い失敗時の処理
 
 ### パフォーマンス・セキュリティ

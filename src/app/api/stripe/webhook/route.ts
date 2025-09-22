@@ -5,6 +5,7 @@ import { stripe } from '@/lib/stripe';
 import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { webhookRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
+import { sendPaymentFailedEmail } from '@/lib/emails';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -78,6 +79,10 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
 
       case 'invoice.payment_failed':
         processingSuccess = await handlePaymentFailed(event.data.object as Stripe.Invoice);
+        break;
+
+      case 'checkout.session.completed':
+        processingSuccess = await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
         break;
 
       default:
@@ -263,22 +268,125 @@ async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
     if (typeof invoice.customer === 'string') {
       const { data: customer } = await supabaseBrowser
         .from('stripe_customers')
-        .select('organization_id')
+        .select(`
+          organization_id,
+          email,
+          organization:organizations(id, name, created_by)
+        `)
         .eq('stripe_customer_id', invoice.customer)
         .maybeSingle();
 
-      if (customer) {
+      if (customer?.organization) {
         // 支払い失敗の場合、組織を一時停止に
         await supabaseBrowser
           .from('organizations')
           .update({ status: 'paused' })
           .eq('id', customer.organization_id);
+
+        // ユーザー情報を取得してメール送信
+        const orgData = customer.organization as any;
+        const { data: user } = await supabaseBrowser
+          .from('users')
+          .select('email, full_name')
+          .eq('id', orgData.created_by)
+          .maybeSingle();
+
+        if (user) {
+          // 支払い失敗メールを送信
+          await sendPaymentFailedEmail(
+            user.email,
+            user.full_name || user.email,
+            orgData.name
+          );
+          console.log(`Payment failed email sent to ${user.email}`);
+        }
       }
     }
 
     return true;
   } catch (error) {
     console.error('Error handling payment failure:', error);
+    return false;
+  }
+}
+
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session): Promise<boolean> {
+  try {
+    const supabaseBrowser = supabaseBrowserAdmin();
+    const organizationId = session.metadata?.organization_id;
+    const setupFeeAmount = parseInt(session.metadata?.setup_fee_amount || '0');
+    const planType = session.metadata?.plan_type;
+    const notes = session.metadata?.notes;
+
+    if (!organizationId) {
+      console.error('No organization_id in checkout session metadata');
+      return false;
+    }
+
+    // Get the subscription from the session
+    const subscriptionId = session.subscription as string;
+    if (!subscriptionId) {
+      console.error('No subscription ID in checkout session');
+      return false;
+    }
+
+    // Retrieve subscription from Stripe to get details
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+    // Update stripe_customers table with email if provided
+    if (session.customer_details?.email) {
+      await supabaseBrowser
+        .from('stripe_customers')
+        .update({
+          email: session.customer_details.email,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('stripe_customer_id', session.customer)
+        .eq('organization_id', organizationId);
+    }
+
+    // Create or update subscription record
+    const subscriptionData = {
+      org_id: organizationId,
+      stripe_subscription_id: subscription.id,
+      stripe_customer_id: subscription.customer as string,
+      status: subscription.status === 'active' ? 'active' : 'pending',
+      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      setup_fee_amount: setupFeeAmount > 0 ? setupFeeAmount : null,
+      setup_fee_paid_at: setupFeeAmount > 0 ? new Date().toISOString() : null,
+      notes: notes || null,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error: subError } = await supabaseBrowser
+      .from('subscriptions')
+      .upsert(subscriptionData, {
+        onConflict: 'stripe_subscription_id'
+      });
+
+    if (subError) {
+      console.error('Error creating/updating subscription:', subError);
+      return false;
+    }
+
+    // Update organization status to published if subscription is active
+    if (subscription.status === 'active') {
+      await supabaseBrowser
+        .from('organizations')
+        .update({ 
+          status: 'published',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', organizationId)
+        .in('status', ['draft', 'paused']);
+    }
+
+    console.log(`Checkout session completed for organization ${organizationId}, subscription ${subscription.id}`);
+    return true;
+
+  } catch (error) {
+    console.error('Error handling checkout session completion:', error);
     return false;
   }
 }
