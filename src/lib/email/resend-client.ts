@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend client with fallback for build time
+const resend = new Resend(process.env.RESEND_API_KEY || 'dummy-key-for-build');
 
 interface SendEmailParams {
   to: string;
@@ -24,6 +24,23 @@ export async function sendHtmlEmail({
   requestId = crypto.randomUUID() 
 }: SendEmailParams): Promise<SendEmailResult> {
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@aiohub.jp';
+  
+  // Check if API key is available (for runtime)
+  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'dummy-key-for-build') {
+    console.warn({
+      event: 'auth_email_warning',
+      provider: 'resend',
+      message: 'RESEND_API_KEY not configured, skipping Resend email',
+      requestId,
+      timestamp: new Date().toISOString()
+    });
+    
+    return {
+      success: false,
+      requestId,
+      error: 'Resend API key not configured'
+    };
+  }
   
   try {
     console.info({
