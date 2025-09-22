@@ -7,14 +7,23 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.build.json",
+    "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
     "test:setup": "playwright install",
     "test:production": "node scripts/production-test.js",
-    "test:auth": "node scripts/auth-test.js"
+    "test:auth": "node scripts/auth-test.js",
+    "uat:env-check": "node scripts/uat/verify-env.mjs",
+    "uat:dns-check": "node scripts/uat/verify-dns.mjs",
+    "uat:endpoint-check": "node scripts/uat/verify-endpoints.mjs",
+    "uat:preflight": "npm run uat:env-check && npm run uat:dns-check && npm run uat:endpoint-check",
+    "uat:critical": "echo '🚨 クリティカルテスト実行' && echo '詳細: docs/uat/checklists/critical.md 参照'",
+    "uat:important": "echo '🟡 重要テスト実行' && echo '詳細: docs/uat/checklists/important.md 参照'",
+    "uat:recommended": "echo '🟢 推奨テスト実行' && echo '詳細: docs/uat/checklists/recommended.md 参照'",
+    "uat:full": "npm run uat:preflight && echo '✅ 事前チェック完了。次のステップ: npm run uat:critical'"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.8",
@@ -36,11 +45,11 @@
     "jose": "^5.1.0",
     "jsdom": "^27.0.0",
     "lodash": "^4.17.21",
-    "next": "14.0.0",
+    "next": "^15.0.0",
     "postcss": "^8.4.31",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "resend": "^2.0.0",
+    "resend": "^4.0.0",
     "sharp": "^0.34.4",
     "stripe": "^14.25.0",
     "tailwind-merge": "^3.3.1",
@@ -51,8 +60,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
-    "eslint": "^8.51.0",
-    "eslint-config-next": "14.0.0",
-    "supabase": "^2.40.7"
+    "eslint": "^9.36.0",
+    "eslint-config-next": "^15.0.0",
+    "supabase": "^2.45.2"
   }
 }
