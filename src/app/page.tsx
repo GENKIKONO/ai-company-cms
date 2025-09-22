@@ -187,10 +187,10 @@ export default function HomePage() {
             <div>
               <h4 className="font-semibold mb-4">サポート</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>ヘルプセンター</li>
-                <li>お問い合わせ</li>
-                <li>利用規約</li>
-                <li>プライバシーポリシー</li>
+                <li><Link href="/help" className="hover:text-white transition-colors">ヘルプセンター</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors">お問い合わせ</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">利用規約</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors">プライバシーポリシー</Link></li>
               </ul>
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-client';
+import { BackLink } from '@/components/ui/back-link';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -60,6 +61,9 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8 p-8">
+        <div className="flex justify-start">
+          <BackLink fallbackUrl="/" />
+        </div>
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             AIO Hub に新規登録

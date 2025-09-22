@@ -24,7 +24,8 @@
     "uat:important": "echo '🟡 重要テスト実行' && echo '詳細: docs/uat/checklists/important.md 参照'",
     "uat:recommended": "echo '🟢 推奨テスト実行' && echo '詳細: docs/uat/checklists/recommended.md 参照'",
     "uat:report": "node scripts/uat/generate-report.mjs",
-    "uat:full": "npm run uat:preflight && echo '✅ 事前チェック完了。次のステップ: npm run uat:critical'"
+    "uat:full": "npm run uat:preflight && echo '✅ 事前チェック完了。次のステップ: npm run uat:critical'",
+    "diag:email": "node scripts/ops/diagnose-email.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.8",
