@@ -11,6 +11,8 @@ function ConfirmPageContent() {
   const [loading, setLoading] = useState(true);
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState('');
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -69,6 +71,42 @@ function ConfirmPageContent() {
     handleEmailConfirmation();
   }, [router, searchParams]);
 
+  const handleResendConfirmation = async () => {
+    const email = searchParams.get('email');
+    if (!email) {
+      setResendMessage('メールアドレスが見つかりません。再度サインアップをお試しください。');
+      return;
+    }
+
+    setResendLoading(true);
+    setResendMessage('');
+
+    try {
+      const response = await fetch('/api/auth/resend-confirmation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          type: 'signup'
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setResendMessage('確認メールを再送信しました。メールをご確認ください。');
+      } else {
+        setResendMessage(result.error || '再送信に失敗しました。');
+      }
+    } catch (err) {
+      setResendMessage('再送信に失敗しました。しばらく時間をおいてお試しください。');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -91,10 +129,31 @@ function ConfirmPageContent() {
             <div className="mt-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
               {error}
             </div>
-            <div className="mt-6">
-              <a href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
-                ログインページに戻る
-              </a>
+            
+            {resendMessage && (
+              <div className={`mt-4 px-4 py-3 rounded ${
+                resendMessage.includes('再送信しました') 
+                  ? 'bg-green-50 border border-green-200 text-green-600'
+                  : 'bg-yellow-50 border border-yellow-200 text-yellow-600'
+              }`}>
+                {resendMessage}
+              </div>
+            )}
+
+            <div className="mt-6 space-y-4">
+              <button
+                onClick={handleResendConfirmation}
+                disabled={resendLoading}
+                className="w-full flex justify-center py-2 px-4 border border-blue-300 rounded-md text-sm font-medium text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {resendLoading ? '再送信中...' : '確認メールを再送信'}
+              </button>
+              
+              <div className="text-center">
+                <a href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+                  ログインページに戻る
+                </a>
+              </div>
             </div>
           </div>
         </div>

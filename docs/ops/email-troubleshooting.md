@@ -13,6 +13,15 @@ npm run diag:email
 
 このスクリプトが自動的に主要な設定をチェックし、問題箇所を特定します。
 
+### 新機能: デュアルパス メール配信システム
+
+確認メールの信頼性を向上させるため、以下の機能が追加されました：
+
+- **自動バックアップ配信**: Supabase標準メールと並行してResend経由でも配信
+- **手動再送信**: UIから簡単にメールの再送信が可能
+- **診断API**: `/api/ops/email/diagnose` でメール設定の健全性チェック
+- **詳細ログ**: Request IDによる配信追跡とトラブルシューティング
+
 ## 🚨 よくある問題と対処法
 
 ### 1. Site URL の設定ミス
@@ -66,8 +75,12 @@ npm run diag:email
 NEXT_PUBLIC_APP_URL=https://aiohub.jp
 NEXT_PUBLIC_SUPABASE_URL=https://[project-id].supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
 RESEND_API_KEY=re_...
 RESEND_FROM_EMAIL=noreply@aiohub.jp
+
+# デュアルパス配信設定（新機能）
+USE_SUPABASE_EMAIL=true  # falseにするとResendのみ使用
 ```
 
 ### B. Supabase Auth 設定
@@ -96,6 +109,18 @@ RESEND_FROM_EMAIL=noreply@aiohub.jp
 ### ステップ 1: 基本設定確認
 ```bash
 npm run diag:email
+```
+
+### ステップ 1.5: 診断API確認（新機能）
+```bash
+# Webブラウザまたはcurlで診断APIを実行
+curl -X POST https://aiohub.jp/api/ops/email/diagnose
+
+# 返されるJSONで各コンポーネントの健全性を確認
+# - environment_check: 環境変数の設定状況
+# - smtp_connectivity: SMTP接続テスト
+# - resend_api: Resend API接続テスト  
+# - supabase_admin: Supabase Admin API接続テスト
 ```
 
 ### ステップ 2: 手動での Supabase 設定確認
@@ -132,10 +157,18 @@ SET email_confirmed_at = NOW()
 WHERE email = 'test@example.com';
 ```
 
-### 手動でのメール再送信
+### 手動でのメール再送信（新機能）
 ```bash
-# Supabase CLI を使用
+# 1. Supabase CLI を使用（従来の方法）
 supabase auth resend --type signup --email user@example.com
+
+# 2. Resend APIを使用（新機能）
+curl -X POST https://aiohub.jp/api/auth/resend-confirmation \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","type":"signup"}'
+
+# 3. UIからの再送信
+# サインアップ完了画面またはエラー画面で「メールが届かない場合は再送信」ボタンをクリック
 ```
 
 ## 📊 ログの確認方法

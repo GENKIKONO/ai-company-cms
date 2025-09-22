@@ -12,6 +12,8 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showResendButton, setShowResendButton] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -49,12 +51,61 @@ export default function SignupPage() {
       }
 
       setSuccess('確認メールを送信しました。メールをご確認の上、リンクをクリックしてアカウントを有効化してください。');
+      setShowResendButton(true);
+      
+      // Send backup email via Resend API
+      try {
+        await fetch('/api/auth/resend-confirmation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            type: 'signup'
+          }),
+        });
+      } catch (backupError) {
+        console.warn('Backup email failed:', backupError);
+      }
       
     } catch (err) {
       console.error('Signup error:', err);
       setError(err instanceof Error ? err.message : 'アカウント作成に失敗しました');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendEmail = async () => {
+    if (!email) return;
+    
+    setResendLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch('/api/auth/resend-confirmation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          type: 'signup'
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setSuccess('確認メールを再送信しました。メールをご確認ください。');
+      } else {
+        setError(result.error || '再送信に失敗しました');
+      }
+    } catch (err) {
+      setError('再送信に失敗しました');
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -82,6 +133,18 @@ export default function SignupPage() {
           {success && (
             <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded">
               {success}
+              {showResendButton && (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={handleResendEmail}
+                    disabled={resendLoading}
+                    className="text-sm text-blue-600 hover:text-blue-500 underline disabled:opacity-50"
+                  >
+                    {resendLoading ? '再送信中...' : 'メールが届かない場合は再送信'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
           
