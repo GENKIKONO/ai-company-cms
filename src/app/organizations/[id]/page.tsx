@@ -55,6 +55,19 @@ export default function EditOrganizationPage() {
         
         setUser(currentUser);
         
+        // 'new'または'create'の場合は早期return（新規作成ページ）
+        if (organizationId === 'new' || organizationId === 'create') {
+          router.push('/organizations/new');
+          return;
+        }
+        
+        // UUIDでない値をチェック
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(organizationId)) {
+          router.push('/404');
+          return;
+        }
+        
         // 企業データと業界一覧を取得
         const [orgResult, industriesResult] = await Promise.all([
           getOrganization(organizationId),

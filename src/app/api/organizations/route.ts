@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('organizations')
       .select('*', { count: 'exact' })
-      .eq('visibility', 'public');
+      .eq('status', 'published');
 
     // Apply filters
     if (industry) {
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     const organizationData = {
       ...body,
       created_by: userId,
-      visibility: body.visibility || 'public',
+      status: body.status || 'draft',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };

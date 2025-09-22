@@ -28,8 +28,8 @@ export async function GET(
       );
     }
 
-    // Check if organization is public or user has access
-    if (data.visibility !== 'public') {
+    // Check if organization is published or user has access
+    if (data.status !== 'published') {
       const authHeader = request.headers.get('authorization');
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return NextResponse.json(
