@@ -168,8 +168,8 @@ export async function healthCheck(): Promise<{
   try {
     // Supabase接続チェック
     try {
-      const { supabaseBrowserServer } = await import('@/lib/supabase-server');
-      const supabaseBrowser = supabaseBrowserServer();
+      const { supabaseServer } = await import('@/lib/supabase-server');
+      const supabaseBrowser = await supabaseServer();
       const { error } = await supabaseBrowser.from('organizations').select('id').limit(1);
       checks.supabase = !error;
     } catch {

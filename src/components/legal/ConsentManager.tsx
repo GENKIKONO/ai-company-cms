@@ -26,12 +26,12 @@ interface ConsentManagerProps {
 const LEGAL_TEXTS = {
   terms: {
     title: '利用規約',
-    summary: 'LuxuCareサービスの利用に関する規約です。',
+    summary: 'AIO Hubサービスの利用に関する規約です。',
     content: `
-## LuxuCare利用規約
+## AIO Hub利用規約
 
 ### 第1条（目的）
-本規約は、株式会社LuxuCare（以下「当社」）が提供するAI対応企業情報管理システム「LuxuCare」（以下「本サービス」）の利用条件を定めるものです。
+本規約は、株式会社AIO Hub（以下「当社」）が提供するAI対応企業情報管理システム「AIO Hub」（以下「本サービス」）の利用条件を定めるものです。
 
 ### 第2条（定義）
 1. 「ユーザー」とは、本サービスを利用する個人または法人をいいます
@@ -108,7 +108,7 @@ const LEGAL_TEXTS = {
 適切な技術的・組織的安全管理措置を講じます。
 
 ### 8. お問い合わせ
-個人情報に関するお問い合わせ：privacy@luxucare.ai
+個人情報に関するお問い合わせ：privacy@aiohub.ai
 
 制定日：2024年1月1日
 改定日：2024年3月1日（v1.1）

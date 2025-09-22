@@ -91,7 +91,7 @@ export default function OrganizationsPage() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600">
-                LuxuCare AI企業CMS
+                AIO Hub AI企業CMS
               </Link>
             </div>
             <div className="flex items-center space-x-4">
@@ -111,7 +111,7 @@ export default function OrganizationsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">企業ディレクトリ</h1>
           <p className="text-lg text-gray-600">
-            LuxuCareに登録された{organizations.length}社の企業情報を検索・閲覧できます
+            AIO Hubに登録された{organizations.length}社の企業情報を検索・閲覧できます
           </p>
         </div>
 

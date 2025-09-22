@@ -34,7 +34,7 @@ export class ExportService {
 
     this.downloadFile(
       csvContent,
-      options.customFilename || `luxucare-organizations-${new Date().toISOString().split('T')[0]}.csv`,
+      options.customFilename || `aiohub-organizations-${new Date().toISOString().split('T')[0]}.csv`,
       'text/csv'
     );
   }
@@ -45,7 +45,7 @@ export class ExportService {
       metadata: {
         exportDate: new Date().toISOString(),
         totalCount: organizations.length,
-        source: 'LuxuCare',
+        source: 'AIO Hub',
         version: '1.0'
       },
       organizations: organizations
@@ -55,7 +55,7 @@ export class ExportService {
     
     this.downloadFile(
       jsonContent,
-      options.customFilename || `luxucare-organizations-${new Date().toISOString().split('T')[0]}.json`,
+      options.customFilename || `aiohub-organizations-${new Date().toISOString().split('T')[0]}.json`,
       'application/json'
     );
   }
@@ -80,7 +80,7 @@ export class ExportService {
 
     this.downloadFile(
       csvContent,
-      options.customFilename || `luxucare-organizations-detailed-${new Date().toISOString().split('T')[0]}.csv`,
+      options.customFilename || `aiohub-organizations-detailed-${new Date().toISOString().split('T')[0]}.csv`,
       'text/csv'
     );
   }
@@ -91,7 +91,7 @@ export class ExportService {
     
     this.downloadFile(
       reportHtml,
-      `luxucare-report-${options.type}-${new Date().toISOString().split('T')[0]}.html`,
+      `aiohub-report-${options.type}-${new Date().toISOString().split('T')[0]}.html`,
       'text/html'
     );
   }
@@ -107,7 +107,7 @@ export class ExportService {
     
     this.downloadFile(
       reportHtml,
-      `luxucare-comparison-${organizations.map(o => o.slug).join('-')}-${new Date().toISOString().split('T')[0]}.html`,
+      `aiohub-comparison-${organizations.map(o => o.slug).join('-')}-${new Date().toISOString().split('T')[0]}.html`,
       'text/html'
     );
   }
@@ -196,7 +196,7 @@ export class ExportService {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuxuCare 企業レポート</title>
+    <title>AIO Hub 企業レポート</title>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 40px; color: #333; }
         .header { border-bottom: 2px solid #4F46E5; padding-bottom: 20px; margin-bottom: 30px; }
@@ -215,7 +215,7 @@ export class ExportService {
 </head>
 <body>
     <div class="header">
-        <h1 class="title">LuxuCare 企業レポート</h1>
+        <h1 class="title">AIO Hub 企業レポート</h1>
         <p class="subtitle">生成日: ${new Date().toLocaleDateString('ja-JP')} | 対象企業数: ${organizations.length}社</p>
     </div>
     
@@ -257,7 +257,7 @@ export class ExportService {
     `).join('')}
     
     <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #E5E7EB; text-align: center; color: #6B7280; font-size: 12px;">
-        Powered by LuxuCare - AI企業ディレクトリ
+        Powered by AIO Hub - AI企業ディレクトリ
     </div>
 </body>
 </html>`;
@@ -285,7 +285,7 @@ export class ExportService {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>企業比較レポート - LuxuCare</title>
+    <title>企業比較レポート - AIO Hub</title>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 40px; color: #333; }
         .header { border-bottom: 2px solid #4F46E5; padding-bottom: 20px; margin-bottom: 30px; }
@@ -344,7 +344,7 @@ export class ExportService {
     </table>
     
     <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #E5E7EB; text-align: center; color: #6B7280; font-size: 12px;">
-        Powered by LuxuCare
+        Powered by AIO Hub
     </div>
 </body>
 </html>`;

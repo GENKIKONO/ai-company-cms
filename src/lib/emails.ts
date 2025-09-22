@@ -4,29 +4,29 @@ import { Resend } from 'resend';
 
 // Resend configuration
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@luxucare.ai';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@aiohub.ai';
 
 // Email templates
 export const EMAIL_TEMPLATES = {
   WELCOME: {
-    subject: 'LuxuCare AI企業CMSへようこそ！',
+    subject: 'AIO Hub AI企業CMSへようこそ！',
     getHtml: (userName: string) => `
       <!DOCTYPE html>
       <html>
         <head>
           <meta charset="utf-8">
-          <title>LuxuCare AI企業CMSへようこそ</title>
+          <title>AIO Hub AI企業CMSへようこそ</title>
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333;">
           <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 40px;">
-              <h1 style="color: #2563eb; margin: 0;">LuxuCare AI企業CMS</h1>
+              <h1 style="color: #2563eb; margin: 0;">AIO Hub AI企業CMS</h1>
               <p style="color: #6b7280; margin: 10px 0 0 0;">企業情報管理プラットフォーム</p>
             </div>
             
             <div style="background: #f8fafc; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
               <h2 style="color: #1f2937; margin: 0 0 20px 0;">ようこそ、${userName}さん！</h2>
-              <p style="margin: 0 0 20px 0;">LuxuCare AI企業CMSにご登録いただき、ありがとうございます。</p>
+              <p style="margin: 0 0 20px 0;">AIO Hub AI企業CMSにご登録いただき、ありがとうございます。</p>
               <p style="margin: 0 0 20px 0;">このプラットフォームでは、以下のことができます：</p>
               
               <ul style="padding-left: 20px; margin: 0 0 20px 0;">
@@ -48,7 +48,7 @@ export const EMAIL_TEMPLATES = {
             <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; text-align: center;">
               <p style="color: #6b7280; font-size: 14px; margin: 0;">
                 ご質問がございましたら、お気軽にお問い合わせください。<br>
-                <a href="mailto:support@luxucare.ai" style="color: #2563eb;">support@luxucare.ai</a>
+                <a href="mailto:support@aiohub.ai" style="color: #2563eb;">support@aiohub.ai</a>
               </p>
             </div>
           </div>
@@ -56,11 +56,11 @@ export const EMAIL_TEMPLATES = {
       </html>
     `,
     getText: (userName: string) => `
-LuxuCare AI企業CMSへようこそ！
+AIO Hub AI企業CMSへようこそ！
 
 ${userName}さん、
 
-LuxuCare AI企業CMSにご登録いただき、ありがとうございます。
+AIO Hub AI企業CMSにご登録いただき、ありがとうございます。
 
 このプラットフォームでは、以下のことができます：
 - 企業情報の登録・管理
@@ -71,9 +71,9 @@ LuxuCare AI企業CMSにご登録いただき、ありがとうございます。
 
 ダッシュボード: ${process.env.NEXT_PUBLIC_APP_URL}/dashboard
 
-ご質問がございましたら、support@luxucare.ai までお問い合わせください。
+ご質問がございましたら、support@aiohub.ai までお問い合わせください。
 
-LuxuCare チーム
+AIO Hub チーム
     `
   },
 
@@ -128,7 +128,7 @@ LuxuCare チーム
             <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; text-align: center;">
               <p style="color: #6b7280; font-size: 14px; margin: 0;">
                 ご不明な点がございましたら、お気軽にお問い合わせください。<br>
-                <a href="mailto:support@luxucare.ai" style="color: #2563eb;">support@luxucare.ai</a>
+                <a href="mailto:support@aiohub.ai" style="color: #2563eb;">support@aiohub.ai</a>
               </p>
             </div>
           </div>
@@ -153,9 +153,9 @@ ${userName}さん、
 
 注意: 決済が完了するまで、一部の機能が制限される場合があります。
 
-お問い合わせ: support@luxucare.ai
+お問い合わせ: support@aiohub.ai
 
-LuxuCare チーム
+AIO Hub チーム
     `
   }
 } as const;

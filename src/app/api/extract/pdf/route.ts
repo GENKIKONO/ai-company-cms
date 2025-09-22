@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 認証チェック
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     
     if (authError || !user) {

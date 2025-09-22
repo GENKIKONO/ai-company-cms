@@ -171,7 +171,7 @@ export default function NewOrganizationPage() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600">
-                LuxuCare AI企業CMS
+                AIO Hub AI企業CMS
               </Link>
               <nav className="ml-10 hidden md:flex space-x-8">
                 <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">

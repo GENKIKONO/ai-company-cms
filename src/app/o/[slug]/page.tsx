@@ -74,7 +74,7 @@ export default function OrganizationDetailPage() {
   return (
     <>
       <Head>
-        <title>{organization.meta_title || `${organization.name} - LuxuCare企業ディレクトリ`}</title>
+        <title>{organization.meta_title || `${organization.name} - AIO Hub企業ディレクトリ`}</title>
         <meta 
           name="description" 
           content={organization.meta_description || organization.description} 
@@ -95,7 +95,7 @@ export default function OrganizationDetailPage() {
             <div className="flex justify-between items-center py-6">
               <div className="flex items-center">
                 <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600">
-                  LuxuCare AI企業CMS
+                  AIO Hub AI企業CMS
                 </Link>
                 <nav className="ml-10 hidden md:flex space-x-8">
                   <Link href="/organizations" className="text-gray-500 hover:text-gray-700">

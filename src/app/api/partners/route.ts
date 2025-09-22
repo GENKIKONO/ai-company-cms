@@ -3,7 +3,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
 
     // ユーザー認証確認
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
 
     // ユーザー認証確認
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();

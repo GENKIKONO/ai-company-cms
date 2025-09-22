@@ -70,7 +70,7 @@ interface DirectoryStructuredData {
 export class StructuredDataGenerator {
   private baseUrl: string;
 
-  constructor(baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL || 'https://luxucare.ai') {
+  constructor(baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL || 'https://aiohub.ai') {
     this.baseUrl = baseUrl;
   }
 
@@ -158,13 +158,13 @@ export class StructuredDataGenerator {
 
   generateWebSiteData(locale: string = 'ja'): WebSiteStructuredData {
     const siteNames = {
-      ja: 'LuxuCare - AI企業ディレクトリ',
-      en: 'LuxuCare - AI Enterprise Directory',
-      zh: 'LuxuCare - AI企业目录',
-      ko: 'LuxuCare - AI 기업 디렉토리',
-      es: 'LuxuCare - Directorio de Empresas AI',
-      fr: 'LuxuCare - Répertoire d\'entreprises IA',
-      de: 'LuxuCare - KI-Unternehmensverzeichnis',
+      ja: 'AIO Hub - AI企業ディレクトリ',
+      en: 'AIO Hub - AI Enterprise Directory',
+      zh: 'AIO Hub - AI企业目录',
+      ko: 'AIO Hub - AI 기업 디렉토리',
+      es: 'AIO Hub - Directorio de Empresas AI',
+      fr: 'AIO Hub - Répertoire d\'entreprises IA',
+      de: 'AIO Hub - KI-Unternehmensverzeichnis',
     };
 
     const siteDescriptions = {

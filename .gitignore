@@ -34,3 +34,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# UAT logs (contain potentially sensitive test data)
+docs/uat/logs/*
+!docs/uat/logs/README.md

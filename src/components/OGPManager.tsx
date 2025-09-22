@@ -228,7 +228,7 @@ export default function OGPManager({ companyName, description, logoUrl, onOGPGen
                   <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                     {description || `${companyName}の企業情報`}
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">luxucare.example.com</p>
+                  <p className="text-xs text-gray-400 mt-1">aiohub.example.com</p>
                 </div>
               </div>
             ) : (
@@ -246,7 +246,7 @@ export default function OGPManager({ companyName, description, logoUrl, onOGPGen
                     <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                       {description || `${companyName}の企業情報`}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">🔗 luxucare.example.com</p>
+                    <p className="text-xs text-gray-400 mt-1">🔗 aiohub.example.com</p>
                   </div>
                 </div>
               </div>

@@ -55,12 +55,12 @@ const OGP_TEMPLATE = `
         fill-opacity="0.8">{{description}}</text>
   {{/if}}
   
-  <!-- LuxuCare ブランディング -->
+  <!-- AIO Hub ブランディング -->
   <text x="120" y="500" 
         font-family="'Hiragino Sans', 'Noto Sans JP', sans-serif" 
         font-size="18" 
         fill="{{textColor}}" 
-        fill-opacity="0.6">Powered by LuxuCare</text>
+        fill-opacity="0.6">Powered by AIO Hub</text>
   
   <!-- アクセントライン -->
   <rect x="120" y="520" width="100" height="4" fill="{{accentColor}}"/>
@@ -131,7 +131,7 @@ async function generateOGPImage(options: OGPGenerationOptions): Promise<Buffer> 
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
     
     // ユーザー認証確認
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();

@@ -3,14 +3,15 @@ import { supabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const supabase = supabaseAdmin();
     const { data, error } = await supabase
       .from('organizations')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', resolvedParams.id)
       .single();
 
     if (error) {
@@ -53,9 +54,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -74,7 +76,7 @@ export async function PUT(
     const { data, error } = await supabase
       .from('organizations')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', resolvedParams.id)
       .select()
       .single();
 
@@ -107,9 +109,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -123,13 +126,13 @@ export async function DELETE(
     const { data: org } = await supabase
       .from('organizations')
       .select('id, name')
-      .eq('id', params.id)
+      .eq('id', resolvedParams.id)
       .single();
 
     const { error } = await supabase
       .from('organizations')
       .delete()
-      .eq('id', params.id);
+      .eq('id', resolvedParams.id);
 
     if (error) {
       console.error('Database error:', error);

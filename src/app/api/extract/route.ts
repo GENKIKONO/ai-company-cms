@@ -46,7 +46,7 @@ async function extractFromURL(url: string): Promise<ExtractionResult> {
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; LuxuCare-Bot/1.0)'
+        'User-Agent': 'Mozilla/5.0 (compatible; AIOHub-Bot/1.0)'
       }
     });
     
@@ -100,7 +100,7 @@ async function extractFromPDF(buffer: Buffer): Promise<ExtractionResult> {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
     
     // ユーザー認証確認
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();

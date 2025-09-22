@@ -7,25 +7,26 @@ import crypto from 'crypto';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   const requestId = crypto.randomUUID();
   const startTime = Date.now();
+  const resolvedParams = await params;
   
   try {
     apiLogger.info('Public organization API request started', {
-      slug: params.slug,
+      slug: resolvedParams.slug,
       userAgent: request.headers.get('user-agent'),
-      ip: request.ip
+      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     }, requestId);
 
-    const slug = params.slug;
+    const slug = resolvedParams.slug;
 
     if (!slug) {
       throw createError.validation('スラグが指定されていません', { slug });
     }
 
-    const supabase = supabaseServer();
+    const supabase = await supabaseServer();
 
     // 公開中の企業情報を取得（パフォーマンス監視付き）
     const organization = await PerformanceMonitor.monitor(
@@ -180,7 +181,7 @@ export async function GET(
     
     apiLogger.request(
       'GET',
-      `/api/public/organizations/${params.slug}`,
+      `/api/public/organizations/${resolvedParams.slug}`,
       status,
       duration,
       requestId,
@@ -195,11 +196,12 @@ export async function GET(
 // HEAD リクエスト対応（SEO用）
 export async function HEAD(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const supabase = supabaseServer();
-    const slug = params.slug;
+    const resolvedParams = await params;
+    const supabase = await supabaseServer();
+    const slug = resolvedParams.slug;
 
     const { data: organization, error } = await supabase
       .from('organizations')

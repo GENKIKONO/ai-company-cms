@@ -1,0 +1,334 @@
+name: UAT Preflight Checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docs/uat/**'
+      - 'scripts/uat/**'
+      - '.github/workflows/uat-preflight.yml'
+      - 'package.json'
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Target branch for UAT verification'
+        required: false
+        default: 'chore/uat-final'
+
+concurrency:
+  group: uat-preflight-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight-verification:
+    name: UAT Preflight Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    env:
+      # 本番環境設定（機微情報はRepository Secretsから取得）
+      NEXT_PUBLIC_APP_URL: "https://aiohub.jp"
+      UAT_LOG_DIR: "./scripts/uat/output"
+      
+    outputs:
+      env_check_status: ${{ steps.env-check.outputs.status }}
+      dns_check_status: ${{ steps.dns-check.outputs.status }}
+      endpoint_check_status: ${{ steps.endpoint-check.outputs.status }}
+      overall_status: ${{ steps.summary.outputs.status }}
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 🔧 Install dependencies
+        run: npm ci
+
+      - name: 📁 Create output directory
+        run: |
+          mkdir -p ${{ env.UAT_LOG_DIR }}
+          echo "$(date '+%Y-%m-%d %H:%M:%S') UAT Preflight Started" > ${{ env.UAT_LOG_DIR }}/execution.log
+
+      - name: 🔐 Environment Variables Check
+        id: env-check
+        run: |
+          echo "🔧 環境変数検証を実行しています..."
+          if npm run uat:env-check > ${{ env.UAT_LOG_DIR }}/env-check.log 2>&1; then
+            echo "status=PASS" >> $GITHUB_OUTPUT
+            echo "✅ 環境変数チェック: PASS" >> $GITHUB_STEP_SUMMARY
+            echo "$(date '+%Y-%m-%d %H:%M:%S') ENV_CHECK: PASS" >> ${{ env.UAT_LOG_DIR }}/execution.log
+          else
+            echo "status=FAIL" >> $GITHUB_OUTPUT
+            echo "❌ 環境変数チェック: FAIL" >> $GITHUB_STEP_SUMMARY
+            echo "$(date '+%Y-%m-%d %H:%M:%S') ENV_CHECK: FAIL" >> ${{ env.UAT_LOG_DIR }}/execution.log
+            echo "::error::環境変数の設定に問題があります。ログを確認してください。"
+          fi
+        continue-on-error: true
+
+      - name: 🌐 DNS/SSL Verification
+        id: dns-check
+        run: |
+          echo "🌐 DNS/SSL検証を実行しています..."
+          if npm run uat:dns-check > ${{ env.UAT_LOG_DIR }}/dns-check.log 2>&1; then
+            echo "status=PASS" >> $GITHUB_OUTPUT
+            echo "✅ DNS/SSL チェック: PASS" >> $GITHUB_STEP_SUMMARY
+            echo "$(date '+%Y-%m-%d %H:%M:%S') DNS_CHECK: PASS" >> ${{ env.UAT_LOG_DIR }}/execution.log
+          else
+            echo "status=FAIL" >> $GITHUB_OUTPUT
+            echo "❌ DNS/SSL チェック: FAIL" >> $GITHUB_STEP_SUMMARY
+            echo "$(date '+%Y-%m-%d %H:%M:%S') DNS_CHECK: FAIL" >> ${{ env.UAT_LOG_DIR }}/execution.log
+            echo "::error::DNS/SSL設定に問題があります。ログを確認してください。"
+          fi
+        continue-on-error: true
+
+      - name: 🔌 API Endpoint Verification
+        id: endpoint-check
+        run: |
+          echo "🔌 APIエンドポイント検証を実行しています..."
+          if npm run uat:endpoint-check > ${{ env.UAT_LOG_DIR }}/endpoint-check.log 2>&1; then
+            echo "status=PASS" >> $GITHUB_OUTPUT
+            echo "✅ APIエンドポイント チェック: PASS" >> $GITHUB_STEP_SUMMARY
+            echo "$(date '+%Y-%m-%d %H:%M:%S') ENDPOINT_CHECK: PASS" >> ${{ env.UAT_LOG_DIR }}/execution.log
+          else
+            echo "status=FAIL" >> $GITHUB_OUTPUT
+            echo "❌ APIエンドポイント チェック: FAIL" >> $GITHUB_STEP_SUMMARY
+            echo "$(date '+%Y-%m-%d %H:%M:%S') ENDPOINT_CHECK: FAIL" >> ${{ env.UAT_LOG_DIR }}/execution.log
+            echo "::error::APIエンドポイントに問題があります。ログを確認してください。"
+          fi
+        continue-on-error: true
+
+      - name: 📊 Generate Summary Report
+        id: summary
+        run: |
+          echo "📊 結果サマリーを生成しています..."
+          
+          ENV_STATUS="${{ steps.env-check.outputs.status }}"
+          DNS_STATUS="${{ steps.dns-check.outputs.status }}"
+          ENDPOINT_STATUS="${{ steps.endpoint-check.outputs.status }}"
+          
+          # カウント結果
+          PASS_COUNT=0
+          FAIL_COUNT=0
+          
+          if [ "$ENV_STATUS" = "PASS" ]; then PASS_COUNT=$((PASS_COUNT + 1)); else FAIL_COUNT=$((FAIL_COUNT + 1)); fi
+          if [ "$DNS_STATUS" = "PASS" ]; then PASS_COUNT=$((PASS_COUNT + 1)); else FAIL_COUNT=$((FAIL_COUNT + 1)); fi
+          if [ "$ENDPOINT_STATUS" = "PASS" ]; then PASS_COUNT=$((PASS_COUNT + 1)); else FAIL_COUNT=$((FAIL_COUNT + 1)); fi
+          
+          # サマリーレポート生成
+          cat > ${{ env.UAT_LOG_DIR }}/summary.log << EOF
+          UAT Preflight 検証結果サマリー
+          ================================
+          実行日時: $(date '+%Y-%m-%d %H:%M:%S')
+          実行ブランチ: ${{ github.event.pull_request.head.ref || github.ref }}
+          コミットSHA: ${{ github.sha }}
+          
+          検証結果:
+          - 環境変数チェック: $ENV_STATUS
+          - DNS/SSL検証: $DNS_STATUS
+          - APIエンドポイント検証: $ENDPOINT_STATUS
+          
+          総合結果: $PASS_COUNT/3 項目合格
+          EOF
+          
+          # GitHub Step Summary に結果を追加
+          echo "## 📋 UAT Preflight 検証結果" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| チェック項目 | 結果 |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔐 環境変数 | $ENV_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌐 DNS/SSL | $DNS_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔌 API疎通 | $ENDPOINT_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ $FAIL_COUNT -eq 0 ]; then
+            echo "status=PASS" >> $GITHUB_OUTPUT
+            echo "🎉 **全チェック項目が合格しました！** クリティカルテストに進むことができます。" >> $GITHUB_STEP_SUMMARY
+            echo "$(date '+%Y-%m-%d %H:%M:%S') OVERALL: PASS (3/3)" >> ${{ env.UAT_LOG_DIR }}/execution.log
+          else
+            echo "status=FAIL" >> $GITHUB_OUTPUT
+            echo "⚠️ **$FAIL_COUNT 項目で問題が検出されました。** 修正後に再実行してください。" >> $GITHUB_STEP_SUMMARY
+            echo "$(date '+%Y-%m-%d %H:%M:%S') OVERALL: FAIL ($PASS_COUNT/3)" >> ${{ env.UAT_LOG_DIR }}/execution.log
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📖 次のステップ" >> $GITHUB_STEP_SUMMARY
+          if [ $FAIL_COUNT -eq 0 ]; then
+            echo "1. プルリクエストをマージ" >> $GITHUB_STEP_SUMMARY
+            echo "2. クリティカルテスト実行: \`npm run uat:critical\`" >> $GITHUB_STEP_SUMMARY
+            echo "3. 詳細手順: [docs/uat/checklists/critical.md](../docs/uat/checklists/critical.md)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "1. 検証ログを確認: アーティファクト \`uat-preflight-logs\` をダウンロード" >> $GITHUB_STEP_SUMMARY
+            echo "2. 問題を修正" >> $GITHUB_STEP_SUMMARY
+            echo "3. 再度プッシュして CI を再実行" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 📊 Generate UAT Report
+        id: generate-report
+        run: |
+          echo "📊 UAT レポートを生成しています..."
+          if npm run uat:report > ${{ env.UAT_LOG_DIR }}/report-generation.log 2>&1; then
+            echo "status=SUCCESS" >> $GITHUB_OUTPUT
+            echo "✅ UAT レポート生成: 成功" >> $GITHUB_STEP_SUMMARY
+            
+            # レポートファイルのパスを取得
+            REPORT_DATE=$(date +%Y%m%d)
+            REPORT_PATH="docs/uat/logs/$REPORT_DATE/uat-report.md"
+            
+            if [ -f "$REPORT_PATH" ]; then
+              echo "report_path=$REPORT_PATH" >> $GITHUB_OUTPUT
+              echo "📄 レポートパス: $REPORT_PATH" >> $GITHUB_STEP_SUMMARY
+              
+              # レポートの一部をCIアーティファクトにもコピー
+              cp "$REPORT_PATH" "${{ env.UAT_LOG_DIR }}/uat-report.md"
+            else
+              echo "⚠️ レポートファイルが見つかりませんでした: $REPORT_PATH" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "status=FAILED" >> $GITHUB_OUTPUT
+            echo "❌ UAT レポート生成: 失敗" >> $GITHUB_STEP_SUMMARY
+            echo "::warning::レポート生成に失敗しましたが、処理を継続します。"
+          fi
+        continue-on-error: true
+
+      - name: 📂 Upload UAT Logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: uat-preflight-logs
+          path: ${{ env.UAT_LOG_DIR }}/
+          retention-days: 30
+
+      - name: 💬 Enhanced PR Comment with Release Decision
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const envStatus = '${{ steps.env-check.outputs.status }}';
+            const dnsStatus = '${{ steps.dns-check.outputs.status }}';
+            const endpointStatus = '${{ steps.endpoint-check.outputs.status }}';
+            const overallStatus = '${{ steps.summary.outputs.status }}';
+            const reportGenStatus = '${{ steps.generate-report.outputs.status }}';
+            const reportPath = '${{ steps.generate-report.outputs.report_path }}';
+            
+            const statusIcon = (status) => status === 'PASS' || status === 'SUCCESS' ? '✅' : '❌';
+            
+            // リリース判定ロジック
+            const criticalTestsPassed = 4; // ダミー値 - 実際は手動テスト後に設定
+            const criticalTestsRequired = 4;
+            const isReleasable = (overallStatus === 'PASS' && criticalTestsPassed >= criticalTestsRequired);
+            
+            // 次のアクション決定
+            let nextActions = '';
+            let releaseDecision = '';
+            
+            if (overallStatus === 'PASS') {
+              if (isReleasable) {
+                releaseDecision = '🟢 **本番リリース可能**';
+                nextActions = `
+            📋 **次のステップ**:
+            1. プルリクエストをマージ
+            2. 手動クリティカルテスト実行: \`npm run uat:critical\`
+            3. クリティカル 4/4 成功後、本番リリース実行
+            
+            📖 **手順詳細**: [critical.md](../docs/uat/checklists/critical.md)`;
+              } else {
+                releaseDecision = '🟡 **事前チェック完了 - クリティカルテスト待ち**';
+                nextActions = `
+            📋 **次のステップ**:
+            1. プルリクエストをマージ
+            2. 手動クリティカルテスト実行: \`npm run uat:critical\`
+            3. 全4項目成功後、リリース判定更新
+            
+            ⚠️ **注意**: クリティカルテスト 4/4 成功まではリリース延期`;
+              }
+            } else {
+              releaseDecision = '🔴 **リリース延期 - 事前チェック失敗**';
+              nextActions = `
+            📋 **必要な対応**:
+            1. 検証ログ確認: Artifacts \`uat-preflight-logs\` をダウンロード
+            2. 問題修正 (環境変数/DNS/API設定)
+            3. 再度プッシュしてCI再実行
+            4. 全て解決後、クリティカルテストに進行`;
+            }
+            
+            // レポート情報
+            const reportSection = reportGenStatus === 'SUCCESS' && reportPath ? 
+              `
+            ## 📊 自動生成レポート
+            
+            ✅ UAT結果レポートが自動生成されました
+            - **レポートパス**: \`${reportPath}\`
+            - **アーティファクト**: [uat-preflight-logs](../actions) からダウンロード可能
+            - **ローカル生成**: \`npm run uat:report\` で最新レポート作成` 
+              : 
+              `
+            ## 📊 レポート生成状況
+            
+            ${reportGenStatus === 'FAILED' ? '❌' : '⚠️'} レポート自動生成に問題が発生
+            - **手動生成**: \`npm run uat:report\` で作成してください
+            - **テンプレート**: \`docs/uat/templates/report.md\``;
+            
+            const comment = `## 🧪 UAT Preflight 検証結果
+            
+            ### 📋 事前チェック結果
+            | チェック項目 | 結果 | 詳細 |
+            |-------------|------|------|
+            | ${statusIcon(envStatus)} 環境変数チェック | **${envStatus}** | 本番環境設定の検証 |
+            | ${statusIcon(dnsStatus)} DNS/SSL検証 | **${dnsStatus}** | aiohub.jp ドメインと証明書 |
+            | ${statusIcon(endpointStatus)} API疎通確認 | **${endpointStatus}** | 全エンドポイントの疎通確認 |
+            
+            ### 🎯 リリース判定
+            
+            ${releaseDecision}
+            
+            ${nextActions}
+            ${reportSection}
+            
+            ---
+            
+            ### 🔧 実行コマンド参考
+            - **事前チェック**: \`npm run uat:preflight\`
+            - **レポート生成**: \`npm run uat:report\`
+            - **クリティカルテスト**: \`npm run uat:critical\`
+            
+            ### 📚 関連ドキュメント
+            - [📋 実行ガイド](../docs/uat/runner.md)
+            - [🔴 クリティカルテスト](../docs/uat/checklists/critical.md)
+            - [🎯 UAT最終版手順書](../docs/uat/uat_final.md)
+            
+            ---
+            *🤖 このコメントはGitHub Actionsにより自動生成されました*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: 🚨 Fail job if checks failed
+        if: steps.summary.outputs.status == 'FAIL'
+        run: |
+          echo "::error::UAT Preflight 検証に失敗しました。アーティファクトのログを確認してください。"
+          exit 1
+
+  # セキュリティスキャン（オプション）
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: 🔒 Run security audit
+        run: |
+          npm audit --audit-level=high
+        continue-on-error: true

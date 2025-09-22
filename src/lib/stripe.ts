@@ -106,7 +106,7 @@ export interface StripeWebhookEvent {
 }
 
 // Helper functions for Stripe operations
-export const getLuxuCareProducts = async () => {
+export const getAIOHubProducts = async () => {
   try {
     const products = await stripe.products.list({
       active: true,
@@ -114,12 +114,12 @@ export const getLuxuCareProducts = async () => {
     });
     return products.data;
   } catch (error) {
-    console.error('Error fetching LuxuCare products:', error);
+    console.error('Error fetching AIO Hub products:', error);
     return [];
   }
 };
 
-export const createLuxuCareProducts = async () => {
+export const createAIOHubProducts = async () => {
   try {
     const products = [];
     
@@ -151,7 +151,7 @@ export const createLuxuCareProducts = async () => {
     
     return products;
   } catch (error) {
-    console.error('Error creating LuxuCare products:', error);
+    console.error('Error creating AIO Hub products:', error);
     throw error;
   }
 };
@@ -162,7 +162,7 @@ export const createStripeCustomer = async (email: string, name?: string) => {
       email,
       name,
       metadata: {
-        source: 'luxucare_cms',
+        source: 'aiohub_cms',
       },
     });
     return customer;

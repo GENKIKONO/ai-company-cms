@@ -1,5 +1,26 @@
 # 🚀 UAT実行ガイド - コピペ実行マニュアル
 
+## ⚠️ 【重要】実行前の安全確認
+
+```
+🚨 本番環境での安全なテスト実行のため、必ず以下を確認:
+
+❌ やってはいけないこと:
+- 本番データベースでDELETE/UPDATEの実行
+- 実際のクレジットカード番号の使用（4242カードのみ）
+- 実在顧客へのテストメール送信
+- 認証情報・個人情報をログファイルに記録
+- 本番環境設定（Vercel/Supabase）の変更
+
+✅ 安全な実行方法:
+- テスト専用データ・アカウントのみ使用
+- コマンド実行前に必ず内容確認
+- ログには機微情報をマスキングして記録
+- 疑問がある場合は実行前に開発チームに確認
+
+詳細: docs/uat/uat_final.md の "やってはいけないこと" セクション参照
+```
+
 ## 📋 実行前の準備
 
 ### 必要な権限・アクセス
@@ -600,6 +621,76 @@ echo "- Supabase Logs & Metrics"
 echo "- Stripe Event Logs"
 echo "- Browser DevTools Console/Network"
 ```
+
+---
+
+## 📈 実行とログ保存
+
+### ローカル実行例
+```bash
+# 全段階一括実行（推奨）
+npm run uat:full
+
+# 段階別実行
+npm run uat:preflight && npm run uat:critical
+
+# ログ付き実行（手動）
+DATE=$(date +%Y%m%d)
+LOG_DIR="docs/uat/logs/$DATE"
+mkdir -p "$LOG_DIR"
+
+npm run uat:preflight > "$LOG_DIR/preflight.log" 2>&1
+npm run uat:critical > "$LOG_DIR/critical.log" 2>&1
+npm run uat:important > "$LOG_DIR/important.log" 2>&1
+npm run uat:recommended > "$LOG_DIR/recommended.log" 2>&1
+```
+
+### ログ保存先
+```
+docs/uat/logs/
+├── YYYYMMDD/              # 実行日別ディレクトリ（例：20241222/）
+│   ├── preflight.log     # 事前チェック結果
+│   ├── critical.log      # クリティカルテスト結果
+│   ├── important.log     # 重要テスト結果
+│   ├── recommended.log   # 推奨テスト結果
+│   └── summary.log       # 総合結果サマリー
+└── README.md             # ログ管理ガイド
+```
+
+### CI/CD実行ログ
+```bash
+# GitHub Actions実行後にアーティファクトをダウンロード
+# Actions タブ > UAT Preflight Checks > Artifacts > uat-preflight-logs
+
+# ダウンロード後の展開
+unzip uat-preflight-logs.zip -d ./ci-logs/
+ls ./ci-logs/
+# -> execution.log, env-check.log, dns-check.log, endpoint-check.log, summary.log
+```
+
+### ログ分析コマンド
+```bash
+# 成功率の確認
+find docs/uat/logs/ -name "summary.log" -exec grep "PASS" {} \; | wc -l
+
+# 失敗パターンの分析
+find docs/uat/logs/ -name "*.log" -exec grep "FAIL\|ERROR" {} \; | sort | uniq -c
+
+# 最新実行結果の確認
+LATEST_DIR=$(ls -1 docs/uat/logs/ | grep "^[0-9]" | sort -r | head -1)
+echo "最新実行結果: docs/uat/logs/$LATEST_DIR/"
+```
+
+---
+
+## 📚 関連ドキュメント
+
+- [📋 **UAT README**](./README.md) - 全体概要とナビゲーション
+- [🚀 **本番UAT実行ガイド**](./uat_execution.md) - 本番環境での公式実行手順
+- [🎭 **リハーサル実行シナリオ**](./rehearsal-scenarios.md) - 本番前2段階リハーサル手順
+- [📱 **GitHub Actions手動実行**](./README.md#️-github-actions-を手動で強制実行する) - CI環境での実行方法
+- [🎯 **QA向けリハーサルガイド**](./qa-guide.md) - 本番運用前のリハーサル手順
+- [📊 **レポート・PRコメントサンプル**](./examples/) - 実行結果のサンプル
 
 ---
 

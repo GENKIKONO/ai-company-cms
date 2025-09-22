@@ -3,7 +3,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 
 export async function POST(req: NextRequest) {
   try {
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     
     if (authError || !user) {

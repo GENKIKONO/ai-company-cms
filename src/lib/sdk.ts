@@ -1,7 +1,7 @@
 import { Organization } from '@/types';
 import { SearchFilters, SearchResult } from '@/lib/faceted-search';
 
-export interface LuxuCareSDKOptions {
+export interface AIOHubSDKOptions {
   apiKey: string;
   baseURL?: string;
   timeout?: number;
@@ -24,26 +24,26 @@ export interface ApiError {
   code?: number;
 }
 
-export class LuxuCareSDKError extends Error {
+export class AIOHubSDKError extends Error {
   public status: number;
   public code?: number;
 
   constructor(message: string, status: number, code?: number) {
     super(message);
-    this.name = 'LuxuCareSDKError';
+    this.name = 'AIOHubSDKError';
     this.status = status;
     this.code = code;
   }
 }
 
-export class LuxuCareSDK {
+export class AIOHubSDK {
   private apiKey: string;
   private baseURL: string;
   private timeout: number;
 
-  constructor(options: LuxuCareSDKOptions) {
+  constructor(options: AIOHubSDKOptions) {
     this.apiKey = options.apiKey;
-    this.baseURL = options.baseURL || 'https://api.luxucare.jp';
+    this.baseURL = options.baseURL || 'https://api.aiohub.jp';
     this.timeout = options.timeout || 30000;
   }
 
@@ -75,7 +75,7 @@ export class LuxuCareSDK {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({})) as ApiError;
-        throw new LuxuCareSDKError(
+        throw new AIOHubSDKError(
           errorData.message || errorData.error || `HTTP ${response.status}`,
           response.status,
           errorData.code
@@ -84,15 +84,15 @@ export class LuxuCareSDK {
 
       return await response.json();
     } catch (error) {
-      if (error instanceof LuxuCareSDKError) {
+      if (error instanceof AIOHubSDKError) {
         throw error;
       }
       
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new LuxuCareSDKError('Network error', 0);
+        throw new AIOHubSDKError('Network error', 0);
       }
 
-      throw new LuxuCareSDKError(
+      throw new AIOHubSDKError(
         error instanceof Error ? error.message : 'Unknown error',
         0
       );
@@ -228,8 +228,8 @@ export class LuxuCareSDK {
 }
 
 // Factory function for easy instantiation
-export function createLuxuCareSDK(options: LuxuCareSDKOptions): LuxuCareSDK {
-  return new LuxuCareSDK(options);
+export function createAIOHubSDK(options: AIOHubSDKOptions): AIOHubSDK {
+  return new AIOHubSDK(options);
 }
 
 // Type exports for TypeScript users
@@ -237,11 +237,11 @@ export type { Organization, SearchFilters, SearchResult };
 
 // Example usage:
 /*
-import { LuxuCareSDK } from '@luxucare/sdk';
+import { AIOHubSDK } from '@aiohub/sdk';
 
-const client = new LuxuCareSDK({
+const client = new AIOHubSDK({
   apiKey: 'your-api-key',
-  baseURL: 'https://api.luxucare.jp' // optional
+  baseURL: 'https://api.aiohub.jp' // optional
 });
 
 // List organizations
@@ -267,7 +267,7 @@ const searchResults = await client.search.faceted({
 try {
   const org = await client.organizations.get('invalid-id');
 } catch (error) {
-  if (error instanceof LuxuCareSDKError) {
+  if (error instanceof AIOHubSDKError) {
     console.error(`API Error ${error.status}: ${error.message}`);
   }
 }

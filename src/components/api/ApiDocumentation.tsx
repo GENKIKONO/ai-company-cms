@@ -191,14 +191,14 @@ export default function ApiDocumentation() {
 
   const sdkExamples = {
     javascript: `// インストール
-npm install @luxucare/sdk
+npm install @aiohub/sdk
 
 // 初期化
-import { LuxuCareSDK } from '@luxucare/sdk';
+import { AIO HubSDK } from '@aiohub/sdk';
 
-const client = new LuxuCareSDK({
+const client = new AIO HubSDK({
   apiKey: 'your-api-key',
-  baseURL: 'https://api.luxucare.jp'
+  baseURL: 'https://api.aiohub.jp'
 });
 
 // 組織一覧を取得
@@ -229,14 +229,14 @@ collaboration.on('fieldEdit', (edit) => {
 });`,
     
     python: `# インストール
-pip install luxucare-sdk
+pip install aiohub-sdk
 
 # 初期化
-from luxucare import LuxuCareSDK
+from aiohub import AIO HubSDK
 
-client = LuxuCareSDK(
+client = AIO HubSDK(
     api_key="your-api-key",
-    base_url="https://api.luxucare.jp"
+    base_url="https://api.aiohub.jp"
 )
 
 # 組織一覧を取得
@@ -257,12 +257,12 @@ search_results = client.search.faceted(
 )`,
 
     curl: `# 組織一覧を取得
-curl -X GET "https://api.luxucare.jp/api/organizations?page=1&limit=24" \\
+curl -X GET "https://api.aiohub.jp/api/organizations?page=1&limit=24" \\
   -H "Authorization: Bearer your-api-key" \\
   -H "Content-Type: application/json"
 
 # 組織を作成
-curl -X POST "https://api.luxucare.jp/api/organizations" \\
+curl -X POST "https://api.aiohub.jp/api/organizations" \\
   -H "Authorization: Bearer your-api-key" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -272,7 +272,7 @@ curl -X POST "https://api.luxucare.jp/api/organizations" \\
   }'
 
 # ファセット検索
-curl -X GET "https://api.luxucare.jp/api/search?q=キーワード&industries=IT" \\
+curl -X GET "https://api.aiohub.jp/api/search?q=キーワード&industries=IT" \\
   -H "Authorization: Bearer your-api-key" \\
   -H "Content-Type: application/json"`,
   };
@@ -351,9 +351,9 @@ curl -X GET "https://api.luxucare.jp/api/search?q=キーワード&industries=IT"
       case 'overview':
         return (
           <div className="prose max-w-none">
-            <h1>LuxuCare API ドキュメント</h1>
+            <h1>AIO Hub API ドキュメント</h1>
             <p className="text-lg text-gray-600">
-              LuxuCare APIは、企業組織情報の管理、検索、リアルタイム共同編集機能を提供するRESTful APIです。
+              AIO Hub APIは、企業組織情報の管理、検索、リアルタイム共同編集機能を提供するRESTful APIです。
             </p>
 
             <h2>主な機能</h2>
@@ -367,7 +367,7 @@ curl -X GET "https://api.luxucare.jp/api/search?q=キーワード&industries=IT"
 
             <h2>ベースURL</h2>
             <div className="bg-gray-100 p-3 rounded">
-              <code>https://api.luxucare.jp</code>
+              <code>https://api.aiohub.jp</code>
             </div>
 
             <h2>レート制限</h2>
@@ -397,12 +397,12 @@ curl -X GET "https://api.luxucare.jp/api/search?q=キーワード&industries=IT"
         return (
           <div className="prose max-w-none">
             <h1>認証</h1>
-            <p>LuxuCare APIは Bearer Token による認証を使用します。</p>
+            <p>AIO Hub APIは Bearer Token による認証を使用します。</p>
 
             <h2>APIキーの取得</h2>
             <p>APIキーは管理画面から取得できます：</p>
             <ol>
-              <li>LuxuCareにログイン</li>
+              <li>AIO Hubにログイン</li>
               <li>設定 → API キー管理にアクセス</li>
               <li>「新しいAPIキー」をクリック</li>
               <li>必要な権限を選択して作成</li>
@@ -459,11 +459,11 @@ curl -X GET "https://api.luxucare.jp/api/search?q=キーワード&industries=IT"
 
             <h2>接続</h2>
             <p>WebSocketエンドポイント：</p>
-            {renderCodeBlock('wss://api.luxucare.jp/ws/collaboration/{organization_id}', 'url', 'ws-endpoint')}
+            {renderCodeBlock('wss://api.aiohub.jp/ws/collaboration/{organization_id}', 'url', 'ws-endpoint')}
 
             <h2>認証</h2>
             <p>WebSocket接続時に認証トークンをクエリパラメータで送信：</p>
-            {renderCodeBlock('wss://api.luxucare.jp/ws/collaboration/{org_id}?token=your-api-key', 'url', 'ws-auth')}
+            {renderCodeBlock('wss://api.aiohub.jp/ws/collaboration/{org_id}?token=your-api-key', 'url', 'ws-auth')}
 
             <h2>イベント</h2>
             <h3>nullJoined</h3>
@@ -512,19 +512,19 @@ curl -X GET "https://api.luxucare.jp/api/search?q=キーワード&industries=IT"
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-6">SDK</h1>
             <p className="text-lg text-gray-600 mb-8">
-              公式SDKを使用してLuxuCare APIを簡単に統合できます。
+              公式SDKを使用してAIO Hub APIを簡単に統合できます。
             </p>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               <div className="border border-gray-200 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">JavaScript/TypeScript</h3>
                 <p className="text-sm text-gray-600 mb-3">Node.js とブラウザ環境で使用可能</p>
-                <code className="text-sm bg-gray-100 px-2 py-1 rounded">npm install @luxucare/sdk</code>
+                <code className="text-sm bg-gray-100 px-2 py-1 rounded">npm install @aiohub/sdk</code>
               </div>
               <div className="border border-gray-200 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Python</h3>
                 <p className="text-sm text-gray-600 mb-3">Python 3.7+ 対応</p>
-                <code className="text-sm bg-gray-100 px-2 py-1 rounded">pip install luxucare-sdk</code>
+                <code className="text-sm bg-gray-100 px-2 py-1 rounded">pip install aiohub-sdk</code>
               </div>
               <div className="border border-gray-200 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">cURL</h3>
@@ -590,7 +590,7 @@ curl -X GET "https://api.luxucare.jp/api/search?q=キーワード&industries=IT"
           <h3 className="text-sm font-medium text-gray-900 mb-3">リンク</h3>
           <div className="space-y-2">
             <a
-              href="https://github.com/luxucare/sdk"
+              href="https://github.com/aiohub/sdk"
               className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900"
               target="_blank"
               rel="noopener noreferrer"

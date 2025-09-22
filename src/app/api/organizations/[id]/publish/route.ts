@@ -11,7 +11,7 @@ interface PublishGateResult {
 }
 
 async function checkPublishGate(organizationId: string): Promise<PublishGateResult> {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
 
   try {
     // 組織とその関連データを取得
@@ -116,10 +116,11 @@ async function checkPublishGate(organizationId: string): Promise<PublishGateResu
   }
 }
 
-export const POST = withErrorHandling(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const POST = withErrorHandling(async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     const { action } = await request.json();
-    const organizationId = params.id;
+    const resolvedParams = await params;
+    const organizationId = resolvedParams.id;
 
     if (!organizationId) {
       return NextResponse.json(
@@ -128,7 +129,7 @@ export const POST = withErrorHandling(async (request: NextRequest, { params }: {
       );
     }
 
-    const supabase = supabaseServer();
+    const supabase = await supabaseServer();
 
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -260,7 +261,7 @@ export const POST = withErrorHandling(async (request: NextRequest, { params }: {
     if (error instanceof Error) {
       await notifyError(error, { 
         api: 'publish',
-        organizationId: params.id,
+        organizationId: (await params).id,
         action: request.method 
       });
     }

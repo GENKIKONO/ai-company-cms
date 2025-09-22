@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
 
     // 組織情報を取得
     const { data: organization, error: orgError } = await supabaseBrowser

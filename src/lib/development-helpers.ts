@@ -7,7 +7,7 @@ export const SAMPLE_ORGANIZATION = {
   id: 'sample-org-id',
   name: 'サンプル株式会社',
   slug: 'sample-company',
-  description: 'これはサンプルの企業情報です。LuxuCareを使用した企業情報管理システムのデモンストレーションとして作成されています。AIを活用したマーケティングソリューションを提供し、お客様のビジネス成長をサポートします。',
+  description: 'これはサンプルの企業情報です。AIO Hubを使用した企業情報管理システムのデモンストレーションとして作成されています。AIを活用したマーケティングソリューションを提供し、お客様のビジネス成長をサポートします。',
   status: 'published',
   url: 'https://sample-company.example.com',
   telephone: '03-1234-5678',

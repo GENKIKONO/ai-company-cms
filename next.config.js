@@ -45,9 +45,11 @@ const nextConfig = {
     return config;
   },
 
+  // 外部パッケージ設定（Next.js 15対応）
+  serverExternalPackages: ['@supabase/supabase-js'],
+  
   // 実験的機能
   experimental: {
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
     webpackBuildWorker: true,
   },
 };

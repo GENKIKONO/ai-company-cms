@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 認証チェック
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
     
     if (authError || !user) {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // レート制限チェック（簡易版）
-    const userAgent = 'LuxuCare-CMS/1.0 (+https://luxucare.ai)';
+    const userAgent = 'AIOHub-CMS/1.0 (+https://aiohub.ai)';
     
     try {
       // タイムアウト付きでフェッチ

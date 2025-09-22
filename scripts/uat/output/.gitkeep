@@ -1,0 +1,2 @@
+# UAT verification script output directory
+# This directory is used to store temporary log files during CI/CD execution

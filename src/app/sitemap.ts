@@ -1,9 +1,9 @@
 import { MetadataRoute } from 'next'
-import { supabaseBrowserServer } from '@/lib/supabase-server'
+import { supabaseServer } from '@/lib/supabase-server'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabaseBrowser = supabaseBrowserServer()
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luxucare.example.com'
+  const supabaseBrowser = await supabaseServer()
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.example.com'
   
   // Generate basic pages
   const staticPages: MetadataRoute.Sitemap = [

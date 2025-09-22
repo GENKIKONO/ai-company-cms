@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { globalSearch, getIndustries, getServiceCategories } from '@/lib/organizations';
 import { type Organization, type Service, type CaseStudy } from '@/types/database';
 
+// Next.js 15: Force dynamic rendering to resolve useSearchParams prerender warning
+export const dynamic = 'force-dynamic';
+
 interface SearchFilters {
   query: string;
   type: 'all' | 'organizations' | 'services' | 'case_studies';
@@ -131,7 +134,7 @@ export default function SearchPage() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600">
-                LuxuCare AI企業CMS
+                AIO Hub AI企業CMS
               </Link>
               <nav className="ml-10 hidden md:flex space-x-8">
                 <Link href="/organizations" className="text-gray-500 hover:text-gray-700">

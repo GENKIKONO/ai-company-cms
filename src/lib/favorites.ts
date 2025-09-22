@@ -1,6 +1,6 @@
 // お気に入り機能のユーティリティ（localStorage使用）
 
-const FAVORITES_KEY = 'luxucare_favorites';
+const FAVORITES_KEY = 'aiohub_favorites';
 
 export interface FavoriteOrganization {
   id: string;

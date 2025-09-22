@@ -9,7 +9,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-gray-900">
-                LuxuCare AI企業CMS
+                AIO Hub AI企業CMS
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -35,7 +35,7 @@ export default function HomePage() {
                 <span className="text-blue-600">スマートに管理</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                LuxuCare AI企業CMSで、企業情報・サービス・導入事例を効率的に管理。
+                AIO Hub AI企業CMSで、企業情報・サービス・導入事例を効率的に管理。
                 検索機能やデータ分析で、ビジネスの成長をサポートします。
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -148,7 +148,7 @@ export default function HomePage() {
               今すぐ始めましょう
             </h2>
             <p className="text-xl text-blue-100 mb-8">
-              無料プランでLuxuCare AI企業CMSの機能をお試しください
+              無料プランでAIO Hub AI企業CMSの機能をお試しください
             </p>
             <Link href="/auth/signup" className="px-8 py-3 bg-white text-blue-600 text-lg rounded-lg hover:bg-gray-100">
               無料アカウント作成
@@ -162,7 +162,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">LuxuCare AI企業CMS</h3>
+              <h3 className="text-lg font-semibold mb-4">AIO Hub AI企業CMS</h3>
               <p className="text-gray-400">
                 企業情報管理の新しいスタンダード
               </p>
@@ -195,7 +195,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 LuxuCare株式会社. All rights reserved.</p>
+            <p>&copy; 2024 AIO Hub株式会社. All rights reserved.</p>
           </div>
         </div>
       </footer>

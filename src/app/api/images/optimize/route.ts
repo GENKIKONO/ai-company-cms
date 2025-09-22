@@ -15,7 +15,7 @@ interface OptimizationOptions {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
     
     // ユーザー認証確認
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();

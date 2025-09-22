@@ -314,7 +314,8 @@ test.describe('LuxuCare主要フロー', () => {
         new PerformanceObserver((list) => {
           const entries = list.getEntries();
           if (entries.length > 0) {
-            resolve(entries[0].processingStart - entries[0].startTime);
+            const entry = entries[0] as PerformanceEventTiming;
+            resolve(entry.processingStart - entry.startTime);
           }
         }).observe({ entryTypes: ['first-input'] });
         

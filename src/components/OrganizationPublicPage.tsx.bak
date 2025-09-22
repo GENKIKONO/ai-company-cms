@@ -510,7 +510,7 @@ export default function OrganizationPublicPage({ data }: Props) {
             <p className="mt-2">
               Powered by{' '}
               <Link href="/" className="text-blue-600 hover:text-blue-800">
-                LuxuCare
+                AIO Hub
               </Link>
             </p>
           </div>

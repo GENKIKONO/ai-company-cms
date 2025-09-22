@@ -37,7 +37,7 @@ export function generateOrganizationOGP(organization: {
   url?: string;
   industries?: string[];
 }): OGPMetadata {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://luxucare.jp';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aiohub.jp';
   const pageUrl = `${baseUrl}/o/${organization.slug}`;
   
   // OGP画像の自動生成パラメータ
@@ -51,14 +51,14 @@ export function generateOrganizationOGP(organization: {
   const ogpImageUrl = organization.logo_url || `${baseUrl}/api/ogp/generate?${ogpParams.toString()}`;
   
   return {
-    title: `${organization.name} | LuxuCare`,
+    title: `${organization.name} | AIO Hub`,
     description: organization.description.length > 155 
       ? organization.description.substring(0, 155) + '...' 
       : organization.description,
     image: ogpImageUrl,
     url: pageUrl,
     type: 'website',
-    siteName: 'LuxuCare',
+    siteName: 'AIO Hub',
     locale: 'ja_JP'
   };
 }
@@ -70,15 +70,15 @@ export function generateTwitterCard(organization: {
   slug: string;
   logo_url?: string;
 }): TwitterCardMetadata {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://luxucare.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aiohub.example.com';
   
   return {
     card: 'summary_large_image',
     title: organization.name,
     description: organization.description,
     image: organization.logo_url || `${baseUrl}/api/ogp/generate?company=${encodeURIComponent(organization.name)}`,
-    site: '@luxucare',
-    creator: '@luxucare'
+    site: '@aiohub',
+    creator: '@aiohub'
   };
 }
 
@@ -89,7 +89,7 @@ export function generateSEOMetadata(organization: {
   slug: string;
   industries?: string[];
 }): SEOMetadata {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://luxucare.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aiohub.example.com';
   
   // キーワード生成
   const keywords = [
@@ -101,7 +101,7 @@ export function generateSEOMetadata(organization: {
   ];
 
   return {
-    title: `${organization.name} - 企業情報 | LuxuCare`,
+    title: `${organization.name} - 企業情報 | AIO Hub`,
     description: organization.description,
     keywords,
     canonical: `${baseUrl}/o/${organization.slug}`,
@@ -127,7 +127,7 @@ export function generateNextMetadata(organization: {
     title: seo.title,
     description: seo.description,
     keywords: seo.keywords?.join(', '),
-    authors: [{ name: 'LuxuCare' }],
+    authors: [{ name: 'AIO Hub' }],
     robots: seo.robots,
     viewport: seo.viewport,
     canonical: seo.canonical,

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
-import { createLuxuCareProducts, getLuxuCareProducts } from '@/lib/stripe';
+import { createAIOHubProducts, getAIOHubProducts } from '@/lib/stripe';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = supabaseServer();
+    const supabaseBrowser = await supabaseServer();
 
     // 管理者権限チェック
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 既存の商品をチェック
-    const existingProducts = await getLuxuCareProducts();
+    const existingProducts = await getAIOHubProducts();
     
     if (existingProducts && existingProducts.length >= 2) {
       return NextResponse.json({
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 新しい商品を作成
-    const products = await createLuxuCareProducts();
+    const products = await createAIOHubProducts();
 
     // 商品情報をデータベースに保存
     const productsToSave = [];

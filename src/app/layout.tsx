@@ -1,7 +1,7 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'LuxuCare AI企業CMS',
+  title: 'AIO Hub AI企業CMS',
   description: 'AI-powered enterprise CMS for company directory and service management',
 }
 

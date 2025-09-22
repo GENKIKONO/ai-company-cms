@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseBrowserAdmin } from '@/lib/supabase-server';
-import { stripe, getLuxuCareProducts, createStripeCustomer } from '@/lib/stripe';
+import { stripe, getAIOHubProducts, createStripeCustomer } from '@/lib/stripe';
 
 export async function POST(request: NextRequest) {
   try {
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       subscription_data: {
         metadata: {
           organization_id: organizationId,
-          service: 'luxucare_cms',
+          service: 'aiohub_cms',
         },
       },
       allow_promotion_codes: true,
