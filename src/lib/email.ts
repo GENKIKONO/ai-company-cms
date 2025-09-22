@@ -1,7 +1,8 @@
 import { Resend } from 'resend';
 import { signApprovalToken, generateApprovalUrl } from './jwt';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 export interface ApprovalEmailData {
   organizationId: string;
@@ -14,6 +15,11 @@ export interface ApprovalEmailData {
 
 export async function sendApprovalEmail(data: ApprovalEmailData): Promise<void> {
   try {
+    // Resend API が設定されていない場合はスキップ
+    if (!resend) {
+      console.warn('Resend API key not configured, skipping email send');
+      return;
+    }
     // 承認用トークンを生成
     const approveToken = await signApprovalToken({
       organizationId: data.organizationId,

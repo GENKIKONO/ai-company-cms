@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation';
 import { approvalRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // レート制限チェック

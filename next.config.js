@@ -40,28 +40,15 @@ const nextConfig = {
     ];
   },
 
-  // Webpack設定
-  webpack: (config, { isServer }) => {
-    // テストファイルを除外
-    config.resolve.alias = {
-      ...config.resolve.alias,
-    };
-    
-    // pdf-parseのテストファイルを除外
-    config.externals = config.externals || [];
-    if (isServer) {
-      config.externals.push({
-        'pdf-parse/test': 'commonjs pdf-parse/test',
-        './test/data/05-versions-space.pdf': 'false',
-      });
-    }
-    
+  // Webpack設定（簡略化）
+  webpack: (config) => {
     return config;
   },
 
   // 実験的機能
   experimental: {
     serverComponentsExternalPackages: ['@supabase/supabase-js'],
+    webpackBuildWorker: true,
   },
 };
 

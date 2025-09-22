@@ -6,11 +6,7 @@ import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { webhookRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
-if (!webhookSecret) {
-  throw new Error('STRIPE_WEBHOOK_SECRET is not set');
-}
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 interface WebhookProcessingResult {
   success: boolean;
@@ -289,6 +285,14 @@ async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
 
 export async function POST(request: NextRequest) {
   try {
+    // Stripe webhook secret が設定されていない場合は無効化
+    if (!webhookSecret) {
+      return NextResponse.json(
+        { error: 'Stripe webhook is not configured' },
+        { status: 503 }
+      );
+    }
+
     // レート制限チェック
     const rateLimitResponse = await webhookRateLimit(request);
     if (rateLimitResponse) {

@@ -35,7 +35,8 @@
       "Bash(node:*)",
       "Bash(xargs sed:*)",
       "Bash(find:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npm run lint)"
     ],
     "deny": [],
     "ask": []
