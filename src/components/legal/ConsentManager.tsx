@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabaseBrowser } from '@/lib/supabase-client';
 
 interface ConsentRecord {
@@ -192,13 +192,7 @@ export default function ConsentManager({
   const [isLoading, setLoading] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   
-  useEffect(() => {
-    if (nullId) {
-      loadExistingConsents();
-    }
-  }, [nullId]);
-
-  const loadExistingConsents = async () => {
+  const loadExistingConsents = useCallback(async () => {
     if (!nullId) return;
     
     setLoading(true);
@@ -224,7 +218,13 @@ export default function ConsentManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [nullId, required, onConsentChange]);
+
+  useEffect(() => {
+    if (nullId) {
+      loadExistingConsents();
+    }
+  }, [nullId, loadExistingConsents]);
 
   const handleConsentChange = async (type: string, granted: boolean) => {
     const newConsents = { ...consents, [type]: granted };

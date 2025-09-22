@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { generateOGPImage, optimizeImage, OGP_COLOR_PALETTES } from '@/lib/ogp';
 
 interface Props {
@@ -18,14 +18,7 @@ export default function OGPManager({ companyName, description, logoUrl, onOGPGen
   const [previewMode, setPreviewMode] = useState<'ogp' | 'twitter'>('ogp');
   const [isOptimizing, setIsOptimizing] = useState(false);
 
-  // フォームデータが変更されたらプレビューを更新
-  useEffect(() => {
-    if (companyName) {
-      generatePreview();
-    }
-  }, [companyName, description, logoUrl, selectedTemplate, customColors]);
-
-  const generatePreview = async () => {
+  const generatePreview = useCallback(async () => {
     if (!companyName.trim()) return;
 
     setIsGenerating(true);
@@ -60,7 +53,14 @@ export default function OGPManager({ companyName, description, logoUrl, onOGPGen
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [companyName, description, logoUrl, customColors, onOGPGenerated]);
+
+  // フォームデータが変更されたらプレビューを更新
+  useEffect(() => {
+    if (companyName) {
+      generatePreview();
+    }
+  }, [companyName, generatePreview]);
 
   const handleTemplateChange = (template: string) => {
     setSelectedTemplate(template);
@@ -216,11 +216,13 @@ export default function OGPManager({ companyName, description, logoUrl, onOGPGen
           <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
             {previewMode === 'ogp' ? (
               <div className="max-w-lg">
+                {/* eslint-disable @next/next/no-img-element */}
                 <img
                   src={ogpImage}
                   alt="OGP Preview"
                   className="w-full rounded-lg shadow-sm"
                 />
+                {/* Dynamic base64 OGP preview image */}
                 <div className="mt-3 p-3 bg-white rounded border">
                   <h4 className="font-semibold text-gray-900 truncate">{companyName}</h4>
                   <p className="text-sm text-gray-600 mt-1 line-clamp-2">
@@ -232,11 +234,13 @@ export default function OGPManager({ companyName, description, logoUrl, onOGPGen
             ) : (
               <div className="max-w-lg">
                 <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+                  {/* eslint-disable @next/next/no-img-element */}
                   <img
                     src={ogpImage}
                     alt="Twitter Card Preview"
                     className="w-full"
                   />
+                  {/* Dynamic base64 Twitter card preview image */}
                   <div className="p-3">
                     <h4 className="font-semibold text-gray-900 truncate">{companyName}</h4>
                     <p className="text-sm text-gray-600 mt-1 line-clamp-2">

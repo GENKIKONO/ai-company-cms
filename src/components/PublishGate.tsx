@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface PublishGateProps {
   organizationId: string;
@@ -33,7 +33,7 @@ export default function PublishGate({
   const [isPublishing, setIsPublishing] = useState(false);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
 
-  const checkPublishGate = async () => {
+  const checkPublishGate = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/organizations/${organizationId}/publish`, {
@@ -67,7 +67,7 @@ export default function PublishGate({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [organizationId]);
 
   const handlePublish = async () => {
     if (!gateResult?.canPublish) {
@@ -108,7 +108,7 @@ export default function PublishGate({
     if (currentStatus !== 'published') {
       checkPublishGate();
     }
-  }, [organizationId, currentStatus]);
+  }, [currentStatus, checkPublishGate]);
 
   if (currentStatus === 'published') {
     return (
