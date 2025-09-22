@@ -33,7 +33,7 @@
 ```bash
 # 手動テスト完了後、認証状態を確認（セルフテストAPI使用）
 curl -X GET "https://aiohub.jp/api/selftest/auth" \
-  -H "Cookie: next-auth.session-token=YOUR_SESSION_TOKEN" \
+  -H "Authorization: Bearer YOUR_SUPABASE_TOKEN" \
   -H "Accept: application/json"
 
 # 期待レスポンス: {"ok": true, "user": {"id": "redacted"}, "timestamp": "..."}

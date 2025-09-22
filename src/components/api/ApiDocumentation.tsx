@@ -84,7 +84,7 @@ export default function ApiDocumentation() {
     "employee_count": 100,
     "founded_year": 2010,
     "is_verified": true,
-    "visibility": "public",
+    "status": "published",
     "created_at": "2024-01-01T00:00:00Z",
     "updated_at": "2024-01-15T12:00:00Z"
   }
@@ -101,7 +101,7 @@ export default function ApiDocumentation() {
   "url": "https://newcompany.com",
   "email": "info@newcompany.com",
   "industries": ["IT"],
-  "visibility": "public"
+  "status": "published"
 }`,
         response: `{
   "data": {
@@ -111,7 +111,7 @@ export default function ApiDocumentation() {
     "url": "https://newcompany.com",
     "email": "info@newcompany.com",
     "industries": ["IT"],
-    "visibility": "public",
+    "status": "published",
     "created_by": "null-uuid",
     "created_at": "2024-01-16T10:00:00Z"
   }
