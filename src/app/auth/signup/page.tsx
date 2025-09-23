@@ -105,27 +105,6 @@ export default function SignupPage() {
       setSuccess('確認メールを送信しました。メールをご確認の上、リンクをクリックしてアカウントを有効化してください。');
       setShowResendButton(true);
       
-      // Send backup email via Resend API
-      try {
-        const backupResponse = await fetch('/api/auth/resend-confirmation', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            type: 'signup'
-          }),
-        });
-        
-        if (!backupResponse.ok) {
-          const backupResult = await backupResponse.json();
-          console.warn('Backup email failed:', backupResult.error);
-        }
-      } catch (backupError) {
-        console.warn('Backup email failed:', backupError);
-      }
-      
     } catch (err) {
       console.error('Signup error:', err);
       setError(err instanceof Error ? err.message : 'アカウント作成に失敗しました');

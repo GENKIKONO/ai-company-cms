@@ -10,6 +10,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showResendButton, setShowResendButton] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState('');
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -26,19 +29,27 @@ export default function LoginPage() {
       if (signInError) {
         // Handle specific error messages in Japanese
         let errorMessage = signInError.message;
+        let showResend = false;
         
         if (signInError.message.includes('Email not confirmed') || 
             signInError.message.includes('email not confirmed') ||
             signInError.message.includes('not confirmed')) {
-          errorMessage = 'メールアドレスが確認されていません。確認メールをご確認いただくか、下記から再送信してください。';
+          errorMessage = 'メールアドレスが確認されていません。下記から確認メールを再送信できます。';
+          showResend = true;
         } else if (signInError.message.includes('Invalid login credentials') ||
                    signInError.message.includes('invalid credentials')) {
-          errorMessage = 'メールアドレスまたはパスワードが正しくありません。';
+          errorMessage = 'メールアドレスまたはパスワードが正しくありません。メール確認がお済みでない場合は、下記から確認メールを再送信してください。';
+          showResend = true;
         } else if (signInError.message.includes('Too many requests')) {
           errorMessage = '試行回数が上限に達しました。しばらく時間をおいてからお試しください。';
+        } else if (signInError.message.includes('Email rate limit exceeded')) {
+          errorMessage = 'メール送信の制限に達しました。しばらく時間をおいてからお試しください。';
+        } else if (signInError.message.includes('Signup not allowed')) {
+          errorMessage = 'サインアップが許可されていません。管理者にお問い合わせください。';
         }
         
         setError(errorMessage);
+        setShowResendButton(showResend);
         return;
       }
 
@@ -62,9 +73,78 @@ export default function LoginPage() {
       
     } catch (err) {
       console.error('Login error:', err);
-      setError(err instanceof Error ? err.message : 'Login failed');
+      let errorMessage = 'ログインに失敗しました。';
+      
+      if (err instanceof Error) {
+        if (err.message.includes('Failed to sync user profile')) {
+          errorMessage = 'ユーザープロフィール同期に失敗しました。再度ログインをお試しください。';
+        } else if (err.message.includes('network') || err.message.includes('NetworkError')) {
+          errorMessage = 'ネットワークエラーが発生しました。インターネット接続を確認してお試しください。';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      setError('メールアドレスを入力してください。');
+      return;
+    }
+    
+    setResendLoading(true);
+    setError('');
+    setResendSuccess('');
+    
+    try {
+      const response = await fetch('/api/auth/resend-confirmation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          type: 'signup'
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setResendSuccess('確認メールを再送信しました。メールをご確認ください。');
+        setShowResendButton(false);
+      } else {
+        // Handle specific error codes
+        let errorMessage = result.error || '再送信に失敗しました';
+        
+        switch (result.code) {
+          case 'rate_limited':
+            errorMessage = `送信制限に達しました。${result.retryAfter || 60}秒後に再度お試しください。`;
+            break;
+          case 'validation_error':
+            errorMessage = 'メールアドレスの形式が正しくありません。';
+            break;
+          case 'user_not_found':
+            errorMessage = 'ユーザーが見つかりません。先にサインアップを行ってください。';
+            break;
+          case 'already_confirmed':
+            errorMessage = 'このメールアドレスは既に確認済みです。パスワードをお忘れの場合は、パスワードリセットをご利用ください。';
+            break;
+          default:
+            break;
+        }
+        
+        setError(errorMessage);
+      }
+    } catch (err) {
+      setError('ネットワークエラーが発生しました。インターネット接続を確認してお試しください。');
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -86,13 +166,24 @@ export default function LoginPage() {
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
               {error}
-              {error.includes('メールアドレスが確認されていません') && (
-                <div className="mt-3 text-sm">
-                  <a href="/auth/signup" className="text-blue-600 hover:text-blue-500 underline">
-                    確認メール再送信（サインアップページ）
-                  </a>
+              {showResendButton && (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={handleResendConfirmation}
+                    disabled={resendLoading}
+                    className="text-sm text-blue-600 hover:text-blue-500 underline disabled:opacity-50"
+                  >
+                    {resendLoading ? '再送信中...' : '確認メールを再送信'}
+                  </button>
                 </div>
               )}
+            </div>
+          )}
+
+          {resendSuccess && (
+            <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded">
+              {resendSuccess}
             </div>
           )}
           
