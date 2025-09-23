@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
 import { supabaseAdmin } from '@/lib/supabase-server';
 
 export async function POST(request: NextRequest) {
+=======
+import { generateAuthLink } from '@/lib/auth/generate-link';
+import { sendHtmlEmail } from '@/lib/email/resend-client';
+import { APP_URL } from '@/lib/utils/env';
+
+export async function POST(request: NextRequest) {
+  // Production safety guard
+  if (process.env.NODE_ENV === 'production' && APP_URL.includes('localhost')) {
+    return NextResponse.json(
+      { error: 'Configuration error - localhost detected in production', code: 'config_error' },
+      { status: 500 }
+    );
+  }
+
+>>>>>>> release/p0-freeze
   try {
     const { email } = await request.json();
 
@@ -21,6 +37,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+<<<<<<< HEAD
     const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password-confirm`;
 
     // Send password reset email using Supabase
@@ -47,10 +64,34 @@ export async function POST(request: NextRequest) {
       // Don't reveal if email exists or not for security
       return NextResponse.json(
         { success: true },
+=======
+    // Generate password reset link using unified auth link generation
+    const linkResult = await generateAuthLink({
+      email,
+      type: 'recovery',
+      requestId: crypto.randomUUID()
+    });
+
+    if (!linkResult.success || !linkResult.url) {
+      console.error('Password reset link generation failed:', linkResult.error);
+      return NextResponse.json(
+        { success: true }, // Don't reveal if email exists for security
+>>>>>>> release/p0-freeze
         { status: 200 }
       );
     }
 
+<<<<<<< HEAD
+=======
+    // Note: We now rely on Supabase built-in email delivery
+    // The link generation will trigger Supabase's own email system
+    console.info('Password reset link generated', {
+      email: email.replace(/(..).*(@.*)/, '$1***$2'),
+      redirectTo: `${APP_URL}/auth/reset-password-confirm`,
+      requestId: linkResult.requestId
+    });
+
+>>>>>>> release/p0-freeze
     return NextResponse.json(
       { success: true },
       { status: 200 }

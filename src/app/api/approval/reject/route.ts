@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { verifyApprovalToken } from '@/lib/jwt';
+import { APP_URL } from '@/lib/utils/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -103,15 +104,13 @@ export async function GET(request: NextRequest) {
     }
 
     // 成功ページにリダイレクト
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const redirectUrl = `${baseUrl}/approval/success?action=rejected&organization=${encodeURIComponent(organization.name)}`;
+    const redirectUrl = `${APP_URL}/approval/success?action=rejected&organization=${encodeURIComponent(organization.name)}`;
     
     return NextResponse.redirect(redirectUrl);
 
   } catch (error) {
     console.error('Rejection error:', error);
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const errorUrl = `${baseUrl}/approval/error?message=${encodeURIComponent('拒否処理に失敗しました')}`;
+    const errorUrl = `${APP_URL}/approval/error?message=${encodeURIComponent('拒否処理に失敗しました')}`;
     return NextResponse.redirect(errorUrl);
   }
 }
