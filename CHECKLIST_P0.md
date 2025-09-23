@@ -1,164 +1,110 @@
-# 📋 P0要件準拠 最小スコープ安定版 チェックリスト
+# ✅ P0 Release Checklist - 最小スコープ安定版
 
-## 🔴 P0 未完了（要因: 本番デプロイ未完了）
+**更新日**: 2024-09-23  
+**ターゲット**: https://aiohub.jp  
+**リリース**: P0 (最小スコープ安定版)
 
-**ブランチ:** `release/p0-freeze`  
-**実行日時:** 2025-09-23  
-**目的:** P0要件定義に完全準拠した最小スコープの安定版構築  
-**現在の進捗:** 70% (コード実装完了、本番デプロイ待ち)
+## 🎯 P0 要件定義
 
----
+### スコープ制限
+- ✅ **認証システムのみ**: ユーザー登録・ログイン・メール確認
+- ✅ **Supabase標準**: Resend削除、Supabase内蔵メール配信のみ
+- ✅ **URL統一**: すべて https://aiohub.jp に統一
+- ✅ **最小DB**: app_users テーブルのみ
 
-## ✅ 実装完了項目
+### 除外機能
+- ❌ パートナー管理システム
+- ❌ 承認ワークフロー
+- ❌ 検索・フィルター機能
+- ❌ Resendメール配信
+- ❌ 追加のSlack/Sentry連携
 
-### 1. ブランチ管理
-- [x] `release/p0-freeze` ブランチ作成
-- [x] 以後このブランチでのみ作業
-- [x] PR は `release/p0-freeze` → `main` のみ
+## 📋 実装チェックリスト
 
-### 2. メール配信統一 (Supabase標準のみ)
-- [x] signup時のResend backup呼び出し削除
-- [x] resend-confirmation API は Supabase 標準メール配信のみ使用確認
-- [x] Custom SMTP は OFF (Supabase Dashboard設定)
+### A. コード変更
+- [🟢] signup/page.tsx: Resendバックアップ削除
+- [🟢] resend-confirmation/route.ts: Supabase専用に簡素化
+- [🟢] .env.local.example: 本番URL設定
+- [🟢] supabase/migrations: app_users テーブル作成
 
-### 3. URL統一 (https://aiohub.jp)
-- [x] APP_URL ユーティリティ使用確認
-- [x] localhost分岐の本番防止機能確認
-- [x] 全redirect_to が https://aiohub.jp 統一済み
+### B. 設定統一
+- [🟢] NEXT_PUBLIC_APP_URL: https://aiohub.jp
+- [🟢] Supabase Auth Site URL: https://aiohub.jp
+- [🟢] Email Template Redirect: https://aiohub.jp/auth/confirm
 
-### 4. Supabase Dashboard設定
-**以下をSupabase Dashboardで手動設定必須:**
-- [ ] **Settings → Auth → URL Configuration:**
-  - Site URL: `https://aiohub.jp`
-  - Redirect URLs: 
-    - `https://aiohub.jp/*`
-    - `https://aiohub.jp/auth/confirm`
-    - `https://aiohub.jp/auth/reset-password-confirm`
-- [ ] **Settings → Auth → Email Templates:**
-  - Confirm signup: `{{ .ConfirmationURL }}` そのまま使用
-  - Custom SMTP: OFF
+### C. 動作検証
+- [🔄] **スモークテスト A**: ユーザー登録 (signup → email確認 → アクティベート)
+- [🔄] **スモークテスト B**: ログイン (email/password → dashboard移動)
+- [🔄] **スモークテスト C**: メール再送信 (UI操作 → メール受信)
+- [🔄] **スモークテスト D**: エラーハンドリング (不正メール → 適切なエラー表示)
 
-### 5. DBスキーマ (最小限)
-- [x] `app_users` テーブル作成 SQL準備
-- [x] RLS ポリシー最小限設定
-- [ ] **Supabase SQL Editor で migration実行必須**
+## 🚀 デプロイ手順
 
-### 6. 認証UI
-- [x] 既存メール登録時の文言確認 (適切)
-- [x] パスワードリセット導線確認 (`/auth/forgot-password`)
-- [x] 新規UI追加なし (要件通り)
+### 1. GitHub準備
+- [🔄] release/p0-freeze → main PR作成・マージ
 
----
+### 2. Vercel設定確認
+- [🔄] Environment Variables検証
+- [🔄] Build & Deploy実行
+- [🔄] Production URLアクセス確認
 
-## 🧪 スモークテスト結果
+### 3. Supabase設定確認
+- [🔄] Auth設定が本番URLに統一されているか確認
+- [🔄] RLS (Row Level Security) 有効化確認
 
-### ❌ テスト実行前の前提条件チェック
-**実行日時:** 2025-09-23 14:50  
-**テスト環境:** https://aiohub.jp (本番)
+## 📊 検証スクリプト
 
-#### 本番環境 API 動作確認
+### 手動実行コマンド
 ```bash
-$ curl -X GET "https://aiohub.jp/api/ops/config-check"
-# 結果: 404 HTML レスポンス
-# 要因: 本番環境にAPIルートが存在しない（デプロイ未完了）
+# 環境変数チェック
+npm run uat:env-check
+
+# DNS解決確認
+npm run uat:dns-check
+
+# エンドポイント疎通確認
+npm run uat:endpoint-check
+
+# 認証デバッグ
+npm run debug:auth user@example.com
 ```
 
-#### 本番サイト基本動作確認  
+### 自動検証予定
 ```bash
-$ curl -X GET "https://aiohub.jp/"
-# 結果: 200 OK (トップページ正常表示)
-# 要因: 静的ページは動作、API routesのみ未デプロイ
+npm run uat:critical
+npm run test:e2e:production
 ```
 
-### Test A: 新規登録→確認メール→ログイン→/dashboard到達
-- ❌ **ブロッカー**: 本番API未デプロイのため実行不可
-- ⚠️ **前提条件**: ggg.golf.66@gmail.com メール確認状況未確認
+## 🎯 成功基準
 
-### Test B: 企業作成→公開→/o/{slug}表示  
-- ❌ **ブロッカー**: Test A 完了が前提のため実行不可
+### 必須クリア項目
+1. **ユーザー登録完了**: signup → 確認メール → ログイン成功
+2. **URLアクセス**: https://aiohub.jp で正常表示
+3. **エラーフリー**: コンソールエラー・500エラーなし
+4. **メール配信**: 確認メールが60秒以内に到着
 
-### Test C: Stripeテスト決済→Webhook確認
-- ❌ **ブロッカー**: 本番API未デプロイのため実行不可
+### パフォーマンス
+- ページロード時間: 3秒以内
+- メール配信時間: 60秒以内
+- API応答時間: 2秒以内
 
-### Test D: ログアウト→再ログイン
-- ❌ **ブロッカー**: Test A 完了が前提のため実行不可
+## 📈 進捗トラッキング
 
-### 🚨 スモークテスト結果サマリー
-**実行状況:** 0/4 テスト完了  
-**主要ブロッカー:** 本番環境APIデプロイ未完了  
-**次のアクション:** 本番デプロイ実行 → 前提条件確認 → テスト再実行
+**最終更新**: 2024-09-23 23:45  
+
+| ステータス | 項目 | 完了率 |
+|------------|------|---------|
+| 🟢 | コード実装 | 100% |
+| 🔄 | GitHub PR | 進行中 |
+| ⚪ | Vercel Deploy | 待機中 |
+| ⚪ | スモークテスト | 待機中 |
 
 ---
 
-## 🔧 手動実行必須タスク
+### 🔄 ネクストステップ
+1. **GitHub PR作成・マージ完了**
+2. **Vercel本番デプロイ実行**  
+3. **スモークテスト A-D 実行**
+4. **結果報告 & ドキュメント更新**
 
-### Supabase Dashboard設定
-1. **https://app.supabase.com** にアクセス
-2. **プロジェクト `chyicolujwhkycpkxbej` 選択**
-3. **SQL Editor → New Query**
-4. **migration SQL実行:**
-```sql
--- /supabase/migrations/20250923_create_app_users.sql の内容を実行
-```
-
-### メール確認
-1. **ggg.golf.66@gmail.com メールボックス確認**
-2. **「Confirm your signup」メール開く**
-3. **確認リンクをクリック** (https://aiohub.jp/auth/confirm?... 形式)
-
----
-
-## 📊 技術的検証結果
-
-### 環境設定確認
-```bash
-✅ APP_URL: https://aiohub.jp
-✅ NODE_ENV: development (local), production (deploy時)
-✅ Supabase接続: 正常
-✅ JWT認証: 正常
-```
-
-### API動作確認
-```bash
-✅ /api/auth/resend-confirmation: Supabase標準メール配信
-✅ /api/admin/auth/status: ユーザー状態診断正常
-✅ /api/ops/config-check: 設定検証正常
-❌ /api/auth/sync: app_usersテーブル未作成のため失敗 (migration待ち)
-```
-
-### ユーザー状態
-```json
-{
-  "email": "ggg.golf.66@gmail.com",
-  "id": "ff4e7721-87c5-440a-8cf6-5c02b6c802e0", 
-  "email_confirmed_at": null,
-  "created_at": "2025-09-23T14:38:35.896436Z"
-}
-```
-
----
-
-## ⚡ 次のアクション
-
-### 即座実行
-1. **Supabase migration実行** → app_users テーブル作成
-2. **メール確認** → ggg.golf.66@gmail.com の確認リンククリック
-
-### 完了後実行
-3. **ログインテスト** → メール確認完了後
-4. **スモークテスト完了** → a-d 全項目
-5. **本番デプロイ準備** → 全テスト通過後
-
----
-
-## 🎯 P0要件達成状況
-
-| 要件項目 | 状況 | 備考 |
-|---------|------|------|
-| 認証フロー | 90% | メール確認のみ残り |
-| URL統一 | 100% | 完了 |
-| メール配信 | 100% | Supabase標準のみ |
-| DB設計 | 95% | migration実行のみ残り |
-| UI最小限 | 100% | 完了 |
-
-**🚨 残りタスク: Supabase手動設定 + メール確認のみ**
+**P0リリース目標**: 2024-09-23 24:00

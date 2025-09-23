@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generateAuthLink } from '@/lib/auth/generate-link';
-import { sendHtmlEmail } from '@/lib/email/resend-client';
 import { logger, createRequestContext } from '@/lib/utils/logger';
 
 // Request validation schema
@@ -15,7 +14,6 @@ const ERROR_CODES = {
   INVALID_EMAIL: 'invalid_email',
   VALIDATION_ERROR: 'validation_error',
   GENERATE_LINK_FAILED: 'generate_link_failed',
-  RESEND_SEND_FAILED: 'resend_send_failed',
   RATE_LIMITED: 'rate_limited',
   INTERNAL_ERROR: 'internal_error'
 } as const;
