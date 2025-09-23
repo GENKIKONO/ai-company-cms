@@ -52,8 +52,20 @@ export default function SignupPage() {
     }
 
     try {
-      const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL || 
-        (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/auth/callback`;
+      // Production-safe redirect URL generation  
+      const getClientAppUrl = () => {
+        if (process.env.NEXT_PUBLIC_APP_URL) {
+          return process.env.NEXT_PUBLIC_APP_URL;
+        }
+        // Only fallback to window.location.origin in development
+        if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+          return window.location.origin;
+        }
+        // Should never reach this in production due to env validation
+        throw new Error('NEXT_PUBLIC_APP_URL must be configured');
+      };
+      
+      const redirectTo = `${getClientAppUrl()}/auth/confirm`;
       
       const { error: signUpError } = await supabaseBrowser.auth.signUp({
         email,
