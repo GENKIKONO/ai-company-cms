@@ -121,7 +121,12 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <div className="text-center">
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gray-600">
+              <a href="/auth/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+                パスワードを忘れた方はこちら
+              </a>
+            </p>
             <p className="text-sm text-gray-600">
               アカウントをお持ちでない方は{' '}
               <a href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-500">
