@@ -4,6 +4,7 @@ import { verifyApprovalToken } from '@/lib/jwt';
 import { redirect } from 'next/navigation';
 import { approvalRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
+import { APP_URL } from '@/lib/utils/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -125,15 +126,13 @@ export async function GET(request: NextRequest) {
     );
 
     // 成功ページにリダイレクト
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const redirectUrl = `${baseUrl}/approval/success?action=approved&organization=${encodeURIComponent(organization.name)}&slug=${organization.slug}`;
+    const redirectUrl = `${APP_URL}/approval/success?action=approved&organization=${encodeURIComponent(organization.name)}&slug=${organization.slug}`;
     
     return NextResponse.redirect(redirectUrl);
 
   } catch (error) {
     console.error('Approval error:', error);
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const errorUrl = `${baseUrl}/approval/error?message=${encodeURIComponent('承認処理に失敗しました')}`;
+    const errorUrl = `${APP_URL}/approval/error?message=${encodeURIComponent('承認処理に失敗しました')}`;
     return NextResponse.redirect(errorUrl);
   }
 }

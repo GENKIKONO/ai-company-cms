@@ -52,7 +52,8 @@ export default function SignupPage() {
     }
 
     try {
-      const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`;
+      const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL || 
+        (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/auth/callback`;
       
       const { error: signUpError } = await supabaseBrowser.auth.signUp({
         email,
@@ -65,11 +66,13 @@ export default function SignupPage() {
       if (signUpError) {
         // Handle specific error messages in Japanese
         let errorMessage = signUpError.message;
+        let showExistingUserActions = false;
         
         if (signUpError.message.includes('User already registered') || 
             signUpError.message.includes('already registered') ||
             signUpError.message.includes('Email address already in use')) {
           errorMessage = 'このメールアドレスはすでに登録されています';
+          showExistingUserActions = true;
         } else if (signUpError.message.includes('Invalid email') || 
                    signUpError.message.includes('invalid email')) {
           errorMessage = 'メールアドレスの形式が正しくありません';
@@ -78,6 +81,12 @@ export default function SignupPage() {
         }
         
         setError(errorMessage);
+        
+        // Show appropriate action links for existing users
+        if (showExistingUserActions) {
+          setError(errorMessage + ' ログイン、またはパスワードをお忘れの方は下記のリンクをご利用ください。');
+        }
+        
         return;
       }
 
@@ -191,6 +200,16 @@ export default function SignupPage() {
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
               {error}
+              {error.includes('すでに登録されています') && (
+                <div className="mt-3 text-sm">
+                  <a href="/auth/login" className="text-blue-600 hover:text-blue-500 underline mr-4">
+                    ログインページへ
+                  </a>
+                  <a href="/auth/forgot-password" className="text-blue-600 hover:text-blue-500 underline">
+                    パスワードリセット
+                  </a>
+                </div>
+              )}
             </div>
           )}
 

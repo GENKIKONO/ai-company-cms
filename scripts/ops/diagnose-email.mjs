@@ -310,7 +310,11 @@ class EmailDiagnostic {
 
     // Check if we can run email tests
     const testEmail = process.env.EMAIL_TEST_TARGET;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
+      (process.env.NODE_ENV === 'production' ? 
+        (() => { throw new Error('NEXT_PUBLIC_APP_URL must be set in production'); })() :
+        'http://localhost:3000'
+      );
     
     if (!testEmail || !testEmail.includes('@')) {
       log.warning('EMAIL_TEST_TARGET not set - skipping live email tests');

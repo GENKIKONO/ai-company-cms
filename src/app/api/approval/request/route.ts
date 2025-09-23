@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { sendApprovalEmail } from '@/lib/email';
+import { APP_URL } from '@/lib/utils/env';
 
 export async function POST(request: NextRequest) {
   try {
@@ -113,8 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 承認メールを送信
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const previewUrl = `${baseUrl}/dashboard/organizations/${organizationId}/preview`;
+    const previewUrl = `${APP_URL}/dashboard/organizations/${organizationId}/preview`;
 
     await sendApprovalEmail({
       organizationId: organization.id,

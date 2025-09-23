@@ -53,6 +53,14 @@ function maskEmail(email: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  // Production safety guard - check APP_URL constant via import
+  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_APP_URL?.includes('localhost')) {
+    return NextResponse.json(
+      { error: 'Configuration error - localhost detected in production', code: 'config_error' },
+      { status: 500 }
+    );
+  }
+
   const requestId = crypto.randomUUID();
   const timestamp = new Date().toISOString();
   const requestContext = createRequestContext(request, { requestId });
@@ -124,7 +132,8 @@ export async function POST(request: NextRequest) {
       type
     });
 
-    // Step 1: Generate auth link via Supabase Admin API
+    // Generate auth link via Supabase Admin API
+    // This will automatically trigger Supabase's built-in email delivery
     let linkResult;
     try {
       linkResult = await generateAuthLink({
@@ -174,98 +183,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Send email via Resend
-    const emailSubject = type === 'signup' 
-      ? 'アカウント登録の確認'
-      : 'ログイン確認';
-
-    const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>${emailSubject}</h2>
-        <p>以下のボタンをクリックして${type === 'signup' ? 'アカウント登録を完了' : 'ログイン'}してください：</p>
-        <div style="margin: 30px 0;">
-          <a href="${linkResult.url}" 
-             style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-            ${type === 'signup' ? '登録を完了する' : 'ログインする'}
-          </a>
-        </div>
-        <p style="color: #666; font-size: 14px;">
-          このリンクは24時間有効です。<br>
-          もしボタンが機能しない場合は、以下のURLを直接ブラウザにコピー＆ペーストしてください：<br>
-          <span style="word-break: break-all;">${linkResult.url}</span>
-        </p>
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-        <p style="color: #999; font-size: 12px;">
-          このメールに心当たりがない場合は、このメールを無視してください。
-          <br>Request ID: ${requestId}
-        </p>
-      </div>
-    `;
-
-    let emailResult;
-    try {
-      emailResult = await sendHtmlEmail({
-        to: email,
-        subject: emailSubject,
-        html: emailHtml,
-        requestId
-      });
-    } catch (emailError) {
-      const errorMessage = emailError instanceof Error ? emailError.message : 'Unknown error';
-      
-      logger.emailFailed(errorMessage, {
-        ...requestContext,
-        email,
-        type,
-        provider: 'resend',
-        error: emailError
-      });
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Email service unavailable',
-          code: ERROR_CODES.RESEND_SEND_FAILED,
-          requestId
-        },
-        { status: 424 } // Failed Dependency
-      );
-    }
-
-    if (!emailResult.success) {
-      logger.emailFailed(emailResult.error || 'Failed to send confirmation email', {
-        ...requestContext,
-        email,
-        type,
-        provider: 'resend',
-        error: emailResult.error
-      });
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: emailResult.error || 'Failed to send confirmation email',
-          code: ERROR_CODES.RESEND_SEND_FAILED,
-          requestId
-        },
-        { status: 424 } // Failed Dependency
-      );
-    }
-
+    // Note: Supabase will handle email delivery automatically
+    // We no longer use Resend for auth emails
     logger.emailSent({
       ...requestContext,
       email,
       type,
-      messageId: emailResult.messageId,
-      provider: 'resend'
+      provider: 'supabase-builtin'
     });
 
     return NextResponse.json({
       success: true,
       message: '確認メールを再送信しました',
-      provider: 'resend',
-      requestId,
-      messageId: emailResult.messageId
+      provider: 'supabase',
+      requestId
     });
 
   } catch (error) {

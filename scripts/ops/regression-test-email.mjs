@@ -50,7 +50,11 @@ class EmailRegressionTester {
       startTime: new Date().toISOString()
     };
     
-    this.appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    this.appUrl = process.env.NEXT_PUBLIC_APP_URL || 
+      (process.env.NODE_ENV === 'production' ? 
+        (() => { throw new Error('NEXT_PUBLIC_APP_URL must be set in production'); })() :
+        'http://localhost:3000'
+      );
     this.testEmail = process.env.EMAIL_TEST_TARGET;
     this.skipSend = process.env.EMAIL_TEST_SKIP_SEND === 'true';
   }

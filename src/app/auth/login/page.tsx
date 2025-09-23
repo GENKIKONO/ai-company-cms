@@ -24,7 +24,21 @@ export default function LoginPage() {
       });
 
       if (signInError) {
-        setError(signInError.message);
+        // Handle specific error messages in Japanese
+        let errorMessage = signInError.message;
+        
+        if (signInError.message.includes('Email not confirmed') || 
+            signInError.message.includes('email not confirmed') ||
+            signInError.message.includes('not confirmed')) {
+          errorMessage = 'メールアドレスが確認されていません。確認メールをご確認いただくか、下記から再送信してください。';
+        } else if (signInError.message.includes('Invalid login credentials') ||
+                   signInError.message.includes('invalid credentials')) {
+          errorMessage = 'メールアドレスまたはパスワードが正しくありません。';
+        } else if (signInError.message.includes('Too many requests')) {
+          errorMessage = '試行回数が上限に達しました。しばらく時間をおいてからお試しください。';
+        }
+        
+        setError(errorMessage);
         return;
       }
 
@@ -72,6 +86,13 @@ export default function LoginPage() {
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
               {error}
+              {error.includes('メールアドレスが確認されていません') && (
+                <div className="mt-3 text-sm">
+                  <a href="/auth/signup" className="text-blue-600 hover:text-blue-500 underline">
+                    確認メール再送信（サインアップページ）
+                  </a>
+                </div>
+              )}
             </div>
           )}
           

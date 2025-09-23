@@ -1,4 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose';
+import { APP_URL } from '@/lib/utils/env';
 
 const secret = new TextEncoder().encode(
   process.env.JWT_SECRET || 'fallback-secret-key-for-development'
@@ -34,6 +35,5 @@ export async function verifyApprovalToken(token: string): Promise<ApprovalTokenP
 }
 
 export function generateApprovalUrl(token: string, action: 'approve' | 'reject'): string {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  return `${baseUrl}/api/approval/${action}?token=${token}`;
+  return `${APP_URL}/api/approval/${action}?token=${token}`;
 }

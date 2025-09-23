@@ -1,8 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase-server';
+import { APP_URL } from '@/lib/utils/env';
 
 interface GenerateLinkParams {
   email: string;
-  type: 'signup' | 'magiclink';
+  type: 'signup' | 'magiclink' | 'recovery';
   requestId?: string;
 }
 
@@ -18,7 +19,10 @@ export async function generateAuthLink({
   type,
   requestId = crypto.randomUUID()
 }: GenerateLinkParams): Promise<GenerateLinkResult> {
-  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`;
+  // Unified redirectTo based on auth type
+  const redirectTo = type === 'recovery' 
+    ? `${APP_URL}/auth/reset-password-confirm`
+    : `${APP_URL}/auth/confirm`;
   
   try {
     console.info({
@@ -39,6 +43,16 @@ export async function generateAuthLink({
         type: 'signup',
         email,
         password: 'temp-password-for-link-generation',
+        options: {
+          redirectTo: redirectTo
+        }
+      });
+      data = result.data;
+      error = result.error;
+    } else if (type === 'recovery') {
+      const result = await admin.auth.admin.generateLink({
+        type: 'recovery',
+        email,
         options: {
           redirectTo: redirectTo
         }

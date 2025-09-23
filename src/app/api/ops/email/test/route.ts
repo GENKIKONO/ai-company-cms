@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { generateAuthLink } from '@/lib/auth/generate-link';
 import { sendHtmlEmail } from '@/lib/email/resend-client';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { APP_URL } from '@/lib/utils/env';
 
 // Request validation schema
 const EmailTestSchema = z.object({
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
     const environment = {
       hasResendKey: !!(process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 'dummy-key-for-build'),
       hasSupabaseKeys: !!(process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL),
-      appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+      appUrl: APP_URL
     };
 
     console.info({

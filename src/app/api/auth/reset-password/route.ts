@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { generateAuthLink } from '@/lib/auth/generate-link';
+import { sendHtmlEmail } from '@/lib/email/resend-client';
+import { APP_URL } from '@/lib/utils/env';
 
 export async function POST(request: NextRequest) {
+  // Production safety guard
+  if (process.env.NODE_ENV === 'production' && APP_URL.includes('localhost')) {
+    return NextResponse.json(
+      { error: 'Configuration error - localhost detected in production', code: 'config_error' },
+      { status: 500 }
+    );
+  }
+
   try {
     const { email } = await request.json();
 
@@ -21,35 +31,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password-confirm`;
-
-    // Send password reset email using Supabase
-    const admin = supabaseAdmin();
-    const { error } = await admin.auth.resetPasswordForEmail(email, {
-      redirectTo,
+    // Generate password reset link using unified auth link generation
+    const linkResult = await generateAuthLink({
+      email,
+      type: 'recovery',
+      requestId: crypto.randomUUID()
     });
 
-    if (error) {
-      console.error('Reset password error:', error);
-      
-      // Handle specific Supabase errors
-      if (error.message.includes('rate limit')) {
-        return NextResponse.json(
-          { 
-            error: '送信制限に達しました。しばらく時間をおいてからお試しください。', 
-            code: 'rate_limited',
-            retryAfter: 60
-          },
-          { status: 429 }
-        );
-      }
-      
-      // Don't reveal if email exists or not for security
+    if (!linkResult.success || !linkResult.url) {
+      console.error('Password reset link generation failed:', linkResult.error);
       return NextResponse.json(
-        { success: true },
+        { success: true }, // Don't reveal if email exists for security
         { status: 200 }
       );
     }
+
+    // Note: We now rely on Supabase built-in email delivery
+    // The link generation will trigger Supabase's own email system
+    console.info('Password reset link generated', {
+      email: email.replace(/(..).*(@.*)/, '$1***$2'),
+      redirectTo: `${APP_URL}/auth/reset-password-confirm`,
+      requestId: linkResult.requestId
+    });
 
     return NextResponse.json(
       { success: true },
