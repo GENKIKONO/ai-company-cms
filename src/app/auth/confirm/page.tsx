@@ -13,6 +13,7 @@ function ConfirmPageContent() {
   const [error, setError] = useState('');
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
+  const [retryAfter, setRetryAfter] = useState<number | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -71,6 +72,22 @@ function ConfirmPageContent() {
     handleEmailConfirmation();
   }, [router, searchParams]);
 
+  // Countdown timer for retry after rate limiting
+  useEffect(() => {
+    if (retryAfter !== null && retryAfter > 0) {
+      const timer = setInterval(() => {
+        setRetryAfter((prev) => {
+          if (prev === null || prev <= 1) {
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [retryAfter]);
+
   const handleResendConfirmation = async () => {
     const email = searchParams.get('email');
     if (!email) {
@@ -80,6 +97,7 @@ function ConfirmPageContent() {
 
     setResendLoading(true);
     setResendMessage('');
+    setRetryAfter(null);
 
     try {
       const response = await fetch('/api/auth/resend-confirmation', {
@@ -98,10 +116,37 @@ function ConfirmPageContent() {
       if (result.success) {
         setResendMessage('確認メールを再送信しました。メールをご確認ください。');
       } else {
-        setResendMessage(result.error || '再送信に失敗しました。');
+        // Handle specific error codes from the API
+        const errorCode = result.code;
+        let errorMessage = result.error || '再送信に失敗しました。';
+        
+        switch (errorCode) {
+          case 'rate_limited':
+            const retrySeconds = result.retryAfter || 60;
+            setRetryAfter(retrySeconds);
+            errorMessage = `送信制限に達しました。${retrySeconds}秒後に再度お試しください。`;
+            break;
+          case 'validation_error':
+            errorMessage = 'メールアドレスの形式が正しくありません。';
+            break;
+          case 'generate_link_failed':
+            errorMessage = 'システムエラーが発生しました。しばらく時間をおいてからお試しください。';
+            break;
+          case 'resend_send_failed':
+            errorMessage = 'メール送信に失敗しました。しばらく時間をおいてからお試しください。';
+            break;
+          case 'internal_error':
+            errorMessage = 'システムエラーが発生しました。問題が続く場合はサポートまでお問い合わせください。';
+            break;
+          default:
+            // Use the error message from the API or fallback
+            break;
+        }
+        
+        setResendMessage(errorMessage);
       }
     } catch (err) {
-      setResendMessage('再送信に失敗しました。しばらく時間をおいてお試しください。');
+      setResendMessage('ネットワークエラーが発生しました。インターネット接続を確認してお試しください。');
     } finally {
       setResendLoading(false);
     }
@@ -143,10 +188,15 @@ function ConfirmPageContent() {
             <div className="mt-6 space-y-4">
               <button
                 onClick={handleResendConfirmation}
-                disabled={resendLoading}
+                disabled={resendLoading || retryAfter !== null}
                 className="w-full flex justify-center py-2 px-4 border border-blue-300 rounded-md text-sm font-medium text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {resendLoading ? '再送信中...' : '確認メールを再送信'}
+                {resendLoading 
+                  ? '再送信中...' 
+                  : retryAfter !== null 
+                    ? `${retryAfter}秒後に再送信可能` 
+                    : '確認メールを再送信'
+                }
               </button>
               
               <div className="text-center">

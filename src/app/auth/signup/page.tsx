@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { BackLink } from '@/components/ui/back-link';
@@ -14,7 +14,24 @@ export default function SignupPage() {
   const [success, setSuccess] = useState('');
   const [showResendButton, setShowResendButton] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  const [retryAfter, setRetryAfter] = useState<number | null>(null);
   const router = useRouter();
+
+  // Countdown timer for retry after rate limiting
+  useEffect(() => {
+    if (retryAfter !== null && retryAfter > 0) {
+      const timer = setInterval(() => {
+        setRetryAfter((prev) => {
+          if (prev === null || prev <= 1) {
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [retryAfter]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +63,21 @@ export default function SignupPage() {
       });
 
       if (signUpError) {
-        setError(signUpError.message);
+        // Handle specific error messages in Japanese
+        let errorMessage = signUpError.message;
+        
+        if (signUpError.message.includes('User already registered') || 
+            signUpError.message.includes('already registered') ||
+            signUpError.message.includes('Email address already in use')) {
+          errorMessage = 'このメールアドレスはすでに登録されています';
+        } else if (signUpError.message.includes('Invalid email') || 
+                   signUpError.message.includes('invalid email')) {
+          errorMessage = 'メールアドレスの形式が正しくありません';
+        } else if (signUpError.message.includes('Password')) {
+          errorMessage = 'パスワードの形式が正しくありません';
+        }
+        
+        setError(errorMessage);
         return;
       }
 
@@ -55,7 +86,7 @@ export default function SignupPage() {
       
       // Send backup email via Resend API
       try {
-        await fetch('/api/auth/resend-confirmation', {
+        const backupResponse = await fetch('/api/auth/resend-confirmation', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -65,6 +96,11 @@ export default function SignupPage() {
             type: 'signup'
           }),
         });
+        
+        if (!backupResponse.ok) {
+          const backupResult = await backupResponse.json();
+          console.warn('Backup email failed:', backupResult.error);
+        }
       } catch (backupError) {
         console.warn('Backup email failed:', backupError);
       }
@@ -82,6 +118,7 @@ export default function SignupPage() {
     
     setResendLoading(true);
     setError('');
+    setRetryAfter(null);
     
     try {
       const response = await fetch('/api/auth/resend-confirmation', {
@@ -100,10 +137,37 @@ export default function SignupPage() {
       if (result.success) {
         setSuccess('確認メールを再送信しました。メールをご確認ください。');
       } else {
-        setError(result.error || '再送信に失敗しました');
+        // Handle specific error codes from the API
+        const errorCode = result.code;
+        let errorMessage = result.error || '再送信に失敗しました';
+        
+        switch (errorCode) {
+          case 'rate_limited':
+            const retrySeconds = result.retryAfter || 60;
+            setRetryAfter(retrySeconds);
+            errorMessage = `送信制限に達しました。${retrySeconds}秒後に再度お試しください。`;
+            break;
+          case 'validation_error':
+            errorMessage = 'メールアドレスの形式が正しくありません。';
+            break;
+          case 'generate_link_failed':
+            errorMessage = 'システムエラーが発生しました。しばらく時間をおいてからお試しください。';
+            break;
+          case 'resend_send_failed':
+            errorMessage = 'メール送信に失敗しました。しばらく時間をおいてからお試しください。';
+            break;
+          case 'internal_error':
+            errorMessage = 'システムエラーが発生しました。問題が続く場合はサポートまでお問い合わせください。';
+            break;
+          default:
+            // Use the error message from the API or fallback
+            break;
+        }
+        
+        setError(errorMessage);
       }
     } catch (err) {
-      setError('再送信に失敗しました');
+      setError('ネットワークエラーが発生しました。インターネット接続を確認してお試しください。');
     } finally {
       setResendLoading(false);
     }
@@ -138,10 +202,15 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={handleResendEmail}
-                    disabled={resendLoading}
+                    disabled={resendLoading || retryAfter !== null}
                     className="text-sm text-blue-600 hover:text-blue-500 underline disabled:opacity-50"
                   >
-                    {resendLoading ? '再送信中...' : 'メールが届かない場合は再送信'}
+                    {resendLoading 
+                      ? '再送信中...' 
+                      : retryAfter !== null 
+                        ? `${retryAfter}秒後に再送信可能` 
+                        : 'メールが届かない場合は再送信'
+                    }
                   </button>
                 </div>
               )}
