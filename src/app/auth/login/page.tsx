@@ -73,7 +73,12 @@ export default function LoginPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // アクセストークンを必ず付与
+          Authorization: `Bearer ${session.access_token}`,
         },
+        // Cookieベースの実装に切替える場合のcredentials
+        credentials: 'include',
+        body: JSON.stringify({}),
       });
 
       if (!response.ok) {

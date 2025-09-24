@@ -1,6 +1,6 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@supabase/supabase-js';
 
 interface SyncResponse {
   success: boolean;
@@ -15,28 +15,38 @@ export async function POST(req: NextRequest): Promise<NextResponse<SyncResponse>
   const requestId = crypto.randomUUID();
   
   try {
-    const supabase = await supabaseServer();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Authorizationヘッダーからトークンを取得
+    const auth = req.headers.get('authorization') ?? '';
+    const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
     
-    if (authError) {
-      console.warn('Auth sync: Authentication error', {
-        requestId,
-        error: authError.message
-      });
+    if (!token) {
+      console.warn('Auth sync: Auth session missing!', { requestId });
       return NextResponse.json({
         success: false,
-        error: 'Authentication failed',
-        message: 'ユーザー認証に失敗しました',
+        error: 'Auth session missing!',
+        message: '認証セッションがありません',
         requestId
       }, { status: 401 });
     }
+
+    // ユーザー権限でサーバー側クライアントを作る
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { global: { headers: { Authorization: `Bearer ${token}` } } }
+    );
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    if (!user) {
-      console.warn('Auth sync: No user found', { requestId });
+    if (authError || !user) {
+      console.warn('Auth sync: Invalid or expired token', {
+        requestId,
+        error: authError?.message
+      });
       return NextResponse.json({
         success: false,
-        error: 'No user found',
-        message: 'ユーザーが見つかりません',
+        error: 'Invalid or expired token',
+        message: 'トークンが無効または期限切れです',
         requestId
       }, { status: 401 });
     }
