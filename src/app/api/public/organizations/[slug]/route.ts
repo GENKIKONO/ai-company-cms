@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 // import { trackOrganizationView } from '@/lib/analytics';
 import { createError, errorToResponse } from '@/lib/error-handler';
-import { apiLogger, PerformanceMonitor } from '@/lib/logger';
 import crypto from 'crypto';
 
 export async function GET(
@@ -14,11 +13,12 @@ export async function GET(
   const resolvedParams = await params;
   
   try {
-    apiLogger.info('Public organization API request started', {
+    console.log('[Public Organization API Request Started]', {
+      requestId,
       slug: resolvedParams.slug,
       userAgent: request.headers.get('user-agent'),
       ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
-    }, requestId);
+    });
 
     const slug = resolvedParams.slug;
 
@@ -28,82 +28,78 @@ export async function GET(
 
     const supabase = await supabaseServer();
 
-    // 公開中の企業情報を取得（パフォーマンス監視付き）
-    const organization = await PerformanceMonitor.monitor(
-      'database',
-      'fetch organization',
-      async () => {
-        const { data, error } = await supabase
-          .from('organizations')
-          .select(`
-            id,
-            name,
-            slug,
-            description,
-            legal_form,
-            representative_name,
-            founded,
-            capital,
-            employees,
-            address_country,
-            address_region,
-            address_locality,
-            street_address,
-            postal_code,
-            telephone,
-            email,
-            email_public,
-            url,
-            logo_url,
-            same_as,
-            industries,
-            status,
-            created_at,
-            updated_at,
-            partner_id,
-            services!org_id(
-              id,
-              name,
-              description,
-              features,
-              price_range,
-              url,
-              created_at
-            ),
-            case_studies!org_id(
-              id,
-              title,
-              problem,
-              solution,
-              outcome,
-              metrics,
-              client_name,
-              client_industry,
-              is_anonymous,
-              created_at
-            ),
-            faqs!org_id(
-              id,
-              question,
-              answer,
-              category,
-              order_index,
-              created_at
-            )
-          `)
-          .eq('slug', slug)
-          .eq('status', 'published')
-          .single();
+    // 公開中の企業情報を取得
+    const queryStart = Date.now();
+    const { data: organization, error } = await supabase
+      .from('organizations')
+      .select(`
+        id,
+        name,
+        slug,
+        description,
+        legal_form,
+        representative_name,
+        founded,
+        capital,
+        employees,
+        address_country,
+        address_region,
+        address_locality,
+        street_address,
+        postal_code,
+        telephone,
+        email,
+        email_public,
+        url,
+        logo_url,
+        same_as,
+        industries,
+        status,
+        created_at,
+        updated_at,
+        partner_id,
+        services!org_id(
+          id,
+          name,
+          description,
+          features,
+          price_range,
+          url,
+          created_at
+        ),
+        case_studies!org_id(
+          id,
+          title,
+          problem,
+          solution,
+          outcome,
+          metrics,
+          client_name,
+          client_industry,
+          is_anonymous,
+          created_at
+        ),
+        faqs!org_id(
+          id,
+          question,
+          answer,
+          category,
+          order_index,
+          created_at
+        )
+      `)
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .single();
 
-        if (error) {
-          throw createError.notFound('企業', slug);
-        }
+    const queryDuration = Date.now() - queryStart;
+    if (queryDuration > 1000) {
+      console.warn(`[Slow Query] Database query took ${queryDuration}ms for slug ${slug}`);
+    }
 
-        return data;
-      },
-      apiLogger,
-      { slug }
-    );
+    if (error) {
+      throw createError.notFound('企業', slug);
+    }
 
     if (!organization) {
       throw createError.notFound('企業', slug);
@@ -163,15 +159,14 @@ export async function GET(
 
     const duration = Date.now() - startTime;
     
-    apiLogger.request(
-      'GET',
-      `/api/public/organizations/${slug}`,
-      200,
+    console.log('[API Success]', {
+      method: 'GET',
+      path: `/api/public/organizations/${slug}`,
+      status: 200,
       duration,
       requestId,
-      undefined,
-      { organizationId: organization.id }
-    );
+      organizationId: organization.id
+    });
 
     return NextResponse.json(responseData);
 
@@ -179,15 +174,14 @@ export async function GET(
     const duration = Date.now() - startTime;
     const { status, body } = errorToResponse(error, requestId);
     
-    apiLogger.request(
-      'GET',
-      `/api/public/organizations/${resolvedParams.slug}`,
+    console.error('[API Error]', {
+      method: 'GET',
+      path: `/api/public/organizations/${resolvedParams.slug}`,
       status,
       duration,
       requestId,
-      undefined,
-      { error: body }
-    );
+      error: body
+    });
 
     return NextResponse.json(body, { status });
   }

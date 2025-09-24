@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generateAuthLink } from '@/lib/auth/generate-link';
-import { logger, createRequestContext } from '@/lib/utils/logger';
 
 // Request validation schema
 const ResendConfirmationSchema = z.object({
@@ -61,10 +60,16 @@ export async function POST(request: NextRequest) {
 
   const requestId = crypto.randomUUID();
   const timestamp = new Date().toISOString();
-  const requestContext = createRequestContext(request, { requestId });
+  const requestContext = { 
+    requestId,
+    endpoint: new URL(request.url).pathname,
+    method: request.method,
+    userAgent: request.headers.get('user-agent') || undefined,
+    ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+  };
   
   // Log incoming request
-  logger.apiRequest(requestContext);
+  console.log('[API Request]', requestContext);
   
   try {
     // Parse and validate request body
@@ -76,10 +81,7 @@ export async function POST(request: NextRequest) {
         `${err.path.join('.')}: ${err.message}`
       ).join(', ');
 
-      logger.validationError(validationErrors, {
-        ...requestContext,
-        errors: validationErrors
-      });
+      console.warn('[Validation Error]', validationErrors, { ...requestContext, errors: validationErrors });
 
       return NextResponse.json(
         { 
@@ -101,11 +103,7 @@ export async function POST(request: NextRequest) {
     if (!rateLimitCheck.allowed) {
       const retryAfter = Math.ceil((rateLimitCheck.resetTime! - Date.now()) / 1000);
       
-      logger.rateLimitHit({
-        ...requestContext,
-        email,
-        retryAfter
-      });
+      console.warn('[Rate Limit Hit]', { ...requestContext, email, retryAfter });
 
       return NextResponse.json(
         {
@@ -124,11 +122,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    logger.info('Resend confirmation request received', {
-      ...requestContext,
-      email,
-      type
-    });
+    console.log('[Resend Confirmation Request]', { ...requestContext, email, type });
 
     // Generate auth link via Supabase Admin API
     // This will automatically trigger Supabase's built-in email delivery
@@ -142,7 +136,7 @@ export async function POST(request: NextRequest) {
     } catch (linkError) {
       const errorMessage = linkError instanceof Error ? linkError.message : 'Unknown error';
       
-      logger.authLinkFailed(errorMessage, {
+      console.error('[Auth Link Failed]', errorMessage, {
         ...requestContext,
         email,
         type,
@@ -162,7 +156,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!linkResult.success || !linkResult.url) {
-      logger.authLinkFailed(linkResult.error || 'Failed to generate confirmation link', {
+      console.error('[Auth Link Failed]', linkResult.error || 'Failed to generate confirmation link', {
         ...requestContext,
         email,
         type,
@@ -183,7 +177,7 @@ export async function POST(request: NextRequest) {
 
     // Note: Supabase will handle email delivery automatically
     // We no longer use Resend for auth emails
-    logger.emailSent({
+    console.log('[Email Sent]', {
       ...requestContext,
       email,
       type,
@@ -201,7 +195,7 @@ export async function POST(request: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const errorStack = error instanceof Error ? error.stack : undefined;
     
-    logger.error(errorMessage, {
+    console.error('[Internal Error]', errorMessage, {
       ...requestContext,
       error,
       stack: errorStack
