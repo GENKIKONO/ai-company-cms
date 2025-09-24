@@ -53,7 +53,22 @@ export default function LoginPage() {
         return;
       }
 
-      // ユーザー同期API呼び出し
+      // セッション確認後にsync呼び出し
+      const { data: { session }, error: sessionError } = await supabaseBrowser.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session check error:', sessionError);
+        throw new Error('セッション確認に失敗しました。');
+      }
+
+      if (!session) {
+        // セッション未確立の場合はsyncを呼ばずにダッシュボードへ
+        console.log('Session not established, skipping sync');
+        router.push('/dashboard');
+        return;
+      }
+
+      // セッション確立済みの場合のみsync呼び出し
       const response = await fetch('/api/auth/sync', { 
         method: 'POST',
         headers: {
