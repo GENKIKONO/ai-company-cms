@@ -26,6 +26,12 @@ export default function LoginPage() {
         password,
       });
 
+      console.log('SignIn result:', {
+        hasSession: !!data.session,
+        hasUser: !!data.user,
+        error: signInError?.message
+      });
+
       if (signInError) {
         // Handle specific error messages in Japanese
         let errorMessage = signInError.message;
@@ -53,11 +59,28 @@ export default function LoginPage() {
         return;
       }
 
-      // ここで必ず同一オリジン + Cookie同送
+      // デバッグ用：ログイン成功確認
+      console.log('Login successful, attempting sync...');
+      
+      // セッション情報を取得
+      const { data: { session } } = await supabaseBrowser.auth.getSession();
+      console.log('Current session:', {
+        hasSession: !!session,
+        hasAccessToken: !!session?.access_token
+      });
+      
+      // ここで必ず同一オリジン + Cookie同送 + セッション情報
       const response = await fetch('/api/auth/sync', { 
         method: 'POST', 
         credentials: 'include',
-        cache: 'no-store'
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          // Cookieが機能しない場合のフォールバック
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        }
       });
       
       if (!response.ok) {
