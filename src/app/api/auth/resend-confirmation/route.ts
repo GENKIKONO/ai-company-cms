@@ -1,214 +1,81 @@
+import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { generateAuthLink } from '@/lib/auth/generate-link';
+import { cookies } from 'next/headers';
+import { createClient } from '@supabase/supabase-js';
 
-// Request validation schema
-const ResendConfirmationSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  type: z.enum(['signup', 'magiclink']).optional().default('signup')
-});
+type Body = { email: string; type?: 'signup' | 'magiclink' };
 
-// Error codes for machine-readable responses
-const ERROR_CODES = {
-  INVALID_EMAIL: 'invalid_email',
-  VALIDATION_ERROR: 'validation_error',
-  GENERATE_LINK_FAILED: 'generate_link_failed',
-  RATE_LIMITED: 'rate_limited',
-  INTERNAL_ERROR: 'internal_error'
-} as const;
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const SUPABASE_SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-// Simple in-memory rate limiting (in production, use Redis or database)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 60 * 1000; // 60 seconds
-const RATE_LIMIT_MAX_REQUESTS = 3; // Max 3 requests per minute per email
+export async function POST(req: NextRequest) {
+  const { email, type = 'signup' } = (await req.json()) as Body;
+  const requestId = crypto.randomUUID();
 
-function checkRateLimit(email: string): { allowed: boolean; resetTime?: number } {
-  const now = Date.now();
-  const key = `resend_${email}`;
-  const existing = rateLimitMap.get(key);
-
-  if (!existing || now > existing.resetTime) {
-    // Reset or create new entry
-    rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return { allowed: true };
-  }
-
-  if (existing.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return { allowed: false, resetTime: existing.resetTime };
-  }
-
-  existing.count++;
-  return { allowed: true };
-}
-
-function maskEmail(email: string): string {
-  const [username, domain] = email.split('@');
-  const maskedUsername = username.length > 2 
-    ? `${username[0]}${'*'.repeat(username.length - 2)}${username[username.length - 1]}`
-    : username;
-  return `${maskedUsername}@${domain}`;
-}
-
-export async function POST(request: NextRequest) {
-  // Production safety guard - check APP_URL constant via import
-  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_APP_URL?.includes('localhost')) {
+  if (!email) {
     return NextResponse.json(
-      { error: 'Configuration error - localhost detected in production', code: 'config_error' },
-      { status: 500 }
+      { success: false, code: 'bad_request', error: 'Email is required', requestId },
+      { status: 400 },
     );
   }
 
-  const requestId = crypto.randomUUID();
-  const timestamp = new Date().toISOString();
-  const requestContext = { 
-    requestId,
-    endpoint: new URL(request.url).pathname,
-    method: request.method,
-    userAgent: request.headers.get('user-agent') || undefined,
-    ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
-  };
-  
-  // Log incoming request
-  console.log('[API Request]', requestContext);
-  
+  const redirectTo = `${APP_URL}/auth/confirm`;
+
+  // Admin（Service Role）とAnonの両方を用意
+  const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE, { auth: { persistSession: false } });
+  const anon = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false }, global: { headers: { cookie: cookies().toString() } } });
+
   try {
-    // Parse and validate request body
-    const body = await request.json();
-    const validationResult = ResendConfirmationSchema.safeParse(body);
-
-    if (!validationResult.success) {
-      const validationErrors = validationResult.error.errors.map(err => 
-        `${err.path.join('.')}: ${err.message}`
-      ).join(', ');
-
-      console.warn('[Validation Error]', validationErrors, { ...requestContext, errors: validationErrors });
-
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Validation failed',
-          code: ERROR_CODES.VALIDATION_ERROR,
-          details: validationErrors,
-          requestId 
-        },
-        { status: 400 }
-      );
-    }
-
-    const { email, type } = validationResult.data;
-    const maskedEmailForLogs = maskEmail(email);
-
-    // Check rate limiting
-    const rateLimitCheck = checkRateLimit(email);
-    if (!rateLimitCheck.allowed) {
-      const retryAfter = Math.ceil((rateLimitCheck.resetTime! - Date.now()) / 1000);
-      
-      console.warn('[Rate Limit Hit]', { ...requestContext, email, retryAfter });
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Rate limit exceeded',
-          code: ERROR_CODES.RATE_LIMITED,
-          retryAfter,
-          requestId
-        },
-        { 
-          status: 429,
-          headers: {
-            'Retry-After': retryAfter.toString()
-          }
-        }
-      );
-    }
-
-    console.log('[Resend Confirmation Request]', { ...requestContext, email, type });
-
-    // Generate auth link via Supabase Admin API
-    // This will automatically trigger Supabase's built-in email delivery
+    // 1) まず Admin generateLink を試す（新規 or 未確認ユーザー想定）
     let linkResult;
-    try {
-      linkResult = await generateAuthLink({
+    if (type === 'signup') {
+      linkResult = await admin.auth.admin.generateLink({
+        type: 'signup',
         email,
-        type,
-        requestId
+        password: Math.random().toString(36), // ランダムパスワード（メール確認後にユーザーが設定）
+        options: { redirectTo: redirectTo },
       });
-    } catch (linkError) {
-      const errorMessage = linkError instanceof Error ? linkError.message : 'Unknown error';
-      
-      console.error('[Auth Link Failed]', errorMessage, {
-        ...requestContext,
+    } else {
+      linkResult = await admin.auth.admin.generateLink({
+        type: 'magiclink',
         email,
-        type,
-        provider: 'supabase',
-        error: linkError
+        options: { redirectTo: redirectTo },
       });
+    }
+    const { data, error } = linkResult;
 
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Supabase service unavailable',
-          code: ERROR_CODES.GENERATE_LINK_FAILED,
-          requestId
-        },
-        { status: 424 } // Failed Dependency
-      );
+    if (error) {
+      // 「既に登録済み」エラーは signUp では正常系。resend にフォールバックする
+      const msg = (error.message || '').toLowerCase();
+      const isAlready = msg.includes('already been registered') || msg.includes('user already registered') || error.status === 422;
+
+      if (!isAlready) {
+        return NextResponse.json(
+          { success: false, code: 'generate_link_failed', error: error.message, requestId },
+          { status: 424 },
+        );
+      }
+
+      // 2) 既存ユーザー向け：確認メールの再送（anon側の resend API）
+      const resend = await anon.auth.resend({ type: 'signup', email, options: { emailRedirectTo: redirectTo } });
+      if (resend.error) {
+        return NextResponse.json(
+          { success: false, code: 'resend_failed', error: resend.error.message, requestId },
+          { status: 424 },
+        );
+      }
+
+      return NextResponse.json({ success: true, code: 'resent', requestId }, { status: 200 });
     }
 
-    if (!linkResult.success || !linkResult.url) {
-      console.error('[Auth Link Failed]', linkResult.error || 'Failed to generate confirmation link', {
-        ...requestContext,
-        email,
-        type,
-        provider: 'supabase',
-        error: linkResult.error
-      });
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: linkResult.error || 'Failed to generate confirmation link',
-          code: ERROR_CODES.GENERATE_LINK_FAILED,
-          requestId
-        },
-        { status: 424 } // Failed Dependency
-      );
-    }
-
-    // Note: Supabase will handle email delivery automatically
-    // We no longer use Resend for auth emails
-    console.log('[Email Sent]', {
-      ...requestContext,
-      email,
-      type,
-      provider: 'supabase-builtin'
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: '確認メールを再送信しました',
-      provider: 'supabase',
-      requestId
-    });
-
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStack = error instanceof Error ? error.stack : undefined;
-    
-    console.error('[Internal Error]', errorMessage, {
-      ...requestContext,
-      error,
-      stack: errorStack
-    });
-
+    // generateLink 成功（URL を直接返す必要がなければ 200 OK）
+    return NextResponse.json({ success: true, code: 'link_generated', requestId }, { status: 200 });
+  } catch (e: any) {
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Internal server error',
-        code: ERROR_CODES.INTERNAL_ERROR,
-        requestId
-      },
-      { status: 500 }
+      { success: false, code: 'unexpected', error: e?.message ?? 'unknown', requestId },
+      { status: 500 },
     );
   }
 }
