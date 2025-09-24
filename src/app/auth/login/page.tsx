@@ -21,7 +21,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const { error: signInError } = await supabaseBrowser.auth.signInWithPassword({
+      const { data, error: signInError } = await supabaseBrowser.auth.signInWithPassword({
         email,
         password,
       });
@@ -53,43 +53,19 @@ export default function LoginPage() {
         return;
       }
 
-      // セッション確認後にsync呼び出し
-      const { data: { session }, error: sessionError } = await supabaseBrowser.auth.getSession();
-      
-      if (sessionError) {
-        console.error('Session check error:', sessionError);
-        throw new Error('セッション確認に失敗しました。');
-      }
-
-      if (!session) {
-        // セッション未確立の場合はsyncを呼ばずにダッシュボードへ
-        console.log('Session not established, skipping sync');
-        router.push('/dashboard');
-        return;
-      }
-
-      // セッション確立済みの場合のみsync呼び出し
+      // ログイン成功直後にsync呼び出し（Cookie同送）
       const response = await fetch('/api/auth/sync', { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // アクセストークンを必ず付与
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        // Cookieベースの実装に切替える場合のcredentials
-        credentials: 'include',
-        body: JSON.stringify({}),
+        method: 'POST', 
+        credentials: 'include' 
       });
-
+      
       if (!response.ok) {
-        throw new Error('Failed to sync user profile');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error ?? 'Failed to sync profile');
       }
 
-      const syncResult = await response.json();
-      console.log('User sync result:', syncResult);
-
-      // ダッシュボードにリダイレクト
-      router.push('/dashboard');
+      // sync成功後にのみ遷移
+      router.replace('/dashboard');
       
     } catch (err) {
       console.error('Login error:', err);

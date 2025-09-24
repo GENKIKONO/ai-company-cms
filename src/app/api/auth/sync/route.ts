@@ -1,6 +1,6 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseServer } from '@/lib/supabase-server';
 
 interface SyncResponse {
   success: boolean;
@@ -11,159 +11,43 @@ interface SyncResponse {
   requestId: string;
 }
 
-export async function POST(req: NextRequest): Promise<NextResponse<SyncResponse>> {
+export async function POST(): Promise<NextResponse> {
   const requestId = crypto.randomUUID();
   
   try {
-    // Authorizationヘッダーからトークンを取得
-    const auth = req.headers.get('authorization') ?? '';
-    const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
-    
-    if (!token) {
-      console.warn('Auth sync: Auth session missing!', { requestId });
-      return NextResponse.json({
-        success: false,
-        error: 'Auth session missing!',
-        message: '認証セッションがありません',
-        requestId
-      }, { status: 401 });
-    }
+    const supabase = await supabaseServer();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    // ユーザー権限でサーバー側クライアントを作る
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { global: { headers: { Authorization: `Bearer ${token}` } } }
-    );
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      console.warn('Auth sync: Invalid or expired token', {
-        requestId,
-        error: authError?.message
-      });
-      return NextResponse.json({
-        success: false,
-        error: 'Invalid or expired token',
-        message: 'トークンが無効または期限切れです',
-        requestId
-      }, { status: 401 });
-    }
-
-    console.info('Auth sync request', {
-      requestId,
-      userId: user.id,
-      email: user.email ? `${user.email.substring(0, 3)}***${user.email.substring(user.email.length - 10)}` : 'N/A'
-    });
-
-    // 既存のapp_userをチェック
-    const { data: existingUser, error: selectError } = await supabase
-      .from('app_users')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (selectError) {
-      console.error('Auth sync: Database select error', {
-        requestId,
-        userId: user.id,
-        error: selectError.message,
-        code: selectError.code,
-        details: selectError.details
-      });
-      
-      return NextResponse.json({
-        success: false,
-        error: 'Database query failed',
-        message: 'データベースエラーが発生しました',
-        requestId
-      }, { status: 500 });
-    }
-
-    if (!existingUser) {
-      console.info('Auth sync: Creating new user profile', {
-        requestId,
-        userId: user.id
-      });
-      
-      // 新規ユーザーの場合、初期ロールをorg_ownerとして作成
-      const { error: insertError } = await supabase
-        .from('app_users')
-        .insert({
-          id: user.id,
-          role: 'org_owner', // 初期ロール（後でadminが変更可能）
-          partner_id: null
-        });
-
-      if (insertError) {
-        console.error('Auth sync: Database insert error', {
-          requestId,
-          userId: user.id,
-          error: insertError.message,
-          code: insertError.code,
-          details: insertError.details
-        });
-        
-        // RLS関連のエラーを特定
-        if (insertError.code === '42501' || insertError.message.includes('RLS') || insertError.message.includes('policy')) {
-          return NextResponse.json({
-            success: false,
-            error: 'Permission denied',
-            message: 'ユーザープロフィール作成の権限がありません',
-            requestId
-          }, { status: 403 });
-        }
-        
-        return NextResponse.json({
-          success: false,
-          error: 'Failed to create user profile',
-          message: 'ユーザープロフィールの作成に失敗しました',
-          requestId
-        }, { status: 500 });
-      }
-
-      console.info('Auth sync: User profile created successfully', {
-        requestId,
-        userId: user.id,
-        role: 'org_owner'
-      });
-
+    if (!user) {
+      console.warn('Auth sync: Auth session missing', { requestId });
       return NextResponse.json({ 
-        success: true, 
-        message: 'User profile created',
-        role: 'org_owner',
-        requestId
-      });
+        ok: false, 
+        error: 'Auth session missing' 
+      }, { status: 401 });
     }
 
-    console.info('Auth sync: User profile already exists', {
-      requestId,
-      userId: user.id,
-      role: existingUser.role,
-      hasPartner: !!existingUser.partner_id
-    });
+    // RLS: auth.uid() = id を満たす upsert
+    const { error } = await supabase
+      .from('app_users')
+      .upsert({ id: user.id, role: 'org_owner' }, { onConflict: 'id' });
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'User already exists',
-      role: existingUser.role,
-      partnerId: existingUser.partner_id,
-      requestId
-    });
+    if (error) {
+      // ここでエラー内容をconsole.errorに出す（P0はconsoleでOK）
+      console.error('[sync] upsert failed', { code: error.code, message: error.message });
+      return NextResponse.json({ ok: false, error: 'Profile sync failed' }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true }, { status: 200 });
 
   } catch (error) {
-    console.error('Auth sync: Unexpected error', {
+    console.error('[sync] unexpected error', {
       requestId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
     
     return NextResponse.json({
-      success: false,
-      error: 'Internal server error',
-      message: 'システムエラーが発生しました',
-      requestId
+      ok: false,
+      error: 'Internal server error'
     }, { status: 500 });
   }
 }
