@@ -53,28 +53,8 @@ export default function LoginPage() {
         return;
       }
 
-      const accessToken = data.session?.access_token;
-      if (!accessToken) {
-        throw new Error('No access token');
-      }
-
-      // ★ ここが重要：Authorization を必ず付ける
-      const response = await fetch('/api/auth/sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        credentials: 'include',
-        body: JSON.stringify({}), // 空でもOKだが body を付けるとCDNが弾きにくい
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? 'Failed to sync profile');
-      }
-
-      // 同期できたらダッシュボードへ
+      // P0最小スコープ: 標準的なSupabase認証フローに統一
+      // DBトリガーでプロフィール自動作成されるため、/api/auth/sync は不要
       router.replace('/dashboard');
       
     } catch (err) {
