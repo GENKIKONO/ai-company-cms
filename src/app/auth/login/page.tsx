@@ -53,10 +53,11 @@ export default function LoginPage() {
         return;
       }
 
-      // ログイン成功直後にsync呼び出し（Cookie同送）
+      // ここで必ず同一オリジン + Cookie同送
       const response = await fetch('/api/auth/sync', { 
         method: 'POST', 
-        credentials: 'include' 
+        credentials: 'include',
+        cache: 'no-store'
       });
       
       if (!response.ok) {
