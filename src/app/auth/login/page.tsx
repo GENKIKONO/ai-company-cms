@@ -26,12 +26,6 @@ export default function LoginPage() {
         password,
       });
 
-      console.log('SignIn result:', {
-        hasSession: !!data.session,
-        hasUser: !!data.user,
-        error: signInError?.message
-      });
-
       if (signInError) {
         // Handle specific error messages in Japanese
         let errorMessage = signInError.message;
@@ -59,28 +53,20 @@ export default function LoginPage() {
         return;
       }
 
-      // デバッグ用：ログイン成功確認
-      console.log('Login successful, attempting sync...');
-      
-      // セッション情報を取得
-      const { data: { session } } = await supabaseBrowser.auth.getSession();
-      console.log('Current session:', {
-        hasSession: !!session,
-        hasAccessToken: !!session?.access_token
-      });
-      
-      // ここで必ず同一オリジン + Cookie同送 + セッション情報
-      const response = await fetch('/api/auth/sync', { 
-        method: 'POST', 
-        credentials: 'include',
-        cache: 'no-store',
+      const accessToken = data.session?.access_token;
+      if (!accessToken) {
+        throw new Error('No access token');
+      }
+
+      // ★ ここが重要：Authorization を必ず付ける
+      const response = await fetch('/api/auth/sync', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Cookieが機能しない場合のフォールバック
-          ...(session?.access_token && {
-            'Authorization': `Bearer ${session.access_token}`
-          })
-        }
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+        body: JSON.stringify({}), // 空でもOKだが body を付けるとCDNが弾きにくい
       });
       
       if (!response.ok) {
@@ -88,7 +74,7 @@ export default function LoginPage() {
         throw new Error(errorData.error ?? 'Failed to sync profile');
       }
 
-      // sync成功後にのみ遷移
+      // 同期できたらダッシュボードへ
       router.replace('/dashboard');
       
     } catch (err) {
