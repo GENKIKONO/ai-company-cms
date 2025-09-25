@@ -41,21 +41,7 @@ function ConfirmPageContent() {
 
         setConfirmed(true);
 
-        // ユーザー同期API呼び出し
-        const response = await fetch('/api/auth/sync', { 
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to sync user profile');
-        }
-
-        const syncResult = await response.json();
-        console.log('User sync result:', syncResult);
-
+        // 商用レベル統合版: DBトリガーでプロフィール自動作成されるため、/api/auth/syncは不要
         // 3秒後にダッシュボードにリダイレクト
         setTimeout(() => {
           router.push('/dashboard');

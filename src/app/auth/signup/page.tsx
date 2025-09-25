@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { BackLink } from '@/components/ui/back-link';
+import { getAppUrl } from '@/lib/utils/env';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -52,20 +53,8 @@ export default function SignupPage() {
     }
 
     try {
-      // Production-safe redirect URL generation  
-      const getClientAppUrl = () => {
-        if (process.env.NEXT_PUBLIC_APP_URL) {
-          return process.env.NEXT_PUBLIC_APP_URL;
-        }
-        // Only fallback to window.location.origin in development
-        if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
-          return window.location.origin;
-        }
-        // Should never reach this in production due to env validation
-        throw new Error('NEXT_PUBLIC_APP_URL must be configured');
-      };
-      
-      const redirectTo = `${getClientAppUrl()}/auth/confirm`;
+      // 統一化されたAPP_URL使用（常にhttps://aiohub.jp）
+      const redirectTo = `${getAppUrl()}/auth/confirm`;
       
       const { error: signUpError } = await supabaseBrowser.auth.signUp({
         email,

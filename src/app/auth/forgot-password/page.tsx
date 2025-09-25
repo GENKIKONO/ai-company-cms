@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
       if (result.success) {
         setSuccess('パスワードリセットメールを送信しました。メールをご確認の上、リンクをクリックしてパスワードを変更してください。');
       } else {
-        // Handle specific error codes
+        // Handle specific error codes (商用レベル統合版)
         switch (result.code) {
           case 'validation_error':
             setError('メールアドレスの形式が正しくありません。');
@@ -37,6 +37,18 @@ export default function ForgotPasswordPage() {
           case 'rate_limited':
             const retryAfter = result.retryAfter || 60;
             setError(`送信制限に達しました。${retryAfter}秒後に再度お試しください。`);
+            break;
+          case 'user_not_found':
+            setError('入力されたメールアドレスは登録されていません。アカウントを作成してください。');
+            break;
+          case 'generate_link_failed':
+            setError('リセットメールの生成に失敗しました。しばらく時間をおいてからお試しください。');
+            break;
+          case 'resend_failed':
+            setError('メール送信に失敗しました。しばらく時間をおいてからお試しください。');
+            break;
+          case 'internal_error':
+            setError('システムエラーが発生しました。問題が続く場合はサポートまでお問い合わせください。');
             break;
           default:
             setError(result.error || 'エラーが発生しました。もう一度お試しください。');
