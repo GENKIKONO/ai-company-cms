@@ -35,8 +35,8 @@ export async function GET(req: Request) {
     
     // Cookie 文字列から sb-*-auth-token の有無を判定
     const cookieHeader = req.headers.get('cookie') || '';
-    const hasAccessTokenCookie = /sb-[^-]+-auth-token(?!=\.persistent)/.test(cookieHeader);
-    const hasPersistentCookie = /sb-[^-]+-auth-token\.persistent/.test(cookieHeader);
+    const hasAccessTokenCookie = /sb-[^=;]+-auth-token=/.test(cookieHeader);
+    const hasPersistentCookie = /sb-[^=;]+-auth-token\.persistent=/.test(cookieHeader);
 
     const response = {
       authenticated: !!user && !userError,
@@ -45,19 +45,21 @@ export async function GET(req: Request) {
       sessionExpiresAt: session?.expires_at,
       hasAccessTokenCookie,
       hasPersistentCookie,
+      cookieHeaderLength: cookieHeader.length,
     };
 
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
     // エラー時も authenticated: false で 200 を返す
     const cookieHeader = req.headers.get('cookie') || '';
-    const hasAccessTokenCookie = /sb-[^-]+-auth-token(?!=\.persistent)/.test(cookieHeader);
-    const hasPersistentCookie = /sb-[^-]+-auth-token\.persistent/.test(cookieHeader);
+    const hasAccessTokenCookie = /sb-[^=;]+-auth-token=/.test(cookieHeader);
+    const hasPersistentCookie = /sb-[^=;]+-auth-token\.persistent=/.test(cookieHeader);
 
     return NextResponse.json({
       authenticated: false,
       hasAccessTokenCookie,
       hasPersistentCookie,
+      cookieHeaderLength: cookieHeader.length,
     }, { status: 200 });
   }
 }
