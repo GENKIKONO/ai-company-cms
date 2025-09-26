@@ -24,7 +24,10 @@
     "uat:important": "echo '🟡 重要テスト実行' && echo '詳細: docs/uat/checklists/important.md 参照'",
     "uat:recommended": "echo '🟢 推奨テスト実行' && echo '詳細: docs/uat/checklists/recommended.md 参照'",
     "uat:report": "node scripts/uat/generate-report.mjs",
-    "uat:full": "npm run uat:preflight && echo '✅ 事前チェック完了。次のステップ: npm run uat:critical'"
+    "uat:full": "npm run uat:preflight && echo '✅ 事前チェック完了。次のステップ: npm run uat:critical'",
+    "verify:env": "node scripts/ops/verify-env.mjs",
+    "verify:supabase": "node scripts/ops/verify-supabase.mjs",
+    "verify:prod-ready": "echo '🔍 本番稼働準備確認を開始...' && npm run verify:env && npm run verify:supabase && echo '🎉 全ての検証が完了しました。本番デプロイ準備完了です。'"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.8",

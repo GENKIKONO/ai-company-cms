@@ -28,24 +28,23 @@ export default function BillingPage() {
     async function fetchData() {
       try {
         const currentUser = await getCurrentUser();
-        if (!currentUser) {
-          router.push('/login');
-          return;
-        }
+        // middleware認証済み前提のため、リダイレクト削除
+        
+        if (currentUser) {
+          setUser(currentUser);
 
-        setUser(currentUser);
-
-        const [subscriptionResult, statsResult] = await Promise.all([
-          getUserSubscription(currentUser.id),
-          getSubscriptionStats(currentUser.id)
+          const [subscriptionResult, statsResult] = await Promise.all([
+            getUserSubscription(currentUser.id),
+            getSubscriptionStats(currentUser.id)
         ]);
 
         if (subscriptionResult.data) {
           setSubscription(subscriptionResult.data);
         }
 
-        if (statsResult.data) {
-          setStats(statsResult.data);
+          if (statsResult.data) {
+            setStats(statsResult.data);
+          }
         }
       } catch (error) {
         console.error('Failed to fetch billing data:', error);

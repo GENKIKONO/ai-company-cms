@@ -41,7 +41,7 @@ function ConfirmPageContent() {
 
         setConfirmed(true);
 
-        // 商用レベル統合版: DBトリガーでプロフィール自動作成されるため、/api/auth/syncは不要
+        // DBトリガーでプロフィール自動作成されるため、直接リダイレクト
         // 3秒後にダッシュボードにリダイレクト
         setTimeout(() => {
           router.push('/dashboard');

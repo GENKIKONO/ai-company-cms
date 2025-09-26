@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { BackLink } from '@/components/ui/back-link';
 
-export default function LoginPage() {
+// Force dynamic rendering to resolve useSearchParams prerender warning
+export const dynamic = 'force-dynamic';
+
+function LoginPageContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -14,6 +17,7 @@ export default function LoginPage() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSuccess, setResendSuccess] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +42,7 @@ export default function LoginPage() {
           showResend = true;
         } else if (signInError.message.includes('Invalid login credentials') ||
                    signInError.message.includes('invalid credentials')) {
-          errorMessage = 'メールアドレスまたはパスワードが正しくありません。メール確認がお済みでない場合は、下記から確認メールを再送信してください。';
+          errorMessage = 'メールアドレスまたはパスワードが正しくありません。メール確認が未完了の場合は確認メールをご確認ください。';
           showResend = true;
         } else if (signInError.message.includes('Too many requests')) {
           errorMessage = '試行回数が上限に達しました。しばらく時間をおいてからお試しください。';
@@ -53,18 +57,16 @@ export default function LoginPage() {
         return;
       }
 
-      // P0最小スコープ: 標準的なSupabase認証フローに統一
-      // DBトリガーでプロフィール自動作成されるため、/api/auth/sync は不要
-      router.replace('/dashboard');
+      // 直接ダッシュボードへ遷移（DBトリガーでプロフィールは自動作成）
+      const redirectUrl = searchParams.get('redirect') ?? '/dashboard';
+      router.replace(redirectUrl);
       
     } catch (err) {
       console.error('Login error:', err);
       let errorMessage = 'ログインに失敗しました。';
       
       if (err instanceof Error) {
-        if (err.message.includes('Failed to sync user profile')) {
-          errorMessage = 'ユーザープロフィール同期に失敗しました。再度ログインをお試しください。';
-        } else if (err.message.includes('network') || err.message.includes('NetworkError')) {
+        if (err.message.includes('network') || err.message.includes('NetworkError')) {
           errorMessage = 'ネットワークエラーが発生しました。インターネット接続を確認してお試しください。';
         } else {
           errorMessage = err.message;
@@ -235,5 +237,20 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">読み込み中...</p>
+        </div>
+      </div>
+    }>
+      <LoginPageContent />
+    </Suspense>
   );
 }

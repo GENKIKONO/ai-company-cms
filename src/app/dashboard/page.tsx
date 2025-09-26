@@ -14,18 +14,15 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({ total: 0, draft: 0, published: 0, archived: 0 });
   const [loading, setLoading] = useState(true);
 
-  // 認証確認とデータ取得
+  // データ取得と後追いプロフィール初期化
   useEffect(() => {
-    async function checkAuth() {
+    async function loadData() {
       try {
+        // 後追いプロフィール初期化（middleware認証済み前提）
         const currentUser = await getCurrentUser();
-        if (!currentUser) {
-          // 未認証の場合、ログインページにリダイレクト
-          window.location.href = '/login';
-          return;
+        if (currentUser) {
+          setUser(currentUser);
         }
-        
-        setUser(currentUser);
         
         // 企業データと統計を取得
         const [orgsResult, statsResult] = await Promise.all([
@@ -40,14 +37,14 @@ export default function DashboardPage() {
           setStats(statsResult.data);
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
-        window.location.href = '/login';
+        console.error('Data loading failed:', error);
+        // エラーでもページは表示継続（middleware認証済み）
       } finally {
         setLoading(false);
       }
     }
 
-    checkAuth();
+    loadData();
   }, []);
 
   const handleSignOut = async () => {

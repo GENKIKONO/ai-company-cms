@@ -27,22 +27,7 @@ export default function LoginPage() {
         return;
       }
 
-      // ユーザー同期API呼び出し
-      const response = await fetch('/api/auth/sync', { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to sync null profile');
-      }
-
-      const syncResult = await response.json();
-      console.log('User sync result:', syncResult);
-
-      // ダッシュボードにリダイレクト
+      // 直接ダッシュボードへ遷移（DBトリガーでプロフィールは自動作成）
       router.push('/dashboard');
       
     } catch (err) {
