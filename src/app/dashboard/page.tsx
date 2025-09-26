@@ -101,9 +101,6 @@ export default function DashboardPage() {
                 <Link href="/dashboard" className="text-blue-600 font-medium">
                   ダッシュボード
                 </Link>
-                <Link href="/organizations" className="text-gray-500 hover:text-gray-700">
-                  企業ディレクトリ
-                </Link>
                 <Link href="/dashboard/billing" className="text-gray-500 hover:text-gray-700">
                   サブスクリプション
                 </Link>
@@ -197,7 +194,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">クイックアクション</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
               onClick={handleCreateOrganization}
               className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
@@ -213,17 +210,6 @@ export default function DashboardPage() {
               </div>
             </button>
 
-            <Link href="/organizations" className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
-              <div className="p-2 bg-green-100 rounded-lg mr-3">
-                <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <p className="font-medium text-gray-900">企業を検索</p>
-                <p className="text-sm text-gray-600">公開済み企業を検索・閲覧します</p>
-              </div>
-            </Link>
 
             <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
               <div className="p-2 bg-purple-100 rounded-lg mr-3">
