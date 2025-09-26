@@ -1,26 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
 
-// Normalize empty strings to null for DATE and optional text fields
-function normalizeOrganizationData(data: any) {
+// Normalize empty strings to null for optional fields
+function normalizePostData(data: any) {
   const normalized = { ...data };
   
-  // DATE type fields - convert empty string to null
-  const dateFields = ['founded', 'established_at'];
-  
   // Optional text fields that should be null if empty
-  const optionalTextFields = [
-    'postal_code', 'street_address', 'description', 'keywords',
-    'address_locality', 'address_region', 'address_country',
-    'address_postal_code', 'telephone', 'email', 'url'
-  ];
-  
-  // Normalize date fields
-  dateFields.forEach(field => {
-    if (normalized[field] === '') {
-      normalized[field] = null;
-    }
-  });
+  const optionalTextFields = ['body'];
   
   // Normalize optional text fields
   optionalTextFields.forEach(field => {
@@ -28,6 +14,11 @@ function normalizeOrganizationData(data: any) {
       normalized[field] = null;
     }
   });
+  
+  // Handle published_at date field
+  if (normalized.published_at === '') {
+    normalized.published_at = null;
+  }
   
   return normalized;
 }
@@ -38,17 +29,38 @@ export async function GET(
 ) {
   try {
     const resolvedParams = await params;
+    const postId = resolvedParams.id;
+
     const supabase = supabaseAdmin();
     const { data, error } = await supabase
-      .from('organizations')
-      .select('*')
-      .eq('id', resolvedParams.id)
+      .from('posts')
+      .select(`
+        id,
+        title,
+        body,
+        status,
+        published_at,
+        created_at,
+        updated_at,
+        org_id,
+        organization:organizations!org_id(
+          id,
+          name,
+          slug
+        ),
+        author:app_users!created_by(
+          id,
+          name,
+          email
+        )
+      `)
+      .eq('id', postId)
       .single();
 
     if (error) {
       if (error.code === 'PGRST116') {
         return NextResponse.json(
-          { error: 'Organization not found' },
+          { error: 'Post not found' },
           { status: 404 }
         );
       }
@@ -58,19 +70,6 @@ export async function GET(
         { status: 500 }
       );
     }
-
-    // Check if organization is published or user has access
-    if (data.status !== 'published') {
-      const authHeader = request.headers.get('authorization');
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return NextResponse.json(
-          { error: 'Unauthorized', message: 'This organization is private' },
-          { status: 401 }
-        );
-      }
-    }
-
-    // Track API usage
 
     return NextResponse.json({ data });
 
@@ -89,48 +88,63 @@ export async function PUT(
 ) {
   try {
     const resolvedParams = await params;
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Unauthorized', message: 'Invalid or missing API key' },
-        { status: 401 }
-      );
-    }
-
+    const postId = resolvedParams.id;
     const body = await request.json();
-    
+
     // Remove system fields that shouldn't be updated directly
-    const { id, created_at, created_by, ...rawUpdateData } = body;
+    const { id, org_id, created_at, created_by, ...rawUpdateData } = body;
     
-    // Normalize data before saving to prevent DATE type errors
-    const normalizedUpdateData = normalizeOrganizationData(rawUpdateData);
+    // Normalize data before saving
+    const normalizedUpdateData = normalizePostData(rawUpdateData);
     normalizedUpdateData.updated_at = new Date().toISOString();
     
+    // If status is being changed to 'published', set published_at
+    if (normalizedUpdateData.status === 'published' && !normalizedUpdateData.published_at) {
+      normalizedUpdateData.published_at = new Date().toISOString();
+    }
+    
+    // If status is being changed from 'published' to 'draft', clear published_at
+    if (normalizedUpdateData.status === 'draft') {
+      normalizedUpdateData.published_at = null;
+    }
+
     const updateData = normalizedUpdateData;
 
     const supabase = supabaseAdmin();
     const { data, error } = await supabase
-      .from('organizations')
+      .from('posts')
       .update(updateData)
-      .eq('id', resolvedParams.id)
-      .select()
+      .eq('id', postId)
+      .select(`
+        id,
+        title,
+        body,
+        status,
+        published_at,
+        created_at,
+        updated_at,
+        org_id,
+        organization:organizations!org_id(
+          id,
+          name,
+          slug
+        )
+      `)
       .single();
 
     if (error) {
       if (error.code === 'PGRST116') {
         return NextResponse.json(
-          { error: 'Organization not found' },
+          { error: 'Post not found' },
           { status: 404 }
         );
       }
       console.error('Database error:', error);
       return NextResponse.json(
-        { error: 'Failed to update organization', message: error.message },
+        { error: 'Failed to update post', message: error.message },
         { status: 500 }
       );
     }
-
-    // Track update
 
     return NextResponse.json({ data });
 
@@ -149,41 +163,39 @@ export async function DELETE(
 ) {
   try {
     const resolvedParams = await params;
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const postId = resolvedParams.id;
+
+    const supabase = supabaseAdmin();
+    
+    // First verify the post exists
+    const { data: post, error: checkError } = await supabase
+      .from('posts')
+      .select('id, title')
+      .eq('id', postId)
+      .single();
+
+    if (checkError || !post) {
       return NextResponse.json(
-        { error: 'Unauthorized', message: 'Invalid or missing API key' },
-        { status: 401 }
+        { error: 'Post not found' },
+        { status: 404 }
       );
     }
 
-    // First, get the organization to track the deletion
-    const supabase = supabaseAdmin();
-    const { data: org } = await supabase
-      .from('organizations')
-      .select('id, name')
-      .eq('id', resolvedParams.id)
-      .single();
-
     const { error } = await supabase
-      .from('organizations')
+      .from('posts')
       .delete()
-      .eq('id', resolvedParams.id);
+      .eq('id', postId);
 
     if (error) {
       console.error('Database error:', error);
       return NextResponse.json(
-        { error: 'Failed to delete organization', message: error.message },
+        { error: 'Failed to delete post', message: error.message },
         { status: 500 }
       );
     }
 
-    // Track deletion
-    if (org) {
-    }
-
     return NextResponse.json({ 
-      message: 'Organization deleted successfully' 
+      message: 'Post deleted successfully' 
     });
 
   } catch (error) {

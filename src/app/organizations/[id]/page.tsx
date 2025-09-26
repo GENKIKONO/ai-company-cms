@@ -6,6 +6,10 @@ import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization, updateOrganization, updateOrganizationStatus, deleteOrganization, getIndustries } from '@/lib/organizations';
 import { type AppUser, type Organization, type OrganizationFormData } from '@/types/database';
+import ServicesTab from '@/components/ServicesTab';
+import CaseStudiesTab from '@/components/CaseStudiesTab';
+import FAQsTab from '@/components/FAQsTab';
+import PostsTab from '@/components/PostsTab';
 
 export default function EditOrganizationPage() {
   const router = useRouter();
@@ -19,6 +23,7 @@ export default function EditOrganizationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [activeTab, setActiveTab] = useState<'basic' | 'services' | 'casestudies' | 'faqs' | 'posts'>('basic');
 
   const [formData, setFormData] = useState<OrganizationFormData>({
     name: '',
@@ -350,8 +355,67 @@ export default function EditOrganizationPage() {
           </div>
         </div>
 
-        {/* フォーム */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200">
+        {/* タブナビゲーション */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8 px-6">
+              <button
+                onClick={() => setActiveTab('basic')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'basic'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                基本情報
+              </button>
+              <button
+                onClick={() => setActiveTab('services')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'services'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                サービス
+              </button>
+              <button
+                onClick={() => setActiveTab('casestudies')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'casestudies'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                事例
+              </button>
+              <button
+                onClick={() => setActiveTab('faqs')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'faqs'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                FAQ
+              </button>
+              <button
+                onClick={() => setActiveTab('posts')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'posts'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                記事
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* タブコンテンツ */}
+        {activeTab === 'basic' && (
+          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200">
           {/* 基本情報 */}
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">基本情報</h2>
@@ -720,6 +784,27 @@ export default function EditOrganizationPage() {
             </div>
           </div>
         </form>
+        )}
+
+        {/* サービスタブ */}
+        {activeTab === 'services' && (
+          <ServicesTab organizationId={organizationId} />
+        )}
+
+        {/* 事例タブ */}
+        {activeTab === 'casestudies' && (
+          <CaseStudiesTab organizationId={organizationId} />
+        )}
+
+        {/* FAQタブ */}
+        {activeTab === 'faqs' && (
+          <FAQsTab organizationId={organizationId} />
+        )}
+
+        {/* 記事タブ */}
+        {activeTab === 'posts' && (
+          <PostsTab organizationId={organizationId} organizationSlug={organization?.slug} />
+        )}
       </main>
 
       {/* 削除確認モーダル */}

@@ -1,26 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
 
-// Normalize empty strings to null for DATE and optional text fields
-function normalizeOrganizationData(data: any) {
+// Normalize empty strings to null for optional fields
+function normalizeServiceData(data: any) {
   const normalized = { ...data };
-  
-  // DATE type fields - convert empty string to null
-  const dateFields = ['founded', 'established_at'];
   
   // Optional text fields that should be null if empty
   const optionalTextFields = [
-    'postal_code', 'street_address', 'description', 'keywords',
-    'address_locality', 'address_region', 'address_country',
-    'address_postal_code', 'telephone', 'email', 'url'
+    'summary', 'price', 'category', 'cta_url'
   ];
-  
-  // Normalize date fields
-  dateFields.forEach(field => {
-    if (normalized[field] === '') {
-      normalized[field] = null;
-    }
-  });
   
   // Normalize optional text fields
   optionalTextFields.forEach(field => {
@@ -29,26 +17,38 @@ function normalizeOrganizationData(data: any) {
     }
   });
   
+  // Handle array fields
+  if (normalized.features && Array.isArray(normalized.features)) {
+    normalized.features = normalized.features.filter((f: any) => f && f.trim() !== '');
+  }
+  
+  if (normalized.media && Array.isArray(normalized.media)) {
+    normalized.media = normalized.media.filter((m: any) => m && m.trim() !== '');
+  }
+  
   return normalized;
 }
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string; serviceId: string }> }
 ) {
   try {
     const resolvedParams = await params;
+    const { id: organizationId, serviceId } = resolvedParams;
+
     const supabase = supabaseAdmin();
     const { data, error } = await supabase
-      .from('organizations')
+      .from('services')
       .select('*')
-      .eq('id', resolvedParams.id)
+      .eq('id', serviceId)
+      .eq('org_id', organizationId)
       .single();
 
     if (error) {
       if (error.code === 'PGRST116') {
         return NextResponse.json(
-          { error: 'Organization not found' },
+          { error: 'Service not found' },
           { status: 404 }
         );
       }
@@ -58,19 +58,6 @@ export async function GET(
         { status: 500 }
       );
     }
-
-    // Check if organization is published or user has access
-    if (data.status !== 'published') {
-      const authHeader = request.headers.get('authorization');
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return NextResponse.json(
-          { error: 'Unauthorized', message: 'This organization is private' },
-          { status: 401 }
-        );
-      }
-    }
-
-    // Track API usage
 
     return NextResponse.json({ data });
 
@@ -85,52 +72,44 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string; serviceId: string }> }
 ) {
   try {
     const resolvedParams = await params;
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Unauthorized', message: 'Invalid or missing API key' },
-        { status: 401 }
-      );
-    }
-
+    const { id: organizationId, serviceId } = resolvedParams;
     const body = await request.json();
-    
+
     // Remove system fields that shouldn't be updated directly
-    const { id, created_at, created_by, ...rawUpdateData } = body;
+    const { id, org_id, created_at, ...rawUpdateData } = body;
     
-    // Normalize data before saving to prevent DATE type errors
-    const normalizedUpdateData = normalizeOrganizationData(rawUpdateData);
+    // Normalize data before saving
+    const normalizedUpdateData = normalizeServiceData(rawUpdateData);
     normalizedUpdateData.updated_at = new Date().toISOString();
     
     const updateData = normalizedUpdateData;
 
     const supabase = supabaseAdmin();
     const { data, error } = await supabase
-      .from('organizations')
+      .from('services')
       .update(updateData)
-      .eq('id', resolvedParams.id)
+      .eq('id', serviceId)
+      .eq('org_id', organizationId)
       .select()
       .single();
 
     if (error) {
       if (error.code === 'PGRST116') {
         return NextResponse.json(
-          { error: 'Organization not found' },
+          { error: 'Service not found' },
           { status: 404 }
         );
       }
       console.error('Database error:', error);
       return NextResponse.json(
-        { error: 'Failed to update organization', message: error.message },
+        { error: 'Failed to update service', message: error.message },
         { status: 500 }
       );
     }
-
-    // Track update
 
     return NextResponse.json({ data });
 
@@ -145,45 +124,45 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string; serviceId: string }> }
 ) {
   try {
     const resolvedParams = await params;
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const { id: organizationId, serviceId } = resolvedParams;
+
+    const supabase = supabaseAdmin();
+    
+    // First verify the service exists and belongs to the organization
+    const { data: service, error: checkError } = await supabase
+      .from('services')
+      .select('id, name')
+      .eq('id', serviceId)
+      .eq('org_id', organizationId)
+      .single();
+
+    if (checkError || !service) {
       return NextResponse.json(
-        { error: 'Unauthorized', message: 'Invalid or missing API key' },
-        { status: 401 }
+        { error: 'Service not found' },
+        { status: 404 }
       );
     }
 
-    // First, get the organization to track the deletion
-    const supabase = supabaseAdmin();
-    const { data: org } = await supabase
-      .from('organizations')
-      .select('id, name')
-      .eq('id', resolvedParams.id)
-      .single();
-
     const { error } = await supabase
-      .from('organizations')
+      .from('services')
       .delete()
-      .eq('id', resolvedParams.id);
+      .eq('id', serviceId)
+      .eq('org_id', organizationId);
 
     if (error) {
       console.error('Database error:', error);
       return NextResponse.json(
-        { error: 'Failed to delete organization', message: error.message },
+        { error: 'Failed to delete service', message: error.message },
         { status: 500 }
       );
     }
 
-    // Track deletion
-    if (org) {
-    }
-
     return NextResponse.json({ 
-      message: 'Organization deleted successfully' 
+      message: 'Service deleted successfully' 
     });
 
   } catch (error) {
