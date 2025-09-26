@@ -22,9 +22,10 @@ export async function getCurrentUser(): Promise<AppUser | null> {
     
     if (!user) return null
 
+    // migrated from users → app_users
     const { data: profile, error } = await supabaseBrowser
-      .from('users')
-      .select('*')
+      .from('app_users')
+      .select('id, email, name, role, created_at, updated_at')
       .eq('id', user.id)
       .single()
 
@@ -58,13 +59,14 @@ export const auth = {
 
     // プロフィール情報を作成
     if (data.user) {
+      // migrated from users → app_users
       const { error: profileError } = await supabaseBrowser
-        .from('users')
+        .from('app_users')
         .insert({
           id: data.user.id,
           email: data.user.email!,
-          full_name: fullName,
-          role: 'viewer'
+          name: fullName,
+          role: 'user'
         })
 
       if (profileError) {
@@ -127,8 +129,9 @@ export const auth = {
     
     if (!user) throw new Error('Not authenticated')
 
+    // migrated from users → app_users
     const { error } = await supabaseBrowser
-      .from('users')
+      .from('app_users')
       .update(updates)
       .eq('id', user.id)
 
@@ -145,9 +148,10 @@ export const auth = {
 export const profile = {
   // プロフィール取得
   get: async (userId: string): Promise<AppUser | null> => {
+    // migrated from users → app_users
     const { data, error } = await supabaseBrowser
-      .from('users')
-      .select('*')
+      .from('app_users')
+      .select('id, email, name, role, created_at, updated_at')
       .eq('id', userId)
       .single();
 
@@ -161,8 +165,9 @@ export const profile = {
 
   // プロフィール更新
   update: async (userId: string, updates: Partial<AppUser>) => {
+    // migrated from users → app_users
     const { data, error } = await supabaseBrowser
-      .from('users')
+      .from('app_users')
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
