@@ -189,6 +189,29 @@ export interface PaginatedResponse<T> extends APIResponse<T[]> {
   };
 }
 
+// Single-Org Mode API レスポンス型定義
+export interface MyOrganizationResponse {
+  data: Organization | null;
+  message?: string;
+}
+
+export interface MyOrganizationCreateResponse {
+  data: Organization;
+}
+
+export interface MyOrganizationUpdateResponse {
+  data: Organization;
+}
+
+export interface MyOrganizationDeleteResponse {
+  message: string;
+}
+
+export interface MyOrganizationErrorResponse {
+  error: string;
+  message: string;
+}
+
 // フォーム型定義
 export interface OrganizationFormData {
   name: string;
