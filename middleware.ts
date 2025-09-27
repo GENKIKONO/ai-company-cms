@@ -7,6 +7,7 @@ import { createServerClient } from '@supabase/ssr';
 const PUBLIC_PATHS = new Set([
   '/', '/help', '/contact', '/terms', '/privacy',
   '/auth/login', '/login',
+  '/auth/signin',
   '/auth/signup', '/signup',
   '/auth/confirm',
   '/auth/forgot-password',
@@ -23,6 +24,7 @@ const SEMI_PUBLIC_PREFIXES = ['/organizations'];
 // 認証系ページ（ログイン済ならリダイレクト）
 const AUTH_PAGES = new Set([
   '/auth/login', '/login',
+  '/auth/signin',
   '/auth/signup', '/signup',
   '/auth/forgot-password',
   '/auth/reset-password-confirm',
@@ -45,13 +47,21 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
+    console.log(`[Middleware] Processing: ${pathname}`);
+
   // 公開パスは認証チェック不要
   if (PUBLIC_PATHS.has(pathname)) {
+    console.log(`[Middleware] Public path, skipping auth: ${pathname}`);
     return NextResponse.next();
   }
 
-  // Supabase SSR クライアント（最小・公式推奨パターン）
+  // Supabase SSR クライアント（セキュアCookie設定付き）
   const res = NextResponse.next();
+  const isProduction = process.env.NODE_ENV === 'production';
+  const domain = isProduction && process.env.NEXT_PUBLIC_APP_URL?.includes('aiohub.jp') 
+    ? '.aiohub.jp' 
+    : undefined;
+    
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -59,11 +69,26 @@ export async function middleware(req: NextRequest) {
       cookies: {
         get: (name: string) => req.cookies.get(name)?.value,
         set: (name: string, value: string, options: any) => {
-          // ❗ request ではなく response 側にのみセット
-          res.cookies.set(name, value, options);
+          const secureOptions = {
+            ...options,
+            sameSite: 'lax' as const,
+            secure: isProduction,
+            domain,
+            path: '/',
+            httpOnly: false, // Supabase needs client access to auth tokens
+          };
+          res.cookies.set(name, value, secureOptions);
         },
         remove: (name: string, options: any) => {
-          res.cookies.set(name, '', { ...options, maxAge: 0 });
+          const secureOptions = {
+            ...options,
+            sameSite: 'lax' as const,
+            secure: isProduction,
+            domain,
+            path: '/',
+            maxAge: 0,
+          };
+          res.cookies.set(name, '', secureOptions);
         },
       },
     }
@@ -74,6 +99,8 @@ export async function middleware(req: NextRequest) {
   const isProtected = PROTECTED_PREFIXES.some(p => pathname.startsWith(p));
   const isSemiPublic = SEMI_PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
   const isAuthPage = AUTH_PAGES.has(pathname);
+
+  console.log(`[Middleware] Auth check: ${pathname}, isAuthed: ${isAuthed}, isProtected: ${isProtected}, isAuthPage: ${isAuthPage}`);
 
   // 半公開ルートの処理（/organizations/new や /organizations/[id]/edit は要ログイン）
   const requiresAuthInSemiPublic = isSemiPublic && (
@@ -110,5 +137,5 @@ export async function middleware(req: NextRequest) {
 
 // API と静的は除外（最小マッチャー）
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'],
+  matcher: ['/dashboard'],
 };

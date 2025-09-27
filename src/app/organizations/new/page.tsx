@@ -45,7 +45,7 @@ export default function NewOrganizationPage() {
       try {
         const currentUser = await getCurrentUser();
         if (!currentUser) {
-          router.push('/login');
+          router.replace('/auth/signin?redirect=' + encodeURIComponent('/organizations/new'));
           return;
         }
         
@@ -109,9 +109,11 @@ export default function NewOrganizationPage() {
       newErrors.name = '企業名は必須です';
     }
 
-    if (!formData.slug.trim()) {
+    // 安全な文字列処理でundefined.test()エラーを回避
+    const slugValue = typeof formData.slug === 'string' ? formData.slug : '';
+    if (!slugValue.trim()) {
       newErrors.slug = 'スラッグは必須です';
-    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
+    } else if (!/^[a-z0-9-]+$/.test(slugValue)) {
       newErrors.slug = 'スラッグは小文字、数字、ハイフンのみ使用できます';
     }
 
@@ -141,6 +143,21 @@ export default function NewOrganizationPage() {
       return;
     }
 
+    // 送信直前にクライアント側セッションチェック
+    const cookieString = document.cookie;
+    const hasSupabaseAuthToken = /sb-[^=;]+-auth-token=/.test(cookieString);
+    
+    if (!hasSupabaseAuthToken) {
+      setErrors({ 
+        submit: 'セッションが切れています。再度ログインしてください。' 
+      });
+      // 3秒後に自動でログインページにリダイレクト
+      setTimeout(() => {
+        router.push('/auth/signin?redirect=' + encodeURIComponent('/organizations/new'));
+      }, 3000);
+      return;
+    }
+
     setSubmitting(true);
     try {
       // データ正規化とバリデーション
@@ -152,6 +169,7 @@ export default function NewOrganizationPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(normalizedData),
       });
       
@@ -181,9 +199,15 @@ export default function NewOrganizationPage() {
     } catch (error) {
       console.error('Failed to create organization:', error);
       if (error instanceof Error) {
-        setErrors({ submit: error.message });
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+          setErrors({ submit: 'ログインが必要です。再度ログインしてください。' });
+        } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
+          setErrors({ submit: '権限がありません。管理者にお問い合わせください。' });
+        } else {
+          setErrors({ submit: error.message });
+        }
       } else {
-        setErrors({ submit: '企業の作成に失敗しました' });
+        setErrors({ submit: '企業の作成に失敗しました。しばらく時間をおいてから再度お試しください。' });
       }
     } finally {
       setSubmitting(false);

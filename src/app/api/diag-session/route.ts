@@ -1,63 +1,63 @@
-import { NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase-server-unified';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
-export async function GET(req: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const res = NextResponse.next();
-    
-    // middleware と同じ cookies ハンドラで Supabase クライアント初期化
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get: (name: string) => {
-            const cookies = req.headers.get('cookie') || '';
-            const match = cookies.match(new RegExp(`${name}=([^;]+)`));
-            return match ? decodeURIComponent(match[1]) : undefined;
-          },
-          set: (name: string, value: string, options: any) => {
-            res.cookies.set(name, value, options);
-          },
-          remove: (name: string, options: any) => {
-            res.cookies.set(name, '', { ...options, maxAge: 0 });
-          },
-        },
-      }
-    );
+    const supabase = supabaseServer();
 
     // ユーザーセッション取得
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
     // Cookie 文字列から sb-*-auth-token の有無を判定
-    const cookieHeader = req.headers.get('cookie') || '';
-    const hasAccessTokenCookie = /sb-[^-]+-auth-token(?!=\.persistent)/.test(cookieHeader);
-    const hasPersistentCookie = /sb-[^-]+-auth-token\.persistent/.test(cookieHeader);
+    const cookieHeader = request.headers.get('cookie') || '';
+    const hasAccessTokenCookie = /sb-[^=;]+-auth-token=/.test(cookieHeader);
+    const hasPersistentCookie = /sb-[^=;]+-auth-token\.persistent=/.test(cookieHeader);
 
-    const response = {
+    const diagnosticResponse = {
       authenticated: !!user && !userError,
       userId: user?.id,
       email: user?.email,
       sessionExpiresAt: session?.expires_at,
       hasAccessTokenCookie,
       hasPersistentCookie,
+      cookieHeaderLength: cookieHeader.length,
+      timestamp: new Date().toISOString(),
+      userError: userError?.message,
+      sessionError: sessionError?.message,
     };
 
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(diagnosticResponse, { 
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, must-revalidate',
+        'Content-Type': 'application/json'
+      }
+    });
   } catch (error) {
     // エラー時も authenticated: false で 200 を返す
-    const cookieHeader = req.headers.get('cookie') || '';
-    const hasAccessTokenCookie = /sb-[^-]+-auth-token(?!=\.persistent)/.test(cookieHeader);
-    const hasPersistentCookie = /sb-[^-]+-auth-token\.persistent/.test(cookieHeader);
+    const cookieHeader = request.headers.get('cookie') || '';
+    const hasAccessTokenCookie = /sb-[^=;]+-auth-token=/.test(cookieHeader);
+    const hasPersistentCookie = /sb-[^=;]+-auth-token\.persistent=/.test(cookieHeader);
 
     return NextResponse.json({
       authenticated: false,
       hasAccessTokenCookie,
       hasPersistentCookie,
-    }, { status: 200 });
+      cookieHeaderLength: cookieHeader.length,
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }, { 
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, must-revalidate',
+        'Content-Type': 'application/json'
+      }
+    });
   }
 }

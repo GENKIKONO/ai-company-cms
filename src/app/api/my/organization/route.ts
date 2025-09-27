@@ -1,7 +1,7 @@
 // Single-Org Mode API: /api/my/organization
 // 各ユーザーが自分の企業情報を管理するためのAPI
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase-server-unified';
 import type { Organization, OrganizationFormData } from '@/types/database';
 
 // エラーログ送信関数（失敗しても無視）
@@ -21,19 +21,30 @@ async function logErrorToDiag(errorInfo: any) {
   }
 }
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 // GET - ユーザーの企業情報を取得
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = supabaseServer();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
       return NextResponse.json(
-        { error: 'Unauthorized', message: 'Authentication required' },
-        { status: 401 }
+        { 
+          code: 'UNAUTHORIZED', 
+          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
+        },
+        { 
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-store, must-revalidate'
+          }
+        }
       );
     }
 
@@ -49,7 +60,12 @@ export async function GET() {
       if (error.code === 'PGRST116') {
         return NextResponse.json(
           { data: null, message: 'No organization found' },
-          { status: 200 }
+          { 
+            status: 200,
+            headers: {
+              'Cache-Control': 'no-store, must-revalidate'
+            }
+          }
         );
       }
       console.error('Database error:', error);
@@ -59,7 +75,15 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({ data });
+    return NextResponse.json(
+      { data }, 
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, must-revalidate'
+        }
+      }
+    );
 
   } catch (error) {
     const errorId = `get-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -84,14 +108,22 @@ export async function GET() {
 // POST - 新しい企業を作成（ユーザーが企業を持っていない場合のみ）
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = supabaseServer();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
       return NextResponse.json(
-        { error: 'Unauthorized', message: 'Authentication required' },
-        { status: 401 }
+        { 
+          code: 'UNAUTHORIZED', 
+          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
+        },
+        { 
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-store, must-revalidate'
+          }
+        }
       );
     }
 
@@ -123,7 +155,10 @@ export async function POST(request: NextRequest) {
 
     if (existingOrg) {
       return NextResponse.json(
-        { error: 'Conflict', message: 'User already has an organization' },
+        { 
+          code: 'CONFLICT', 
+          reason: 'User already has an organization' 
+        },
         { status: 409 }
       );
     }
@@ -137,7 +172,10 @@ export async function POST(request: NextRequest) {
 
     if (slugCheck) {
       return NextResponse.json(
-        { error: 'Conflict', message: 'Slug already exists' },
+        { 
+          code: 'CONFLICT', 
+          reason: 'Slug already exists' 
+        },
         { status: 409 }
       );
     }
@@ -166,13 +204,19 @@ export async function POST(request: NextRequest) {
       if (error.code === '23505') {
         if (error.message.includes('unique_organizations_created_by')) {
           return NextResponse.json(
-            { error: 'Conflict', message: 'User already has an organization' },
+            { 
+              code: 'CONFLICT', 
+              reason: 'User already has an organization' 
+            },
             { status: 409 }
           );
         }
         if (error.message.includes('organizations_slug_key')) {
           return NextResponse.json(
-            { error: 'Conflict', message: 'Slug already exists' },
+            { 
+              code: 'CONFLICT', 
+              reason: 'Slug already exists' 
+            },
             { status: 409 }
           );
         }
@@ -184,7 +228,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ data }, { status: 201 });
+    return NextResponse.json(
+      { data }, 
+      { 
+        status: 201,
+        headers: {
+          'Cache-Control': 'no-store, must-revalidate'
+        }
+      }
+    );
 
   } catch (error) {
     const errorId = `post-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -209,14 +261,22 @@ export async function POST(request: NextRequest) {
 // PUT - 既存の企業情報を更新
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = supabaseServer();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
       return NextResponse.json(
-        { error: 'Unauthorized', message: 'Authentication required' },
-        { status: 401 }
+        { 
+          code: 'UNAUTHORIZED', 
+          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
+        },
+        { 
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-store, must-revalidate'
+          }
+        }
       );
     }
 
@@ -258,7 +318,10 @@ export async function PUT(request: NextRequest) {
 
       if (slugCheck) {
         return NextResponse.json(
-          { error: 'Conflict', message: 'Slug already exists' },
+          { 
+            code: 'CONFLICT', 
+            reason: 'Slug already exists' 
+          },
           { status: 409 }
         );
       }
@@ -287,7 +350,10 @@ export async function PUT(request: NextRequest) {
       // 制約違反の場合
       if (error.code === '23505' && error.message.includes('organizations_slug_key')) {
         return NextResponse.json(
-          { error: 'Conflict', message: 'Slug already exists' },
+          { 
+            code: 'CONFLICT', 
+            reason: 'Slug already exists' 
+          },
           { status: 409 }
         );
       }
@@ -298,7 +364,15 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ data });
+    return NextResponse.json(
+      { data },
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, must-revalidate'
+        }
+      }
+    );
 
   } catch (error) {
     const errorId = `put-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -321,16 +395,24 @@ export async function PUT(request: NextRequest) {
 }
 
 // DELETE - 企業を削除（必要に応じて）
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = supabaseServer();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
       return NextResponse.json(
-        { error: 'Unauthorized', message: 'Authentication required' },
-        { status: 401 }
+        { 
+          code: 'UNAUTHORIZED', 
+          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
+        },
+        { 
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-store, must-revalidate'
+          }
+        }
       );
     }
 
@@ -363,7 +445,15 @@ export async function DELETE() {
       );
     }
 
-    return NextResponse.json({ message: 'Organization deleted successfully' });
+    return NextResponse.json(
+      { message: 'Organization deleted successfully' },
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, must-revalidate'
+        }
+      }
+    );
 
   } catch (error) {
     const errorId = `delete-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
