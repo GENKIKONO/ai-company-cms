@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { CalendarIcon, UserIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { markdownToHtml, truncateMarkdown } from '@/lib/markdown';
+import { JsonLdModal } from '@/components/ui/json-ld-modal';
 
 interface Post {
   id: string;
@@ -27,10 +28,15 @@ interface Post {
   } | null;
 }
 
-async function getPost(slug: string, postId: string): Promise<Post | null> {
+async function getPost(slug: string, postId: string, isPreview: boolean = false): Promise<Post | null> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/public/o/${slug}/posts/${postId}`, {
+    const url = new URL(`${baseUrl}/api/public/o/${slug}/posts/${postId}`);
+    if (isPreview) {
+      url.searchParams.set('preview', 'true');
+    }
+    
+    const response = await fetch(url.toString(), {
       cache: 'no-store'
     });
     
@@ -132,12 +138,17 @@ function formatDate(dateString: string): string {
 }
 
 export default async function PostPage({
-  params
+  params,
+  searchParams
 }: {
-  params: Promise<{ slug: string; id: string }>
+  params: Promise<{ slug: string; id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedParams = await params;
-  const post = await getPost(resolvedParams.slug, resolvedParams.id);
+  const resolvedSearchParams = await searchParams;
+  const isPreview = resolvedSearchParams.preview === 'true';
+  
+  const post = await getPost(resolvedParams.slug, resolvedParams.id, isPreview);
 
   if (!post || !post.organization) {
     notFound();
@@ -155,6 +166,44 @@ export default async function PostPage({
       )}
       
       <div className="min-h-screen bg-gray-50">
+        {/* Preview Banner */}
+        {isPreview && post.status === 'draft' && (
+          <div className="bg-orange-500 text-white py-3 px-4">
+            <div className="max-w-4xl mx-auto flex items-center justify-between">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <span className="font-medium">プレビューモード</span>
+                <span className="ml-2 text-orange-100">この記事は下書き状態です</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                {jsonLd && (
+                  <JsonLdModal 
+                    jsonLdData={[jsonLd]}
+                    organizationName={post.organization?.name || 'Unknown'}
+                    trigger={
+                      <button className="inline-flex items-center px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded transition-colors">
+                        <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        JSON-LD
+                      </button>
+                    }
+                  />
+                )}
+                <Link
+                  href={`/dashboard`}
+                  className="inline-flex items-center px-3 py-1 bg-white text-orange-600 text-sm rounded hover:bg-orange-50 transition-colors"
+                >
+                  ダッシュボードに戻る
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="max-w-4xl mx-auto px-4 py-8">
           {/* Navigation */}
           <div className="mb-8">

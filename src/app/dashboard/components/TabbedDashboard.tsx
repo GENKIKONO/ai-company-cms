@@ -5,11 +5,13 @@ import Link from 'next/link';
 import type { Post, Service, CaseStudy, FAQ } from '@/types/database';
 import { ErrorDisplay } from '@/components/ui/error-display';
 import { LoadingSkeleton, EmptyState } from '@/components/ui/loading-skeleton';
+import { OrganizationPreview } from '@/components/ui/organization-preview';
 import { useApiList } from '@/hooks/useApiClient';
 
 interface TabbedDashboardProps {
   organizationId: string;
   organizationSlug?: string;
+  organizationName: string;
   isPublished: boolean;
 }
 
@@ -22,7 +24,7 @@ interface ContentStats {
   faqs: number;
 }
 
-export default function TabbedDashboard({ organizationId, organizationSlug, isPublished }: TabbedDashboardProps) {
+export default function TabbedDashboard({ organizationId, organizationSlug, organizationName, isPublished }: TabbedDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [posts, setPosts] = useState<Post[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -301,21 +303,14 @@ export default function TabbedDashboard({ organizationId, organizationSlug, isPu
         </div>
       </div>
 
-      {/* Public Page Link */}
-      {isPublished && organizationSlug && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">公開ページ</h3>
-          <Link
-            href={`/o/${organizationSlug}`}
-            target="_blank"
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-            公開ページを表示
-          </Link>
-        </div>
+      {/* Organization Preview Section */}
+      {organizationSlug && (
+        <OrganizationPreview 
+          organizationId={organizationId}
+          organizationSlug={organizationSlug}
+          organizationName={organizationName}
+          isPublished={isPublished}
+        />
       )}
     </div>
   );
@@ -401,14 +396,33 @@ export default function TabbedDashboard({ organizationId, organizationSlug, isPu
                   >
                     編集
                   </Link>
-                  {item.status === 'published' && organizationSlug && (
-                    <Link
-                      href={`/o/${organizationSlug}/${type}/${item.id}`}
-                      target="_blank"
-                      className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      表示
-                    </Link>
+                  {organizationSlug && (
+                    <>
+                      {item.status === 'published' ? (
+                        <Link
+                          href={`/o/${organizationSlug}/${type}/${item.id}`}
+                          target="_blank"
+                          className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                          公開表示
+                        </Link>
+                      ) : (
+                        <Link
+                          href={`/o/${organizationSlug}/${type}/${item.id}?preview=true`}
+                          target="_blank"
+                          className="inline-flex items-center px-3 py-1 border border-orange-300 shadow-sm text-sm font-medium rounded-md text-orange-700 bg-orange-50 hover:bg-orange-100"
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          プレビュー
+                        </Link>
+                      )}
+                    </>
                   )}
                   <button
                     onClick={() => handleDelete(type, item.id)}

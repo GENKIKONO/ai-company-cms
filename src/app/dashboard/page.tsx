@@ -227,6 +227,7 @@ export default async function DashboardPage() {
         <TabbedDashboard 
           organizationId={organization.id}
           organizationSlug={organization.slug}
+          organizationName={organization.name}
           isPublished={organization.is_published}
         />
 

@@ -21,6 +21,8 @@ export async function GET(
     });
 
     const { slug, postId } = resolvedParams;
+    const { searchParams } = new URL(request.url);
+    const isPreview = searchParams.get('preview') === 'true';
 
     if (!slug || !postId) {
       throw createError.validation('Organization slug and post ID are required', { slug, postId });
@@ -28,9 +30,43 @@ export async function GET(
 
     const supabase = supabaseAdmin();
 
-    // Get published post with organization info
+    // If preview mode, check authentication first
+    let allowDraftAccess = false;
+    if (isPreview) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader) {
+        try {
+          const token = authHeader.replace('Bearer ', '');
+          const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+          
+          if (!authError && user) {
+            // Check if user has access to the organization
+            const { data: orgAccess } = await supabase
+              .from('organizations')
+              .select('id')
+              .eq('slug', slug)
+              .eq('created_by', user.id)
+              .single();
+            
+            if (orgAccess) {
+              allowDraftAccess = true;
+            }
+          }
+        } catch (authErr) {
+          console.log('Auth check failed for preview:', authErr);
+        }
+      }
+    }
+
+    // Get post with appropriate status filter
     const queryStart = Date.now();
-    const { data: post, error } = await supabase
+    let statusCondition = 'published';
+    if (isPreview && allowDraftAccess) {
+      // For authenticated preview, allow any status
+      statusCondition = undefined;
+    }
+
+    const query = supabase
       .from('posts')
       .select(`
         id,
@@ -54,9 +90,13 @@ export async function GET(
           name
         )
       `)
-      .eq('id', postId)
-      .eq('status', 'published')
-      .single() as { data: any | null; error: any };
+      .eq('id', postId);
+    
+    if (statusCondition) {
+      query.eq('status', statusCondition);
+    }
+
+    const { data: post, error } = await query.single() as { data: any | null; error: any };
 
     const queryDuration = Date.now() - queryStart;
     if (queryDuration > 1000) {
