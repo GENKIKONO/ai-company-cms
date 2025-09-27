@@ -1,5 +1,5 @@
 import './globals.css'
-import AuthHeader from '@/components/header/AuthHeader'
+import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 
 // SSRで常に正しい認証UIが出るように
 export const dynamic = 'force-dynamic';
@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
-        <AuthHeader />
+        <SafeAuthHeader />
         
         {/* ビルド情報バッジ - 本番とソースの乖離可視化用 */}
         <div 

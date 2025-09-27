@@ -29,20 +29,21 @@ const AUTH_PAGES = new Set([
 ]);
 
 export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  try {
+    const { pathname } = req.nextUrl;
 
-  // Next内部・API・静的リソースは対象外
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname === '/favicon.ico' ||
-    pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml' ||
-    pathname.startsWith('/og-image') ||
-    pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|css|js|woff|woff2|ttf|eot|webp)$/)
-  ) {
-    return NextResponse.next();
-  }
+    // Next内部・API・静的リソースは対象外
+    if (
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/api') ||
+      pathname === '/favicon.ico' ||
+      pathname === '/robots.txt' ||
+      pathname === '/sitemap.xml' ||
+      pathname.startsWith('/og-image') ||
+      pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|css|js|woff|woff2|ttf|eot|webp)$/)
+    ) {
+      return NextResponse.next();
+    }
 
   // 公開パスは認証チェック不要
   if (PUBLIC_PATHS.has(pathname)) {
@@ -98,8 +99,13 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(target, req.url));
   }
 
-  // それ以外はそのまま通過
-  return res;
+    // それ以外はそのまま通過
+    return res;
+  } catch (error) {
+    console.error('[Middleware] Exception caught:', error);
+    // 例外時は素通り（フォールバック）
+    return NextResponse.next();
+  }
 }
 
 // API と静的は除外（最小マッチャー）
