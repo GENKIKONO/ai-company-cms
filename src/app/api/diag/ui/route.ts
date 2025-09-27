@@ -75,14 +75,68 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // 実体ファイルパスの詳細分析
+    const actualFiles = {
+      homepage: {
+        source: 'src/app/page.tsx',
+        manifestPath: routes['/'],
+        exists: fs.existsSync(path.join(process.cwd(), 'src/app/page.tsx'))
+      },
+      dashboard: {
+        source: 'src/app/dashboard/page.tsx', 
+        manifestPath: routes['/dashboard'],
+        exists: fs.existsSync(path.join(process.cwd(), 'src/app/dashboard/page.tsx'))
+      }
+    };
+
+    // Layout階層の詳細分析
+    const layoutAnalysis = {
+      rootLayout: {
+        path: 'src/app/layout.tsx',
+        exists: fs.existsSync(path.join(process.cwd(), 'src/app/layout.tsx')),
+        hasAuthHeader: false,
+        snippet: ''
+      },
+      dashboardLayout: {
+        path: 'src/app/dashboard/layout.tsx',
+        exists: fs.existsSync(path.join(process.cwd(), 'src/app/dashboard/layout.tsx')),
+        hasAuthHeader: false,
+        snippet: ''
+      }
+    };
+
+    // Layout詳細解析
+    try {
+      const rootLayoutContent = fs.readFileSync(path.join(process.cwd(), 'src/app/layout.tsx'), 'utf-8');
+      layoutAnalysis.rootLayout.hasAuthHeader = rootLayoutContent.includes('AuthHeader');
+      layoutAnalysis.rootLayout.snippet = rootLayoutContent.slice(0, 150).replace(/\n/g, ' ');
+    } catch {}
+
+    if (layoutAnalysis.dashboardLayout.exists) {
+      try {
+        const dashLayoutContent = fs.readFileSync(path.join(process.cwd(), 'src/app/dashboard/layout.tsx'), 'utf-8');
+        layoutAnalysis.dashboardLayout.hasAuthHeader = dashLayoutContent.includes('AuthHeader');
+        layoutAnalysis.dashboardLayout.snippet = dashLayoutContent.slice(0, 150).replace(/\n/g, ' ');
+      } catch {}
+    }
+
     const diagnosis = {
       timestamp: new Date().toISOString(),
       status: 'ok',
-      routes,
-      dashboardSnippet,
-      layoutSnippet,
-      hasAuthHeader,
-      hasSearchCard,
+      routes: {
+        '/': routes['/'] || 'not found',
+        '/dashboard': routes['/dashboard'] || 'not found'
+      },
+      snippets: {
+        homepage: dashboardSnippet,
+        layout: layoutSnippet
+      },
+      flags: {
+        hasAuthHeader,
+        hasSearchCard
+      },
+      actualFiles,
+      layoutAnalysis,
       manifest_status: manifestStatus,
       build_required: !fs.existsSync(path.join(process.cwd(), '.next/server/app-paths-manifest.json'))
     };
@@ -102,16 +156,27 @@ export async function GET(request: NextRequest) {
 UI Diagnosis Report - ${diagnosis.timestamp}
 =========================================
 
-Routes Resolution:
-/ → ${diagnosis.routes['/'] || 'not resolved'}
-/dashboard → ${diagnosis.routes['/dashboard'] || 'not resolved'}
+ROUTES RESOLUTION:
+/ → ${diagnosis.routes['/']}
+/dashboard → ${diagnosis.routes['/dashboard']}
 
-Dashboard Snippet: ${diagnosis.dashboardSnippet}
-Layout Snippet: ${diagnosis.layoutSnippet}
+ACTUAL FILES:
+Homepage: ${diagnosis.actualFiles.homepage.source} (exists: ${diagnosis.actualFiles.homepage.exists})
+Dashboard: ${diagnosis.actualFiles.dashboard.source} (exists: ${diagnosis.actualFiles.dashboard.exists})
 
-Status Checks:
-- AuthHeader in Layout: ${diagnosis.hasAuthHeader ? 'YES' : 'NO'}
-- Search Card in Dashboard: ${diagnosis.hasSearchCard ? 'YES - NEEDS REMOVAL' : 'NO'}
+LAYOUT ANALYSIS:
+Root Layout: ${diagnosis.layoutAnalysis.rootLayout.path}
+- Exists: ${diagnosis.layoutAnalysis.rootLayout.exists}
+- Has AuthHeader: ${diagnosis.layoutAnalysis.rootLayout.hasAuthHeader}
+- Snippet: ${diagnosis.layoutAnalysis.rootLayout.snippet}
+
+Dashboard Layout: ${diagnosis.layoutAnalysis.dashboardLayout.path}
+- Exists: ${diagnosis.layoutAnalysis.dashboardLayout.exists}
+- Has AuthHeader: ${diagnosis.layoutAnalysis.dashboardLayout.hasAuthHeader}
+
+STATUS FLAGS:
+- AuthHeader in Layout: ${diagnosis.flags.hasAuthHeader ? 'YES' : 'NO'}
+- Search Card in Dashboard: ${diagnosis.flags.hasSearchCard ? 'YES - NEEDS REMOVAL' : 'NO'}
 - Manifest Status: ${diagnosis.manifest_status}
 - Build Required: ${diagnosis.build_required ? 'YES' : 'NO'}
 
