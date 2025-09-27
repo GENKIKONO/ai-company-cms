@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import { supabaseServer } from '@/lib/supabase-server';
-import { getOrganizations, getOrganizationStats } from '@/lib/organizations';
-// import CreateOrganizationButton from './components/CreateOrganizationButton';
+import { headers } from 'next/headers';
+import { getMyOrganizationSafe, getOrganizationStatsSafe } from '@/lib/safeData';
 
 // 強制的に動的SSRにして、認証状態を毎回評価
 export const dynamic = 'force-dynamic';
@@ -10,16 +9,35 @@ export const revalidate = 0;
 
 export default async function DashboardPage() {
   try {
-    // サーバーサイドで認証チェック
-    const supabase = await supabaseServer();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    console.log('[Dashboard] Rendering started');
+    
+    // リクエストヘッダーを取得
+    const reqHeaders = await headers();
+    
+    // 安全なデータ取得
+    const [orgResult, statsResult] = await Promise.all([
+      getMyOrganizationSafe(reqHeaders),
+      getOrganizationStatsSafe()
+    ]);
 
-    if (error || !user) {
-      // 認証エラーの場合はリダイレクト
+    const organization = orgResult.data;
+    const stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
+
+    console.log('[Dashboard] Data loaded:', { 
+      hasOrg: !!organization, 
+      orgName: organization?.name,
+      stats: stats.total 
+    });
+
+    // 3段構えのレンダリング分岐
+
+    // 1. 認証状態不明 or エラー時 → サインイン導線
+    if (orgResult.error && orgResult.error.includes('401')) {
+      console.log('[Dashboard] Unauthorized access');
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">認証が必要です</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">サインインしてください</h2>
             <p className="text-gray-600 mb-4">ダッシュボードにアクセスするにはログインが必要です。</p>
             <Link
               href="/auth/signin"
@@ -32,21 +50,27 @@ export default async function DashboardPage() {
       );
     }
 
-    // 企業データと統計を取得 - エラーハンドリング付き
-    let organizations = [];
-    let stats = { total: 0, draft: 0, published: 0, archived: 0 };
-    
-    try {
-      const [orgsResult, statsResult] = await Promise.all([
-        getOrganizations({ limit: 10 }),
-        getOrganizationStats()
-      ]);
-      organizations = orgsResult.data || [];
-      stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
-    } catch (dataError) {
-      console.error('[Dashboard] データ取得エラー:', dataError);
-      // デフォルト値を使用してレンダリング続行
+    // 2. 認証OK & 組織なし → 企業作成導線
+    if (!organization) {
+      console.log('[Dashboard] No organization found');
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">まず企業を作成しましょう</h2>
+            <p className="text-gray-600 mb-4">ダッシュボードを使用するには企業情報の登録が必要です。</p>
+            <Link
+              href="/organizations/new"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-center block"
+            >
+              企業を作成
+            </Link>
+          </div>
+        </div>
+      );
     }
+
+    // 3. 組織あり → ダッシュボードUI
+    console.log('[Dashboard] Rendering dashboard UI');
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -78,7 +102,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* 統計カード */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -87,22 +111,8 @@ export default async function DashboardPage() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">総企業数</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">下書き</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.draft}</p>
+                <p className="text-sm font-medium text-gray-600">企業情報</p>
+                <p className="text-2xl font-bold text-gray-900">{organization.name}</p>
               </div>
             </div>
           </div>
@@ -115,22 +125,8 @@ export default async function DashboardPage() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">公開中</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.published}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">アーカイブ</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.archived}</p>
+                <p className="text-sm font-medium text-gray-600">ステータス</p>
+                <p className="text-2xl font-bold text-gray-900">{getStatusText(organization.status)}</p>
               </div>
             </div>
           </div>
@@ -175,86 +171,59 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* 最近の企業一覧 */}
+        {/* 企業管理 */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">最近の企業</h2>
-              <Link href="/organizations" className="text-sm text-blue-600 hover:text-blue-700">
-                すべて表示
-              </Link>
-            </div>
+            <h2 className="text-lg font-semibold text-gray-900">企業管理</h2>
           </div>
           
-          {organizations.length === 0 ? (
-            <div className="p-6 text-center">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">企業がありません</h3>
-              <p className="mt-2 text-gray-500">
-                最初の企業を追加して始めましょう
-              </p>
-              <Link
-                href="/organizations/new"
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 inline-block text-center"
-              >
-                企業を追加
-              </Link>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-200">
-              {organizations.slice(0, 5).map((org) => (
-                <div key={org.id} className="p-6 hover:bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      {org.logo_url ? (
-                        <img
-                          src={org.logo_url}
-                          alt={`${org.name}のロゴ`}
-                          className="w-10 h-10 rounded-lg object-cover"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <span className="text-blue-600 font-semibold">
-                            {org.name.charAt(0)}
-                          </span>
-                        </div>
-                      )}
-                      <div className="ml-4">
-                        <h3 className="text-sm font-medium text-gray-900">
-                          {org.name}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          更新日: {new Date(org.updated_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${getStatusBadge(org.status)}`}>
-                        {getStatusText(org.status)}
-                      </span>
-                      <Link
-                        href={`/organizations/${org.id}`}
-                        className="text-sm text-blue-600 hover:text-blue-700"
-                      >
-                        編集
-                      </Link>
-                      {org.status === 'published' && (
-                        <Link
-                          href={`/o/${org.slug}`}
-                          className="text-sm text-green-600 hover:text-green-700"
-                          target="_blank"
-                        >
-                          表示
-                        </Link>
-                      )}
-                    </div>
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                {organization.logo_url ? (
+                  <img
+                    src={organization.logo_url}
+                    alt={`${organization.name}のロゴ`}
+                    className="w-12 h-12 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <span className="text-blue-600 font-semibold text-lg">
+                      {organization.name.charAt(0)}
+                    </span>
                   </div>
+                )}
+                <div className="ml-4">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {organization.name}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    最終更新: {new Date(organization.updated_at).toLocaleDateString()}
+                  </p>
                 </div>
-              ))}
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusBadge(organization.status)}`}>
+                  {getStatusText(organization.status)}
+                </span>
+                <Link
+                  href={`/organizations/${organization.id}`}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium"
+                >
+                  編集
+                </Link>
+                {organization.status === 'published' && organization.slug && (
+                  <Link
+                    href={`/o/${organization.slug}`}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium"
+                    target="_blank"
+                  >
+                    表示
+                  </Link>
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </main>
     </div>
