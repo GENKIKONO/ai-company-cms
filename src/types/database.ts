@@ -54,6 +54,7 @@ export interface Organization {
   same_as?: string[];
   industries?: string[];
   status: OrganizationStatus;
+  is_published: boolean;
   partner_id?: string;
   created_by?: string;
   created_at: string;
