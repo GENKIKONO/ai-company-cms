@@ -1,5 +1,6 @@
 import './globals.css'
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
+import { ToastProvider } from '@/components/ui/toast'
 
 // SSRで常に正しい認証UIが出るように
 export const dynamic = 'force-dynamic';
@@ -21,18 +22,20 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
-        <SafeAuthHeader />
-        
-        {/* ビルド情報バッジ - 本番とソースの乖離可視化用 */}
-        <div 
-          data-testid="build-badge"
-          className="fixed top-2 right-2 z-50 px-2 py-1 bg-gray-800 text-white text-xs font-mono rounded shadow-lg opacity-75 hover:opacity-100 transition-opacity"
-          style={{ fontSize: '10px', lineHeight: '12px' }}
-        >
-          {buildInfo}
-        </div>
-        
-        {children}
+        <ToastProvider>
+          <SafeAuthHeader />
+          
+          {/* ビルド情報バッジ - 本番とソースの乖離可視化用 */}
+          <div 
+            data-testid="build-badge"
+            className="fixed top-2 right-2 z-40 px-2 py-1 bg-gray-800 text-white text-xs font-mono rounded shadow-lg opacity-75 hover:opacity-100 transition-opacity"
+            style={{ fontSize: '10px', lineHeight: '12px' }}
+          >
+            {buildInfo}
+          </div>
+          
+          {children}
+        </ToastProvider>
       </body>
     </html>
   )

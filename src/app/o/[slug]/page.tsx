@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateOrganizationPageJsonLd } from '@/lib/utils/jsonld';
+import { LogoImage } from '@/components/ui/optimized-image';
 import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/database';
 
 interface OrganizationPageData {
@@ -139,10 +140,11 @@ export default async function OrganizationDetailPage({
               <div className="flex items-start justify-between">
                 <div className="flex items-center">
                   {organization.logo_url ? (
-                    <img
+                    <LogoImage
                       src={organization.logo_url}
                       alt={`${organization.name}のロゴ`}
-                      className="w-20 h-20 rounded-lg object-cover"
+                      size="xl"
+                      organizationName={organization.name}
                     />
                   ) : (
                     <div className="w-20 h-20 bg-blue-100 rounded-lg flex items-center justify-center">

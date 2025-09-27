@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { CalendarIcon, UserIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { markdownToHtml, truncateMarkdown } from '@/lib/markdown';
 import { JsonLdModal } from '@/components/ui/json-ld-modal';
+import { LogoImage } from '@/components/ui/optimized-image';
 
 interface Post {
   id: string;
@@ -220,10 +221,11 @@ export default async function PostPage({
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <div className="flex items-center space-x-4">
               {post.organization.logo_url && (
-                <img
+                <LogoImage
                   src={post.organization.logo_url}
                   alt={post.organization.name}
-                  className="h-12 w-12 rounded-lg object-cover"
+                  size="lg"
+                  organizationName={post.organization.name}
                 />
               )}
               <div>

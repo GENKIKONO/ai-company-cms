@@ -3,15 +3,23 @@ import React from 'react';
 
 interface LoadingSkeletonProps {
   lines?: number;
-  variant?: 'default' | 'card' | 'list' | 'table';
+  variant?: 'default' | 'card' | 'list' | 'table' | 'grid' | 'hero' | 'form';
   className?: string;
+  animate?: boolean;
 }
+
+// Shimmer animation CSS
+const shimmerAnimation = 'relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
 
 export function LoadingSkeleton({ 
   lines = 3, 
   variant = 'default', 
-  className = '' 
+  className = '',
+  animate = true 
 }: LoadingSkeletonProps) {
+  
+  const baseClasses = animate ? 'animate-pulse' : '';
+  const skeletonClasses = animate ? shimmerAnimation : '';
   if (variant === 'card') {
     return (
       <div className={`animate-pulse bg-white rounded-lg border border-gray-200 p-6 ${className}`}>
@@ -79,12 +87,74 @@ export function LoadingSkeleton({
     );
   }
 
+  if (variant === 'grid') {
+    return (
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}>
+        {[...Array(lines)].map((_, i) => (
+          <div key={i} className={`${baseClasses} bg-white rounded-lg border border-gray-200 p-6`}>
+            <div className="space-y-4">
+              <div className={`h-6 bg-gray-200 rounded w-3/4 ${skeletonClasses}`}></div>
+              <div className="space-y-2">
+                <div className={`h-3 bg-gray-200 rounded ${skeletonClasses}`}></div>
+                <div className={`h-3 bg-gray-200 rounded w-2/3 ${skeletonClasses}`}></div>
+              </div>
+              <div className="flex space-x-2">
+                <div className={`h-8 bg-gray-200 rounded w-16 ${skeletonClasses}`}></div>
+                <div className={`h-8 bg-gray-200 rounded w-20 ${skeletonClasses}`}></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (variant === 'hero') {
+    return (
+      <div className={`${baseClasses} space-y-8 ${className}`}>
+        <div className="text-center space-y-4">
+          <div className={`h-12 bg-gray-200 rounded w-2/3 mx-auto ${skeletonClasses}`}></div>
+          <div className={`h-6 bg-gray-200 rounded w-1/2 mx-auto ${skeletonClasses}`}></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="space-y-4">
+                <div className={`h-6 bg-gray-200 rounded w-3/4 ${skeletonClasses}`}></div>
+                <div className={`h-3 bg-gray-200 rounded ${skeletonClasses}`}></div>
+                <div className={`h-3 bg-gray-200 rounded w-2/3 ${skeletonClasses}`}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (variant === 'form') {
+    return (
+      <div className={`${baseClasses} bg-white rounded-lg border border-gray-200 p-6 space-y-6 ${className}`}>
+        <div className={`h-8 bg-gray-200 rounded w-1/3 ${skeletonClasses}`}></div>
+        {[...Array(lines)].map((_, i) => (
+          <div key={i} className="space-y-2">
+            <div className={`h-4 bg-gray-200 rounded w-1/4 ${skeletonClasses}`}></div>
+            <div className={`h-10 bg-gray-200 rounded ${skeletonClasses}`}></div>
+          </div>
+        ))}
+        <div className="flex space-x-3">
+          <div className={`h-10 bg-gray-200 rounded w-24 ${skeletonClasses}`}></div>
+          <div className={`h-10 bg-gray-200 rounded w-20 ${skeletonClasses}`}></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`animate-pulse space-y-4 ${className}`}>
+    <div className={`${baseClasses} space-y-4 ${className}`}>
       {[...Array(lines)].map((_, i) => (
         <div key={i} className="space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          <div className={`h-4 bg-gray-200 rounded w-3/4 ${skeletonClasses}`}></div>
+          <div className={`h-3 bg-gray-200 rounded w-1/2 ${skeletonClasses}`}></div>
         </div>
       ))}
     </div>

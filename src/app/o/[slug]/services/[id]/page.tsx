@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateServiceJsonLd } from '@/lib/utils/jsonld';
 import type { Organization, Service } from '@/types/database';
+import { LogoImage } from '@/components/ui/optimized-image';
 
 interface ServiceDetailData {
   service: Service;
@@ -148,10 +149,11 @@ export default async function ServiceDetailPage({
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <div className="flex items-center space-x-4">
               {organization.logo_url && (
-                <img
+                <LogoImage
                   src={organization.logo_url}
                   alt={organization.name}
-                  className="h-12 w-12 rounded-lg object-cover"
+                  size="lg"
+                  organizationName={organization.name}
                 />
               )}
               <div>

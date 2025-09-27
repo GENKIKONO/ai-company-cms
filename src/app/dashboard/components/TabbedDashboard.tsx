@@ -7,6 +7,7 @@ import { ErrorDisplay } from '@/components/ui/error-display';
 import { LoadingSkeleton, EmptyState } from '@/components/ui/loading-skeleton';
 import { OrganizationPreview } from '@/components/ui/organization-preview';
 import { useApiList } from '@/hooks/useApiClient';
+import { useSuccessToast, useErrorToast } from '@/components/ui/toast';
 
 interface TabbedDashboardProps {
   organizationId: string;
@@ -43,6 +44,9 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
     caseStudies: 0,
     faqs: 0
   });
+
+  const showSuccessToast = useSuccessToast();
+  const showErrorToast = useErrorToast();
 
   // Load content stats for overview
   useEffect(() => {
@@ -148,9 +152,10 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
           setStats(prev => ({ ...prev, faqs: prev.faqs - 1 }));
           break;
       }
+      showSuccessToast('削除完了', `${getContentTypeLabel(type)}を削除しました`);
     } catch (error) {
       console.error(`Failed to delete ${type}:`, error);
-      alert('削除に失敗しました');
+      showErrorToast('削除失敗', 'ネットワークエラーが発生しました');
     }
   };
 
