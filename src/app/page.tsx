@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import AuthHeader from '@/components/header/AuthHeader';
 
 // 認証状態を毎回評価するため動的SSRに設定
 export const dynamic = 'force-dynamic';
@@ -9,7 +8,6 @@ export const revalidate = 0;
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <AuthHeader />
 
       {/* メインコンテンツ */}
       <main>

@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase-server';
 import { getOrganizations, getOrganizationStats } from '@/lib/organizations';
-import AuthHeader from '@/components/header/AuthHeader';
 import CreateOrganizationButton from './components/CreateOrganizationButton';
 
 // 強制的に動的SSRにして、認証状態を毎回評価
@@ -61,8 +60,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AuthHeader currentPage="dashboard" />
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ページタイトル */}
         <div className="mb-8">

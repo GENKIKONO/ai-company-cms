@@ -11,10 +11,14 @@ const PUBLIC_PATHS = new Set([
   '/auth/confirm',
   '/auth/forgot-password',
   '/auth/reset-password-confirm',
+  '/search',
 ]);
 
-// 要ログインのプレフィックス
-const PROTECTED_PREFIXES = ['/dashboard', '/organizations', '/settings', '/profile'];
+// 要ログインのプレフィックス  
+const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/profile'];
+
+// 半公開ルート（ディレクトリ表示は公開、編集は要ログイン）
+const SEMI_PUBLIC_PREFIXES = ['/organizations'];
 
 // 認証系ページ（ログイン済ならリダイレクト）
 const AUTH_PAGES = new Set([
@@ -67,10 +71,18 @@ export async function middleware(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const isAuthed = !!user;
   const isProtected = PROTECTED_PREFIXES.some(p => pathname.startsWith(p));
+  const isSemiPublic = SEMI_PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
   const isAuthPage = AUTH_PAGES.has(pathname);
 
-  // 未ログインで保護ページに来たら /auth/login に intended redirect 付きで送る
-  if (!isAuthed && isProtected) {
+  // 半公開ルートの処理（/organizations/new や /organizations/[id]/edit は要ログイン）
+  const requiresAuthInSemiPublic = isSemiPublic && (
+    pathname.includes('/new') || 
+    pathname.includes('/edit') ||
+    pathname.match(/\/organizations\/[^\/]+\/(edit|settings)$/)
+  );
+
+  // 未ログインで保護ページ、または半公開の編集ページに来たら /auth/login に intended redirect 付きで送る
+  if (!isAuthed && (isProtected || requiresAuthInSemiPublic)) {
     const loginUrl = new URL('/auth/login', req.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);

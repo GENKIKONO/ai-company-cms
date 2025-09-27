@@ -1,5 +1,3 @@
-import AuthHeader from '@/components/header/AuthHeader';
-
 // 強制的に動的SSRにして、認証状態を毎回評価
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
@@ -12,7 +10,6 @@ export default function NewOrganizationLayout({
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <AuthHeader />
       {children}
     </div>
   );
