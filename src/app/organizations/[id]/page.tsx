@@ -160,11 +160,14 @@ export default function EditOrganizationPage() {
       newErrors.description = '企業説明は必須です';
     }
 
-    if (formData.url && !formData.url.match(/^https?:\/\/.+/)) {
+    // 安全な文字列処理でundefined.match()エラーを回避
+    const urlValue = typeof formData.url === 'string' ? formData.url : '';
+    if (urlValue && !/^https?:\/\/.+/.test(urlValue)) {
       newErrors.url = '正しいURL形式で入力してください';
     }
 
-    if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    const emailValue = typeof formData.email === 'string' ? formData.email : '';
+    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
       newErrors.email = '正しいメールアドレス形式で入力してください';
     }
 

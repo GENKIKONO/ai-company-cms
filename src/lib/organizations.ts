@@ -242,7 +242,7 @@ export async function globalSearch(options: {
       total: 0
     };
 
-    // 企業検索
+    // Organizations search
     if (options.type === 'all' || options.type === 'organizations') {
       let orgQuery = supabaseBrowser
         .from('organizations')

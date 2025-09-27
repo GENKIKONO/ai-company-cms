@@ -1,28 +1,15 @@
 import Link from 'next/link';
+import AuthHeader from '@/components/header/AuthHeader';
+
+// 認証状態を毎回評価するため動的SSRに設定
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* ヘッダー */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">
-                AIO Hub AI企業CMS
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/auth/login" className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-                ログイン
-              </Link>
-              <Link href="/auth/signup" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                無料で始める
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AuthHeader />
 
       {/* メインコンテンツ */}
       <main>

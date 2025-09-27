@@ -159,7 +159,9 @@ export default function NewServicePage() {
       newErrors.categories = '少なくとも1つのカテゴリを選択してください';
     }
 
-    if (formData.url && !formData.url.match(/^https?:\/\/.+/)) {
+    // 安全な文字列処理でundefined.match()エラーを回避
+    const urlValue = typeof formData.url === 'string' ? formData.url : '';
+    if (urlValue && !/^https?:\/\/.+/.test(urlValue)) {
       newErrors.url = '正しいURL形式で入力してください';
     }
 

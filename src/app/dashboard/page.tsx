@@ -1,64 +1,45 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser, auth } from '@/lib/auth';
-import { getOrganizations, createOrganization, getOrganizationStats } from '@/lib/organizations';
-import { type AppUser, type Organization } from '@/types/database';
+import { supabaseServer } from '@/lib/supabase-server';
+import { getOrganizations, getOrganizationStats } from '@/lib/organizations';
+import AuthHeader from '@/components/header/AuthHeader';
+import CreateOrganizationButton from './components/CreateOrganizationButton';
 
-export default function DashboardPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<AppUser | null>(null);
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [stats, setStats] = useState({ total: 0, draft: 0, published: 0, archived: 0 });
-  const [loading, setLoading] = useState(true);
+// 強制的に動的SSRにして、認証状態を毎回評価
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
-  // データ取得と後追いプロフィール初期化
-  useEffect(() => {
-    async function loadData() {
-      try {
-        // 後追いプロフィール初期化（middleware認証済み前提）
-        const currentUser = await getCurrentUser();
-        if (currentUser) {
-          setUser(currentUser);
-        }
-        
-        // 企業データと統計を取得
-        const [orgsResult, statsResult] = await Promise.all([
-          getOrganizations({ limit: 10 }),
-          getOrganizationStats()
-        ]);
+export default async function DashboardPage() {
+  // サーバーサイドで認証チェック
+  const supabase = await supabaseServer();
+  const { data: { user }, error } = await supabase.auth.getUser();
 
-        if (orgsResult.data) {
-          setOrganizations(orgsResult.data);
-        }
-        if (statsResult.data) {
-          setStats(statsResult.data);
-        }
-      } catch (error) {
-        console.error('Data loading failed:', error);
-        // エラーでもページは表示継続（middleware認証済み）
-      } finally {
-        setLoading(false);
-      }
-    }
+  if (error || !user) {
+    // 認証エラーの場合はリダイレクト
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">認証が必要です</h2>
+          <p className="text-gray-600 mb-4">ダッシュボードにアクセスするにはログインが必要です。</p>
+          <Link
+            href="/auth/signin"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-center block"
+          >
+            ログインページへ
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
-    loadData();
-  }, []);
+  // 企業データと統計を取得
+  const [orgsResult, statsResult] = await Promise.all([
+    getOrganizations({ limit: 10 }),
+    getOrganizationStats()
+  ]);
 
-  const handleSignOut = async () => {
-    try {
-      await auth.signOut();
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Sign out failed:', error);
-    }
-  };
-
-  const handleCreateOrganization = () => {
-    router.push('/organizations/new');
-  };
+  const organizations = orgsResult.data || [];
+  const stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -78,48 +59,9 @@ export default function DashboardPage() {
     return text[status as keyof typeof text] || '不明';
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600">読み込み中...</span>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ヘッダー */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600">
-                AIO Hub AI企業CMS
-              </Link>
-              <nav className="ml-10 hidden md:flex space-x-8">
-                <Link href="/dashboard" className="text-blue-600 font-medium">
-                  ダッシュボード
-                </Link>
-                <Link href="/dashboard/billing" className="text-gray-500 hover:text-gray-700">
-                  サブスクリプション
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-700">
-                こんにちは、{user?.full_name || user?.email}さん
-              </div>
-              <button
-                onClick={handleSignOut}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                ログアウト
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AuthHeader currentPage="dashboard" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ページタイトル */}
@@ -195,21 +137,7 @@ export default function DashboardPage() {
             <h2 className="text-lg font-semibold text-gray-900">クイックアクション</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button
-              onClick={handleCreateOrganization}
-              className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
-            >
-              <div className="p-2 bg-blue-100 rounded-lg mr-3">
-                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <p className="font-medium text-gray-900">新しい企業を追加</p>
-                <p className="text-sm text-gray-600">企業情報を登録して公開します</p>
-              </div>
-            </button>
-
+            <CreateOrganizationButton />
 
             <button className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
               <div className="p-2 bg-purple-100 rounded-lg mr-3">
@@ -307,7 +235,6 @@ export default function DashboardPage() {
           )}
         </div>
       </main>
-
     </div>
   );
 }

@@ -149,7 +149,9 @@ export default function NewCaseStudyPage() {
       newErrors.client_name = '実名公開の場合、クライアント名は必須です';
     }
 
-    if (formData.url && !formData.url.match(/^https?:\/\/.+/)) {
+    // 安全な文字列処理でundefined.match()エラーを回避
+    const urlValue = typeof formData.url === 'string' ? formData.url : '';
+    if (urlValue && !/^https?:\/\/.+/.test(urlValue)) {
       newErrors.url = '正しいURL形式で入力してください';
     }
 

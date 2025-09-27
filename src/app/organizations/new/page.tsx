@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
-import { createOrganization, getIndustries } from '@/lib/organizations';
+import { getIndustries } from '@/lib/organizations';
+import { normalizeOrganizationPayload } from '@/lib/normalize';
 import { type AppUser, type OrganizationFormData } from '@/types/database';
 
 export default function NewOrganizationPage() {
@@ -118,11 +119,14 @@ export default function NewOrganizationPage() {
       newErrors.description = '企業説明は必須です';
     }
 
-    if (formData.url && !formData.url.match(/^https?:\/\/.+/)) {
+    // 安全な文字列処理でundefined.match()エラーを回避
+    const urlValue = typeof formData.url === 'string' ? formData.url : '';
+    if (urlValue && !/^https?:\/\/.+/.test(urlValue)) {
       newErrors.url = '正しいURL形式で入力してください';
     }
 
-    if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    const emailValue = typeof formData.email === 'string' ? formData.email : '';
+    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
       newErrors.email = '正しいメールアドレス形式で入力してください';
     }
 
@@ -139,16 +143,47 @@ export default function NewOrganizationPage() {
 
     setSubmitting(true);
     try {
-      const result = await createOrganization(formData);
+      // データ正規化とバリデーション
+      const normalizedData = normalizeOrganizationPayload(formData);
       
-      if (result.data) {
-        router.push(`/organizations/${result.data.id}`);
+      // Single-Org API経由で作成
+      const response = await fetch('/api/my/organization', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(normalizedData),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        
+        // APIエラーレスポンスに基づいてエラー表示
+        if (response.status === 409) {
+          setErrors({ slug: errorData.message || 'このスラッグは既に使用されています' });
+        } else if (response.status === 400) {
+          setErrors({ submit: errorData.message || 'データに不備があります' });
+        } else if (response.status === 422) {
+          setErrors({ submit: errorData.message || 'バリデーションエラーです' });
+        } else {
+          setErrors({ submit: errorData.message || '企業の作成に失敗しました' });
+        }
+        return;
+      }
+      
+      const result = await response.json();
+      if (result.organization?.id) {
+        router.push(`/organizations/${result.organization.id}`);
       } else {
         setErrors({ submit: '企業の作成に失敗しました' });
       }
     } catch (error) {
       console.error('Failed to create organization:', error);
-      setErrors({ submit: '企業の作成に失敗しました' });
+      if (error instanceof Error) {
+        setErrors({ submit: error.message });
+      } else {
+        setErrors({ submit: '企業の作成に失敗しました' });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -164,34 +199,7 @@ export default function NewOrganizationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ヘッダー */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600">
-                AIO Hub AI企業CMS
-              </Link>
-              <nav className="ml-10 hidden md:flex space-x-8">
-                <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
-                  ダッシュボード
-                </Link>
-                <Link href="/organizations" className="text-blue-600 font-medium">
-                  企業ディレクトリ
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-700">
-                こんにちは、{user?.full_name || user?.email}さん
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* パンくずナビ */}
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-4">
@@ -596,6 +604,5 @@ export default function NewOrganizationPage() {
           </div>
         </form>
       </main>
-    </div>
   );
 }
