@@ -20,7 +20,7 @@ export default async function AuthHeader({ currentPage }: AuthHeaderProps) {
         <div className="flex justify-between items-center py-6">
           <div className="flex items-center">
             <Link 
-              href={isAuthenticated ? "/dashboard" : "/auth/signin"} 
+              href={isAuthenticated ? "/dashboard" : "/auth/login"} 
               className="text-2xl font-bold text-gray-900 hover:text-blue-600"
             >
               AIO Hub AI企業CMS
@@ -54,7 +54,7 @@ export default async function AuthHeader({ currentPage }: AuthHeaderProps) {
             ) : (
               <>
                 <Link
-                  href="/auth/signin"
+                  href="/auth/login"
                   className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   ログイン

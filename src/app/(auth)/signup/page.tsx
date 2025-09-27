@@ -143,7 +143,7 @@ export default function SignupPage() {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               すでにアカウントをお持ちの方は{' '}
-              <Link href="/auth/signin" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link href="/auth/login" className="font-medium text-indigo-600 hover:text-indigo-500">
                 ログイン
               </Link>
             </p>

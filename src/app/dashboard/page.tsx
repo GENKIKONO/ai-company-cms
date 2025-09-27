@@ -42,7 +42,7 @@ export default async function DashboardPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">サインインしてください</h2>
             <p className="text-gray-600 mb-4">ダッシュボードにアクセスするにはログインが必要です。</p>
             <Link
-              href="/auth/signin"
+              href="/auth/login"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-center block"
             >
               ログインページへ

@@ -29,8 +29,9 @@ export const supabaseBrowser = createBrowserClient(
       set: (key, value, options) => {
         if (typeof document !== 'undefined') {
           const isProduction = process.env.NODE_ENV === 'production';
-          const domain = isProduction && process.env.NEXT_PUBLIC_APP_URL?.includes('aiohub.jp') 
-            ? '.aiohub.jp' 
+          const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
+          const domain = isProduction && cookieDomain 
+            ? `.${cookieDomain}` 
             : undefined;
           
           const cookieOptions = {
@@ -52,8 +53,9 @@ export const supabaseBrowser = createBrowserClient(
       remove: (key, options) => {
         if (typeof document !== 'undefined') {
           const isProduction = process.env.NODE_ENV === 'production';
-          const domain = isProduction && process.env.NEXT_PUBLIC_APP_URL?.includes('aiohub.jp')
-            ? '.aiohub.jp'
+          const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
+          const domain = isProduction && cookieDomain
+            ? `.${cookieDomain}`
             : undefined;
             
           const cookieOptions = {

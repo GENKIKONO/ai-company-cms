@@ -45,7 +45,7 @@ export default function NewOrganizationPage() {
       try {
         const currentUser = await getCurrentUser();
         if (!currentUser) {
-          router.replace('/auth/signin?redirect=' + encodeURIComponent('/organizations/new'));
+          router.replace('/auth/login?redirect=' + encodeURIComponent('/organizations/new'));
           return;
         }
         
