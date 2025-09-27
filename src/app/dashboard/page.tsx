@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase-server';
 import { getOrganizations, getOrganizationStats } from '@/lib/organizations';
-import CreateOrganizationButton from './components/CreateOrganizationButton';
+// import CreateOrganizationButton from './components/CreateOrganizationButton';
 
 // 強制的に動的SSRにして、認証状態を毎回評価
 export const dynamic = 'force-dynamic';
@@ -9,36 +9,44 @@ export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 
 export default async function DashboardPage() {
-  // サーバーサイドで認証チェック
-  const supabase = await supabaseServer();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  try {
+    // サーバーサイドで認証チェック
+    const supabase = await supabaseServer();
+    const { data: { user }, error } = await supabase.auth.getUser();
 
-  if (error || !user) {
-    // 認証エラーの場合はリダイレクト
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">認証が必要です</h2>
-          <p className="text-gray-600 mb-4">ダッシュボードにアクセスするにはログインが必要です。</p>
-          <Link
-            href="/auth/signin"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-center block"
-          >
-            ログインページへ
-          </Link>
+    if (error || !user) {
+      // 認証エラーの場合はリダイレクト
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">認証が必要です</h2>
+            <p className="text-gray-600 mb-4">ダッシュボードにアクセスするにはログインが必要です。</p>
+            <Link
+              href="/auth/signin"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-center block"
+            >
+              ログインページへ
+            </Link>
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  // 企業データと統計を取得
-  const [orgsResult, statsResult] = await Promise.all([
-    getOrganizations({ limit: 10 }),
-    getOrganizationStats()
-  ]);
-
-  const organizations = orgsResult.data || [];
-  const stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
+    // 企業データと統計を取得 - エラーハンドリング付き
+    let organizations = [];
+    let stats = { total: 0, draft: 0, published: 0, archived: 0 };
+    
+    try {
+      const [orgsResult, statsResult] = await Promise.all([
+        getOrganizations({ limit: 10 }),
+        getOrganizationStats()
+      ]);
+      organizations = orgsResult.data || [];
+      stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
+    } catch (dataError) {
+      console.error('[Dashboard] データ取得エラー:', dataError);
+      // デフォルト値を使用してレンダリング続行
+    }
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -134,9 +142,21 @@ export default async function DashboardPage() {
             <h2 className="text-lg font-semibold text-gray-900">クイックアクション</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div data-testid="qa-add-org">
-              <CreateOrganizationButton />
-            </div>
+            <Link 
+              href="/organizations/new"
+              data-testid="qa-add-org"
+              className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+            >
+              <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-gray-900">新しい企業を追加</p>
+                <p className="text-sm text-gray-600">企業情報を登録して公開します</p>
+              </div>
+            </Link>
 
             <button 
               data-testid="qa-report"
@@ -239,4 +259,22 @@ export default async function DashboardPage() {
       </main>
     </div>
   );
+  } catch (error) {
+    console.error('[Dashboard] 予期しないエラー:', error);
+    // フォールバック UI
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">一時的なエラーが発生しました</h2>
+          <p className="text-gray-600 mb-4">数秒後にリロードしてください。</p>
+          <Link
+            href="/dashboard"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-center block"
+          >
+            再読み込み
+          </Link>
+        </div>
+      </div>
+    );
+  }
 }
