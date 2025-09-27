@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Post, Service, CaseStudy, FAQ } from '@/types/database';
+import { ErrorDisplay } from '@/components/ui/error-display';
+import { LoadingSkeleton, EmptyState } from '@/components/ui/loading-skeleton';
+import { useApiList } from '@/hooks/useApiClient';
 
 interface TabbedDashboardProps {
   organizationId: string;
