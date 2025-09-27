@@ -1,8 +1,15 @@
 // 監視・ログ・通知システム
+import { SentryUtils } from '@/lib/utils/sentry-utils';
 
 // エラー通知機能
 export async function notifyError(error: Error, context?: Record<string, any>) {
   try {
+    // Sentry統合
+    SentryUtils.captureException(error, {
+      ...context,
+      notificationAttempted: true,
+    });
+
     // Slack通知
     if (process.env.SLACK_WEBHOOK_URL) {
       await fetch(process.env.SLACK_WEBHOOK_URL, {
@@ -29,20 +36,26 @@ export async function notifyError(error: Error, context?: Record<string, any>) {
         })
       });
     }
-
-    // Sentry（クライアントサイドでは自動送信）
-    if (typeof window === 'undefined' && process.env.NEXT_PUBLIC_SENTRY_DSN) {
-      // サーバーサイドでのSentry送信は別途設定が必要
-      console.error('Server Error:', error, context);
-    }
   } catch (notifyError) {
     console.error('Failed to send error notification:', notifyError);
+    SentryUtils.captureException(
+      notifyError instanceof Error ? notifyError : new Error('Failed to send error notification'), 
+      { originalError: error.message }
+    );
   }
 }
 
 // パフォーマンス監視
 export function trackPerformance(metricName: string, value: number, context?: Record<string, any>) {
   try {
+    // Sentry パフォーマンス追跡
+    SentryUtils.trackPerformance({
+      name: metricName,
+      value,
+      unit: metricName.includes('time') || metricName.includes('LCP') ? 'milliseconds' : 'count',
+      tags: context as Record<string, string>,
+    });
+
     // LCP監視
     if (metricName === 'LCP' && value > 2500) {
       notifyError(new Error(`Poor LCP performance: ${value}ms`), { 
@@ -66,6 +79,7 @@ export function trackPerformance(metricName: string, value: number, context?: Re
     }
   } catch (error) {
     console.error('Failed to track performance:', error);
+    SentryUtils.captureException(error instanceof Error ? error : new Error('Failed to track performance'));
   }
 }
 
@@ -77,7 +91,14 @@ export async function trackBusinessEvent(
   data?: Record<string, any>
 ) {
   try {
-    // 重要なビジネスイベントをSlackに通知
+    // Sentry ビジネスイベント追跡
+    SentryUtils.addBreadcrumb(
+      `Business event: ${event}`,
+      'business',
+      { userId, orgId, ...data }
+    );
+    
+    // 重要なイベントはSentryメッセージとして記録
     const importantEvents = [
       'organization_published',
       'subscription_created',
@@ -85,6 +106,15 @@ export async function trackBusinessEvent(
       'approval_requested',
       'approval_granted'
     ];
+    
+    if (importantEvents.includes(event)) {
+      SentryUtils.captureMessage(
+        `Business event: ${event}`,
+        'info',
+        { userId, organizationId: orgId, eventData: data }
+      );
+    }
+    // 重要なビジネスイベントをSlackに通知
 
     if (importantEvents.includes(event) && process.env.SLACK_WEBHOOK_URL) {
       const eventEmojis: Record<string, string> = {
@@ -135,6 +165,7 @@ export async function trackBusinessEvent(
     console.log(`Business Event [${event}]:`, { userId, orgId, data });
   } catch (error) {
     console.error('Failed to track business event:', error);
+    SentryUtils.captureException(error instanceof Error ? error : new Error('Failed to track business event'));
   }
 }
 
@@ -142,31 +173,25 @@ export async function trackBusinessEvent(
 export function withErrorHandling<T extends any[], R>(
   handler: (...args: T) => Promise<R>
 ) {
-  return async (...args: T): Promise<R> => {
-    try {
-      return await handler(...args);
-    } catch (error) {
-      if (error instanceof Error) {
-        await notifyError(error, { 
-          handler: handler.name,
-          args: args.map(arg => typeof arg === 'object' ? 'object' : typeof arg)
-        });
-      }
-      throw error;
-    }
-  };
+  return SentryUtils.wrapAPIHandler(handler as any, {
+    operationName: handler.name || 'anonymous-handler',
+    extractContext: (...args) => ({
+      handler: handler.name,
+      argsTypes: args.map(arg => typeof arg === 'object' ? 'object' : typeof arg),
+    }),
+  }) as (...args: T) => Promise<R>;
 }
 
 // ヘルスチェック
 export async function healthCheck(): Promise<{
-  status: 'healthy' | 'unhealthy';
+  status: 'healthy' | 'degraded' | 'unhealthy';
   checks: Record<string, boolean>;
   timestamp: string;
 }> {
   const checks: Record<string, boolean> = {};
   
   try {
-    // Supabase接続チェック
+    // Supabase接続チェック（コアサービス）
     try {
       const { supabaseServer } = await import('@/lib/supabase-server');
       const supabaseBrowser = await supabaseServer();
@@ -176,43 +201,81 @@ export async function healthCheck(): Promise<{
       checks.supabase = false;
     }
 
-    // Stripe接続チェック
+    // Stripe接続チェック（オプショナルサービス、タイムアウト付き）
     try {
       if (process.env.STRIPE_SECRET_KEY) {
         const stripe = (await import('stripe')).default;
         const stripeClient = new stripe(process.env.STRIPE_SECRET_KEY);
-        await stripeClient.products.list({ limit: 1 });
+        
+        // タイムアウト付きでAPI呼び出し
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Stripe timeout')), 5000)
+        );
+        
+        await Promise.race([
+          stripeClient.products.list({ limit: 1 }),
+          timeoutPromise
+        ]);
         checks.stripe = true;
       } else {
-        checks.stripe = false;
+        // 設定されていない場合はスキップ（健康とみなす）
+        checks.stripe = true;
       }
     } catch {
+      // Stripe失敗は degraded であり unhealthy ではない
       checks.stripe = false;
     }
 
-    // Resend接続チェック
+    // Resend接続チェック（オプショナルサービス、タイムアウト付き）
     try {
       if (process.env.RESEND_API_KEY) {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
-        await resend.domains.list();
+        
+        // タイムアウト付きでAPI呼び出し
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Resend timeout')), 5000)
+        );
+        
+        await Promise.race([
+          resend.domains.list(),
+          timeoutPromise
+        ]);
         checks.resend = true;
       } else {
-        checks.resend = false;
+        // 設定されていない場合はスキップ（健康とみなす）
+        checks.resend = true;
       }
     } catch {
+      // Resend失敗は degraded であり unhealthy ではない
       checks.resend = false;
     }
 
+    // ステータス判定ロジック：コアサービス（Supabase）が生きていれば最低でも degraded
+    const coreServices = { supabase: checks.supabase };
+    const optionalServices = { stripe: checks.stripe, resend: checks.resend };
+    
+    const coreHealthy = Object.values(coreServices).every(Boolean);
     const allHealthy = Object.values(checks).every(Boolean);
     
+    let status: 'healthy' | 'degraded' | 'unhealthy';
+    if (!coreHealthy) {
+      status = 'unhealthy';
+    } else if (allHealthy) {
+      status = 'healthy';
+    } else {
+      status = 'degraded';
+    }
+    
     return {
-      status: allHealthy ? 'healthy' : 'unhealthy',
+      status,
       checks,
       timestamp: new Date().toISOString()
     };
   } catch (error) {
-    await notifyError(error instanceof Error ? error : new Error('Health check failed'));
+    const healthError = error instanceof Error ? error : new Error('Health check failed');
+    await notifyError(healthError);
+    SentryUtils.captureException(healthError, { healthChecks: checks });
     return {
       status: 'unhealthy',
       checks,

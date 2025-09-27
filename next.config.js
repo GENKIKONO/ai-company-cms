@@ -1,3 +1,5 @@
+const { withSentryConfig } = require('@sentry/nextjs');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // 画像最適化設定
@@ -54,4 +56,24 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+// Sentry configuration
+const sentryWebpackPluginOptions = {
+  // Additional config options for the Sentry Webpack plugin.
+  silent: true, // Suppresses source map uploading logs during build
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+
+  // Suppresses source map uploading logs during build
+  silent: true,
+  
+  // Upload source maps in production only
+  dryRun: process.env.NODE_ENV !== 'production',
+  
+  // Automatically tree-shake Sentry logger statements for production
+  disableLogger: true,
+};
+
+module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);

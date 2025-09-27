@@ -1,0 +1,296 @@
+// ================================
+// DATA NORMALIZATION UTILITIES
+// ================================
+// Single-Org API全体で使用する統一されたデータ正規化機能
+
+/**
+ * 空文字をnullに変換する共通ユーティリティ
+ * フォームデータの正規化に使用
+ */
+export function normalizeEmptyStrings<T extends Record<string, any>>(
+  data: T,
+  fieldsToNormalize: (keyof T)[]
+): T {
+  const normalized = { ...data };
+  
+  fieldsToNormalize.forEach(field => {
+    if (normalized[field] === '') {
+      normalized[field] = null as any;
+    }
+  });
+  
+  return normalized;
+}
+
+/**
+ * 数値フィールドの正規化
+ * 空文字や不正な値をnullに変換
+ */
+export function normalizeNumericFields<T extends Record<string, any>>(
+  data: T,
+  numericFields: (keyof T)[]
+): T {
+  const normalized = { ...data };
+  
+  numericFields.forEach(field => {
+    const value = normalized[field];
+    if (value === '' || value === null || value === undefined) {
+      normalized[field] = null as any;
+    } else if (typeof value === 'string') {
+      const parsed = parseFloat(value);
+      if (isNaN(parsed)) {
+        normalized[field] = null as any;
+      } else {
+        normalized[field] = parsed as any;
+      }
+    }
+  });
+  
+  return normalized;
+}
+
+/**
+ * 配列フィールドの正規化
+ * 空配列をnullに変換
+ */
+export function normalizeArrayFields<T extends Record<string, any>>(
+  data: T,
+  arrayFields: (keyof T)[]
+): T {
+  const normalized = { ...data };
+  
+  arrayFields.forEach(field => {
+    const value = normalized[field];
+    if (Array.isArray(value) && value.length === 0) {
+      normalized[field] = null as any;
+    }
+  });
+  
+  return normalized;
+}
+
+/**
+ * Post データの正規化
+ */
+export function normalizePostPayload(data: any) {
+  let normalized = normalizeEmptyStrings(data, [
+    'content_markdown',
+    'content_html',
+    'slug'
+  ]);
+  
+  // published_atの設定
+  if (normalized.status === 'published' && !normalized.published_at) {
+    normalized.published_at = new Date().toISOString();
+  } else if (normalized.status === 'draft') {
+    normalized.published_at = null;
+  }
+  
+  return normalized;
+}
+
+/**
+ * Service データの正規化
+ */
+export function normalizeServicePayload(data: any) {
+  let normalized = normalizeEmptyStrings(data, [
+    'description',
+    'category'
+  ]);
+  
+  normalized = normalizeNumericFields(normalized, [
+    'price',
+    'duration_months'
+  ]);
+  
+  return normalized;
+}
+
+/**
+ * CaseStudy データの正規化
+ */
+export function normalizeCaseStudyPayload(data: any) {
+  let normalized = normalizeEmptyStrings(data, [
+    'problem',
+    'solution',
+    'result'
+  ]);
+  
+  normalized = normalizeArrayFields(normalized, ['tags']);
+  
+  return normalized;
+}
+
+/**
+ * FAQ データの正規化
+ */
+export function normalizeFAQPayload(data: any) {
+  const normalized = normalizeEmptyStrings(data, ['category']);
+  
+  return normalized;
+}
+
+/**
+ * Organization データの正規化
+ */
+export function normalizeOrganizationPayload(data: any) {
+  let normalized = normalizeEmptyStrings(data, [
+    'description',
+    'url',
+    'logo_url',
+    'address_street',
+    'address_locality',
+    'address_region',
+    'address_postal_code',
+    'address_country',
+    'telephone',
+    'email',
+    'founded'
+  ]);
+  
+  normalized = normalizeArrayFields(normalized, ['same_as']);
+  
+  // email_public boolean validation
+  if (typeof normalized.email_public !== 'boolean') {
+    normalized.email_public = false;
+  }
+  
+  return normalized;
+}
+
+/**
+ * API レスポンス用の統一エラー形式
+ */
+export interface APIError {
+  error: string;
+  message: string;
+  details?: any;
+  errorId?: string;
+}
+
+/**
+ * 統一されたエラーレスポンス生成
+ */
+export function createErrorResponse(
+  error: string,
+  message: string,
+  status: number,
+  details?: any,
+  errorId?: string
+): Response {
+  const errorResponse: APIError = {
+    error,
+    message,
+    ...(details && { details }),
+    ...(errorId && { errorId })
+  };
+  
+  return new Response(JSON.stringify(errorResponse), {
+    status,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * バリデーションエラーの統一形式
+ */
+export function createValidationError(field: string, message: string): Response {
+  return createErrorResponse(
+    'Validation Error',
+    `${field}: ${message}`,
+    400,
+    { field, validation: message }
+  );
+}
+
+/**
+ *認証エラーの統一形式
+ */
+export function createAuthError(message: string = 'Authentication required'): Response {
+  return createErrorResponse(
+    'Unauthorized',
+    message,
+    401
+  );
+}
+
+/**
+ * 権限エラーの統一形式
+ */
+export function createForbiddenError(message: string = 'Access denied'): Response {
+  return createErrorResponse(
+    'Forbidden',
+    message,
+    403
+  );
+}
+
+/**
+ * Not Found エラーの統一形式
+ */
+export function createNotFoundError(resource: string): Response {
+  return createErrorResponse(
+    'Not Found',
+    `${resource} not found`,
+    404,
+    { resource }
+  );
+}
+
+/**
+ * Conflict エラーの統一形式
+ */
+export function createConflictError(message: string, details?: any): Response {
+  return createErrorResponse(
+    'Conflict',
+    message,
+    409,
+    details
+  );
+}
+
+/**
+ * 内部サーバーエラーの統一形式
+ */
+export function createInternalError(errorId: string, message?: string): Response {
+  return createErrorResponse(
+    'Internal Server Error',
+    message || 'An unexpected error occurred',
+    500,
+    undefined,
+    errorId
+  );
+}
+
+/**
+ * エラーIDの生成
+ */
+export function generateErrorId(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+/**
+ * スラッグバリデーション
+ */
+export function validateSlug(slug: string): { isValid: boolean; error?: string } {
+  if (!slug || typeof slug !== 'string') {
+    return { isValid: false, error: 'Slug is required' };
+  }
+  
+  // 空文字チェック
+  if (slug.trim() === '') {
+    return { isValid: false, error: 'Slug cannot be empty' };
+  }
+  
+  // 全角文字チェック
+  if (!/^[a-zA-Z0-9-_]+$/.test(slug)) {
+    return { isValid: false, error: 'Slug must contain only alphanumeric characters, hyphens, and underscores' };
+  }
+  
+  // 長さチェック
+  if (slug.length < 2 || slug.length > 100) {
+    return { isValid: false, error: 'Slug must be between 2 and 100 characters' };
+  }
+  
+  return { isValid: true };
+}

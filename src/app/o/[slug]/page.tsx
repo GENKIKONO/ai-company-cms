@@ -1,92 +1,105 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useParams, notFound } from 'next/navigation';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Head from 'next/head';
-import { getOrganizationBySlug } from '@/lib/organizations';
-import { type Organization } from '@/types/database';
+import { generateOrganizationPageJsonLd } from '@/lib/utils/jsonld';
+import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/database';
 
-export default function OrganizationDetailPage() {
-  const params = useParams();
-  const slug = params.slug as string;
-  
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  const [loading, setLoading] = useState(true);
+interface OrganizationPageData {
+  organization: Organization;
+  posts: Post[];
+  services: Service[];
+  case_studies: CaseStudy[];
+  faqs: FAQ[];
+}
 
-  useEffect(() => {
-    async function fetchOrganization() {
-      try {
-        const result = await getOrganizationBySlug(slug);
-        if (result.data) {
-          setOrganization(result.data);
-        } else {
-          notFound();
-        }
-      } catch (error) {
-        console.error('Failed to fetch organization:', error);
-        notFound();
-      } finally {
-        setLoading(false);
-      }
+async function getOrganizationData(slug: string): Promise<OrganizationPageData | null> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/public/organizations/${slug}`, {
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) {
+      return null;
     }
+    
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error('Failed to fetch organization data:', error);
+    return null;
+  }
+}
 
-    if (slug) {
-      fetchOrganization();
-    }
-  }, [slug]);
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const resolvedParams = await params;
+  const data = await getOrganizationData(resolvedParams.slug);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600">読み込み中...</span>
-      </div>
-    );
+  if (!data) {
+    return {
+      title: 'Organization Not Found',
+    };
   }
 
-  if (!organization) {
+  const { organization } = data;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+  return {
+    title: organization.meta_title || `${organization.name} - AIO Hub企業ディレクトリ`,
+    description: organization.meta_description || organization.description || `${organization.name}の企業情報、サービス、記事を紹介します。`,
+    keywords: organization.meta_keywords?.join(', '),
+    openGraph: {
+      title: organization.name,
+      description: organization.description || '',
+      type: 'website',
+      url: `${baseUrl}/o/${organization.slug}`,
+      siteName: 'AIO Hub企業ディレクトリ',
+      images: organization.logo_url ? [{
+        url: organization.logo_url,
+        width: 1200,
+        height: 630,
+        alt: `${organization.name} logo`,
+      }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: organization.name,
+      description: organization.description || '',
+      images: organization.logo_url ? [organization.logo_url] : undefined,
+    },
+    alternates: {
+      canonical: `/o/${organization.slug}`,
+    },
+  };
+}
+
+export default async function OrganizationDetailPage({
+  params
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const resolvedParams = await params;
+  const data = await getOrganizationData(resolvedParams.slug);
+
+  if (!data) {
     notFound();
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": organization.name,
-    "description": organization.description,
-    "url": organization.url,
-    "logo": organization.logo_url,
-    "email": organization.email_public ? organization.email : undefined,
-    "telephone": organization.telephone,
-    "foundingDate": organization.founded,
-    "legalName": organization.name,
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": organization.address_country,
-      "addressRegion": organization.address_region,
-      "addressLocality": organization.address_locality,
-      "streetAddress": organization.address_street,
-      "postalCode": organization.address_postal_code
-    },
-    "sameAs": organization.same_as || []
-  };
+  const { organization, posts, services, case_studies, faqs } = data;
+  const jsonLdArray = generateOrganizationPageJsonLd(organization, posts, services, case_studies, faqs);
 
   return (
     <>
-      <Head>
-        <title>{organization.meta_title || `${organization.name} - AIO Hub企業ディレクトリ`}</title>
-        <meta 
-          name="description" 
-          content={organization.meta_description || organization.description} 
-        />
-        {organization.meta_keywords && (
-          <meta name="keywords" content={organization.meta_keywords.join(', ')} />
-        )}
+      {/* JSON-LD structured data */}
+      {jsonLdArray.map((jsonLd, index) => (
         <script
+          key={index}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-      </Head>
+      ))}
 
       <div className="min-h-screen bg-gray-50">
         {/* ヘッダー */}
@@ -294,65 +307,70 @@ export default function OrganizationDetailPage() {
               </div>
             </div>
 
+            {/* 記事一覧 */}
+            {posts && posts.length > 0 && (
+              <div className="border-t border-gray-200">
+                <div className="p-6 sm:p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900">最新記事</h2>
+                    <Link
+                      href={`/o/${organization.slug}/posts`}
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    >
+                      記事一覧を見る →
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {posts.slice(0, 6).map((post) => (
+                      <Link
+                        key={post.id}
+                        href={`/o/${organization.slug}/posts/${post.id}`}
+                        className="block border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                      >
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">{post.title}</h3>
+                        {post.content_markdown && (
+                          <p className="text-sm text-gray-600 line-clamp-3 mb-3">
+                            {post.content_markdown.substring(0, 150)}...
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>{new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
+                          <span className={`px-2 py-1 rounded-full ${
+                            post.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {post.status === 'published' ? '公開中' : '下書き'}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* サービス一覧 */}
-            {organization.services && organization.services.length > 0 && (
+            {services && services.length > 0 && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">提供サービス</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {organization.services.map((service) => (
+                    {services.map((service) => (
                       <div key={service.id} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-start">
-                          {service.logo_url ? (
-                            <img
-                              src={service.logo_url}
-                              alt={`${service.name}のロゴ`}
-                              className="w-12 h-12 rounded-lg object-cover"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                              <span className="text-gray-600 font-semibold">
-                                {service.name.charAt(0)}
-                              </span>
-                            </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">{service.name}</h3>
+                        {service.description && (
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                            {service.description}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          {service.category && (
+                            <span className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
+                              {service.category}
+                            </span>
                           )}
-                          <div className="ml-3 flex-1">
-                            <h3 className="text-lg font-medium text-gray-900">{service.name}</h3>
-                            {service.description && (
-                              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                                {service.description}
-                              </p>
-                            )}
-                            {service.categories && service.categories.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mt-2">
-                                {service.categories.slice(0, 2).map((category, index) => (
-                                  <span 
-                                    key={index}
-                                    className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
-                                  >
-                                    {category}
-                                  </span>
-                                ))}
-                                {service.categories.length > 2 && (
-                                  <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                                    +{service.categories.length - 2}
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                            <div className="flex items-center space-x-3 mt-3 text-xs text-gray-500">
-                              {service.api_available && (
-                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                                  API提供
-                                </span>
-                              )}
-                              {service.free_trial && (
-                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                  無料トライアル
-                                </span>
-                              )}
-                            </div>
-                          </div>
+                          {service.price && (
+                            <span className="font-medium">¥{service.price.toLocaleString()}</span>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -362,30 +380,17 @@ export default function OrganizationDetailPage() {
             )}
 
             {/* 事例一覧 */}
-            {organization.case_studies && organization.case_studies.length > 0 && (
+            {case_studies && case_studies.length > 0 && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">導入事例</h2>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {organization.case_studies.map((caseStudy) => (
+                    {case_studies.map((caseStudy) => (
                       <div key={caseStudy.id} className="border border-gray-200 rounded-lg p-6">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <h3 className="text-lg font-medium text-gray-900">{caseStudy.title}</h3>
-                            {!caseStudy.is_anonymous && caseStudy.client_name && (
-                              <p className="text-sm text-gray-600 mt-1">
-                                {caseStudy.client_name}
-                                {caseStudy.client_industry && ` - ${caseStudy.client_industry}`}
-                              </p>
-                            )}
                           </div>
-                          {caseStudy.thumbnail_url && (
-                            <img
-                              src={caseStudy.thumbnail_url}
-                              alt={caseStudy.title}
-                              className="w-16 h-16 rounded-lg object-cover ml-4"
-                            />
-                          )}
                         </div>
                         
                         {caseStudy.problem && (
@@ -402,10 +407,23 @@ export default function OrganizationDetailPage() {
                           </div>
                         )}
                         
-                        {caseStudy.outcome && (
+                        {caseStudy.result && (
                           <div className="mt-3">
                             <h4 className="text-sm font-medium text-gray-700">成果</h4>
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{caseStudy.outcome}</p>
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{caseStudy.result}</p>
+                          </div>
+                        )}
+
+                        {caseStudy.tags && caseStudy.tags.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-1">
+                            {caseStudy.tags.map((tag, index) => (
+                              <span
+                                key={index}
+                                className="bg-orange-100 text-orange-800 px-2 py-1 text-xs rounded-full"
+                              >
+                                {tag}
+                              </span>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -416,14 +434,12 @@ export default function OrganizationDetailPage() {
             )}
 
             {/* FAQ */}
-            {organization.faqs && organization.faqs.length > 0 && (
+            {faqs && faqs.length > 0 && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">よくある質問</h2>
                   <div className="space-y-4">
-                    {organization.faqs
-                      .sort((a, b) => a.order_index - b.order_index)
-                      .map((faq) => (
+                    {faqs.map((faq) => (
                         <div key={faq.id} className="border border-gray-200 rounded-lg">
                           <details className="group">
                             <summary className="flex items-center justify-between p-4 cursor-pointer">

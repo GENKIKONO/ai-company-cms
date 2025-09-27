@@ -5,9 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
-import { getServices } from '@/lib/services';
-import { createCaseStudy, getClientIndustries, getClientSizes } from '@/lib/case-studies';
-import { type AppUser, type Organization, type Service, type CaseStudyFormData } from '@/types/database';
+import { createCaseStudy } from '@/lib/case-studies';
+import { type AppUser, type Organization, type CaseStudyFormData } from '@/types/database';
 
 export default function NewCaseStudyPage() {
   const router = useRouter();
@@ -16,8 +15,6 @@ export default function NewCaseStudyPage() {
   
   const [user, setUser] = useState<AppUser | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
-  const [services, setServices] = useState<Service[]>([]);
-  const [industries, setIndustries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -26,18 +23,12 @@ export default function NewCaseStudyPage() {
     title: '',
     problem: '',
     solution: '',
-    outcome: '',
-    metrics: {},
-    client_name: '',
-    client_industry: '',
-    client_size: '',
-    is_anonymous: false,
-    published_date: '',
-    url: '',
-    service_id: ''
+    result: '',
+    tags: []
   });
 
-  const clientSizes = getClientSizes();
+  const [newTag, setNewTag] = useState('');
+
 
   useEffect(() => {
     async function fetchData() {
@@ -50,24 +41,12 @@ export default function NewCaseStudyPage() {
         
         setUser(currentUser);
         
-        const [orgResult, servicesResult, industriesResult] = await Promise.all([
-          getOrganization(organizationId),
-          getServices({ organizationId }),
-          getClientIndustries()
-        ]);
+        const orgResult = await getOrganization(organizationId);
 
         if (orgResult.data) {
           setOrganization(orgResult.data);
         } else {
           router.push('/dashboard');
-        }
-        
-        if (servicesResult.data) {
-          setServices(servicesResult.data);
-        }
-
-        if (industriesResult.data) {
-          setIndustries(industriesResult.data);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -94,36 +73,21 @@ export default function NewCaseStudyPage() {
     }
   };
 
-  const handleMetricChange = (key: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      metrics: {
-        ...prev.metrics,
-        [key]: value
-      }
-    }));
-  };
-
-  const addMetric = () => {
-    const keyInput = document.getElementById('metricKey') as HTMLInputElement;
-    const valueInput = document.getElementById('metricValue') as HTMLInputElement;
-    
-    const key = keyInput?.value.trim();
-    const value = valueInput?.value.trim();
-    
-    if (key && value) {
-      handleMetricChange(key, value);
-      keyInput.value = '';
-      valueInput.value = '';
+  const addTag = () => {
+    if (newTag.trim() && !formData.tags?.includes(newTag.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...(prev.tags || []), newTag.trim()]
+      }));
+      setNewTag('');
     }
   };
 
-  const removeMetric = (key: string) => {
-    setFormData(prev => {
-      const updatedMetrics = { ...prev.metrics };
-      delete updatedMetrics[key];
-      return { ...prev, metrics: updatedMetrics };
-    });
+  const removeTag = (tagToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags?.filter(tag => tag !== tagToRemove) || []
+    }));
   };
 
   const validateForm = (): boolean => {
@@ -131,28 +95,6 @@ export default function NewCaseStudyPage() {
 
     if (!formData.title.trim()) {
       newErrors.title = 'タイトルは必須です';
-    }
-
-    if (!formData.problem?.trim()) {
-      newErrors.problem = '課題・問題は必須です';
-    }
-
-    if (!formData.solution?.trim()) {
-      newErrors.solution = '解決策は必須です';
-    }
-
-    if (!formData.outcome?.trim()) {
-      newErrors.outcome = '成果・結果は必須です';
-    }
-
-    if (!formData.is_anonymous && !formData.client_name?.trim()) {
-      newErrors.client_name = '実名公開の場合、クライアント名は必須です';
-    }
-
-    // 安全な文字列処理でundefined.match()エラーを回避
-    const urlValue = typeof formData.url === 'string' ? formData.url : '';
-    if (urlValue && !/^https?:\/\/.+/.test(urlValue)) {
-      newErrors.url = '正しいURL形式で入力してください';
     }
 
     setErrors(newErrors);
@@ -294,53 +236,6 @@ export default function NewCaseStudyPage() {
                 />
                 {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
               </div>
-
-              <div>
-                <label htmlFor="service_id" className="block text-sm font-medium text-gray-700 mb-2">
-                  関連サービス
-                </label>
-                <select
-                  id="service_id"
-                  value={formData.service_id || ''}
-                  onChange={(e) => handleInputChange('service_id', e.target.value || undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">選択してください（任意）</option>
-                  {services.map(service => (
-                    <option key={service.id} value={service.id}>{service.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="published_date" className="block text-sm font-medium text-gray-700 mb-2">
-                  公開日
-                </label>
-                <input
-                  type="date"
-                  id="published_date"
-                  value={formData.published_date}
-                  onChange={(e) => handleInputChange('published_date', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
-                  詳細URL
-                </label>
-                <input
-                  type="url"
-                  id="url"
-                  value={formData.url}
-                  onChange={(e) => handleInputChange('url', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.url ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="https://example.com/case-study"
-                />
-                {errors.url && <p className="mt-1 text-sm text-red-600">{errors.url}</p>}
-              </div>
             </div>
           </div>
 
@@ -351,186 +246,98 @@ export default function NewCaseStudyPage() {
             <div className="space-y-6">
               <div>
                 <label htmlFor="problem" className="block text-sm font-medium text-gray-700 mb-2">
-                  課題・問題 <span className="text-red-500">*</span>
+                  課題・問題
                 </label>
                 <textarea
                   id="problem"
                   rows={4}
-                  value={formData.problem}
+                  value={formData.problem || ''}
                   onChange={(e) => handleInputChange('problem', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.problem ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="導入前に抱えていた課題や問題点を記載してください"
                 />
-                {errors.problem && <p className="mt-1 text-sm text-red-600">{errors.problem}</p>}
               </div>
 
               <div>
                 <label htmlFor="solution" className="block text-sm font-medium text-gray-700 mb-2">
-                  解決策 <span className="text-red-500">*</span>
+                  解決策
                 </label>
                 <textarea
                   id="solution"
                   rows={4}
-                  value={formData.solution}
+                  value={formData.solution || ''}
                   onChange={(e) => handleInputChange('solution', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.solution ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="どのように課題を解決したかを記載してください"
                 />
-                {errors.solution && <p className="mt-1 text-sm text-red-600">{errors.solution}</p>}
               </div>
 
               <div>
-                <label htmlFor="outcome" className="block text-sm font-medium text-gray-700 mb-2">
-                  成果・結果 <span className="text-red-500">*</span>
+                <label htmlFor="result" className="block text-sm font-medium text-gray-700 mb-2">
+                  成果・結果
                 </label>
                 <textarea
-                  id="outcome"
+                  id="result"
                   rows={4}
-                  value={formData.outcome}
-                  onChange={(e) => handleInputChange('outcome', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.outcome ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  value={formData.result || ''}
+                  onChange={(e) => handleInputChange('result', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="導入後に得られた成果や効果を記載してください"
                 />
-                {errors.outcome && <p className="mt-1 text-sm text-red-600">{errors.outcome}</p>}
               </div>
             </div>
           </div>
 
-          {/* 定量的指標 */}
+          {/* タグ */}
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">定量的指標</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">タグ</h2>
             
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  指標を追加
+                  タグを追加
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex gap-2">
                   <input
                     type="text"
-                    id="metricKey"
-                    placeholder="指標名（例: 作業時間削減率）"
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                    placeholder="例: 業務効率化, AI導入, コスト削減"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      id="metricValue"
-                      placeholder="値（例: 50%）"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={addMetric}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                      追加
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={addTag}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    追加
+                  </button>
                 </div>
               </div>
 
-              {formData.metrics && Object.keys(formData.metrics).length > 0 && (
+              {formData.tags && formData.tags.length > 0 && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">登録済み指標:</p>
-                  <div className="space-y-2">
-                    {Object.entries(formData.metrics).map(([key, value]) => (
-                      <div key={key} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md">
-                        <span className="text-sm text-gray-900">
-                          <strong>{key}:</strong> {value}
-                        </span>
+                  <p className="text-sm font-medium text-gray-700 mb-2">登録済みタグ:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+                      >
+                        {tag}
                         <button
                           type="button"
-                          onClick={() => removeMetric(key)}
-                          className="text-red-600 hover:text-red-800"
+                          onClick={() => removeTag(tag)}
+                          className="ml-2 text-blue-600 hover:text-blue-800"
                         >
-                          削除
+                          ×
                         </button>
-                      </div>
+                      </span>
                     ))}
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* クライアント情報 */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">クライアント情報</h2>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_anonymous}
-                    onChange={(e) => handleInputChange('is_anonymous', e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">匿名での公開（クライアント名を非公開）</span>
-                </label>
-              </div>
-
-              {!formData.is_anonymous && (
-                <div>
-                  <label htmlFor="client_name" className="block text-sm font-medium text-gray-700 mb-2">
-                    クライアント名 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="client_name"
-                    value={formData.client_name}
-                    onChange={(e) => handleInputChange('client_name', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.client_name ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="株式会社サンプル"
-                  />
-                  {errors.client_name && <p className="mt-1 text-sm text-red-600">{errors.client_name}</p>}
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="client_industry" className="block text-sm font-medium text-gray-700 mb-2">
-                    業界
-                  </label>
-                  <select
-                    id="client_industry"
-                    value={formData.client_industry}
-                    onChange={(e) => handleInputChange('client_industry', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">選択してください</option>
-                    {industries.map(industry => (
-                      <option key={industry} value={industry}>{industry}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="client_size" className="block text-sm font-medium text-gray-700 mb-2">
-                    企業規模
-                  </label>
-                  <select
-                    id="client_size"
-                    value={formData.client_size}
-                    onChange={(e) => handleInputChange('client_size', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">選択してください</option>
-                    {clientSizes.map(size => (
-                      <option key={size} value={size}>{size}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { webhookRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
 import { sendPaymentFailedEmail } from '@/lib/emails';
+import { SentryUtils } from '@/lib/utils/sentry-utils';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -18,6 +19,20 @@ interface WebhookProcessingResult {
 
 async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessingResult> {
   const supabaseBrowser = supabaseBrowserAdmin();
+  const startTime = Date.now();
+
+  return SentryUtils.withTransaction(
+    `webhook.${event.type}`,
+    'webhook.process',
+    async (transaction) => {
+      transaction.setTag('event.type', event.type);
+      transaction.setTag('event.id', event.id);
+      
+      SentryUtils.addBreadcrumb(
+        `Processing webhook: ${event.type}`,
+        'webhook',
+        { eventId: event.id }
+      );
 
   try {
     // イベントの冪等性チェック
@@ -100,6 +115,12 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
         })
         .eq('stripe_event_id', event.id);
 
+      const processingTime = Date.now() - startTime;
+      SentryUtils.trackWebhookEvent(event.type, true, {
+        eventId: event.id,
+        processingTime,
+      });
+
       return { success: true, processed: true };
     } else {
       // リトライ回数を増加
@@ -127,13 +148,46 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
 
       // リトライの場合は指数バックオフ
       const retryAfter = Math.pow(2, newRetryCount) * 60; // 2分、4分、8分
+      
+      const processingTime = Date.now() - startTime;
+      SentryUtils.trackWebhookEvent(event.type, false, {
+        eventId: event.id,
+        retryCount: newRetryCount,
+        processingTime,
+      });
+      
       return { success: false, processed: false, retryAfter };
     }
 
   } catch (error) {
     console.error('Error processing webhook event:', error);
+    
+    const processingTime = Date.now() - startTime;
+    SentryUtils.trackWebhookEvent(event.type, false, {
+      eventId: event.id,
+      processingTime,
+    });
+    
+    if (error instanceof Error) {
+      SentryUtils.captureException(error, {
+        webhook: {
+          eventType: event.type,
+          eventId: event.id,
+          processingTime,
+        },
+      });
+    }
+    
     return { success: false, processed: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
+    },
+    {
+      webhook: {
+        eventType: event.type,
+        eventId: event.id,
+      },
+    }
+  );
 }
 
 async function handleSubscriptionChange(subscription: Stripe.Subscription): Promise<boolean> {

@@ -381,19 +381,11 @@ function SearchPageContent() {
                           <div key={service.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                             <div className="flex items-start justify-between">
                               <div className="flex items-start">
-                                {service.logo_url ? (
-                                  <img
-                                    src={service.logo_url}
-                                    alt={`${service.name}のロゴ`}
-                                    className="w-12 h-12 rounded-lg object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                                    <span className="text-gray-600 font-semibold">
-                                      {service.name.charAt(0)}
-                                    </span>
-                                  </div>
-                                )}
+                                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                  <span className="text-gray-600 font-semibold">
+                                    {service.name.charAt(0)}
+                                  </span>
+                                </div>
                                 <div className="ml-3 flex-1">
                                   <h4 className="text-lg font-medium text-gray-900">{service.name}</h4>
                                   <Link 
@@ -411,36 +403,14 @@ function SearchPageContent() {
                               </div>
                             </div>
                             
-                            {service.categories && service.categories.length > 0 && (
+                            {service.category && (
                               <div className="flex flex-wrap gap-1 mt-3">
-                                {service.categories.slice(0, 3).map((category, index) => (
-                                  <span 
-                                    key={index}
-                                    className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
-                                  >
-                                    {category}
-                                  </span>
-                                ))}
-                                {service.categories.length > 3 && (
-                                  <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                                    +{service.categories.length - 3}
-                                  </span>
-                                )}
+                                <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                                  {service.category}
+                                </span>
                               </div>
                             )}
                             
-                            <div className="flex items-center space-x-3 mt-3 text-xs text-gray-500">
-                              {service.api_available && (
-                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                                  API提供
-                                </span>
-                              )}
-                              {service.free_trial && (
-                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                  無料トライアル
-                                </span>
-                              )}
-                            </div>
                           </div>
                         ))}
                       </div>
@@ -465,20 +435,7 @@ function SearchPageContent() {
                                 >
                                   {caseStudy.organization.name}
                                 </Link>
-                                {!caseStudy.is_anonymous && caseStudy.client_name && (
-                                  <p className="text-sm text-gray-600 mt-1">
-                                    {caseStudy.client_name}
-                                    {caseStudy.client_industry && ` - ${caseStudy.client_industry}`}
-                                  </p>
-                                )}
                               </div>
-                              {caseStudy.thumbnail_url && (
-                                <img
-                                  src={caseStudy.thumbnail_url}
-                                  alt={caseStudy.title}
-                                  className="w-16 h-16 rounded-lg object-cover ml-4"
-                                />
-                              )}
                             </div>
                             
                             {caseStudy.problem && (

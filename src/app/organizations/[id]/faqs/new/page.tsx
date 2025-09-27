@@ -5,9 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
-import { getServices } from '@/lib/services';
 import { createFAQ, getFAQCategories, getPopularFAQCategories } from '@/lib/faqs';
-import { type AppUser, type Organization, type Service, type FAQFormData } from '@/types/database';
+import { type AppUser, type Organization, type FAQFormData } from '@/types/database';
 
 export default function NewFAQPage() {
   const router = useRouter();
@@ -16,7 +15,6 @@ export default function NewFAQPage() {
   
   const [user, setUser] = useState<AppUser | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
-  const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -26,7 +24,7 @@ export default function NewFAQPage() {
     question: '',
     answer: '',
     category: '',
-    order_index: 1
+    sort_order: 1
   });
 
   const popularCategories = getPopularFAQCategories();
@@ -42,9 +40,8 @@ export default function NewFAQPage() {
         
         setUser(currentUser);
         
-        const [orgResult, servicesResult, categoriesResult] = await Promise.all([
+        const [orgResult, categoriesResult] = await Promise.all([
           getOrganization(organizationId),
-          getServices({ organizationId }),
           getFAQCategories()
         ]);
 
@@ -54,10 +51,6 @@ export default function NewFAQPage() {
           router.push('/dashboard');
         }
         
-        if (servicesResult.data) {
-          setServices(servicesResult.data);
-        }
-
         if (categoriesResult.data) {
           setCategories(categoriesResult.data);
         }
@@ -276,20 +269,20 @@ export default function NewFAQPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="service_id" className="block text-sm font-medium text-gray-700 mb-2">
-                    関連サービス
+                  <label htmlFor="sort_order" className="block text-sm font-medium text-gray-700 mb-2">
+                    表示順序
                   </label>
-                  <select
-                    id="service_id"
-                    value={formData.service_id || ''}
-                    onChange={(e) => handleInputChange('service_id', e.target.value || undefined)}
+                  <input
+                    type="number"
+                    id="sort_order"
+                    min="1"
+                    value={formData.sort_order}
+                    onChange={(e) => handleInputChange('sort_order', parseInt(e.target.value) || 1)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">選択してください（任意）</option>
-                    {services.map(service => (
-                      <option key={service.id} value={service.id}>{service.name}</option>
-                    ))}
-                  </select>
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    小さい数字ほど上に表示されます
+                  </p>
                 </div>
               </div>
 

@@ -16,7 +16,7 @@ Sentry.init({
   release: process.env.NEXT_PUBLIC_APP_VERSION || 'unknown',
   environment: process.env.NEXT_PUBLIC_APP_ENV || 'development',
   
-  // Filter out noisy errors
+  // Enhanced error filtering for client
   beforeSend(event, hint) {
     // Filter out hydration errors and other non-critical errors
     if (event.exception?.values?.[0]?.value?.includes('Hydration')) {
@@ -28,13 +28,47 @@ Sentry.init({
       return null;
     }
     
+    // Filter out ResizeObserver errors (browser quirks)
+    if (event.exception?.values?.[0]?.value?.includes('ResizeObserver')) {
+      return null;
+    }
+    
+    // Filter out script loading errors (ad blockers, etc.)
+    if (event.exception?.values?.[0]?.value?.includes('Loading chunk')) {
+      return null;
+    }
+    
+    // Add client context
+    if (event.contexts) {
+      event.contexts.browser = {
+        name: navigator?.userAgent || 'unknown',
+        viewport: {
+          width: window?.innerWidth || 0,
+          height: window?.innerHeight || 0,
+        },
+      };
+    }
+    
     return event;
   },
   
-  // Custom tags
+  // Custom tags and context
   initialScope: {
     tags: {
       component: 'client',
+      runtime: 'browser',
+    },
+    contexts: {
+      app: {
+        name: 'luxucare-cms',
+        version: process.env.NEXT_PUBLIC_APP_VERSION || 'unknown',
+      },
     },
   },
+  
+  // Performance monitoring
+  profilesSampleRate: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 0.05 : 0.2,
+  
+  // Enhanced integrations - using correct import paths
+  integrations: [],
 });

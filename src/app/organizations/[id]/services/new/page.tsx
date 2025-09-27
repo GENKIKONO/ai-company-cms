@@ -23,33 +23,12 @@ export default function NewServicePage() {
   const [formData, setFormData] = useState<ServiceFormData>({
     name: '',
     description: '',
-    features: [],
-    categories: [],
-    price_range: '',
-    url: '',
-    supported_platforms: [],
-    api_available: false,
-    free_trial: false
+    price: undefined,
+    duration_months: undefined,
+    category: ''
   });
 
-  const priceRanges = [
-    '無料',
-    '月額1,000円未満',
-    '月額1,000円〜5,000円',
-    '月額5,000円〜10,000円',
-    '月額10,000円〜50,000円',
-    '月額50,000円〜100,000円',
-    '月額100,000円以上',
-    '要問い合わせ'
-  ];
-
-  const platforms = [
-    'Web', 'iOS', 'Android', 'Windows', 'macOS', 'Linux',
-    'Chrome Extension', 'Firefox Extension', 'Safari Extension',
-    'API', 'SDK', 'WordPress Plugin', 'Shopify App'
-  ];
-
-  const popularCategories = [
+  const categoryOptions = [
     'Webサービス', 'モバイルアプリ', 'SaaS', 'API・SDK',
     'マーケティング', 'セールス', 'カスタマーサポート', 'HR・人事',
     '経理・財務', 'プロジェクト管理', 'コミュニケーション', 'セキュリティ',
@@ -106,43 +85,6 @@ export default function NewServicePage() {
     }
   };
 
-  const handleArrayChange = (field: 'features' | 'categories' | 'supported_platforms', value: string[]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const addFeature = () => {
-    const feature = (document.getElementById('newFeature') as HTMLInputElement)?.value.trim();
-    if (feature && !(formData.features || []).includes(feature)) {
-      handleArrayChange('features', [...(formData.features || []), feature]);
-      (document.getElementById('newFeature') as HTMLInputElement).value = '';
-    }
-  };
-
-  const removeFeature = (index: number) => {
-    handleArrayChange('features', (formData.features || []).filter((_, i) => i !== index));
-  };
-
-  const addCustomCategory = () => {
-    const category = (document.getElementById('customCategory') as HTMLInputElement)?.value.trim();
-    if (category && !(formData.categories || []).includes(category)) {
-      handleArrayChange('categories', [...(formData.categories || []), category]);
-      (document.getElementById('customCategory') as HTMLInputElement).value = '';
-    }
-  };
-
-  const toggleCategory = (category: string) => {
-    const updatedCategories = (formData.categories || []).includes(category)
-      ? (formData.categories || []).filter(c => c !== category)
-      : [...(formData.categories || []), category];
-    handleArrayChange('categories', updatedCategories);
-  };
-
-  const togglePlatform = (platform: string) => {
-    const updatedPlatforms = (formData.supported_platforms || []).includes(platform)
-      ? (formData.supported_platforms || []).filter(p => p !== platform)
-      : [...(formData.supported_platforms || []), platform];
-    handleArrayChange('supported_platforms', updatedPlatforms);
-  };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -155,14 +97,12 @@ export default function NewServicePage() {
       newErrors.description = 'サービス説明は必須です';
     }
 
-    if ((formData.categories || []).length === 0) {
-      newErrors.categories = '少なくとも1つのカテゴリを選択してください';
+    if (formData.price !== undefined && formData.price < 0) {
+      newErrors.price = '価格は0以上で入力してください';
     }
 
-    // 安全な文字列処理でundefined.match()エラーを回避
-    const urlValue = typeof formData.url === 'string' ? formData.url : '';
-    if (urlValue && !/^https?:\/\/.+/.test(urlValue)) {
-      newErrors.url = '正しいURL形式で入力してください';
+    if (formData.duration_months !== undefined && formData.duration_months < 1) {
+      newErrors.duration_months = '期間は1ヶ月以上で入力してください';
     }
 
     setErrors(newErrors);
@@ -332,206 +272,60 @@ export default function NewServicePage() {
               </div>
 
               <div>
-                <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
-                  サービスURL
+                <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
+                  価格（円）
                 </label>
                 <input
-                  type="url"
-                  id="url"
-                  value={formData.url}
-                  onChange={(e) => handleInputChange('url', e.target.value)}
+                  type="number"
+                  id="price"
+                  min="0"
+                  value={formData.price || ''}
+                  onChange={(e) => handleInputChange('price', e.target.value ? Number(e.target.value) : undefined)}
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.url ? 'border-red-500' : 'border-gray-300'
+                    errors.price ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  placeholder="https://example.com/service"
+                  placeholder="例: 5000"
                 />
-                {errors.url && <p className="mt-1 text-sm text-red-600">{errors.url}</p>}
+                {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
               </div>
 
               <div>
-                <label htmlFor="price_range" className="block text-sm font-medium text-gray-700 mb-2">
-                  価格帯
+                <label htmlFor="duration_months" className="block text-sm font-medium text-gray-700 mb-2">
+                  期間（月）
+                </label>
+                <input
+                  type="number"
+                  id="duration_months"
+                  min="1"
+                  value={formData.duration_months || ''}
+                  onChange={(e) => handleInputChange('duration_months', e.target.value ? Number(e.target.value) : undefined)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.duration_months ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="例: 12"
+                />
+                {errors.duration_months && <p className="mt-1 text-sm text-red-600">{errors.duration_months}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                  カテゴリ
                 </label>
                 <select
-                  id="price_range"
-                  value={formData.price_range}
-                  onChange={(e) => handleInputChange('price_range', e.target.value)}
+                  id="category"
+                  value={formData.category || ''}
+                  onChange={(e) => handleInputChange('category', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">選択してください</option>
-                  {priceRanges.map(range => (
-                    <option key={range} value={range}>{range}</option>
+                  {categoryOptions.map(category => (
+                    <option key={category} value={category}>{category}</option>
                   ))}
                 </select>
               </div>
             </div>
           </div>
 
-          {/* カテゴリ */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">カテゴリ</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  サービスカテゴリ <span className="text-red-500">*</span>
-                </label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {popularCategories.map(category => (
-                    <label key={category} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={(formData.categories || []).includes(category)}
-                        onChange={() => toggleCategory(category)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{category}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.categories && <p className="mt-1 text-sm text-red-600">{errors.categories}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="customCategory" className="block text-sm font-medium text-gray-700 mb-2">
-                  カスタムカテゴリを追加
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    id="customCategory"
-                    placeholder="独自のカテゴリ名"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={addCustomCategory}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-                  >
-                    追加
-                  </button>
-                </div>
-              </div>
-
-              {(formData.categories || []).length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">選択中のカテゴリ:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {(formData.categories || []).map((category, index) => (
-                      <span 
-                        key={index}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full flex items-center"
-                      >
-                        {category}
-                        <button
-                          type="button"
-                          onClick={() => toggleCategory(category)}
-                          className="ml-2 text-blue-600 hover:text-blue-800"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* 機能・特徴 */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">機能・特徴</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="newFeature" className="block text-sm font-medium text-gray-700 mb-2">
-                  主要機能を追加
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    id="newFeature"
-                    placeholder="例: 複数プロジェクト管理"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
-                  />
-                  <button
-                    type="button"
-                    onClick={addFeature}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  >
-                    追加
-                  </button>
-                </div>
-              </div>
-
-              {formData.features && formData.features.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">機能一覧:</p>
-                  <div className="space-y-2">
-                    {formData.features.map((feature, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md">
-                        <span className="text-sm text-gray-900">{feature}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeFeature(index)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          削除
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* 対応プラットフォーム */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">対応プラットフォーム</h2>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {platforms.map(platform => (
-                <label key={platform} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.supported_platforms?.includes(platform) || false}
-                    onChange={() => togglePlatform(platform)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">{platform}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* その他の設定 */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">その他の設定</h2>
-            
-            <div className="space-y-4">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.api_available}
-                  onChange={(e) => handleInputChange('api_available', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">API提供あり</span>
-              </label>
-
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.free_trial}
-                  onChange={(e) => handleInputChange('free_trial', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">無料トライアルあり</span>
-              </label>
-            </div>
-          </div>
 
           {/* アクションボタン */}
           <div className="p-6">

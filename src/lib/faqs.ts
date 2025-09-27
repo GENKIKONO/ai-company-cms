@@ -56,12 +56,14 @@ export async function createFAQ(organizationId: string, faqData: FAQFormData) {
       ? maxOrderData[0].order_index + 1 
       : 1;
 
+    // Map sort_order to order_index for database
+    const { sort_order, ...restData } = faqData;
     const { data, error } = await supabaseBrowser
       .from('faqs')
       .insert({
-        ...faqData,
+        ...restData,
         organization_id: organizationId,
-        order_index: nextOrderIndex
+        order_index: sort_order || nextOrderIndex
       })
       .select()
       .single();
@@ -77,9 +79,16 @@ export async function createFAQ(organizationId: string, faqData: FAQFormData) {
 // FAQ更新
 export async function updateFAQ(faqId: string, faqData: Partial<FAQFormData>) {
   try {
+    // Map sort_order to order_index for database
+    const { sort_order, ...restData } = faqData;
+    const updateData = {
+      ...restData,
+      ...(sort_order !== undefined && { order_index: sort_order })
+    };
+    
     const { data, error } = await supabaseBrowser
       .from('faqs')
-      .update(faqData)
+      .update(updateData)
       .eq('id', faqId)
       .select()
       .single();
