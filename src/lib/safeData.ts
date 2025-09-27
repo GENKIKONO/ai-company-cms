@@ -5,7 +5,7 @@
 interface SafeOrganizationData {
   id: string;
   name: string;
-  status: string;
+  is_published: boolean;
   slug?: string;
   updated_at: string;
   logo_url?: string;

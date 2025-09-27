@@ -65,6 +65,12 @@ export interface Organization {
   case_studies?: CaseStudy[];
   faqs?: FAQ[];
   posts?: Post[];
+  // Stripe subscription fields
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
+  plan?: 'free' | 'basic' | 'pro';
+  subscription_status?: 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'paused';
+  current_period_end?: string;
 }
 
 export interface Service {

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { CaseStudy, CaseStudyFormData } from '@/types/database';
+import { PLAN_LIMITS } from '@/lib/plan-limits';
 
 async function logErrorToDiag(errorInfo: any) {
   try {
@@ -79,12 +80,44 @@ export async function POST(request: NextRequest) {
 
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
-      .select('id')
+      .select('id, plan')
       .eq('created_by', authData.user.id)
       .single();
 
     if (orgError || !orgData) {
       return NextResponse.json({ error: 'Not Found', message: 'Organization not found' }, { status: 404 });
+    }
+
+    // プラン制限チェック
+    const currentPlan = orgData.plan || 'free';
+    const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+    
+    if (planLimits.case_studies !== -1) {
+      const { count: currentCount, error: countError } = await supabase
+        .from('case_studies')
+        .select('id', { count: 'exact' })
+        .eq('organization_id', orgData.id);
+
+      if (countError) {
+        console.error('Error counting case studies:', countError);
+        return NextResponse.json(
+          { error: 'Database error', message: countError.message },
+          { status: 500 }
+        );
+      }
+
+      if ((currentCount || 0) >= planLimits.case_studies) {
+        return NextResponse.json(
+          {
+            error: 'Plan limit exceeded',
+            message: '上限に達しました。プランをアップグレードしてください。',
+            currentCount,
+            limit: planLimits.case_studies,
+            plan: currentPlan
+          },
+          { status: 402 }
+        );
+      }
     }
 
     const normalizedData = normalizeCaseStudyPayload(body);

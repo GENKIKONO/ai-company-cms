@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { FAQ } from '@/types/database';
+import PublicPageLinks from '../components/PublicPageLinks';
 
 export default function FAQsManagementPage() {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
@@ -81,15 +82,18 @@ export default function FAQsManagementPage() {
               <h1 className="text-3xl font-bold text-gray-900">FAQ管理</h1>
               <p className="text-lg text-gray-600 mt-2">よくある質問を管理します</p>
             </div>
-            <Link
-              href="/dashboard/faqs/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              新しいFAQ
-            </Link>
+            <div className="flex items-center space-x-3">
+              <PublicPageLinks contentType="faq" />
+              <Link
+                href="/dashboard/faqs/new"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                新しいFAQ
+              </Link>
+            </div>
           </div>
         </div>
 

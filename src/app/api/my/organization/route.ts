@@ -150,6 +150,7 @@ export async function POST(request: NextRequest) {
       ...normalizedData,
       created_by: authData.user.id,
       status: 'draft' as const,
+      is_published: false, // 初期は非公開
     };
 
     const { data, error } = await supabase

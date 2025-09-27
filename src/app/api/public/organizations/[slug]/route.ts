@@ -13,12 +13,12 @@ export async function GET(
     const { slug } = await params;
     const supabase = await supabaseServer();
     
-    // 組織情報を取得
+    // 組織情報を取得（is_published=true の企業のみ）
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('*')
       .eq('slug', slug)
-      .eq('status', 'published')
+      .eq('is_published', true)
       .single();
 
     if (orgError || !organization) {
@@ -35,29 +35,32 @@ export async function GET(
         .from('posts')
         .select('*')
         .eq('organization_id', organization.id)
-        .eq('status', 'published')
-        .order('published_at', { ascending: false })
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
         .limit(10),
       
-      // サービス一覧
+      // 公開されたサービス一覧
       supabase
         .from('services')
         .select('*')
         .eq('organization_id', organization.id)
+        .eq('is_published', true)
         .order('created_at', { ascending: false }),
       
-      // 事例一覧
+      // 公開された事例一覧
       supabase
         .from('case_studies')
         .select('*')
         .eq('organization_id', organization.id)
+        .eq('is_published', true)
         .order('created_at', { ascending: false }),
       
-      // FAQ一覧
+      // 公開されたFAQ一覧
       supabase
         .from('faqs')
         .select('*')
         .eq('organization_id', organization.id)
+        .eq('is_published', true)
         .order('created_at', { ascending: false })
     ]);
 

@@ -172,8 +172,9 @@ export default function NewOrganizationPage() {
       }
       
       const result = await response.json();
-      if (result.organization?.id) {
-        router.push(`/organizations/${result.organization.id}`);
+      if (result.data?.id) {
+        // Single-Org モードでは企業作成後はダッシュボードにリダイレクト
+        router.push('/dashboard');
       } else {
         setErrors({ submit: '企業の作成に失敗しました' });
       }

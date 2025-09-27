@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('organizations')
       .select('*', { count: 'exact' })
-      .eq('status', 'published');
+      .eq('is_published', true);
 
     // Apply filters
     if (industry) {

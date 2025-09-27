@@ -1,6 +1,8 @@
 // Stripe configuration for subscription implementation
 import { loadStripe } from '@stripe/stripe-js';
 import Stripe from 'stripe';
+import { supabaseServer } from '@/lib/supabase-server';
+import type { Organization } from '@/types/database';
 
 // Initialize Stripe.js with publishable key
 const stripePromise = loadStripe(
@@ -8,8 +10,8 @@ const stripePromise = loadStripe(
 );
 
 // Initialize server-side Stripe
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2024-06-20',
 });
 
 export { stripePromise };
@@ -172,11 +174,178 @@ export const createStripeCustomer = async (email: string, name?: string) => {
   }
 };
 
-// Future API routes structure
-/*
-/api/stripe/
-  ├── checkout-session.ts     - Create checkout session
-  ├── customer-portal.ts      - Customer portal redirect
-  ├── webhooks.ts            - Handle Stripe webhooks
-  └── subscription-status.ts  - Get current subscription
-*/
+// Single-Org Mode specific functions
+
+/**
+ * Get or create a Stripe customer for an organization (Single-Org Mode)
+ */
+export async function getOrCreateCustomer(organization: Organization): Promise<string> {
+  // If customer already exists, return it
+  if (organization.stripe_customer_id) {
+    return organization.stripe_customer_id;
+  }
+
+  try {
+    // Create new Stripe customer
+    const customer = await stripe.customers.create({
+      email: organization.email || undefined,
+      name: organization.name,
+      metadata: {
+        organization_id: organization.id,
+        organization_slug: organization.slug,
+      },
+    });
+
+    // Update organization with new customer ID
+    const supabase = await supabaseServer();
+    const { error } = await supabase
+      .from('organizations')
+      .update({ stripe_customer_id: customer.id })
+      .eq('id', organization.id);
+
+    if (error) {
+      console.error('Failed to save customer ID to database:', error);
+      throw new Error('Failed to save customer ID');
+    }
+
+    return customer.id;
+  } catch (error) {
+    console.error('Failed to create Stripe customer:', error);
+    throw new Error('Failed to create customer');
+  }
+}
+
+/**
+ * Create a Stripe Billing Portal URL
+ */
+export async function getPortalUrl(customerId: string, returnUrl?: string): Promise<string> {
+  const defaultReturnUrl = process.env.NEXT_PUBLIC_APP_URL 
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`
+    : 'http://localhost:3000/dashboard/billing';
+
+  try {
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: process.env.STRIPE_PORTAL_RETURN_URL || returnUrl || defaultReturnUrl,
+    });
+
+    return portalSession.url;
+  } catch (error) {
+    console.error('Failed to create portal session:', error);
+    throw new Error('Failed to create portal session');
+  }
+}
+
+interface CreateCheckoutSessionParams {
+  priceId: string;
+  customerId: string;
+  successUrl: string;
+  cancelUrl: string;
+}
+
+/**
+ * Create a Stripe Checkout Session
+ */
+export async function createCheckoutSession(params: CreateCheckoutSessionParams): Promise<string> {
+  const { priceId, customerId, successUrl, cancelUrl } = params;
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      automatic_tax: { enabled: false },
+      metadata: {
+        customer_id: customerId,
+      },
+    });
+
+    if (!session.url) {
+      throw new Error('Failed to create checkout session URL');
+    }
+
+    return session.url;
+  } catch (error) {
+    console.error('Failed to create checkout session:', error);
+    throw new Error('Failed to create checkout session');
+  }
+}
+
+/**
+ * Verify webhook signature (safe fallback if no secret)
+ */
+export function verifyWebhookSignature(body: string, signature: string): Stripe.Event | null {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  
+  if (!webhookSecret) {
+    console.warn('STRIPE_WEBHOOK_SECRET not configured - webhook verification skipped');
+    return null;
+  }
+
+  try {
+    return stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (error) {
+    console.error('Webhook signature verification failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Handle subscription status updates
+ */
+export async function updateSubscriptionInDB(subscriptionId: string) {
+  try {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const customerId = subscription.customer as string;
+
+    const supabase = await supabaseServer();
+    
+    // Find organization by customer ID
+    const { data: org, error: fetchError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('stripe_customer_id', customerId)
+      .single();
+
+    if (fetchError || !org) {
+      console.error('Organization not found for customer:', customerId);
+      return;
+    }
+
+    // Determine plan based on subscription status and items
+    let plan: 'free' | 'basic' | 'pro' = 'free';
+    if (subscription.status === 'active' || subscription.status === 'trialing') {
+      // For now, all paid subscriptions are 'basic'
+      // Later can check subscription.items.data[0].price.id to determine plan
+      plan = 'basic';
+    }
+
+    // Update organization
+    const { error: updateError } = await supabase
+      .from('organizations')
+      .update({
+        stripe_subscription_id: subscriptionId,
+        subscription_status: subscription.status,
+        plan: plan,
+        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      })
+      .eq('id', org.id);
+
+    if (updateError) {
+      console.error('Failed to update subscription in database:', updateError);
+    }
+  } catch (error) {
+    console.error('Failed to update subscription:', error);
+  }
+}
+
+// Re-export plan limits for convenience
+export { PLAN_LIMITS, type PlanType, type ResourceType } from '@/lib/plan-limits';

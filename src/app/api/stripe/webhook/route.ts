@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { stripe } from '@/lib/stripe';
-import { supabaseBrowserAdmin } from '@/lib/supabase-server';
-import { webhookRateLimit } from '@/lib/rate-limit';
-import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
-import { sendPaymentFailedEmail } from '@/lib/emails';
-import { SentryUtils } from '@/lib/utils/sentry-utils';
+import { stripe, verifyWebhookSignature, updateSubscriptionInDB } from '@/lib/stripe';
+import { createClient } from '@/lib/supabase/server';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -445,22 +441,38 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session):
   }
 }
 
+// Single-Org Mode webhook handler (simplified)
+async function handleSingleOrgWebhook(event: Stripe.Event): Promise<boolean> {
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const session = event.data.object as Stripe.Checkout.Session;
+        if (session.subscription) {
+          await updateSubscriptionInDB(session.subscription as string);
+        }
+        return true;
+
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated':
+      case 'customer.subscription.deleted':
+      case 'customer.subscription.paused':
+      case 'customer.subscription.resumed':
+        const subscription = event.data.object as Stripe.Subscription;
+        await updateSubscriptionInDB(subscription.id);
+        return true;
+
+      default:
+        console.log(`Unhandled Single-Org webhook event: ${event.type}`);
+        return true; // Return true for unhandled events to acknowledge receipt
+    }
+  } catch (error) {
+    console.error('Single-Org webhook processing error:', error);
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    // Stripe webhook secret が設定されていない場合は無効化
-    if (!webhookSecret) {
-      return NextResponse.json(
-        { error: 'Stripe webhook is not configured' },
-        { status: 503 }
-      );
-    }
-
-    // レート制限チェック
-    const rateLimitResponse = await webhookRateLimit(request);
-    if (rateLimitResponse) {
-      return rateLimitResponse;
-    }
-
     const body = await request.text();
     const headersList = await headers();
     const sig = headersList.get('stripe-signature');
@@ -472,39 +484,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Stripeイベントを検証
-    let event: Stripe.Event;
-    try {
-      event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-    } catch (err) {
-      console.error('Webhook signature verification failed:', err);
+    // Use the safe webhook verification function
+    const event = verifyWebhookSignature(body, sig);
+    
+    if (!event) {
+      // If verification fails or webhook secret is not configured
+      if (!process.env.STRIPE_WEBHOOK_SECRET) {
+        console.warn('Webhook received but STRIPE_WEBHOOK_SECRET not configured');
+        return NextResponse.json({ received: true, processed: false, warning: 'Webhook not configured' });
+      }
+      
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
       );
     }
 
-    // イベントを処理
-    const result = await processWebhookEvent(event);
+    // Process with Single-Org Mode handler
+    const success = await handleSingleOrgWebhook(event);
 
-    if (result.success) {
-      return NextResponse.json({ received: true, processed: result.processed });
+    if (success) {
+      return NextResponse.json({ received: true, processed: true });
     } else {
-      const status = result.retryAfter ? 429 : 500;
-      const response = NextResponse.json(
-        { error: result.error || 'Processing failed' },
-        { status }
+      return NextResponse.json(
+        { error: 'Processing failed' },
+        { status: 500 }
       );
-
-      if (result.retryAfter) {
-        response.headers.set('Retry-After', result.retryAfter.toString());
-      }
-
-      return response;
     }
 
   } catch (error) {
     console.error('Webhook error:', error);
+    
+    // Use Sentry if available, otherwise just log
+    if (typeof SentryUtils !== 'undefined') {
+      SentryUtils.captureException(error);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

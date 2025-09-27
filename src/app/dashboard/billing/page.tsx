@@ -1,363 +1,311 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { getCurrentUser } from '@/lib/auth';
-import { 
-  getUserSubscription, 
-  getSubscriptionStats, 
-  createCustomerPortalSession,
-  createCheckoutSession,
-  getSubscriptionStatusBadge,
-  isSubscriptionActive,
-  isSubscriptionExpiringSoon
-} from '@/lib/subscriptions';
-import { SUBSCRIPTION_PLANS } from '@/lib/stripe';
-import { type AppUser, type Subscription } from '@/types/database';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase-client';
+import { PLAN_LIMITS } from '@/lib/plan-limits';
+import type { Organization } from '@/types/database';
+
+interface BillingData {
+  organization: Organization;
+  currentCounts: {
+    services: number;
+    posts: number;
+    case_studies: number;
+    faqs: number;
+  };
+}
 
 export default function BillingPage() {
   const router = useRouter();
-  const [user, setUser] = useState<AppUser | null>(null);
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [stats, setStats] = useState<any>(null);
+  const searchParams = useSearchParams();
+  const [data, setData] = useState<BillingData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Check for success/cancel parameters
+  const success = searchParams.get('success');
+  const canceled = searchParams.get('canceled');
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const currentUser = await getCurrentUser();
-        // middleware認証済み前提のため、リダイレクト削除
-        
-        if (currentUser) {
-          setUser(currentUser);
+    fetchBillingData();
+  }, []);
 
-          const [subscriptionResult, statsResult] = await Promise.all([
-            getUserSubscription(currentUser.id),
-            getSubscriptionStats(currentUser.id)
-        ]);
-
-        if (subscriptionResult.data) {
-          setSubscription(subscriptionResult.data);
-        }
-
-          if (statsResult.data) {
-            setStats(statsResult.data);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch billing data:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchData();
-  }, [router]);
-
-  const handleManageSubscription = async () => {
-    if (!subscription?.org_id) return;
-
-    setActionLoading('portal');
+  async function fetchBillingData() {
     try {
-      const result = await createCustomerPortalSession(subscription.org_id);
-      if (result.data?.portal_url) {
-        window.open(result.data.portal_url, '_blank');
+      setLoading(true);
+      const supabase = createClient();
+      
+      // Get current user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        router.push('/login');
+        return;
       }
+
+      // Get user's organization (Single-Org Mode)
+      const { data: org, error: orgError } = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('created_by', user.id)
+        .single();
+
+      if (orgError || !org) {
+        setError('Organization not found');
+        return;
+      }
+
+      // Get current resource counts
+      const [servicesRes, postsRes, caseStudiesRes, faqsRes] = await Promise.all([
+        supabase.from('services').select('id', { count: 'exact' }).eq('organization_id', org.id),
+        supabase.from('posts').select('id', { count: 'exact' }).eq('organization_id', org.id),
+        supabase.from('case_studies').select('id', { count: 'exact' }).eq('organization_id', org.id),
+        supabase.from('faqs').select('id', { count: 'exact' }).eq('organization_id', org.id),
+      ]);
+
+      setData({
+        organization: org,
+        currentCounts: {
+          services: servicesRes.count || 0,
+          posts: postsRes.count || 0,
+          case_studies: caseStudiesRes.count || 0,
+          faqs: faqsRes.count || 0,
+        },
+      });
     } catch (error) {
-      console.error('Failed to open customer portal:', error);
-      alert('サブスクリプション管理画面を開けませんでした');
+      console.error('Failed to fetch billing data:', error);
+      setError('Failed to load billing information');
     } finally {
-      setActionLoading(null);
+      setLoading(false);
     }
-  };
+  }
 
-  const handleSubscribe = async (planId: string) => {
-    if (!user || !stats?.totalOrganizations) {
-      alert('サブスクリプションを開始するには、まず企業を作成してください。');
-      return;
-    }
-
-    setActionLoading(planId);
+  async function handleSubscribe() {
     try {
-      // 最初の組織IDを使用（実際のアプリでは組織選択UIを提供することを想定）
-      const result = await createCheckoutSession('org-id-placeholder', planId);
-      if (result.data?.checkout_url) {
-        window.location.href = result.data.checkout_url;
+      setActionLoading(true);
+      const response = await fetch('/api/billing/checkout', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
       }
+
+      const { url } = await response.json();
+      window.location.href = url;
     } catch (error) {
-      console.error('Failed to create checkout session:', error);
-      alert('サブスクリプション開始に失敗しました');
+      console.error('Checkout failed:', error);
+      setError('Failed to start checkout process');
     } finally {
-      setActionLoading(null);
+      setActionLoading(false);
     }
-  };
+  }
 
-  const getCurrentPlan = () => {
-    if (!subscription) return SUBSCRIPTION_PLANS.FREE;
-    return SUBSCRIPTION_PLANS[subscription.plan_id as keyof typeof SUBSCRIPTION_PLANS] || SUBSCRIPTION_PLANS.FREE;
-  };
+  async function handleManageBilling() {
+    try {
+      setActionLoading(true);
+      const response = await fetch('/api/billing/portal', {
+        method: 'POST',
+      });
 
-  const statusBadge = getSubscriptionStatusBadge(subscription);
+      if (!response.ok) {
+        throw new Error('Failed to create portal session');
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error('Portal creation failed:', error);
+      setError('Failed to open billing portal');
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  function getPlanLimits(plan: string) {
+    return PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+  }
+
+  function formatDate(dateString?: string) {
+    if (!dateString) return '未設定';
+    return new Date(dateString).toLocaleDateString('ja-JP');
+  }
+
+  function getStatusBadge(status?: string) {
+    switch (status) {
+      case 'active':
+        return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">有効</span>;
+      case 'past_due':
+        return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-sm">支払い遅延</span>;
+      case 'canceled':
+        return <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm">キャンセル済み</span>;
+      case 'trialing':
+        return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">トライアル中</span>;
+      default:
+        return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-sm">未契約</span>;
+    }
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600">読み込み中...</span>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">読み込み中...</div>
       </div>
     );
   }
 
-  const currentPlan = getCurrentPlan();
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-600">{error}</div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-600">データが見つかりません</div>
+      </div>
+    );
+  }
+
+  const { organization, currentCounts } = data;
+  const currentPlan = organization.plan || 'free';
+  const limits = getPlanLimits(currentPlan);
+  const isActive = organization.subscription_status === 'active' || organization.subscription_status === 'trialing';
+  const canUpgrade = !isActive || currentPlan === 'free';
 
   return (
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">サブスクリプション管理</h1>
+        <p className="text-gray-600">プランの管理と請求情報を確認できます。</p>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* パンくずナビ */}
-        <nav className="flex mb-8" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-4">
-            <li>
-              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
-                ダッシュボード
-              </Link>
-            </li>
-            <li>
-              <svg className="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-              </svg>
-            </li>
-            <li>
-              <span className="text-gray-900 font-medium">サブスクリプション管理</span>
-            </li>
-          </ol>
-        </nav>
-
-        {/* ページタイトル */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">サブスクリプション管理</h1>
-          <p className="text-lg text-gray-600">
-            プランの管理と使用状況の確認
-          </p>
+      {/* Success/Cancel Messages */}
+      {success && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+          <p className="text-green-800">サブスクリプションの設定が完了しました！</p>
         </div>
+      )}
+      {canceled && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="text-yellow-800">サブスクリプションの設定がキャンセルされました。</p>
+        </div>
+      )}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-red-800">{error}</p>
+        </div>
+      )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* 現在のプラン */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">現在のプラン</h2>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusBadge.className}`}>
-                  {statusBadge.text}
-                </span>
-              </div>
-
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{currentPlan.name}</h3>
-                <p className="text-3xl font-bold text-blue-600 mb-4">
-                  ¥{currentPlan.price.toLocaleString()}
-                  <span className="text-sm font-normal text-gray-500">/月</span>
-                </p>
-                
-                {subscription && isSubscriptionExpiringSoon(subscription) && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
-                    <div className="flex">
-                      <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                      <div className="ml-3">
-                        <h3 className="text-sm font-medium text-yellow-800">
-                          サブスクリプションの更新が近づいています
-                        </h3>
-                        <p className="text-sm text-yellow-700 mt-1">
-                          次回更新日: {subscription && new Date(subscription.current_period_end).toLocaleDateString('ja-JP')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {subscription && (subscription as any).setup_fee_amount && (
-                  <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
-                    <h4 className="font-medium text-green-800 mb-2">初期費用情報</h4>
-                    <div className="text-sm text-green-700">
-                      <p>支払済み初期費用: ¥{(subscription as any).setup_fee_amount.toLocaleString()}</p>
-                      {(subscription as any).setup_fee_paid_at && (
-                        <p>支払日: {new Date((subscription as any).setup_fee_paid_at).toLocaleDateString('ja-JP')}</p>
-                      )}
-                      {(subscription as any).notes && (
-                        <p className="mt-1">備考: {(subscription as any).notes}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <h4 className="font-medium text-gray-900">プラン機能</h4>
-                  <ul className="space-y-1">
-                    {currentPlan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-sm text-gray-600">
-                        <svg className="h-4 w-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {isSubscriptionActive(subscription) ? (
-                <button
-                  onClick={handleManageSubscription}
-                  disabled={actionLoading === 'portal'}
-                  className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
-                >
-                  {actionLoading === 'portal' ? '読み込み中...' : 'サブスクリプション管理'}
-                </button>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600">
-                    より多くの機能を利用するには、有料プランをご検討ください。
-                  </p>
-                  <Link
-                    href="#plans"
-                    className="block w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-center"
-                  >
-                    プランを見る
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* 使用状況 */}
-            {stats && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">使用状況</h2>
-                
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <div className="text-sm font-medium text-gray-500 mb-1">企業登録数</div>
-                    <div className="text-2xl font-bold text-gray-900">
-                      {stats.totalOrganizations}
-                      <span className="text-sm font-normal text-gray-500">
-                        / {currentPlan.limits.maxOrganizations === -1 ? '無制限' : currentPlan.limits.maxOrganizations}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="text-sm font-medium text-gray-500 mb-1">サービス登録数</div>
-                    <div className="text-2xl font-bold text-gray-900">
-                      {stats.totalServices}
-                      <span className="text-sm font-normal text-gray-500">
-                        / {currentPlan.limits.maxServices === -1 ? '無制限' : currentPlan.limits.maxServices}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="text-sm font-medium text-gray-500 mb-1">導入事例数</div>
-                    <div className="text-2xl font-bold text-gray-900">
-                      {stats.totalCaseStudies}
-                      <span className="text-sm font-normal text-gray-500">
-                        / {currentPlan.limits.maxCaseStudies === -1 ? '無制限' : currentPlan.limits.maxCaseStudies}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="text-sm font-medium text-gray-500 mb-1">FAQ数</div>
-                    <div className="text-2xl font-bold text-gray-900">
-                      {stats.totalFaqs}
-                      <span className="text-sm font-normal text-gray-500">
-                        / {currentPlan.limits.maxCaseStudies === -1 ? '無制限' : currentPlan.limits.maxCaseStudies}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* プラン変更 */}
+      {/* Current Plan Info */}
+      <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">現在のプラン</h2>
+          {getStatusBadge(organization.subscription_status)}
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">プラン変更</h2>
-              
-              <div className="space-y-4" id="plans">
-                {Object.entries(SUBSCRIPTION_PLANS).map(([planId, plan]) => {
-                  const isCurrentPlan = subscription?.plan_id === planId || (!subscription && planId === 'FREE');
-                  
-                  return (
-                    <div 
-                      key={planId}
-                      className={`border rounded-lg p-4 ${
-                        isCurrentPlan ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900">{plan.name}</h3>
-                        {isCurrentPlan && (
-                          <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
-                            現在のプラン
-                          </span>
-                        )}
-                      </div>
-                      
-                      <p className="text-lg font-bold text-gray-900 mb-2">
-                        ¥{plan.price.toLocaleString()}/月
-                      </p>
-                      
-                      <ul className="text-sm text-gray-600 space-y-1 mb-3">
-                        {plan.features.slice(0, 3).map((feature, index) => (
-                          <li key={index} className="flex items-center">
-                            <svg className="h-3 w-3 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      {!isCurrentPlan && planId !== 'FREE' && (
-                        <button
-                          onClick={() => handleSubscribe(planId)}
-                          disabled={actionLoading === planId}
-                          className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
-                        >
-                          {actionLoading === planId ? '処理中...' : '選択する'}
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
+            <div className="text-sm text-gray-500 mb-1">プラン</div>
+            <div className="text-lg font-medium text-gray-900 capitalize">
+              {currentPlan === 'free' ? 'フリープラン' : 
+               currentPlan === 'basic' ? 'ベーシックプラン (¥5,000/月)' : 
+               currentPlan === 'pro' ? 'プロプラン' : currentPlan}
+            </div>
+          </div>
+          
+          {organization.current_period_end && (
+            <div>
+              <div className="text-sm text-gray-500 mb-1">次回請求日</div>
+              <div className="text-lg font-medium text-gray-900">
+                {formatDate(organization.current_period_end)}
               </div>
             </div>
+          )}
+        </div>
 
-            {/* Admin Tools */}
-            {user?.role === 'admin' && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">管理者ツール</h2>
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600">
-                    管理者専用の機能です。初期費用付きのサブスクリプション作成などが可能です。
-                  </p>
-                  <Link
-                    href="/dashboard/billing/new-session"
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    新規チェックアウトセッション作成
-                  </Link>
+        {/* Usage Stats */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">利用状況</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Object.entries(currentCounts).map(([key, count]) => {
+              const limit = limits[key as keyof typeof limits];
+              const isNearLimit = limit !== -1 && count >= limit * 0.8;
+              const isOverLimit = limit !== -1 && count >= limit;
+              
+              return (
+                <div key={key} className="text-center">
+                  <div className="text-sm text-gray-500 mb-1 capitalize">
+                    {key === 'case_studies' ? '導入事例' : 
+                     key === 'services' ? 'サービス' : 
+                     key === 'posts' ? '記事' : 
+                     key === 'faqs' ? 'FAQ' : key}
+                  </div>
+                  <div className={`text-lg font-medium ${isOverLimit ? 'text-red-600' : isNearLimit ? 'text-yellow-600' : 'text-gray-900'}`}>
+                    {count} / {limit === -1 ? '無制限' : limit}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })}
           </div>
         </div>
-      </main>
+
+        {/* Action Buttons */}
+        <div className="mt-6 pt-6 border-t border-gray-200 flex gap-4">
+          {canUpgrade ? (
+            <button
+              onClick={handleSubscribe}
+              disabled={actionLoading}
+              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            >
+              {actionLoading ? '処理中...' : '¥5,000で購読'}
+            </button>
+          ) : (
+            <button
+              onClick={handleManageBilling}
+              disabled={actionLoading || !organization.stripe_customer_id}
+              className="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            >
+              {actionLoading ? '処理中...' : '請求の管理'}
+            </button>
+          )}
+          
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-medium"
+          >
+            ダッシュボードに戻る
+          </button>
+        </div>
+      </div>
+
+      {/* Plan Comparison */}
+      <div className="bg-white rounded-lg shadow-sm border p-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">プラン比較</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">機能</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">フリー</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ベーシック</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">プロ</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">サービス</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.services}</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">記事</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.posts}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.posts}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.posts}</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">導入事例</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.case_studies}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.case_studies}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.case_studies}</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">FAQ</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.faqs}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.faqs}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.faqs}</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">料金</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無料</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥5,000/月</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">近日公開</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }

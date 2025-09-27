@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { Post, PostFormData } from '@/types/database';
 import { normalizePostPayload, validateSlug, createAuthError, createNotFoundError, createConflictError, createValidationError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import { PLAN_LIMITS } from '@/lib/plan-limits';
 
 // エラーログ送信関数（失敗しても無視）
 async function logErrorToDiag(errorInfo: any) {
@@ -104,15 +105,47 @@ export async function POST(request: NextRequest) {
       return createValidationError('slug', slugValidation.error!);
     }
 
-    // ユーザーの企業IDを取得
+    // ユーザーの企業IDとプラン情報を取得
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
-      .select('id')
+      .select('id, plan')
       .eq('created_by', authData.user.id)
       .single();
 
     if (orgError || !orgData) {
       return createNotFoundError('Organization');
+    }
+
+    // プラン制限チェック
+    const currentPlan = orgData.plan || 'free';
+    const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+    
+    if (planLimits.posts !== -1) {
+      const { count: currentCount, error: countError } = await supabase
+        .from('posts')
+        .select('id', { count: 'exact' })
+        .eq('organization_id', orgData.id);
+
+      if (countError) {
+        console.error('Error counting posts:', countError);
+        return NextResponse.json(
+          { error: 'Database error', message: countError.message },
+          { status: 500 }
+        );
+      }
+
+      if ((currentCount || 0) >= planLimits.posts) {
+        return NextResponse.json(
+          {
+            error: 'Plan limit exceeded',
+            message: '上限に達しました。プランをアップグレードしてください。',
+            currentCount,
+            limit: planLimits.posts,
+            plan: currentPlan
+          },
+          { status: 402 }
+        );
+      }
     }
 
     // 同じ企業内でのslugの重複チェック

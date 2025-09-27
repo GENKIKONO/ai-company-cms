@@ -17,7 +17,7 @@ export default async function SafeAuthHeader() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <Link 
-                href={isAuthenticated ? "/dashboard" : "/auth/signin"} 
+                href={isAuthenticated ? "/dashboard" : "/auth/login"} 
                 className="text-2xl font-bold text-gray-900 hover:text-blue-600"
               >
                 AIO Hub AI企業CMS
