@@ -7,7 +7,7 @@ export default function FallbackHeader() {
       <div className="mx-auto max-w-6xl flex items-center justify-between p-3">
         <Link href="/" className="font-semibold">AIO Hub AI企業CMS</Link>
         <nav className="flex gap-3">
-          <Link href="/login" className="text-sm">ログイン</Link>
+          <Link href="/auth/signin" className="text-sm">ログイン</Link>
           <Link href="/auth/signup" className="text-sm">新規登録</Link>
         </nav>
       </div>

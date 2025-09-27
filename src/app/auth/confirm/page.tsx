@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-client';
 
 // Next.js 15: Force dynamic rendering to resolve useSearchParams prerender warning
@@ -186,9 +187,9 @@ function ConfirmPageContent() {
               </button>
               
               <div className="text-center">
-                <a href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+                <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
                   ログインページに戻る
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -212,9 +213,9 @@ function ConfirmPageContent() {
               3秒後にダッシュボードにリダイレクトします...
             </p>
             <div className="mt-6">
-              <a href="/dashboard" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/dashboard" className="font-medium text-blue-600 hover:text-blue-500">
                 今すぐダッシュボードに移動
-              </a>
+              </Link>
             </div>
           </div>
         </div>

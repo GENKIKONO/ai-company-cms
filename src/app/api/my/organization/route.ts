@@ -29,7 +29,7 @@ export const fetchCache = 'force-no-store';
 // GET - ユーザーの企業情報を取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = supabaseServer();
+    const supabase = await supabaseServer();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
 // POST - 新しい企業を作成（ユーザーが企業を持っていない場合のみ）
 export async function POST(request: NextRequest) {
   try {
-    const supabase = supabaseServer();
+    const supabase = await supabaseServer();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -261,7 +261,7 @@ export async function POST(request: NextRequest) {
 // PUT - 既存の企業情報を更新
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = supabaseServer();
+    const supabase = await supabaseServer();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -397,7 +397,7 @@ export async function PUT(request: NextRequest) {
 // DELETE - 企業を削除（必要に応じて）
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = supabaseServer();
+    const supabase = await supabaseServer();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();

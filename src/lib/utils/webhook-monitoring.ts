@@ -42,31 +42,31 @@ export async function getWebhookHealthMetrics(hoursBack: number = 24): Promise<W
     }
 
     const totalEvents = events?.length || 0;
-    const successfulEvents = events?.filter(e => e.processed).length || 0;
-    const failedEvents = events?.filter(e => !e.processed && e.retry_count >= 3).length || 0;
-    const pendingRetries = events?.filter(e => !e.processed && e.retry_count < 3).length || 0;
+    const successfulEvents = events?.filter((e: any) => e.processed).length || 0;
+    const failedEvents = events?.filter((e: any) => !e.processed && e.retry_count >= 3).length || 0;
+    const pendingRetries = events?.filter((e: any) => !e.processed && e.retry_count < 3).length || 0;
     
     const successRate = totalEvents > 0 ? (successfulEvents / totalEvents) * 100 : 100;
 
     // 最新イベント時刻
     const lastEventTime = events && events.length > 0 
-      ? Math.max(...events.map(e => new Date(e.created_at).getTime()))
+      ? Math.max(...events.map((e: any) => new Date(e.created_at).getTime()))
       : null;
 
     // 古い未処理イベントをチェック
-    const oldPendingEvents = events?.filter(e => 
+    const oldPendingEvents = events?.filter((e: any) => 
       !e.processed && 
       new Date(e.created_at).getTime() < Date.now() - 30 * 60 * 1000 // 30分以上前
     ) || [];
 
     const oldestPendingEvent = oldPendingEvents.length > 0
-      ? Math.min(...oldPendingEvents.map(e => new Date(e.created_at).getTime()))
+      ? Math.min(...oldPendingEvents.map((e: any) => new Date(e.created_at).getTime()))
       : null;
 
     // 平均処理時間（処理済みイベントのみ）
-    const processedEvents = events?.filter(e => e.processed && e.processed_at) || [];
+    const processedEvents = events?.filter((e: any) => e.processed && e.processed_at) || [];
     const avgProcessingTime = processedEvents.length > 0
-      ? processedEvents.reduce((sum, e) => {
+      ? processedEvents.reduce((sum: number, e: any) => {
           const start = new Date(e.created_at).getTime();
           const end = new Date(e.processed_at!).getTime();
           return sum + (end - start);

@@ -52,7 +52,7 @@ async function globalSetup(config: FullConfig) {
     const page = await context.newPage();
 
     const baseURL = config.projects[0].use?.baseURL || 'http://localhost:3000';
-    await page.goto(`${baseURL}/login`);
+    await page.goto(`${baseURL}/auth/signin`);
 
     // ログイン
     await page.fill('[name="email"]', testUser.email);
@@ -60,7 +60,7 @@ async function globalSetup(config: FullConfig) {
     await page.click('button[type="submit"]');
 
     // ダッシュボードページの表示を待機
-    await page.waitForURL('**/dashboard**');
+    await page.waitForURL('**/dashboard**', { timeout: 30000 });
 
     // 認証状態を保存
     await context.storageState({ path: 'tests/auth.json' });

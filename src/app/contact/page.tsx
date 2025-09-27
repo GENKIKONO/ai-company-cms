@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { BackLink } from '@/components/ui/back-link';
 
 export default function ContactPage() {
@@ -57,12 +58,12 @@ export default function ContactPage() {
               </p>
             </div>
             
-            <a 
+            <Link 
               href="/help" 
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               ヘルプセンターへ戻る
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -173,7 +174,7 @@ export default function ContactPage() {
               <p className="text-sm text-gray-600">
                 <span className="font-medium">個人情報の取り扱いについて：</span><br />
                 お客様からいただいた個人情報は、お問い合わせへの回答およびサービス向上のためにのみ使用いたします。
-                詳細は <a href="/privacy" className="text-blue-600 hover:text-blue-500 underline">プライバシーポリシー</a> をご確認ください。
+                詳細は <Link href="/privacy" className="text-blue-600 hover:text-blue-500 underline">プライバシーポリシー</Link> をご確認ください。
               </p>
             </div>
             

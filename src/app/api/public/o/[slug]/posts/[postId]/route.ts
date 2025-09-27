@@ -60,10 +60,10 @@ export async function GET(
 
     // Get post with appropriate status filter
     const queryStart = Date.now();
-    let statusCondition = 'published';
+    let statusCondition: string | null = 'published';
     if (isPreview && allowDraftAccess) {
       // For authenticated preview, allow any status
-      statusCondition = undefined;
+      statusCondition = null;
     }
 
     const query = supabase

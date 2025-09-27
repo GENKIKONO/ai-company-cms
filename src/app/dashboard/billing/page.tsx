@@ -234,8 +234,8 @@ export default function BillingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Object.entries(currentCounts).map(([key, count]) => {
               const limit = limits[key as keyof typeof limits];
-              const isNearLimit = limit !== -1 && count >= limit * 0.8;
-              const isOverLimit = limit !== -1 && count >= limit;
+              const isNearLimit = limit > 0 && count >= limit * 0.8;
+              const isOverLimit = limit > 0 && count >= limit;
               
               return (
                 <div key={key} className="text-center">
@@ -246,7 +246,7 @@ export default function BillingPage() {
                      key === 'faqs' ? 'FAQ' : key}
                   </div>
                   <div className={`text-lg font-medium ${isOverLimit ? 'text-red-600' : isNearLimit ? 'text-yellow-600' : 'text-gray-900'}`}>
-                    {count} / {limit === -1 ? '無制限' : limit}
+                    {count} / {limit > 0 ? limit : '無制限'}
                   </div>
                 </div>
               );

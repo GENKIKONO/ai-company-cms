@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     const currentPlan = orgData.plan || 'free';
     const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
     
-    if (planLimits.case_studies !== -1) {
+    if (planLimits.case_studies > 0) {
       const { count: currentCount, error: countError } = await supabase
         .from('case_studies')
         .select('id', { count: 'exact' })

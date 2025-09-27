@@ -87,7 +87,7 @@ test.describe('LuxuCare主要フロー', () => {
 
   test('フロー2: サービス・FAQ・導入事例管理', async ({ page }) => {
     // 事前準備：既存の公開済み企業にログイン
-    await page.goto('/login');
+    await page.goto('/auth/signin');
     await page.fill('[name="email"]', TEST_USER.email);
     await page.fill('[name="password"]', TEST_USER.password);
     await page.click('button[type="submit"]');
@@ -149,7 +149,7 @@ test.describe('LuxuCare主要フロー', () => {
 
   test('フロー3: Stripe課金→Active→解約→停止', async ({ page }) => {
     // 事前準備
-    await page.goto('/login');
+    await page.goto('/auth/signin');
     await page.fill('[name="email"]', TEST_USER.email);
     await page.fill('[name="password"]', TEST_USER.password);
     await page.click('button[type="submit"]');
@@ -252,7 +252,7 @@ test.describe('LuxuCare主要フロー', () => {
       password: 'Password123!'
     };
 
-    await page.goto('/login');
+    await page.goto('/auth/signin');
     await page.fill('[name="email"]', unauthorizedUser.email);
     await page.fill('[name="password"]', unauthorizedUser.password);
     await page.click('button[type="submit"]');

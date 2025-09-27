@@ -45,7 +45,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
 
   const fetchFAQs = async () => {
     try {
-      const response = await fetch(`/api/organizations/${organizationId}/faqs`);
+      const response = await fetch('/api/my/faqs');
       if (response.ok) {
         const result = await response.json();
         setFAQs(result.data || []);
@@ -100,8 +100,8 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
 
     try {
       const url = editingFAQ 
-        ? `/api/organizations/${organizationId}/faqs/${editingFAQ.id}`
-        : `/api/organizations/${organizationId}/faqs`;
+        ? `/api/my/faqs/${editingFAQ.id}`
+        : '/api/my/faqs';
       
       const method = editingFAQ ? 'PUT' : 'POST';
       
@@ -133,7 +133,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
     }
 
     try {
-      const response = await fetch(`/api/organizations/${organizationId}/faqs/${faqId}`, {
+      const response = await fetch(`/api/my/faqs/${faqId}`, {
         method: 'DELETE',
       });
 

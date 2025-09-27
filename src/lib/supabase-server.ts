@@ -7,7 +7,7 @@
  * - セッション永続化・管理
  */
 import 'server-only';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 /**
@@ -17,34 +17,25 @@ import { cookies } from 'next/headers';
 export const supabaseServer = async () => {
   const cookieStore = await cookies();
   
-  return createClient(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      auth: {
-        storage: {
-          getItem: (key: string) => {
-            const value = cookieStore.get(key)?.value ?? null;
-            return value;
-          },
-          setItem: (key: string, value: string) => {
-            // HTTPOnly Cookie設定（セキュリティ強化）
-            cookieStore.set(key, value, {
-              httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
-              sameSite: 'lax',
-              maxAge: 60 * 60 * 24 * 7, // 7日間
-              path: '/'
-            });
-          },
-          removeItem: (key: string) => {
-            cookieStore.delete(key);
-          },
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
         },
-        // セッション自動更新（商用レベル）
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: false, // サーバーサイドではURL検出不要
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
       },
     }
   );
@@ -54,8 +45,9 @@ export const supabaseServer = async () => {
  * 管理者権限Supabaseクライアント（Service Role）
  * 用途: DBトリガー、管理操作、RLSバイパス
  */
-export const supabaseAdmin = () =>
-  createClient(
+export const supabaseAdmin = () => {
+  const { createClient } = require('@supabase/supabase-js');
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
@@ -65,6 +57,7 @@ export const supabaseAdmin = () =>
       },
     }
   );
+};
 
 /**
  * レガシー互換性エクスポート

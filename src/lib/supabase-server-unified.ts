@@ -1,9 +1,8 @@
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 
-export function supabaseServer() {
-  const cookieStore = cookies();
-  const hdrs = headers();
+export async function supabaseServer() {
+  const cookieStore = await cookies();
   
   // SSR Cookie を Supabase クライアントに委譲。NextResponse.setCookie 等は使わない。
   return createServerClient(
@@ -14,9 +13,6 @@ export function supabaseServer() {
         get: (key) => cookieStore.get(key)?.value,
         set: () => {}, // SSR 認証では原則サーバからは書かない
         remove: () => {}
-      },
-      headers: {
-        get: (key) => hdrs.get(key) ?? undefined
       }
     }
   );

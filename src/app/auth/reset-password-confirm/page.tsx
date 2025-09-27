@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { BackLink } from '@/components/ui/back-link';
 
@@ -83,9 +84,9 @@ function ResetPasswordConfirmContent() {
               このパスワードリセットリンクは無効です。
             </p>
             <div className="mt-4">
-              <a href="/auth/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/auth/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
                 新しいパスワードリセットリクエストを送信
-              </a>
+              </Link>
             </div>
           </div>
         </div>

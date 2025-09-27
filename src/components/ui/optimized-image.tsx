@@ -148,11 +148,7 @@ export function LogoImage({
     xl: { width: 80, height: 80 }
   };
 
-  const fallbackText = organizationName ? (
-    <span className="text-blue-600 font-semibold text-lg">
-      {organizationName.charAt(0)}
-    </span>
-  ) : undefined;
+  const fallbackText = organizationName ? organizationName.charAt(0) : undefined;
 
   return (
     <OptimizedImage
@@ -234,11 +230,7 @@ export function AvatarImage({
     xl: { width: 64, height: 64 }
   };
 
-  const fallbackText = userName ? (
-    <span className="text-gray-600 font-medium">
-      {userName.charAt(0).toUpperCase()}
-    </span>
-  ) : undefined;
+  const fallbackText = userName ? userName.charAt(0).toUpperCase() : undefined;
 
   return (
     <OptimizedImage

@@ -50,7 +50,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch(`/api/organizations/${organizationId}/posts`);
+      const response = await fetch('/api/my/posts');
       if (response.ok) {
         const result = await response.json();
         setPosts(result.data || []);
@@ -131,7 +131,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
     }
 
     try {
-      const response = await fetch(`/api/posts/${postId}`, {
+      const response = await fetch(`/api/my/posts/${postId}`, {
         method: 'DELETE',
       });
 

@@ -66,8 +66,13 @@ export async function getMyOrganizationSafe(reqHeaders?: Headers): Promise<SafeD
       cache: 'no-store'
     });
 
-    if (response.status === 404 || response.status === 401) {
-      // ログインしていない or 組織がない場合
+    if (response.status === 401) {
+      // ログインしていない場合
+      return { data: null, error: '401 Unauthorized' };
+    }
+    
+    if (response.status === 404) {
+      // 組織がない場合
       return { data: null };
     }
 

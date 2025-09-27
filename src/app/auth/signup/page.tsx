@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { BackLink } from '@/components/ui/back-link';
 import { getAppUrl } from '@/lib/utils/env';
@@ -182,12 +183,12 @@ export default function SignupPage() {
               {error}
               {error.includes('すでに登録されています') && (
                 <div className="mt-3 text-sm">
-                  <a href="/auth/login" className="text-blue-600 hover:text-blue-500 underline mr-4">
+                  <Link href="/auth/login" className="text-blue-600 hover:text-blue-500 underline mr-4">
                     ログインページへ
-                  </a>
-                  <a href="/auth/forgot-password" className="text-blue-600 hover:text-blue-500 underline">
+                  </Link>
+                  <Link href="/auth/forgot-password" className="text-blue-600 hover:text-blue-500 underline">
                     パスワードリセット
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
@@ -282,9 +283,9 @@ export default function SignupPage() {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               すでにアカウントをお持ちの方は{' '}
-              <a href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
                 ログイン
-              </a>
+              </Link>
             </p>
           </div>
         </form>

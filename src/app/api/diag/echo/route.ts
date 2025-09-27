@@ -27,7 +27,7 @@ function maskHeaderValue(name: string, value: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const hdrs = headers();
+    const hdrs = await headers();
     
     // リクエストボディの取得（JSON以外も対応）
     let requestBody: any = null;
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       request: {
         method: 'POST',
         url: request.url,
-        cookieHeaderLength: headers().get('cookie')?.length || 0,
+        cookieHeaderLength: (await headers()).get('cookie')?.length || 0,
       }
     };
     

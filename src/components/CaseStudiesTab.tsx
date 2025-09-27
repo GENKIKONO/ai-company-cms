@@ -54,7 +54,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
 
   const fetchCaseStudies = async () => {
     try {
-      const response = await fetch(`/api/organizations/${organizationId}/case-studies`);
+      const response = await fetch('/api/my/case-studies');
       if (response.ok) {
         const result = await response.json();
         setCaseStudies(result.data || []);
@@ -110,8 +110,8 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
 
     try {
       const url = editingCaseStudy 
-        ? `/api/organizations/${organizationId}/case-studies/${editingCaseStudy.id}`
-        : `/api/organizations/${organizationId}/case-studies`;
+        ? `/api/my/case-studies/${editingCaseStudy.id}`
+        : '/api/my/case-studies';
       
       const method = editingCaseStudy ? 'PUT' : 'POST';
       
@@ -143,7 +143,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
     }
 
     try {
-      const response = await fetch(`/api/organizations/${organizationId}/case-studies/${caseStudyId}`, {
+      const response = await fetch(`/api/my/case-studies/${caseStudyId}`, {
         method: 'DELETE',
       });
 

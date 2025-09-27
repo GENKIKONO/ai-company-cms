@@ -15,9 +15,9 @@ function maskCookie(value: string): string {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = supabaseServer();
-    const cookieStore = cookies();
-    const hdrs = headers();
+    const supabase = await supabaseServer();
+    const cookieStore = await cookies();
+    const hdrs = await headers();
     
     // Cookie の解析
     const cookieHeader = hdrs.get('cookie') || '';
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
       },
-      cookieHeaderLength: headers().get('cookie')?.length || 0,
+      cookieHeaderLength: (await headers()).get('cookie')?.length || 0,
     };
     
     return NextResponse.json(errorResponse, { 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { BackLink } from '@/components/ui/back-link';
 
 export default function ForgotPasswordPage() {
@@ -117,9 +118,9 @@ export default function ForgotPasswordPage() {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              <a href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
                 ログイン画面に戻る
-              </a>
+              </Link>
             </p>
           </div>
         </form>

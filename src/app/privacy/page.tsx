@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { BackLink } from '@/components/ui/back-link';
 
 export default function PrivacyPage() {
@@ -176,7 +177,7 @@ export default function PrivacyPage() {
                 <p className="text-gray-700">
                   <strong>LuxuCare株式会社</strong><br />
                   個人情報取扱責任者<br />
-                  <a href="/contact" className="text-blue-600 hover:text-blue-500 underline">お問い合わせフォーム</a>
+                  <Link href="/contact" className="text-blue-600 hover:text-blue-500 underline">お問い合わせフォーム</Link>
                 </p>
               </div>
             </section>

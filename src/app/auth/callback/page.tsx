@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-client';
 
 export default function CallbackPage() {
@@ -57,9 +58,9 @@ export default function CallbackPage() {
               {error}
             </div>
             <div className="mt-6">
-              <a href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
                 ログインページに戻る
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ export const fetchCache = 'force-no-store';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = supabaseServer();
+    const supabase = await supabaseServer();
 
     // ユーザーセッション取得
     const { data: { user }, error: userError } = await supabase.auth.getUser();

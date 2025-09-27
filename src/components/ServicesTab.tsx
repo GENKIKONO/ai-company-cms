@@ -48,7 +48,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
 
   const fetchServices = async () => {
     try {
-      const response = await fetch(`/api/organizations/${organizationId}/services`);
+      const response = await fetch('/api/my/services');
       if (response.ok) {
         const result = await response.json();
         setServices(result.data || []);
@@ -100,8 +100,8 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
 
     try {
       const url = editingService 
-        ? `/api/organizations/${organizationId}/services/${editingService.id}`
-        : `/api/organizations/${organizationId}/services`;
+        ? `/api/my/services/${editingService.id}`
+        : '/api/my/services';
       
       const method = editingService ? 'PUT' : 'POST';
       
@@ -133,7 +133,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
     }
 
     try {
-      const response = await fetch(`/api/organizations/${organizationId}/services/${serviceId}`, {
+      const response = await fetch(`/api/my/services/${serviceId}`, {
         method: 'DELETE',
       });
 

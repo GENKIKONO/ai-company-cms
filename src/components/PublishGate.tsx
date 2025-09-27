@@ -36,7 +36,7 @@ export default function PublishGate({
   const checkPublishGate = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/organizations/${organizationId}/publish`, {
+      const response = await fetch('/api/my/organization/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'check' }),
@@ -76,7 +76,7 @@ export default function PublishGate({
 
     setIsPublishing(true);
     try {
-      const response = await fetch(`/api/organizations/${organizationId}/publish`, {
+      const response = await fetch('/api/my/organization/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'publish' }),

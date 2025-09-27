@@ -6,101 +6,53 @@
    - Environments: .env.local
    - Experiments (use with caution):
      ✓ webpackBuildWorker
+     · clientTraceMetadata
 
    Creating an optimized production build ...
- ✓ Compiled successfully in 6.9s
+[@sentry/nextjs] DEPRECATION WARNING: It is recommended renaming your `sentry.client.config.ts` file, or moving its content to `instrumentation-client.ts`. When using Turbopack `sentry.client.config.ts` will no longer work. Read more about the `instrumentation-client.ts` file: https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation-client
+[@sentry/nextjs] DEPRECATION WARNING: It is recommended renaming your `sentry.client.config.ts` file, or moving its content to `instrumentation-client.ts`. When using Turbopack `sentry.client.config.ts` will no longer work. Read more about the `instrumentation-client.ts` file: https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation-client
+[@sentry/nextjs] DEPRECATION WARNING: It is recommended renaming your `sentry.client.config.ts` file, or moving its content to `instrumentation-client.ts`. When using Turbopack `sentry.client.config.ts` will no longer work. Read more about the `instrumentation-client.ts` file: https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation-client
+ ✓ Compiled successfully in 8.1s
    Linting and checking validity of types ...
 
-./src/app/dashboard/page.tsx
-276:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+./src/app/dashboard/billing/page.tsx
+33:6  Warning: React Hook useEffect has a missing dependency: 'fetchBillingData'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
-./src/app/o/[slug]/page.tsx
-152:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-307:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-383:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+./src/app/dashboard/page.tsx
+177:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/app/organizations/page.tsx
-239:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+218:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 ./src/app/search/page.tsx
-327:33  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-385:35  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-476:33  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+301:33  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/CaseStudiesTab.tsx
+53:6  Warning: React Hook useEffect has a missing dependency: 'fetchCaseStudies'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/FAQsTab.tsx
+44:6  Warning: React Hook useEffect has a missing dependency: 'fetchFAQs'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/PostsTab.tsx
+49:6  Warning: React Hook useEffect has a missing dependency: 'fetchPosts'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/ServicesTab.tsx
+47:6  Warning: React Hook useEffect has a missing dependency: 'fetchServices'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/ui/toast.tsx
+52:6  Warning: React Hook useCallback has a missing dependency: 'removeToast'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
-   Collecting page data ...
-   Generating static pages (0/43) ...
-   Generating static pages (10/43) 
-   Generating static pages (21/43) 
-   Generating static pages (32/43) 
- ✓ Generating static pages (43/43)
-   Finalizing page optimization ...
-   Collecting build traces ...
+Failed to compile.
 
-Route (app)                                      Size  First Load JS
-┌ ○ /                                           165 B         106 kB
-├ ○ /_not-found                                  1 kB         103 kB
-├ ƒ /api/approval/approve                       201 B         102 kB
-├ ƒ /api/approval/reject                        201 B         102 kB
-├ ƒ /api/approval/request                       201 B         102 kB
-├ ƒ /api/auth/resend-confirmation               201 B         102 kB
-├ ƒ /api/auth/reset-password                    201 B         102 kB
-├ ƒ /api/auth/sync                              201 B         102 kB
-├ ƒ /api/diag                                   201 B         102 kB
-├ ƒ /api/diag/session                           201 B         102 kB
-├ ○ /api/docs                                 6.31 kB         108 kB
-├ ƒ /api/emails/welcome                         162 B         106 kB
-├ ƒ /api/extract                                201 B         102 kB
-├ ƒ /api/extract/pdf                            201 B         102 kB
-├ ƒ /api/extract/url                            201 B         102 kB
-├ ƒ /api/health                                 201 B         102 kB
-├ ƒ /api/images/optimize                        201 B         102 kB
-├ ƒ /api/ogp/generate                           201 B         102 kB
-├ ƒ /api/organizations                          201 B         102 kB
-├ ƒ /api/organizations/[id]                     201 B         102 kB
-├ ƒ /api/organizations/[id]/publish             201 B         102 kB
-├ ƒ /api/partners                               201 B         102 kB
-├ ƒ /api/partners/[id]                          201 B         102 kB
-├ ƒ /api/public/organizations/[slug]            201 B         102 kB
-├ ƒ /api/selftest/auth                          201 B         102 kB
-├ ƒ /api/stripe/checkout                        201 B         102 kB
-├ ƒ /api/stripe/checkout/create                 201 B         102 kB
-├ ƒ /api/stripe/customer-portal                 201 B         102 kB
-├ ƒ /api/stripe/products/init                   201 B         102 kB
-├ ƒ /api/stripe/webhook                         163 B         106 kB
-├ ○ /auth/callback                            1.34 kB         146 kB
-├ ○ /auth/confirm                             2.58 kB         147 kB
-├ ○ /auth/forgot-password                     2.56 kB         112 kB
-├ ○ /auth/login                               3.72 kB         156 kB
-├ ○ /auth/reset-password-confirm              2.91 kB         155 kB
-├ ○ /auth/signup                              3.85 kB         156 kB
-├ ○ /contact                                  2.76 kB         113 kB
-├ ○ /dashboard                                 4.9 kB         153 kB
-├ ○ /dashboard/billing                        36.6 kB         185 kB
-├ ○ /dashboard/billing/new-session            3.05 kB         113 kB
-├ ○ /help                                     1.09 kB         111 kB
-├ ○ /login                                    1.74 kB         147 kB
-├ ƒ /o/[slug]                                 5.04 kB         153 kB
-├ ○ /organizations                            4.13 kB         152 kB
-├ ƒ /organizations/[id]                       7.06 kB         155 kB
-├ ƒ /organizations/[id]/case-studies/new      4.18 kB         155 kB
-├ ƒ /organizations/[id]/faqs/[faqId]          4.07 kB         155 kB
-├ ƒ /organizations/[id]/faqs/new              3.74 kB         154 kB
-├ ƒ /organizations/[id]/services/[serviceId]  4.28 kB         155 kB
-├ ƒ /organizations/[id]/services/new          4.02 kB         155 kB
-├ ○ /organizations/new                        6.38 kB         155 kB
-├ ○ /privacy                                  1.09 kB         111 kB
-├ ○ /robots.txt                                 201 B         102 kB
-├ ○ /search                                   5.27 kB         153 kB
-├ ○ /signup                                   2.07 kB         147 kB
-├ ƒ /sitemap.xml                                201 B         102 kB
-└ ○ /terms                                    1.09 kB         111 kB
-+ First Load JS shared by all                  102 kB
-  ├ chunks/1255-5d20414d214c24ab.js           45.7 kB
-  ├ chunks/4bd1b696-f785427dddbba9fb.js       54.2 kB
-  └ other shared chunks (total)               2.07 kB
+./src/app/api/my/faqs/route.ts:108:9
+Type error: This comparison appears to be unintentional because the types '200 | 10 | 2000' and '-1' have no overlap.
 
-
-○  (Static)   prerendered as static content
-ƒ  (Dynamic)  server-rendered on demand
-
+[0m [90m 106 |[39m     [36mconst[39m planLimits [33m=[39m [33mPLAN_LIMITS[39m[currentPlan [36mas[39m keyof [36mtypeof[39m [33mPLAN_LIMITS[39m] [33m||[39m [33mPLAN_LIMITS[39m[33m.[39mfree[33m;[39m
+ [90m 107 |[39m     
+[31m[1m>[22m[39m[90m 108 |[39m     [36mif[39m (planLimits[33m.[39mfaqs [33m!==[39m [33m-[39m[35m1[39m) {
+ [90m     |[39m         [31m[1m^[22m[39m
+ [90m 109 |[39m       [36mconst[39m { count[33m:[39m currentCount[33m,[39m error[33m:[39m countError } [33m=[39m [36mawait[39m supabase
+ [90m 110 |[39m         [33m.[39m[36mfrom[39m([32m'faqs'[39m)
+ [90m 111 |[39m         [33m.[39mselect([32m'id'[39m[33m,[39m { count[33m:[39m [32m'exact'[39m })[0m
+Next.js build worker exited with code: 1 and signal: null
