@@ -4,6 +4,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { Organization, OrganizationFormData } from '@/types/database';
 
+// エラーログ送信関数（失敗しても無視）
+async function logErrorToDiag(errorInfo: any) {
+  try {
+    await fetch('/api/diag/ui', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'server_error',
+        ...errorInfo
+      }),
+      cache: 'no-store'
+    });
+  } catch {
+    // 診断ログ送信失敗は無視
+  }
+}
+
 export const dynamic = 'force-dynamic';
 
 // GET - ユーザーの企業情報を取得
@@ -45,9 +62,20 @@ export async function GET() {
     return NextResponse.json({ data });
 
   } catch (error) {
-    console.error('API error:', error);
+    const errorId = `get-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.error('[GET /api/my/organization] Unexpected error:', { errorId, error });
+    
+    // エラーログを診断APIに送信
+    logErrorToDiag({
+      errorId,
+      endpoint: 'GET /api/my/organization',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', errorId },
       { status: 500 }
     );
   }
@@ -73,6 +101,15 @@ export async function POST(request: NextRequest) {
     if (!body.name || !body.slug) {
       return NextResponse.json(
         { error: 'Validation error', message: 'Name and slug are required' },
+        { status: 400 }
+      );
+    }
+
+    // slugバリデーション
+    const slugValidation = validateSlug(body.slug);
+    if (!slugValidation.isValid) {
+      return NextResponse.json(
+        { error: 'Validation error', message: slugValidation.error },
         { status: 400 }
       );
     }
@@ -106,7 +143,7 @@ export async function POST(request: NextRequest) {
     }
 
     // データの正規化
-    const normalizedData = normalizeOrganizationData(body);
+    const normalizedData = normalizeOrganizationPayload(body);
 
     // 企業データの作成
     const organizationData: Partial<Organization> = {
@@ -149,9 +186,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ data }, { status: 201 });
 
   } catch (error) {
-    console.error('API error:', error);
+    const errorId = `post-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.error('[POST /api/my/organization] Unexpected error:', { errorId, error });
+    
+    // エラーログを診断APIに送信
+    logErrorToDiag({
+      errorId,
+      endpoint: 'POST /api/my/organization',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', errorId },
       { status: 500 }
     );
   }
@@ -187,6 +235,17 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // slugが変更される場合、バリデーション
+    if (body.slug) {
+      const slugValidation = validateSlug(body.slug);
+      if (!slugValidation.isValid) {
+        return NextResponse.json(
+          { error: 'Validation error', message: slugValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
     // slugが変更される場合、重複チェック
     if (body.slug && body.slug !== existingOrg.slug) {
       const { data: slugCheck } = await supabase
@@ -205,7 +264,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // データの正規化
-    const normalizedData = normalizeOrganizationData(body);
+    const normalizedData = normalizeOrganizationPayload(body);
 
     // 更新データの準備（created_byは変更不可）
     const updateData = {
@@ -241,9 +300,20 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ data });
 
   } catch (error) {
-    console.error('API error:', error);
+    const errorId = `put-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.error('[PUT /api/my/organization] Unexpected error:', { errorId, error });
+    
+    // エラーログを診断APIに送信
+    logErrorToDiag({
+      errorId,
+      endpoint: 'PUT /api/my/organization',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', errorId },
       { status: 500 }
     );
   }
@@ -295,16 +365,57 @@ export async function DELETE() {
     return NextResponse.json({ message: 'Organization deleted successfully' });
 
   } catch (error) {
-    console.error('API error:', error);
+    const errorId = `delete-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.error('[DELETE /api/my/organization] Unexpected error:', { errorId, error });
+    
+    // エラーログを診断APIに送信
+    logErrorToDiag({
+      errorId,
+      endpoint: 'DELETE /api/my/organization',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', errorId },
       { status: 500 }
     );
   }
 }
 
+// slugバリデーション関数
+function validateSlug(slug: string): { isValid: boolean; error?: string } {
+  if (!slug || typeof slug !== 'string') {
+    return { isValid: false, error: 'Slug is required' };
+  }
+  
+  // 空文字チェック
+  if (slug.trim() === '') {
+    return { isValid: false, error: 'Slug cannot be empty' };
+  }
+  
+  // 全角文字チェック
+  if (!/^[a-zA-Z0-9-_]+$/.test(slug)) {
+    return { isValid: false, error: 'Slug must contain only alphanumeric characters, hyphens, and underscores' };
+  }
+  
+  // 長さチェック
+  if (slug.length < 2 || slug.length > 50) {
+    return { isValid: false, error: 'Slug must be between 2 and 50 characters' };
+  }
+  
+  // 予約語チェック
+  const reservedSlugs = ['api', 'admin', 'www', 'mail', 'ftp', 'new', 'edit', 'delete', 'search'];
+  if (reservedSlugs.includes(slug.toLowerCase())) {
+    return { isValid: false, error: 'This slug is reserved and cannot be used' };
+  }
+  
+  return { isValid: true };
+}
+
 // データ正規化ヘルパー関数
-function normalizeOrganizationData(data: any) {
+function normalizeOrganizationPayload(data: any) {
   const normalized = { ...data };
   
   // DATE型フィールド - 空文字をnullに変換
