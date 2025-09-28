@@ -253,7 +253,7 @@ async function validateCoreAPIs(): Promise<ValidationCheck> {
           });
           return { endpoint, status: response.status, ok: response.ok };
         } catch (error) {
-          return { endpoint, status: 0, ok: false, error: error.message };
+          return { endpoint, status: 0, ok: false, error: error instanceof Error ? error.message : 'Unknown error' };
         }
       })
     );
@@ -331,7 +331,7 @@ async function validateExternalServices(): Promise<ValidationCheck> {
       const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
       await stripe.products.list({ limit: 1 });
     } catch (error) {
-      issues.push(`Stripe: ${error.message}`);
+      issues.push(`Stripe: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
     // Resend接続チェック
@@ -340,7 +340,7 @@ async function validateExternalServices(): Promise<ValidationCheck> {
       const resend = new Resend(process.env.RESEND_API_KEY);
       // APIキーの検証（実際にメールは送信しない）
     } catch (error) {
-      issues.push(`Resend: ${error.message}`);
+      issues.push(`Resend: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
     if (issues.length > 0) {
@@ -456,7 +456,7 @@ async function validatePerformanceRequirements(): Promise<ValidationCheck> {
       return {
         name: 'Performance Requirements',
         status: 'fail',
-        message: `Performance test failed: ${error.message}`,
+        message: `Performance test failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         critical: false,
       };
     }
@@ -509,7 +509,7 @@ async function validateJsonLdSystem(): Promise<ValidationCheck> {
       return {
         name: 'JSON-LD System',
         status: 'fail',
-        message: `JSON-LD generation failed: ${error.message}`,
+        message: `JSON-LD generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         critical: false,
       };
     }

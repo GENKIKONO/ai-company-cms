@@ -13,9 +13,6 @@
     "**/*.spec.ts",
     "**/*.spec.tsx",
     "tests/**/*",
-    "**/__tests__/**/*",
-    "src/lib/monitoring/**/*",
-    "src/lib/json-ld/validator.ts",
-    "src/app/api/ops/**/*"
+    "**/__tests__/**/*"
   ]
 }

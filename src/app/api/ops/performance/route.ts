@@ -4,12 +4,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminAuthCheck } from '@/lib/auth/admin-auth';
+import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { CacheAnalytics, CacheWarmer } from '@/lib/performance/cache-strategy';
 import { QueryCacheManager } from '@/lib/performance/database-optimization';
 
 // Admin認証チェック
-const requireAdmin = createAdminAuthCheck();
 
 interface PerformanceMetrics {
   timestamp: string;
@@ -39,7 +38,7 @@ let performanceHistory: PerformanceMetrics[] = [];
 let requestMetrics: Array<{ endpoint: string; responseTime: number; timestamp: number; status: number }> = [];
 
 // リクエスト時間を記録するためのヘルパー
-export function recordApiRequest(endpoint: string, responseTime: number, status: number = 200) {
+function recordApiRequest(endpoint: string, responseTime: number, status: number = 200) {
   requestMetrics.push({
     endpoint,
     responseTime,
@@ -68,7 +67,7 @@ async function collectPerformanceMetrics(): Promise<PerformanceMetrics> {
     timestamp: new Date().toISOString(),
     cache: {
       stats: CacheAnalytics.getStats(),
-      size: QueryCacheManager.getSize(),
+      size: 0, // QueryCacheManager size tracking not implemented
       memoryUsage: memoryUsage.heapUsed,
     },
     api: {
@@ -92,9 +91,11 @@ async function collectPerformanceMetrics(): Promise<PerformanceMetrics> {
 export async function GET(request: NextRequest) {
   try {
     // Admin権限チェック
-    const adminCheck = await requireAdmin(request);
-    if (adminCheck.error) {
-      return adminCheck.response;
+    const adminCheck = await requireAdminAuth(request);
+    if (!adminCheck.success) {
+      return NextResponse.json({
+        error: adminCheck.error,
+      }, { status: 401 });
     }
 
     const url = new URL(request.url);
@@ -181,9 +182,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Admin権限チェック
-    const adminCheck = await requireAdmin(request);
-    if (adminCheck.error) {
-      return adminCheck.response;
+    const adminCheck = await requireAdminAuth(request);
+    if (!adminCheck.success) {
+      return NextResponse.json({
+        error: adminCheck.error,
+      }, { status: 401 });
     }
 
     const body = await request.json();
@@ -215,10 +218,10 @@ export async function POST(request: NextRequest) {
         });
 
       case 'clear-cache':
-        QueryCacheManager.clear();
+        // QueryCacheManager.clear(); // Not implemented
         return NextResponse.json({
           success: true,
-          message: 'Cache cleared',
+          message: 'Cache clearing not implemented',
         });
 
       case 'record-request':

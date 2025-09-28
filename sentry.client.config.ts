@@ -6,19 +6,16 @@ Sentry.init({
   
   // Session Replay
   integrations: [
-    Sentry.replayIntegration({
-      // Capture 10% of all sessions,
-      // plus 100% of sessions with an error
-      sessionSampleRate: 0.1,
-      errorSampleRate: 1.0,
-    }),
+    Sentry.replayIntegration(),
   ],
+  
+  // Replay configuration
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
   
   // Performance Monitoring
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
   
-  // Release Health
-  autoSessionTracking: true,
   
   // Debug
   debug: process.env.NODE_ENV === 'development',

@@ -187,7 +187,7 @@ async function validateHealthAPI() {
       return {
         name: 'Health API',
         status: 'warning',
-        message: `Health API not accessible: ${error.message}`,
+        message: `Health API not accessible: ${error instanceof Error ? error.message : 'Unknown error'}`,
         critical: false,
       };
     }
@@ -240,7 +240,7 @@ async function validateJsonLdSystem() {
       return {
         name: 'JSON-LD System',
         status: 'fail',
-        message: `JSON-LD generation failed: ${error.message}`,
+        message: `JSON-LD generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         critical: false,
       };
     }
@@ -272,7 +272,7 @@ function generateValidationMarkdown(report: any): string {
   return `# System Validation Report
 
 **Generated:** ${new Date(report.timestamp).toLocaleString()}
-**Overall Status:** ${statusEmoji[report.overall_status]} ${report.overall_status.toUpperCase()}
+**Overall Status:** ${statusEmoji[report.overall_status as keyof typeof statusEmoji] || '❓'} ${report.overall_status.toUpperCase()}
 **Deployment Approval:** ${report.deployment_approval ? '✅ APPROVED' : '❌ NOT APPROVED'}
 **Execution Time:** ${report.execution_time}ms
 
@@ -289,8 +289,8 @@ function generateValidationMarkdown(report: any): string {
 
 | Check | Status | Critical | Message |
 |-------|--------|----------|---------|
-${report.checks.map(check => 
-  `| ${check.name} | ${checkEmoji[check.status]} ${check.status} | ${check.critical ? '🔴' : '🟡'} | ${check.message} |`
+${report.checks.map((check: any) => 
+  `| ${check.name} | ${checkEmoji[check.status as keyof typeof checkEmoji] || '❓'} ${check.status} | ${check.critical ? '🔴' : '🟡'} | ${check.message} |`
 ).join('\n')}
 
 ## Deployment Decision
@@ -303,7 +303,7 @@ ${report.deployment_approval ?
 ${report.critical_issues > 0 ? `
 ### Critical Issues to Resolve
 
-${report.checks.filter(c => c.status === 'fail' && c.critical).map(check => 
+${report.checks.filter((c: any) => c.status === 'fail' && c.critical).map((check: any) => 
   `- **${check.name}:** ${check.message}`
 ).join('\n')}
 ` : ''}
@@ -311,7 +311,7 @@ ${report.checks.filter(c => c.status === 'fail' && c.critical).map(check =>
 ${report.warning_issues > 0 ? `
 ### Warnings (Non-blocking)
 
-${report.checks.filter(c => c.status === 'warning' || (c.status === 'fail' && !c.critical)).map(check => 
+${report.checks.filter((c: any) => c.status === 'warning' || (c.status === 'fail' && !c.critical)).map((check: any) => 
   `- **${check.name}:** ${check.message}`
 ).join('\n')}
 ` : ''}
