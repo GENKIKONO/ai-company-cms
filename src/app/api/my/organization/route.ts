@@ -5,6 +5,20 @@ import { supabaseServer } from '@/lib/supabase-server';
 import { env } from '@/lib/env';
 import { z } from 'zod';
 import type { Organization, OrganizationFormData } from '@/types/database';
+import { 
+  organizationCreateSchema, 
+  organizationUpdateSchema,
+  type OrganizationCreate 
+} from '@/lib/schemas/organization';
+import { 
+  ApiError, 
+  ApiErrorCode,
+  createValidationError, 
+  createDatabaseError, 
+  createAuthError, 
+  createForbiddenError,
+  createNotFoundError 
+} from '@/lib/errors/api-error';
 
 // デバッグモード判定関数
 function isDebugMode(request: NextRequest): boolean {
@@ -77,20 +91,10 @@ export async function GET(request: NextRequest) {
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
-      const debugInfo = generateDebugInfo(request, null, null, authError);
-      return NextResponse.json(
-        { 
-          code: 'UNAUTHORIZED', 
-          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server',
-          ...(debugInfo && { debug: debugInfo })
-        },
-        { 
-          status: 401,
-          headers: {
-            'Cache-Control': 'no-store, must-revalidate'
-          }
-        }
+      const apiError = createAuthError(
+        authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
       );
+      return apiError.toResponse(request);
     }
 
     // ユーザーの企業情報を取得（RLSポリシーにより自動的に自分の企業のみ取得）
@@ -174,60 +178,28 @@ export async function POST(request: NextRequest) {
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
-      const debugInfo = generateDebugInfo(request, null, null, authError);
-      return NextResponse.json(
-        { 
-          code: 'UNAUTHORIZED', 
-          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server',
-          ...(debugInfo && { debug: debugInfo })
-        },
-        { 
-          status: 401,
-          headers: {
-            'Cache-Control': 'no-store, must-revalidate'
-          }
-        }
+      const apiError = createAuthError(
+        authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
       );
+      return apiError.toResponse(request);
     }
 
-    body = await request.json();
+    const rawBody = await request.json();
 
-    // Zodバリデーション
-    let validatedData: any;
+    // 統一バリデーション
+    let validatedData: OrganizationCreate;
     try {
-      validatedData = organizationCreateSchema.parse(body);
-      body = validatedData;
+      validatedData = organizationCreateSchema.parse(rawBody);
+      body = validatedData as any; // 既存の型との互換性のため
     } catch (error) {
-      const debugInfo = generateDebugInfo(request, authData.user, body, error);
-      const zodError = error as z.ZodError;
-      return NextResponse.json(
-        { 
-          code: 'VALIDATION_ERROR',
-          reason: 'Invalid input data',
-          details: zodError.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', '),
-          ...(debugInfo && { debug: debugInfo })
-        },
-        { status: 400 }
-      );
+      if (error instanceof z.ZodError) {
+        const apiError = createValidationError(error);
+        return apiError.toResponse(request, authData.user);
+      }
+      throw error;
     }
 
-    // 追加のslugバリデーション（予約語チェック等）
-    const slugValidation = validateSlug(body!.slug);
-    if (!slugValidation.isValid) {
-      const debugInfo = generateDebugInfo(request, authData.user, body, {
-        message: slugValidation.error,
-        code: 'SLUG_VALIDATION_FAILED'
-      });
-      return NextResponse.json(
-        { 
-          code: 'VALIDATION_ERROR',
-          reason: 'Invalid slug format',
-          details: slugValidation.error,
-          ...(debugInfo && { debug: debugInfo })
-        },
-        { status: 400 }
-      );
-    }
+    // slugバリデーションは統一スキーマで処理済み
 
     // 既に企業を持っているかチェック
     const { data: existingOrg } = await supabase
@@ -237,16 +209,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingOrg) {
-      const debugInfo = generateDebugInfo(request, authData.user, body!);
-      return NextResponse.json(
-        { 
-          code: 'UNIQUE_VIOLATION', 
-          reason: 'User already has an organization',
-          details: 'Each user can only create one organization',
-          ...(debugInfo && { debug: debugInfo })
-        },
-        { status: 409 }
+      const apiError = new ApiError(
+        ApiErrorCode.UNIQUE_VIOLATION,
+        'User already has an organization',
+        409,
+        'Each user can only create one organization'
       );
+      return apiError.toResponse(request, authData.user);
     }
 
     // slugの重複チェック
@@ -257,16 +226,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (slugCheck) {
-      const debugInfo = generateDebugInfo(request, authData.user, body!);
-      return NextResponse.json(
-        { 
-          code: 'UNIQUE_VIOLATION', 
-          reason: 'Slug already exists',
-          details: 'Organization slug must be unique across all organizations',
-          ...(debugInfo && { debug: debugInfo })
-        },
-        { status: 409 }
+      const apiError = new ApiError(
+        ApiErrorCode.UNIQUE_VIOLATION,
+        'Slug already exists',
+        409,
+        'Organization slug must be unique across all organizations'
       );
+      return apiError.toResponse(request, authData.user);
     }
 
     // データの正規化
@@ -288,43 +254,10 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Database error:', error);
-      const debugInfo = generateDebugInfo(request, authData.user, body, error);
       
-      // 制約違反の場合
-      if (error.code === '23505') {
-        if (error.message.includes('unique_organizations_created_by')) {
-          return NextResponse.json(
-            { 
-              code: 'UNIQUE_VIOLATION', 
-              reason: 'User already has an organization',
-              details: 'Database constraint: unique_organizations_created_by',
-              ...(debugInfo && { debug: debugInfo })
-            },
-            { status: 409 }
-          );
-        }
-        if (error.message.includes('organizations_slug_key')) {
-          return NextResponse.json(
-            { 
-              code: 'UNIQUE_VIOLATION', 
-              reason: 'Slug already exists',
-              details: 'Database constraint: organizations_slug_key',
-              ...(debugInfo && { debug: debugInfo })
-            },
-            { status: 409 }
-          );
-        }
-      }
-      
-      return NextResponse.json(
-        { 
-          code: 'DATABASE_ERROR',
-          reason: 'Failed to create organization',
-          details: error.message,
-          ...(debugInfo && { debug: debugInfo })
-        },
-        { status: 500 }
-      );
+      // 統一エラーハンドリング
+      const apiError = createDatabaseError(error);
+      return apiError.toResponse(request, authData.user);
     }
 
     const debugInfo = generateDebugInfo(request, authData.user, body);
@@ -613,29 +546,7 @@ function validateSlug(slug: string): { isValid: boolean; error?: string } {
   return { isValid: true };
 }
 
-// Zodバリデーションスキーマ
-const organizationCreateSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255, 'Name too long'),
-  slug: z.string().min(3, 'Slug must be at least 3 characters').max(50, 'Slug too long')
-    .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
-  description: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  legal_form: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  representative_name: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  establishment_date: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  founded: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  address_region: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  address_locality: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  address_postal_code: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  address_street: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  telephone: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  email: z.string().email().nullable().optional().or(z.literal('')).transform(val => val === '' ? null : val),
-  url: z.string().url().nullable().optional().or(z.literal('')).transform(val => val === '' ? null : val),
-  logo_url: z.string().url().optional().or(z.literal('')).transform(val => val === '' ? null : val),
-  capital: z.union([z.number(), z.string()]).optional().transform(val => val === '' ? null : val),
-  employees: z.union([z.number(), z.string()]).optional().transform(val => val === '' ? null : val),
-  meta_title: z.string().nullable().optional().transform(val => val === '' ? null : val),
-  meta_description: z.string().nullable().optional().transform(val => val === '' ? null : val),
-});
+// 統一バリデーションスキーマを使用（既存のローカルスキーマは削除）
 
 // データ正規化ヘルパー関数（強化版）
 function normalizeOrganizationPayload(data: any) {

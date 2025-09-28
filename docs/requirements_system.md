@@ -281,3 +281,68 @@ draft → waiting_approval → published → (paused|archived)
 
 ### paused時のページ仕様
 配信OKだが noindex + noarchive + JSON-LD非出力 + canonicalを自社ドメイン固定
+
+## 体系的リファクタリング計画（基盤強化）
+
+### Phase 1: 基盤強化（最優先・1週間）
+
+#### 統一バリデーション層
+- 全Zodスキーマを `/lib/schemas/` に集約
+- フロント/バックエンドで同一スキーマ使用
+- `zod-to-typescript` で型安全性完全保証
+- `transform(normalizeEmptyToNull)` で null/undefined/空文字統一
+
+#### エラーハンドリング体系統一
+- 本番/開発環境での出力レベル自動分離
+- JSON形式統一: `{ code, reason, details }`
+- ApiError クラスでの統一例外処理
+- Sentryログ集約とSlack通知
+
+#### RLSポリシー完全実装
+- admin/partner/org_owner の権限分離完全対応
+- 監査ログ自動記録（DBトリガー）
+- セキュリティテスト自動化
+- 要件定義準拠の完全なポリシー実装
+
+#### 型安全性完全保証
+- 全APIエンドポイントでの型安全性
+- null/undefined/空文字の完全な型システム統合
+- バリデーション層での型推論活用
+
+### Phase 2: JSON-LD・公開ガード（1週間）
+
+#### JSON-LD検証システム
+- 要件定義準拠: 空値省略、価格未入力時offers非出力
+- スナップショットテスト自動化
+- Rich Results Test API連携
+- 内部検証関数（Preflight用）
+
+#### Publish Gate (Preflight) 実装
+- JSON-LD検証 + Subscription確認 + DNS検証
+- OGP生成 + 画像最適化確認
+- 全PASS時のみ公開ボタン活性化
+- 署名トークン15分有効・ワンタイム
+
+### Phase 3: UI/UX最適化（1週間）
+
+#### デザインシステム構築
+- Tailwindベースのコンポーネントライブラリ
+- 一貫したスタイルガイド
+- アクセシビリティ対応（AA準拠）
+
+#### フォーム体験最適化
+- リアルタイムバリデーション
+- 段階的入力フロー
+- 自動保存機能
+
+### Phase 4: 運用・監視体制（継続）
+
+#### 監視システム完備
+- Sentry + Plausible + Slack通知
+- LCP < 2.5s 監視（要件定義準拠）
+- APIレート制限実装
+
+#### セキュリティ強化
+- 監査ログ90日保存（要件定義準拠）
+- セッション管理最適化
+- CSRF対策完全実装
