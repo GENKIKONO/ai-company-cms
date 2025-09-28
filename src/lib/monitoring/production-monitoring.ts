@@ -186,13 +186,17 @@ export class ProductionMonitor {
       services.map(async (service) => {
         const startTime = Date.now();
         try {
-          const response = await fetch(service.url, { timeout: 5000 });
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          const response = await fetch(service.url, { signal: controller.signal });
+          clearTimeout(timeoutId);
           const responseTime = Date.now() - startTime;
           const data = await response.json();
           
           return {
             service: service.name,
-            status: data.status?.indicator === 'none' ? 'up' : 'degraded',
+            status: (data.status?.indicator === 'none' ? 'up' : 'degraded') as 'up' | 'degraded',
             responseTime,
             lastCheck: new Date().toISOString(),
           };
@@ -278,12 +282,12 @@ export class ProductionMonitor {
         return [];
       }
 
-      const errorTypes = [...new Set(errors.map(e => e.error_type))];
+      const errorTypes = [...new Set(errors.map(e => e.error_type))].filter(Boolean) as string[];
       
       return errorTypes.map(type => {
         const typeErrors = errors.filter(e => e.error_type === type);
         return {
-          type,
+          type: type as string,
           count: typeErrors.length,
           rate: typeErrors.length / 60, // per minute
           lastOccurrence: typeErrors[typeErrors.length - 1]?.created_at || '',
@@ -487,8 +491,8 @@ export class ProductionMonitor {
 
   private async sendSentryAlert(alert: any): Promise<void> {
     // Sentry SDK implementation
-    if (typeof window !== 'undefined' && window.Sentry) {
-      window.Sentry.captureMessage(alert.message, alert.level);
+    if (typeof window !== 'undefined' && (window as any).Sentry) {
+      (window as any).Sentry.captureMessage(alert.message, alert.level);
     }
   }
 }

@@ -71,7 +71,7 @@ export default function OrganizationsPage() {
         org.address_region?.includes(filters.region) ||
         org.address_locality?.includes(filters.region);
 
-      const matchesSize = !filters.size || org.size === filters.size;
+      const matchesSize = !filters.size || org.size === parseInt(filters.size);
 
       const matchesServices = !filters.hasServices || 
         (org.services && Array.isArray(org.services) && org.services.length > 0);
@@ -89,9 +89,9 @@ export default function OrganizationsPage() {
         case 'name':
           return a.name.localeCompare(b.name);
         case 'founded':
-          return (b.founded || 0) - (a.founded || 0);
+          return (parseInt((b.founded as unknown) as string) || 0) - (parseInt((a.founded as unknown) as string) || 0);
         case 'employees':
-          return (b.employees || 0) - (a.employees || 0);
+          return (parseInt((b.employees as unknown) as string) || 0) - (parseInt((a.employees as unknown) as string) || 0);
         case 'services':
           const aServices = Array.isArray(a.services) ? a.services.length : 0;
           const bServices = Array.isArray(b.services) ? b.services.length : 0;

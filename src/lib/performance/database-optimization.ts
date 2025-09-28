@@ -297,8 +297,8 @@ export class OptimizedQueryBuilder {
       results[result.type] = result.data || [];
     });
 
-    this.logQueryPerformance('search_optimized', startTime, 
-      Object.values(results).reduce((acc: number, arr: any) => acc + arr.length, 0));
+    const totalResults = Object.values(results).reduce((acc: number, arr: any) => acc + (arr?.length || 0), 0) as number;
+    this.logQueryPerformance('search_optimized', startTime, totalResults);
 
     return results;
   }

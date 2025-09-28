@@ -99,6 +99,7 @@ export async function GET(request: NextRequest) {
       name: 'process_uptime',
       status: 'healthy', // プロセス稼働時間は通常問題なし
       value: uptimeHours,
+      threshold: { warning: 168, critical: 720 }, // 1週間で警告、1ヶ月で要再起動
       unit: 'hours',
       message: `プロセス稼働時間: ${uptimeHours.toFixed(1)}時間`
     });
@@ -115,9 +116,15 @@ export async function GET(request: NextRequest) {
     };
 
     const essentialEnvMissing = !Object.values(envCheck.essential).every(Boolean);
+    const essentialEnvCount = Object.values(envCheck.essential).filter(Boolean).length;
+    const totalEssentialEnv = Object.keys(envCheck.essential).length;
+    
     healthChecks.push({
       name: 'environment_config',
       status: essentialEnvMissing ? 'critical' : 'healthy',
+      value: essentialEnvCount,
+      threshold: { warning: totalEssentialEnv - 1, critical: totalEssentialEnv },
+      unit: 'vars',
       message: essentialEnvMissing ? '必須環境変数が不足しています' : '環境設定は正常です'
     });
 
