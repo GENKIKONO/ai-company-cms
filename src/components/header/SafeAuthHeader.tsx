@@ -3,6 +3,7 @@ import FallbackHeader from './FallbackHeader';
 import Link from 'next/link';
 import SignoutButton from '@/components/auth/SignoutButton';
 import UserAvatarMenu from './UserAvatarMenu';
+import SmoothScrollLink from '@/components/ui/SmoothScrollLink';
 
 export default async function SafeAuthHeader() {
   try {
@@ -55,16 +56,12 @@ export default async function SafeAuthHeader() {
               
               {/* 全ユーザー向けナビゲーション表示 */}
               <nav className="ml-10 hidden md:flex space-x-8">
-                <Link 
+                <SmoothScrollLink 
                   href="#service-flow" 
                   className="text-gray-500 hover:text-gray-700"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('service-flow')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
                 >
                   サービスの流れ
-                </Link>
+                </SmoothScrollLink>
                 {isAuthenticated && (
                   <>
                     <Link 
