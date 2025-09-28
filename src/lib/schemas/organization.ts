@@ -49,7 +49,9 @@ export const organizationCreateSchema = z.object({
   establishment_date: optionalString(), // DATE型への変換はAPI側で処理
   founded: optionalString(), // DATE型への変換はAPI側で処理
   address_postal_code: postalCodeField(),
+  postal_code: optionalString(), // フロントエンドとの互換性のため
   address_street: optionalString(),
+  street_address: optionalString(), // フロントエンドとの互換性のため
   address_country: optionalString(), // 要件定義準拠: "JP"
   email: emailField(),
   logo_url: urlField(),
@@ -60,10 +62,27 @@ export const organizationCreateSchema = z.object({
   meta_title: optionalString(),
   meta_description: optionalString(),
   
+  // ブランド・デザイン設定
+  favicon_url: optionalString(),
+  brand_color_primary: optionalString(),
+  brand_color_secondary: optionalString(),
+  
   // JSON配列フィールド
   industries: jsonArrayField<string>(),
   same_as: jsonArrayField<string>(), // SNSリンク等
   area_served: jsonArrayField<string>(), // サービス提供地域
+  
+  // 拡張フィールド（I1）
+  social_media: z.record(z.string()).optional(),
+  business_hours: jsonArrayField<any>(),
+  timezone: optionalString(),
+  languages_supported: jsonArrayField<string>(),
+  certifications: jsonArrayField<string>(),
+  awards: jsonArrayField<string>(),
+  company_culture: optionalString(),
+  mission_statement: optionalString(),
+  vision_statement: optionalString(),
+  values: jsonArrayField<string>(),
   
   // 公開設定
   email_public: z.boolean().optional(),
