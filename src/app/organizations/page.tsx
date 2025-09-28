@@ -132,18 +132,18 @@ export default function OrganizationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="page-container">
+      <main className="content-wrapper py-8">
         {/* ページタイトル */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">企業ディレクトリ</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="text-heading-2 text-gray-900 dark:text-gray-100 mb-2">企業ディレクトリ</h1>
+          <p className="text-body-large text-gray-600 dark:text-gray-300">
             AIO Hubに登録された{organizations.length}社の企業情報を検索・閲覧できます
           </p>
         </div>
 
         {/* 検索・フィルター */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="card card-padding mb-6">
           {/* 検索ボックス */}
           <div className="mb-6">
             <div className="relative">
@@ -369,7 +369,7 @@ export default function OrganizationsPage() {
               <Link
                 key={org.id}
                 href={`/o/${org.slug}`}
-                className="group bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-xl hover:border-blue-300 transition-all duration-300 transform hover:-translate-y-1"
+                className="group card card-padding hover-lift focus-ring"
               >
                 <div className="flex items-center mb-4">
                   {org.logo_url ? (

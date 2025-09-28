@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 統一デザインシステム */
+@import '../styles/design-tokens.css';
+
 /* Line clamp utilities */
 .line-clamp-2 {
   overflow: hidden;

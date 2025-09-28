@@ -301,7 +301,7 @@ export default function NewOrganizationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="page-container flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
@@ -338,10 +338,10 @@ export default function NewOrganizationPage() {
         </div>
 
         {/* フォーム */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <form onSubmit={handleSubmit} className="card">
           {/* 基本情報 */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">基本情報</h2>
+          <div className="card-padding card-header">
+            <h2 className="text-heading-4 text-gray-900 dark:text-gray-100">基本情報</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -877,14 +877,14 @@ export default function NewOrganizationPage() {
             <div className="flex justify-end space-x-3">
               <Link
                 href="/dashboard"
-                className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="btn-secondary"
               >
                 キャンセル
               </Link>
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary"
               >
                 {submitting ? '作成中...' : '企業を作成'}
               </button>
