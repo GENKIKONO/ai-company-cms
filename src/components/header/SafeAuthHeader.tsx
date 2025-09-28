@@ -53,23 +53,35 @@ export default async function SafeAuthHeader() {
                 AIO Hub AI企業CMS
               </Link>
               
-              {/* 認証済みのみナビゲーション表示 */}
-              {isAuthenticated && (
-                <nav className="ml-10 hidden md:flex space-x-8">
-                  <Link 
-                    href="/dashboard" 
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    ダッシュボード
-                  </Link>
-                  <Link 
-                    href="/dashboard/billing" 
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    サブスクリプション
-                  </Link>
-                </nav>
-              )}
+              {/* 全ユーザー向けナビゲーション表示 */}
+              <nav className="ml-10 hidden md:flex space-x-8">
+                <Link 
+                  href="#service-flow" 
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('service-flow')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  サービスの流れ
+                </Link>
+                {isAuthenticated && (
+                  <>
+                    <Link 
+                      href="/dashboard" 
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      ダッシュボード
+                    </Link>
+                    <Link 
+                      href="/dashboard/services-info" 
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      サービス紹介
+                    </Link>
+                  </>
+                )}
+              </nav>
             </div>
             
             <div className="flex items-center space-x-4">

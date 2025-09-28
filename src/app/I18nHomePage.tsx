@@ -293,8 +293,83 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </section>
 
+        {/* サービスの流れ */}
+        <section id="service-flow" className="py-20 bg-white dark:bg-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                サービスの流れ
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300">
+                簡単3ステップで始められます
+              </p>
+            </div>
+
+            <div className="relative">
+              {/* 接続線 */}
+              <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-200 via-green-200 to-purple-200 transform -translate-y-1/2 z-0"></div>
+              
+              <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* ステップ1: アカウント作成 */}
+                <div className="text-center group">
+                  <div className="relative mx-auto w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-2xl font-bold text-white">1</span>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-200 rounded-full animate-ping"></div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    アカウント作成
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                    メールアドレスとパスワードで簡単にアカウントを作成。無料で始められます。
+                  </p>
+                </div>
+
+                {/* ステップ2: 企業情報登録 */}
+                <div className="text-center group">
+                  <div className="relative mx-auto w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-2xl font-bold text-white">2</span>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-200 rounded-full animate-ping animation-delay-2000"></div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    企業情報登録
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                    企業の基本情報を入力。必要最小限の項目のみで素早く登録完了。
+                  </p>
+                </div>
+
+                {/* ステップ3: コンテンツ管理開始 */}
+                <div className="text-center group">
+                  <div className="relative mx-auto w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-2xl font-bold text-white">3</span>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-200 rounded-full animate-ping animation-delay-4000"></div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    コンテンツ管理開始
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                    サービス情報や導入事例を追加して、効果的な企業PRを開始できます。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 追加情報 */}
+            <div className="mt-16 text-center">
+              <div className="inline-flex items-center bg-blue-50 dark:bg-blue-900 rounded-full px-6 py-3">
+                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="text-blue-600 dark:text-blue-400 font-medium">
+                  約5分で完了 • クレジットカード不要 • いつでも無料
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* 代表メッセージ */}
-        <section className="py-20 bg-white dark:bg-gray-800">
+        <section className="py-20 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">
               {t('pages.home.message.title')}
