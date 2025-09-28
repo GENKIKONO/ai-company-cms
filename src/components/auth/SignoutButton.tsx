@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 
 interface SignoutButtonProps {
   className?: string;
+  children?: React.ReactNode;
+  onClick?: () => void;
 }
 
-export default function SignoutButton({ className }: SignoutButtonProps) {
+export default function SignoutButton({ className, children, onClick }: SignoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -22,6 +24,9 @@ export default function SignoutButton({ className }: SignoutButtonProps) {
       });
 
       if (response.ok) {
+        // カスタムonClickハンドラがあれば実行
+        if (onClick) onClick();
+        
         // 303リダイレクトの場合、手動でホームに移動
         router.push('/');
         router.refresh(); // Server Componentを更新
@@ -43,7 +48,7 @@ export default function SignoutButton({ className }: SignoutButtonProps) {
       disabled={isLoading}
       className={className}
     >
-      {isLoading ? 'ログアウト中...' : 'ログアウト'}
+      {children || (isLoading ? 'ログアウト中...' : 'ログアウト')}
     </button>
   );
 }

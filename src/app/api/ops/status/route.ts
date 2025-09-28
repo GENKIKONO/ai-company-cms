@@ -10,15 +10,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { cookies } from 'next/headers';
+import { env, getCookieDomain } from '@/lib/env';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // 管理者チェック
 function isAdmin(userEmail?: string): boolean {
-  const adminEmail = process.env.ADMIN_EMAIL;
-  if (!adminEmail || !userEmail) return false;
-  return userEmail.toLowerCase().trim() === adminEmail.toLowerCase().trim();
+  if (!env.ADMIN_EMAIL || !userEmail) return false;
+  return userEmail.toLowerCase().trim() === env.ADMIN_EMAIL;
 }
 
 // メールマスク化
@@ -28,20 +28,6 @@ function maskEmail(email?: string): string {
   return email.charAt(0) + '*'.repeat(email.length - 1);
 }
 
-// ドメイン抽出
-function extractDomain(request: NextRequest): string {
-  const cookieDomain = process.env.COOKIE_DOMAIN || process.env.SUPABASE_COOKIE_DOMAIN;
-  if (cookieDomain) return cookieDomain;
-  
-  const host = request.headers.get('host') || '';
-  if (host.includes('.')) {
-    const parts = host.split('.');
-    if (parts.length >= 2) {
-      return `.${parts.slice(-2).join('.')}`;
-    }
-  }
-  return host;
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -70,18 +56,20 @@ export async function GET(request: NextRequest) {
     const hasOpsCookie = opsAdminCookie?.value === '1';
 
     // 環境変数確認（値は返さない、長さのみ）
-    const adminEmailEnv = process.env.ADMIN_EMAIL;
-    const opsPasswordEnv = process.env.ADMIN_OPS_PASSWORD;
-    const appUrlEnv = process.env.NEXT_PUBLIC_APP_URL;
-
-    const hasAdminEmailEnv = !!adminEmailEnv && adminEmailEnv.trim() !== '';
-    const hasOpsPasswordEnv = !!opsPasswordEnv && opsPasswordEnv.trim() !== '';
-    const opsPasswordLength = opsPasswordEnv ? opsPasswordEnv.trim().length : 0;
+    const hasAdminEmailEnv = !!env.ADMIN_EMAIL;
+    const hasOpsPasswordEnv = !!env.ADMIN_OPS_PASSWORD;
+    const opsPasswordLength = env.ADMIN_OPS_PASSWORD.length;
     const opsPasswordLengthValid = opsPasswordLength >= 20;
-    const hasValidAppUrl = appUrlEnv === 'https://aiohub.jp';
+    const hasValidAppUrl = env.APP_URL === 'https://aiohub.jp';
+    
+    // Whitespace チェック
+    const rawAppUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+    const rawCookieDomain = process.env.SUPABASE_COOKIE_DOMAIN || process.env.COOKIE_DOMAIN || '';
+    const appUrlTrailingWhitespace = rawAppUrl !== rawAppUrl.trim();
+    const cookieDomainTrailingWhitespace = rawCookieDomain !== rawCookieDomain.trim();
 
     // ドメイン情報
-    const domainUsed = extractDomain(request);
+    const domainUsed = getCookieDomain(request);
     const rawHost = request.headers.get('host') || '';
 
     // 診断結果を返す（値は漏らさない）
@@ -96,7 +84,9 @@ export async function GET(request: NextRequest) {
         opsPasswordLength,
         opsPasswordLengthValid,
         hasValidAppUrl,
-        appUrl: appUrlEnv
+        appUrl: env.APP_URL,
+        appUrlTrailingWhitespace,
+        cookieDomainTrailingWhitespace
       },
       cookie: {
         domainUsed,

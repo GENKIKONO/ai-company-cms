@@ -6,6 +6,7 @@
  * - ホームページへリダイレクト
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { getCookieDomain } from '@/lib/env';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,24 +27,9 @@ export async function GET(request: NextRequest) {
   );
 }
 
-// ドメイン抽出（login と同一の設定）
-function extractDomain(request: NextRequest): string {
-  const cookieDomain = process.env.COOKIE_DOMAIN || process.env.SUPABASE_COOKIE_DOMAIN;
-  if (cookieDomain) return cookieDomain;
-  
-  const host = request.headers.get('host') || '';
-  if (host.includes('.')) {
-    const parts = host.split('.');
-    if (parts.length >= 2) {
-      return `.${parts.slice(-2).join('.')}`;
-    }
-  }
-  return host;
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const domain = extractDomain(request);
+    const domain = getCookieDomain(request);
 
     // ホームページへ303リダイレクト
     const response = NextResponse.redirect(

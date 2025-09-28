@@ -2,6 +2,8 @@
 // 各ユーザーが自分の企業情報を管理するためのAPI
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { env } from '@/lib/env';
+import { z } from 'zod';
 import type { Organization, OrganizationFormData } from '@/types/database';
 
 // デバッグモード判定関数
@@ -11,7 +13,7 @@ function isDebugMode(request: NextRequest): boolean {
 
 // 管理者チェック関数
 function isAdmin(userEmail?: string): boolean {
-  return userEmail === process.env.ADMIN_EMAIL;
+  return userEmail?.toLowerCase().trim() === env.ADMIN_EMAIL;
 }
 
 // デバッグ情報生成関数（管理者かつデバッグモードのみ）
@@ -190,22 +192,27 @@ export async function POST(request: NextRequest) {
 
     body = await request.json();
 
-    // 必須フィールドの検証
-    if (!body || !body.name || !body.slug) {
-      const debugInfo = generateDebugInfo(request, authData.user, body);
+    // Zodバリデーション
+    let validatedData: any;
+    try {
+      validatedData = organizationCreateSchema.parse(body);
+      body = validatedData;
+    } catch (error) {
+      const debugInfo = generateDebugInfo(request, authData.user, body, error);
+      const zodError = error as z.ZodError;
       return NextResponse.json(
         { 
           code: 'VALIDATION_ERROR',
-          reason: 'Name and slug are required',
-          details: 'Missing required fields',
+          reason: 'Invalid input data',
+          details: zodError.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', '),
           ...(debugInfo && { debug: debugInfo })
         },
         { status: 400 }
       );
     }
 
-    // slugバリデーション
-    const slugValidation = validateSlug(body.slug);
+    // 追加のslugバリデーション（予約語チェック等）
+    const slugValidation = validateSlug(body!.slug);
     if (!slugValidation.isValid) {
       const debugInfo = generateDebugInfo(request, authData.user, body, {
         message: slugValidation.error,
@@ -230,7 +237,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingOrg) {
-      const debugInfo = generateDebugInfo(request, authData.user, body);
+      const debugInfo = generateDebugInfo(request, authData.user, body!);
       return NextResponse.json(
         { 
           code: 'UNIQUE_VIOLATION', 
@@ -246,11 +253,11 @@ export async function POST(request: NextRequest) {
     const { data: slugCheck } = await supabase
       .from('organizations')
       .select('id')
-      .eq('slug', body.slug)
+      .eq('slug', body!.slug)
       .single();
 
     if (slugCheck) {
-      const debugInfo = generateDebugInfo(request, authData.user, body);
+      const debugInfo = generateDebugInfo(request, authData.user, body!);
       return NextResponse.json(
         { 
           code: 'UNIQUE_VIOLATION', 
@@ -323,7 +330,12 @@ export async function POST(request: NextRequest) {
     const debugInfo = generateDebugInfo(request, authData.user, body);
     return NextResponse.json(
       { 
-        data,
+        data: {
+          id: data.id,
+          name: data.name,
+          slug: data.slug
+        },
+        message: 'created',
         ...(debugInfo && { debug: debugInfo })
       }, 
       { 
@@ -601,14 +613,38 @@ function validateSlug(slug: string): { isValid: boolean; error?: string } {
   return { isValid: true };
 }
 
-// データ正規化ヘルパー関数
+// Zodバリデーションスキーマ
+const organizationCreateSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(255, 'Name too long'),
+  slug: z.string().min(3, 'Slug must be at least 3 characters').max(50, 'Slug too long')
+    .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
+  description: z.string().optional(),
+  legal_form: z.string().optional(),
+  representative_name: z.string().optional(),
+  establishment_date: z.string().optional(),
+  founded: z.string().optional(),
+  address_region: z.string().optional(),
+  address_locality: z.string().optional(),
+  address_postal_code: z.string().optional(),
+  address_street: z.string().optional(),
+  telephone: z.string().optional(),
+  email: z.string().email().optional().or(z.literal('')),
+  url: z.string().url().optional().or(z.literal('')),
+  logo_url: z.string().url().optional().or(z.literal('')),
+  capital: z.union([z.number(), z.string()]).optional(),
+  employees: z.union([z.number(), z.string()]).optional(),
+  meta_title: z.string().optional(),
+  meta_description: z.string().optional(),
+});
+
+// データ正規化ヘルパー関数（強化版）
 function normalizeOrganizationPayload(data: any) {
   const normalized = { ...data };
   
-  // DATE型フィールド - 空文字をnullに変換
-  const dateFields = ['founded'];
+  // DATE型フィールド - 空文字・空白をnullに変換
+  const dateFields = ['establishment_date', 'founded'];
   
-  // オプショナルテキストフィールド - 空文字をnullに変換
+  // オプショナルテキストフィールド - 空文字・空白をnullに変換
   const optionalTextFields = [
     'description', 'legal_form', 'representative_name',
     'address_region', 'address_locality', 'address_postal_code', 'address_street',
@@ -617,21 +653,56 @@ function normalizeOrganizationPayload(data: any) {
   
   // 日付フィールドの正規化
   dateFields.forEach(field => {
-    if (normalized[field] === '') {
+    if (normalized[field] === '' || normalized[field] === null || 
+        (typeof normalized[field] === 'string' && normalized[field].trim() === '')) {
       normalized[field] = null;
     }
   });
   
   // オプショナルテキストフィールドの正規化
   optionalTextFields.forEach(field => {
-    if (normalized[field] === '') {
+    const value = normalized[field];
+    if (value === '' || value === null || value === undefined ||
+        (typeof value === 'string' && value.trim() === '')) {
       normalized[field] = null;
+    } else if (typeof value === 'string') {
+      normalized[field] = value.trim();
     }
   });
   
   // 数値フィールドの正規化
-  if (normalized.capital === '') normalized.capital = null;
-  if (normalized.employees === '') normalized.employees = null;
+  ['capital', 'employees'].forEach(field => {
+    const value = normalized[field];
+    if (value === '' || value === null || value === undefined ||
+        (typeof value === 'string' && value.trim() === '')) {
+      normalized[field] = null;
+    } else if (typeof value === 'string') {
+      const numValue = parseInt(value.trim(), 10);
+      normalized[field] = isNaN(numValue) ? null : numValue;
+    }
+  });
+  
+  // URL フィールドの特別処理
+  ['url', 'logo_url'].forEach(field => {
+    const value = normalized[field];
+    if (value && typeof value === 'string' && value.trim() !== '') {
+      const trimmed = value.trim();
+      // 簡単なURL検証（http/httpsで始まる）
+      if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+        normalized[field] = `https://${trimmed}`;
+      }
+    }
+  });
+  
+  // Email フィールドの特別処理
+  if (normalized.email && typeof normalized.email === 'string') {
+    const emailTrimmed = normalized.email.trim().toLowerCase();
+    if (!emailTrimmed.includes('@')) {
+      normalized.email = null; // 無効なemailは削除
+    } else {
+      normalized.email = emailTrimmed;
+    }
+  }
   
   return normalized;
 }

@@ -15,6 +15,8 @@ interface StatusData {
     opsPasswordLengthValid: boolean;
     hasValidAppUrl: boolean;
     appUrl: string;
+    appUrlTrailingWhitespace?: boolean;
+    cookieDomainTrailingWhitespace?: boolean;
   };
   cookie: {
     domainUsed: string;
@@ -260,6 +262,35 @@ export default async function OpsProbe() {
               </div>
             </div>
           </div>
+
+          {/* 推奨アクション */}
+          {!allGreen && (
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                🔧 推奨アクション
+              </h3>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="text-sm text-yellow-800 space-y-2">
+                  <p className="font-medium">環境変数の再設定が必要です：</p>
+                  <div className="pl-4 space-y-1">
+                    {!status.env.hasAdminEmailEnv && (
+                      <div>• <code>npx vercel env add ADMIN_EMAIL production</code></div>
+                    )}
+                    {!status.env.opsPasswordLengthValid && (
+                      <div>• <code>npx vercel env add ADMIN_OPS_PASSWORD production</code> (20文字以上)</div>
+                    )}
+                    {!status.env.hasValidAppUrl && (
+                      <div>• <code>npx vercel env add NEXT_PUBLIC_APP_URL production</code> (値: https://aiohub.jp)</div>
+                    )}
+                    {(status.env.appUrlTrailingWhitespace || status.env.cookieDomainTrailingWhitespace) && (
+                      <div>• 環境変数の前後の空白を削除してください</div>
+                    )}
+                  </div>
+                  <p className="text-xs mt-2">設定後: <code>npx vercel deploy --prod --yes</code></p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ナビゲーション */}
           <div className="mt-8 pt-6 border-t border-gray-200">

@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { supabaseServer } from '@/lib/supabase-server';
+import { env } from '@/lib/env';
 
 export interface OpsGuardResult {
   isAuthorized: boolean;
@@ -22,9 +23,8 @@ export interface OpsGuardResult {
  * 管理者チェック（小文字・trim対応）
  */
 function isAdmin(userEmail?: string): boolean {
-  const adminEmail = process.env.ADMIN_EMAIL;
-  if (!adminEmail || !userEmail) return false;
-  return userEmail.toLowerCase().trim() === adminEmail.toLowerCase().trim();
+  if (!env.ADMIN_EMAIL || !userEmail) return false;
+  return userEmail.toLowerCase().trim() === env.ADMIN_EMAIL;
 }
 
 /**
@@ -138,7 +138,7 @@ export async function getOpsAdminStatus() {
       },
       adminCheck: {
         isAdminEmail: isAdmin(user?.email),
-        configuredAdminEmail: process.env.ADMIN_EMAIL ? '***configured***' : null
+        configuredAdminEmail: env.ADMIN_EMAIL ? '***configured***' : null
       },
       opsAdmin: {
         hasCookie: !!opsAdminCookie,

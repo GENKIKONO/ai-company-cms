@@ -46,6 +46,7 @@ export default function OpsLoginForm() {
             setError('パスフレーズを入力してください');
             break;
           case 'NOT_ADMIN':
+          case 'ADMIN_EMAIL_MISMATCH':
             setError('管理者アカウントではありません');
             break;
           case 'MISSING_SESSION':

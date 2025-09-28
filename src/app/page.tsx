@@ -1,11 +1,55 @@
 import Link from 'next/link';
+import { supabaseServer } from '@/lib/supabase-server';
 
 // 認証状態を毎回評価するため動的SSRに設定
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 
-export default function HomePage() {
+// サイト設定の型定義
+interface SiteSettings {
+  hero_title: string;
+  hero_subtitle: string;
+  representative_message: string;
+  footer_links: Array<{
+    label: string;
+    url: string;
+    order?: number;
+  }>;
+}
+
+// デフォルト設定
+const defaultSettings: SiteSettings = {
+  hero_title: 'AIO Hub AI企業CMS',
+  hero_subtitle: 'AI技術を活用した企業情報の統合管理プラットフォーム',
+  representative_message: '私たちは、AI技術を通じて企業の情報発信を支援し、より良いビジネス成果の実現をお手伝いします。',
+  footer_links: []
+};
+
+export default async function HomePage() {
+  // サイト設定を取得
+  let siteSettings = defaultSettings;
+  
+  try {
+    const supabase = await supabaseServer();
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('*')
+      .single();
+    
+    if (data && !error) {
+      siteSettings = {
+        hero_title: data.hero_title || defaultSettings.hero_title,
+        hero_subtitle: data.hero_subtitle || defaultSettings.hero_subtitle,
+        representative_message: data.representative_message || defaultSettings.representative_message,
+        footer_links: data.footer_links || defaultSettings.footer_links
+      };
+    }
+  } catch (e) {
+    console.error('Failed to load site settings:', e);
+    // エラー時はデフォルト設定を使用
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
 
@@ -16,12 +60,10 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-                企業情報を
-                <span className="text-blue-600">スマートに管理</span>
+                {siteSettings.hero_title}
               </h1>
               <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                AIO Hub AI企業CMSで、企業情報・サービス・導入事例を効率的に管理。
-                検索機能やデータ分析で、ビジネスの成長をサポートします。
+                {siteSettings.hero_subtitle}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/auth/signup" className="px-8 py-3 bg-blue-600 text-white text-lg rounded-lg hover:bg-blue-700 text-center">
@@ -122,6 +164,18 @@ export default function HomePage() {
                 <div className="text-4xl font-bold text-orange-600 mb-2">50+</div>
                 <div className="text-gray-600">業界カテゴリ</div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 代表メッセージ */}
+        <section className="py-20 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
+              代表メッセージ
+            </h2>
+            <div className="text-lg text-gray-700 leading-relaxed">
+              {siteSettings.representative_message}
             </div>
           </div>
         </section>

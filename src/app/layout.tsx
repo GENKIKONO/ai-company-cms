@@ -1,6 +1,7 @@
 import './globals.css'
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 import { ToastProvider } from '@/components/ui/toast'
+import BuildBanner from '@/components/BuildBanner'
 
 // SSRで常に正しい認証UIが出るように
 export const dynamic = 'force-dynamic';
@@ -17,23 +18,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const buildInfo = `commit:${process.env.VERCEL_GIT_COMMIT_SHA ?? 'local'} / deploy:${process.env.VERCEL_DEPLOYMENT_ID ?? 'dev'}`;
-  
   return (
     <html lang="ja">
       <body>
         <ToastProvider>
+          <BuildBanner 
+            commit={process.env.VERCEL_GIT_COMMIT_SHA}
+            deployUrl={process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined}
+            environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
+          />
           <SafeAuthHeader />
-          
-          {/* ビルド情報バッジ - 本番とソースの乖離可視化用 */}
-          <div 
-            data-testid="build-badge"
-            className="fixed top-2 right-2 z-40 px-2 py-1 bg-gray-800 text-white text-xs font-mono rounded shadow-lg opacity-75 hover:opacity-100 transition-opacity"
-            style={{ fontSize: '10px', lineHeight: '12px' }}
-          >
-            {buildInfo}
-          </div>
-          
           {children}
         </ToastProvider>
       </body>

@@ -2,6 +2,7 @@
 import FallbackHeader from './FallbackHeader';
 import Link from 'next/link';
 import SignoutButton from '@/components/auth/SignoutButton';
+import UserAvatarMenu from './UserAvatarMenu';
 
 export default async function SafeAuthHeader() {
   try {
@@ -11,18 +12,48 @@ export default async function SafeAuthHeader() {
     const { data: { user }, error } = await supabase.auth.getUser();
     
     const isAuthenticated = !error && !!user;
+    
+    // 企業の存在確認（認証済みの場合のみ）
+    let hasOrganization = false;
+    if (isAuthenticated) {
+      try {
+        const { data: orgData } = await supabase
+          .from('organizations')
+          .select('id')
+          .eq('created_by', user!.id)
+          .single();
+        hasOrganization = !!orgData;
+      } catch {
+        // 企業確認エラーは無視（安全なデフォルト）
+        hasOrganization = false;
+      }
+    }
+
+    // CTAのリンク先決定
+    const getCtaHref = () => {
+      if (!isAuthenticated) return '/auth/login';
+      return hasOrganization ? '/dashboard' : '/organizations/new';
+    };
+
+    const getCtaText = () => {
+      if (!isAuthenticated) return '無料で始める';
+      return hasOrganization ? 'ダッシュボード' : '企業を作成';
+    };
 
     return (
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
+              {/* ロゴは常に / に遷移 */}
               <Link 
-                href={isAuthenticated ? "/dashboard" : "/"} 
+                href="/" 
                 className="text-2xl font-bold text-gray-900 hover:text-blue-600"
               >
                 AIO Hub AI企業CMS
               </Link>
+              
+              {/* 認証済みのみナビゲーション表示 */}
               {isAuthenticated && (
                 <nav className="ml-10 hidden md:flex space-x-8">
                   <Link 
@@ -44,12 +75,23 @@ export default async function SafeAuthHeader() {
             <div className="flex items-center space-x-4">
               {isAuthenticated ? (
                 <>
-                  <div className="text-sm text-gray-700">
+                  {/* デスクトップ: メール表示、モバイル: 非表示 */}
+                  <div className="hidden sm:block text-sm text-gray-700 max-w-[200px] truncate">
                     こんにちは、{user?.user_metadata?.full_name || user?.email}さん
                   </div>
-                  <SignoutButton
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
-                  />
+                  
+                  {/* モバイル: Avatarメニュー、デスクトップ: サインアウトボタン */}
+                  <div className="sm:hidden">
+                    <UserAvatarMenu 
+                      user={user} 
+                      hasOrganization={hasOrganization}
+                    />
+                  </div>
+                  <div className="hidden sm:block">
+                    <SignoutButton
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
+                    />
+                  </div>
                 </>
               ) : (
                 <>
@@ -60,10 +102,10 @@ export default async function SafeAuthHeader() {
                     ログイン
                   </Link>
                   <Link
-                    href="/auth/signup"
+                    href={getCtaHref()}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
                   >
-                    新規登録
+                    {getCtaText()}
                   </Link>
                 </>
               )}

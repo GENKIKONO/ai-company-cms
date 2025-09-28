@@ -10,31 +10,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { timingSafeEqual } from 'crypto';
+import { env, getCookieDomain } from '@/lib/env';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// ドメイン抽出ヘルパー
-function extractDomain(request: NextRequest): string {
-  const cookieDomain = process.env.COOKIE_DOMAIN || process.env.SUPABASE_COOKIE_DOMAIN;
-  if (cookieDomain) return cookieDomain;
-  
-  const host = request.headers.get('host') || '';
-  // aiohub.jp のようなeTLD+1を抽出
-  if (host.includes('.')) {
-    const parts = host.split('.');
-    if (parts.length >= 2) {
-      return `.${parts.slice(-2).join('.')}`;
-    }
-  }
-  return host;
-}
-
 // 管理者チェック
 function isAdmin(userEmail?: string): boolean {
-  const adminEmail = process.env.ADMIN_EMAIL;
-  if (!adminEmail || !userEmail) return false;
-  return userEmail.toLowerCase().trim() === adminEmail.toLowerCase().trim();
+  if (!env.ADMIN_EMAIL || !userEmail) return false;
+  return userEmail.toLowerCase().trim() === env.ADMIN_EMAIL;
 }
 
 // GETアクセス時は405を返す
@@ -84,21 +68,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 環境変数検証
-    const adminOpsPassword = process.env.ADMIN_OPS_PASSWORD;
-    if (!adminOpsPassword) {
+    if (!env.ADMIN_OPS_PASSWORD) {
       console.error('[OPS_LOGIN] ADMIN_OPS_PASSWORD not configured');
-      return NextResponse.json(
-        {
-          code: 'OPS_PASSWORD_NOT_SET',
-          reason: 'Server configuration error'
-        },
-        { status: 500 }
-      );
-    }
-
-    const trimmedExpected = adminOpsPassword.trim();
-    if (trimmedExpected === '') {
-      console.error('[OPS_LOGIN] ADMIN_OPS_PASSWORD is empty');
       return NextResponse.json(
         {
           code: 'OPS_PASSWORD_NOT_SET',
@@ -128,7 +99,7 @@ export async function POST(request: NextRequest) {
       console.error('[OPS_LOGIN] Not admin user:', user.email);
       return NextResponse.json(
         {
-          code: 'NOT_ADMIN',
+          code: 'ADMIN_EMAIL_MISMATCH',
           reason: 'Admin access required'
         },
         { status: 401 }
@@ -137,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     // パスフレーズ検証（タイミング攻撃対策）
     const inputBuffer = Buffer.from(trimmedPassphrase, 'utf8');
-    const expectedBuffer = Buffer.from(trimmedExpected, 'utf8');
+    const expectedBuffer = Buffer.from(env.ADMIN_OPS_PASSWORD, 'utf8');
 
     // 長さ不一致チェック（timingSafeEqual前の事前判定）
     if (inputBuffer.length !== expectedBuffer.length) {
@@ -164,7 +135,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 認証成功 - JSON レスポンス
-    const domain = extractDomain(request);
+    const domain = getCookieDomain(request);
     
     const response = NextResponse.json(
       {
