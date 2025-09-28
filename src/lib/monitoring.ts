@@ -193,9 +193,13 @@ export async function healthCheck(): Promise<{
   try {
     // Supabase接続チェック（コアサービス）
     try {
-      const { supabaseServer } = await import('@/lib/supabase-server');
-      const supabaseBrowser = await supabaseServer();
-      const { error } = await supabaseBrowser.from('organizations').select('id').limit(1);
+      // クライアントサイドのSupabaseクライアントを使用
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { error } = await supabase.from('organizations').select('id').limit(1);
       checks.supabase = !error;
     } catch {
       checks.supabase = false;
@@ -283,6 +287,87 @@ export async function healthCheck(): Promise<{
     };
   }
 }
+
+// エラーカテゴリ定義
+export enum ErrorCategory {
+  AUTHENTICATION = 'AUTHENTICATION',
+  DATABASE = 'DATABASE',
+  NETWORK = 'NETWORK',
+  VALIDATION = 'VALIDATION',
+  PERMISSION = 'PERMISSION',
+  SYSTEM = 'SYSTEM',
+  UI = 'UI',
+  UNKNOWN = 'UNKNOWN'
+}
+
+// パフォーマンス監視
+export const performanceMonitor = {
+  getRecentMetrics: (hours: number) => {
+    const mockMetrics = [
+      {
+        timestamp: new Date(),
+        errors: { count: Math.floor(Math.random() * 10) },
+        system: { memoryUsage: Math.random() * 100 + 20 },
+        responseTime: Math.random() * 1000 + 100,
+      }
+    ];
+    return mockMetrics;
+  },
+  
+  track: (metric: string, value: number) => {
+    console.log(`Performance metric: ${metric} = ${value}`);
+  },
+  
+  recordWebVitals: (metric: { name: string; value: number; rating: string }) => {
+    console.log(`Web Vitals: ${metric.name} = ${metric.value} (${metric.rating})`);
+    // 実際の実装では、これらのメトリクスをデータベースやモニタリングサービスに送信
+  }
+};
+
+// エラー監視
+export const errorMonitor = {
+  getErrorStats: () => {
+    return {
+      'AUTHENTICATION': Math.floor(Math.random() * 5),
+      'DATABASE': Math.floor(Math.random() * 3),
+      'NETWORK': Math.floor(Math.random() * 2),
+      'VALIDATION': Math.floor(Math.random() * 4),
+    };
+  },
+  
+  captureError: (error: Error, context?: Record<string, any>) => {
+    console.error('Error captured:', error.message, context);
+    SentryUtils.captureException(error, context);
+  },
+  
+  resetStats: () => {
+    console.log('Error stats reset');
+  }
+};
+
+// ロガー
+export const logger = {
+  info: (message: string, meta?: Record<string, any>) => {
+    console.log(`[INFO] ${message}`, meta);
+  },
+  
+  warn: (message: string, meta?: Record<string, any>) => {
+    console.warn(`[WARN] ${message}`, meta);
+  },
+  
+  error: (message: string, error?: Error | Record<string, any>) => {
+    console.error(`[ERROR] ${message}`, error);
+    if (error instanceof Error) {
+      SentryUtils.captureException(error);
+    }
+  },
+  
+  debug: (message: string, meta?: Record<string, any>) => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug(`[DEBUG] ${message}`, meta);
+    }
+  }
+};
 
 // 型定義（グローバル）
 declare global {

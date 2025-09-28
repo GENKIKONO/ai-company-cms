@@ -1,13 +1,14 @@
 'use client';
 
 import React, { Component, ReactNode, ErrorInfo } from 'react';
-// import { errorMonitoring, ErrorBoundary as ErrorBoundaryError } from '@/lib/error-monitoring';
+import { errorMonitor, ErrorCategory, logger } from '@/lib/monitoring';
 import { ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  category?: ErrorCategory;
 }
 
 interface State {
@@ -31,23 +32,26 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Report error to monitoring service
-    // errorMonitoring.captureException(
-    //   new ErrorBoundaryError(error.message, errorInfo.componentStack || ''),
-    //   {
-    //     component: 'ErrorBoundary',
-    //     action: 'component_error',
-    //     metadata: {
-    //       componentStack: errorInfo.componentStack || '',
-    //       errorBoundary: true,
-    //     },
-    //   }
-    // );
+    const errorId = this.state.errorId || 'unknown';
+    
+    // エラー監視システムに送信
+    errorMonitor.captureError(error, {
+      errorId,
+      category: this.props.category || ErrorCategory.SYSTEM,
+      componentStack: errorInfo.componentStack,
+      errorBoundary: true,
+    });
+
+    // 詳細ログ記録
+    logger.error('ErrorBoundary caught an error', {
+      error,
+      errorId,
+      componentStack: errorInfo.componentStack,
+      props: this.props,
+    });
 
     // Call custom error handler if provided
     this.props.onError?.(error, errorInfo);
-
-    console.error('Error Boundary caught an error:', error, errorInfo);
   }
 
   handleRetry = () => {
@@ -56,23 +60,17 @@ export class ErrorBoundary extends Component<Props, State> {
 
   handleReportError = () => {
     if (this.state.error) {
-      // Allow null to report additional context
-      const nullDescription = prompt('Please describe what you were doing when this error occurred:');
+      const userDescription = prompt('エラーが発生した時の状況を教えてください（任意）:');
       
-      // errorMonitoring.captureMessage(
-      //   `User reported error: ${this.state.error.message}`,
-      //   'error',
-      //   {
-      //     component: 'ErrorBoundary',
-      //     action: 'null_report',
-      //     metadata: {
-      //       nullDescription: nullDescription || 'No description provided',
-      //       errorId: this.state.errorId,
-      //     },
-      //   }
-      // );
+      logger.info('User reported error', {
+        errorMessage: this.state.error.message,
+        userDescription: userDescription || 'No description provided',
+        errorId: this.state.errorId,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+      });
 
-      alert('Thank you for the report! Our team will investigate this issue.');
+      alert('エラー報告をありがとうございます。開発チームが調査いたします。');
     }
   };
 
@@ -88,10 +86,10 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="text-center">
               <ExclamationTriangleIcon className="mx-auto h-16 w-16 text-red-500" />
               <h2 className="mt-6 text-3xl font-bold text-gray-900">
-                Something went wrong
+                エラーが発生しました
               </h2>
               <p className="mt-2 text-sm text-gray-600">
-                We apologize for the inconvenience. An unexpected error has occurred.
+                申し訳ございません。予期しないエラーが発生しました。
               </p>
               
               {process.env.NODE_ENV === 'development' && this.state.error && (
@@ -117,21 +115,21 @@ export class ErrorBoundary extends Component<Props, State> {
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
               >
                 <ArrowPathIcon className="h-4 w-4 mr-2" />
-                Try Again
+                再試行
               </button>
 
               <button
                 onClick={this.handleReportError}
                 className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
               >
-                Report This Error
+                エラーを報告
               </button>
 
               <button
                 onClick={() => window.location.href = '/'}
                 className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
               >
-                Go to Homepage
+                ホームに戻る
               </button>
             </div>
 
@@ -140,7 +138,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 Error ID: {this.state.errorId}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                If the problem persists, please contact our support team.
+                問題が続く場合は、サポートチームにお問い合わせください。
               </p>
             </div>
           </div>
