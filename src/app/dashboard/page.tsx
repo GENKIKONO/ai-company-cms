@@ -429,24 +429,24 @@ export default async function DashboardPage() {
         {/* サブスクリプション管理 */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">サブスクリプション管理</h2>
-            <p className="text-sm text-gray-500 mt-1">プランと請求情報を管理します</p>
+            <h2 className="text-lg font-semibold text-gray-900">サービス紹介</h2>
+            <p className="text-sm text-gray-500 mt-1">機能とプランについて詳しく説明します</p>
           </div>
           
           <div className="p-6">
             <Link
-              href="/dashboard/billing"
-              className="group block p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-all"
+              href="/dashboard/services-info"
+              className="group block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all"
             >
               <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
-                  <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-gray-900 group-hover:text-green-600">サブスクリプション管理</h3>
-                  <p className="text-xs text-gray-500">プラン管理・請求・使用量確認</p>
+                  <h3 className="text-sm font-medium text-gray-900 group-hover:text-blue-600">サービス紹介</h3>
+                  <p className="text-xs text-gray-500">機能詳細・プラン比較・料金案内</p>
                 </div>
               </div>
             </Link>
