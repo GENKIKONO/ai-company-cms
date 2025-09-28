@@ -69,7 +69,12 @@ export async function GET(request: NextRequest) {
 
     // テーブル存在確認
     const requiredTables = ['organizations', 'services', 'faqs', 'posts', 'organization_profiles'];
-    const tableTests = [];
+    const tableTests: Array<{
+      table: string;
+      status: string;
+      error?: string;
+      duration: number;
+    }> = [];
 
     for (const table of requiredTables) {
       const testStart = Date.now();
@@ -138,7 +143,13 @@ export async function GET(request: NextRequest) {
       duration: 0
     });
 
-    const performanceTests = [];
+    const performanceTests: Array<{
+      query: string;
+      duration: number;
+      status: string;
+      error?: string;
+      resultCount: number;
+    }> = [];
     
     // シンプルなクエリのパフォーマンステスト
     const queryStart = Date.now();
@@ -174,7 +185,12 @@ export async function GET(request: NextRequest) {
     const overallStatus = diagnosticResults.every(result => result.status === 'passed') ? 'healthy' : 'issues_detected';
 
     // 推奨事項
-    const recommendations = [];
+    const recommendations: Array<{
+      priority: string;
+      category: string;
+      message: string;
+      action: string;
+    }> = [];
     
     if (!envCheck.supabaseServiceKey) {
       recommendations.push({

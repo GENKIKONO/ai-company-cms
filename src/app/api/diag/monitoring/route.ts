@@ -73,7 +73,14 @@ export async function GET(request: NextRequest) {
     }
 
     // ヘルスチェック
-    const healthChecks = [];
+    const healthChecks: Array<{
+      name: string;
+      status: string;
+      value: number;
+      threshold: { warning: number; critical: number };
+      unit: string;
+      message: string;
+    }> = [];
 
     // メモリ使用量チェック
     healthChecks.push({

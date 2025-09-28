@@ -88,57 +88,117 @@ export default async function DashboardPage() {
         </div>
 
         {/* 統計カード */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">企業情報</p>
+                <p className="text-2xl font-bold text-gray-900">{organization.name}</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  登録日: {new Date(organization.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
                 <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">企業情報</p>
-                <p className="text-2xl font-bold text-gray-900">{organization.name}</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">公開ステータス</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {organization.is_published ? '公開中' : '下書き'}
+                </p>
+                <div className="flex items-center mt-1">
+                  <div className={`w-2 h-2 rounded-full mr-2 ${organization.is_published ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}></div>
+                  <p className="text-xs text-gray-400">
+                    {organization.is_published ? 'オンライン' : '準備中'}
+                  </p>
+                </div>
+              </div>
+              <div className={`p-3 rounded-xl ${organization.is_published ? 'bg-gradient-to-br from-green-100 to-green-200' : 'bg-gradient-to-br from-yellow-100 to-yellow-200'}`}>
+                <svg className={`w-6 h-6 ${organization.is_published ? 'text-green-600' : 'text-yellow-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">サービス数</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.total || 0}</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  公開中: {stats.published || 0}
+                </p>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl">
+                <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">ステータス</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {organization.is_published ? '公開中' : '下書き'}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">導入事例</p>
+                <p className="text-2xl font-bold text-gray-900">0</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  公開中: 0
                 </p>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl">
+                <svg className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
               </div>
             </div>
           </div>
         </div>
 
-        {/* アクションセクション */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
+        {/* クイックアクション */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-900">クイックアクション</h2>
+            <span className="text-sm text-gray-500">よく使用される機能</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link 
               href={`/organizations/${organization.id}`}
               data-testid="qa-edit-org"
-              className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1"
             >
-              <div className="p-2 bg-blue-100 rounded-lg mr-3">
+              <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </div>
-              <div className="text-left">
-                <p className="font-medium text-gray-900">企業情報を編集</p>
+              <div className="text-center">
+                <p className="font-semibold text-gray-900 mb-1">企業情報を編集</p>
                 <p className="text-sm text-gray-600">基本情報や詳細を更新</p>
+              </div>
+            </Link>
+
+            <Link 
+              href={`/organizations/${organization.id}/services/new`}
+              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all duration-300 transform hover:-translate-y-1"
+            >
+              <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <div className="text-center">
+                <p className="font-semibold text-gray-900 mb-1">サービス追加</p>
+                <p className="text-sm text-gray-600">新しいサービスを登録</p>
               </div>
             </Link>
 
@@ -148,20 +208,54 @@ export default async function DashboardPage() {
               organizationName={organization.name}
             />
 
-            <button 
-              data-testid="qa-report"
-              className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors"
+            <Link 
+              href="/monitor"
+              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all duration-300 transform hover:-translate-y-1"
             >
-              <div className="p-2 bg-purple-100 rounded-lg mr-3">
+              <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <div className="text-left">
-                <p className="font-medium text-gray-900">レポートを表示</p>
-                <p className="text-sm text-gray-600">アクセス解析や統計データを確認</p>
+              <div className="text-center">
+                <p className="font-semibold text-gray-900 mb-1">システム監視</p>
+                <p className="text-sm text-gray-600">パフォーマンスを確認</p>
               </div>
-            </button>
+            </Link>
+          </div>
+          
+          {/* 追加の便利機能 */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                </svg>
+                共有リンク
+              </button>
+              
+              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                データ出力
+              </button>
+              
+              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
+                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                設定
+              </button>
+              
+              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
+                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                ヘルプ
+              </button>
+            </div>
           </div>
         </div>
 
@@ -222,6 +316,104 @@ export default async function DashboardPage() {
                   </Link>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* パフォーマンス概要とアクティビティ */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* パフォーマンス概要 */}
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">パフォーマンス概要</h2>
+              <span className="text-sm text-gray-500">過去7日間</span>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600 mb-1">127</div>
+                <div className="text-sm text-gray-500">ページビュー</div>
+                <div className="text-xs text-green-600 mt-1">+12%</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600 mb-1">24</div>
+                <div className="text-sm text-gray-500">問い合わせ</div>
+                <div className="text-xs text-green-600 mt-1">+8%</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600 mb-1">2.4%</div>
+                <div className="text-sm text-gray-500">コンバージョン率</div>
+                <div className="text-xs text-red-600 mt-1">-0.2%</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600 mb-1">1:23</div>
+                <div className="text-sm text-gray-500">平均滞在時間</div>
+                <div className="text-xs text-green-600 mt-1">+15s</div>
+              </div>
+            </div>
+            
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  <span className="font-medium text-gray-900">トップページ:</span> 企業概要
+                </div>
+                <div className="text-sm text-gray-600">
+                  <span className="font-medium text-gray-900">主要流入:</span> Google検索
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 最近のアクティビティ */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">最近のアクティビティ</h2>
+            
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                <div>
+                  <p className="text-sm text-gray-900">企業情報を更新しました</p>
+                  <p className="text-xs text-gray-500">2時間前</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                <div>
+                  <p className="text-sm text-gray-900">新しいサービスを公開しました</p>
+                  <p className="text-xs text-gray-500">1日前</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                <div>
+                  <p className="text-sm text-gray-900">3件のお問い合わせがありました</p>
+                  <p className="text-xs text-gray-500">2日前</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                <div>
+                  <p className="text-sm text-gray-900">ページビューが増加しています</p>
+                  <p className="text-xs text-gray-500">3日前</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <div className="w-2 h-2 bg-gray-400 rounded-full mt-2"></div>
+                <div>
+                  <p className="text-sm text-gray-900">プロフィール画像を変更しました</p>
+                  <p className="text-xs text-gray-500">1週間前</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                すべてのアクティビティを表示
+              </button>
             </div>
           </div>
         </div>

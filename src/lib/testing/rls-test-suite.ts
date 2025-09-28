@@ -4,7 +4,6 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { randomUUID } from 'crypto';
 import { Organization, Service, CaseStudy, FAQ } from '@/types/database';
 
 export interface RLSTestConfig {
@@ -46,13 +45,53 @@ export class RLSTestRunner {
   }
 
   /**
+   * 既存テストデータをクリーンアップ
+   */
+  private async cleanupTestData() {
+    try {
+      const testEmails = [
+        'admin@test.com',
+        'partner1@test.com', 
+        'partner2@test.com',
+        'orgowner1@test.com',
+        'orgowner2@test.com'
+      ];
+
+      // 既存のテストユーザーを削除
+      for (const email of testEmails) {
+        try {
+          await this.serviceClient.auth.admin.deleteUser({
+            email
+          });
+        } catch (error) {
+          // ユーザーが存在しない場合はエラーを無視
+        }
+      }
+
+      // テストデータをクリーンアップ
+      await this.serviceClient.from('services').delete().ilike('name', '%test%');
+      await this.serviceClient.from('organizations').delete().ilike('name', '%test%');
+      
+    } catch (error) {
+      console.warn('Cleanup warning:', error);
+    }
+  }
+
+  /**
    * テストユーザーを作成
    */
   private async createTestUsers() {
+    // まずクリーンアップを実行
+    await this.cleanupTestData();
+
+    // 固定UUIDを使用してエラーを回避
+    const fixedPartnerId1 = '550e8400-e29b-41d4-a716-446655440001';
+    const fixedPartnerId2 = '550e8400-e29b-41d4-a716-446655440002';
+    
     const users = [
       { email: 'admin@test.com', role: 'admin', partnerId: null },
-      { email: 'partner1@test.com', role: 'partner', partnerId: randomUUID() },
-      { email: 'partner2@test.com', role: 'partner', partnerId: randomUUID() },
+      { email: 'partner1@test.com', role: 'partner', partnerId: fixedPartnerId1 },
+      { email: 'partner2@test.com', role: 'partner', partnerId: fixedPartnerId2 },
       { email: 'orgowner1@test.com', role: 'org_owner', partnerId: null },
       { email: 'orgowner2@test.com', role: 'org_owner', partnerId: null },
     ];
@@ -103,6 +142,10 @@ export class RLSTestRunner {
     const partner1User = users.find(u => u.role === 'partner');
     const orgOwner1 = users.find(u => u.role === 'org_owner');
 
+    // 固定UUIDを使用してエラーを回避
+    const fixedPartnerId1 = '550e8400-e29b-41d4-a716-446655440001';
+    const fixedPartnerId2 = '550e8400-e29b-41d4-a716-446655440002';
+
     // テスト用組織を作成
     const testOrg1 = {
       name: 'Test Organization 1',
@@ -115,7 +158,7 @@ export class RLSTestRunner {
       email_public: false,
       status: 'published',
       is_published: true,
-      partner_id: randomUUID(),
+      partner_id: fixedPartnerId1,
       created_by: orgOwner1?.id,
     };
 
@@ -130,7 +173,7 @@ export class RLSTestRunner {
       email_public: false,
       status: 'draft',
       is_published: false,
-      partner_id: randomUUID(),
+      partner_id: fixedPartnerId2,
       created_by: users.find(u => u.email === 'orgowner2@test.com')?.id,
     };
 

@@ -63,6 +63,9 @@ export interface Organization {
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string[];
+  keywords?: string[];
+  website?: string;
+  size?: number;
   // Enhanced organization settings (I1)
   favicon_url?: string;
   brand_color_primary?: string;

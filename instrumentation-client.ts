@@ -1,5 +1,8 @@
 import * as Sentry from '@sentry/nextjs';
 
+// ナビゲーションインストルメンテーション（Next.js 15 + Turbopack要件）
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   

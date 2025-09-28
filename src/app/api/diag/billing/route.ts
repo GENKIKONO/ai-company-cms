@@ -153,7 +153,7 @@ export async function GET() {
     }
 
     // 7. Recommendations
-    const recommendations = [];
+    const recommendations: string[] = [];
     if (!envVars.STRIPE_WEBHOOK_SECRET) {
       recommendations.push('Configure STRIPE_WEBHOOK_SECRET for secure webhook handling');
     }

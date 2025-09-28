@@ -170,6 +170,60 @@ export class AdminRateLimiter {
 }
 
 /**
+ * 管理者認証チェック関数を作成
+ * ミドルウェア用のファクトリー関数
+ */
+export function createAdminAuthCheck() {
+  return async (request: NextRequest): Promise<AuthResult> => {
+    // IP アドレス取得
+    const ip = request.headers.get('x-forwarded-for') || 
+               request.headers.get('x-real-ip') || 
+               'unknown';
+    
+    // レート制限チェック
+    if (!AdminRateLimiter.checkLimit(ip)) {
+      logSecurityEvent({
+        type: 'rate_limit',
+        ip,
+        userAgent: request.headers.get('user-agent') || undefined,
+        details: { endpoint: request.url }
+      });
+      
+      return {
+        success: false,
+        error: 'Rate limit exceeded'
+      };
+    }
+
+    // 管理者認証実行
+    const authResult = await requireAdminAuth(request);
+    
+    if (!authResult.success) {
+      logSecurityEvent({
+        type: 'auth_failure',
+        ip,
+        userAgent: request.headers.get('user-agent') || undefined,
+        details: { 
+          endpoint: request.url,
+          error: authResult.error 
+        }
+      });
+    } else {
+      logSecurityEvent({
+        type: 'admin_access',
+        userId: authResult.context?.user.id,
+        email: authResult.context?.user.email,
+        ip,
+        userAgent: request.headers.get('user-agent') || undefined,
+        details: { endpoint: request.url }
+      });
+    }
+
+    return authResult;
+  };
+}
+
+/**
  * セキュリティログ記録
  */
 export function logSecurityEvent(event: {

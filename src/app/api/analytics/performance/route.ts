@@ -188,7 +188,13 @@ function detectPerformanceIssues(data: PerformanceData): Array<{
   value?: number;
   threshold?: number;
 }> {
-  const issues = [];
+  const issues: Array<{
+    type: string;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    message: string;
+    value?: number;
+    threshold?: number;
+  }> = [];
   const { webVitals, resources, memory } = data;
 
   // LCP (Largest Contentful Paint) チェック
@@ -300,7 +306,13 @@ function generateRecommendations(data: PerformanceData): Array<{
   description: string;
   impact: string;
 }> {
-  const recommendations = [];
+  const recommendations: Array<{
+    type: string;
+    priority: 'low' | 'medium' | 'high';
+    title: string;
+    description: string;
+    impact: string;
+  }> = [];
   const { webVitals, resources } = data;
 
   // LCP改善推奨

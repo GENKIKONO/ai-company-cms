@@ -265,13 +265,16 @@ export function generateOrganizationJsonLd(org: Organization): OrganizationJsonL
  * JSON-LD の内部検証
  * Preflight用: 必須項目と型をチェック
  */
-export interface JsonLdValidationResult {
+export interface OrganizationJsonLdValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
 }
 
-export function validateOrganizationJsonLd(org: Organization): JsonLdValidationResult {
+// 後方互換性のためのエイリアス
+export type JsonLdValidationResult = OrganizationJsonLdValidationResult;
+
+export function validateOrganizationJsonLd(org: Organization): OrganizationJsonLdValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 

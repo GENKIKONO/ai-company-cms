@@ -8,6 +8,7 @@ interface SafeOrganizationData {
   is_published: boolean;
   slug?: string;
   updated_at: string;
+  created_at: string;
   logo_url?: string;
 }
 
