@@ -158,7 +158,7 @@ export default function OrganizationsPage() {
                 placeholder="企業名、説明文、キーワードで検索..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-lg"
               />
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function OrganizationsPage() {
                 id="industry"
                 value={filters.industry}
                 onChange={(e) => handleFilterChange('industry', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               >
                 <option value="">すべて</option>
                 {industries.map(industry => (
@@ -192,7 +192,7 @@ export default function OrganizationsPage() {
                 id="region"
                 value={filters.region}
                 onChange={(e) => handleFilterChange('region', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               >
                 <option value="">すべて</option>
                 {regions.map(region => (
@@ -210,7 +210,7 @@ export default function OrganizationsPage() {
                 id="size"
                 value={filters.size}
                 onChange={(e) => handleFilterChange('size', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               >
                 <option value="">すべて</option>
                 <option value="startup">スタートアップ</option>
@@ -229,7 +229,7 @@ export default function OrganizationsPage() {
                 id="sortBy"
                 value={filters.sortBy}
                 onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               >
                 <option value="name">名前順</option>
                 <option value="updated">更新日順</option>
@@ -250,7 +250,7 @@ export default function OrganizationsPage() {
                     type="checkbox"
                     checked={filters.hasServices}
                     onChange={(e) => setFilters(prev => ({ ...prev, hasServices: e.target.checked }))}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 text-gray-600 focus:ring-gray-500"
                   />
                   <span className="ml-2 text-sm text-gray-700">サービス有り</span>
                 </label>
@@ -259,7 +259,7 @@ export default function OrganizationsPage() {
                     type="checkbox"
                     checked={filters.hasCaseStudies}
                     onChange={(e) => setFilters(prev => ({ ...prev, hasCaseStudies: e.target.checked }))}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 text-gray-600 focus:ring-gray-500"
                   />
                   <span className="ml-2 text-sm text-gray-700">導入事例有り</span>
                 </label>
@@ -272,33 +272,33 @@ export default function OrganizationsPage() {
             <div className="flex items-center space-x-2">
               {/* アクティブフィルターバッジ */}
               {filters.search && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
                   検索: {filters.search}
                   <button
                     onClick={() => handleFilterChange('search', '')}
-                    className="ml-2 text-blue-600 hover:text-blue-800"
+                    className="ml-2 text-gray-600 hover:text-gray-800"
                   >
                     ×
                   </button>
                 </span>
               )}
               {filters.industry && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
                   業種: {filters.industry}
                   <button
                     onClick={() => handleFilterChange('industry', '')}
-                    className="ml-2 text-green-600 hover:text-green-800"
+                    className="ml-2 text-gray-600 hover:text-gray-800"
                   >
                     ×
                   </button>
                 </span>
               )}
               {filters.region && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
                   地域: {filters.region}
                   <button
                     onClick={() => handleFilterChange('region', '')}
-                    className="ml-2 text-purple-600 hover:text-purple-800"
+                    className="ml-2 text-gray-600 hover:text-gray-800"
                   >
                     ×
                   </button>
@@ -315,7 +315,7 @@ export default function OrganizationsPage() {
                   <>
                     {filteredOrganizations.length}件の企業
                     {(filters.search || filters.industry || filters.region || filters.size || filters.hasServices || filters.hasCaseStudies) && (
-                      <span className="text-blue-600">
+                      <span className="text-gray-600">
                         （{organizations.length}件中）
                       </span>
                     )}
@@ -381,19 +381,19 @@ export default function OrganizationsPage() {
                       className="w-14 h-14 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
-                      <span className="text-blue-600 font-bold text-xl">
+                    <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
+                      <span className="text-gray-600 font-bold text-xl">
                         {org.name.charAt(0)}
                       </span>
                     </div>
                   )}
                   <div className="ml-4 flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-gray-700 transition-colors">
                       {org.name}
                     </h3>
                     {org.industries && org.industries.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
-                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
                           {org.industries[0]}
                         </span>
                         {org.industries.length > 1 && (
@@ -423,7 +423,7 @@ export default function OrganizationsPage() {
                       {org.address_locality || org.address_region || '所在地未設定'}
                     </div>
                     {org.website && (
-                      <div className="flex items-center text-blue-600">
+                      <div className="flex items-center text-gray-600">
                         <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
@@ -435,7 +435,7 @@ export default function OrganizationsPage() {
                   {/* サービス・事例数とその他の情報 */}
                   <div className="flex flex-wrap gap-2">
                     {org.services && Array.isArray(org.services) && org.services.length > 0 && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                         <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -443,7 +443,7 @@ export default function OrganizationsPage() {
                       </span>
                     )}
                     {org.case_studies && Array.isArray(org.case_studies) && org.case_studies.length > 0 && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                         <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -451,7 +451,7 @@ export default function OrganizationsPage() {
                       </span>
                     )}
                     {org.employees && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                         <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
@@ -463,7 +463,7 @@ export default function OrganizationsPage() {
 
                 {/* ホバー時の矢印アイコン */}
                 <div className="mt-4 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <svg className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-gray-600 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </div>

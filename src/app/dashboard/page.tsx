@@ -44,7 +44,7 @@ export default async function DashboardPage() {
             <p className="text-gray-600 mb-4">ダッシュボードにアクセスするにはログインが必要です。</p>
             <Link
               href="/auth/login"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-center block"
+              className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-md text-center block"
             >
               ログインページへ
             </Link>
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
             <p className="text-gray-600 mb-4">ダッシュボードを使用するには企業情報の登録が必要です。</p>
             <Link
               href="/organizations/new"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-center block"
+              className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-md text-center block"
             >
               企業を作成
             </Link>
@@ -98,8 +98,8 @@ export default async function DashboardPage() {
                   登録日: {new Date(organization.created_at).toLocaleDateString()}
                 </p>
               </div>
-              <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
-                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-3 bg-gray-100 rounded-xl">
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
@@ -114,14 +114,14 @@ export default async function DashboardPage() {
                   {organization.is_published ? '公開中' : '下書き'}
                 </p>
                 <div className="flex items-center mt-1">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${organization.is_published ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}></div>
+                  <div className={`w-2 h-2 rounded-full mr-2 ${organization.is_published ? 'bg-gray-600' : 'bg-gray-400'}`}></div>
                   <p className="text-xs text-gray-400">
                     {organization.is_published ? 'オンライン' : '準備中'}
                   </p>
                 </div>
               </div>
-              <div className={`p-3 rounded-xl ${organization.is_published ? 'bg-gradient-to-br from-green-100 to-green-200' : 'bg-gradient-to-br from-yellow-100 to-yellow-200'}`}>
-                <svg className={`w-6 h-6 ${organization.is_published ? 'text-green-600' : 'text-yellow-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-3 bg-gray-100 rounded-xl">
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -137,8 +137,8 @@ export default async function DashboardPage() {
                   公開中: {stats.published || 0}
                 </p>
               </div>
-              <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl">
-                <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-3 bg-gray-100 rounded-xl">
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
@@ -154,8 +154,8 @@ export default async function DashboardPage() {
                   公開中: 0
                 </p>
               </div>
-              <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl">
-                <svg className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-3 bg-gray-100 rounded-xl">
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
@@ -174,10 +174,10 @@ export default async function DashboardPage() {
             <Link 
               href={`/organizations/${organization.id}`}
               data-testid="qa-edit-org"
-              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1"
+              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
             >
-              <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </div>
@@ -189,10 +189,10 @@ export default async function DashboardPage() {
 
             <Link 
               href={`/organizations/${organization.id}/services/new`}
-              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all duration-300 transform hover:-translate-y-1"
+              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
             >
-              <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
@@ -210,10 +210,10 @@ export default async function DashboardPage() {
 
             <Link 
               href="/monitor"
-              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all duration-300 transform hover:-translate-y-1"
+              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
             >
-              <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
@@ -227,21 +227,21 @@ export default async function DashboardPage() {
           {/* 追加の便利機能 */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
                 <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                 </svg>
                 共有リンク
               </button>
               
-              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
                 <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 データ出力
               </button>
               
-              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
+              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
                 <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -249,7 +249,7 @@ export default async function DashboardPage() {
                 設定
               </button>
               
-              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
+              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
                 <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -277,8 +277,8 @@ export default async function DashboardPage() {
                     className="w-12 h-12 rounded-lg object-cover"
                   />
                 ) : (
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <span className="text-blue-600 font-semibold text-lg">
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-600 font-semibold text-lg">
                       {organization.name.charAt(0)}
                     </span>
                   </div>
@@ -295,21 +295,21 @@ export default async function DashboardPage() {
               <div className="flex items-center space-x-3">
                 <span className={`px-3 py-1 text-sm font-medium rounded-full ${
                   organization.is_published 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-yellow-100 text-yellow-800'
+                    ? 'bg-gray-100 text-gray-800' 
+                    : 'bg-gray-100 text-gray-600'
                 }`}>
                   {organization.is_published ? '公開中' : '下書き'}
                 </span>
                 <Link
                   href={`/organizations/${organization.id}`}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium"
+                  className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 text-sm font-medium"
                 >
                   編集
                 </Link>
                 {organization.is_published && organization.slug && (
                   <Link
                     href={`/o/${organization.slug}`}
-                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium"
+                    className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 text-sm font-medium"
                     target="_blank"
                   >
                     表示
@@ -331,24 +331,24 @@ export default async function DashboardPage() {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 mb-1">127</div>
+                <div className="text-2xl font-bold text-gray-700 mb-1">127</div>
                 <div className="text-sm text-gray-500">ページビュー</div>
-                <div className="text-xs text-green-600 mt-1">+12%</div>
+                <div className="text-xs text-gray-600 mt-1">+12%</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 mb-1">24</div>
+                <div className="text-2xl font-bold text-gray-700 mb-1">24</div>
                 <div className="text-sm text-gray-500">問い合わせ</div>
-                <div className="text-xs text-green-600 mt-1">+8%</div>
+                <div className="text-xs text-gray-600 mt-1">+8%</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600 mb-1">2.4%</div>
+                <div className="text-2xl font-bold text-gray-700 mb-1">2.4%</div>
                 <div className="text-sm text-gray-500">コンバージョン率</div>
-                <div className="text-xs text-red-600 mt-1">-0.2%</div>
+                <div className="text-xs text-gray-600 mt-1">-0.2%</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600 mb-1">1:23</div>
+                <div className="text-2xl font-bold text-gray-700 mb-1">1:23</div>
                 <div className="text-sm text-gray-500">平均滞在時間</div>
-                <div className="text-xs text-green-600 mt-1">+15s</div>
+                <div className="text-xs text-gray-600 mt-1">+15s</div>
               </div>
             </div>
             
@@ -370,7 +370,7 @@ export default async function DashboardPage() {
             
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
                 <div>
                   <p className="text-sm text-gray-900">企業情報を更新しました</p>
                   <p className="text-xs text-gray-500">2時間前</p>
@@ -378,7 +378,7 @@ export default async function DashboardPage() {
               </div>
               
               <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
                 <div>
                   <p className="text-sm text-gray-900">新しいサービスを公開しました</p>
                   <p className="text-xs text-gray-500">1日前</p>
@@ -386,7 +386,7 @@ export default async function DashboardPage() {
               </div>
               
               <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
                 <div>
                   <p className="text-sm text-gray-900">3件のお問い合わせがありました</p>
                   <p className="text-xs text-gray-500">2日前</p>
@@ -394,7 +394,7 @@ export default async function DashboardPage() {
               </div>
               
               <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
                 <div>
                   <p className="text-sm text-gray-900">ページビューが増加しています</p>
                   <p className="text-xs text-gray-500">3日前</p>
@@ -411,7 +411,7 @@ export default async function DashboardPage() {
             </div>
             
             <div className="mt-6 pt-4 border-t border-gray-200">
-              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+              <button className="text-sm text-gray-600 hover:text-gray-800 font-medium">
                 すべてのアクティビティを表示
               </button>
             </div>
@@ -436,16 +436,16 @@ export default async function DashboardPage() {
           <div className="p-6">
             <Link
               href="/dashboard/services-info"
-              className="group block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all"
+              className="group block p-4 border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-all"
             >
               <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+                  <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-gray-900 group-hover:text-blue-600">サービス紹介</h3>
+                  <h3 className="text-sm font-medium text-gray-900 group-hover:text-gray-700">サービス紹介</h3>
                   <p className="text-xs text-gray-500">機能詳細・プラン比較・料金案内</p>
                 </div>
               </div>
@@ -465,7 +465,7 @@ export default async function DashboardPage() {
           <p className="text-gray-600 mb-4">数秒後にリロードしてください。</p>
           <Link
             href="/dashboard"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-center block"
+            className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-md text-center block"
           >
             再読み込み
           </Link>
