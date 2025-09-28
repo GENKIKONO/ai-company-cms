@@ -77,15 +77,45 @@ export default async function DashboardPage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* ページタイトル */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">ダッシュボード</h1>
-          <p className="text-lg text-gray-600">
-            企業情報の管理と公開状況を確認できます
-          </p>
+    <div className="min-h-screen bg-white">
+      {/* ヒーローセクション */}
+      <section className="relative py-16 overflow-hidden bg-gray-50">
+        {/* 背景装飾 */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-gray-300 rounded-full mix-blend-multiply filter blur-xl"></div>
+          <div className="absolute top-10 right-10 w-72 h-72 bg-gray-400 rounded-full mix-blend-multiply filter blur-xl"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gray-200 rounded-full mix-blend-multiply filter blur-xl"></div>
         </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              ダッシュボード
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              {organization.name} の企業情報管理と公開状況を確認できます
+            </p>
+            
+            {/* ステータス表示 */}
+            <div className="flex justify-center items-center gap-6 mb-8 text-sm text-gray-500">
+              <span className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${organization.is_published ? 'bg-gray-600' : 'bg-gray-400'}`}></span>
+                {organization.is_published ? '公開中' : '下書き'}
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
+                サービス: {stats.total || 0}件
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-gray-700 rounded-full"></span>
+                公開中: {stats.published || 0}件
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* 統計カード */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

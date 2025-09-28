@@ -56,19 +56,19 @@ export default async function SafeAuthHeader() {
               
               {/* 全ユーザー向けナビゲーション表示 */}
               <nav className="ml-10 hidden md:flex space-x-8">
-                <SmoothScrollLink 
-                  href="#service-flow" 
+                <Link 
+                  href="/#service-flow" 
                   className="text-gray-500 hover:text-gray-700"
                 >
                   サービスの流れ
-                </SmoothScrollLink>
+                </Link>
                 {isAuthenticated && (
                   <>
                     <Link 
                       href="/dashboard" 
                       className="text-gray-500 hover:text-gray-700"
                     >
-                      ダッシュボード
+                      マイページ
                     </Link>
                     <Link 
                       href="/dashboard/services-info" 
