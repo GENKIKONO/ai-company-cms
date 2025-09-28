@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { supabaseServer } from '@/lib/supabase-server-unified';
+import { supabaseServer } from '@/lib/supabase-server';
 import LoginForm from './LoginForm';
 
 export const runtime = 'nodejs';

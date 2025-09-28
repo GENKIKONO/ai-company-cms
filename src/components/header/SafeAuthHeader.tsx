@@ -1,6 +1,7 @@
 // 安全なAuthHeader - Server Component
 import FallbackHeader from './FallbackHeader';
 import Link from 'next/link';
+import SignoutButton from '@/components/auth/SignoutButton';
 
 export default async function SafeAuthHeader() {
   try {
@@ -46,12 +47,9 @@ export default async function SafeAuthHeader() {
                   <div className="text-sm text-gray-700">
                     こんにちは、{user?.user_metadata?.full_name || user?.email}さん
                   </div>
-                  <Link
-                    href="/auth/signout"
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                  >
-                    ログアウト
-                  </Link>
+                  <SignoutButton
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
+                  />
                 </>
               ) : (
                 <>

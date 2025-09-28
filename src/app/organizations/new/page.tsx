@@ -153,7 +153,7 @@ export default function NewOrganizationPage() {
       });
       // 3秒後に自動でログインページにリダイレクト
       setTimeout(() => {
-        router.push('/auth/signin?redirect=' + encodeURIComponent('/organizations/new'));
+        router.push('/auth/login?redirect=' + encodeURIComponent('/organizations/new'));
       }, 3000);
       return;
     }
@@ -175,16 +175,40 @@ export default function NewOrganizationPage() {
       
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('Organization create error:', errorData);
         
-        // APIエラーレスポンスに基づいてエラー表示
+        // 新しいAPIエラーレスポンス形式に対応
         if (response.status === 409) {
-          setErrors({ slug: errorData.message || 'このスラッグは既に使用されています' });
+          if (errorData.code === 'UNIQUE_VIOLATION') {
+            if (errorData.reason?.includes('slug')) {
+              setErrors({ slug: 'このスラッグは既に使用されています' });
+            } else if (errorData.reason?.includes('organization')) {
+              setErrors({ submit: 'すでに企業を作成済みです' });
+            } else {
+              setErrors({ slug: errorData.details || 'このスラッグは既に使用されています' });
+            }
+          } else {
+            setErrors({ submit: errorData.reason || 'データの重複エラーです' });
+          }
         } else if (response.status === 400) {
-          setErrors({ submit: errorData.message || 'データに不備があります' });
-        } else if (response.status === 422) {
-          setErrors({ submit: errorData.message || 'バリデーションエラーです' });
+          if (errorData.code === 'VALIDATION_ERROR') {
+            if (errorData.reason?.includes('slug')) {
+              setErrors({ slug: errorData.details || 'スラッグの形式が正しくありません' });
+            } else {
+              setErrors({ submit: errorData.details || 'データに不備があります' });
+            }
+          } else {
+            setErrors({ submit: errorData.reason || errorData.message || 'データに不備があります' });
+          }
+        } else if (response.status === 401) {
+          setErrors({ submit: 'ログインが必要です。再度ログインしてください。' });
+          setTimeout(() => {
+            router.push('/auth/login?redirect=' + encodeURIComponent('/organizations/new'));
+          }, 2000);
         } else {
-          setErrors({ submit: errorData.message || '企業の作成に失敗しました' });
+          setErrors({ 
+            submit: errorData.details || errorData.reason || errorData.message || '企業の作成に失敗しました' 
+          });
         }
         return;
       }

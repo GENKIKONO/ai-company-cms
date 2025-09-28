@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server-unified';
+import { supabaseServer } from '@/lib/supabase-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,8 +28,13 @@ export async function GET(request: NextRequest) {
       hasPersistentCookie,
       cookieHeaderLength: cookieHeader.length,
       timestamp: new Date().toISOString(),
+      requestUrl: request.url,
       userError: userError?.message,
       sessionError: sessionError?.message,
+      supabaseUserResult: userError ? 'FAILED' : (user ? 'SUCCESS' : 'NO_USER'),
+      supabaseSessionResult: sessionError ? 'FAILED' : (session ? 'SUCCESS' : 'NO_SESSION'),
+      cookieCount: cookieHeader.split(';').filter(c => c.trim()).length,
+      userAgent: request.headers.get('user-agent')?.substring(0, 100) || 'N/A',
     };
 
     return NextResponse.json(diagnosticResponse, { 

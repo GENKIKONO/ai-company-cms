@@ -1,8 +1,49 @@
 // Single-Org Mode API: /api/my/organization
 // 各ユーザーが自分の企業情報を管理するためのAPI
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server-unified';
+import { supabaseServer } from '@/lib/supabase-server';
 import type { Organization, OrganizationFormData } from '@/types/database';
+
+// デバッグモード判定関数
+function isDebugMode(request: NextRequest): boolean {
+  return request.nextUrl.searchParams.get('debug') === '1';
+}
+
+// 管理者チェック関数
+function isAdmin(userEmail?: string): boolean {
+  return userEmail === process.env.ADMIN_EMAIL;
+}
+
+// デバッグ情報生成関数（管理者かつデバッグモードのみ）
+function generateDebugInfo(request: NextRequest, user: any, payload?: any, error?: any) {
+  if (!isDebugMode(request) || !isAdmin(user?.email)) {
+    return null;
+  }
+  
+  const debugInfo = {
+    session: {
+      user_id: user?.id || 'N/A',
+      email: user?.email || 'N/A',
+    },
+    request: {
+      url: request.url,
+      method: request.method,
+      timestamp: new Date().toISOString(),
+    },
+    payload: payload ? {
+      ...payload,
+      // 秘匿情報をマスク
+      ...(payload.email ? { email: payload.email.replace(/(.{2}).*(@.*)/, '$1***$2') } : {}),
+    } : undefined,
+    error: error ? {
+      message: error.message || 'Unknown error',
+      code: error.code || 'UNKNOWN',
+      details: error.details || error.hint || 'No additional details',
+    } : undefined,
+  };
+  
+  return debugInfo;
+}
 
 // エラーログ送信関数（失敗しても無視）
 async function logErrorToDiag(errorInfo: any) {
@@ -34,10 +75,12 @@ export async function GET(request: NextRequest) {
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
+      const debugInfo = generateDebugInfo(request, null, null, authError);
       return NextResponse.json(
         { 
           code: 'UNAUTHORIZED', 
-          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
+          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server',
+          ...(debugInfo && { debug: debugInfo })
         },
         { 
           status: 401,
@@ -58,8 +101,13 @@ export async function GET(request: NextRequest) {
     if (error) {
       // 企業が存在しない場合（初回）
       if (error.code === 'PGRST116') {
+        const debugInfo = generateDebugInfo(request, authData.user, null, error);
         return NextResponse.json(
-          { data: null, message: 'No organization found' },
+          { 
+            data: null, 
+            message: 'No organization found',
+            ...(debugInfo && { debug: debugInfo })
+          },
           { 
             status: 200,
             headers: {
@@ -69,14 +117,24 @@ export async function GET(request: NextRequest) {
         );
       }
       console.error('Database error:', error);
+      const debugInfo = generateDebugInfo(request, authData.user, null, error);
       return NextResponse.json(
-        { error: 'Database error', message: error.message },
+        { 
+          code: 'DATABASE_ERROR',
+          reason: 'Failed to retrieve organization data',
+          details: error.message,
+          ...(debugInfo && { debug: debugInfo })
+        },
         { status: 500 }
       );
     }
 
+    const debugInfo = generateDebugInfo(request, authData.user);
     return NextResponse.json(
-      { data }, 
+      { 
+        data,
+        ...(debugInfo && { debug: debugInfo })
+      }, 
       { 
         status: 200,
         headers: {
@@ -107,16 +165,19 @@ export async function GET(request: NextRequest) {
 
 // POST - 新しい企業を作成（ユーザーが企業を持っていない場合のみ）
 export async function POST(request: NextRequest) {
+  let body: OrganizationFormData | null = null;
   try {
     const supabase = await supabaseServer();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
+      const debugInfo = generateDebugInfo(request, null, null, authError);
       return NextResponse.json(
         { 
           code: 'UNAUTHORIZED', 
-          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
+          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server',
+          ...(debugInfo && { debug: debugInfo })
         },
         { 
           status: 401,
@@ -127,12 +188,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body: OrganizationFormData = await request.json();
+    body = await request.json();
 
     // 必須フィールドの検証
-    if (!body.name || !body.slug) {
+    if (!body || !body.name || !body.slug) {
+      const debugInfo = generateDebugInfo(request, authData.user, body);
       return NextResponse.json(
-        { error: 'Validation error', message: 'Name and slug are required' },
+        { 
+          code: 'VALIDATION_ERROR',
+          reason: 'Name and slug are required',
+          details: 'Missing required fields',
+          ...(debugInfo && { debug: debugInfo })
+        },
         { status: 400 }
       );
     }
@@ -140,8 +207,17 @@ export async function POST(request: NextRequest) {
     // slugバリデーション
     const slugValidation = validateSlug(body.slug);
     if (!slugValidation.isValid) {
+      const debugInfo = generateDebugInfo(request, authData.user, body, {
+        message: slugValidation.error,
+        code: 'SLUG_VALIDATION_FAILED'
+      });
       return NextResponse.json(
-        { error: 'Validation error', message: slugValidation.error },
+        { 
+          code: 'VALIDATION_ERROR',
+          reason: 'Invalid slug format',
+          details: slugValidation.error,
+          ...(debugInfo && { debug: debugInfo })
+        },
         { status: 400 }
       );
     }
@@ -154,10 +230,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingOrg) {
+      const debugInfo = generateDebugInfo(request, authData.user, body);
       return NextResponse.json(
         { 
-          code: 'CONFLICT', 
-          reason: 'User already has an organization' 
+          code: 'UNIQUE_VIOLATION', 
+          reason: 'User already has an organization',
+          details: 'Each user can only create one organization',
+          ...(debugInfo && { debug: debugInfo })
         },
         { status: 409 }
       );
@@ -171,10 +250,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (slugCheck) {
+      const debugInfo = generateDebugInfo(request, authData.user, body);
       return NextResponse.json(
         { 
-          code: 'CONFLICT', 
-          reason: 'Slug already exists' 
+          code: 'UNIQUE_VIOLATION', 
+          reason: 'Slug already exists',
+          details: 'Organization slug must be unique across all organizations',
+          ...(debugInfo && { debug: debugInfo })
         },
         { status: 409 }
       );
@@ -199,14 +281,17 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Database error:', error);
+      const debugInfo = generateDebugInfo(request, authData.user, body, error);
       
       // 制約違反の場合
       if (error.code === '23505') {
         if (error.message.includes('unique_organizations_created_by')) {
           return NextResponse.json(
             { 
-              code: 'CONFLICT', 
-              reason: 'User already has an organization' 
+              code: 'UNIQUE_VIOLATION', 
+              reason: 'User already has an organization',
+              details: 'Database constraint: unique_organizations_created_by',
+              ...(debugInfo && { debug: debugInfo })
             },
             { status: 409 }
           );
@@ -214,8 +299,10 @@ export async function POST(request: NextRequest) {
         if (error.message.includes('organizations_slug_key')) {
           return NextResponse.json(
             { 
-              code: 'CONFLICT', 
-              reason: 'Slug already exists' 
+              code: 'UNIQUE_VIOLATION', 
+              reason: 'Slug already exists',
+              details: 'Database constraint: organizations_slug_key',
+              ...(debugInfo && { debug: debugInfo })
             },
             { status: 409 }
           );
@@ -223,13 +310,22 @@ export async function POST(request: NextRequest) {
       }
       
       return NextResponse.json(
-        { error: 'Database error', message: error.message },
+        { 
+          code: 'DATABASE_ERROR',
+          reason: 'Failed to create organization',
+          details: error.message,
+          ...(debugInfo && { debug: debugInfo })
+        },
         { status: 500 }
       );
     }
 
+    const debugInfo = generateDebugInfo(request, authData.user, body);
     return NextResponse.json(
-      { data }, 
+      { 
+        data,
+        ...(debugInfo && { debug: debugInfo })
+      }, 
       { 
         status: 201,
         headers: {
