@@ -41,31 +41,76 @@ export const requiredString = (minLength = 1, maxLength = 255) =>
  */
 export const urlField = () =>
   z.string()
-    .url('Invalid URL format')
-    .refine(url => url.startsWith('https://'), 'HTTPS required')
     .optional()
     .or(z.literal(''))
-    .transform(normalizeEmptyToNull);
+    .transform(val => {
+      const normalized = normalizeEmptyToNull(val);
+      if (!normalized) return null;
+      
+      // 空文字やnullの場合はnullを返す
+      if (typeof normalized !== 'string' || normalized.trim() === '') {
+        return null;
+      }
+      
+      // URLが有効かチェック
+      try {
+        const url = normalized.startsWith('http') ? normalized : `https://${normalized}`;
+        new URL(url);
+        return url;
+      } catch {
+        throw new Error('Invalid URL format');
+      }
+    });
 
 /**
  * メールアドレス バリデーション
  */
 export const emailField = () =>
   z.string()
-    .email('Invalid email format')
     .optional()
     .or(z.literal(''))
-    .transform(normalizeEmptyToNull);
+    .transform(val => {
+      const normalized = normalizeEmptyToNull(val);
+      if (!normalized) return null;
+      
+      // 空文字やnullの場合はnullを返す
+      if (typeof normalized !== 'string' || normalized.trim() === '') {
+        return null;
+      }
+      
+      // 基本的なメール形式チェック
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(normalized)) {
+        throw new Error('Invalid email format');
+      }
+      
+      return normalized;
+    });
 
 /**
  * 電話番号 バリデーション（要件定義準拠: E.164対応）
  */
 export const phoneField = () =>
   z.string()
-    .regex(/^[\d\s\-\+\(\)]+$/, 'Invalid phone number format')
     .optional()
     .or(z.literal(''))
-    .transform(normalizeEmptyToNull);
+    .transform(val => {
+      const normalized = normalizeEmptyToNull(val);
+      if (!normalized) return null;
+      
+      // 空文字やnullの場合はnullを返す
+      if (typeof normalized !== 'string' || normalized.trim() === '') {
+        return null;
+      }
+      
+      // 電話番号の基本的な形式チェック（数字、スペース、ハイフン、プラス、括弧のみ）
+      const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+      if (!phoneRegex.test(normalized)) {
+        throw new Error('Invalid phone number format');
+      }
+      
+      return normalized;
+    });
 
 /**
  * スラッグ バリデーション（要件定義準拠: 予約語チェック）

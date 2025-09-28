@@ -243,11 +243,20 @@ export default function NewOrganizationPage() {
             setErrors({ submit: errorData.reason || 'データの重複エラーです' });
           }
         } else if (response.status === 400) {
-          if (errorData.code === 'VALIDATION_ERROR') {
-            if (errorData.reason?.includes('slug')) {
-              setErrors({ slug: errorData.details || 'スラッグの形式が正しくありません' });
+          if (errorData.code === 'VALIDATION_ERROR' && errorData.details && Array.isArray(errorData.details)) {
+            // Zod詳細エラーを各フィールドにマッピング
+            const fieldErrors: Record<string, string> = {};
+            errorData.details.forEach((err: any) => {
+              if (err.field && err.message) {
+                fieldErrors[err.field] = err.message;
+              }
+            });
+            
+            // フィールドエラーがある場合はそれを設定、なければ一般的なエラー
+            if (Object.keys(fieldErrors).length > 0) {
+              setErrors(fieldErrors);
             } else {
-              setErrors({ submit: errorData.details || 'データに不備があります' });
+              setErrors({ submit: 'データに不備があります' });
             }
           } else {
             setErrors({ submit: errorData.reason || errorData.message || 'データに不備があります' });
