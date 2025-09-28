@@ -48,7 +48,8 @@ export default function BillingPage() {
         .single();
 
       if (orgError || !org) {
-        setError('Organization not found');
+        // 組織が見つからない場合は企業作成ページにリダイレクト
+        router.push('/organizations/new');
         return;
       }
 

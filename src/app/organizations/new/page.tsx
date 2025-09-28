@@ -341,8 +341,8 @@ export default function NewOrganizationPage() {
         {/* フォーム */}
         <form onSubmit={handleSubmit} className="card">
           {/* 基本情報 */}
-          <div className="card-padding card-header">
-            <h2 className="text-heading-4 text-gray-900 dark:text-gray-100">基本情報</h2>
+          <div className="card-padding card-header bg-gray-50">
+            <h2 className="text-heading-4 text-gray-900">基本情報</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

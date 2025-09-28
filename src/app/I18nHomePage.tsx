@@ -384,10 +384,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div>
               <h4 className="font-semibold mb-4">{t('pages.home.footer.features')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>{t('pages.home.features.organizationManagement.title')}</li>
-                <li>{t('pages.home.features.serviceManagement.title')}</li>
-                <li>{t('pages.home.features.caseManagement.title')}</li>
-                <li>{t('pages.home.footer.search')}</li>
+                <li><Link href="/organizations" className="hover:text-white transition-colors">{t('pages.home.features.organizationManagement.title')}</Link></li>
+                <li><Link href="/organizations" className="hover:text-white transition-colors">{t('pages.home.features.serviceManagement.title')}</Link></li>
+                <li><Link href="/organizations" className="hover:text-white transition-colors">{t('pages.home.features.caseManagement.title')}</Link></li>
               </ul>
             </div>
             <div>
