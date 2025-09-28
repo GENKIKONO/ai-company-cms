@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { PLAN_LIMITS } from '@/lib/plan-limits';
@@ -28,11 +28,7 @@ export default function BillingPage() {
   const success = searchParams.get('success');
   const canceled = searchParams.get('canceled');
 
-  useEffect(() => {
-    fetchBillingData();
-  }, []);
-
-  async function fetchBillingData() {
+  const fetchBillingData = useCallback(async () => {
     try {
       setLoading(true);
       const supabase = createClient();
@@ -79,7 +75,11 @@ export default function BillingPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [router]);
+
+  useEffect(() => {
+    fetchBillingData();
+  }, [fetchBillingData]);
 
   async function handleSubscribe() {
     try {

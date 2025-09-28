@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/lib/design-system/co
 import { LoadingSpinner } from '@/lib/design-system/components/ui/LoadingSpinner';
 import { usePerformanceTracking, useApiMonitoring } from '@/lib/monitoring/react-hooks';
 import { performanceMonitor, errorMonitor, logger } from '@/lib/monitoring';
+import type { SystemHealthStatus } from '@/lib/utils/monitoring-integration';
 
 interface DashboardData {
   performance: {
@@ -32,6 +33,7 @@ interface DashboardData {
     responseTime: number;
     throughput: number;
   };
+  health?: SystemHealthStatus;
 }
 
 export default function MonitoringDashboard() {
@@ -46,6 +48,18 @@ export default function MonitoringDashboard() {
   const fetchDashboardData = React.useCallback(async () => {
     try {
       mark('data-fetch-start');
+      
+      // 統合ヘルスチェックをAPIから取得
+      let healthStatus: SystemHealthStatus | undefined;
+      try {
+        const healthResponse = await fetch('/api/ops/monitoring/health');
+        if (healthResponse.ok) {
+          const healthResult = await healthResponse.json();
+          healthStatus = healthResult.data;
+        }
+      } catch (error) {
+        console.error('Failed to fetch health status:', error);
+      }
       
       // 模擬データ（実際の実装では API から取得）
       const mockData: DashboardData = {
@@ -73,10 +87,11 @@ export default function MonitoringDashboard() {
           byCategory: errorMonitor.getErrorStats(),
         },
         system: {
-          uptime: 99.9,
-          responseTime: Math.random() * 100 + 50,
+          uptime: healthStatus?.metrics.uptimePercentage || 99.9,
+          responseTime: healthStatus?.metrics.responseTimeP95 || Math.random() * 100 + 50,
           throughput: Math.random() * 1000 + 500,
         },
+        health: healthStatus,
       };
 
       // 実際のメトリクスを混合
@@ -211,6 +226,107 @@ export default function MonitoringDashboard() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* 統合ヘルス状態 */}
+            {data.health && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>システム統合ヘルス状態</span>
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      data.health.overall === 'healthy' ? 'bg-green-100 text-green-800' :
+                      data.health.overall === 'degraded' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {data.health.overall === 'healthy' ? '正常' :
+                       data.health.overall === 'degraded' ? '劣化' : '異常'}
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {Object.entries(data.health.services).map(([service, status]) => (
+                      <div key={service} className="text-center">
+                        <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
+                          status === 'operational' ? 'bg-green-100' :
+                          status === 'degraded' ? 'bg-yellow-100' : 'bg-red-100'
+                        }`}>
+                          <div className={`w-4 h-4 rounded-full ${
+                            status === 'operational' ? 'bg-green-500' :
+                            status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
+                          }`} />
+                        </div>
+                        <div className="text-xs font-medium text-gray-700 capitalize">
+                          {service === 'database' ? 'DB' : service}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {status === 'operational' ? '正常' :
+                           status === 'degraded' ? '劣化' : 'ダウン'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {data.health.alerts && data.health.alerts.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">アクティブアラート</h4>
+                      <div className="space-y-2">
+                        {data.health.alerts.map((alert, index) => (
+                          <div key={index} className={`p-3 rounded-lg ${
+                            alert.severity === 'critical' ? 'bg-red-50 border border-red-200' :
+                            'bg-yellow-50 border border-yellow-200'
+                          }`}>
+                            <div className="flex items-center justify-between">
+                              <div className="text-sm font-medium">
+                                {alert.type.replace(/_/g, ' ').toUpperCase()}
+                              </div>
+                              <div className={`text-xs px-2 py-1 rounded ${
+                                alert.severity === 'critical' ? 'bg-red-100 text-red-800' :
+                                'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {alert.severity === 'critical' ? 'クリティカル' : '警告'}
+                              </div>
+                            </div>
+                            <div className="text-sm text-gray-600 mt-1">
+                              {alert.message}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                      <div>
+                        <div className="text-lg font-bold text-blue-600">
+                          {data.health.metrics.webhookHealthScore.toFixed(0)}%
+                        </div>
+                        <div className="text-xs text-gray-500">Webhook健全性</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-purple-600">
+                          {data.health.metrics.errorRate.toFixed(1)}
+                        </div>
+                        <div className="text-xs text-gray-500">エラー/時</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-green-600">
+                          {data.health.metrics.responseTimeP95.toFixed(0)}ms
+                        </div>
+                        <div className="text-xs text-gray-500">P95応答時間</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-indigo-600">
+                          {data.health.metrics.uptimePercentage.toFixed(1)}%
+                        </div>
+                        <div className="text-xs text-gray-500">稼働率</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* システム状態 */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

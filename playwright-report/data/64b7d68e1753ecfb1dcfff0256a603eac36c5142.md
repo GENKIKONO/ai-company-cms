@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e6] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+      - img [ref=e8] [cursor=pointer]
+    - generic [ref=e13] [cursor=pointer]:
+      - button "Open issues overlay" [ref=e14] [cursor=pointer]:
+        - generic [ref=e15] [cursor=pointer]:
+          - generic [ref=e16] [cursor=pointer]: "0"
+          - generic [ref=e17] [cursor=pointer]: "1"
+        - generic [ref=e18] [cursor=pointer]: Issue
+      - button "Collapse issues badge" [ref=e19] [cursor=pointer]:
+        - img [ref=e20] [cursor=pointer]
+  - banner [ref=e22]:
+    - generic [ref=e24]:
+      - link "AIO Hub AI企業CMS" [ref=e26]:
+        - /url: /
+      - generic [ref=e27]:
+        - button "ui.language.selector" [ref=e29] [cursor=pointer]:
+          - img [ref=e30] [cursor=pointer]
+          - generic [ref=e35] [cursor=pointer]: 🇺🇸
+          - generic [ref=e36] [cursor=pointer]: English
+          - img [ref=e37] [cursor=pointer]
+        - link "ログイン" [ref=e39]:
+          - /url: /auth/login
+        - link "無料で始める" [ref=e40]:
+          - /url: /auth/login
+  - generic [ref=e42]:
+    - generic [ref=e43]:
+      - heading "AIO Hub にログイン" [level=2] [ref=e44]
+      - paragraph [ref=e45]: AI企業情報プラットフォーム
+    - generic [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - generic [ref=e49]: メールアドレス
+          - textbox "メールアドレス" [ref=e50]: partner-user@test.example.com
+        - generic [ref=e51]:
+          - generic [ref=e52]: パスワード
+          - textbox "パスワード" [ref=e53]: Partner123!
+      - button "ログイン中..." [disabled] [ref=e55]
+    - generic [ref=e56]:
+      - paragraph [ref=e57]:
+        - link "パスワードを忘れた方はこちら" [ref=e58]:
+          - /url: /auth/forgot-password
+      - paragraph [ref=e59]:
+        - text: アカウントをお持ちでない方は
+        - link "新規登録" [ref=e60]:
+          - /url: /auth/signup
+  - alert [ref=e61]
+```

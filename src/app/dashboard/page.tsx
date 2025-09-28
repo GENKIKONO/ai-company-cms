@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { headers } from 'next/headers';
 import { getMyOrganizationSafe, getOrganizationStatsSafe } from '@/lib/safeData';
 import PublishToggle from './components/PublishToggle';
@@ -174,9 +175,11 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 {organization.logo_url ? (
-                  <img
+                  <Image
                     src={organization.logo_url}
                     alt={`${organization.name}のロゴ`}
+                    width={48}
+                    height={48}
                     className="w-12 h-12 rounded-lg object-cover"
                   />
                 ) : (

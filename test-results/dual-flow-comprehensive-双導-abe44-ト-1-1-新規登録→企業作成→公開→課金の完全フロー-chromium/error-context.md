@@ -1,0 +1,113 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8] [cursor=pointer]
+  - banner [ref=e11]:
+    - generic [ref=e13]:
+      - link "AIO Hub AI企業CMS" [ref=e15] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e16]:
+        - button "ui.language.selector" [ref=e18] [cursor=pointer]:
+          - img [ref=e19] [cursor=pointer]
+          - generic [ref=e24] [cursor=pointer]: 🇺🇸
+          - generic [ref=e25] [cursor=pointer]: English
+          - img [ref=e26] [cursor=pointer]
+        - link "ログイン" [ref=e28] [cursor=pointer]:
+          - /url: /auth/login
+        - link "無料で始める" [ref=e29] [cursor=pointer]:
+          - /url: /auth/login
+  - generic [ref=e30]:
+    - main [ref=e31]:
+      - generic [ref=e34]:
+        - heading "pages.home.hero.title" [level=1] [ref=e35]
+        - paragraph [ref=e36]: pages.home.hero.subtitle
+        - generic [ref=e37]:
+          - link "ui.common.tryFree" [ref=e38] [cursor=pointer]:
+            - /url: /auth/signup
+          - link "pages.home.hero.viewDirectory" [ref=e39] [cursor=pointer]:
+            - /url: /organizations
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - heading "pages.home.features.title" [level=2] [ref=e43]
+          - paragraph [ref=e44]: pages.home.features.subtitle
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - img [ref=e48]
+            - heading "pages.home.features.organizationManagement.title" [level=3] [ref=e50]
+            - paragraph [ref=e51]: pages.home.features.organizationManagement.description
+          - generic [ref=e52]:
+            - img [ref=e54]
+            - heading "pages.home.features.serviceManagement.title" [level=3] [ref=e56]
+            - paragraph [ref=e57]: pages.home.features.serviceManagement.description
+          - generic [ref=e58]:
+            - img [ref=e60]
+            - heading "pages.home.features.caseManagement.title" [level=3] [ref=e62]
+            - paragraph [ref=e63]: pages.home.features.caseManagement.description
+      - generic [ref=e65]:
+        - heading "pages.home.stats.title" [level=2] [ref=e67]
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - generic [ref=e70]: 1,000+
+            - generic [ref=e71]: pages.home.stats.organizations
+          - generic [ref=e72]:
+            - generic [ref=e73]: 5,000+
+            - generic [ref=e74]: pages.home.stats.services
+          - generic [ref=e75]:
+            - generic [ref=e76]: 2,500+
+            - generic [ref=e77]: pages.home.stats.cases
+          - generic [ref=e78]:
+            - generic [ref=e79]: 50+
+            - generic [ref=e80]: pages.home.stats.categories
+      - generic [ref=e82]:
+        - heading "pages.home.message.title" [level=2] [ref=e83]
+        - generic [ref=e84]: pages.home.message.content
+      - generic [ref=e86]:
+        - heading "pages.home.cta.title" [level=2] [ref=e87]
+        - paragraph [ref=e88]: pages.home.cta.subtitle
+        - link "pages.home.cta.button" [ref=e89] [cursor=pointer]:
+          - /url: /auth/signup
+    - contentinfo [ref=e90]:
+      - generic [ref=e91]:
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - heading "ui.header.title" [level=3] [ref=e94]
+            - paragraph [ref=e95]: pages.home.footer.tagline
+          - generic [ref=e96]:
+            - heading "pages.home.footer.features" [level=4] [ref=e97]
+            - list [ref=e98]:
+              - listitem [ref=e99]: pages.home.features.organizationManagement.title
+              - listitem [ref=e100]: pages.home.features.serviceManagement.title
+              - listitem [ref=e101]: pages.home.features.caseManagement.title
+              - listitem [ref=e102]: pages.home.footer.search
+          - generic [ref=e103]:
+            - heading "pages.home.footer.links" [level=4] [ref=e104]
+            - list [ref=e105]:
+              - listitem [ref=e106]:
+                - link "pages.home.footer.directory" [ref=e107] [cursor=pointer]:
+                  - /url: /organizations
+              - listitem [ref=e108]:
+                - link "pages.home.footer.search" [ref=e109] [cursor=pointer]:
+                  - /url: /search
+              - listitem [ref=e110]:
+                - link "ui.header.dashboard" [ref=e111] [cursor=pointer]:
+                  - /url: /dashboard
+          - generic [ref=e112]:
+            - heading "pages.home.footer.support" [level=4] [ref=e113]
+            - list [ref=e114]:
+              - listitem [ref=e115]:
+                - link "pages.home.footer.helpCenter" [ref=e116] [cursor=pointer]:
+                  - /url: /help
+              - listitem [ref=e117]:
+                - link "pages.home.footer.contact" [ref=e118] [cursor=pointer]:
+                  - /url: /contact
+              - listitem [ref=e119]:
+                - link "pages.home.footer.terms" [ref=e120] [cursor=pointer]:
+                  - /url: /terms
+              - listitem [ref=e121]:
+                - link "pages.home.footer.privacy" [ref=e122] [cursor=pointer]:
+                  - /url: /privacy
+        - paragraph [ref=e124]: pages.home.footer.copyright
+  - alert [ref=e125]: AIO Hub AI企業CMS
+```

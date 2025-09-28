@@ -1,5 +1,5 @@
 import { FullConfig } from '@playwright/test';
-import { supabaseAdmin } from '../src/lib/supabase-server';
+import { supabaseTest } from '../src/lib/supabase-test';
 import fs from 'fs';
 import path from 'path';
 
@@ -31,7 +31,7 @@ async function cleanupTestData() {
   console.log('🗑️ テストデータのクリーンアップ中...');
 
   try {
-    const supabase = supabaseAdmin();
+    const supabase = supabaseTest;
 
     // テスト用メールアドレスパターンでユーザーを検索
     const testEmailPattern = /^test@example\.com$/;

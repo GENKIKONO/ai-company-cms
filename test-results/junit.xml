@@ -1,0 +1,2116 @@
+<testsuites id="" name="" tests="80" failures="52" skipped="0" errors="0" time="118.479463">
+<testsuite name="dual-flow-comprehensive.spec.ts" timestamp="2025-09-28T11:48:11.789Z" hostname="chromium" tests="16" failures="11" skipped="0" time="128.74" errors="0">
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー" classname="dual-flow-comprehensive.spec.ts" time="12.825">
+<failure message="dual-flow-comprehensive.spec.ts:33:9 1-1: 新規登録→企業作成→公開→課金の完全フロー" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:33:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=新規登録')
+
+
+      34 |       // 1. 新規登録
+      35 |       await page.goto('/');
+    > 36 |       await page.click('text=新規登録');
+         |                  ^
+      37 |       
+      38 |       await page.fill('input[name="email"]', SELF_SERVE_USER.email);
+      39 |       await page.fill('input[name="password"]', SELF_SERVE_USER.password);
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:36:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-chromium/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-2: ナビゲーション規則確認" classname="dual-flow-comprehensive.spec.ts" time="13.556">
+<failure message="dual-flow-comprehensive.spec.ts:74:9 1-2: ナビゲーション規則確認" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:74:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-2: ナビゲーション規則確認 
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /.*auth\/login/
+    Received string:  "http://localhost:3000/"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 10000ms
+        14 × unexpected value "http://localhost:3000/"
+
+
+      81 |       // 未ログイン時のCTA確認
+      82 |       await page.click('text=無料で始める');
+    > 83 |       await expect(page).toHaveURL(/.*auth\/login/);
+         |                          ^
+      84 |       
+      85 |       // TODO: ログイン済み状態でのCTA→ダッシュボード遷移のテスト
+      86 |     });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:83:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-bc44f-セルフサーブ導線テスト-1-2-ナビゲーション規則確認-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-bc44f-セルフサーブ導線テスト-1-2-ナビゲーション規則確認-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-bc44f-セルフサーブ導線テスト-1-2-ナビゲーション規則確認-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-bc44f-セルフサーブ導線テスト-1-2-ナビゲーション規則確認-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-bc44f-セルフサーブ導線テスト-1-2-ナビゲーション規則確認-chromium/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-bc44f-セルフサーブ導線テスト-1-2-ナビゲーション規則確認-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-3: レスポンシブ表示確認" classname="dual-flow-comprehensive.spec.ts" time="3.327">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー" classname="dual-flow-comprehensive.spec.ts" time="18.351">
+<failure message="dual-flow-comprehensive.spec.ts:103:9 2-1: パートナーによる企業代理作成フロー" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:103:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=企業管理')
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=企業管理')
+
+
+      110 |       // 2. パートナー専用の企業管理画面への遷移
+      111 |       await page.goto('/dashboard/organizations');
+    > 112 |       await expect(page.locator('text=企業管理')).toBeVisible();
+          |                                               ^
+      113 |       
+      114 |       // 3. 新規企業作成（代理）
+      115 |       await page.click('text=新規企業追加');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:112:47
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-chromium/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認" classname="dual-flow-comprehensive.spec.ts" time="6.989">
+<failure message="dual-flow-comprehensive.spec.ts:131:9 2-2: パートナーの課金機能アクセス制限確認" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:131:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      140 |         data: { organizationId: 'test-org-id' }
+      141 |       });
+    > 142 |       expect(billingResponse.status()).toBe(403);
+          |                                        ^
+      143 |       
+      144 |       const portalResponse = await page.request.post('/api/billing/portal', {
+      145 |         data: { customerId: 'test-customer-id' }
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:142:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-chromium/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="17.675">
+<failure message="dual-flow-comprehensive.spec.ts:152:9 3-1: Organization JSON-LD出力確認" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:152:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('script[type="application/ld+json"]').first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('script[type="application/ld+json"]').first()
+
+
+      155 |       // JSON-LDスクリプトタグの存在確認
+      156 |       const jsonLdScript = await page.locator('script[type="application/ld+json"]').first();
+    > 157 |       await expect(jsonLdScript).toBeVisible();
+          |                                  ^
+      158 |       
+      159 |       // JSON-LD内容の検証
+      160 |       const jsonLdContent = await jsonLdScript.textContent();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:157:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-chromium/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-2: Article JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="5.418">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-3: BreadcrumbList JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="4.794">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック" classname="dual-flow-comprehensive.spec.ts" time="15.237">
+<failure message="dual-flow-comprehensive.spec.ts:208:9 4-1: /ops/verify 統合ヘルスチェック" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:208:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+
+
+      210 |       
+      211 |       // ALL_GREEN状態の確認
+    > 212 |       await expect(page.locator('text=ALL_GREEN').or(page.locator('text=SUCCESS'))).toBeVisible();
+          |                                                                                     ^
+      213 |       
+      214 |       // 主要コンポーネントの状態確認
+      215 |       await expect(page.locator('text=Database').or(page.locator('text=データベース'))).toBeVisible();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:212:85
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-chromium/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断" classname="dual-flow-comprehensive.spec.ts" time="13.921">
+<failure message="dual-flow-comprehensive.spec.ts:220:9 4-2: /ops/probe 詳細診断" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:220:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=API応答時間').or(locator('text=Response Time'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=API応答時間').or(locator('text=Response Time'))
+
+
+      222 |       
+      223 |       // パフォーマンス指標の確認
+    > 224 |       await expect(page.locator('text=API応答時間').or(page.locator('text=Response Time'))).toBeVisible();
+          |                                                                                         ^
+      225 |       await expect(page.locator('text=データベース接続').or(page.locator('text=Database Connection'))).toBeVisible();
+      226 |     });
+      227 |
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:224:89
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-chromium/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認" classname="dual-flow-comprehensive.spec.ts" time="4.462">
+<failure message="dual-flow-comprehensive.spec.ts:228:9 4-3: API health エンドポイント確認" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:228:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 206
+
+      228 |     test('4-3: API health エンドポイント確認', async ({ page }) => {
+      229 |       const response = await page.request.get('/api/health');
+    > 230 |       expect(response.status()).toBe(200);
+          |                                 ^
+      231 |       
+      232 |       const health = await response.json();
+      233 |       expect(health.status).toBe('ok');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:230:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-chromium/video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-1: セルフサーブユーザーの複数企業作成防止" classname="dual-flow-comprehensive.spec.ts" time="3.337">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認" classname="dual-flow-comprehensive.spec.ts" time="2.644">
+<failure message="dual-flow-comprehensive.spec.ts:251:9 5-2: パートナーアクセス権限確認" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:251:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      258 |       // セルフサーブ専用APIへのアクセス制限確認
+      259 |       const myOrgResponse = await page.request.get('/api/my/organization');
+    > 260 |       expect(myOrgResponse.status()).toBe(403);
+          |                                      ^
+      261 |     });
+      262 |
+      263 |     test('5-3: 未認証ユーザーのアクセス制限', async ({ page }) => {
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:260:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-chromium/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限" classname="dual-flow-comprehensive.spec.ts" time="1.931">
+<failure message="dual-flow-comprehensive.spec.ts:263:9 5-3: 未認証ユーザーのアクセス制限" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:263:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 405
+
+      272 |       for (const endpoint of protectedEndpoints) {
+      273 |         const response = await page.request.get(endpoint);
+    > 274 |         expect(response.status()).toBe(401);
+          |                                   ^
+      275 |       }
+      276 |     });
+      277 |   });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:274:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-chromium/video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-1: ページ読み込み速度確認" classname="dual-flow-comprehensive.spec.ts" time="2.599">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認" classname="dual-flow-comprehensive.spec.ts" time="1.674">
+<failure message="dual-flow-comprehensive.spec.ts:290:9 6-2: API応答時間確認" type="FAILURE">
+<![CDATA[  [chromium] › dual-flow-comprehensive.spec.ts:290:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 1000
+    Received:   1190
+
+      294 |       
+      295 |       // 1秒以内のAPI応答
+    > 296 |       expect(responseTime).toBeLessThan(1000);
+          |                            ^
+      297 |       expect(response.status()).toBe(200);
+      298 |     });
+      299 |   });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:296:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-chromium/video.webm]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="dual-flow-comprehensive.spec.ts" timestamp="2025-09-28T11:48:11.789Z" hostname="firefox" tests="16" failures="11" skipped="0" time="110.189" errors="0">
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー" classname="dual-flow-comprehensive.spec.ts" time="11.967">
+<failure message="dual-flow-comprehensive.spec.ts:33:9 1-1: 新規登録→企業作成→公開→課金の完全フロー" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:33:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=新規登録')
+
+
+      34 |       // 1. 新規登録
+      35 |       await page.goto('/');
+    > 36 |       await page.click('text=新規登録');
+         |                  ^
+      37 |       
+      38 |       await page.fill('input[name="email"]', SELF_SERVE_USER.email);
+      39 |       await page.fill('input[name="password"]', SELF_SERVE_USER.password);
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:36:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-2: ナビゲーション規則確認" classname="dual-flow-comprehensive.spec.ts" time="5.361">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-3: レスポンシブ表示確認" classname="dual-flow-comprehensive.spec.ts" time="4.934">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー" classname="dual-flow-comprehensive.spec.ts" time="17.314">
+<failure message="dual-flow-comprehensive.spec.ts:103:9 2-1: パートナーによる企業代理作成フロー" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:103:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=企業管理')
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=企業管理')
+
+
+      110 |       // 2. パートナー専用の企業管理画面への遷移
+      111 |       await page.goto('/dashboard/organizations');
+    > 112 |       await expect(page.locator('text=企業管理')).toBeVisible();
+          |                                               ^
+      113 |       
+      114 |       // 3. 新規企業作成（代理）
+      115 |       await page.click('text=新規企業追加');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:112:47
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認" classname="dual-flow-comprehensive.spec.ts" time="6.205">
+<failure message="dual-flow-comprehensive.spec.ts:131:9 2-2: パートナーの課金機能アクセス制限確認" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:131:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      140 |         data: { organizationId: 'test-org-id' }
+      141 |       });
+    > 142 |       expect(billingResponse.status()).toBe(403);
+          |                                        ^
+      143 |       
+      144 |       const portalResponse = await page.request.post('/api/billing/portal', {
+      145 |         data: { customerId: 'test-customer-id' }
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:142:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="16.664">
+<failure message="dual-flow-comprehensive.spec.ts:152:9 3-1: Organization JSON-LD出力確認" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:152:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('script[type="application/ld+json"]').first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('script[type="application/ld+json"]').first()
+
+
+      155 |       // JSON-LDスクリプトタグの存在確認
+      156 |       const jsonLdScript = await page.locator('script[type="application/ld+json"]').first();
+    > 157 |       await expect(jsonLdScript).toBeVisible();
+          |                                  ^
+      158 |       
+      159 |       // JSON-LD内容の検証
+      160 |       const jsonLdContent = await jsonLdScript.textContent();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:157:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-2: Article JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="6.047">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-3: BreadcrumbList JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="2.469">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック" classname="dual-flow-comprehensive.spec.ts" time="10.935">
+<failure message="dual-flow-comprehensive.spec.ts:208:9 4-1: /ops/verify 統合ヘルスチェック" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:208:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+
+
+      210 |       
+      211 |       // ALL_GREEN状態の確認
+    > 212 |       await expect(page.locator('text=ALL_GREEN').or(page.locator('text=SUCCESS'))).toBeVisible();
+          |                                                                                     ^
+      213 |       
+      214 |       // 主要コンポーネントの状態確認
+      215 |       await expect(page.locator('text=Database').or(page.locator('text=データベース'))).toBeVisible();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:212:85
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断" classname="dual-flow-comprehensive.spec.ts" time="12.011">
+<failure message="dual-flow-comprehensive.spec.ts:220:9 4-2: /ops/probe 詳細診断" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:220:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=API応答時間').or(locator('text=Response Time'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=API応答時間').or(locator('text=Response Time'))
+
+
+      222 |       
+      223 |       // パフォーマンス指標の確認
+    > 224 |       await expect(page.locator('text=API応答時間').or(page.locator('text=Response Time'))).toBeVisible();
+          |                                                                                         ^
+      225 |       await expect(page.locator('text=データベース接続').or(page.locator('text=Database Connection'))).toBeVisible();
+      226 |     });
+      227 |
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:224:89
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認" classname="dual-flow-comprehensive.spec.ts" time="3.562">
+<failure message="dual-flow-comprehensive.spec.ts:228:9 4-3: API health エンドポイント確認" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:228:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 206
+
+      228 |     test('4-3: API health エンドポイント確認', async ({ page }) => {
+      229 |       const response = await page.request.get('/api/health');
+    > 230 |       expect(response.status()).toBe(200);
+          |                                 ^
+      231 |       
+      232 |       const health = await response.json();
+      233 |       expect(health.status).toBe('ok');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:230:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-firefox/test-failed-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-1: セルフサーブユーザーの複数企業作成防止" classname="dual-flow-comprehensive.spec.ts" time="2.522">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認" classname="dual-flow-comprehensive.spec.ts" time="2.647">
+<failure message="dual-flow-comprehensive.spec.ts:251:9 5-2: パートナーアクセス権限確認" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:251:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      258 |       // セルフサーブ専用APIへのアクセス制限確認
+      259 |       const myOrgResponse = await page.request.get('/api/my/organization');
+    > 260 |       expect(myOrgResponse.status()).toBe(403);
+          |                                      ^
+      261 |     });
+      262 |
+      263 |     test('5-3: 未認証ユーザーのアクセス制限', async ({ page }) => {
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:260:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限" classname="dual-flow-comprehensive.spec.ts" time="0.346">
+<failure message="dual-flow-comprehensive.spec.ts:263:9 5-3: 未認証ユーザーのアクセス制限" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:263:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 405
+
+      272 |       for (const endpoint of protectedEndpoints) {
+      273 |         const response = await page.request.get(endpoint);
+    > 274 |         expect(response.status()).toBe(401);
+          |                                   ^
+      275 |       }
+      276 |     });
+      277 |   });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:274:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-firefox/test-failed-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-1: ページ読み込み速度確認" classname="dual-flow-comprehensive.spec.ts" time="4.229">
+<failure message="dual-flow-comprehensive.spec.ts:280:9 6-1: ページ読み込み速度確認" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:280:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-1: ページ読み込み速度確認 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 2500
+    Received:   3400
+
+      285 |       
+      286 |       // 2.5秒以内の読み込み（LCP要件）
+    > 287 |       expect(loadTime).toBeLessThan(2500);
+          |                        ^
+      288 |     });
+      289 |
+      290 |     test('6-2: API応答時間確認', async ({ page }) => {
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:287:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-ea850-ォーマンス・可用性確認-6-1-ページ読み込み速度確認-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-ea850-ォーマンス・可用性確認-6-1-ページ読み込み速度確認-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-ea850-ォーマンス・可用性確認-6-1-ページ読み込み速度確認-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-ea850-ォーマンス・可用性確認-6-1-ページ読み込み速度確認-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認" classname="dual-flow-comprehensive.spec.ts" time="2.976">
+<failure message="dual-flow-comprehensive.spec.ts:290:9 6-2: API応答時間確認" type="FAILURE">
+<![CDATA[  [firefox] › dual-flow-comprehensive.spec.ts:290:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 1000
+    Received:   2171
+
+      294 |       
+      295 |       // 1秒以内のAPI応答
+    > 296 |       expect(responseTime).toBeLessThan(1000);
+          |                            ^
+      297 |       expect(response.status()).toBe(200);
+      298 |     });
+      299 |   });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:296:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-firefox/test-failed-1.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="dual-flow-comprehensive.spec.ts" timestamp="2025-09-28T11:48:11.789Z" hostname="webkit" tests="16" failures="10" skipped="0" time="74.747" errors="0">
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー" classname="dual-flow-comprehensive.spec.ts" time="12.213">
+<failure message="dual-flow-comprehensive.spec.ts:33:9 1-1: 新規登録→企業作成→公開→課金の完全フロー" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:33:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=新規登録')
+
+
+      34 |       // 1. 新規登録
+      35 |       await page.goto('/');
+    > 36 |       await page.click('text=新規登録');
+         |                  ^
+      37 |       
+      38 |       await page.fill('input[name="email"]', SELF_SERVE_USER.email);
+      39 |       await page.fill('input[name="password"]', SELF_SERVE_USER.password);
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:36:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-webkit/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-2: ナビゲーション規則確認" classname="dual-flow-comprehensive.spec.ts" time="2.888">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-3: レスポンシブ表示確認" classname="dual-flow-comprehensive.spec.ts" time="2.243">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー" classname="dual-flow-comprehensive.spec.ts" time="11.977">
+<failure message="dual-flow-comprehensive.spec.ts:103:9 2-1: パートナーによる企業代理作成フロー" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:103:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=企業管理')
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=企業管理')
+
+
+      110 |       // 2. パートナー専用の企業管理画面への遷移
+      111 |       await page.goto('/dashboard/organizations');
+    > 112 |       await expect(page.locator('text=企業管理')).toBeVisible();
+          |                                               ^
+      113 |       
+      114 |       // 3. 新規企業作成（代理）
+      115 |       await page.click('text=新規企業追加');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:112:47
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-webkit/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認" classname="dual-flow-comprehensive.spec.ts" time="1.616">
+<failure message="dual-flow-comprehensive.spec.ts:131:9 2-2: パートナーの課金機能アクセス制限確認" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:131:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      140 |         data: { organizationId: 'test-org-id' }
+      141 |       });
+    > 142 |       expect(billingResponse.status()).toBe(403);
+          |                                        ^
+      143 |       
+      144 |       const portalResponse = await page.request.post('/api/billing/portal', {
+      145 |         data: { customerId: 'test-customer-id' }
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:142:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-webkit/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="11.822">
+<failure message="dual-flow-comprehensive.spec.ts:152:9 3-1: Organization JSON-LD出力確認" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:152:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('script[type="application/ld+json"]').first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('script[type="application/ld+json"]').first()
+
+
+      155 |       // JSON-LDスクリプトタグの存在確認
+      156 |       const jsonLdScript = await page.locator('script[type="application/ld+json"]').first();
+    > 157 |       await expect(jsonLdScript).toBeVisible();
+          |                                  ^
+      158 |       
+      159 |       // JSON-LD内容の検証
+      160 |       const jsonLdContent = await jsonLdScript.textContent();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:157:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-webkit/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-2: Article JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="1.802">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-3: BreadcrumbList JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="1.444">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック" classname="dual-flow-comprehensive.spec.ts" time="10.753">
+<failure message="dual-flow-comprehensive.spec.ts:208:9 4-1: /ops/verify 統合ヘルスチェック" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:208:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+
+
+      210 |       
+      211 |       // ALL_GREEN状態の確認
+    > 212 |       await expect(page.locator('text=ALL_GREEN').or(page.locator('text=SUCCESS'))).toBeVisible();
+          |                                                                                     ^
+      213 |       
+      214 |       // 主要コンポーネントの状態確認
+      215 |       await expect(page.locator('text=Database').or(page.locator('text=データベース'))).toBeVisible();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:212:85
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-webkit/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断" classname="dual-flow-comprehensive.spec.ts" time="10.799">
+<failure message="dual-flow-comprehensive.spec.ts:220:9 4-2: /ops/probe 詳細診断" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:220:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=API応答時間').or(locator('text=Response Time'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=API応答時間').or(locator('text=Response Time'))
+
+
+      222 |       
+      223 |       // パフォーマンス指標の確認
+    > 224 |       await expect(page.locator('text=API応答時間').or(page.locator('text=Response Time'))).toBeVisible();
+          |                                                                                         ^
+      225 |       await expect(page.locator('text=データベース接続').or(page.locator('text=Database Connection'))).toBeVisible();
+      226 |     });
+      227 |
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:224:89
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-webkit/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認" classname="dual-flow-comprehensive.spec.ts" time="1.062">
+<failure message="dual-flow-comprehensive.spec.ts:228:9 4-3: API health エンドポイント確認" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:228:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 206
+
+      228 |     test('4-3: API health エンドポイント確認', async ({ page }) => {
+      229 |       const response = await page.request.get('/api/health');
+    > 230 |       expect(response.status()).toBe(200);
+          |                                 ^
+      231 |       
+      232 |       const health = await response.json();
+      233 |       expect(health.status).toBe('ok');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:230:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-webkit/video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-1: セルフサーブユーザーの複数企業作成防止" classname="dual-flow-comprehensive.spec.ts" time="1.161">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認" classname="dual-flow-comprehensive.spec.ts" time="1.412">
+<failure message="dual-flow-comprehensive.spec.ts:251:9 5-2: パートナーアクセス権限確認" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:251:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      258 |       // セルフサーブ専用APIへのアクセス制限確認
+      259 |       const myOrgResponse = await page.request.get('/api/my/organization');
+    > 260 |       expect(myOrgResponse.status()).toBe(403);
+          |                                      ^
+      261 |     });
+      262 |
+      263 |     test('5-3: 未認証ユーザーのアクセス制限', async ({ page }) => {
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:260:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-webkit/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限" classname="dual-flow-comprehensive.spec.ts" time="0.512">
+<failure message="dual-flow-comprehensive.spec.ts:263:9 5-3: 未認証ユーザーのアクセス制限" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:263:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 405
+
+      272 |       for (const endpoint of protectedEndpoints) {
+      273 |         const response = await page.request.get(endpoint);
+    > 274 |         expect(response.status()).toBe(401);
+          |                                   ^
+      275 |       }
+      276 |     });
+      277 |   });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:274:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-webkit/video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-1: ページ読み込み速度確認" classname="dual-flow-comprehensive.spec.ts" time="1.524">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認" classname="dual-flow-comprehensive.spec.ts" time="1.519">
+<failure message="dual-flow-comprehensive.spec.ts:290:9 6-2: API応答時間確認" type="FAILURE">
+<![CDATA[  [webkit] › dual-flow-comprehensive.spec.ts:290:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 1000
+    Received:   1064
+
+      294 |       
+      295 |       // 1秒以内のAPI応答
+    > 296 |       expect(responseTime).toBeLessThan(1000);
+          |                            ^
+      297 |       expect(response.status()).toBe(200);
+      298 |     });
+      299 |   });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:296:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-webkit/video.webm]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="dual-flow-comprehensive.spec.ts" timestamp="2025-09-28T11:48:11.789Z" hostname="mobile-chrome" tests="16" failures="10" skipped="0" time="77.568" errors="0">
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー" classname="dual-flow-comprehensive.spec.ts" time="12.103">
+<failure message="dual-flow-comprehensive.spec.ts:33:9 1-1: 新規登録→企業作成→公開→課金の完全フロー" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:33:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=新規登録')
+
+
+      34 |       // 1. 新規登録
+      35 |       await page.goto('/');
+    > 36 |       await page.click('text=新規登録');
+         |                  ^
+      37 |       
+      38 |       await page.fill('input[name="email"]', SELF_SERVE_USER.email);
+      39 |       await page.fill('input[name="password"]', SELF_SERVE_USER.password);
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:36:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-chrome/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-2: ナビゲーション規則確認" classname="dual-flow-comprehensive.spec.ts" time="2.543">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-3: レスポンシブ表示確認" classname="dual-flow-comprehensive.spec.ts" time="2.182">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー" classname="dual-flow-comprehensive.spec.ts" time="12.901">
+<failure message="dual-flow-comprehensive.spec.ts:103:9 2-1: パートナーによる企業代理作成フロー" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:103:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=企業管理')
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=企業管理')
+
+
+      110 |       // 2. パートナー専用の企業管理画面への遷移
+      111 |       await page.goto('/dashboard/organizations');
+    > 112 |       await expect(page.locator('text=企業管理')).toBeVisible();
+          |                                               ^
+      113 |       
+      114 |       // 3. 新規企業作成（代理）
+      115 |       await page.click('text=新規企業追加');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:112:47
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-chrome/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認" classname="dual-flow-comprehensive.spec.ts" time="1.84">
+<failure message="dual-flow-comprehensive.spec.ts:131:9 2-2: パートナーの課金機能アクセス制限確認" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:131:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      140 |         data: { organizationId: 'test-org-id' }
+      141 |       });
+    > 142 |       expect(billingResponse.status()).toBe(403);
+          |                                        ^
+      143 |       
+      144 |       const portalResponse = await page.request.post('/api/billing/portal', {
+      145 |         data: { customerId: 'test-customer-id' }
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:142:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-chrome/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="12.3">
+<failure message="dual-flow-comprehensive.spec.ts:152:9 3-1: Organization JSON-LD出力確認" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:152:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('script[type="application/ld+json"]').first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('script[type="application/ld+json"]').first()
+
+
+      155 |       // JSON-LDスクリプトタグの存在確認
+      156 |       const jsonLdScript = await page.locator('script[type="application/ld+json"]').first();
+    > 157 |       await expect(jsonLdScript).toBeVisible();
+          |                                  ^
+      158 |       
+      159 |       // JSON-LD内容の検証
+      160 |       const jsonLdContent = await jsonLdScript.textContent();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:157:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-chrome/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-2: Article JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="1.991">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-3: BreadcrumbList JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="1.499">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック" classname="dual-flow-comprehensive.spec.ts" time="11.501">
+<failure message="dual-flow-comprehensive.spec.ts:208:9 4-1: /ops/verify 統合ヘルスチェック" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:208:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+
+
+      210 |       
+      211 |       // ALL_GREEN状態の確認
+    > 212 |       await expect(page.locator('text=ALL_GREEN').or(page.locator('text=SUCCESS'))).toBeVisible();
+          |                                                                                     ^
+      213 |       
+      214 |       // 主要コンポーネントの状態確認
+      215 |       await expect(page.locator('text=Database').or(page.locator('text=データベース'))).toBeVisible();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:212:85
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-chrome/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断" classname="dual-flow-comprehensive.spec.ts" time="10.978">
+<failure message="dual-flow-comprehensive.spec.ts:220:9 4-2: /ops/probe 詳細診断" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:220:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=API応答時間').or(locator('text=Response Time'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=API応答時間').or(locator('text=Response Time'))
+
+
+      222 |       
+      223 |       // パフォーマンス指標の確認
+    > 224 |       await expect(page.locator('text=API応答時間').or(page.locator('text=Response Time'))).toBeVisible();
+          |                                                                                         ^
+      225 |       await expect(page.locator('text=データベース接続').or(page.locator('text=Database Connection'))).toBeVisible();
+      226 |     });
+      227 |
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:224:89
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-chrome/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認" classname="dual-flow-comprehensive.spec.ts" time="1.003">
+<failure message="dual-flow-comprehensive.spec.ts:228:9 4-3: API health エンドポイント確認" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:228:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 206
+
+      228 |     test('4-3: API health エンドポイント確認', async ({ page }) => {
+      229 |       const response = await page.request.get('/api/health');
+    > 230 |       expect(response.status()).toBe(200);
+          |                                 ^
+      231 |       
+      232 |       const health = await response.json();
+      233 |       expect(health.status).toBe('ok');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:230:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-mobile-chrome/video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-1: セルフサーブユーザーの複数企業作成防止" classname="dual-flow-comprehensive.spec.ts" time="1.526">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認" classname="dual-flow-comprehensive.spec.ts" time="1.462">
+<failure message="dual-flow-comprehensive.spec.ts:251:9 5-2: パートナーアクセス権限確認" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:251:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      258 |       // セルフサーブ専用APIへのアクセス制限確認
+      259 |       const myOrgResponse = await page.request.get('/api/my/organization');
+    > 260 |       expect(myOrgResponse.status()).toBe(403);
+          |                                      ^
+      261 |     });
+      262 |
+      263 |     test('5-3: 未認証ユーザーのアクセス制限', async ({ page }) => {
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:260:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-chrome/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限" classname="dual-flow-comprehensive.spec.ts" time="0.58">
+<failure message="dual-flow-comprehensive.spec.ts:263:9 5-3: 未認証ユーザーのアクセス制限" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:263:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 405
+
+      272 |       for (const endpoint of protectedEndpoints) {
+      273 |         const response = await page.request.get(endpoint);
+    > 274 |         expect(response.status()).toBe(401);
+          |                                   ^
+      275 |       }
+      276 |     });
+      277 |   });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:274:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-mobile-chrome/video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-1: ページ読み込み速度確認" classname="dual-flow-comprehensive.spec.ts" time="1.637">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認" classname="dual-flow-comprehensive.spec.ts" time="1.522">
+<failure message="dual-flow-comprehensive.spec.ts:290:9 6-2: API応答時間確認" type="FAILURE">
+<![CDATA[  [mobile-chrome] › dual-flow-comprehensive.spec.ts:290:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 1000
+    Received:   1061
+
+      294 |       
+      295 |       // 1秒以内のAPI応答
+    > 296 |       expect(responseTime).toBeLessThan(1000);
+          |                            ^
+      297 |       expect(response.status()).toBe(200);
+      298 |     });
+      299 |   });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:296:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-mobile-chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-mobile-chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-mobile-chrome/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-mobile-chrome/video.webm]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="dual-flow-comprehensive.spec.ts" timestamp="2025-09-28T11:48:11.789Z" hostname="mobile-safari" tests="16" failures="10" skipped="0" time="69.937" errors="0">
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー" classname="dual-flow-comprehensive.spec.ts" time="11.185">
+<failure message="dual-flow-comprehensive.spec.ts:33:9 1-1: 新規登録→企業作成→公開→課金の完全フロー" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:33:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-1: 新規登録→企業作成→公開→課金の完全フロー 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=新規登録')
+
+
+      34 |       // 1. 新規登録
+      35 |       await page.goto('/');
+    > 36 |       await page.click('text=新規登録');
+         |                  ^
+      37 |       
+      38 |       await page.fill('input[name="email"]', SELF_SERVE_USER.email);
+      39 |       await page.fill('input[name="password"]', SELF_SERVE_USER.password);
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:36:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-safari/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-abe44-ト-1-1-新規登録→企業作成→公開→課金の完全フロー-mobile-safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-2: ナビゲーション規則確認" classname="dual-flow-comprehensive.spec.ts" time="1.666">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › セルフサーブ導線テスト › 1-3: レスポンシブ表示確認" classname="dual-flow-comprehensive.spec.ts" time="1.334">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー" classname="dual-flow-comprehensive.spec.ts" time="11.769">
+<failure message="dual-flow-comprehensive.spec.ts:103:9 2-1: パートナーによる企業代理作成フロー" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:103:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-1: パートナーによる企業代理作成フロー 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=企業管理')
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=企業管理')
+
+
+      110 |       // 2. パートナー専用の企業管理画面への遷移
+      111 |       await page.goto('/dashboard/organizations');
+    > 112 |       await expect(page.locator('text=企業管理')).toBeVisible();
+          |                                               ^
+      113 |       
+      114 |       // 3. 新規企業作成（代理）
+      115 |       await page.click('text=新規企業追加');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:112:47
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-safari/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93ad1-導線テスト-2-1-パートナーによる企業代理作成フロー-mobile-safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認" classname="dual-flow-comprehensive.spec.ts" time="1.086">
+<failure message="dual-flow-comprehensive.spec.ts:131:9 2-2: パートナーの課金機能アクセス制限確認" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:131:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パートナー導線テスト › 2-2: パートナーの課金機能アクセス制限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      140 |         data: { organizationId: 'test-org-id' }
+      141 |       });
+    > 142 |       expect(billingResponse.status()).toBe(403);
+          |                                        ^
+      143 |       
+      144 |       const portalResponse = await page.request.post('/api/billing/portal', {
+      145 |         data: { customerId: 'test-customer-id' }
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:142:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-safari/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-8847b-線テスト-2-2-パートナーの課金機能アクセス制限確認-mobile-safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="11.375">
+<failure message="dual-flow-comprehensive.spec.ts:152:9 3-1: Organization JSON-LD出力確認" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:152:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-1: Organization JSON-LD出力確認 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('script[type="application/ld+json"]').first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('script[type="application/ld+json"]').first()
+
+
+      155 |       // JSON-LDスクリプトタグの存在確認
+      156 |       const jsonLdScript = await page.locator('script[type="application/ld+json"]').first();
+    > 157 |       await expect(jsonLdScript).toBeVisible();
+          |                                  ^
+      158 |       
+      159 |       // JSON-LD内容の検証
+      160 |       const jsonLdContent = await jsonLdScript.textContent();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:157:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-safari/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-63375--1-Organization-JSON-LD出力確認-mobile-safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-2: Article JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="1.439">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › JSON-LD構造化データ確認 › 3-3: BreadcrumbList JSON-LD出力確認" classname="dual-flow-comprehensive.spec.ts" time="1.353">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック" classname="dual-flow-comprehensive.spec.ts" time="10.763">
+<failure message="dual-flow-comprehensive.spec.ts:208:9 4-1: /ops/verify 統合ヘルスチェック" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:208:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-1: /ops/verify 統合ヘルスチェック 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=ALL_GREEN').or(locator('text=SUCCESS'))
+
+
+      210 |       
+      211 |       // ALL_GREEN状態の確認
+    > 212 |       await expect(page.locator('text=ALL_GREEN').or(page.locator('text=SUCCESS'))).toBeVisible();
+          |                                                                                     ^
+      213 |       
+      214 |       // 主要コンポーネントの状態確認
+      215 |       await expect(page.locator('text=Database').or(page.locator('text=データベース'))).toBeVisible();
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:212:85
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-safari/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d2fef-確認-4-1-ops-verify-統合ヘルスチェック-mobile-safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断" classname="dual-flow-comprehensive.spec.ts" time="10.744">
+<failure message="dual-flow-comprehensive.spec.ts:220:9 4-2: /ops/probe 詳細診断" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:220:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-2: /ops/probe 詳細診断 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('text=API応答時間').or(locator('text=Response Time'))
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('text=API応答時間').or(locator('text=Response Time'))
+
+
+      222 |       
+      223 |       // パフォーマンス指標の確認
+    > 224 |       await expect(page.locator('text=API応答時間').or(page.locator('text=Response Time'))).toBeVisible();
+          |                                                                                         ^
+      225 |       await expect(page.locator('text=データベース接続').or(page.locator('text=Database Connection'))).toBeVisible();
+      226 |     });
+      227 |
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:224:89
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-safari/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-a378a-ム診断・運用確認-4-2-ops-probe-詳細診断-mobile-safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認" classname="dual-flow-comprehensive.spec.ts" time="1.706">
+<failure message="dual-flow-comprehensive.spec.ts:228:9 4-3: API health エンドポイント確認" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:228:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › システム診断・運用確認 › 4-3: API health エンドポイント確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 206
+
+      228 |     test('4-3: API health エンドポイント確認', async ({ page }) => {
+      229 |       const response = await page.request.get('/api/health');
+    > 230 |       expect(response.status()).toBe(200);
+          |                                 ^
+      231 |       
+      232 |       const health = await response.json();
+      233 |       expect(health.status).toBe('ok');
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:230:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-d5e4a-確認-4-3-API-health-エンドポイント確認-mobile-safari/video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-1: セルフサーブユーザーの複数企業作成防止" classname="dual-flow-comprehensive.spec.ts" time="1.312">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認" classname="dual-flow-comprehensive.spec.ts" time="1.195">
+<failure message="dual-flow-comprehensive.spec.ts:251:9 5-2: パートナーアクセス権限確認" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:251:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-2: パートナーアクセス権限確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 401
+
+      258 |       // セルフサーブ専用APIへのアクセス制限確認
+      259 |       const myOrgResponse = await page.request.get('/api/my/organization');
+    > 260 |       expect(myOrgResponse.status()).toBe(403);
+          |                                      ^
+      261 |     });
+      262 |
+      263 |     test('5-3: 未認証ユーザーのアクセス制限', async ({ page }) => {
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:260:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-safari/video.webm]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-c7d68-・セキュリティ確認-5-2-パートナーアクセス権限確認-mobile-safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限" classname="dual-flow-comprehensive.spec.ts" time="0.47">
+<failure message="dual-flow-comprehensive.spec.ts:263:9 5-3: 未認証ユーザーのアクセス制限" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:263:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › エラーケース・セキュリティ確認 › 5-3: 未認証ユーザーのアクセス制限 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 405
+
+      272 |       for (const endpoint of protectedEndpoints) {
+      273 |         const response = await page.request.get(endpoint);
+    > 274 |         expect(response.status()).toBe(401);
+          |                                   ^
+      275 |       }
+      276 |     });
+      277 |   });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:274:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-93b60-セキュリティ確認-5-3-未認証ユーザーのアクセス制限-mobile-safari/video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-1: ページ読み込み速度確認" classname="dual-flow-comprehensive.spec.ts" time="1.621">
+</testcase>
+<testcase name="双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認" classname="dual-flow-comprehensive.spec.ts" time="0.919">
+<failure message="dual-flow-comprehensive.spec.ts:290:9 6-2: API応答時間確認" type="FAILURE">
+<![CDATA[  [mobile-safari] › dual-flow-comprehensive.spec.ts:290:9 › 双導線E2Eテスト: セルフサーブ + パートナー併存 › パフォーマンス・可用性確認 › 6-2: API応答時間確認 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 206
+
+      295 |       // 1秒以内のAPI応答
+      296 |       expect(responseTime).toBeLessThan(1000);
+    > 297 |       expect(response.status()).toBe(200);
+          |                                 ^
+      298 |     });
+      299 |   });
+      300 | });
+        at /Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e/dual-flow-comprehensive.spec.ts:297:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-mobile-safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-mobile-safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-mobile-safari/test-failed-1.png]]
+
+[[ATTACHMENT|dual-flow-comprehensive-双導-3980e-パフォーマンス・可用性確認-6-2-API応答時間確認-mobile-safari/video.webm]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

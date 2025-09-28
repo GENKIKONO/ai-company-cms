@@ -1,5 +1,5 @@
 import { chromium, FullConfig } from '@playwright/test';
-import { supabaseAdmin } from '../src/lib/supabase-server';
+import { supabaseTest } from '../src/lib/supabase-test';
 
 async function globalSetup(config: FullConfig) {
   console.log('🚀 E2Eテストのグローバルセットアップを開始...');
@@ -12,7 +12,7 @@ async function globalSetup(config: FullConfig) {
   };
 
   try {
-    const supabase = supabaseAdmin();
+    const supabase = supabaseTest;
 
     // 既存のテストデータをクリーンアップ
     await cleanupTestData(supabase, testUser.email);

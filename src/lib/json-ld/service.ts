@@ -3,17 +3,7 @@
  * 要件定義準拠: 価格未入力時offers非出力
  */
 
-import type { Organization } from '@/types/database';
-
-interface Service {
-  id: string;
-  name: string;
-  summary?: string | null;
-  price?: string | null;
-  category?: string | null;
-  cta_url?: string | null;
-  organization_id: string;
-}
+import type { Organization, Service, ServiceMedia } from '@/types/database';
 
 interface ServiceJsonLd {
   '@context': string;
@@ -26,6 +16,8 @@ interface ServiceJsonLd {
   };
   description?: string;
   category?: string;
+  features?: string[];
+  image?: string | string[];
   offers?: {
     '@type': string;
     priceCurrency: string;
@@ -36,17 +28,10 @@ interface ServiceJsonLd {
 }
 
 /**
- * 価格文字列から数値を抽出
+ * 価格を文字列に変換
  */
-function extractNumericPrice(priceString: string): string | null {
-  if (!priceString) return null;
-  
-  // 数値のみを抽出（カンマ区切りも含む）
-  const numericMatch = priceString.match(/[\d,]+/);
-  if (!numericMatch) return null;
-  
-  // カンマを除去
-  return numericMatch[0].replace(/,/g, '');
+function formatPrice(price: number): string {
+  return price.toString();
 }
 
 /**
@@ -85,8 +70,8 @@ export function generateServiceJsonLd(service: Service, org: Organization): Serv
   }
 
   // サービス説明
-  if (service.summary) {
-    jsonLd.description = service.summary;
+  if (service.description) {
+    jsonLd.description = service.description;
   }
 
   // カテゴリ
@@ -94,14 +79,28 @@ export function generateServiceJsonLd(service: Service, org: Organization): Serv
     jsonLd.category = service.category;
   }
 
-  // 価格情報（要件定義準拠: 価格未入力時は非出力）
-  if (service.price?.trim()) {
-    const numericPrice = extractNumericPrice(service.price);
+  // 機能一覧
+  if (service.features && service.features.length > 0) {
+    jsonLd.features = service.features;
+  }
+
+  // 画像（メディアから画像のみ抽出）
+  if (service.media && service.media.length > 0) {
+    const imageUrls = service.media
+      .filter(m => m.type === 'image')
+      .map(m => m.url);
     
+    if (imageUrls.length > 0) {
+      jsonLd.image = imageUrls.length === 1 ? imageUrls[0] : imageUrls;
+    }
+  }
+
+  // 価格情報（要件定義準拠: 価格未入力時は非出力）
+  if (service.price && service.price > 0) {
     const offers = omitEmpty({
       '@type': 'Offer',
       priceCurrency: 'JPY',
-      price: numericPrice,
+      price: formatPrice(service.price),
       url: service.cta_url,
       availability: 'https://schema.org/InStock',
     });
@@ -139,12 +138,16 @@ export function validateServiceJsonLd(service: Service, org: Organization): Serv
   }
 
   // 推奨項目チェック
-  if (!service.summary?.trim()) {
+  if (!service.description?.trim()) {
     warnings.push('Service description is recommended for better SEO');
   }
 
   if (!service.category?.trim()) {
     warnings.push('Service category is recommended');
+  }
+
+  if (!service.features || service.features.length === 0) {
+    warnings.push('Service features are recommended to highlight benefits');
   }
 
   // URL形式チェック
@@ -157,8 +160,17 @@ export function validateServiceJsonLd(service: Service, org: Organization): Serv
   }
 
   // 価格形式チェック
-  if (service.price && !extractNumericPrice(service.price)) {
-    warnings.push('Price format may not be recognized by search engines');
+  if (service.price && service.price <= 0) {
+    warnings.push('Price should be a positive number');
+  }
+
+  // メディア形式チェック
+  if (service.media) {
+    service.media.forEach((media, index) => {
+      if (!media.url?.startsWith('https://')) {
+        errors.push(`Media ${index + 1} URL must use HTTPS`);
+      }
+    });
   }
 
   return {

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 import { getIndustries } from '@/lib/organizations';
-import { normalizeOrganizationPayload } from '@/lib/normalize';
+import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
 import { type AppUser, type OrganizationFormData } from '@/types/database';
 
 export default function NewOrganizationPage() {
@@ -36,7 +36,21 @@ export default function NewOrganizationPage() {
     url: '',
     logo_url: '',
     same_as: [],
-    industries: []
+    industries: [],
+    // Enhanced organization settings (I1)
+    favicon_url: '',
+    brand_color_primary: '',
+    brand_color_secondary: '',
+    social_media: {},
+    business_hours: [],
+    timezone: 'Asia/Tokyo',
+    languages_supported: [],
+    certifications: [],
+    awards: [],
+    company_culture: '',
+    mission_statement: '',
+    vision_statement: '',
+    values: []
   });
 
   // 認証確認とデータ取得
@@ -98,8 +112,33 @@ export default function NewOrganizationPage() {
     }
   };
 
-  const handleArrayChange = (field: 'same_as' | 'industries', value: string[]) => {
+  const handleArrayChange = (field: 'same_as' | 'industries' | 'languages_supported' | 'certifications' | 'awards' | 'values', value: string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSocialMediaChange = (platform: string, url: string) => {
+    setFormData(prev => ({
+      ...prev,
+      social_media: {
+        ...prev.social_media,
+        [platform]: url.trim() || undefined
+      }
+    }));
+  };
+
+  const handleBusinessHoursChange = (day: string, hours: any) => {
+    setFormData(prev => {
+      const existingHours = [...(prev.business_hours || [])];
+      const dayIndex = existingHours.findIndex(h => h.day === day);
+      
+      if (dayIndex >= 0) {
+        existingHours[dayIndex] = { day, ...hours };
+      } else {
+        existingHours.push({ day, ...hours });
+      }
+      
+      return { ...prev, business_hours: existingHours };
+    });
   };
 
   const validateForm = (): boolean => {
@@ -130,6 +169,19 @@ export default function NewOrganizationPage() {
     const emailValue = typeof formData.email === 'string' ? formData.email : '';
     if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
       newErrors.email = '正しいメールアドレス形式で入力してください';
+    }
+
+    // Enhanced validation (I1)
+    if (formData.brand_color_primary && !/^#[0-9A-Fa-f]{6}$/.test(formData.brand_color_primary)) {
+      newErrors.brand_color_primary = '正しいHEXカラー形式で入力してください（例: #FF0000）';
+    }
+
+    if (formData.brand_color_secondary && !/^#[0-9A-Fa-f]{6}$/.test(formData.brand_color_secondary)) {
+      newErrors.brand_color_secondary = '正しいHEXカラー形式で入力してください（例: #00FF00）';
+    }
+
+    if (formData.favicon_url && formData.favicon_url.trim() && !/^https?:\/\/.+/.test(formData.favicon_url)) {
+      newErrors.favicon_url = '正しいURL形式で入力してください';
     }
 
     setErrors(newErrors);
@@ -623,6 +675,184 @@ export default function NewOrganizationPage() {
                     <span className="ml-2 text-sm text-gray-700">{industry}</span>
                   </label>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 拡張設定（I1） */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">ブランド・デザイン設定</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="logo_url" className="block text-sm font-medium text-gray-700 mb-2">
+                  ロゴURL
+                </label>
+                <input
+                  type="url"
+                  id="logo_url"
+                  value={formData.logo_url}
+                  onChange={(e) => handleInputChange('logo_url', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example.com/logo.png"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="favicon_url" className="block text-sm font-medium text-gray-700 mb-2">
+                  ファビコンURL
+                </label>
+                <input
+                  type="url"
+                  id="favicon_url"
+                  value={formData.favicon_url}
+                  onChange={(e) => handleInputChange('favicon_url', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.favicon_url ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="https://example.com/favicon.ico"
+                />
+                {errors.favicon_url && <p className="mt-1 text-sm text-red-600">{errors.favicon_url}</p>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div>
+                <label htmlFor="brand_color_primary" className="block text-sm font-medium text-gray-700 mb-2">
+                  プライマリブランドカラー
+                </label>
+                <input
+                  type="color"
+                  id="brand_color_primary"
+                  value={formData.brand_color_primary}
+                  onChange={(e) => handleInputChange('brand_color_primary', e.target.value)}
+                  className={`w-full h-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.brand_color_primary ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.brand_color_primary && <p className="mt-1 text-sm text-red-600">{errors.brand_color_primary}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="brand_color_secondary" className="block text-sm font-medium text-gray-700 mb-2">
+                  セカンダリブランドカラー
+                </label>
+                <input
+                  type="color"
+                  id="brand_color_secondary"
+                  value={formData.brand_color_secondary}
+                  onChange={(e) => handleInputChange('brand_color_secondary', e.target.value)}
+                  className={`w-full h-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.brand_color_secondary ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.brand_color_secondary && <p className="mt-1 text-sm text-red-600">{errors.brand_color_secondary}</p>}
+              </div>
+            </div>
+          </div>
+
+          {/* SNS・外部リンク */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">SNS・外部リンク</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { key: 'facebook', label: 'Facebook', placeholder: 'https://www.facebook.com/yourcompany' },
+                { key: 'twitter', label: 'Twitter/X', placeholder: 'https://twitter.com/yourcompany' },
+                { key: 'linkedin', label: 'LinkedIn', placeholder: 'https://www.linkedin.com/company/yourcompany' },
+                { key: 'instagram', label: 'Instagram', placeholder: 'https://www.instagram.com/yourcompany' },
+                { key: 'youtube', label: 'YouTube', placeholder: 'https://www.youtube.com/c/yourcompany' },
+                { key: 'github', label: 'GitHub', placeholder: 'https://github.com/yourcompany' },
+                { key: 'note', label: 'note', placeholder: 'https://note.com/yourcompany' },
+                { key: 'qiita', label: 'Qiita', placeholder: 'https://qiita.com/yourcompany' }
+              ].map(({ key, label, placeholder }) => (
+                <div key={key}>
+                  <label htmlFor={key} className="block text-sm font-medium text-gray-700 mb-2">
+                    {label}
+                  </label>
+                  <input
+                    type="url"
+                    id={key}
+                    value={(formData.social_media as any)?.[key] || ''}
+                    onChange={(e) => handleSocialMediaChange(key, e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={placeholder}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 企業理念・文化 */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">企業理念・文化</h2>
+            
+            <div className="space-y-6">
+              <div>
+                <label htmlFor="mission_statement" className="block text-sm font-medium text-gray-700 mb-2">
+                  ミッション・企業理念
+                </label>
+                <textarea
+                  id="mission_statement"
+                  rows={3}
+                  value={formData.mission_statement}
+                  onChange={(e) => handleInputChange('mission_statement', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="私たちの使命や企業理念を記載してください"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="vision_statement" className="block text-sm font-medium text-gray-700 mb-2">
+                  ビジョン・将来像
+                </label>
+                <textarea
+                  id="vision_statement"
+                  rows={3}
+                  value={formData.vision_statement}
+                  onChange={(e) => handleInputChange('vision_statement', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="目指す将来像やビジョンを記載してください"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="company_culture" className="block text-sm font-medium text-gray-700 mb-2">
+                  企業文化・働き方
+                </label>
+                <textarea
+                  id="company_culture"
+                  rows={3}
+                  value={formData.company_culture}
+                  onChange={(e) => handleInputChange('company_culture', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="企業文化や働き方の特徴を記載してください"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 詳細設定 */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">詳細設定</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-2">
+                  タイムゾーン
+                </label>
+                <select
+                  id="timezone"
+                  value={formData.timezone}
+                  onChange={(e) => handleInputChange('timezone', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                  <option value="UTC">UTC</option>
+                  <option value="America/New_York">America/New_York (EST)</option>
+                  <option value="Europe/London">Europe/London (GMT)</option>
+                  <option value="Asia/Shanghai">Asia/Shanghai (CST)</option>
+                </select>
               </div>
             </div>
           </div>

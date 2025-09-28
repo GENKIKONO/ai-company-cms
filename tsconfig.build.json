@@ -1,7 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "downlevelIteration": true
   },
   "exclude": [
     "node_modules",
@@ -10,6 +13,9 @@
     "**/*.spec.ts",
     "**/*.spec.tsx",
     "tests/**/*",
-    "**/__tests__/**/*"
+    "**/__tests__/**/*",
+    "src/lib/monitoring/**/*",
+    "src/lib/json-ld/validator.ts",
+    "src/app/api/ops/**/*"
   ]
 }

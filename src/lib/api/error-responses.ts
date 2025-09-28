@@ -1,0 +1,146 @@
+/**
+ * API統一エラーレスポンス
+ * 全APIエンドポイントで一貫したエラー形式を提供
+ */
+
+import { NextResponse } from 'next/server';
+import { ZodError } from 'zod';
+
+export interface ApiErrorResponse {
+  error: {
+    code: string;
+    message: string;
+    details?: any;
+    timestamp: string;
+  };
+}
+
+/**
+ * 統一エラーレスポンス生成
+ */
+export function createErrorResponse(
+  code: string,
+  message: string,
+  status: number,
+  details?: any
+): NextResponse<ApiErrorResponse> {
+  return NextResponse.json(
+    {
+      error: {
+        code,
+        message,
+        details,
+        timestamp: new Date().toISOString(),
+      },
+    },
+    { status }
+  );
+}
+
+/**
+ * 認証エラー (401)
+ */
+export function unauthorizedError(message = 'Authentication required'): NextResponse<ApiErrorResponse> {
+  return createErrorResponse('UNAUTHORIZED', message, 401);
+}
+
+/**
+ * 権限エラー (403)
+ */
+export function forbiddenError(message = 'Insufficient permissions'): NextResponse<ApiErrorResponse> {
+  return createErrorResponse('FORBIDDEN', message, 403);
+}
+
+/**
+ * バリデーションエラー (400)
+ */
+export function validationError(details: any, message = 'Validation failed'): NextResponse<ApiErrorResponse> {
+  return createErrorResponse('VALIDATION_ERROR', message, 400, details);
+}
+
+/**
+ * 重複エラー (409)
+ */
+export function conflictError(resource: string, field?: string): NextResponse<ApiErrorResponse> {
+  const message = field 
+    ? `${resource} with this ${field} already exists`
+    : `${resource} already exists`;
+  
+  return createErrorResponse('CONFLICT', message, 409, { resource, field });
+}
+
+/**
+ * リソース未発見エラー (404)
+ */
+export function notFoundError(resource: string): NextResponse<ApiErrorResponse> {
+  return createErrorResponse('NOT_FOUND', `${resource} not found`, 404, { resource });
+}
+
+/**
+ * レート制限エラー (429)
+ */
+export function rateLimitError(message = 'Too many requests'): NextResponse<ApiErrorResponse> {
+  return createErrorResponse('RATE_LIMIT_EXCEEDED', message, 429);
+}
+
+/**
+ * Zodエラーを統一レスポンスに変換
+ */
+export function handleZodError(error: ZodError): NextResponse<ApiErrorResponse> {
+  const details = error.errors.map(err => ({
+    field: err.path.join('.'),
+    message: err.message,
+    code: err.code,
+  }));
+
+  return validationError(details, 'Request validation failed');
+}
+
+/**
+ * データベースエラーを統一レスポンスに変換
+ */
+export function handleDatabaseError(error: any): NextResponse<ApiErrorResponse> {
+  console.error('Database error:', error);
+
+  // PostgreSQL固有エラーコードのハンドリング
+  if (error.code === '23505') { // unique_violation
+    const match = error.detail?.match(/Key \(([^)]+)\)=\(([^)]+)\) already exists/);
+    if (match) {
+      const field = match[1];
+      return conflictError('Resource', field);
+    }
+    return conflictError('Resource');
+  }
+
+  if (error.code === '23503') { // foreign_key_violation
+    return createErrorResponse('FOREIGN_KEY_VIOLATION', 'Referenced resource does not exist', 400);
+  }
+
+  if (error.code === '23514') { // check_violation
+    return createErrorResponse('CHECK_VIOLATION', 'Data violates database constraints', 400);
+  }
+
+  // 一般的なデータベースエラー
+  return createErrorResponse('DATABASE_ERROR', 'Database operation failed', 500);
+}
+
+/**
+ * 汎用エラーハンドラー
+ */
+export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
+  console.error('API Error:', error);
+
+  if (error instanceof ZodError) {
+    return handleZodError(error);
+  }
+
+  if (error && typeof error === 'object' && 'code' in error) {
+    return handleDatabaseError(error);
+  }
+
+  if (error instanceof Error) {
+    return createErrorResponse('INTERNAL_ERROR', error.message, 500);
+  }
+
+  return createErrorResponse('UNKNOWN_ERROR', 'An unknown error occurred', 500);
+}

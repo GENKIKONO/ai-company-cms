@@ -1,348 +1,369 @@
-# 要件定義（システム/技術視点）
+# 要件定義（システム/技術要件）
 
-## データモデル（MVP最小）
+## アーキテクチャ概要
+
+### システム構成
+- **フロントエンド**: Next.js 15 + TypeScript + Tailwind CSS
+- **バックエンド**: Next.js API Routes + Supabase
+- **データベース**: PostgreSQL (Supabase)
+- **認証**: Supabase Auth
+- **課金**: Stripe
+- **デプロイ**: Vercel
+- **監視**: Sentry + Vercel Analytics
+
+### セキュリティモデル
+- **Row Level Security (RLS)**: マルチテナント分離
+- **認証フロー**: Supabase Auth (email/password)
+- **権限管理**: role-based access control
+- **API保護**: 統一認証ミドルウェア
+
+## データモデル
 
 ### 共通仕様
-- すべて uuid PK、created_at / updated_at 付与
-- RLS：orgId ベースで厳格制御
-- Migration冒頭に `create extension if not exists pgcrypto;` 必須（gen_random_uuid()用）
+- すべて `uuid` PK、`created_at` / `updated_at` 付与
+- RLS：role・org_idベースで厳格制御
+- Migration冒頭に `CREATE EXTENSION IF NOT EXISTS pgcrypto;` 必須
 
-### エンティティ
+### コアエンティティ
 
-#### Organization（企業）
+#### organizations（企業）
 ```sql
-- id / name / slug(unique) / legalForm / representativeName / founded / capital / employees
-- description / addressCountry / addressRegion / addressLocality / streetAddress / postalCode
-- telephone / email（公開可否） / url / logoUrl / sameAs[] / gbpUrl / industries[] / eeat
-- status(draft|waiting_approval|published|paused|archived)
-- ownerUserId / partnerId / timestamps
+CREATE TABLE organizations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  slug VARCHAR(100) UNIQUE NOT NULL,
+  description TEXT,
+  legal_form VARCHAR(100),
+  representative_name VARCHAR(255),
+  establishment_date DATE,
+  capital BIGINT,
+  employees INTEGER,
+  
+  -- 住所情報
+  address_country VARCHAR(2) DEFAULT 'JP',
+  address_region VARCHAR(100),
+  address_locality VARCHAR(100),
+  address_postal_code VARCHAR(10),
+  address_street TEXT,
+  
+  -- 連絡先
+  telephone VARCHAR(20),
+  email VARCHAR(255),
+  url TEXT,
+  logo_url TEXT,
+  
+  -- SEO・構造化データ
+  meta_title VARCHAR(60),
+  meta_description VARCHAR(160),
+  industries TEXT[], -- JSON配列
+  keywords TEXT,
+  
+  -- 公開管理
+  status VARCHAR(20) DEFAULT 'draft' 
+    CHECK (status IN ('draft', 'published', 'archived')),
+  is_published BOOLEAN DEFAULT false,
+  
+  -- 権限管理
+  created_by UUID REFERENCES auth.users(id) NOT NULL,
+  
+  -- タイムスタンプ
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
-**注意**: slug列は URL安定化のため追加。公開ページは `/o/{slug}` で参照。
-
-#### Service（提供サービス/商品）
+#### services（サービス/商品）
 ```sql
-- id / orgId / name / summary / features[] / price(文字列) / category / media[] / ctaUrl / status
+CREATE TABLE services (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  features TEXT[], -- JSON配列
+  price_text VARCHAR(100), -- "月額5,000円〜" など
+  category VARCHAR(100),
+  image_url TEXT,
+  cta_url TEXT,
+  display_order INTEGER DEFAULT 0,
+  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
-#### CaseStudy（導入事例）
+#### case_studies（導入事例）
 ```sql
-- id / orgId / title / clientType / clientName / problem / solution / outcome / metrics[] / publishedAt
+CREATE TABLE case_studies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  client_type VARCHAR(100),
+  client_name VARCHAR(255),
+  problem TEXT,
+  solution TEXT,
+  outcome TEXT,
+  metrics JSONB, -- {metric: value} 形式
+  published_at TIMESTAMP WITH TIME ZONE,
+  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
-#### FAQ
+#### faqs（よくある質問）
 ```sql
-- id / orgId / question / answer / order
+CREATE TABLE faqs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  display_order INTEGER DEFAULT 0,
+  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
-#### ContactPoint
+#### posts（記事/ニュース）
 ```sql
-- id / orgId / areaServed[] / contactType(sales|support) / telephone / email / availableLanguage[]
+CREATE TABLE posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  content TEXT,
+  excerpt VARCHAR(500),
+  published_at TIMESTAMP WITH TIME ZONE,
+  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
-#### User
+### 権限管理テーブル
+
+#### organization_profiles（ユーザー・組織関連）
 ```sql
-- id / role(admin|partner|org_owner|org_editor|viewer) / partnerId
+CREATE TABLE organization_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  role VARCHAR(50) DEFAULT 'org_owner' 
+    CHECK (role IN ('org_owner', 'org_editor', 'viewer')),
+  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  UNIQUE(user_id, organization_id)
+);
 ```
 
-#### Partner（代理店）
+### Stripe連携テーブル
+
+#### stripe_customers
 ```sql
-- id / name / contactEmail / brandLogoUrl / subdomain / commissionRateInit / commissionRateMRR
+CREATE TABLE stripe_customers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  stripe_customer_id VARCHAR(255) UNIQUE NOT NULL,
+  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  email VARCHAR(255),
+  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
-#### Subscription
+#### subscriptions
 ```sql
-- id / orgId / plan(basic|pro) / status(active|paused|cancelled) / stripeCustomerId / stripeSubId
+CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  stripe_subscription_id VARCHAR(255) UNIQUE NOT NULL,
+  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  status VARCHAR(50) NOT NULL,
+  current_period_start TIMESTAMP WITH TIME ZONE,
+  current_period_end TIMESTAMP WITH TIME ZONE,
+  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
-#### AuditLog
+## Row Level Security (RLS) ポリシー
+
+### セルフサーブモード（1ユーザー=1組織）
+
 ```sql
-- id / actorUserId / entity / entityId / action(create|update|publish|approve) / timestamp / diff(JSON)
+-- organizations: セルフサーブユーザーは自分が作成した組織のみ
+CREATE POLICY "selfserve_organizations_policy" ON organizations
+  FOR ALL USING (
+    auth.uid() = created_by AND
+    (auth.jwt()->>'user_metadata'->>'role' IS NULL OR 
+     auth.jwt()->>'user_metadata'->>'role' IN ('org_owner', 'org_editor'))
+  );
+
+-- services: 組織オーナーのみ
+CREATE POLICY "selfserve_services_policy" ON services
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM organizations o 
+      WHERE o.id = organization_id 
+      AND o.created_by = auth.uid()
+    )
+  );
 ```
 
-#### Redirect（301用・任意）
+### 代理店モード（partner ロール）
+
 ```sql
-- id / fromPath / toPath / orgId
+-- organizations: partner権限で管理組織へのアクセス
+CREATE POLICY "partner_organizations_policy" ON organizations
+  FOR ALL USING (
+    auth.jwt()->>'user_metadata'->>'role' = 'partner' AND
+    EXISTS (
+      SELECT 1 FROM organization_profiles op
+      WHERE op.organization_id = id 
+      AND op.user_id = auth.uid()
+      AND op.role IN ('org_owner', 'org_editor')
+    )
+  );
 ```
 
-## JSON-LD 生成テンプレート（最小セット）
+### 管理者モード（admin ロール）
 
-### 方針
-- 空値キーは出力しない
-- 電話は表示用と別に**E.164(+81)**を用意
-- 価格未入力時はoffersを出力しない
+```sql
+-- 全テーブル: admin権限で全アクセス
+CREATE POLICY "admin_full_access" ON organizations
+  FOR ALL USING (auth.jwt()->>'user_metadata'->>'role' = 'admin');
+```
 
-### Organization
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "{{name}}",
-  "url": "{{url}}",
-  "logo": "{{logoUrl}}",
-  "description": "{{description}}",
-  "foundingDate": "{{founded}}",
-  "inLanguage": "ja",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "{{streetAddress}}",
-    "addressLocality": "{{addressLocality}}",
-    "addressRegion": "{{addressRegion}}",
-    "postalCode": "{{postalCode}}",
-    "addressCountry": "JP"
-  },
-  "contactPoint": [
-    {
-      "@type": "ContactPoint",
-      "contactType": "sales",
-      "telephone": "{{telephoneE164}}",
-      "email": "{{email}}",
-      "areaServed": {{areaServedArray}},
-      "availableLanguage": ["ja"]
-    }
-  ],
-  "sameAs": {{sameAsArray}}
+## API設計
+
+### エンドポイント体系
+
+#### セルフサーブ専用API
+```
+GET/POST/PUT/DELETE /api/my/organization
+GET/POST/PUT/DELETE /api/my/services
+GET/POST/PUT/DELETE /api/my/case-studies
+GET/POST/PUT/DELETE /api/my/faqs
+GET/POST/PUT/DELETE /api/my/posts
+```
+
+#### 代理店専用API
+```
+GET/POST /api/organizations
+GET/POST/PUT/DELETE /api/organizations/[id]
+GET/POST/PUT/DELETE /api/organizations/[id]/services
+GET/POST/PUT/DELETE /api/organizations/[id]/case-studies
+GET/POST/PUT/DELETE /api/organizations/[id]/faqs
+GET/POST/PUT/DELETE /api/organizations/[id]/posts
+```
+
+#### 公開API（認証不要）
+```
+GET /api/public/organizations
+GET /api/public/organizations/[slug]
+GET /api/public/health
+```
+
+#### 管理者API
+```
+GET /ops/verify
+GET /ops/probe
+POST /ops/actions/[action]
+```
+
+### 認証・認可フロー
+
+```typescript
+// 統一認証ミドルウェア
+export async function requireAuth(request: NextRequest): Promise<AuthContext | Response> {
+  // Supabase Authでユーザー認証
+  // フロー判定（self_serve / partner / admin）
+  // 権限計算・アクセス可能組織リスト生成
+}
+
+// 権限チェック関数
+export function requireSelfServeAccess(authContext: AuthContext): Response | null
+export function requirePartnerAccess(authContext: AuthContext): Response | null  
+export function requireOrgOwner(authContext: AuthContext, orgId: string): Response | null
+```
+
+### エラーレスポンス統一
+
+```typescript
+interface ApiErrorResponse {
+  error: {
+    code: string;        // 'VALIDATION_ERROR', 'UNAUTHORIZED', etc.
+    message: string;     // ユーザー向けメッセージ
+    details?: any;       // 詳細情報（バリデーションエラー等）
+    timestamp: string;   // ISO 8601形式
+  };
+}
+
+// HTTPステータス責務分離
+// 400番台: クライアントエラー（修正可能）
+// 500番台: サーバーエラー（システム異常）
+```
+
+### データ正規化
+
+```typescript
+// 全APIで統一適用
+function normalizePayload(data: any) {
+  // 空文字 → null 変換
+  // トリム処理
+  // URL正規化（https:// 補完）
+  // Email正規化（小文字化）
 }
 ```
 
-### Service
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "Service",
-  "name": "{{name}}",
-  "provider": { "@type": "Organization", "name": "{{org.name}}", "url": "{{org.url}}" },
-  "description": "{{summary}}",
-  "category": "{{category}}"
-  /* "offers": { "@type":"Offer", "priceCurrency":"JPY", "price":"{{priceNumeric}}", "url":"{{ctaUrl}}", "availability":"https://schema.org/InStock" } 価格がある場合のみ出力 */
-}
+## 環境変数管理
+
+### 必須環境変数
+
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Stripe
+STRIPE_SECRET_KEY=
+STRIPE_BASIC_PRICE_ID=
+STRIPE_WEBHOOK_SECRET=
+
+# 管理者
+ADMIN_EMAIL=
+ADMIN_OPS_PASSWORD=
+
+# アプリケーション
+NEXT_PUBLIC_APP_URL=
 ```
 
-### FAQPage
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {{#each faqs}}
-    {
-      "@type": "Question",
-      "name": "{{question}}",
-      "acceptedAnswer": { "@type": "Answer", "text": "{{answer}}" }
-    }{{#unless @last}},{{/unless}}
-    {{/each}}
-  ]
-}
+### フィーチャーフラグ
+
+```bash
+# 本番設定
+SHOW_BUILD_BADGE=false      # 本番ではコミットバッジ非表示
+ENABLE_PARTNER_FLOW=true    # 代理店機能有効
 ```
 
-### CaseStudy
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "CaseStudy",
-  "headline": "{{title}}",
-  "about": "{{clientType}}",
-  "author": { "@type": "Organization", "name": "{{org.name}}" },
-  "datePublished": "{{publishedAt}}",
-  "articleBody": "Problem: {{problem}}\nSolution: {{solution}}\nOutcome: {{outcome}}",
-  "inLanguage": "ja"
-}
-```
+## 診断・監視
 
-## 役割・権限（RLS）
+### ヘルスチェックエンドポイント
 
-### ロール定義
-- **admin**: 全操作、代理店作成、料金プラン編集、監査ログ閲覧
-- **partner**: 自社配下のorg CRUD、公開申請、承認URL発行
-- **org_owner**: 自社データ編集、公開承認
-- **org_editor**: 編集のみ（承認不可）
-- **viewer**: 閲覧のみ（将来）
+- **`/api/health`**: 基本的なシステム稼働確認
+- **`/api/diag/session`**: 認証・セッション診断
+- **`/ops/verify`**: 総合診断（両モード健全性）
+- **`/ops/probe`**: 詳細診断（DB・Stripe・公開ページ）
 
-### RLS原則
-- PostgresのRLSは1ポリシー=1コマンドが原則
-- SELECT/INSERT/UPDATE/DELETE を個別ポリシーで定義
-- user.partnerId == org.partnerId かつ user.role に応じた操作限定
-- AuditLogは全write必須（DBトリガ）
+### 監視項目
 
-### RLSポリシー例（Organizations）
-```sql
--- admin 全権
-create policy org_admin_select on organizations
-for select using (exists (select 1 from app_users au where au.id = auth.uid() and au.role='admin'));
-create policy org_admin_insert on organizations
-for insert with check (exists (select 1 from app_users au where au.id = auth.uid() and au.role='admin'));
-create policy org_admin_update on organizations
-for update using (exists (select 1 from app_users au where au.id = auth.uid() and au.role='admin'));
-create policy org_admin_delete on organizations
-for delete using (exists (select 1 from app_users au where au.id = auth.uid() and au.role='admin'));
+- **レスポンス時間**: P95 < 2秒
+- **エラー率**: < 1%
+- **JSON-LD検証**: エラー0件
+- **Stripe webhook**: 成功率 > 98%
 
--- partner：自社配下のみ
-create policy org_partner_select on organizations
-for select using (partner_id in (select partner_id from app_users where id = auth.uid()));
-create policy org_partner_insert on organizations
-for insert with check (partner_id in (select partner_id from app_users where id = auth.uid()));
-create policy org_partner_update on organizations
-for update using (partner_id in (select partner_id from app_users where id = auth.uid()));
+---
 
--- org_owner：自社Orgのみ更新可
-create policy org_owner_select on organizations
-for select using (owner_user_id = auth.uid());
-create policy org_owner_update on organizations
-for update using (owner_user_id = auth.uid());
-```
-
-**注意**: 子テーブル（services/case_studies/faqs/contact_points）も同様に、条件は `org_id in (select id from organizations where ...)` で制御
-
-## 非機能要件（MVPで厳守）
-
-### パフォーマンス
-- LCP < 2.5s（モバイル）
-
-### SEO/AIO
-- サイトマップ自動生成
-- robots適正
-- JSON-LD検証エラー0
-
-### 可用性
-- 稼働99%（Vercel / Supabase標準）
-
-### セキュリティ
-- RLS有効
-- トークン短寿命
-- 監査ログ90日
-
-### バックアップ・復旧
-- DB日次スナップショット
-- RTO=4h / RPO=24h（SOPに復旧手順を明記）
-
-### CDN/Cache
-- s-maxage=600＋公開/更新時にタグパージ
-
-### アクセシビリティ
-- 画像alt必須
-- 色コントラストAA
-
-### SSL自動化
-- サブドメイン/独自ドメインはVercel/Cloudflareで自動証明書発行・更新
-
-## 状態遷移（ステートマシン）
-
-### 状態フロー
-```
-draft → waiting_approval → published → (paused|archived)
-```
-
-### ガード条件
-- **draft→waiting_approval**: 必須項目充足＋JSON-LD内部検証PASS
-- **waiting_approval→published**: org_owner承認＋Subscription.active＋DNS/CNAME検証OK
-- **published→paused**: Stripe未払い／解約
-
-### 不変条件
-- Service.orgId は必ず既存 Organization.id を参照
-- published の編集はドラフトコピーを作って更新（公開版破壊禁止）
-
-## 公開処理の安全装置（Publish Gate）
-
-### Preflight（全PASSで公開ボタン活性）
-- JSON-LD内部検証（必須キー/型、空キー省略）
-- Subscription.active（Stripe Webhook反映済み）
-- ドメイン配信OK（自社サブドメイン or 独自CNAME検証OK）
-- OGP生成成功／画像最適化完了
-- プレビューRLS確認（第三者に漏れない）
-
-### Search Consoleの現実対応
-- **自社サブドメイン**: サイトオーナーのため自動ping可
-- **独自ドメイン**: 自動登録不可 → サイトマップURL提示＋SOPで代替（将来：所有権委任API検討）
-
-## 入力検証（JSON-LDが死なないルール）
-
-### 必須項目
-- name / description / addressRegion / addressLocality / telephone / url
-
-### 正規化
-- **telephone**: 表示用とは別に E.164(+81) をJSON-LDへ
-- **url/email**: RFC検証／https強制／HEADで200/301/308のみ許可（10s timeout）
-- **住所**: 都道府県プルダウン／郵便番号 ^\d{3}-\d{4}$
-- **addressCountry**: ISO 3166-1 alpha-2（"JP"）
-- **areaServed**: 配列で統一
-- **価格未入力時**: offersを出力しない
-- **空キー**: 出力しない（null/空文字弾く）
-
-## 決済・停止の整合性（Stripe）
-
-### Webhook仕様
-- 冪等（Idempotency-Key）
-- 失敗は3リトライ＋DLQ
-
-### 主要イベント
-- **checkout.session.completed** → Subscription.active
-- **invoice.payment_failed** → grace_period=7日 → 未入金で paused
-- **customer.subscription.deleted** → paused
-
-### paused時のページ仕様
-配信OKだが noindex + noarchive + JSON-LD非出力 + canonicalを自社ドメイン固定
-
-## 体系的リファクタリング計画（基盤強化）
-
-### Phase 1: 基盤強化（最優先・1週間）
-
-#### 統一バリデーション層
-- 全Zodスキーマを `/lib/schemas/` に集約
-- フロント/バックエンドで同一スキーマ使用
-- `zod-to-typescript` で型安全性完全保証
-- `transform(normalizeEmptyToNull)` で null/undefined/空文字統一
-
-#### エラーハンドリング体系統一
-- 本番/開発環境での出力レベル自動分離
-- JSON形式統一: `{ code, reason, details }`
-- ApiError クラスでの統一例外処理
-- Sentryログ集約とSlack通知
-
-#### RLSポリシー完全実装
-- admin/partner/org_owner の権限分離完全対応
-- 監査ログ自動記録（DBトリガー）
-- セキュリティテスト自動化
-- 要件定義準拠の完全なポリシー実装
-
-#### 型安全性完全保証
-- 全APIエンドポイントでの型安全性
-- null/undefined/空文字の完全な型システム統合
-- バリデーション層での型推論活用
-
-### Phase 2: JSON-LD・公開ガード（1週間）
-
-#### JSON-LD検証システム
-- 要件定義準拠: 空値省略、価格未入力時offers非出力
-- スナップショットテスト自動化
-- Rich Results Test API連携
-- 内部検証関数（Preflight用）
-
-#### Publish Gate (Preflight) 実装
-- JSON-LD検証 + Subscription確認 + DNS検証
-- OGP生成 + 画像最適化確認
-- 全PASS時のみ公開ボタン活性化
-- 署名トークン15分有効・ワンタイム
-
-### Phase 3: UI/UX最適化（1週間）
-
-#### デザインシステム構築
-- Tailwindベースのコンポーネントライブラリ
-- 一貫したスタイルガイド
-- アクセシビリティ対応（AA準拠）
-
-#### フォーム体験最適化
-- リアルタイムバリデーション
-- 段階的入力フロー
-- 自動保存機能
-
-### Phase 4: 運用・監視体制（継続）
-
-#### 監視システム完備
-- Sentry + Plausible + Slack通知
-- LCP < 2.5s 監視（要件定義準拠）
-- APIレート制限実装
-
-#### セキュリティ強化
-- 監査ログ90日保存（要件定義準拠）
-- セッション管理最適化
-- CSRF対策完全実装
+**準拠義務**: すべての実装はこのシステム要件に厳密に従うこと。要件逸脱はPRで却下します。

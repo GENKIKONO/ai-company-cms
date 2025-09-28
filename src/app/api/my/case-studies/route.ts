@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { CaseStudy, CaseStudyFormData } from '@/types/database';
 import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { normalizeCaseStudyPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 
 async function logErrorToDiag(errorInfo: any) {
   try {
@@ -24,7 +25,7 @@ export async function GET() {
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
-      return NextResponse.json({ error: 'Unauthorized', message: 'Authentication required' }, { status: 401 });
+      return createAuthError();
     }
 
     const { data: orgData, error: orgError } = await supabase
@@ -34,7 +35,7 @@ export async function GET() {
       .single();
 
     if (orgError || !orgData) {
-      return NextResponse.json({ error: 'Not Found', message: 'Organization not found' }, { status: 404 });
+      return createNotFoundError('Organization');
     }
 
     const { data, error } = await supabase
@@ -50,7 +51,7 @@ export async function GET() {
     return NextResponse.json({ data: data || [] });
 
   } catch (error) {
-    const errorId = `get-case-studies-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const errorId = generateErrorId('get-case-studies');
     logErrorToDiag({
       errorId,
       endpoint: 'GET /api/my/case-studies',
@@ -58,7 +59,7 @@ export async function GET() {
       timestamp: new Date().toISOString()
     });
     
-    return NextResponse.json({ error: 'Internal server error', errorId }, { status: 500 });
+    return createInternalError(errorId);
   }
 }
 
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
-      return NextResponse.json({ error: 'Unauthorized', message: 'Authentication required' }, { status: 401 });
+      return createAuthError();
     }
 
     const body: CaseStudyFormData = await request.json();
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (orgError || !orgData) {
-      return NextResponse.json({ error: 'Not Found', message: 'Organization not found' }, { status: 404 });
+      return createNotFoundError('Organization');
     }
 
     // プラン制限チェック
@@ -136,7 +137,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ data }, { status: 201 });
 
   } catch (error) {
-    const errorId = `post-case-studies-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const errorId = generateErrorId('post-case-studies');
     logErrorToDiag({
       errorId,
       endpoint: 'POST /api/my/case-studies',
@@ -144,24 +145,6 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
     
-    return NextResponse.json({ error: 'Internal server error', errorId }, { status: 500 });
+    return createInternalError(errorId);
   }
-}
-
-function normalizeCaseStudyPayload(data: any) {
-  const normalized = { ...data };
-  const optionalTextFields = ['problem', 'solution', 'result'];
-  
-  optionalTextFields.forEach(field => {
-    if (normalized[field] === '') {
-      normalized[field] = null;
-    }
-  });
-  
-  // tags配列の処理
-  if (!normalized.tags || normalized.tags.length === 0) {
-    normalized.tags = null;
-  }
-  
-  return normalized;
 }

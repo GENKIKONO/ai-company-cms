@@ -13,8 +13,8 @@ import {
   type ServiceJsonLdValidationResult 
 } from '@/lib/json-ld/service';
 import { 
-  validateFaqJsonLd,
-  type FaqJsonLdValidationResult 
+  validateFAQPageJsonLd,
+  type FAQJsonLdValidationResult 
 } from '@/lib/json-ld/faq';
 import { 
   validateCaseStudyJsonLd,

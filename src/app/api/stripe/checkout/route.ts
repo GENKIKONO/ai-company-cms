@@ -1,9 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { stripe, getAIOHubProducts, createStripeCustomer } from '@/lib/stripe';
+import {
+  requireAuth,
+  requireSelfServeAccess,
+  type AuthContext
+} from '@/lib/api/auth-middleware';
+import {
+  handleApiError
+} from '@/lib/api/error-responses';
 
 export async function POST(request: NextRequest) {
   try {
+    // 統一認証チェック
+    const authResult = await requireAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    
+    // セルフサーブアクセスチェック
+    const selfServeCheck = requireSelfServeAccess(authResult as AuthContext);
+    if (selfServeCheck) {
+      return selfServeCheck;
+    }
+
     const { organizationId } = await request.json();
 
     if (!organizationId) {
@@ -14,15 +34,6 @@ export async function POST(request: NextRequest) {
     }
 
     const supabaseBrowser = supabaseBrowserAdmin();
-
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: '認証が必要です' },
-        { status: 401 }
-      );
-    }
 
     // 組織情報を取得
     const { data: organization, error: orgError } = await supabaseBrowser
@@ -39,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 組織の所有者かチェック
-    if (organization.owner_user_id !== user.id) {
+    if (organization.owner_user_id !== (authResult as AuthContext).user.id) {
       return NextResponse.json(
         { error: '組織の所有者のみが決済できます' },
         { status: 403 }
@@ -85,7 +96,7 @@ export async function POST(request: NextRequest) {
       customerId = existingCustomer.stripe_customer_id;
     } else {
       const customer = await createStripeCustomer(
-        organization.email || user.email || '',
+        organization.email || (authResult as AuthContext).user.email || '',
         organization.name
       );
       customerId = customer.id;
@@ -96,7 +107,7 @@ export async function POST(request: NextRequest) {
         .insert({
           organization_id: organizationId,
           stripe_customer_id: customerId,
-          email: organization.email || user.email || '',
+          email: organization.email || (authResult as AuthContext).user.email || '',
         });
     }
 
@@ -119,7 +130,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/organizations/${organizationId}?payment=cancelled`,
       metadata: {
         organization_id: organizationId,
-        user_id: user.id,
+        user_id: (authResult as AuthContext).user.id,
       },
       subscription_data: {
         metadata: {

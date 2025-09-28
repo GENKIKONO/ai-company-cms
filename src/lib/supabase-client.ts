@@ -91,3 +91,8 @@ export const createClient = () => supabaseBrowser;
  * @deprecated supabaseBrowser を名前付きインポートしてください
  */
 export default supabaseBrowser;
+
+/**
+ * supabaseClient エイリアス（互換性のため）
+ */
+export { supabaseBrowser as supabaseClient };

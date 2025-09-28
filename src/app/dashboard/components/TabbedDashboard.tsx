@@ -345,7 +345,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
             <p className="mt-1 text-sm text-gray-500">{emptyMessage}</p>
             <div className="mt-6">
               <Link
-                href={`/dashboard/${type}/new`}
+                href={`/my/${type}/new`}
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -366,7 +366,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
             {getContentTypeLabel(type)}一覧 ({items.length}件)
           </h3>
           <Link
-            href={`/dashboard/${type}/new`}
+            href={`/my/${type}/new`}
             className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
           >
             <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -396,7 +396,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
                 </div>
                 <div className="flex items-center space-x-2 ml-4">
                   <Link
-                    href={`/dashboard/${type}/${item.id}/edit`}
+                    href={`/my/${type}/${item.id}/edit`}
                     className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                   >
                     編集

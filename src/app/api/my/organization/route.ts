@@ -1,7 +1,6 @@
 // Single-Org Mode API: /api/my/organization
 // 各ユーザーが自分の企業情報を管理するためのAPI
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
 import { env } from '@/lib/env';
 import { z } from 'zod';
 import type { Organization, OrganizationFormData } from '@/types/database';
@@ -11,14 +10,22 @@ import {
   type OrganizationCreate 
 } from '@/lib/schemas/organization';
 import { 
-  ApiError, 
-  ApiErrorCode,
-  createValidationError, 
-  createDatabaseError, 
-  createAuthError, 
-  createForbiddenError,
-  createNotFoundError 
-} from '@/lib/errors/api-error';
+  requireAuth, 
+  requireSelfServeAccess, 
+  type AuthContext 
+} from '@/lib/api/auth-middleware';
+import {
+  handleApiError,
+  validationError,
+  conflictError,
+  notFoundError,
+  handleZodError,
+  unauthorizedError,
+  createErrorResponse
+} from '@/lib/api/error-responses';
+import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 // デバッグモード判定関数
 function isDebugMode(request: NextRequest): boolean {
@@ -86,28 +93,51 @@ export const fetchCache = 'force-no-store';
 // GET - ユーザーの企業情報を取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
-      const apiError = createAuthError(
-        authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
-      );
-      return apiError.toResponse(request);
+    // 統一認証チェック
+    const authResult = await requireAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    
+    // セルフサーブアクセスチェック
+    const selfServeCheck = requireSelfServeAccess(authResult as AuthContext);
+    if (selfServeCheck) {
+      return selfServeCheck;
+    }
+    
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      env.SUPABASE_URL,
+      env.SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch (error) {
+              // Server Component での cookie 設定エラーをハンドル
+            }
+          },
+        },
+      }
+    );
 
     // ユーザーの企業情報を取得（RLSポリシーにより自動的に自分の企業のみ取得）
     const { data, error } = await supabase
       .from('organizations')
       .select('*')
-      .eq('created_by', authData.user.id)
+      .eq('created_by', (authResult as AuthContext).user.id)
       .single();
 
     if (error) {
       // 企業が存在しない場合（初回）
       if (error.code === 'PGRST116') {
-        const debugInfo = generateDebugInfo(request, authData.user, null, error);
+        const debugInfo = generateDebugInfo(request, (authResult as AuthContext).user, null, error);
         return NextResponse.json(
           { 
             data: null, 
@@ -123,19 +153,16 @@ export async function GET(request: NextRequest) {
         );
       }
       console.error('Database error:', error);
-      const debugInfo = generateDebugInfo(request, authData.user, null, error);
-      return NextResponse.json(
-        { 
-          code: 'DATABASE_ERROR',
-          reason: 'Failed to retrieve organization data',
-          details: error.message,
-          ...(debugInfo && { debug: debugInfo })
-        },
-        { status: 500 }
+      const debugInfo = generateDebugInfo(request, (authResult as AuthContext).user, null, error);
+      return createErrorResponse(
+        'DATABASE_ERROR',
+        'Failed to retrieve organization data',
+        500,
+        { originalError: error.message, ...(debugInfo && { debug: debugInfo }) }
       );
     }
 
-    const debugInfo = generateDebugInfo(request, authData.user);
+    const debugInfo = generateDebugInfo(request, (authResult as AuthContext).user);
     return NextResponse.json(
       { 
         data,
@@ -162,10 +189,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
     
-    return NextResponse.json(
-      { error: 'Internal server error', errorId },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -173,16 +197,39 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   let body: OrganizationFormData | null = null;
   try {
-    const supabase = await supabaseServer();
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
-      const apiError = createAuthError(
-        authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
-      );
-      return apiError.toResponse(request);
+    // 統一認証チェック
+    const authResult = await requireAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    
+    // セルフサーブアクセスチェック
+    const selfServeCheck = requireSelfServeAccess(authResult as AuthContext);
+    if (selfServeCheck) {
+      return selfServeCheck;
+    }
+    
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      env.SUPABASE_URL,
+      env.SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch (error) {
+              // Server Component での cookie 設定エラーをハンドル
+            }
+          },
+        },
+      }
+    );
 
     const rawBody = await request.json();
 
@@ -193,8 +240,7 @@ export async function POST(request: NextRequest) {
       body = validatedData as any; // 既存の型との互換性のため
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const apiError = createValidationError(error);
-        return apiError.toResponse(request, authData.user);
+        return handleZodError(error);
       }
       throw error;
     }
@@ -205,17 +251,11 @@ export async function POST(request: NextRequest) {
     const { data: existingOrg } = await supabase
       .from('organizations')
       .select('id')
-      .eq('created_by', authData.user.id)
+      .eq('created_by', (authResult as AuthContext).user.id)
       .single();
 
     if (existingOrg) {
-      const apiError = new ApiError(
-        ApiErrorCode.UNIQUE_VIOLATION,
-        'User already has an organization',
-        409,
-        'Each user can only create one organization'
-      );
-      return apiError.toResponse(request, authData.user);
+      return conflictError('Organization', 'user');
     }
 
     // slugの重複チェック
@@ -226,13 +266,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (slugCheck) {
-      const apiError = new ApiError(
-        ApiErrorCode.UNIQUE_VIOLATION,
-        'Slug already exists',
-        409,
-        'Organization slug must be unique across all organizations'
-      );
-      return apiError.toResponse(request, authData.user);
+      return conflictError('Organization', 'slug');
     }
 
     // データの正規化
@@ -241,7 +275,7 @@ export async function POST(request: NextRequest) {
     // 企業データの作成
     const organizationData: Partial<Organization> = {
       ...normalizedData,
-      created_by: authData.user.id,
+      created_by: (authResult as AuthContext).user.id,
       status: 'draft' as const,
       is_published: false, // 初期は非公開
     };
@@ -254,13 +288,10 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Database error:', error);
-      
-      // 統一エラーハンドリング
-      const apiError = createDatabaseError(error);
-      return apiError.toResponse(request, authData.user);
+      return handleApiError(error);
     }
 
-    const debugInfo = generateDebugInfo(request, authData.user, body);
+    const debugInfo = generateDebugInfo(request, (authResult as AuthContext).user, body);
     return NextResponse.json(
       { 
         data: {
@@ -292,34 +323,46 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
     
-    return NextResponse.json(
-      { error: 'Internal server error', errorId },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // PUT - 既存の企業情報を更新
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
-      return NextResponse.json(
-        { 
-          code: 'UNAUTHORIZED', 
-          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
-        },
-        { 
-          status: 401,
-          headers: {
-            'Cache-Control': 'no-store, must-revalidate'
-          }
-        }
-      );
+    // 統一認証チェック
+    const authResult = await requireAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    
+    // セルフサーブアクセスチェック
+    const selfServeCheck = requireSelfServeAccess(authResult as AuthContext);
+    if (selfServeCheck) {
+      return selfServeCheck;
+    }
+    
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      env.SUPABASE_URL,
+      env.SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch (error) {
+              // Server Component での cookie 設定エラーをハンドル
+            }
+          },
+        },
+      }
+    );
 
     const body: Partial<OrganizationFormData> = await request.json();
 
@@ -327,24 +370,18 @@ export async function PUT(request: NextRequest) {
     const { data: existingOrg, error: fetchError } = await supabase
       .from('organizations')
       .select('id, slug')
-      .eq('created_by', authData.user.id)
+      .eq('created_by', (authResult as AuthContext).user.id)
       .single();
 
     if (fetchError || !existingOrg) {
-      return NextResponse.json(
-        { error: 'Not Found', message: 'Organization not found' },
-        { status: 404 }
-      );
+      return notFoundError('Organization');
     }
 
-    // slugが変更される場合、バリデーション
+    // slugが変更される場合、バリデーション  
     if (body.slug) {
       const slugValidation = validateSlug(body.slug);
       if (!slugValidation.isValid) {
-        return NextResponse.json(
-          { error: 'Validation error', message: slugValidation.error },
-          { status: 400 }
-        );
+        return validationError({ slug: slugValidation.error }, 'Slug validation failed');
       }
     }
 
@@ -358,13 +395,7 @@ export async function PUT(request: NextRequest) {
         .single();
 
       if (slugCheck) {
-        return NextResponse.json(
-          { 
-            code: 'CONFLICT', 
-            reason: 'Slug already exists' 
-          },
-          { status: 409 }
-        );
+        return conflictError('Organization', 'slug');
       }
     }
 
@@ -381,28 +412,13 @@ export async function PUT(request: NextRequest) {
       .from('organizations')
       .update(updateData)
       .eq('id', existingOrg.id)
-      .eq('created_by', authData.user.id) // セキュリティのため二重チェック
+      .eq('created_by', (authResult as AuthContext).user.id) // セキュリティのため二重チェック
       .select()
       .single();
 
     if (error) {
       console.error('Database error:', error);
-      
-      // 制約違反の場合
-      if (error.code === '23505' && error.message.includes('organizations_slug_key')) {
-        return NextResponse.json(
-          { 
-            code: 'CONFLICT', 
-            reason: 'Slug already exists' 
-          },
-          { status: 409 }
-        );
-      }
-      
-      return NextResponse.json(
-        { error: 'Database error', message: error.message },
-        { status: 500 }
-      );
+      return handleApiError(error);
     }
 
     return NextResponse.json(
@@ -428,47 +444,56 @@ export async function PUT(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
     
-    return NextResponse.json(
-      { error: 'Internal server error', errorId },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // DELETE - 企業を削除（必要に応じて）
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
-      return NextResponse.json(
-        { 
-          code: 'UNAUTHORIZED', 
-          reason: authError ? `Server session error: ${authError.message}` : 'No supabase session cookie at server'
-        },
-        { 
-          status: 401,
-          headers: {
-            'Cache-Control': 'no-store, must-revalidate'
-          }
-        }
-      );
+    // 統一認証チェック
+    const authResult = await requireAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    
+    // セルフサーブアクセスチェック
+    const selfServeCheck = requireSelfServeAccess(authResult as AuthContext);
+    if (selfServeCheck) {
+      return selfServeCheck;
+    }
+    
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      env.SUPABASE_URL,
+      env.SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch (error) {
+              // Server Component での cookie 設定エラーをハンドル
+            }
+          },
+        },
+      }
+    );
 
     // 企業の存在確認
     const { data: existingOrg, error: fetchError } = await supabase
       .from('organizations')
       .select('id')
-      .eq('created_by', authData.user.id)
+      .eq('created_by', (authResult as AuthContext).user.id)
       .single();
 
     if (fetchError || !existingOrg) {
-      return NextResponse.json(
-        { error: 'Not Found', message: 'Organization not found' },
-        { status: 404 }
-      );
+      return notFoundError('Organization');
     }
 
     // 削除実行（RLSポリシーにより自分の企業のみ削除可能）
@@ -476,14 +501,11 @@ export async function DELETE(request: NextRequest) {
       .from('organizations')
       .delete()
       .eq('id', existingOrg.id)
-      .eq('created_by', authData.user.id);
+      .eq('created_by', (authResult as AuthContext).user.id);
 
     if (error) {
       console.error('Database error:', error);
-      return NextResponse.json(
-        { error: 'Database error', message: error.message },
-        { status: 500 }
-      );
+      return handleApiError(error);
     }
 
     return NextResponse.json(
@@ -509,10 +531,7 @@ export async function DELETE(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
     
-    return NextResponse.json(
-      { error: 'Internal server error', errorId },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -549,71 +568,3 @@ function validateSlug(slug: string): { isValid: boolean; error?: string } {
 // 統一バリデーションスキーマを使用（既存のローカルスキーマは削除）
 
 // データ正規化ヘルパー関数（強化版）
-function normalizeOrganizationPayload(data: any) {
-  const normalized = { ...data };
-  
-  // DATE型フィールド - 空文字・空白をnullに変換
-  const dateFields = ['establishment_date', 'founded'];
-  
-  // オプショナルテキストフィールド - 空文字・空白をnullに変換
-  const optionalTextFields = [
-    'description', 'legal_form', 'representative_name',
-    'address_region', 'address_locality', 'address_postal_code', 'address_street',
-    'telephone', 'email', 'url', 'logo_url', 'meta_title', 'meta_description'
-  ];
-  
-  // 日付フィールドの正規化
-  dateFields.forEach(field => {
-    if (normalized[field] === '' || normalized[field] === null || 
-        (typeof normalized[field] === 'string' && normalized[field].trim() === '')) {
-      normalized[field] = null;
-    }
-  });
-  
-  // オプショナルテキストフィールドの正規化
-  optionalTextFields.forEach(field => {
-    const value = normalized[field];
-    if (value === '' || value === null || value === undefined ||
-        (typeof value === 'string' && value.trim() === '')) {
-      normalized[field] = null;
-    } else if (typeof value === 'string') {
-      normalized[field] = value.trim();
-    }
-  });
-  
-  // 数値フィールドの正規化
-  ['capital', 'employees'].forEach(field => {
-    const value = normalized[field];
-    if (value === '' || value === null || value === undefined ||
-        (typeof value === 'string' && value.trim() === '')) {
-      normalized[field] = null;
-    } else if (typeof value === 'string') {
-      const numValue = parseInt(value.trim(), 10);
-      normalized[field] = isNaN(numValue) ? null : numValue;
-    }
-  });
-  
-  // URL フィールドの特別処理
-  ['url', 'logo_url'].forEach(field => {
-    const value = normalized[field];
-    if (value && typeof value === 'string' && value.trim() !== '') {
-      const trimmed = value.trim();
-      // 簡単なURL検証（http/httpsで始まる）
-      if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
-        normalized[field] = `https://${trimmed}`;
-      }
-    }
-  });
-  
-  // Email フィールドの特別処理
-  if (normalized.email && typeof normalized.email === 'string') {
-    const emailTrimmed = normalized.email.trim().toLowerCase();
-    if (!emailTrimmed.includes('@')) {
-      normalized.email = null; // 無効なemailは削除
-    } else {
-      normalized.email = emailTrimmed;
-    }
-  }
-  
-  return normalized;
-}

@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { CaseStudyFormData } from '@/types/database';
+import { normalizeCaseStudyPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 
 async function logErrorToDiag(errorInfo: any) {
   try {
@@ -33,10 +34,7 @@ export async function GET(
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized', message: 'Authentication required' },
-        { status: 401 }
-      );
+      return createAuthError();
     }
 
     const { data, error } = await supabase
@@ -87,10 +85,7 @@ export async function PUT(
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized', message: 'Authentication required' },
-        { status: 401 }
-      );
+      return createAuthError();
     }
 
     const body: Partial<CaseStudyFormData> = await request.json();
@@ -159,10 +154,7 @@ export async function DELETE(
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized', message: 'Authentication required' },
-        { status: 401 }
-      );
+      return createAuthError();
     }
 
     // 存在確認
@@ -209,20 +201,3 @@ export async function DELETE(
   }
 }
 
-function normalizeCaseStudyPayload(data: any) {
-  const normalized = { ...data };
-  const optionalTextFields = ['problem', 'solution', 'result'];
-  
-  optionalTextFields.forEach(field => {
-    if (normalized[field] === '') {
-      normalized[field] = null;
-    }
-  });
-  
-  // tags配列の処理
-  if (!normalized.tags || normalized.tags.length === 0) {
-    normalized.tags = null;
-  }
-  
-  return normalized;
-}

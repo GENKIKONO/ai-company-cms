@@ -41,7 +41,14 @@
     "verify:prod-ready": "echo '🔍 本番稼働準備確認を開始...' && npm run verify:env && npm run verify:supabase && echo '🎉 全ての検証が完了しました。本番デプロイ準備完了です。'",
     "health:check": "node scripts/ops/health-check.mjs",
     "health:detailed": "node scripts/ops/health-check.mjs --detailed",
-    "health:production": "node scripts/ops/health-check.mjs --url=https://aiohub.jp"
+    "health:production": "node scripts/ops/health-check.mjs --url=https://aiohub.jp",
+    "prod:build": "NODE_ENV=production npm run build",
+    "prod:start": "NODE_ENV=production npm run start",
+    "prod:test": "NODE_ENV=production npm run test:e2e",
+    "prod:validate": "npm run typecheck && npm run lint && npm run test:unit",
+    "deploy:staging": "vercel --target preview",
+    "deploy:production": "vercel --prod",
+    "postdeploy": "npm run health:production && npm run test:production"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.8",
@@ -78,6 +85,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.63.0",
     "resend": "^4.0.0",
+    "server-only": "^0.0.1",
     "sharp": "^0.34.4",
     "stripe": "^14.25.0",
     "tailwind-merge": "^3.3.1",
@@ -87,28 +95,27 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@next/bundle-analyzer": "^15.5.3",
     "@playwright/test": "^1.40.0",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
     "@types/dompurify": "^3.0.5",
     "@types/jest": "^30.0.0",
     "@types/marked": "^5.0.2",
     "@types/supertest": "^6.0.3",
-    "@testing-library/react": "^14.1.2",
-    "@testing-library/jest-dom": "^6.1.5", 
-    "@testing-library/user-event": "^14.5.1",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
     "eslint": "^9.36.0",
     "eslint-config-next": "^15.0.0",
     "jest": "^30.1.3",
     "jest-environment-jsdom": "^29.7.0",
-    "@jest/globals": "^29.7.0",
-    "ts-jest": "^29.1.1",
     "prettier": "^3.1.0",
     "size-limit": "^11.0.0",
-    "@size-limit/preset-next": "^11.0.0",
-    "@next/bundle-analyzer": "^15.5.3",
-    "cross-env": "^7.0.3",
-    "concurrently": "^8.2.2",
-    "wait-on": "^7.2.0",
     "supabase": "^2.45.2",
-    "supertest": "^7.1.4"
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.1.1",
+    "wait-on": "^7.2.0"
   }
 }

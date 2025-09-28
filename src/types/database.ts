@@ -3,6 +3,7 @@
 export type UserRole = 'admin' | 'editor' | 'viewer';
 export type OrganizationStatus = 'draft' | 'published' | 'archived';
 export type PartnershipType = 'strategic' | 'technology' | 'distribution' | 'investment';
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
 
 export interface AppUser {
   id: string;
@@ -62,6 +63,20 @@ export interface Organization {
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string[];
+  // Enhanced organization settings (I1)
+  favicon_url?: string;
+  brand_color_primary?: string;
+  brand_color_secondary?: string;
+  social_media?: SocialMediaLinks;
+  business_hours?: BusinessHours[];
+  timezone?: string;
+  languages_supported?: string[];
+  certifications?: string[];
+  awards?: string[];
+  company_culture?: string;
+  mission_statement?: string;
+  vision_statement?: string;
+  values?: string[];
   services?: Service[];
   case_studies?: CaseStudy[];
   faqs?: FAQ[];
@@ -82,8 +97,41 @@ export interface Service {
   duration_months?: number; // Duration in months (nullable)
   category?: string;
   description?: string;
+  features?: string[]; // List of service features
+  media?: ServiceMedia[]; // Associated media (images, videos)
+  cta_text?: string; // Call-to-action text
+  cta_url?: string; // Call-to-action URL
   created_at: string;
   updated_at: string;
+}
+
+export interface ServiceMedia {
+  type: 'image' | 'video';
+  url: string;
+  alt_text?: string;
+  caption?: string;
+}
+
+export interface SocialMediaLinks {
+  facebook?: string;
+  twitter?: string;
+  linkedin?: string;
+  instagram?: string;
+  youtube?: string;
+  tiktok?: string;
+  github?: string;
+  note?: string;
+  qiita?: string;
+  zenn?: string;
+}
+
+export interface BusinessHours {
+  day: DayOfWeek;
+  is_open: boolean;
+  open_time?: string; // HH:MM format
+  close_time?: string; // HH:MM format
+  break_start?: string; // HH:MM format
+  break_end?: string; // HH:MM format
 }
 
 export interface Post {
@@ -240,6 +288,20 @@ export interface OrganizationFormData {
   logo_url?: string;
   same_as?: string[];
   industries?: string[];
+  // Enhanced organization settings
+  favicon_url?: string;
+  brand_color_primary?: string;
+  brand_color_secondary?: string;
+  social_media?: SocialMediaLinks;
+  business_hours?: BusinessHours[];
+  timezone?: string;
+  languages_supported?: string[];
+  certifications?: string[];
+  awards?: string[];
+  company_culture?: string;
+  mission_statement?: string;
+  vision_statement?: string;
+  values?: string[];
 }
 
 export interface PartnerFormData {
@@ -258,6 +320,10 @@ export interface ServiceFormData {
   duration_months?: number;
   category?: string;
   description?: string;
+  features?: string[];
+  media?: ServiceMedia[];
+  cta_text?: string;
+  cta_url?: string;
 }
 
 export interface PostFormData {

@@ -25,7 +25,11 @@ export default function NewServicePage() {
     description: '',
     price: undefined,
     duration_months: undefined,
-    category: ''
+    category: '',
+    features: [],
+    media: [],
+    cta_text: '',
+    cta_url: ''
   });
 
   const categoryOptions = [
@@ -103,6 +107,10 @@ export default function NewServicePage() {
 
     if (formData.duration_months !== undefined && formData.duration_months < 1) {
       newErrors.duration_months = '期間は1ヶ月以上で入力してください';
+    }
+
+    if (formData.cta_url && !formData.cta_url.startsWith('https://')) {
+      newErrors.cta_url = 'URLはhttps://で始まる必要があります';
     }
 
     setErrors(newErrors);
@@ -300,6 +308,93 @@ export default function NewServicePage() {
             </div>
           </div>
 
+          {/* 機能・特徴 */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">機能・特徴</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  サービスの機能・特徴
+                </label>
+                <div className="space-y-2">
+                  {formData.features?.map((feature, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={feature}
+                        onChange={(e) => {
+                          const newFeatures = [...(formData.features || [])];
+                          newFeatures[index] = e.target.value;
+                          handleInputChange('features', newFeatures);
+                        }}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="例: 高度な分析機能"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newFeatures = formData.features?.filter((_, i) => i !== index) || [];
+                          handleInputChange('features', newFeatures);
+                        }}
+                        className="px-3 py-2 text-red-600 hover:text-red-700"
+                      >
+                        削除
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newFeatures = [...(formData.features || []), ''];
+                      handleInputChange('features', newFeatures);
+                    }}
+                    className="px-4 py-2 text-blue-600 hover:text-blue-700 border border-blue-600 rounded-md hover:bg-blue-50"
+                  >
+                    + 機能を追加
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* コール・トゥ・アクション */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">コール・トゥ・アクション</h2>
+            
+            <div className="space-y-6">
+              <div>
+                <label htmlFor="cta_text" className="block text-sm font-medium text-gray-700 mb-2">
+                  CTAボタンテキスト
+                </label>
+                <input
+                  type="text"
+                  id="cta_text"
+                  value={formData.cta_text || ''}
+                  onChange={(e) => handleInputChange('cta_text', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="例: 詳細を見る"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="cta_url" className="block text-sm font-medium text-gray-700 mb-2">
+                  CTAURL
+                </label>
+                <input
+                  type="url"
+                  id="cta_url"
+                  value={formData.cta_url || ''}
+                  onChange={(e) => handleInputChange('cta_url', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.cta_url ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="https://example.com/service"
+                />
+                {errors.cta_url && <p className="mt-1 text-sm text-red-600">{errors.cta_url}</p>}
+              </div>
+            </div>
+          </div>
 
           {/* アクションボタン */}
           <div className="p-6">

@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e6] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+      - img [ref=e8] [cursor=pointer]
+    - generic [ref=e11] [cursor=pointer]:
+      - button "Open issues overlay" [ref=e12] [cursor=pointer]:
+        - generic [ref=e13] [cursor=pointer]:
+          - generic [ref=e14] [cursor=pointer]: "1"
+          - generic [ref=e15] [cursor=pointer]: "2"
+        - generic [ref=e16] [cursor=pointer]:
+          - text: Issue
+          - generic [ref=e17] [cursor=pointer]: s
+      - button "Collapse issues badge" [ref=e18] [cursor=pointer]:
+        - img [ref=e19] [cursor=pointer]
+  - banner [ref=e21]:
+    - generic [ref=e23]:
+      - link "AIO Hub AI企業CMS" [ref=e25] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e26]:
+        - button "ui.language.selector" [ref=e28] [cursor=pointer]:
+          - img [ref=e29] [cursor=pointer]
+          - generic [ref=e34] [cursor=pointer]: 🇺🇸
+          - generic [ref=e35] [cursor=pointer]: English
+          - img [ref=e36] [cursor=pointer]
+        - link "ログイン" [ref=e38] [cursor=pointer]:
+          - /url: /auth/login
+        - link "無料で始める" [ref=e39] [cursor=pointer]:
+          - /url: /auth/login
+  - generic [ref=e41]:
+    - generic [ref=e42]:
+      - generic [ref=e43]: "Host: localhost:3000"
+      - generic [ref=e44]: "Cookie Domain: aiohub.jp"
+    - generic [ref=e45]:
+      - heading "管理者運用ログイン" [level=2] [ref=e46]
+      - paragraph [ref=e47]: 運用管理用の特別なアクセスです
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - generic [ref=e50]: 運用パスフレーズ
+        - textbox "運用パスフレーズ" [ref=e51]
+      - button "管理者としてログイン" [ref=e53] [cursor=pointer]
+      - link "← 一般ログインに戻る" [ref=e55] [cursor=pointer]:
+        - /url: /auth/login
+    - generic [ref=e57]:
+      - generic [ref=e58]: "前提条件:"
+      - generic [ref=e59]:
+        - generic [ref=e60]: ✓ Supabase認証済み（管理者アカウント）
+        - generic [ref=e61]: ✓ 運用パスフレーズの入力
+  - alert [ref=e62]
+```

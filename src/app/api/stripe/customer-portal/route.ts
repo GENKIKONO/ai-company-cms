@@ -1,9 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { stripe } from '@/lib/stripe';
+import {
+  requireAuth,
+  requireSelfServeAccess,
+  type AuthContext
+} from '@/lib/api/auth-middleware';
+import {
+  handleApiError
+} from '@/lib/api/error-responses';
 
 export async function POST(request: NextRequest) {
   try {
+    // 統一認証チェック
+    const authResult = await requireAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    
+    // セルフサーブアクセスチェック
+    const selfServeCheck = requireSelfServeAccess(authResult as AuthContext);
+    if (selfServeCheck) {
+      return selfServeCheck;
+    }
+
     const { organizationId } = await request.json();
 
     if (!organizationId) {
@@ -14,15 +34,6 @@ export async function POST(request: NextRequest) {
     }
 
     const supabaseBrowser = supabaseBrowserAdmin();
-
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: '認証が必要です' },
-        { status: 401 }
-      );
-    }
 
     // 組織の所有者かチェック
     const { data: organization, error: orgError } = await supabaseBrowser
@@ -38,7 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (organization.created_by !== user.id) {
+    if (organization.created_by !== (authResult as AuthContext).user.id) {
       return NextResponse.json(
         { error: '組織の所有者のみがアクセスできます' },
         { status: 403 }

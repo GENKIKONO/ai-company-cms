@@ -1,39 +1,77 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
 import { getOrCreateCustomer, createCheckoutSession } from '@/lib/stripe';
+import { env } from '@/lib/env';
+import {
+  requireAuth,
+  requireSelfServeAccess,
+  type AuthContext
+} from '@/lib/api/auth-middleware';
+import {
+  handleApiError,
+  notFoundError,
+  createErrorResponse
+} from '@/lib/api/error-responses';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const supabase = await supabaseServer();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // 統一認証チェック
+    const authResult = await requireAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    
+    // セルフサーブアクセスチェック
+    const selfServeCheck = requireSelfServeAccess(authResult as AuthContext);
+    if (selfServeCheck) {
+      return selfServeCheck;
+    }
+    
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      env.SUPABASE_URL,
+      env.SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch (error) {
+              // Server Component での cookie 設定エラーをハンドル
+            }
+          },
+        },
+      }
+    );
 
     // Get user's organization (Single-Org Mode)
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('*')
-      .eq('created_by', user.id)
+      .eq('created_by', (authResult as AuthContext).user.id)
       .single();
 
     if (orgError || !organization) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+      return notFoundError('Organization');
     }
 
-    // Check if required environment variables are set
-    const priceId = process.env.STRIPE_PRICE_BASIC;
+    // Check if required environment variables are set - use unified basic price ID
+    const priceId = env.STRIPE_BASIC_PRICE_ID;
     if (!priceId) {
-      return NextResponse.json({ error: 'Subscription plan not configured' }, { status: 400 });
+      return createErrorResponse('MISSING_CONFIG', 'Subscription plan not configured', 400);
     }
 
     // Get base URL for success/cancel URLs
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = env.APP_URL || 'http://localhost:3000';
     const successUrl = `${baseUrl}/dashboard/billing?success=1`;
     const cancelUrl = `${baseUrl}/dashboard/billing?canceled=1`;
 
@@ -48,12 +86,16 @@ export async function POST(request: NextRequest) {
       cancelUrl,
     });
 
-    return NextResponse.json({ url: checkoutUrl });
-  } catch (error) {
-    console.error('Checkout session creation failed:', error);
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
+      { url: checkoutUrl },
+      {
+        headers: {
+          'Cache-Control': 'no-store, must-revalidate'
+        }
+      }
     );
+  } catch (error) {
+    console.error('[POST /api/billing/checkout] Checkout session creation failed:', error);
+    return handleApiError(error);
   }
 }

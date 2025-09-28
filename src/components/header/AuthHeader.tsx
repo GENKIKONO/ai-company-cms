@@ -20,7 +20,7 @@ export default async function AuthHeader({ currentPage }: AuthHeaderProps) {
         <div className="flex justify-between items-center py-6">
           <div className="flex items-center">
             <Link 
-              href={isAuthenticated ? "/dashboard" : "/auth/login"} 
+              href="/" 
               className="text-2xl font-bold text-gray-900 hover:text-blue-600"
             >
               AIO Hub AI企業CMS
@@ -46,10 +46,34 @@ export default async function AuthHeader({ currentPage }: AuthHeaderProps) {
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                <div className="text-sm text-gray-700">
+                {/* PC表示: メールアドレス + サインアウトボタン */}
+                <div className="hidden md:block text-sm text-gray-700 max-w-[200px] truncate">
                   こんにちは、{user?.user_metadata?.full_name || user?.email}さん
                 </div>
-                <SignOutButton />
+                <div className="hidden md:block">
+                  <SignOutButton />
+                </div>
+                
+                {/* モバイル表示: アバターメニュー */}
+                <div className="md:hidden relative">
+                  <details className="group">
+                    <summary className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300">
+                      <span className="text-sm font-medium text-gray-700">
+                        {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
+                      </span>
+                    </summary>
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                      <div className="py-1">
+                        <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
+                          {user?.user_metadata?.full_name || user?.email}
+                        </div>
+                        <div className="px-4 py-2">
+                          <SignOutButton />
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+                </div>
               </>
             ) : (
               <>

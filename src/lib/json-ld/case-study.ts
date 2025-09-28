@@ -1,37 +1,26 @@
 /**
  * CaseStudy JSON-LD 生成
- * 要件定義準拠: CaseStudy スキーマ
+ * @type=CaseStudy スキーマ準拠
  */
 
-import type { Organization } from '@/types/database';
-
-interface CaseStudy {
-  id: string;
-  title: string;
-  client_type?: string | null;
-  client_name?: string | null;
-  problem?: string | null;
-  solution?: string | null;
-  outcome?: string | null;
-  published_at?: string | null;
-  is_anonymous?: boolean;
-  status?: string;
-  organization_id: string;
-}
+import type { Organization, CaseStudy } from '@/types/database';
 
 interface CaseStudyJsonLd {
   '@context': string;
   '@type': string;
-  headline: string;
-  about?: string;
-  author: {
+  name: string;
+  description?: string;
+  provider: {
     '@type': string;
     name: string;
     url?: string;
   };
-  datePublished?: string;
-  articleBody: string;
-  inLanguage: string;
+  problem?: string;
+  solution?: string;
+  result?: string;
+  keywords?: string[];
+  dateCreated?: string;
+  dateModified?: string;
 }
 
 /**
@@ -51,48 +40,60 @@ function omitEmpty<T extends object>(obj: T): Partial<T> {
 
 /**
  * CaseStudy の JSON-LD を生成
+ * @type=CaseStudy スキーマを使用
  */
 export function generateCaseStudyJsonLd(caseStudy: CaseStudy, org: Organization): CaseStudyJsonLd {
-  // 記事本文を構築
-  const articleParts: string[] = [];
-  
-  if (caseStudy.problem?.trim()) {
-    articleParts.push(`Problem: ${caseStudy.problem.trim()}`);
-  }
-  
-  if (caseStudy.solution?.trim()) {
-    articleParts.push(`Solution: ${caseStudy.solution.trim()}`);
-  }
-  
-  if (caseStudy.outcome?.trim()) {
-    articleParts.push(`Outcome: ${caseStudy.outcome.trim()}`);
-  }
-
   const jsonLd: CaseStudyJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CaseStudy',
-    headline: caseStudy.title,
-    author: {
+    name: caseStudy.title,
+    provider: {
       '@type': 'Organization',
       name: org.name,
     },
-    articleBody: articleParts.join('\n\n'),
-    inLanguage: 'ja',
   };
 
-  // 著者のURL
+  // プロバイダーURL
   if (org.url) {
-    jsonLd.author.url = org.url;
+    jsonLd.provider.url = org.url;
   }
 
-  // クライアント情報（匿名化されていない場合）
-  if (caseStudy.client_type && !caseStudy.is_anonymous) {
-    jsonLd.about = caseStudy.client_type;
+  // ケーススタディの詳細
+  if (caseStudy.problem) {
+    jsonLd.problem = caseStudy.problem;
   }
 
-  // 公開日
-  if (caseStudy.published_at) {
-    jsonLd.datePublished = caseStudy.published_at;
+  if (caseStudy.solution) {
+    jsonLd.solution = caseStudy.solution;
+  }
+
+  if (caseStudy.result) {
+    jsonLd.result = caseStudy.result;
+  }
+
+  // 説明（problem + solution + resultの要約）
+  const descriptionParts = [
+    caseStudy.problem,
+    caseStudy.solution, 
+    caseStudy.result
+  ].filter(part => part && part.trim());
+  
+  if (descriptionParts.length > 0) {
+    jsonLd.description = descriptionParts.join(' ');
+  }
+
+  // タグをキーワードとして使用
+  if (caseStudy.tags && caseStudy.tags.length > 0) {
+    jsonLd.keywords = caseStudy.tags;
+  }
+
+  // 日付情報
+  if (caseStudy.created_at) {
+    jsonLd.dateCreated = caseStudy.created_at;
+  }
+
+  if (caseStudy.updated_at) {
+    jsonLd.dateModified = caseStudy.updated_at;
   }
 
   // 空値を除外して返却
@@ -118,58 +119,29 @@ export function validateCaseStudyJsonLd(caseStudy: CaseStudy, org: Organization)
   }
 
   if (!org.name?.trim()) {
-    errors.push('Organization name is required for case study author');
-  }
-
-  // 公開ステータスチェック
-  if (caseStudy.status !== 'published') {
-    errors.push('Case study must be published for JSON-LD generation');
-  }
-
-  // 内容チェック
-  if (!caseStudy.problem?.trim() && !caseStudy.solution?.trim() && !caseStudy.outcome?.trim()) {
-    errors.push('At least one of problem, solution, or outcome is required');
+    errors.push('Organization name is required for case study provider');
   }
 
   // 推奨項目チェック
   if (!caseStudy.problem?.trim()) {
-    warnings.push('Problem description is recommended for better context');
+    warnings.push('Problem description is recommended for better case study context');
   }
 
   if (!caseStudy.solution?.trim()) {
-    warnings.push('Solution description is recommended');
+    warnings.push('Solution description is recommended for complete case study');
   }
 
-  if (!caseStudy.outcome?.trim()) {
-    warnings.push('Outcome description is recommended for credibility');
+  if (!caseStudy.result?.trim()) {
+    warnings.push('Result description is recommended to show impact');
   }
 
-  if (!caseStudy.published_at) {
-    warnings.push('Published date is recommended for freshness signals');
-  }
-
-  if (!caseStudy.client_type?.trim()) {
-    warnings.push('Client type is recommended for context');
+  if (!caseStudy.tags || caseStudy.tags.length === 0) {
+    warnings.push('Tags are recommended for better categorization and discoverability');
   }
 
   // URL形式チェック
   if (org.url && !org.url.startsWith('https://')) {
     errors.push('Organization URL must use HTTPS');
-  }
-
-  // 長さチェック
-  if (caseStudy.title && caseStudy.title.length > 255) {
-    warnings.push('Title is quite long, consider shortening for better display');
-  }
-
-  const totalContentLength = [
-    caseStudy.problem || '',
-    caseStudy.solution || '',
-    caseStudy.outcome || ''
-  ].join('').length;
-
-  if (totalContentLength < 100) {
-    warnings.push('Case study content is quite short, consider adding more detail');
   }
 
   return {

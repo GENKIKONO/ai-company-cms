@@ -95,13 +95,43 @@ export function normalizePostPayload(data: any) {
 export function normalizeServicePayload(data: any) {
   let normalized = normalizeEmptyStrings(data, [
     'description',
-    'category'
+    'category',
+    'cta_text',
+    'cta_url'
   ]);
   
   normalized = normalizeNumericFields(normalized, [
     'price',
     'duration_months'
   ]);
+  
+  // features配列の正規化
+  if (normalized.features) {
+    if (Array.isArray(normalized.features)) {
+      // 空文字やnull要素を除去
+      normalized.features = normalized.features
+        .filter((feature: any) => feature && feature.trim() !== '');
+    } else {
+      normalized.features = null;
+    }
+  }
+  
+  // media配列の正規化
+  if (normalized.media) {
+    if (Array.isArray(normalized.media)) {
+      // 各メディアオブジェクトの正規化とバリデーション
+      normalized.media = normalized.media
+        .filter((media: any) => media && media.url && media.url.trim() !== '')
+        .map((media: any) => ({
+          type: media.type || 'image',
+          url: media.url.trim(),
+          alt_text: media.alt_text?.trim() || null,
+          caption: media.caption?.trim() || null
+        }));
+    } else {
+      normalized.media = null;
+    }
+  }
   
   return normalized;
 }
@@ -112,14 +142,29 @@ export function normalizeServicePayload(data: any) {
 export function normalizeCaseStudyPayload(data: any) {
   let normalized = normalizeEmptyStrings(data, [
     'problem',
-    'solution',
+    'solution', 
     'result'
   ]);
   
-  normalized = normalizeArrayFields(normalized, ['tags']);
+  // tags配列の正規化
+  if (normalized.tags) {
+    if (Array.isArray(normalized.tags)) {
+      // 空文字やnull要素を除去
+      normalized.tags = normalized.tags
+        .filter((tag: any) => tag && tag.trim() !== '');
+      
+      // 空配列の場合はnullに
+      if (normalized.tags.length === 0) {
+        normalized.tags = null;
+      }
+    } else {
+      normalized.tags = null;
+    }
+  }
   
   return normalized;
 }
+
 
 /**
  * FAQ データの正規化
@@ -145,14 +190,77 @@ export function normalizeOrganizationPayload(data: any) {
     'address_country',
     'telephone',
     'email',
-    'founded'
+    'founded',
+    // Enhanced organization settings (I1)
+    'favicon_url',
+    'brand_color_primary',
+    'brand_color_secondary',
+    'timezone',
+    'company_culture',
+    'mission_statement',
+    'vision_statement'
   ]);
   
-  normalized = normalizeArrayFields(normalized, ['same_as']);
+  normalized = normalizeArrayFields(normalized, [
+    'same_as',
+    'languages_supported',
+    'certifications',
+    'awards',
+    'values'
+  ]);
   
   // email_public boolean validation
   if (typeof normalized.email_public !== 'boolean') {
     normalized.email_public = false;
+  }
+  
+  // brand color validation (hex format)
+  if (normalized.brand_color_primary && !/^#[0-9A-Fa-f]{6}$/.test(normalized.brand_color_primary)) {
+    normalized.brand_color_primary = null;
+  }
+  if (normalized.brand_color_secondary && !/^#[0-9A-Fa-f]{6}$/.test(normalized.brand_color_secondary)) {
+    normalized.brand_color_secondary = null;
+  }
+  
+  // social_media object validation
+  if (normalized.social_media && typeof normalized.social_media === 'object') {
+    const allowedKeys = ['facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'tiktok', 'github', 'note', 'qiita', 'zenn'];
+    const validSocialMedia: any = {};
+    
+    for (const [key, value] of Object.entries(normalized.social_media)) {
+      if (allowedKeys.includes(key) && typeof value === 'string' && value.trim() !== '') {
+        // Basic URL validation
+        if (/^https?:\/\//.test(value)) {
+          validSocialMedia[key] = value.trim();
+        }
+      }
+    }
+    
+    normalized.social_media = Object.keys(validSocialMedia).length > 0 ? validSocialMedia : null;
+  } else {
+    normalized.social_media = null;
+  }
+  
+  // business_hours array validation
+  if (normalized.business_hours && Array.isArray(normalized.business_hours)) {
+    const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const validBusinessHours = normalized.business_hours
+      .filter((hours: any) => {
+        return (
+          hours &&
+          typeof hours === 'object' &&
+          validDays.includes(hours.day) &&
+          typeof hours.is_open === 'boolean' &&
+          (!hours.is_open || (
+            hours.open_time && /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(hours.open_time) &&
+            hours.close_time && /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(hours.close_time)
+          ))
+        );
+      });
+    
+    normalized.business_hours = validBusinessHours.length > 0 ? validBusinessHours : null;
+  } else {
+    normalized.business_hours = null;
   }
   
   return normalized;

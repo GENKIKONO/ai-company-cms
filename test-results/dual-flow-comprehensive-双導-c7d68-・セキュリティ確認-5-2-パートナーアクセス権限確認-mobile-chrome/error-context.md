@@ -1,0 +1,53 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e6] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+      - img [ref=e8] [cursor=pointer]
+    - generic [ref=e11] [cursor=pointer]:
+      - button "Open issues overlay" [ref=e12] [cursor=pointer]:
+        - generic [ref=e13] [cursor=pointer]:
+          - generic [ref=e14] [cursor=pointer]: "0"
+          - generic [ref=e15] [cursor=pointer]: "1"
+        - generic [ref=e16] [cursor=pointer]: Issue
+      - button "Collapse issues badge" [ref=e17] [cursor=pointer]:
+        - img [ref=e18] [cursor=pointer]
+  - banner [ref=e20]:
+    - generic [ref=e22]:
+      - link "AIO Hub AI企業CMS" [ref=e24] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e25]:
+        - button "ui.language.selector" [ref=e27] [cursor=pointer]:
+          - img [ref=e28] [cursor=pointer]
+          - generic [ref=e33] [cursor=pointer]: 🇺🇸
+          - generic [ref=e34] [cursor=pointer]: English
+          - img [ref=e35] [cursor=pointer]
+        - link "ログイン" [ref=e37] [cursor=pointer]:
+          - /url: /auth/login
+        - link "無料で始める" [ref=e38] [cursor=pointer]:
+          - /url: /auth/login
+  - generic [ref=e40]:
+    - generic [ref=e41]:
+      - heading "AIO Hub にログイン" [level=2] [ref=e42]
+      - paragraph [ref=e43]: AI企業情報プラットフォーム
+    - generic [ref=e44]:
+      - generic [ref=e45]: メールアドレスまたはパスワードが正しくありません。
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]: メールアドレス
+          - textbox "メールアドレス" [ref=e49]: partner-user@test.example.com
+        - generic [ref=e50]:
+          - generic [ref=e51]: パスワード
+          - textbox "パスワード" [ref=e52]: Partner123!
+      - button "ログイン" [ref=e54] [cursor=pointer]
+    - generic [ref=e55]:
+      - paragraph [ref=e56]:
+        - link "パスワードを忘れた方はこちら" [ref=e57] [cursor=pointer]:
+          - /url: /auth/forgot-password
+      - paragraph [ref=e58]:
+        - text: アカウントをお持ちでない方は
+        - link "新規登録" [ref=e59] [cursor=pointer]:
+          - /url: /auth/signup
+  - alert [ref=e60]
+```

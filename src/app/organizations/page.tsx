@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getOrganizations, getIndustries } from '@/lib/organizations';
 import { type Organization } from '@/types/database';
 
@@ -215,9 +216,11 @@ export default function OrganizationsPage() {
               >
                 <div className="flex items-center mb-4">
                   {org.logo_url ? (
-                    <img
+                    <Image
                       src={org.logo_url}
                       alt={`${org.name}のロゴ`}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded-lg object-cover"
                     />
                   ) : (

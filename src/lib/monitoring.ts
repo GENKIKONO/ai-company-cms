@@ -1,5 +1,6 @@
 // 監視・ログ・通知システム
 import { SentryUtils } from '@/lib/utils/sentry-utils';
+import { slackNotifier } from '@/lib/utils/slack-notifier';
 
 // エラー通知機能
 export async function notifyError(error: Error, context?: Record<string, any>) {
@@ -10,32 +11,18 @@ export async function notifyError(error: Error, context?: Record<string, any>) {
       notificationAttempted: true,
     });
 
-    // Slack通知
-    if (process.env.SLACK_WEBHOOK_URL) {
-      await fetch(process.env.SLACK_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: `🚨 Error in ${process.env.NEXT_PUBLIC_APP_ENV || 'unknown'}`,
-          blocks: [
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*Error:* ${error.message}\n*Stack:* \`\`\`${error.stack?.slice(0, 500) || 'No stack trace'}\`\`\``
-              }
-            },
-            context && {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*Context:* \`\`\`${JSON.stringify(context, null, 2).slice(0, 500)}\`\`\``
-              }
-            }
-          ].filter(Boolean)
-        })
-      });
-    }
+    // 強化されたSlack通知
+    await slackNotifier.notifyError({
+      title: 'System Error',
+      message: error.message,
+      severity: determineSeverity(error, context),
+      environment: process.env.NEXT_PUBLIC_APP_ENV,
+      userId: context?.userId,
+      organizationId: context?.organizationId,
+      url: context?.url,
+      stackTrace: error.stack,
+      timestamp: new Date().toISOString(),
+    });
   } catch (notifyError) {
     console.error('Failed to send error notification:', notifyError);
     SentryUtils.captureException(
@@ -43,6 +30,43 @@ export async function notifyError(error: Error, context?: Record<string, any>) {
       { originalError: error.message }
     );
   }
+}
+
+// エラーの重要度を判定
+function determineSeverity(error: Error, context?: Record<string, any>): 'low' | 'medium' | 'high' | 'critical' {
+  const errorMessage = error.message.toLowerCase();
+  
+  // クリティカル
+  if (errorMessage.includes('database') && errorMessage.includes('connection')) return 'critical';
+  if (errorMessage.includes('payment') && errorMessage.includes('failed')) return 'critical';
+  if (errorMessage.includes('auth') && errorMessage.includes('token')) return 'critical';
+  
+  // 高
+  if (errorMessage.includes('unauthorized') || errorMessage.includes('forbidden')) return 'high';
+  if (errorMessage.includes('timeout')) return 'high';
+  if (context?.api && context?.statusCode >= 500) return 'high';
+  
+  // 中
+  if (errorMessage.includes('validation')) return 'medium';
+  if (context?.api && context?.statusCode >= 400) return 'medium';
+  
+  // デフォルト
+  return 'low';
+}
+
+// ビジネスイベントタイプのマッピング
+function mapEventToBusinessType(event: string): 'new_signup' | 'plan_upgrade' | 'plan_downgrade' | 'cancellation' | 'payment_success' | 'payment_failed' {
+  const eventMap: Record<string, any> = {
+    organization_published: 'new_signup',
+    subscription_created: 'plan_upgrade',
+    subscription_cancelled: 'cancellation',
+    approval_requested: 'new_signup',
+    approval_granted: 'new_signup',
+    payment_succeeded: 'payment_success',
+    payment_failed: 'payment_failed',
+  };
+  
+  return eventMap[event] || 'new_signup';
 }
 
 // パフォーマンス監視
@@ -56,12 +80,39 @@ export function trackPerformance(metricName: string, value: number, context?: Re
       tags: context as Record<string, string>,
     });
 
-    // LCP監視
+    // LCP監視とパフォーマンスアラート
     if (metricName === 'LCP' && value > 2500) {
-      notifyError(new Error(`Poor LCP performance: ${value}ms`), { 
-        metric: metricName, 
+      slackNotifier.notifyPerformanceAlert({
+        metric: 'Largest Contentful Paint (LCP)',
         value,
-        ...context 
+        threshold: 2500,
+        unit: 'ms',
+        severity: value > 4000 ? 'critical' : 'warning',
+        context,
+      });
+    }
+
+    // CLS監視
+    if (metricName === 'CLS' && value > 0.1) {
+      slackNotifier.notifyPerformanceAlert({
+        metric: 'Cumulative Layout Shift (CLS)',
+        value,
+        threshold: 0.1,
+        unit: '',
+        severity: value > 0.25 ? 'critical' : 'warning',
+        context,
+      });
+    }
+
+    // FID監視
+    if (metricName === 'FID' && value > 100) {
+      slackNotifier.notifyPerformanceAlert({
+        metric: 'First Input Delay (FID)',
+        value,
+        threshold: 100,
+        unit: 'ms',
+        severity: value > 300 ? 'critical' : 'warning',
+        context,
       });
     }
 
@@ -115,38 +166,14 @@ export async function trackBusinessEvent(
       );
     }
     // 重要なビジネスイベントをSlackに通知
-
-    if (importantEvents.includes(event) && process.env.SLACK_WEBHOOK_URL) {
-      const eventEmojis: Record<string, string> = {
-        organization_published: '🎉',
-        subscription_created: '💳',
-        subscription_cancelled: '❌',
-        approval_requested: '⏳',
-        approval_granted: '✅'
-      };
-
-      await fetch(process.env.SLACK_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: `${eventEmojis[event] || '📊'} Business Event: ${event}`,
-          blocks: [
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*Event:* ${event}\n*User:* ${userId || 'Unknown'}\n*Org:* ${orgId || 'Unknown'}`
-              }
-            },
-            data && {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*Data:* \`\`\`${JSON.stringify(data, null, 2).slice(0, 300)}\`\`\``
-              }
-            }
-          ].filter(Boolean)
-        })
+    if (importantEvents.includes(event)) {
+      await slackNotifier.notifyBusinessEvent({
+        type: mapEventToBusinessType(event),
+        title: `Business Event: ${event}`,
+        description: `Event: ${event} triggered${userId ? ` by user ${userId}` : ''}${orgId ? ` for organization ${orgId}` : ''}`,
+        userId,
+        organizationId: orgId,
+        ...data
       });
     }
 

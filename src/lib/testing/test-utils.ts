@@ -111,7 +111,7 @@ export const triggerComponentError = (component: React.ReactElement) => {
 export const waitForLoadingToFinish = async () => {
   if (process.env.NODE_ENV === 'test') {
     await waitFor(() => {
-      expect(screen.queryByText(/読み込み中/i)).not.toBeInTheDocument();
+      (expect(screen.queryByText(/読み込み中/i)) as any).not.toBeInTheDocument();
     });
   }
 };
@@ -119,7 +119,7 @@ export const waitForLoadingToFinish = async () => {
 export const waitForErrorToAppear = async (errorMessage: string) => {
   if (process.env.NODE_ENV === 'test') {
     await waitFor(() => {
-      expect(screen.getByText(new RegExp(errorMessage, 'i'))).toBeInTheDocument();
+      (expect(screen.getByText(new RegExp(errorMessage, 'i'))) as any).toBeInTheDocument();
     });
   }
 };
@@ -223,7 +223,7 @@ export const setupTestEnvironment = () => {
   // matchMedia モック
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockImplementation(query => ({
+    value: jest.fn().mockImplementation((query: string) => ({
       matches: false,
       media: query,
       onchange: null,

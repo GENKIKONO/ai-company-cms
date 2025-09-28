@@ -93,93 +93,23 @@ export function generatePostJsonLd(post: Post, organization: Organization) {
 
 // Service JSON-LD
 export function generateServiceJsonLd(service: Service, organization: Organization) {
-  const jsonLd: any = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "@id": `https://aiohub.jp/o/${organization.slug}/services/${service.id}`,
-    "name": service.name,
-    "provider": {
-      "@type": "Organization",
-      "@id": `https://aiohub.jp/o/${organization.slug}`,
-      "name": organization.name
-    }
-  };
-
-  if (service.description) {
-    jsonLd.description = service.description;
-  }
-
-  if (service.category) {
-    jsonLd.category = service.category;
-  }
-
-  if (service.price) {
-    jsonLd.offers = {
-      "@type": "Offer",
-      "price": service.price,
-      "priceCurrency": "JPY"
-    };
-  }
-
-  return jsonLd;
+  // 強化されたJSON-LD生成関数を使用
+  const { generateServiceJsonLd: enhancedServiceJsonLd } = require('@/lib/json-ld/service');
+  return enhancedServiceJsonLd(service, organization);
 }
 
-// Case Study as Article JSON-LD
+// Case Study JSON-LD with @type=CaseStudy
 export function generateCaseStudyJsonLd(caseStudy: CaseStudy, organization: Organization) {
-  const jsonLd: any = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "@id": `https://aiohub.jp/o/${organization.slug}/case-studies/${caseStudy.id}`,
-    "headline": caseStudy.title,
-    "url": `https://aiohub.jp/o/${organization.slug}/case-studies/${caseStudy.id}`,
-    "datePublished": caseStudy.created_at,
-    "dateModified": caseStudy.updated_at,
-    "author": {
-      "@type": "Organization",
-      "@id": `https://aiohub.jp/o/${organization.slug}`,
-      "name": organization.name
-    },
-    "publisher": {
-      "@type": "Organization",
-      "@id": `https://aiohub.jp/o/${organization.slug}`,
-      "name": organization.name
-    }
-  };
-
-  if (caseStudy.problem) {
-    jsonLd.description = caseStudy.problem;
-  }
-
-  if (caseStudy.tags) {
-    jsonLd.keywords = caseStudy.tags.join(', ');
-  }
-
-  if (organization.logo_url) {
-    jsonLd.publisher.logo = {
-      "@type": "ImageObject",
-      "url": organization.logo_url
-    };
-  }
-
-  return jsonLd;
+  // 新しい@type=CaseStudy JSON-LD生成関数を使用
+  const { generateCaseStudyJsonLd: newGenerateCaseStudyJsonLd } = require('@/lib/json-ld/case-study');
+  return newGenerateCaseStudyJsonLd(caseStudy, organization);
 }
 
 // FAQ JSON-LD
-export function generateFAQJsonLd(faqs: FAQ[]) {
-  if (faqs.length === 0) return null;
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": faqs.map(faq => ({
-      "@type": "Question",
-      "name": faq.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.answer
-      }
-    }))
-  };
+export function generateFAQJsonLd(faqs: FAQ[], organization?: Organization) {
+  // 強化されたFAQ JSON-LD生成関数を使用
+  const { generateFAQPageJsonLd } = require('@/lib/json-ld/faq');
+  return generateFAQPageJsonLd(faqs, organization);
 }
 
 // Combined organization page JSON-LD with all content

@@ -2,6 +2,9 @@ import './globals.css'
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 import { ToastProvider } from '@/components/ui/toast'
 import BuildBanner from '@/components/BuildBanner'
+import { env } from '@/lib/env'
+import WebVitalsReporter from '@/components/performance/WebVitalsReporter'
+import { I18nProvider } from '@/components/layout/I18nProvider'
 
 // SSRで常に正しい認証UIが出るように
 export const dynamic = 'force-dynamic';
@@ -21,15 +24,20 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
-        <ToastProvider>
-          <BuildBanner 
-            commit={process.env.VERCEL_GIT_COMMIT_SHA}
-            deployUrl={process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined}
-            environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
-          />
-          <SafeAuthHeader />
-          {children}
-        </ToastProvider>
+        <I18nProvider initialLocale="ja">
+          <ToastProvider>
+            {env.SHOW_BUILD_BANNER && (
+              <BuildBanner 
+                commit={process.env.VERCEL_GIT_COMMIT_SHA}
+                deployUrl={process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined}
+                environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
+              />
+            )}
+            <SafeAuthHeader />
+            {children}
+            <WebVitalsReporter />
+          </ToastProvider>
+        </I18nProvider>
       </body>
     </html>
   )
