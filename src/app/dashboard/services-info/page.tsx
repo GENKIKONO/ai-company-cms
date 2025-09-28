@@ -62,16 +62,16 @@ export default function ServicesInfoPage() {
           AI技術を活用し、SEO最適化やコンテンツ生成をサポートします。
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600 mb-2">企業管理</div>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-gray-700 mb-2">企業管理</div>
             <p className="text-sm text-gray-600">企業情報の一元管理</p>
           </div>
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-600 mb-2">サービス管理</div>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-gray-700 mb-2">サービス管理</div>
             <p className="text-sm text-gray-600">サービス情報の効率的管理</p>
           </div>
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600 mb-2">導入事例</div>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-gray-700 mb-2">導入事例</div>
             <p className="text-sm text-gray-600">成功事例の管理・公開</p>
           </div>
         </div>
@@ -146,14 +146,14 @@ export default function ServicesInfoPage() {
           organization ? (
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+              className="px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-900 font-medium"
             >
               ダッシュボードに戻る
             </button>
           ) : (
             <button
               onClick={() => router.push('/organizations/new')}
-              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+              className="px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-900 font-medium"
             >
               企業情報を登録する
             </button>
@@ -162,7 +162,7 @@ export default function ServicesInfoPage() {
           <>
             <button
               onClick={() => router.push('/auth/signup')}
-              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+              className="px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-900 font-medium"
             >
               無料で始める
             </button>

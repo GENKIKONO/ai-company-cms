@@ -303,7 +303,7 @@ export default function NewOrganizationPage() {
   if (loading) {
     return (
       <div className="page-container flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
     );
@@ -354,7 +354,7 @@ export default function NewOrganizationPage() {
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="株式会社サンプル"
@@ -371,7 +371,7 @@ export default function NewOrganizationPage() {
                   id="slug"
                   value={formData.slug}
                   onChange={(e) => handleInputChange('slug', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 ${
                     errors.slug ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="sample-company"
@@ -392,7 +392,7 @@ export default function NewOrganizationPage() {
                 rows={4}
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 ${
                   errors.description ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="企業の事業内容や特徴を記載してください"
@@ -409,7 +409,7 @@ export default function NewOrganizationPage() {
                   id="legal_form"
                   value={formData.legal_form}
                   onChange={(e) => handleInputChange('legal_form', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
                   <option value="">選択してください</option>
                   <option value="株式会社">株式会社</option>
@@ -432,7 +432,7 @@ export default function NewOrganizationPage() {
                   id="representative_name"
                   value={formData.representative_name}
                   onChange={(e) => handleInputChange('representative_name', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="田中 太郎"
                 />
               </div>
@@ -448,7 +448,7 @@ export default function NewOrganizationPage() {
                   id="founded"
                   value={formData.founded}
                   onChange={(e) => handleInputChange('founded', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
               </div>
 
@@ -461,7 +461,7 @@ export default function NewOrganizationPage() {
                   id="capital"
                   value={formData.capital || ''}
                   onChange={(e) => handleInputChange('capital', e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="1000"
                 />
               </div>
@@ -475,7 +475,7 @@ export default function NewOrganizationPage() {
                   id="employees"
                   value={formData.employees || ''}
                   onChange={(e) => handleInputChange('employees', e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="100"
                 />
               </div>
@@ -496,7 +496,7 @@ export default function NewOrganizationPage() {
                   id="telephone"
                   value={formData.telephone}
                   onChange={(e) => handleInputChange('telephone', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="03-1234-5678"
                 />
               </div>
@@ -510,7 +510,7 @@ export default function NewOrganizationPage() {
                   id="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="info@example.com"
@@ -525,7 +525,7 @@ export default function NewOrganizationPage() {
                   type="checkbox"
                   checked={formData.email_public}
                   onChange={(e) => handleInputChange('email_public', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-gray-600 focus:ring-gray-500"
                 />
                 <span className="ml-2 text-sm text-gray-700">メールアドレスを公開する</span>
               </label>
@@ -540,7 +540,7 @@ export default function NewOrganizationPage() {
                 id="url"
                 value={formData.url}
                 onChange={(e) => handleInputChange('url', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 ${
                   errors.url ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="https://www.example.com"
@@ -563,7 +563,7 @@ export default function NewOrganizationPage() {
                   id="postal_code"
                   value={formData.postal_code}
                   onChange={(e) => handleInputChange('postal_code', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="100-0001"
                 />
               </div>
@@ -576,7 +576,7 @@ export default function NewOrganizationPage() {
                   id="address_region"
                   value={formData.address_region}
                   onChange={(e) => handleInputChange('address_region', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
                   <option value="">選択してください</option>
                   <option value="北海道">北海道</option>
@@ -638,7 +638,7 @@ export default function NewOrganizationPage() {
                   id="address_locality"
                   value={formData.address_locality}
                   onChange={(e) => handleInputChange('address_locality', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="千代田区"
                 />
               </div>
@@ -653,7 +653,7 @@ export default function NewOrganizationPage() {
                 id="street_address"
                 value={formData.street_address}
                 onChange={(e) => handleInputChange('street_address', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                 placeholder="丸の内1-1-1 パレスビル"
               />
             </div>
@@ -680,7 +680,7 @@ export default function NewOrganizationPage() {
                           handleArrayChange('industries', (formData.industries || []).filter(i => i !== industry));
                         }
                       }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 text-gray-600 focus:ring-gray-500"
                     />
                     <span className="ml-2 text-sm text-gray-700">{industry}</span>
                   </label>
@@ -703,7 +703,7 @@ export default function NewOrganizationPage() {
                   id="logo_url"
                   value={formData.logo_url}
                   onChange={(e) => handleInputChange('logo_url', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="https://example.com/logo.png"
                 />
               </div>
@@ -717,7 +717,7 @@ export default function NewOrganizationPage() {
                   id="favicon_url"
                   value={formData.favicon_url}
                   onChange={(e) => handleInputChange('favicon_url', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 ${
                     errors.favicon_url ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="https://example.com/favicon.ico"
@@ -736,7 +736,7 @@ export default function NewOrganizationPage() {
                   id="brand_color_primary"
                   value={formData.brand_color_primary}
                   onChange={(e) => handleInputChange('brand_color_primary', e.target.value)}
-                  className={`w-full h-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full h-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 ${
                     errors.brand_color_primary ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -752,7 +752,7 @@ export default function NewOrganizationPage() {
                   id="brand_color_secondary"
                   value={formData.brand_color_secondary}
                   onChange={(e) => handleInputChange('brand_color_secondary', e.target.value)}
-                  className={`w-full h-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full h-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 ${
                     errors.brand_color_secondary ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -785,7 +785,7 @@ export default function NewOrganizationPage() {
                     id={key}
                     value={(formData.social_media as any)?.[key] || ''}
                     onChange={(e) => handleSocialMediaChange(key, e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                     placeholder={placeholder}
                   />
                 </div>
@@ -807,7 +807,7 @@ export default function NewOrganizationPage() {
                   rows={3}
                   value={formData.mission_statement}
                   onChange={(e) => handleInputChange('mission_statement', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="私たちの使命や企業理念を記載してください"
                 />
               </div>
@@ -821,7 +821,7 @@ export default function NewOrganizationPage() {
                   rows={3}
                   value={formData.vision_statement}
                   onChange={(e) => handleInputChange('vision_statement', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="目指す将来像やビジョンを記載してください"
                 />
               </div>
@@ -835,7 +835,7 @@ export default function NewOrganizationPage() {
                   rows={3}
                   value={formData.company_culture}
                   onChange={(e) => handleInputChange('company_culture', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="企業文化や働き方の特徴を記載してください"
                 />
               </div>
@@ -855,7 +855,7 @@ export default function NewOrganizationPage() {
                   id="timezone"
                   value={formData.timezone}
                   onChange={(e) => handleInputChange('timezone', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
                   <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
                   <option value="UTC">UTC</option>
