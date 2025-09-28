@@ -29,19 +29,19 @@ export const organizationStatusSchema = z.enum([
 
 /**
  * 企業作成スキーマ（POST /api/my/organization）
- * 要件定義必須項目: name, description, addressRegion, addressLocality, telephone, url
+ * 簡素化: 必須項目は name と slug のみ
  */
 export const organizationCreateSchema = z.object({
-  // 必須項目
+  // 必須項目（最小限）
   name: requiredString(1, 255),
   slug: slugField(),
   
-  // 要件定義必須項目（但し作成時は任意、公開時必須）
+  // 全ての項目を任意に変更
   description: optionalString(),
   address_region: optionalString(), // 都道府県
   address_locality: optionalString(), // 市区町村
-  telephone: phoneField(),
-  url: urlField(),
+  telephone: optionalString(), // 電話番号も任意に
+  url: optionalString(), // URLも任意に
   
   // オプション項目
   legal_form: optionalString(),
