@@ -3,7 +3,6 @@ import FallbackHeader from './FallbackHeader';
 import Link from 'next/link';
 import SignoutButton from '@/components/auth/SignoutButton';
 import UserAvatarMenu from './UserAvatarMenu';
-import { LanguageSelector } from '@/components/ui/LanguageSelector';
 
 export default async function SafeAuthHeader() {
   try {
@@ -74,9 +73,6 @@ export default async function SafeAuthHeader() {
             </div>
             
             <div className="flex items-center space-x-4">
-              {/* 言語選択 */}
-              <LanguageSelector />
-              
               {isAuthenticated ? (
                 <>
                   {/* デスクトップ: メール表示、モバイル: 非表示 */}

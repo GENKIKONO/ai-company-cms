@@ -84,16 +84,52 @@ export function rateLimitError(message = 'Too many requests'): NextResponse<ApiE
 }
 
 /**
- * Zodエラーを統一レスポンスに変換
+ * Zodエラーを統一レスポンスに変換（日本語対応）
  */
 export function handleZodError(error: ZodError): NextResponse<ApiErrorResponse> {
-  const details = error.errors.map(err => ({
-    field: err.path.join('.'),
-    message: err.message,
-    code: err.code,
-  }));
+  const details = error.errors.map(err => {
+    const field = err.path.join('.');
+    let message = err.message;
+    
+    // 日本語のフィールド固有エラーメッセージ
+    switch (field) {
+      case 'name':
+        if (err.code === 'too_small') message = '企業名を入力してください';
+        if (err.code === 'too_big') message = '企業名は255文字以内で入力してください';
+        break;
+      case 'slug':
+        if (err.code === 'too_small') message = 'スラッグは3文字以上で入力してください';
+        if (err.code === 'too_big') message = 'スラッグは50文字以内で入力してください';
+        if (err.code === 'invalid_string') message = 'スラッグは小文字、数字、ハイフンのみ使用できます';
+        break;
+      case 'url':
+        if (err.code === 'invalid_string') message = '正しいURL形式で入力してください（例: https://example.com）';
+        break;
+      case 'email':
+        if (err.code === 'invalid_string') message = '正しいメールアドレス形式で入力してください';
+        break;
+      case 'telephone':
+        if (err.code === 'invalid_string') message = '正しい電話番号形式で入力してください';
+        break;
+      case 'postal_code':
+        if (err.code === 'invalid_string') message = '郵便番号は「123-4567」の形式で入力してください';
+        break;
+      default:
+        // 一般的なエラーの日本語化
+        if (err.code === 'too_small') message = `${field}は必須項目です`;
+        if (err.code === 'too_big') message = `${field}は文字数制限を超えています`;
+        if (err.code === 'invalid_type') message = `${field}の形式が正しくありません`;
+        if (err.code === 'invalid_string') message = `${field}の形式が正しくありません`;
+    }
 
-  return validationError(details, 'Request validation failed');
+    return {
+      field,
+      message,
+      code: err.code,
+    };
+  });
+
+  return validationError(details, 'リクエストデータの検証に失敗しました');
 }
 
 /**

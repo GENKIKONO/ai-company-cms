@@ -156,9 +156,10 @@ export default function NewOrganizationPage() {
       newErrors.slug = 'スラッグは小文字、数字、ハイフンのみ使用できます';
     }
 
-    if (!formData.description.trim()) {
-      newErrors.description = '企業説明は必須です';
-    }
+    // 企業説明は任意に変更
+    // if (!formData.description.trim()) {
+    //   newErrors.description = '企業説明は必須です';
+    // }
 
     // 安全な文字列処理でundefined.match()エラーを回避
     const urlValue = typeof formData.url === 'string' ? formData.url : '';
@@ -252,11 +253,11 @@ export default function NewOrganizationPage() {
               }
             });
             
-            // フィールドエラーがある場合はそれを設定、なければ一般的なエラー
+            // フィールドエラーがある場合はそれを設定、なければ詳細なエラー
             if (Object.keys(fieldErrors).length > 0) {
               setErrors(fieldErrors);
             } else {
-              setErrors({ submit: 'データに不備があります' });
+              setErrors({ submit: errorData.message || 'フォームの入力データに問題があります。各項目をご確認ください。' });
             }
           } else {
             setErrors({ submit: errorData.reason || errorData.message || 'データに不備があります' });
@@ -384,7 +385,7 @@ export default function NewOrganizationPage() {
 
             <div className="mt-6">
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                企業説明 <span className="text-red-500">*</span>
+                企業説明
               </label>
               <textarea
                 id="description"

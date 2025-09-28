@@ -1,7 +1,6 @@
 'use client';
 
 import { useI18n } from '@/components/layout/I18nProvider';
-import { LanguageSelector } from '@/components/ui/LanguageSelector';
 import Link from 'next/link';
 import { User } from '@supabase/supabase-js';
 
@@ -59,8 +58,6 @@ export default function I18nSafeAuthHeader({
           </div>
           
           <div className="flex items-center space-x-4">
-            <LanguageSelector />
-            
             {isAuthenticated ? (
               <>
                 <div className="hidden sm:block text-sm text-gray-700 dark:text-gray-300 max-w-[200px] truncate">

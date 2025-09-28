@@ -204,22 +204,43 @@ export async function getOrganizationBySlug(slug: string) {
 // 業界一覧取得
 export async function getIndustries() {
   try {
-    const { data, error } = await supabaseBrowser
-      .from('organizations')
-      .select('industries')
-      .not('industries', 'is', null);
-
-    if (error) throw error;
-
-    // 全ての業界を展開してユニークな値を取得
-    const allIndustries = data
-      .flatMap(org => org.industries || [])
-      .filter((industry, index, self) => self.indexOf(industry) === index)
-      .sort();
-
-    return { data: allIndustries, error: null };
+    // 日本標準産業分類に基づく主要業界リスト
+    const industriesList = [
+      '農業・林業・漁業',
+      '建設業',
+      '製造業',
+      '電気・ガス・水道業',
+      '情報通信業',
+      '運輸・郵便業',
+      '卸売・小売業',
+      '金融・保険業',
+      '不動産・物品賃貸業',
+      '専門・技術サービス業',
+      '宿泊・飲食サービス業',
+      '生活関連サービス・娯楽業',
+      '教育・学習支援業',
+      '医療・福祉',
+      '公務',
+      'サービス業（他に分類されないもの）',
+      'IT・ソフトウェア',
+      'コンサルティング',
+      'マーケティング・広告',
+      'デザイン・クリエイティブ',
+      'メディア・出版',
+      'エンターテイメント',
+      'スポーツ・フィットネス',
+      '人材サービス',
+      '法務・会計',
+      '環境・エネルギー',
+      '研究・開発',
+      '輸入・輸出',
+      'NPO・団体',
+      'その他'
+    ];
+    
+    return { data: industriesList, error: null };
   } catch (error) {
-    console.error('Error fetching industries:', error);
+    console.error('Error getting industries:', error);
     return { data: [], error };
   }
 }

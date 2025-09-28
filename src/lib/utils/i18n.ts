@@ -273,6 +273,76 @@ export interface TranslationDictionary {
       contact: string;
     };
   };
+
+  // ページ固有の翻訳
+  pages: {
+    home: {
+      title: string;
+      description: string;
+      hero: {
+        title: string;
+        subtitle: string;
+        viewDirectory: string;
+      };
+      features: {
+        title: string;
+        subtitle: string;
+        organizationManagement: {
+          title: string;
+          description: string;
+        };
+        serviceManagement: {
+          title: string;
+          description: string;
+        };
+        caseManagement: {
+          title: string;
+          description: string;
+        };
+      };
+      stats: {
+        title: string;
+        organizations: string;
+        services: string;
+        cases: string;
+        categories: string;
+      };
+      message: {
+        title: string;
+        content: string;
+      };
+      cta: {
+        title: string;
+        subtitle: string;
+        button: string;
+      };
+      footer: {
+        tagline: string;
+        features: string;
+        links: string;
+        support: string;
+        directory: string;
+        search: string;
+        helpCenter: string;
+        contact: string;
+        terms: string;
+        privacy: string;
+        copyright: string;
+      };
+    };
+  };
+
+  // UI共通要素
+  ui: {
+    header: {
+      title: string;
+      dashboard: string;
+    };
+    common: {
+      getStarted: string;
+      tryFree: string;
+    };
+  };
 }
 
 /**
@@ -455,6 +525,72 @@ export const translations: Record<SupportedLocale, TranslationDictionary> = {
         about: 'AIO Hubは、AI・DX領域の企業情報を集約したディレクトリサービスです。',
         contact: 'AIO Hubへのお問い合わせ。サービスに関するご質問やご相談をお受けします。'
       }
+    },
+    pages: {
+      home: {
+        title: 'AIO Hub - AI・DX企業ディレクトリ',
+        description: 'AI技術を活用した企業情報の統合管理プラットフォーム',
+        hero: {
+          title: 'AIO Hub AI企業CMS',
+          subtitle: 'AI技術を活用した企業情報の統合管理プラットフォーム',
+          viewDirectory: '企業ディレクトリを見る'
+        },
+        features: {
+          title: '充実した機能',
+          subtitle: 'AI・DX領域の企業情報を効率的に管理・活用できます',
+          organizationManagement: {
+            title: '企業管理',
+            description: 'AI・DX企業の詳細情報を包括的に管理。プロフィール、サービス、導入事例まで一元管理できます。'
+          },
+          serviceManagement: {
+            title: 'サービス管理',
+            description: '企業が提供するAI・DXサービスの詳細情報を管理。特徴、価格、技術仕様まで網羅的に記録できます。'
+          },
+          caseManagement: {
+            title: '導入事例管理',
+            description: '成功事例や実績を効果的に管理・発信。顧客の声や成果を分かりやすく伝えることができます。'
+          }
+        },
+        stats: {
+          title: '実績・統計',
+          organizations: '企業',
+          services: 'サービス',
+          cases: '導入事例',
+          categories: 'カテゴリー'
+        },
+        message: {
+          title: '代表メッセージ',
+          content: '私たちは、AI技術を通じて企業の情報発信を支援し、より良いビジネス成果の実現をお手伝いします。'
+        },
+        cta: {
+          title: '今すぐ始めましょう',
+          subtitle: 'AI・DXビジネスの成長を加速させる最適なソリューションをご提供します',
+          button: '無料で始める'
+        },
+        footer: {
+          tagline: 'AI・DX企業情報の統合管理プラットフォーム',
+          features: '機能',
+          links: 'リンク',
+          support: 'サポート',
+          directory: '企業ディレクトリ',
+          search: '検索',
+          helpCenter: 'ヘルプセンター',
+          contact: 'お問い合わせ',
+          terms: '利用規約',
+          privacy: 'プライバシーポリシー',
+          copyright: '© 2025 AIO Hub. All rights reserved.'
+        }
+      }
+    },
+    ui: {
+      header: {
+        title: 'AIO Hub AI企業CMS',
+        dashboard: 'ダッシュボード'
+      },
+      common: {
+        getStarted: '始める',
+        tryFree: '無料で始める'
+      }
     }
   },
   en: {
@@ -632,6 +768,72 @@ export const translations: Record<SupportedLocale, TranslationDictionary> = {
         search: 'Search AI and DX companies by keywords, categories, and regions.',
         about: 'AIO Hub is a comprehensive directory service for AI and DX companies.',
         contact: 'Contact AIO Hub for inquiries about our services and platform.'
+      }
+    },
+    pages: {
+      home: {
+        title: 'AIO Hub - AI & DX Company Directory',
+        description: 'Integrated management platform for corporate information using AI technology',
+        hero: {
+          title: 'AIO Hub AI Company CMS',
+          subtitle: 'Integrated management platform for corporate information using AI technology',
+          viewDirectory: 'View Company Directory'
+        },
+        features: {
+          title: 'Comprehensive Features',
+          subtitle: 'Efficiently manage and utilize AI & DX company information',
+          organizationManagement: {
+            title: 'Organization Management',
+            description: 'Comprehensively manage detailed information of AI & DX companies. Centrally manage profiles, services, and case studies.'
+          },
+          serviceManagement: {
+            title: 'Service Management',
+            description: 'Manage detailed information of AI & DX services provided by companies. Comprehensively record features, pricing, and technical specifications.'
+          },
+          caseManagement: {
+            title: 'Case Study Management',
+            description: 'Effectively manage and communicate success stories and achievements. Clearly convey customer testimonials and results.'
+          }
+        },
+        stats: {
+          title: 'Statistics & Results',
+          organizations: 'Companies',
+          services: 'Services',
+          cases: 'Case Studies',
+          categories: 'Categories'
+        },
+        message: {
+          title: 'Message from Leadership',
+          content: 'We support corporate information dissemination through AI technology and help achieve better business results.'
+        },
+        cta: {
+          title: 'Get Started Today',
+          subtitle: 'We provide optimal solutions to accelerate AI & DX business growth',
+          button: 'Start Free'
+        },
+        footer: {
+          tagline: 'Integrated management platform for AI & DX company information',
+          features: 'Features',
+          links: 'Links',
+          support: 'Support',
+          directory: 'Company Directory',
+          search: 'Search',
+          helpCenter: 'Help Center',
+          contact: 'Contact',
+          terms: 'Terms of Service',
+          privacy: 'Privacy Policy',
+          copyright: '© 2025 AIO Hub. All rights reserved.'
+        }
+      }
+    },
+    ui: {
+      header: {
+        title: 'AIO Hub AI Company CMS',
+        dashboard: 'Dashboard'
+      },
+      common: {
+        getStarted: 'Get Started',
+        tryFree: 'Try Free'
       }
     }
   },
@@ -811,6 +1013,72 @@ export const translations: Record<SupportedLocale, TranslationDictionary> = {
         about: 'AIO Hub是AI和数字化转型企业的综合目录服务。',
         contact: '联系AIO Hub咨询我们的服务和平台。'
       }
+    },
+    pages: {
+      home: {
+        title: 'AIO Hub - AI和数字化转型企业目录',
+        description: '使用AI技术的企业信息综合管理平台',
+        hero: {
+          title: 'AIO Hub AI企业CMS',
+          subtitle: '使用AI技术的企业信息综合管理平台',
+          viewDirectory: '查看企业目录'
+        },
+        features: {
+          title: '全面功能',
+          subtitle: '高效管理和利用AI和数字化转型企业信息',
+          organizationManagement: {
+            title: '企业管理',
+            description: '全面管理AI和数字化转型企业的详细信息。集中管理简介、服务和案例研究。'
+          },
+          serviceManagement: {
+            title: '服务管理',
+            description: '管理企业提供的AI和数字化转型服务的详细信息。全面记录功能、定价和技术规格。'
+          },
+          caseManagement: {
+            title: '案例研究管理',
+            description: '有效管理和传达成功案例和成就。清晰传达客户评价和结果。'
+          }
+        },
+        stats: {
+          title: '统计和结果',
+          organizations: '企业',
+          services: '服务',
+          cases: '案例研究',
+          categories: '类别'
+        },
+        message: {
+          title: '领导致辞',
+          content: '我们通过AI技术支持企业信息传播，帮助实现更好的商业成果。'
+        },
+        cta: {
+          title: '立即开始',
+          subtitle: '我们提供最佳解决方案，加速AI和数字化转型业务增长',
+          button: '免费开始'
+        },
+        footer: {
+          tagline: 'AI和数字化转型企业信息综合管理平台',
+          features: '功能',
+          links: '链接',
+          support: '支持',
+          directory: '企业目录',
+          search: '搜索',
+          helpCenter: '帮助中心',
+          contact: '联系我们',
+          terms: '服务条款',
+          privacy: '隐私政策',
+          copyright: '© 2025 AIO Hub. All rights reserved.'
+        }
+      }
+    },
+    ui: {
+      header: {
+        title: 'AIO Hub AI企业CMS',
+        dashboard: '控制台'
+      },
+      common: {
+        getStarted: '开始使用',
+        tryFree: '免费试用'
+      }
     }
   },
   ko: {
@@ -988,6 +1256,72 @@ export const translations: Record<SupportedLocale, TranslationDictionary> = {
         search: '키워드, 카테고리, 지역별로 AI 및 DX 기업을 검색하세요.',
         about: 'AIO Hub는 AI 및 DX 기업의 종합 디렉토리 서비스입니다.',
         contact: '서비스 및 플랫폼에 대한 문의는 AIO Hub로 연락하세요.'
+      }
+    },
+    pages: {
+      home: {
+        title: 'AIO Hub - AI 및 DX 기업 디렉토리',
+        description: 'AI 기술을 활용한 기업 정보 통합 관리 플랫폼',
+        hero: {
+          title: 'AIO Hub AI 기업 CMS',
+          subtitle: 'AI 기술을 활용한 기업 정보 통합 관리 플랫폼',
+          viewDirectory: '기업 디렉토리 보기'
+        },
+        features: {
+          title: '포괄적인 기능',
+          subtitle: 'AI 및 DX 기업 정보를 효율적으로 관리하고 활용하세요',
+          organizationManagement: {
+            title: '기업 관리',
+            description: 'AI 및 DX 기업의 상세 정보를 포괄적으로 관리합니다. 프로필, 서비스, 사례 연구를 중앙에서 관리할 수 있습니다.'
+          },
+          serviceManagement: {
+            title: '서비스 관리',
+            description: '기업이 제공하는 AI 및 DX 서비스의 상세 정보를 관리합니다. 기능, 가격, 기술 사양을 포괄적으로 기록할 수 있습니다.'
+          },
+          caseManagement: {
+            title: '사례 연구 관리',
+            description: '성공 사례와 성과를 효과적으로 관리하고 전달합니다. 고객 후기와 결과를 명확하게 전달할 수 있습니다.'
+          }
+        },
+        stats: {
+          title: '통계 및 결과',
+          organizations: '기업',
+          services: '서비스',
+          cases: '사례 연구',
+          categories: '카테고리'
+        },
+        message: {
+          title: '리더십 메시지',
+          content: '우리는 AI 기술을 통해 기업 정보 전파를 지원하고 더 나은 비즈니스 결과를 달성할 수 있도록 도와드립니다.'
+        },
+        cta: {
+          title: '오늘 시작하세요',
+          subtitle: 'AI 및 DX 비즈니스 성장을 가속화하는 최적의 솔루션을 제공합니다',
+          button: '무료 시작'
+        },
+        footer: {
+          tagline: 'AI 및 DX 기업 정보 통합 관리 플랫폼',
+          features: '기능',
+          links: '링크',
+          support: '지원',
+          directory: '기업 디렉토리',
+          search: '검색',
+          helpCenter: '도움말 센터',
+          contact: '문의하기',
+          terms: '서비스 약관',
+          privacy: '개인정보 보호정책',
+          copyright: '© 2025 AIO Hub. All rights reserved.'
+        }
+      }
+    },
+    ui: {
+      header: {
+        title: 'AIO Hub AI 기업 CMS',
+        dashboard: '대시보드'
+      },
+      common: {
+        getStarted: '시작하기',
+        tryFree: '무료 체험'
       }
     }
   }
