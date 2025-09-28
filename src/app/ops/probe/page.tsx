@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { supabaseServer } from '@/lib/supabase-server';
 import { requireOpsAdminPage } from '@/lib/ops-guard';
 
@@ -11,6 +12,9 @@ interface StatusData {
     hasAdminEmailEnv: boolean;
     hasOpsPasswordEnv: boolean;
     opsPasswordLength: number;
+    opsPasswordLengthValid: boolean;
+    hasValidAppUrl: boolean;
+    appUrl: string;
   };
   cookie: {
     domainUsed: string;
@@ -44,6 +48,24 @@ async function getOpsStatus(): Promise<StatusData | null> {
 export default async function OpsProbe() {
   // 管理者運用認証ガード
   await requireOpsAdminPage();
+  
+  // Host banner 情報取得
+  const headersList = await headers();
+  const host = headersList.get('host') || 'unknown';
+  const cookieDomain = process.env.COOKIE_DOMAIN || process.env.SUPABASE_COOKIE_DOMAIN;
+  let domainUsed = cookieDomain;
+  if (!domainUsed) {
+    if (host.includes('.')) {
+      const parts = host.split('.');
+      if (parts.length >= 2) {
+        domainUsed = `.${parts.slice(-2).join('.')}`;
+      } else {
+        domainUsed = host;
+      }
+    } else {
+      domainUsed = host;
+    }
+  }
   
   const status = await getOpsStatus();
   
@@ -85,11 +107,19 @@ export default async function OpsProbe() {
     },
     {
       id: 'password_length',
-      name: 'ADMIN_OPS_PASSWORD の長さ > 15',
-      status: status.env.opsPasswordLength > 15,
-      message: status.env.opsPasswordLength > 15 
+      name: 'ADMIN_OPS_PASSWORD の長さ >= 20',
+      status: status.env.opsPasswordLengthValid,
+      message: status.env.opsPasswordLengthValid 
         ? `パスワード長OK (${status.env.opsPasswordLength}文字)` 
-        : `パスワードが短すぎます (${status.env.opsPasswordLength}文字)`
+        : `パスワードが短すぎます (${status.env.opsPasswordLength}文字、20文字以上必要)`
+    },
+    {
+      id: 'app_url',
+      name: 'NEXT_PUBLIC_APP_URL が https://aiohub.jp',
+      status: status.env.hasValidAppUrl,
+      message: status.env.hasValidAppUrl 
+        ? 'APP_URL正常' 
+        : `APP_URL不正: ${status.env.appUrl || '未設定'}`
     },
     {
       id: 'domain',
@@ -105,6 +135,12 @@ export default async function OpsProbe() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow rounded-lg p-8">
+          {/* Host Banner */}
+          <div className="text-xs text-gray-500 text-center border border-gray-200 rounded p-2 bg-gray-100 mb-6">
+            <div>Host: {host}</div>
+            <div>Cookie Domain: {domainUsed}</div>
+          </div>
+          
           <div className="mb-8">
             <div className="flex justify-between items-start">
               <div>
@@ -187,7 +223,7 @@ export default async function OpsProbe() {
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               環境変数設定状況
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className={`p-3 rounded border ${status.env.hasAdminEmailEnv 
                 ? 'bg-green-50 border-green-200' 
                 : 'bg-red-50 border-red-200'
@@ -197,13 +233,23 @@ export default async function OpsProbe() {
                   {status.env.hasAdminEmailEnv ? '設定済み' : '未設定'}
                 </div>
               </div>
-              <div className={`p-3 rounded border ${status.env.hasOpsPasswordEnv 
+              <div className={`p-3 rounded border ${status.env.hasOpsPasswordEnv && status.env.opsPasswordLengthValid
                 ? 'bg-green-50 border-green-200' 
                 : 'bg-red-50 border-red-200'
               }`}>
                 <div className="text-sm font-medium">ADMIN_OPS_PASSWORD</div>
-                <div className={`text-xs ${status.env.hasOpsPasswordEnv ? 'text-green-600' : 'text-red-600'}`}>
+                <div className={`text-xs ${status.env.hasOpsPasswordEnv && status.env.opsPasswordLengthValid ? 'text-green-600' : 'text-red-600'}`}>
                   {status.env.hasOpsPasswordEnv ? `設定済み (${status.env.opsPasswordLength}文字)` : '未設定'}
+                  {status.env.hasOpsPasswordEnv && !status.env.opsPasswordLengthValid && <div className="text-red-500">※20文字未満</div>}
+                </div>
+              </div>
+              <div className={`p-3 rounded border ${status.env.hasValidAppUrl 
+                ? 'bg-green-50 border-green-200' 
+                : 'bg-red-50 border-red-200'
+              }`}>
+                <div className="text-sm font-medium">NEXT_PUBLIC_APP_URL</div>
+                <div className={`text-xs ${status.env.hasValidAppUrl ? 'text-green-600' : 'text-red-600'}`}>
+                  {status.env.hasValidAppUrl ? 'aiohub.jp' : (status.env.appUrl || '未設定')}
                 </div>
               </div>
               <div className="p-3 rounded border bg-blue-50 border-blue-200">

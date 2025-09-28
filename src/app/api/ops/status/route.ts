@@ -72,10 +72,13 @@ export async function GET(request: NextRequest) {
     // 環境変数確認（値は返さない、長さのみ）
     const adminEmailEnv = process.env.ADMIN_EMAIL;
     const opsPasswordEnv = process.env.ADMIN_OPS_PASSWORD;
+    const appUrlEnv = process.env.NEXT_PUBLIC_APP_URL;
 
     const hasAdminEmailEnv = !!adminEmailEnv && adminEmailEnv.trim() !== '';
     const hasOpsPasswordEnv = !!opsPasswordEnv && opsPasswordEnv.trim() !== '';
     const opsPasswordLength = opsPasswordEnv ? opsPasswordEnv.trim().length : 0;
+    const opsPasswordLengthValid = opsPasswordLength >= 20;
+    const hasValidAppUrl = appUrlEnv === 'https://aiohub.jp';
 
     // ドメイン情報
     const domainUsed = extractDomain(request);
@@ -90,7 +93,10 @@ export async function GET(request: NextRequest) {
       env: {
         hasAdminEmailEnv,
         hasOpsPasswordEnv,
-        opsPasswordLength
+        opsPasswordLength,
+        opsPasswordLengthValid,
+        hasValidAppUrl,
+        appUrl: appUrlEnv
       },
       cookie: {
         domainUsed,

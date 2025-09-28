@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { checkOpsAdmin } from '@/lib/ops-guard';
 import OpsLoginForm from './OpsLoginForm';
 
@@ -16,9 +17,33 @@ export default async function OpsLoginPage({ searchParams }: OpsLoginPageProps) 
   const params = await searchParams;
   const reason = typeof params.reason === 'string' ? params.reason : '';
 
+  // Host banner 情報取得
+  const headersList = await headers();
+  const host = headersList.get('host') || 'unknown';
+  const cookieDomain = process.env.COOKIE_DOMAIN || process.env.SUPABASE_COOKIE_DOMAIN;
+  let domainUsed = cookieDomain;
+  if (!domainUsed) {
+    if (host.includes('.')) {
+      const parts = host.split('.');
+      if (parts.length >= 2) {
+        domainUsed = `.${parts.slice(-2).join('.')}`;
+      } else {
+        domainUsed = host;
+      }
+    } else {
+      domainUsed = host;
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        {/* Host Banner */}
+        <div className="text-xs text-gray-500 text-center border border-gray-200 rounded p-2 bg-gray-100">
+          <div>Host: {host}</div>
+          <div>Cookie Domain: {domainUsed}</div>
+        </div>
+        
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             管理者運用ログイン

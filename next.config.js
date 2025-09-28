@@ -42,8 +42,26 @@ const nextConfig = {
     ];
   },
 
-  // Webpack設定（簡略化）
-  webpack: (config) => {
+  // Webpack設定（環境バリデーション付き）
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
+    if (!dev && isServer) {
+      // Build-time environment validation
+      const adminEmail = process.env.ADMIN_EMAIL;
+      const opsPassword = process.env.ADMIN_OPS_PASSWORD;
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+      
+      console.log('\n🔍 [BUILD] Environment Validation:');
+      console.log(`ADMIN_EMAIL: ${adminEmail ? '✅ Set' : '❌ Missing'}`);
+      console.log(`ADMIN_OPS_PASSWORD: ${opsPassword ? (opsPassword.trim().length >= 20 ? '✅ Set (length ok)' : `⚠️ Set (${opsPassword.trim().length} chars, need >=20)`) : '❌ Missing'}`);
+      console.log(`NEXT_PUBLIC_APP_URL: ${appUrl === 'https://aiohub.jp' ? '✅ aiohub.jp' : `⚠️ ${appUrl || 'Missing'}`}`);
+      console.log('');
+      
+      // Run acceptance test
+      if (process.env.NODE_ENV === 'production') {
+        console.log('🧪 [BUILD] Production acceptance test will run after deployment');
+      }
+    }
+    
     return config;
   },
 
