@@ -184,13 +184,18 @@ export function normalizeOrganizationPayload(data: any) {
     'url',
     'logo_url',
     'address_street',
+    'street_address', // フロントエンド互換性フィールド
     'address_locality',
-    'address_region',
+    'address_region', 
     'address_postal_code',
+    'postal_code', // フロントエンド互換性フィールド
     'address_country',
     'telephone',
     'email',
     'founded',
+    'establishment_date',
+    'legal_form',
+    'representative_name',
     // Enhanced organization settings (I1)
     'favicon_url',
     'brand_color_primary',
@@ -198,15 +203,24 @@ export function normalizeOrganizationPayload(data: any) {
     'timezone',
     'company_culture',
     'mission_statement',
-    'vision_statement'
+    'vision_statement',
+    'meta_title',
+    'meta_description'
+  ]);
+  
+  normalized = normalizeNumericFields(normalized, [
+    'capital',
+    'employees'
   ]);
   
   normalized = normalizeArrayFields(normalized, [
     'same_as',
+    'industries',
     'languages_supported',
     'certifications',
     'awards',
-    'values'
+    'values',
+    'area_served'
   ]);
   
   // email_public boolean validation
