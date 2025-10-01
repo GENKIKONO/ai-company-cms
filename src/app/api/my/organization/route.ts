@@ -304,13 +304,25 @@ export async function POST(request: NextRequest) {
       name: body.name,
       slug: uniqueSlug, // 常にユニークなslugを使用
       created_by: (authResult as AuthContext).user.id,
+      user_id: (authResult as AuthContext).user.id, // 必須フィールド
+      contact_email: (authResult as AuthContext).user.email || '', // 必須フィールド
+      is_published: false, // 必須フィールド
     };
     
-    // 受信データから有効な値のみを追加（空文字とslugは除外）
+    // 受信データから有効な値のみを追加（空文字とslugは除外、日付フィールドの空文字はnullに変換）
     const organizationData: any = { ...baseData };
+    const dateFields = ['founded', 'established_at', 'establishment_date'];
+    
     Object.entries(body).forEach(([key, value]) => {
-      if (key !== 'name' && key !== 'slug' && value !== '' && value !== null && value !== undefined) {
-        organizationData[key] = value;
+      if (key !== 'name' && key !== 'slug') {
+        // 日付フィールドの場合、空文字をnullに変換
+        if (dateFields.includes(key) && value === '') {
+          organizationData[key] = null;
+        }
+        // その他のフィールドで有効な値のみを追加
+        else if (value !== '' && value !== null && value !== undefined) {
+          organizationData[key] = value;
+        }
       }
     });
     
