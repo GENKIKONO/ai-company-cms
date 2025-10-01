@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { type Organization, type Service, type CaseStudy } from '@/types/database';
 
+// Claude改善: 柔軟性を保った型定義
 interface SearchResultCardProps {
   type: 'organization' | 'service' | 'case_study';
   data: Organization | (Service & { organization: Organization }) | (CaseStudy & { organization: Organization });
@@ -28,15 +29,27 @@ interface SearchResultCardProps {
   isFavorited?: boolean;
 }
 
-export default function SearchResultCard({ 
-  type, 
-  data, 
-  onFavorite, 
-  onShare, 
-  isFavorited = false 
-}: SearchResultCardProps) {
+export default function SearchResultCard(props: SearchResultCardProps) {
+  const { type, data, onFavorite, onShare, isFavorited = false } = props;
   const { t, formatDate } = useI18n();
   const [imageError, setImageError] = useState(false);
+
+  // Claude改善: エラーハンドリングとアクセシビリティ向上
+  const handleFavoriteClick = (id: string) => {
+    try {
+      onFavorite?.(id);
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    }
+  };
+
+  const handleShareClick = (item: any) => {
+    try {
+      onShare?.(item);
+    } catch (error) {
+      console.error('Failed to share item:', error);
+    }
+  };
 
   const renderOrganizationCard = (org: Organization) => {
     const location = [org.address_locality, org.address_region].filter(Boolean).join('、');
@@ -71,6 +84,7 @@ export default function SearchResultCard({
                   <Link 
                     href={`/o/${org.slug}`}
                     className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    aria-label={`${org.name}の詳細ページを見る`}
                   >
                     {org.name}
                   </Link>
@@ -85,20 +99,20 @@ export default function SearchResultCard({
                 {/* メタ情報 */}
                 <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
                   {location && (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
+                    <span className="flex items-center gap-1" title={`所在地: ${location}`}>
+                      <MapPin className="w-4 h-4" aria-hidden="true" />
                       {location}
                     </span>
                   )}
                   {foundedYear && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
+                    <span className="flex items-center gap-1" title={`設立年: ${foundedYear}年`}>
+                      <Calendar className="w-4 h-4" aria-hidden="true" />
                       {foundedYear}年設立
                     </span>
                   )}
                   {org.employees && (
-                    <span className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
+                    <span className="flex items-center gap-1" title={`従業員数: ${org.employees}名`}>
+                      <Users className="w-4 h-4" aria-hidden="true" />
                       {org.employees}名
                     </span>
                   )}
@@ -113,13 +127,13 @@ export default function SearchResultCard({
                   ))}
                   {org.awards && org.awards.length > 0 && (
                     <span className="flex items-center gap-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-sm rounded-full">
-                      <Award className="w-3 h-3" />
+                      <Award className="w-3 h-3" aria-hidden="true" />
                       受賞歴あり
                     </span>
                   )}
                   {org.certifications && org.certifications.length > 0 && (
                     <span className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm rounded-full">
-                      <CheckCircle className="w-3 h-3" />
+                      <CheckCircle className="w-3 h-3" aria-hidden="true" />
                       認証取得
                     </span>
                   )}
@@ -130,20 +144,22 @@ export default function SearchResultCard({
               <div className="flex items-center gap-2 ml-4">
                 {onFavorite && (
                   <button
-                    onClick={() => onFavorite(org.id)}
+                    onClick={() => handleFavoriteClick(org.id)}
                     className={`p-2 rounded-full transition-colors ${
                       isFavorited 
                         ? 'text-red-600 bg-red-50 dark:bg-red-900/20' 
                         : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
                     }`}
+                    aria-label={isFavorited ? 'お気に入りから削除' : 'お気に入りに追加'}
                   >
                     <Heart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
                   </button>
                 )}
                 {onShare && (
                   <button
-                    onClick={() => onShare(org)}
+                    onClick={() => handleShareClick(org)}
                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors"
+                    aria-label="共有する"
                   >
                     <Share2 className="w-5 h-5" />
                   </button>
@@ -157,8 +173,9 @@ export default function SearchResultCard({
                 <a 
                   href={`tel:${org.telephone}`}
                   className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  aria-label={`電話: ${org.telephone}`}
                 >
-                  <Phone className="w-4 h-4" />
+                  <Phone className="w-4 h-4" aria-hidden="true" />
                   {org.telephone}
                 </a>
               )}
@@ -168,10 +185,11 @@ export default function SearchResultCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  aria-label={`${org.name}のウェブサイトを開く（新しいタブ）`}
                 >
-                  <Globe className="w-4 h-4" />
+                  <Globe className="w-4 h-4" aria-hidden="true" />
                   ウェブサイト
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3" aria-hidden="true" />
                 </a>
               )}
             </div>
@@ -190,6 +208,7 @@ export default function SearchResultCard({
               <Link 
                 href={`/o/${service.organization.slug}/services/${service.id}`}
                 className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                aria-label={`サービス「${service.name}」の詳細を見る`}
               >
                 {service.name}
               </Link>
@@ -198,6 +217,7 @@ export default function SearchResultCard({
               <Link 
                 href={`/o/${service.organization.slug}`}
                 className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                aria-label={`${service.organization.name}の詳細ページを見る`}
               >
                 {service.organization.name}
               </Link>
@@ -208,20 +228,22 @@ export default function SearchResultCard({
           <div className="flex items-center gap-2">
             {onFavorite && (
               <button
-                onClick={() => onFavorite(service.id)}
+                onClick={() => handleFavoriteClick(service.id)}
                 className={`p-2 rounded-full transition-colors ${
                   isFavorited 
                     ? 'text-red-600 bg-red-50 dark:bg-red-900/20' 
                     : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
                 }`}
+                aria-label={isFavorited ? 'お気に入りから削除' : 'お気に入りに追加'}
               >
                 <Heart className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`} />
               </button>
             )}
             {onShare && (
               <button
-                onClick={() => onShare(service)}
+                onClick={() => handleShareClick(service)}
                 className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors"
+                aria-label="共有する"
               >
                 <Share2 className="w-4 h-4" />
               </button>
@@ -267,6 +289,7 @@ export default function SearchResultCard({
               <Link 
                 href={`/o/${caseStudy.organization.slug}/case-studies/${caseStudy.id}`}
                 className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                aria-label={`事例「${caseStudy.title}」の詳細を見る`}
               >
                 {caseStudy.title}
               </Link>
@@ -275,6 +298,7 @@ export default function SearchResultCard({
               <Link 
                 href={`/o/${caseStudy.organization.slug}`}
                 className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                aria-label={`${caseStudy.organization.name}の詳細ページを見る`}
               >
                 {caseStudy.organization.name}
               </Link>
@@ -285,20 +309,22 @@ export default function SearchResultCard({
           <div className="flex items-center gap-2">
             {onFavorite && (
               <button
-                onClick={() => onFavorite(caseStudy.id)}
+                onClick={() => handleFavoriteClick(caseStudy.id)}
                 className={`p-2 rounded-full transition-colors ${
                   isFavorited 
                     ? 'text-red-600 bg-red-50 dark:bg-red-900/20' 
                     : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
                 }`}
+                aria-label={isFavorited ? 'お気に入りから削除' : 'お気に入りに追加'}
               >
                 <Heart className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`} />
               </button>
             )}
             {onShare && (
               <button
-                onClick={() => onShare(caseStudy)}
+                onClick={() => handleShareClick(caseStudy)}
                 className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors"
+                aria-label="共有する"
               >
                 <Share2 className="w-4 h-4" />
               </button>
@@ -330,6 +356,7 @@ export default function SearchResultCard({
     );
   };
 
+  // Claude改善: 型安全性向上とエラーハンドリング
   switch (type) {
     case 'organization':
       return renderOrganizationCard(data as Organization);
@@ -338,6 +365,7 @@ export default function SearchResultCard({
     case 'case_study':
       return renderCaseStudyCard(data as CaseStudy & { organization: Organization });
     default:
+      console.error('Unknown card type:', type);
       return null;
   }
 }

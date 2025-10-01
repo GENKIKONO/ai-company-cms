@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "supabase-postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres@latest"
+      ],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${SUPABASE_DB_URL_RO}"
+      }
+    },
+    "supabase-rest": {
+      "command": "npx",
+      "args": [
+        "@henkey/postgres-mcp-server@latest"
+      ],
+      "env": {
+        "DATABASE_URL": "${SUPABASE_DB_URL_RO}",
+        "READ_ONLY": "true"
+      }
+    }
+  }
+}
