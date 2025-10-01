@@ -31,10 +31,11 @@ export const organizationStatusSchema = z.enum([
 
 /**
  * 企業作成スキーマ（POST /api/my/organization）
- * 最小限: nameのみ必須
+ * 最小限: nameのみ必須、slugは任意
  */
 export const organizationCreateSchema = z.object({
   name: requiredString(1, 255),
+  slug: optionalSlugField(),
 }).strict(); // 不要なフィールドは受け付けない
 
 /**
