@@ -313,8 +313,17 @@ export async function POST(request: NextRequest) {
     const organizationData: any = { ...baseData };
     const dateFields = ['founded', 'established_at', 'establishment_date'];
     
+    // データベースに存在する有効なフィールドのみ許可
+    const allowedFields = [
+      'description', 'legal_form', 'representative_name', 'founded', 'established_at', 'capital', 'employees',
+      'address_country', 'address_region', 'address_locality', 'address_postal_code', 'address_street',
+      'telephone', 'email', 'email_public', 'url', 'logo_url', 'industries', 'same_as', 'status',
+      'meta_title', 'meta_description', 'meta_keywords', 'postal_code', 'street_address', 'corporate_type',
+      'city', 'prefecture', 'country', 'phone', 'website_url'
+    ];
+    
     Object.entries(body).forEach(([key, value]) => {
-      if (key !== 'name' && key !== 'slug') {
+      if (key !== 'name' && key !== 'slug' && allowedFields.includes(key)) {
         // 日付フィールドの場合、空文字をnullに変換
         if (dateFields.includes(key) && value === '') {
           organizationData[key] = null;
