@@ -207,14 +207,17 @@ export async function POST(request: NextRequest) {
     );
     
     // slugの重複チェック
-    const { data: slugCheck } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('slug', validatedData.slug)
-      .single();
+    // slugが提供されている場合の重複チェック
+    if (validatedData.slug) {
+      const { data: slugCheck } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('slug', validatedData.slug)
+        .single();
 
-    if (slugCheck) {
-      return conflictError('Organization', 'slug');
+      if (slugCheck) {
+        return conflictError('Organization', 'slug');
+      }
     }
 
     const organizationData: Partial<Organization> = {
