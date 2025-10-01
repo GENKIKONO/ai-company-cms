@@ -148,11 +148,9 @@ export default function NewOrganizationPage() {
       newErrors.name = '企業名は必須です';
     }
 
-    // 安全な文字列処理でundefined.test()エラーを回避
+    // スラッグは任意に変更（空の場合はAPI側で自動生成）
     const slugValue = typeof formData.slug === 'string' ? formData.slug : '';
-    if (!slugValue.trim()) {
-      newErrors.slug = 'スラッグは必須です';
-    } else if (!/^[a-z0-9-]+$/.test(slugValue)) {
+    if (slugValue.trim() && !/^[a-z0-9-]+$/.test(slugValue)) {
       newErrors.slug = 'スラッグは小文字、数字、ハイフンのみ使用できます';
     }
 
