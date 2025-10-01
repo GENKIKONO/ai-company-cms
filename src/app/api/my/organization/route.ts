@@ -263,11 +263,18 @@ export async function POST(request: NextRequest) {
 
     // スラッグが空の場合、企業名から自動生成
     if (!normalizedData.slug || normalizedData.slug.trim() === '') {
-      const baseSlug = normalizedData.name
+      let baseSlug = normalizedData.name
         .toLowerCase()
         .replace(/[^\w\s-]/g, '')
         .replace(/[\s_-]+/g, '-')
         .replace(/^-+|-+$/g, '');
+      
+      console.log('Generated base slug:', baseSlug);
+      
+      // 空のスラッグの場合は固定値を使用
+      if (!baseSlug || baseSlug.length === 0) {
+        baseSlug = 'organization';
+      }
       
       // スラッグの重複チェックと自動調整
       let uniqueSlug = baseSlug;
@@ -286,6 +293,7 @@ export async function POST(request: NextRequest) {
         counter++;
       }
       
+      console.log('Final unique slug:', uniqueSlug);
       normalizedData.slug = uniqueSlug;
     } else {
       // スラッグが提供された場合の重複チェック
@@ -306,7 +314,11 @@ export async function POST(request: NextRequest) {
       created_by: (authResult as AuthContext).user.id,
       status: 'draft' as const,
       is_published: false, // 初期は非公開
+      // address_countryが'JP'の場合はデフォルト値を使用（undefinedにして省略）
+      address_country: normalizedData.address_country === 'JP' ? undefined : normalizedData.address_country,
     };
+
+    console.log('Organization data to insert:', JSON.stringify(organizationData, null, 2));
 
     const { data, error } = await supabase
       .from('organizations')
@@ -315,7 +327,12 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Database error:', error);
+      console.error('Database error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       return handleApiError(error);
     }
 
