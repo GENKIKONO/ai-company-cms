@@ -293,12 +293,24 @@ export async function POST(request: NextRequest) {
     
     const uniqueSlug = `${baseSlug}-${timestamp}`;
 
-    // データベーススキーマに合わせた最小限データ
+    // 🚨 暫定対処: 日付型フィールドの空文字→null変換
+    const rawData = { ...body } as any;
+    const dateFields = ['founded', 'establishment_date', 'published_date'];
+    dateFields.forEach(field => {
+      if (rawData[field] === '') {
+        console.warn(`⚠️  空文字→null変換: ${field}`);
+        rawData[field] = null;
+      }
+    });
+
+    // データベーススキーマに合わせた最小限データ + 暫定修正
     const organizationData = {
-      name: body.name,
+      name: rawData.name,
       slug: uniqueSlug,
       created_by: (authResult as AuthContext).user.id,
-      // デフォルト値があるフィールドは省略
+      // 日付フィールドが存在する場合はnull変換済みの値を使用
+      ...(rawData.founded !== undefined && { founded: rawData.founded }),
+      ...(rawData.establishment_date !== undefined && { establishment_date: rawData.establishment_date }),
     };
 
     console.log('Simple organization data:', organizationData);
