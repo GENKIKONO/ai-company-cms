@@ -31,12 +31,22 @@ export const organizationStatusSchema = z.enum([
 
 /**
  * 企業作成スキーマ（POST /api/my/organization）
- * 最小限: nameのみ必須、slugは任意
+ * 最小限: nameのみ必須、その他は任意
  */
 export const organizationCreateSchema = z.object({
   name: requiredString(1, 255),
   slug: optionalSlugField(),
-}).strict(); // 不要なフィールドは受け付けない
+  // フロントエンドから送信される可能性のあるフィールド
+  address_country: optionalString(),
+  brand_color_primary: colorField().optional(),
+  brand_color_secondary: colorField().optional(),
+  description: optionalString(),
+  url: urlField().optional(),
+  email: emailField().optional(),
+  telephone: phoneField().optional(),
+  founded: optionalString(),
+  established_at: optionalString(),
+}); // strict()モードを削除してフレキシブルに
 
 /**
  * 企業更新スキーマ（PUT /api/my/organization）
