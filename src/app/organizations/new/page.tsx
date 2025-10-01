@@ -213,8 +213,20 @@ export default function NewOrganizationPage() {
 
     setSubmitting(true);
     try {
-      // データ正規化とバリデーション
-      const normalizedData = normalizeOrganizationPayload(formData);
+      // 最小限のデータのみ送信（空フィールドは除外）
+      const minimalData: any = {
+        name: formData.name,
+      };
+      
+      // 必要に応じて他のフィールドを追加（空でない場合のみ）
+      if (formData.slug && formData.slug.trim()) {
+        minimalData.slug = formData.slug;
+      }
+      if (formData.description && formData.description.trim()) {
+        minimalData.description = formData.description;
+      }
+      
+      console.log('Sending minimal data:', minimalData);
       
       // Single-Org API経由で作成
       const response = await fetch('/api/my/organization', {
@@ -223,7 +235,7 @@ export default function NewOrganizationPage() {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(normalizedData),
+        body: JSON.stringify(minimalData),
       });
       
       if (!response.ok) {
@@ -245,6 +257,9 @@ export default function NewOrganizationPage() {
           }
         } else if (response.status === 400) {
           if (errorData.code === 'VALIDATION_ERROR' && errorData.details && Array.isArray(errorData.details)) {
+            // デバッグ用: 詳細エラーをコンソールに出力
+            console.log('Validation error details:', errorData.details);
+            
             // Zod詳細エラーを各フィールドにマッピング
             const fieldErrors: Record<string, string> = {};
             errorData.details.forEach((err: any) => {
@@ -257,7 +272,9 @@ export default function NewOrganizationPage() {
             if (Object.keys(fieldErrors).length > 0) {
               setErrors(fieldErrors);
             } else {
-              setErrors({ submit: errorData.message || 'フォームの入力データに問題があります。各項目をご確認ください。' });
+              setErrors({ 
+                submit: `バリデーションエラー: ${errorData.details.map((d: any) => d.message || JSON.stringify(d)).join(', ')}` 
+              });
             }
           } else {
             setErrors({ submit: errorData.reason || errorData.message || 'データに不備があります' });

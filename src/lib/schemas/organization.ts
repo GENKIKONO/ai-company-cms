@@ -31,7 +31,7 @@ export const organizationStatusSchema = z.enum([
 
 /**
  * 企業作成スキーマ（POST /api/my/organization）
- * 簡素化: 必須項目は name と slug のみ
+ * 簡素化: 必須項目は name のみ、他全て任意
  */
 export const organizationCreateSchema = z.object({
   // 必須項目（最小限 - nameのみ）
@@ -98,7 +98,7 @@ export const organizationCreateSchema = z.object({
   subscription_status: z.enum(['active', 'trialing', 'past_due', 'canceled']).optional(),
   stripe_customer_id: z.string().optional(),
   current_period_end: z.string().optional(),
-});
+}).passthrough(); // 未知のフィールドを許可
 
 /**
  * 企業更新スキーマ（PUT /api/my/organization）
