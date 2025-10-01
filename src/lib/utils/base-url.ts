@@ -1,0 +1,67 @@
+/**
+ * サーバーサイドで適切なベースURLを解決するユーティリティ
+ * Vercel本番環境やローカル開発環境に対応
+ */
+
+import { headers } from 'next/headers';
+
+/**
+ * サーバーサイドでのベースURL解決
+ * - 本番: x-forwarded-proto と host ヘッダーから構築
+ * - ローカル: 相対パスを推奨、絶対URL必要時のみフォールバック
+ */
+export async function resolveBaseUrl(): Promise<string> {
+  try {
+    const headersList = await headers();
+    const host = headersList.get('host');
+    const proto = headersList.get('x-forwarded-proto') || 'https';
+    
+    if (host) {
+      return `${proto}://${host}`;
+    }
+    
+    // フォールバック: 環境変数
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+      return process.env.NEXT_PUBLIC_APP_URL;
+    }
+    
+    // 最後のフォールバック（開発環境のみ）
+    if (process.env.NODE_ENV === 'development') {
+      return 'http://localhost:3000';
+    }
+    
+    throw new Error('Cannot resolve base URL - no host header or environment variable');
+  } catch (error) {
+    console.error('[resolveBaseUrl] Error:', error);
+    throw error;
+  }
+}
+
+/**
+ * 相対パスを絶対URLに変換（必要時のみ使用）
+ */
+export async function resolveApiUrl(path: string): Promise<string> {
+  if (path.startsWith('/')) {
+    const baseUrl = await resolveBaseUrl();
+    return `${baseUrl}${path}`;
+  }
+  return path;
+}
+
+/**
+ * 内部API呼び出し用ヘッダー生成
+ */
+export async function createInternalHeaders(reqHeaders?: Headers): Promise<Record<string, string>> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  
+  if (reqHeaders) {
+    const cookie = reqHeaders.get('cookie');
+    if (cookie) {
+      headers.Cookie = cookie;
+    }
+  }
+  
+  return headers;
+}

@@ -2,6 +2,8 @@
  * 安全なデータ取得関数 - SSRでthrowしない実装
  */
 
+import { createInternalHeaders } from './utils/base-url';
+
 interface SafeOrganizationData {
   id: string;
   name: string;
@@ -50,19 +52,10 @@ async function logToDiag(errorInfo: { errorId: string; at: string; note: string 
  */
 export async function getMyOrganizationSafe(reqHeaders?: Headers): Promise<SafeDataResult<SafeOrganizationData>> {
   try {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
-    };
-    
-    // Server-side の場合はリクエストヘッダーを転送
-    if (reqHeaders) {
-      const cookie = reqHeaders.get('cookie');
-      if (cookie) {
-        headers.Cookie = cookie;
-      }
-    }
+    // ✅ 相対パス使用でECONNREFUSED解決
+    const headers = await createInternalHeaders(reqHeaders);
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/my/organization`, {
+    const response = await fetch('/api/my/organization', {
       headers,
       cache: 'no-store'
     });

@@ -21,9 +21,18 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // パフォーマンス統計に追加
-    const { PerformanceStats } = await import('@/components/performance/WebVitalsReporter');
-    PerformanceStats.addMetric(vitalsData);
+    // ✅ パフォーマンス統計に防御的に追加
+    try {
+      const { PerformanceStats } = await import('@/components/performance/WebVitalsReporter');
+      if (PerformanceStats && typeof PerformanceStats.addMetric === 'function') {
+        PerformanceStats.addMetric(vitalsData);
+      } else {
+        console.warn('PerformanceStats.addMetric not available, metrics logged only');
+      }
+    } catch (statsError) {
+      console.warn('Failed to add metric to PerformanceStats:', statsError);
+      // 統計追加に失敗してもメトリクス記録は成功とする
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

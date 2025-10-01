@@ -24,6 +24,7 @@ import {
   createErrorResponse
 } from '@/lib/api/error-responses';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
+import { normalizePayload } from '@/lib/utils/payload-normalizer';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
@@ -233,22 +234,24 @@ export async function POST(request: NextRequest) {
 
     const rawBody = await request.json();
     
-    // サニタイズ前ログ（PIIマスク）
-    console.info('📥 受信JSON (サニタイズ前):', {
-      keys: Object.keys(rawBody),
-      name: rawBody.name ? `${rawBody.name.substring(0,2)}***` : rawBody.name,
-      email: rawBody.email ? rawBody.email?.replace(/(.{2}).*(@.*)/, '$1***$2') : rawBody.email,
-      // 存在する可能性のある日付系フィールドをチェック
-      ...(rawBody.establishment_date !== undefined && { establishment_date: rawBody.establishment_date }),
-      ...(rawBody.founded !== undefined && { founded: rawBody.founded }),
-      ...(rawBody.created_at !== undefined && { created_at: rawBody.created_at }),
-      ...(rawBody.updated_at !== undefined && { updated_at: rawBody.updated_at }),
+    // ✅ ペイロード正規化：空文字→null、email補完
+    const userEmail = (authResult as AuthContext).user.email;
+    const normalizedRawBody = normalizePayload(rawBody, userEmail);
+    
+    // サニタイズ前後ログ（PIIマスク）
+    console.info('📥 受信JSON (正規化後):', {
+      keys: Object.keys(normalizedRawBody),
+      name: normalizedRawBody.name ? `${normalizedRawBody.name.substring(0,2)}***` : normalizedRawBody.name,
+      email: normalizedRawBody.email ? normalizedRawBody.email?.replace(/(.{2}).*(@.*)/, '$1***$2') : 'undefined',
+      hasEmptyStrings: Object.values(normalizedRawBody).some(v => v === ''),
+      // 日付系フィールドの状態確認
+      ...(normalizedRawBody.founded !== undefined && { founded: normalizedRawBody.founded }),
     });
 
-    // 統一バリデーション
+    // 統一バリデーション（正規化済みデータ使用）
     let validatedData: OrganizationCreate;
     try {
-      validatedData = organizationCreateSchema.parse(rawBody);
+      validatedData = organizationCreateSchema.parse(normalizedRawBody);
       body = validatedData as any; // 既存の型との互換性のため
       
       // サニタイズ後ログ

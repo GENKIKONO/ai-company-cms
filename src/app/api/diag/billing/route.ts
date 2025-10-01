@@ -58,7 +58,7 @@ export async function GET() {
 
     // 2. Stripe Integration Check
     try {
-      const stripeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/diag/stripe`);
+      const stripeResponse = await fetch('/api/diag/stripe');
       if (stripeResponse.ok) {
         diagnostics.billing_system.stripe_integration = await stripeResponse.json();
       } else {
