@@ -282,6 +282,8 @@ export async function POST(request: NextRequest) {
     if (existingOrg) {
       return conflictError('Organization', 'user');
     }
+    
+    console.log('🔍 About to insert with minimal data - no normalization');
 
     // 最小限のデータのみでシンプルに作成
     const timestamp = Date.now();
@@ -293,25 +295,14 @@ export async function POST(request: NextRequest) {
     
     const uniqueSlug = `${baseSlug}-${timestamp}`;
 
-    // 🚨 暫定対処: 日付型フィールドの空文字→null変換
-    const rawData = { ...body } as any;
-    const dateFields = ['founded', 'establishment_date', 'published_date'];
-    dateFields.forEach(field => {
-      if (rawData[field] === '') {
-        console.warn(`⚠️  空文字→null変換: ${field}`);
-        rawData[field] = null;
-      }
-    });
-
-    // データベーススキーマに合わせた最小限データ + 暫定修正
+    // 厳密に必要なフィールドのみでデータ作成
     const organizationData = {
-      name: rawData.name,
+      name: body.name,
       slug: uniqueSlug,
       created_by: (authResult as AuthContext).user.id,
-      // 日付フィールドが存在する場合はnull変換済みの値を使用
-      ...(rawData.founded !== undefined && { founded: rawData.founded }),
-      ...(rawData.establishment_date !== undefined && { establishment_date: rawData.establishment_date }),
     };
+    
+    console.log('🔍 Final insert data (keys only):', Object.keys(organizationData));
 
     console.log('Simple organization data:', organizationData);
 
