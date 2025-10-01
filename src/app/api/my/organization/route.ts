@@ -287,25 +287,26 @@ export async function POST(request: NextRequest) {
 
     // 最小限のデータのみでシンプルに作成
     const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(2, 8);
     const baseSlug = body.name
       .toLowerCase()
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '') || 'organization';
     
-    const uniqueSlug = `${baseSlug}-${timestamp}`;
+    const uniqueSlug = `${baseSlug}-${timestamp}-${randomId}`;
 
-    // ✅ API層での保険: 空文字を完全除外
+    // ✅ API層での保険: 空文字を完全除外、slug競合回避
     const baseData = {
       name: body.name,
-      slug: uniqueSlug,
+      slug: uniqueSlug, // 常にユニークなslugを使用
       created_by: (authResult as AuthContext).user.id,
     };
     
-    // 受信データから有効な値のみを追加（空文字は除外）
+    // 受信データから有効な値のみを追加（空文字とslugは除外）
     const organizationData: any = { ...baseData };
     Object.entries(body).forEach(([key, value]) => {
-      if (key !== 'name' && value !== '' && value !== null && value !== undefined) {
+      if (key !== 'name' && key !== 'slug' && value !== '' && value !== null && value !== undefined) {
         organizationData[key] = value;
       }
     });
