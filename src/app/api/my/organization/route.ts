@@ -252,15 +252,16 @@ export async function POST(request: NextRequest) {
       body = validatedData as any; // 既存の型との互換性のため
       
       // サニタイズ後ログ
+      const bodyAny = body as any;
       console.info('📤 バリデーション後 (サニタイズ後):', {
         keys: Object.keys(body),
         name: body.name ? `${body.name.substring(0,2)}***` : body.name,
         slug: body.slug || 'UNDEFINED',
-        // 日付系フィールドを安全にチェック
-        ...(body.establishment_date !== undefined && { establishment_date: body.establishment_date }),
-        ...(body.founded !== undefined && { founded: body.founded }),
-        ...(body.created_at !== undefined && { created_at: body.created_at }),
-        ...(body.updated_at !== undefined && { updated_at: body.updated_at }),
+        // 日付系フィールドを型キャストで安全にチェック
+        ...(bodyAny.establishment_date !== undefined && { establishment_date: bodyAny.establishment_date }),
+        ...(bodyAny.founded !== undefined && { founded: bodyAny.founded }),
+        ...(bodyAny.created_at !== undefined && { created_at: bodyAny.created_at }),
+        ...(bodyAny.updated_at !== undefined && { updated_at: bodyAny.updated_at }),
       });
     } catch (error) {
       if (error instanceof z.ZodError) {

@@ -217,12 +217,13 @@ export default function NewOrganizationPage() {
       };
       
       // 📥 送信前の詳細ログ（日付系フィールドの状態確認）
+      const formDataAny = formData as any;
       console.info('🚀 送信直前のフォームデータ:', {
         name: formData.name,
         slug: formData.slug,
-        // フォームデータに存在する可能性のある日付系フィールドを安全にチェック
-        ...(formData.establishment_date !== undefined && { establishment_date: formData.establishment_date }),
-        ...(formData.founded !== undefined && { founded: formData.founded }),
+        // フォームデータに存在する可能性のある日付系フィールドを型キャストで安全にチェック
+        ...(formDataAny.establishment_date !== undefined && { establishment_date: formDataAny.establishment_date }),
+        ...(formDataAny.founded !== undefined && { founded: formDataAny.founded }),
         // 空文字かどうかもチェック
         allKeys: Object.keys(formData),
         emptyStringFields: Object.entries(formData).filter(([k, v]) => v === '').map(([k]) => k),
