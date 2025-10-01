@@ -220,9 +220,12 @@ export default function NewOrganizationPage() {
       console.info('🚀 送信直前のフォームデータ:', {
         name: formData.name,
         slug: formData.slug,
-        establishment_date: formData.establishment_date || 'UNDEFINED',
-        founded: formData.founded || 'UNDEFINED',
-        // その他日付が含まれそうなフィールド
+        // フォームデータに存在する可能性のある日付系フィールドを安全にチェック
+        ...(formData.establishment_date !== undefined && { establishment_date: formData.establishment_date }),
+        ...(formData.founded !== undefined && { founded: formData.founded }),
+        // 空文字かどうかもチェック
+        allKeys: Object.keys(formData),
+        emptyStringFields: Object.entries(formData).filter(([k, v]) => v === '').map(([k]) => k),
       });
       console.info('📤 実際の送信データ:', minimalData);
       

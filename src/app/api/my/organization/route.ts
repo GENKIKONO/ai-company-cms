@@ -235,14 +235,14 @@ export async function POST(request: NextRequest) {
     
     // サニタイズ前ログ（PIIマスク）
     console.info('📥 受信JSON (サニタイズ前):', {
-      ...rawBody,
+      keys: Object.keys(rawBody),
       name: rawBody.name ? `${rawBody.name.substring(0,2)}***` : rawBody.name,
-      email: rawBody.email ? rawBody.email.replace(/(.{2}).*(@.*)/, '$1***$2') : rawBody.email,
-      // 日付系フィールドの実値を明示
-      establishment_date: rawBody.establishment_date,
-      founded: rawBody.founded,
-      created_at: rawBody.created_at,
-      updated_at: rawBody.updated_at,
+      email: rawBody.email ? rawBody.email?.replace(/(.{2}).*(@.*)/, '$1***$2') : rawBody.email,
+      // 存在する可能性のある日付系フィールドをチェック
+      ...(rawBody.establishment_date !== undefined && { establishment_date: rawBody.establishment_date }),
+      ...(rawBody.founded !== undefined && { founded: rawBody.founded }),
+      ...(rawBody.created_at !== undefined && { created_at: rawBody.created_at }),
+      ...(rawBody.updated_at !== undefined && { updated_at: rawBody.updated_at }),
     });
 
     // 統一バリデーション
@@ -253,13 +253,14 @@ export async function POST(request: NextRequest) {
       
       // サニタイズ後ログ
       console.info('📤 バリデーション後 (サニタイズ後):', {
-        ...body,
+        keys: Object.keys(body),
         name: body.name ? `${body.name.substring(0,2)}***` : body.name,
-        // 日付系フィールドの実値を明示
-        establishment_date: body.establishment_date,
-        founded: body.founded,
-        created_at: body.created_at,
-        updated_at: body.updated_at,
+        slug: body.slug || 'UNDEFINED',
+        // 日付系フィールドを安全にチェック
+        ...(body.establishment_date !== undefined && { establishment_date: body.establishment_date }),
+        ...(body.founded !== undefined && { founded: body.founded }),
+        ...(body.created_at !== undefined && { created_at: body.created_at }),
+        ...(body.updated_at !== undefined && { updated_at: body.updated_at }),
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
