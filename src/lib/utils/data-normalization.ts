@@ -193,6 +193,7 @@ export function normalizeOrganizationPayload(data: any) {
     'telephone',
     'email',
     'founded',
+    'established_at', // 日付型フィールド：空文字をnullに正規化
     'establishment_date',
     'legal_form',
     'representative_name',
