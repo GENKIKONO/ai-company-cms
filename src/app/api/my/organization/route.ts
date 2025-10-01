@@ -258,19 +258,47 @@ export async function POST(request: NextRequest) {
       return conflictError('Organization', 'user');
     }
 
-    // slugの重複チェック
-    const { data: slugCheck } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('slug', body!.slug)
-      .single();
-
-    if (slugCheck) {
-      return conflictError('Organization', 'slug');
-    }
-
     // データの正規化
     const normalizedData = normalizeOrganizationPayload(body);
+
+    // スラッグが空の場合、企業名から自動生成
+    if (!normalizedData.slug || normalizedData.slug.trim() === '') {
+      const baseSlug = normalizedData.name
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      
+      // スラッグの重複チェックと自動調整
+      let uniqueSlug = baseSlug;
+      let counter = 1;
+      
+      while (true) {
+        const { data: existingSlug } = await supabase
+          .from('organizations')
+          .select('id')
+          .eq('slug', uniqueSlug)
+          .single();
+        
+        if (!existingSlug) break;
+        
+        uniqueSlug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+      
+      normalizedData.slug = uniqueSlug;
+    } else {
+      // スラッグが提供された場合の重複チェック
+      const { data: slugCheck } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('slug', normalizedData.slug)
+        .single();
+
+      if (slugCheck) {
+        return conflictError('Organization', 'slug');
+      }
+    }
 
     // 企業データの作成
     const organizationData: Partial<Organization> = {

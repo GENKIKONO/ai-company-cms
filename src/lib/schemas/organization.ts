@@ -11,6 +11,7 @@ import {
   emailField,
   phoneField,
   slugField,
+  optionalSlugField,
   postalCodeField,
   numericField,
   jsonArrayField,
@@ -33,9 +34,9 @@ export const organizationStatusSchema = z.enum([
  * 簡素化: 必須項目は name と slug のみ
  */
 export const organizationCreateSchema = z.object({
-  // 必須項目（最小限）
+  // 必須項目（最小限 - nameのみ）
   name: requiredString(1, 255),
-  slug: slugField(),
+  slug: optionalSlugField(), // スラッグも任意に変更
   
   // 全ての項目を任意に変更
   description: optionalString(),
@@ -49,7 +50,7 @@ export const organizationCreateSchema = z.object({
   representative_name: optionalString(),
   establishment_date: optionalString(), // DATE型への変換はAPI側で処理
   founded: optionalString(), // DATE型への変換はAPI側で処理
-  address_postal_code: postalCodeField(),
+  address_postal_code: optionalString(), // 郵便番号も任意に
   postal_code: optionalString(), // フロントエンドとの互換性のため
   address_street: optionalString(),
   street_address: optionalString(), // フロントエンドとの互換性のため

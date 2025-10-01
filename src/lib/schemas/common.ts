@@ -129,14 +129,58 @@ export const slugField = () =>
     .refine(slug => !RESERVED_SLUGS.includes(slug), 'This slug is reserved');
 
 /**
+ * オプショナルスラッグ バリデーション（企業作成時用）
+ */
+export const optionalSlugField = () =>
+  z.string()
+    .optional()
+    .transform(val => {
+      if (!val || val.trim() === '') {
+        return undefined;
+      }
+      
+      const trimmed = val.trim().toLowerCase();
+      
+      // 基本的な形式チェック
+      if (trimmed.length < 3 || trimmed.length > 50) {
+        throw new Error('Slug must be between 3 and 50 characters');
+      }
+      
+      if (!/^[a-z0-9-]+$/.test(trimmed)) {
+        throw new Error('Slug must contain only lowercase letters, numbers, and hyphens');
+      }
+      
+      if (RESERVED_SLUGS.includes(trimmed)) {
+        throw new Error('This slug is reserved');
+      }
+      
+      return trimmed;
+    });
+
+/**
  * 郵便番号 バリデーション（要件定義準拠: 日本形式）
  */
 export const postalCodeField = () =>
   z.string()
-    .regex(/^\d{3}-\d{4}$/, 'Postal code must be in format 123-4567')
     .optional()
     .or(z.literal(''))
-    .transform(normalizeEmptyToNull);
+    .transform(val => {
+      const normalized = normalizeEmptyToNull(val);
+      if (!normalized) return null;
+      
+      // 空文字やnullの場合はnullを返す
+      if (typeof normalized !== 'string' || normalized.trim() === '') {
+        return null;
+      }
+      
+      // 郵便番号形式チェック
+      const postalCodeRegex = /^\d{3}-\d{4}$/;
+      if (!postalCodeRegex.test(normalized)) {
+        throw new Error('Postal code must be in format 123-4567');
+      }
+      
+      return normalized;
+    });
 
 /**
  * JSON配列フィールド（文字列→配列変換対応）
