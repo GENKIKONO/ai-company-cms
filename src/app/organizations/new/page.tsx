@@ -216,7 +216,15 @@ export default function NewOrganizationPage() {
         name: formData.name.trim(),
       };
       
-      console.log('Sending minimal data:', minimalData);
+      // 📥 送信前の詳細ログ（日付系フィールドの状態確認）
+      console.info('🚀 送信直前のフォームデータ:', {
+        name: formData.name,
+        slug: formData.slug,
+        establishment_date: formData.establishment_date || 'UNDEFINED',
+        founded: formData.founded || 'UNDEFINED',
+        // その他日付が含まれそうなフィールド
+      });
+      console.info('📤 実際の送信データ:', minimalData);
       
       // Single-Org API経由で作成
       const response = await fetch('/api/my/organization', {

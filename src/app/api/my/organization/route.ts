@@ -232,12 +232,35 @@ export async function POST(request: NextRequest) {
     );
 
     const rawBody = await request.json();
+    
+    // サニタイズ前ログ（PIIマスク）
+    console.info('📥 受信JSON (サニタイズ前):', {
+      ...rawBody,
+      name: rawBody.name ? `${rawBody.name.substring(0,2)}***` : rawBody.name,
+      email: rawBody.email ? rawBody.email.replace(/(.{2}).*(@.*)/, '$1***$2') : rawBody.email,
+      // 日付系フィールドの実値を明示
+      establishment_date: rawBody.establishment_date,
+      founded: rawBody.founded,
+      created_at: rawBody.created_at,
+      updated_at: rawBody.updated_at,
+    });
 
     // 統一バリデーション
     let validatedData: OrganizationCreate;
     try {
       validatedData = organizationCreateSchema.parse(rawBody);
       body = validatedData as any; // 既存の型との互換性のため
+      
+      // サニタイズ後ログ
+      console.info('📤 バリデーション後 (サニタイズ後):', {
+        ...body,
+        name: body.name ? `${body.name.substring(0,2)}***` : body.name,
+        // 日付系フィールドの実値を明示
+        establishment_date: body.establishment_date,
+        founded: body.founded,
+        created_at: body.created_at,
+        updated_at: body.updated_at,
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return handleZodError(error);
