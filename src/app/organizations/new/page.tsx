@@ -39,8 +39,8 @@ export default function NewOrganizationPage() {
     industries: [],
     // Enhanced organization settings (I1)
     favicon_url: '',
-    brand_color_primary: '',
-    brand_color_secondary: '',
+    brand_color_primary: '#000000',
+    brand_color_secondary: '#808080',
     social_media: {},
     business_hours: [],
     timezone: 'Asia/Tokyo',
@@ -173,11 +173,11 @@ export default function NewOrganizationPage() {
     }
 
     // Enhanced validation (I1)
-    if (formData.brand_color_primary && !/^#[0-9A-Fa-f]{6}$/.test(formData.brand_color_primary)) {
+    if (formData.brand_color_primary && formData.brand_color_primary.trim() && !/^#[0-9A-Fa-f]{6}$/.test(formData.brand_color_primary)) {
       newErrors.brand_color_primary = '正しいHEXカラー形式で入力してください（例: #FF0000）';
     }
 
-    if (formData.brand_color_secondary && !/^#[0-9A-Fa-f]{6}$/.test(formData.brand_color_secondary)) {
+    if (formData.brand_color_secondary && formData.brand_color_secondary.trim() && !/^#[0-9A-Fa-f]{6}$/.test(formData.brand_color_secondary)) {
       newErrors.brand_color_secondary = '正しいHEXカラー形式で入力してください（例: #00FF00）';
     }
 

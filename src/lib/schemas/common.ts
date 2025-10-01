@@ -170,3 +170,28 @@ export const numericField = () =>
     if (typeof val === 'string' && val === '') return null;
     return val;
   });
+
+/**
+ * HEXカラーフィールド（#rrggbb形式、空文字→null変換対応）
+ */
+export const colorField = () =>
+  z.string()
+    .optional()
+    .or(z.literal(''))
+    .transform(val => {
+      const normalized = normalizeEmptyToNull(val);
+      if (!normalized) return null;
+      
+      // 空文字やnullの場合はnullを返す
+      if (typeof normalized !== 'string' || normalized.trim() === '') {
+        return null;
+      }
+      
+      // HEX color形式チェック
+      const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
+      if (!hexColorRegex.test(normalized)) {
+        throw new Error('Color must be in hex format (#rrggbb)');
+      }
+      
+      return normalized;
+    });

@@ -13,7 +13,8 @@ import {
   slugField,
   postalCodeField,
   numericField,
-  jsonArrayField
+  jsonArrayField,
+  colorField
 } from './common';
 
 /**
@@ -63,9 +64,9 @@ export const organizationCreateSchema = z.object({
   meta_description: optionalString(),
   
   // ブランド・デザイン設定
-  favicon_url: optionalString(),
-  brand_color_primary: optionalString(),
-  brand_color_secondary: optionalString(),
+  favicon_url: urlField(),
+  brand_color_primary: colorField(),
+  brand_color_secondary: colorField(),
   
   // JSON配列フィールド
   industries: jsonArrayField<string>(),
