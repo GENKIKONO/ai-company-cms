@@ -258,67 +258,27 @@ export async function POST(request: NextRequest) {
       return conflictError('Organization', 'user');
     }
 
-    // データの正規化
-    const normalizedData = normalizeOrganizationPayload(body);
+    // 最小限のデータのみでシンプルに作成
+    const timestamp = Date.now();
+    const baseSlug = body.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '') || 'organization';
+    
+    const uniqueSlug = `${baseSlug}-${timestamp}`;
 
-    // スラッグが空の場合、企業名から自動生成
-    if (!normalizedData.slug || normalizedData.slug.trim() === '') {
-      let baseSlug = normalizedData.name
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      
-      console.log('Generated base slug:', baseSlug);
-      
-      // 空のスラッグの場合は固定値を使用
-      if (!baseSlug || baseSlug.length === 0) {
-        baseSlug = 'organization';
-      }
-      
-      // スラッグの重複チェックと自動調整
-      let uniqueSlug = baseSlug;
-      let counter = 1;
-      
-      while (true) {
-        const { data: existingSlug } = await supabase
-          .from('organizations')
-          .select('id')
-          .eq('slug', uniqueSlug)
-          .single();
-        
-        if (!existingSlug) break;
-        
-        uniqueSlug = `${baseSlug}-${counter}`;
-        counter++;
-      }
-      
-      console.log('Final unique slug:', uniqueSlug);
-      normalizedData.slug = uniqueSlug;
-    } else {
-      // スラッグが提供された場合の重複チェック
-      const { data: slugCheck } = await supabase
-        .from('organizations')
-        .select('id')
-        .eq('slug', normalizedData.slug)
-        .single();
-
-      if (slugCheck) {
-        return conflictError('Organization', 'slug');
-      }
-    }
-
-    // 企業データの作成
-    const organizationData: Partial<Organization> = {
-      ...normalizedData,
+    // 最小限の必須データのみ
+    const organizationData = {
+      name: body.name,
+      slug: uniqueSlug,
       created_by: (authResult as AuthContext).user.id,
       status: 'draft' as const,
-      is_published: false, // 初期は非公開
-      // address_countryが'JP'の場合はデフォルト値を使用（undefinedにして省略）
-      address_country: normalizedData.address_country === 'JP' ? undefined : normalizedData.address_country,
+      is_published: false,
+      email_public: false,
     };
 
-    console.log('Organization data to insert:', JSON.stringify(organizationData, null, 2));
+    console.log('Simple organization data:', organizationData);
 
     const { data, error } = await supabase
       .from('organizations')

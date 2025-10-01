@@ -211,18 +211,10 @@ export default function NewOrganizationPage() {
 
     setSubmitting(true);
     try {
-      // 最小限のデータのみ送信（空フィールドは除外）
-      const minimalData: any = {
-        name: formData.name,
+      // 最も最小限のデータのみ送信
+      const minimalData = {
+        name: formData.name.trim(),
       };
-      
-      // 必要に応じて他のフィールドを追加（空でない場合のみ）
-      if (formData.slug && formData.slug.trim()) {
-        minimalData.slug = formData.slug;
-      }
-      if (formData.description && formData.description.trim()) {
-        minimalData.description = formData.description;
-      }
       
       console.log('Sending minimal data:', minimalData);
       
