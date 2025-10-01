@@ -211,10 +211,15 @@ export default function NewOrganizationPage() {
 
     setSubmitting(true);
     try {
-      // 最も最小限のデータのみ送信
-      const minimalData = {
+      // フェーズC修正: 空文字フィールドを一切送信しない
+      const minimalData: any = {
         name: formData.name.trim(),
       };
+      
+      // スラッグが入力されている場合のみ追加
+      if (formData.slug && formData.slug.trim()) {
+        minimalData.slug = formData.slug.trim();
+      }
       
       // 📥 送信前の詳細ログ（日付系フィールドの状態確認）
       const formDataAny = formData as any;
