@@ -268,14 +268,12 @@ export async function POST(request: NextRequest) {
     
     const uniqueSlug = `${baseSlug}-${timestamp}`;
 
-    // 最小限の必須データのみ
+    // データベーススキーマに合わせた最小限データ
     const organizationData = {
       name: body.name,
       slug: uniqueSlug,
       created_by: (authResult as AuthContext).user.id,
-      status: 'draft' as const,
-      is_published: false,
-      email_public: false,
+      // デフォルト値があるフィールドは省略
     };
 
     console.log('Simple organization data:', organizationData);
@@ -291,9 +289,23 @@ export async function POST(request: NextRequest) {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
+        data: organizationData
       });
-      return handleApiError(error);
+      
+      // より具体的なエラーメッセージを返す
+      return new Response(JSON.stringify({
+        error: {
+          code: 'DATABASE_ERROR',
+          message: 'Database operation failed',
+          details: error.message,
+          hint: error.hint,
+          timestamp: new Date().toISOString()
+        }
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     const debugInfo = generateDebugInfo(request, (authResult as AuthContext).user, body);
