@@ -295,14 +295,25 @@ export async function POST(request: NextRequest) {
     
     const uniqueSlug = `${baseSlug}-${timestamp}`;
 
-    // 厳密に必要なフィールドのみでデータ作成
-    const organizationData = {
+    // ✅ API層での保険: 空文字を完全除外
+    const baseData = {
       name: body.name,
       slug: uniqueSlug,
       created_by: (authResult as AuthContext).user.id,
     };
     
-    console.log('🔍 Final insert data (keys only):', Object.keys(organizationData));
+    // 受信データから有効な値のみを追加（空文字は除外）
+    const organizationData: any = { ...baseData };
+    Object.entries(body).forEach(([key, value]) => {
+      if (key !== 'name' && value !== '' && value !== null && value !== undefined) {
+        organizationData[key] = value;
+      }
+    });
+    
+    console.log('🔍 Final insert data (cleaned):', {
+      keys: Object.keys(organizationData),
+      hasEmptyStrings: Object.values(organizationData).some(v => v === ''),
+    });
 
     console.log('Simple organization data:', organizationData);
 

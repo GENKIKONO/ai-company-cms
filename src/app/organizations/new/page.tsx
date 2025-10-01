@@ -211,15 +211,19 @@ export default function NewOrganizationPage() {
 
     setSubmitting(true);
     try {
-      // フェーズC修正: 空文字フィールドを一切送信しない
-      const minimalData: any = {
+      // ✅ 根本修正: 値があるフィールドのみ送信
+      const cleanData: any = {
         name: formData.name.trim(),
       };
       
-      // スラッグが入力されている場合のみ追加
-      if (formData.slug && formData.slug.trim()) {
-        minimalData.slug = formData.slug.trim();
-      }
+      // 入力値がある場合のみ追加（空文字は除外）
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key !== 'name' && value && typeof value === 'string' && value.trim() !== '') {
+          cleanData[key] = value.trim();
+        }
+      });
+      
+      const minimalData = cleanData;
       
       // 📥 送信前の詳細ログ（日付系フィールドの状態確認）
       const formDataAny = formData as any;
