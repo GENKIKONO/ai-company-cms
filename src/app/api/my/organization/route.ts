@@ -324,9 +324,12 @@ export async function POST(request: NextRequest) {
     
     Object.entries(body).forEach(([key, value]) => {
       if (key !== 'name' && key !== 'slug' && allowedFields.includes(key)) {
-        // 日付フィールドの場合、空文字をnullに変換
-        if (dateFields.includes(key) && value === '') {
-          organizationData[key] = null;
+        // 日付フィールドの場合、空文字やnullは完全に除外（フィールド自体を含めない）
+        if (dateFields.includes(key)) {
+          if (value && value !== '' && value !== null && value !== undefined) {
+            organizationData[key] = value;
+          }
+          // 空文字やnullの場合は何もしない（フィールドを追加しない）
         }
         // その他のフィールドで有効な値のみを追加
         else if (value !== '' && value !== null && value !== undefined) {
