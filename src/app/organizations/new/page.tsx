@@ -184,7 +184,7 @@ export default function NewOrganizationPage() {
       };
       
       // ✅ 強化された空文字・null・undefined除外ロジック（日付フィールド特別処理）
-      const dateFields = ['founded']; // 日付フィールドリスト
+      const dateFields: string[] = []; // foundedはUIに存在しないため完全除去
       
       Object.entries(formData).forEach(([key, value]) => {
         if (key !== 'name' && allowedFields.includes(key)) {
