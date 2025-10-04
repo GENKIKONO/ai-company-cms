@@ -382,6 +382,19 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 Normalized organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
+    // 🚨 最終ガード: normalizeForInsert後でも空文字が残っている場合の緊急対応
+    const dateFieldsToCheck = ['established_at', 'founded'];
+    dateFieldsToCheck.forEach(field => {
+      if (organizationData[field] === '') {
+        console.error(`🚨 EMERGENCY: ${field} still contains empty string after normalization!`);
+        organizationData[field] = null; // 強制的にnullに変換
+        console.log(`🔧 FIXED: ${field} forced to null`);
+      }
+    });
+
+    // 最終データ確認ログ
+    console.log('🔍 FINAL organization data for INSERT (after emergency guard):', JSON.stringify(organizationData, null, 2));
+
     const { data, error } = await supabase
       .from('organizations')
       .insert([organizationData])
@@ -541,6 +554,19 @@ export async function PUT(request: NextRequest) {
     });
 
     console.log('🔍 Normalized update data:', JSON.stringify(updateData, null, 2));
+
+    // 🚨 最終ガード: UPDATE時も空文字が残っている場合の緊急対応
+    const updateDateFieldsToCheck = ['established_at', 'founded'];
+    updateDateFieldsToCheck.forEach(field => {
+      if (updateData[field] === '') {
+        console.error(`🚨 UPDATE EMERGENCY: ${field} still contains empty string after normalization!`);
+        updateData[field] = null; // 強制的にnullに変換
+        console.log(`🔧 UPDATE FIXED: ${field} forced to null`);
+      }
+    });
+
+    // 最終データ確認ログ
+    console.log('🔍 FINAL update data (after emergency guard):', JSON.stringify(updateData, null, 2));
 
     const { data, error } = await supabase
       .from('organizations')
