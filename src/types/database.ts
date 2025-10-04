@@ -269,7 +269,7 @@ export interface MyOrganizationErrorResponse {
   message: string;
 }
 
-// フォーム型定義
+// フォーム型定義（基本スキーマのみ - 本番DB存在フィールド）
 export interface OrganizationFormData {
   name: string;
   slug: string;
@@ -282,8 +282,8 @@ export interface OrganizationFormData {
   address_country: string;
   address_region?: string;
   address_locality?: string;
-  street_address?: string;
-  postal_code?: string;
+  address_postal_code?: string;
+  address_street?: string;
   telephone?: string;
   email?: string;
   email_public: boolean;
@@ -291,20 +291,10 @@ export interface OrganizationFormData {
   logo_url?: string;
   same_as?: string[];
   industries?: string[];
-  // Enhanced organization settings
-  favicon_url?: string;
-  brand_color_primary?: string;
-  brand_color_secondary?: string;
-  social_media?: SocialMediaLinks;
-  business_hours?: BusinessHours[];
-  timezone?: string;
-  languages_supported?: string[];
-  certifications?: string[];
-  awards?: string[];
-  company_culture?: string;
-  mission_statement?: string;
-  vision_statement?: string;
-  values?: string[];
+  status?: OrganizationStatus;
+  meta_title?: string;
+  meta_description?: string;
+  meta_keywords?: string[];
 }
 
 export interface PartnerFormData {

@@ -37,8 +37,8 @@ export default function EditOrganizationPage() {
     address_country: 'JP',
     address_region: '',
     address_locality: '',
-    street_address: '',
-    postal_code: '',
+    address_postal_code: '',
+    address_street: '',
     telephone: '',
     email: '',
     email_public: false,
@@ -96,8 +96,8 @@ export default function EditOrganizationPage() {
             address_country: org.address_country || 'JP',
             address_region: org.address_region || '',
             address_locality: org.address_locality || '',
-            street_address: org.address_street || '',
-            postal_code: org.address_postal_code || '',
+            address_street: org.address_street || '',
+            address_postal_code: org.address_postal_code || '',
             telephone: org.telephone || '',
             email: org.email || '',
             email_public: org.email_public || false,
@@ -599,14 +599,14 @@ export default function EditOrganizationPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label htmlFor="postal_code" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="address_postal_code" className="block text-sm font-medium text-gray-700 mb-2">
                   郵便番号
                 </label>
                 <input
                   type="text"
-                  id="postal_code"
-                  value={formData.postal_code}
-                  onChange={(e) => handleInputChange('postal_code', e.target.value)}
+                  id="address_postal_code"
+                  value={formData.address_postal_code}
+                  onChange={(e) => handleInputChange('address_postal_code', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -687,14 +687,14 @@ export default function EditOrganizationPage() {
             </div>
 
             <div className="mt-6">
-              <label htmlFor="street_address" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="address_street" className="block text-sm font-medium text-gray-700 mb-2">
                 番地・建物名
               </label>
               <input
                 type="text"
-                id="street_address"
-                value={formData.street_address}
-                onChange={(e) => handleInputChange('street_address', e.target.value)}
+                id="address_street"
+                value={formData.address_street}
+                onChange={(e) => handleInputChange('address_street', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
