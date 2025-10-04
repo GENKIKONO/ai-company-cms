@@ -39,11 +39,11 @@ export default function NewOrganizationPage() {
     industries: [],
     // Enhanced organization settings (I1)
     favicon_url: '',
-    brand_color_primary: '#000000',
-    brand_color_secondary: '#808080',
+    brand_color_primary: '',
+    brand_color_secondary: '',
     social_media: {},
     business_hours: [],
-    timezone: 'Asia/Tokyo',
+    timezone: '',
     languages_supported: [],
     certifications: [],
     awards: [],
@@ -211,15 +211,42 @@ export default function NewOrganizationPage() {
 
     setSubmitting(true);
     try {
-      // ✅ 根本修正: 値があるフィールドのみ送信
+      // ✅ 根本修正: 実際のDBスキーマに存在するフィールドのみ送信
+      const allowedFields = [
+        // 001_initial_schema.sql で定義されたフィールド
+        'description', 'legal_form', 'representative_name', 'founded', 'capital', 'employees',
+        'address_country', 'address_region', 'address_locality', 'address_postal_code', 'address_street',
+        'telephone', 'email', 'email_public', 'url', 'logo_url', 'industries', 'same_as', 'status',
+        'meta_title', 'meta_description', 'meta_keywords', 'slug',
+        // 拡張マイグレーションで追加されたフィールド
+        'favicon_url', 'brand_color_primary', 'brand_color_secondary', 'social_media', 'business_hours',
+        'timezone', 'languages_supported', 'certifications', 'awards', 'company_culture', 
+        'mission_statement', 'vision_statement', 'values'
+      ];
+      
       const cleanData: any = {
         name: formData.name.trim(),
       };
       
-      // 入力値がある場合のみ追加（空文字は除外）
+      // 許可されたフィールドで値があるもののみ追加（デフォルト値や空文字は除外）
       Object.entries(formData).forEach(([key, value]) => {
-        if (key !== 'name' && value && typeof value === 'string' && value.trim() !== '') {
-          cleanData[key] = value.trim();
+        if (key !== 'name' && allowedFields.includes(key)) {
+          // 文字列の場合：空文字でないもののみ
+          if (typeof value === 'string' && value.trim() !== '') {
+            cleanData[key] = value.trim();
+          }
+          // 数値の場合：有効な値のみ
+          else if (typeof value === 'number' && !isNaN(value)) {
+            cleanData[key] = value;
+          }
+          // ブール値の場合：そのまま追加
+          else if (typeof value === 'boolean') {
+            cleanData[key] = value;
+          }
+          // 配列の場合：空でないもののみ
+          else if (Array.isArray(value) && value.length > 0) {
+            cleanData[key] = value;
+          }
         }
       });
       
@@ -230,8 +257,7 @@ export default function NewOrganizationPage() {
       console.info('🚀 送信直前のフォームデータ:', {
         name: formData.name,
         slug: formData.slug,
-        // フォームデータに存在する可能性のある日付系フィールドを型キャストで安全にチェック
-        ...(formDataAny.establishment_date !== undefined && { establishment_date: formDataAny.establishment_date }),
+        // 実際に存在する日付系フィールドのみチェック
         ...(formDataAny.founded !== undefined && { founded: formDataAny.founded }),
         // 空文字かどうかもチェック
         allKeys: Object.keys(formData),

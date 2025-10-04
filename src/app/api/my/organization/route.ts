@@ -260,11 +260,8 @@ export async function POST(request: NextRequest) {
         keys: Object.keys(body),
         name: body.name ? `${body.name.substring(0,2)}***` : body.name,
         slug: body.slug || 'UNDEFINED',
-        // 日付系フィールドを型キャストで安全にチェック
-        ...(bodyAny.establishment_date !== undefined && { establishment_date: bodyAny.establishment_date }),
+        // 実際に存在する日付系フィールドのみチェック
         ...(bodyAny.founded !== undefined && { founded: bodyAny.founded }),
-        ...(bodyAny.created_at !== undefined && { created_at: bodyAny.created_at }),
-        ...(bodyAny.updated_at !== undefined && { updated_at: bodyAny.updated_at }),
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -299,27 +296,31 @@ export async function POST(request: NextRequest) {
     
     const uniqueSlug = `${baseSlug}-${timestamp}-${randomId}`;
 
-    // ✅ API層での保険: 空文字を完全除外、slug競合回避
+    // ✅ API層での保険: 実際のDBスキーマに完全一致
     const baseData = {
       name: body.name,
       slug: uniqueSlug, // 常にユニークなslugを使用
       created_by: (authResult as AuthContext).user.id,
-      user_id: (authResult as AuthContext).user.id, // 必須フィールド
-      contact_email: (authResult as AuthContext).user.email || '', // 必須フィールド
-      is_published: false, // 必須フィールド
+      // 注意: user_id, contact_email, is_published は実際のDBに存在しないため除外
     };
     
     // 受信データから有効な値のみを追加（空文字とslugは除外、日付フィールドの空文字はnullに変換）
     const organizationData: any = { ...baseData };
-    const dateFields = ['founded', 'established_at', 'establishment_date'];
+    // ✅ 実際に存在する日付フィールドのみ定義
+    const dateFields = ['founded']; // establishment_date, established_at は存在しないため除外
     
-    // データベースに存在する有効なフィールドのみ許可
+    // ✅ 実際のDBスキーマに存在するフィールドのみ許可（001_initial_schema.sql + 拡張マイグレーション対応）
     const allowedFields = [
-      'description', 'legal_form', 'representative_name', 'founded', 'established_at', 'capital', 'employees',
+      // 001_initial_schema.sql で定義されたフィールド
+      'description', 'legal_form', 'representative_name', 'founded', 'capital', 'employees',
       'address_country', 'address_region', 'address_locality', 'address_postal_code', 'address_street',
       'telephone', 'email', 'email_public', 'url', 'logo_url', 'industries', 'same_as', 'status',
-      'meta_title', 'meta_description', 'meta_keywords', 'postal_code', 'street_address', 'corporate_type',
-      'city', 'prefecture', 'country', 'phone', 'website_url'
+      'meta_title', 'meta_description', 'meta_keywords',
+      // 拡張マイグレーションで追加されたフィールド
+      'favicon_url', 'brand_color_primary', 'brand_color_secondary', 'social_media', 'business_hours',
+      'timezone', 'languages_supported', 'certifications', 'awards', 'company_culture', 
+      'mission_statement', 'vision_statement', 'values',
+      // 注意: establishment_date, user_id, contact_email, is_published は存在しないため除外
     ];
     
     Object.entries(body).forEach(([key, value]) => {
