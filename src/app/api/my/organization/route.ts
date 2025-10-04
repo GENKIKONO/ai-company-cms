@@ -24,7 +24,7 @@ import {
   createErrorResponse
 } from '@/lib/api/error-responses';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
-import { normalizePayload } from '@/lib/utils/payload-normalizer';
+import { normalizePayload, normalizeDateFields } from '@/lib/utils/payload-normalizer';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
@@ -303,7 +303,7 @@ export async function POST(request: NextRequest) {
     };
     
     // 受信データから有効な値のみを追加（空文字とslugは除外、日付フィールドの空文字はnullに変換）
-    const organizationData: any = { ...baseData };
+    let organizationData: any = { ...baseData };
     // ✅ 日付フィールドは完全除去（UIに存在しない）
     const dateFields = []; // foundedフィールドはUIに存在しないため完全除去
     
@@ -322,6 +322,12 @@ export async function POST(request: NextRequest) {
     ];
     
     Object.entries(body).forEach(([key, value]) => {
+      // ✅ 特別に founded フィールドを完全除外（DBエラー回避）
+      if (key === 'founded') {
+        console.log('🚫 founded フィールドを明示的に除外:', value);
+        return; // skip completely
+      }
+      
       if (key !== 'name' && key !== 'slug' && allowedFields.includes(key)) {
         // ✅ 強化された空文字・null・undefined除外ロジック
         
@@ -362,6 +368,19 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('🔍 Complete organization data for INSERT:', JSON.stringify(organizationData, null, 2));
+
+    // ✅ 日付フィールドの正規化適用
+    organizationData = normalizeDateFields(organizationData);
+    
+    // ✅ 保険: established_at が空なら未送信にする（PostgreSQL DATE型エラー回避）
+    if (
+      organizationData.established_at === '' ||
+      organizationData.established_at === undefined ||
+      organizationData.established_at === null
+    ) {
+      delete organizationData.established_at;
+      console.log('🔍 established_at を削除（空文字回避）');
+    }
 
     const { data, error } = await supabase
       .from('organizations')
@@ -509,6 +528,16 @@ export async function PUT(request: NextRequest) {
       ...normalizedData,
       updated_at: new Date().toISOString(),
     };
+
+    // ✅ 保険: established_at が空なら未送信にする（PostgreSQL DATE型エラー回避）
+    if (
+      updateData.established_at === '' ||
+      updateData.established_at === undefined ||
+      updateData.established_at === null
+    ) {
+      delete updateData.established_at;
+      console.log('🔍 UPDATE: established_at を削除（空文字回避）');
+    }
 
     const { data, error } = await supabase
       .from('organizations')
