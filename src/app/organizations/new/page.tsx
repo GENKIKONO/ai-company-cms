@@ -211,17 +211,17 @@ export default function NewOrganizationPage() {
 
     setSubmitting(true);
     try {
-      // ✅ 根本修正: 実際のDBスキーマに存在するフィールドのみ送信
+      // ✅ 根本修正: 基本スキーマのフィールドのみ送信（拡張は本番DB未適用）
       const allowedFields = [
-        // 001_initial_schema.sql で定義されたフィールド
+        // 001_initial_schema.sql で定義されたフィールド（確実に存在する）
         'description', 'legal_form', 'representative_name', 'founded', 'capital', 'employees',
         'address_country', 'address_region', 'address_locality', 'address_postal_code', 'address_street',
         'telephone', 'email', 'email_public', 'url', 'logo_url', 'industries', 'same_as', 'status',
-        'meta_title', 'meta_description', 'meta_keywords', 'slug',
-        // 拡張マイグレーションで追加されたフィールド
-        'favicon_url', 'brand_color_primary', 'brand_color_secondary', 'social_media', 'business_hours',
-        'timezone', 'languages_supported', 'certifications', 'awards', 'company_culture', 
-        'mission_statement', 'vision_statement', 'values'
+        'meta_title', 'meta_description', 'meta_keywords', 'slug'
+        // 拡張フィールドは本番DBに未適用のため一時的に除外
+        // 'favicon_url', 'brand_color_primary', 'brand_color_secondary', 'social_media', 'business_hours',
+        // 'timezone', 'languages_supported', 'certifications', 'awards', 'company_culture', 
+        // 'mission_statement', 'vision_statement', 'values'
       ];
       
       const cleanData: any = {
