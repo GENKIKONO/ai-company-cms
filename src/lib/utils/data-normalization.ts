@@ -192,9 +192,7 @@ export function normalizeOrganizationPayload(data: any) {
     'address_country',
     'telephone',
     'email',
-    // founded フィールドはUIに存在しないため完全除去
-    'established_at', // 日付型フィールド：空文字をnullに正規化
-    'establishment_date',
+    // founded と establishment_date フィールドはUIに存在しないため完全除去
     'legal_form',
     'representative_name',
     // Enhanced organization settings (I1)

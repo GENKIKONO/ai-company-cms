@@ -363,14 +363,9 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 Complete organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
-    // ✅ 緊急修正: foundedフィールドを明示的に除外（DBにカラムは存在するがUIには存在しない）
-    const { founded, ...organizationDataWithoutFounded } = organizationData;
-    
-    console.log('🔍 FINAL INSERT (founded excluded):', JSON.stringify(organizationDataWithoutFounded, null, 2));
-
     const { data, error } = await supabase
       .from('organizations')
-      .insert([organizationDataWithoutFounded])
+      .insert([organizationData])
       .select()
       .single();
 

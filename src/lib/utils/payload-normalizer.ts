@@ -33,7 +33,7 @@ export function normalizeEmptyStrings(obj: any): any {
 /**
  * 日付フィールドの正規化（空文字 → null）
  */
-export function normalizeDateFields(obj: any, dateFields: string[] = ['establishment_date', 'created_at', 'updated_at']): any {
+export function normalizeDateFields(obj: any, dateFields: string[] = ['created_at', 'updated_at']): any {
   const normalized = { ...obj };
   
   for (const field of dateFields) {
