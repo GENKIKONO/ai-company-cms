@@ -184,7 +184,7 @@ export class AIOHubSDK {
       if (filters.hasCaseStudies !== undefined) searchParams.set('hasCaseStudies', filters.hasCaseStudies.toString());
       if (filters.isVerified !== undefined) searchParams.set('isVerified', filters.isVerified.toString());
       if (filters.lastUpdated) searchParams.set('lastUpdated', filters.lastUpdated);
-      if (filters.foundedYears) searchParams.set('foundedYears', filters.foundedYears.join(','));
+      if (filters.establishedYears) searchParams.set('establishedYears', filters.establishedYears.join(','));
       if (filters.employeeCount) searchParams.set('employeeCount', filters.employeeCount.join(','));
       if (filters.rating) searchParams.set('rating', filters.rating.join(','));
       if (filters.page) searchParams.set('page', filters.page.toString());

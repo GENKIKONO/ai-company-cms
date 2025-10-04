@@ -53,7 +53,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
 
   const renderOrganizationCard = (org: Organization) => {
     const location = [org.address_locality, org.address_region].filter(Boolean).join('、');
-    const foundedYear = org.founded ? new Date(org.founded).getFullYear() : null;
+    const foundedYear = org.established_at ? new Date(org.established_at).getFullYear() : null;
 
     return (
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow">

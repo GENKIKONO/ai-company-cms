@@ -246,16 +246,14 @@ export default function NewOrganizationPage() {
       
       // Single-Org API経由で作成
       // 🚨 フロント送信前の最終クリーニング: 日付フィールドの空文字をnullに変換
-      const finalCleanData = { ...minimalData };
-      const criticalDateFields = ['established_at', 'founded'];
-      criticalDateFields.forEach(field => {
-        if (finalCleanData[field] === '') {
-          console.warn(`🚨 Frontend: Converting empty ${field} to null`);
-          finalCleanData[field] = null;
-        }
-      });
-
-      console.log('🔍 Frontend: Final data before API call:', JSON.stringify(finalCleanData, null, 2));
+      const payload = { ...minimalData };
+      
+      // established_at 空文字チェック
+      if (payload.established_at === '') {
+        delete (payload as any).established_at;
+      }
+      
+      console.log('Frontend: FINAL payload before fetch:', payload);
 
       const response = await fetch('/api/my/organization', {
         method: 'POST',
@@ -263,7 +261,7 @@ export default function NewOrganizationPage() {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(finalCleanData),
+        body: JSON.stringify(payload),
       });
       
       if (!response.ok) {

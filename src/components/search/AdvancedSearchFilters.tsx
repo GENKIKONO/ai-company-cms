@@ -10,7 +10,7 @@ export interface AdvancedFilters {
   industries: string[];
   regions: string[];
   categories: string[];
-  foundedYear?: {
+  establishedYear?: {
     min?: number;
     max?: number;
   };
@@ -22,7 +22,7 @@ export interface AdvancedFilters {
     min?: number;
     max?: number;
   };
-  sortBy: 'relevance' | 'name' | 'founded' | 'rating' | 'updated';
+  sortBy: 'relevance' | 'name' | 'established' | 'rating' | 'updated';
   sortOrder: 'asc' | 'desc';
 }
 
@@ -99,8 +99,8 @@ export default function AdvancedSearchFilters({
     filters.regions.length > 0 ||
     filters.categories.length > 0 ||
     filters.companySize?.length || 0 > 0 ||
-    filters.foundedYear?.min ||
-    filters.foundedYear?.max ||
+    filters.establishedYear?.min ||
+    filters.establishedYear?.max ||
     filters.rating ||
     filters.hasAwards ||
     filters.hasCertifications ||
@@ -268,16 +268,16 @@ export default function AdvancedSearchFilters({
           <div>
             <h3 className="flex items-center gap-2 font-medium text-gray-900 dark:text-gray-100 mb-3">
               <Calendar className="w-4 h-4" />
-              {t('search.filters.foundedYear')}
+              {t('search.filters.establishedYear')}
             </h3>
             <div className="flex gap-2">
               <input
                 type="number"
                 placeholder={t('search.min')}
-                value={filters.foundedYear?.min || ''}
+                value={filters.establishedYear?.min || ''}
                 onChange={(e) => updateFilters({
-                  foundedYear: {
-                    ...filters.foundedYear,
+                  establishedYear: {
+                    ...filters.establishedYear,
                     min: e.target.value ? parseInt(e.target.value) : undefined
                   }
                 })}
@@ -288,10 +288,10 @@ export default function AdvancedSearchFilters({
               <input
                 type="number"
                 placeholder={t('search.max')}
-                value={filters.foundedYear?.max || ''}
+                value={filters.establishedYear?.max || ''}
                 onChange={(e) => updateFilters({
-                  foundedYear: {
-                    ...filters.foundedYear,
+                  establishedYear: {
+                    ...filters.establishedYear,
                     max: e.target.value ? parseInt(e.target.value) : undefined
                   }
                 })}
@@ -347,7 +347,7 @@ export default function AdvancedSearchFilters({
         >
           <option value="relevance">{t('search.sort.relevance')}</option>
           <option value="name">{t('search.sort.name')}</option>
-          <option value="founded">{t('search.sort.founded')}</option>
+          <option value="established">{t('search.sort.established')}</option>
           <option value="updated">{t('search.sort.updated')}</option>
         </select>
         <select

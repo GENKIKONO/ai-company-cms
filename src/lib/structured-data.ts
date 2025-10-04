@@ -133,8 +133,8 @@ export class StructuredDataGenerator {
     }
 
     // Additional data
-    if (organization.founded) {
-      data.foundingDate = organization.founded;
+    if (organization.established_at) {
+      data.foundingDate = organization.established_at;
     }
 
     if (organization.employees) {

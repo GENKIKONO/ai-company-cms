@@ -245,7 +245,7 @@ export class ExportService {
             <div class="org-info">
                 ${org.address_region ? `📍 ${org.address_region}` : ''}
                 ${org.employees ? ` | 👥 ${org.employees}名` : ''}
-                ${org.founded ? ` | 🗓 ${new Date(org.founded).getFullYear()}年設立` : ''}
+                ${org.established_at ? ` | 🗓 ${new Date(org.established_at).getFullYear()}年設立` : ''}
             </div>
             ${org.description ? `<p style="margin: 10px 0; font-size: 14px;">${org.description}</p>` : ''}
             ${org.industries && org.industries.length > 0 ? `
@@ -269,7 +269,7 @@ export class ExportService {
       organizations,
       comparison: {
         employees: organizations.map(o => ({ name: o.name, value: o.employees || 0 })),
-        founded: organizations.map(o => ({ name: o.name, value: o.founded ? new Date(o.founded).getFullYear() : null })),
+        established: organizations.map(o => ({ name: o.name, value: o.established_at ? new Date(o.established_at).getFullYear() : null })),
         industries: organizations.map(o => ({ name: o.name, value: o.industries?.length || 0 })),
         hasWebsite: organizations.map(o => ({ name: o.name, value: !!o.url })),
         hasLogo: organizations.map(o => ({ name: o.name, value: !!o.logo_url }))

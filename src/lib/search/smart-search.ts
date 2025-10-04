@@ -355,7 +355,7 @@ export class SmartSearchEngine {
         case 'year':
           if (typeof entity.value === 'number') {
             // 設立年の範囲を設定（前後5年）
-            filters.foundedYear = {
+            filters.establishedYear = {
               min: entity.value - 5,
               max: entity.value + 5,
             };

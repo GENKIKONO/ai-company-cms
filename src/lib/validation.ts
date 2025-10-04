@@ -10,7 +10,7 @@ export const organizationSchema = z.object({
   telephone: z.string().min(1, '電話番号は必須です'),
   url: z.string().url('有効なURLを入力してください'),
   logoUrl: z.string().url('有効なURLを入力してください').optional().or(z.literal('')),
-  founded: z.string().optional(),
+  established_at: z.string().optional(),
   streetAddress: z.string().optional(),
   postalCode: z.string().regex(/^\d{3}-\d{4}$/, '郵便番号は000-0000の形式で入力してください').optional().or(z.literal('')),
   email: z.string().email('有効なメールアドレスを入力してください').optional().or(z.literal('')),

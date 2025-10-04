@@ -11,7 +11,7 @@ export interface ExtractionResult {
   address?: string;
   website?: string;
   industry?: string;
-  founded?: string;
+  established_at?: string;
   employees?: string;
   capital?: string;
   representative?: string;

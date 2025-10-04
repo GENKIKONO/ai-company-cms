@@ -39,7 +39,7 @@ export interface Organization {
   description?: string;
   legal_form?: string;
   representative_name?: string;
-  founded?: string;
+  established_at?: string | null;
   capital?: number;
   employees?: number;
   address_country: string;
@@ -276,7 +276,7 @@ export interface OrganizationFormData {
   description: string;
   legal_form?: string;
   representative_name?: string;
-  // founded?: string;  // UIに入力欄がないため型定義から除外
+  established_at?: string;
   capital?: number;
   employees?: number;
   address_country: string;

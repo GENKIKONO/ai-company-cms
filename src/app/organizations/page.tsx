@@ -88,8 +88,8 @@ export default function OrganizationsPage() {
       switch (filters.sortBy) {
         case 'name':
           return a.name.localeCompare(b.name);
-        case 'founded':
-          return (parseInt((b.founded as unknown) as string) || 0) - (parseInt((a.founded as unknown) as string) || 0);
+        case 'established':
+          return (parseInt((b.established_at as unknown) as string) || 0) - (parseInt((a.established_at as unknown) as string) || 0);
         case 'employees':
           return (parseInt((b.employees as unknown) as string) || 0) - (parseInt((a.employees as unknown) as string) || 0);
         case 'services':

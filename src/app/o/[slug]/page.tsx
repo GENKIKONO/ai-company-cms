@@ -207,11 +207,11 @@ export default async function OrganizationDetailPage({
                         <dd className="mt-1 text-sm text-gray-900">{organization.representative_name}</dd>
                       </div>
                     )}
-                    {organization.founded && (
+                    {organization.established_at && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500">設立</dt>
                         <dd className="mt-1 text-sm text-gray-900">
-                          {new Date(organization.founded).toLocaleDateString('ja-JP')}
+                          {new Date(organization.established_at).toLocaleDateString('ja-JP')}
                         </dd>
                       </div>
                     )}

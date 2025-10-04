@@ -12,7 +12,7 @@ export interface AdvancedSearchFilters {
   industries: string[];
   regions: string[];
   categories: string[];
-  foundedYear?: {
+  establishedYear?: {
     min?: number;
     max?: number;
   };
@@ -24,7 +24,7 @@ export interface AdvancedSearchFilters {
     min?: number;
     max?: number;
   };
-  sortBy: 'relevance' | 'name' | 'founded' | 'rating' | 'updated';
+  sortBy: 'relevance' | 'name' | 'established' | 'rating' | 'updated';
   sortOrder: 'asc' | 'desc';
   limit?: number;
   offset?: number;
@@ -137,12 +137,12 @@ async function searchOrganizations(filters: AdvancedSearchFilters) {
   }
 
   // 設立年フィルター
-  if (filters.foundedYear?.min || filters.foundedYear?.max) {
-    if (filters.foundedYear.min) {
-      query = query.gte('founded_date', `${filters.foundedYear.min}-01-01`);
+  if (filters.establishedYear?.min || filters.establishedYear?.max) {
+    if (filters.establishedYear.min) {
+      query = query.gte('established_at', `${filters.establishedYear.min}-01-01`);
     }
-    if (filters.foundedYear.max) {
-      query = query.lte('founded_date', `${filters.foundedYear.max}-12-31`);
+    if (filters.establishedYear.max) {
+      query = query.lte('established_at', `${filters.establishedYear.max}-12-31`);
     }
   }
 
@@ -410,7 +410,7 @@ function getSortColumn(table: string, sortBy: string): string {
   const columnMap: Record<string, Record<string, string>> = {
     organizations: {
       name: 'name',
-      founded: 'founded_date',
+      established: 'established_at',
       updated: 'updated_at'
     },
     services: {

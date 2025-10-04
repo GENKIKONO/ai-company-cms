@@ -25,6 +25,7 @@ import {
 } from '@/lib/api/error-responses';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
 import { normalizePayload, normalizeDateFields, normalizeForInsert, findEmptyDateFields } from '@/lib/utils/payload-normalizer';
+import { buildOrgInsert } from '@/lib/utils/org-whitelist';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
@@ -370,20 +371,20 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Complete organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
     // 🚀 GPT恒久対策: 空文字の日付フィールドを検出（デバッグ用）
-    const emptyDates = findEmptyDateFields(organizationData, ['established_at', 'founded']);
+    const emptyDates = findEmptyDateFields(organizationData, ['established_at']);
     if (emptyDates.length) {
       console.warn('⚠️ Empty date fields detected, normalizing:', emptyDates);
     }
 
     // 🚀 GPT恒久対策: INSERT直前の確実な正規化
     organizationData = normalizeForInsert(organizationData, {
-      dateFields: ['established_at', 'founded'], // DBにある日付カラムを列挙
+      dateFields: ['established_at'], // DBにある日付カラムを列挙
     });
 
     console.log('🔍 Normalized organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
     // 🚨 最終ガード: normalizeForInsert後でも空文字が残っている場合の緊急対応
-    const dateFieldsToCheck = ['established_at', 'founded'];
+    const dateFieldsToCheck = ['established_at'];
     dateFieldsToCheck.forEach(field => {
       if (organizationData[field] === '') {
         console.error(`🚨 EMERGENCY: ${field} still contains empty string after normalization!`);
@@ -395,9 +396,13 @@ export async function POST(request: NextRequest) {
     // 最終データ確認ログ
     console.log('🔍 FINAL organization data for INSERT (after emergency guard):', JSON.stringify(organizationData, null, 2));
 
+    // ホワイトリスト＆空文字スクラブ適用
+    const insertPayload = buildOrgInsert(organizationData);
+    console.log('API/my/organization INSERT payload (final):', insertPayload);
+
     const { data, error } = await supabase
       .from('organizations')
-      .insert([organizationData])
+      .insert([insertPayload])
       .select()
       .single();
 
@@ -543,20 +548,20 @@ export async function PUT(request: NextRequest) {
     };
 
     // 🚀 GPT恒久対策: 空文字の日付フィールドを検出（デバッグ用）
-    const emptyDatesUpdate = findEmptyDateFields(updateData, ['established_at', 'founded']);
+    const emptyDatesUpdate = findEmptyDateFields(updateData, ['established_at']);
     if (emptyDatesUpdate.length) {
       console.warn('⚠️ UPDATE: Empty date fields detected, normalizing:', emptyDatesUpdate);
     }
 
     // 🚀 GPT恒久対策: UPDATE直前の確実な正規化
     updateData = normalizeForInsert(updateData, {
-      dateFields: ['established_at', 'founded'], // DBにある日付カラムを列挙
+      dateFields: ['established_at'], // DBにある日付カラムを列挙
     });
 
     console.log('🔍 Normalized update data:', JSON.stringify(updateData, null, 2));
 
     // 🚨 最終ガード: UPDATE時も空文字が残っている場合の緊急対応
-    const updateDateFieldsToCheck = ['established_at', 'founded'];
+    const updateDateFieldsToCheck = ['established_at'];
     updateDateFieldsToCheck.forEach(field => {
       if (updateData[field] === '') {
         console.error(`🚨 UPDATE EMERGENCY: ${field} still contains empty string after normalization!`);
@@ -568,9 +573,13 @@ export async function PUT(request: NextRequest) {
     // 最終データ確認ログ
     console.log('🔍 FINAL update data (after emergency guard):', JSON.stringify(updateData, null, 2));
 
+    // ホワイトリスト＆空文字スクラブ適用
+    const updatePayload = buildOrgInsert(updateData);
+    console.log('API/my/organization UPDATE payload (final):', updatePayload);
+
     const { data, error } = await supabase
       .from('organizations')
-      .update(updateData)
+      .update(updatePayload)
       .eq('id', existingOrg.id)
       .eq('created_by', (authResult as AuthContext).user.id) // セキュリティのため二重チェック
       .select()

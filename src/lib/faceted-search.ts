@@ -16,7 +16,7 @@ export interface SearchFilters {
   hasFaqs?: boolean;
   isVerified?: boolean;
   lastUpdated?: string;
-  foundedYears?: string[];
+  establishedYears?: string[];
   employeeCount?: string[];
   rating?: string[];
 }

@@ -151,9 +151,9 @@ export function generateOrganizationJsonLd(org: Organization): OrganizationJsonL
     jsonLd.description = org.description;
   }
 
-  // 設立日（foundedではなくfoundingDate）
-  if (org.founded) {
-    jsonLd.foundingDate = org.founded;
+  // 設立日（established_atからfoundingDate）
+  if (org.established_at) {
+    jsonLd.foundingDate = org.established_at;
   }
 
   // Enhanced organization properties (I1)

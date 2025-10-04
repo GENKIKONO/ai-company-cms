@@ -31,8 +31,8 @@ export function generateOrganizationJsonLd(organization: Organization) {
     jsonLd.telephone = organization.telephone;
   }
 
-  if (organization.founded) {
-    jsonLd.foundingDate = organization.founded;
+  if (organization.established_at) {
+    jsonLd.foundingDate = organization.established_at;
   }
 
   if (organization.url) {
