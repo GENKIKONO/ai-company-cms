@@ -244,8 +244,7 @@ export async function POST(request: NextRequest) {
       name: normalizedRawBody.name ? `${normalizedRawBody.name.substring(0,2)}***` : normalizedRawBody.name,
       email: normalizedRawBody.email ? normalizedRawBody.email?.replace(/(.{2}).*(@.*)/, '$1***$2') : 'undefined',
       hasEmptyStrings: Object.values(normalizedRawBody).some(v => v === ''),
-      // 日付系フィールドの状態確認
-      ...(normalizedRawBody.founded !== undefined && { founded: normalizedRawBody.founded }),
+      // 日付系フィールドの状態確認（foundedフィールドはUIに存在しないため除外）
     });
 
     // 統一バリデーション（正規化済みデータ使用）
@@ -260,8 +259,7 @@ export async function POST(request: NextRequest) {
         keys: Object.keys(body),
         name: body.name ? `${body.name.substring(0,2)}***` : body.name,
         slug: body.slug || 'UNDEFINED',
-        // 実際に存在する日付系フィールドのみチェック
-        ...(bodyAny.founded !== undefined && { founded: bodyAny.founded }),
+        // 実際に存在する日付系フィールドのみチェック（foundedフィールドはUIに存在しないため除外）
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -306,16 +304,17 @@ export async function POST(request: NextRequest) {
     
     // 受信データから有効な値のみを追加（空文字とslugは除外、日付フィールドの空文字はnullに変換）
     const organizationData: any = { ...baseData };
-    // ✅ 実際に存在する日付フィールドのみ定義
-    const dateFields = ['founded']; // establishment_date, established_at は存在しないため除外
+    // ✅ 日付フィールドは完全除去（UIに存在しない）
+    const dateFields = []; // foundedフィールドはUIに存在しないため完全除去
     
     // ✅ 実際のDBスキーマに存在するフィールドのみ許可（基本スキーマのみ - 拡張は未適用）
     const allowedFields = [
       // 001_initial_schema.sql で定義されたフィールド（確実に存在する）
-      'description', 'legal_form', 'representative_name', 'founded', 'capital', 'employees',
+      'description', 'legal_form', 'representative_name', 'capital', 'employees',
       'address_country', 'address_region', 'address_locality', 'address_postal_code', 'address_street',
       'telephone', 'email', 'email_public', 'url', 'logo_url', 'industries', 'same_as', 'status',
       'meta_title', 'meta_description', 'meta_keywords',
+      // foundedフィールドはUIに存在しないため完全除外
       // 拡張フィールドは本番DBに未適用のため一時的に除外
       // 'favicon_url', 'brand_color_primary', 'brand_color_secondary', 'social_media', 'business_hours',
       // 'timezone', 'languages_supported', 'certifications', 'awards', 'company_culture', 
@@ -357,7 +356,7 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Final insert data (cleaned):', {
       keys: Object.keys(organizationData),
       hasEmptyStrings: Object.values(organizationData).some(v => v === ''),
-      // foundedフィールドはUIに存在しないため除外済み
+      // foundedフィールドはUIに存在しないため処理対象外
     });
 
     console.log('Simple organization data:', organizationData);
