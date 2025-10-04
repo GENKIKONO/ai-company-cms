@@ -356,10 +356,12 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Final insert data (cleaned):', {
       keys: Object.keys(organizationData),
       hasEmptyStrings: Object.values(organizationData).some(v => v === ''),
+      hasFoundedField: 'founded' in organizationData ? 'PRESENT' : 'ABSENT',
+      foundedValue: organizationData.founded || 'UNDEFINED',
       // foundedフィールドはUIに存在しないため処理対象外
     });
 
-    console.log('Simple organization data:', organizationData);
+    console.log('🔍 Complete organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
     const { data, error } = await supabase
       .from('organizations')
