@@ -41,7 +41,7 @@ export const organizationCreateSchema = z.object({
   description: optionalString(),
   legal_form: optionalString(),
   representative_name: optionalString(),
-  founded: z.string().optional().transform(val => val === '' ? undefined : val), // 空文字を除外
+  // founded フィールドはUIに存在しないため完全除去
   capital: z.number().optional(),
   employees: z.number().optional(),
   // 住所情報
