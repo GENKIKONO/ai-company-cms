@@ -182,13 +182,29 @@ export default function NewOrganizationPage() {
         name: formData.name.trim(),
       };
       
-      // ✅ 完全な空文字・null・undefined除外ロジック（APIと一致）
+      // ✅ 強化された空文字・null・undefined除外ロジック（日付フィールド特別処理）
+      const dateFields = ['founded']; // 日付フィールドリスト
+      
       Object.entries(formData).forEach(([key, value]) => {
         if (key !== 'name' && allowedFields.includes(key)) {
-          // 文字列の場合：空文字・null・undefinedを完全除外
-          if (typeof value === 'string') {
+          // 日付フィールドの特別処理：空文字は完全に除外
+          if (dateFields.includes(key)) {
+            if (typeof value === 'string') {
+              const trimmedValue = value.trim();
+              // 空文字、undefined、nullを完全に除外し、有効な日付形式のみ受け入れ
+              if (trimmedValue !== '' && trimmedValue !== 'undefined' && trimmedValue !== 'null') {
+                // 日付形式チェック（YYYY-MM-DD）
+                if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+                  cleanData[key] = trimmedValue;
+                }
+              }
+            }
+            // 日付フィールドで空文字の場合は完全にスキップ（DBに送信しない）
+          }
+          // 通常の文字列フィールド：空文字・null・undefinedを完全除外
+          else if (typeof value === 'string') {
             const trimmedValue = value.trim();
-            if (trimmedValue !== '') {
+            if (trimmedValue !== '' && trimmedValue !== 'undefined' && trimmedValue !== 'null') {
               cleanData[key] = trimmedValue;
             }
           }
@@ -219,12 +235,17 @@ export default function NewOrganizationPage() {
         name: formData.name,
         slug: formData.slug,
         // 実際に存在する日付系フィールドのみチェック
-        ...(formDataAny.founded !== undefined && { founded: formDataAny.founded }),
+        ...(formDataAny.founded !== undefined && { founded: `"${formDataAny.founded}"` }),
         // 空文字かどうかもチェック
         allKeys: Object.keys(formData),
         emptyStringFields: Object.entries(formData).filter(([k, v]) => v === '').map(([k]) => k),
       });
       console.info('📤 実際の送信データ:', minimalData);
+      console.info('🔍 日付フィールド処理状況:', {
+        foundedInput: formData.founded ? `"${formData.founded}"` : 'NOT_PROVIDED',
+        foundedInOutput: 'founded' in minimalData ? `"${minimalData.founded}"` : 'FILTERED_OUT',
+        dateFieldsProcessed: dateFields.map(field => `${field}: ${formData[field] ? `"${formData[field]}"` : 'empty'} -> ${field in minimalData ? `"${minimalData[field]}"` : 'FILTERED_OUT'}`),
+      });
       
       // Single-Org API経由で作成
       const response = await fetch('/api/my/organization', {
