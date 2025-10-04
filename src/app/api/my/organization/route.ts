@@ -325,15 +325,24 @@ export async function POST(request: NextRequest) {
     
     Object.entries(body).forEach(([key, value]) => {
       if (key !== 'name' && key !== 'slug' && allowedFields.includes(key)) {
-        // 日付フィールドの場合、空文字やnullは完全に除外（フィールド自体を含めない）
+        // ✅ 完全な空文字・null・undefined除外ロジック
+        
+        // 日付フィールド: 完全除外（DBに送信しない）
         if (dateFields.includes(key)) {
-          if (value && value !== '' && value !== null && value !== undefined) {
-            organizationData[key] = value;
+          if (value && typeof value === 'string' && value.trim() !== '') {
+            organizationData[key] = value.trim();
           }
-          // 空文字やnullの場合は何もしない（フィールドを追加しない）
+          // 空文字・null・undefinedの場合は完全にスキップ
         }
-        // その他のフィールドで有効な値のみを追加
-        else if (value !== '' && value !== null && value !== undefined) {
+        // 文字列フィールド: 空文字は除外
+        else if (typeof value === 'string') {
+          const trimmedValue = value.trim();
+          if (trimmedValue !== '') {
+            organizationData[key] = trimmedValue;
+          }
+        }
+        // ブール値・数値・配列・オブジェクト: null/undefinedでなければ追加
+        else if (value !== null && value !== undefined) {
           organizationData[key] = value;
         }
       }

@@ -31,22 +31,54 @@ export const organizationStatusSchema = z.enum([
 
 /**
  * 企業作成スキーマ（POST /api/my/organization）
+ * ✅ 実際のDBスキーマ（001_initial_schema.sql）に完全一致
  * 最小限: nameのみ必須、その他は任意
  */
 export const organizationCreateSchema = z.object({
   name: requiredString(1, 255),
   slug: optionalSlugField(),
-  // フロントエンドから送信される可能性のあるフィールド
+  // ✅ 実際のDBに存在するフィールドのみ定義
+  description: optionalString(),
+  legal_form: optionalString(),
+  representative_name: optionalString(),
+  founded: z.string().optional().transform(val => val === '' ? undefined : val), // 空文字を除外
+  capital: z.number().optional(),
+  employees: z.number().optional(),
+  // 住所情報
   address_country: optionalString(),
+  address_region: optionalString(),
+  address_locality: optionalString(),
+  address_postal_code: optionalString(),
+  address_street: optionalString(),
+  // 連絡先情報
+  telephone: phoneField().optional(),
+  email: emailField().optional(),
+  email_public: z.boolean().optional(),
+  url: urlField().optional(),
+  logo_url: urlField().optional(),
+  // ビジネス情報
+  industries: z.array(z.string()).optional(),
+  same_as: z.array(z.string()).optional(),
+  status: organizationStatusSchema.optional(),
+  // SEO情報
+  meta_title: optionalString(),
+  meta_description: optionalString(),
+  meta_keywords: z.array(z.string()).optional(),
+  // 拡張フィールド（マイグレーションで追加済み）
+  favicon_url: urlField().optional(),
   brand_color_primary: colorField().optional(),
   brand_color_secondary: colorField().optional(),
-  description: optionalString(),
-  url: urlField().optional(),
-  email: emailField().optional(),
-  telephone: phoneField().optional(),
-  founded: optionalString(),
-  established_at: optionalString(),
-}); // strict()モードを削除してフレキシブルに
+  social_media: z.record(z.string()).optional(),
+  business_hours: z.array(z.any()).optional(),
+  timezone: optionalString(),
+  languages_supported: z.array(z.string()).optional(),
+  certifications: z.array(z.string()).optional(),
+  awards: z.array(z.string()).optional(),
+  company_culture: optionalString(),
+  mission_statement: optionalString(),
+  vision_statement: optionalString(),
+  values: z.array(z.string()).optional(),
+});
 
 /**
  * 企業更新スキーマ（PUT /api/my/organization）

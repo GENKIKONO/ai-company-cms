@@ -228,23 +228,30 @@ export default function NewOrganizationPage() {
         name: formData.name.trim(),
       };
       
-      // 許可されたフィールドで値があるもののみ追加（デフォルト値や空文字は除外）
+      // ✅ 完全な空文字・null・undefined除外ロジック（APIと一致）
       Object.entries(formData).forEach(([key, value]) => {
         if (key !== 'name' && allowedFields.includes(key)) {
-          // 文字列の場合：空文字でないもののみ
-          if (typeof value === 'string' && value.trim() !== '') {
-            cleanData[key] = value.trim();
+          // 文字列の場合：空文字・null・undefinedを完全除外
+          if (typeof value === 'string') {
+            const trimmedValue = value.trim();
+            if (trimmedValue !== '') {
+              cleanData[key] = trimmedValue;
+            }
           }
-          // 数値の場合：有効な値のみ
+          // 数値の場合：有効な値のみ（NaN・null・undefined除外）
           else if (typeof value === 'number' && !isNaN(value)) {
             cleanData[key] = value;
           }
-          // ブール値の場合：そのまま追加
+          // ブール値の場合：null・undefinedでなければ追加
           else if (typeof value === 'boolean') {
             cleanData[key] = value;
           }
-          // 配列の場合：空でないもののみ
-          else if (Array.isArray(value) && value.length > 0) {
+          // 配列の場合：空でない、かつ要素が有効なもののみ
+          else if (Array.isArray(value) && value.length > 0 && value.some(item => item !== null && item !== undefined && item !== '')) {
+            cleanData[key] = value.filter(item => item !== null && item !== undefined && item !== '');
+          }
+          // オブジェクトの場合：null・undefinedでなければ追加
+          else if (value !== null && value !== undefined && typeof value === 'object') {
             cleanData[key] = value;
           }
         }
