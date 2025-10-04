@@ -71,3 +71,40 @@ export function normalizePayload(payload: any, userEmail?: string, dateFields?: 
   
   return normalized;
 }
+
+// GPT恒久対策: 型定義
+type AnyObj = Record<string, any>;
+
+/** 空文字や空配列/空オブジェクトを安全に除去・変換（恒久対策） */
+export function normalizeForInsert<T extends AnyObj>(
+  obj: T,
+  opts?: {
+    dateFields?: string[];
+  }
+): T {
+  const dateFields = opts?.dateFields ?? ['established_at', 'founded']; // 必要なら追加
+  const out: AnyObj = { ...obj };
+
+  // 1) 全フィールドの空文字を undefined に
+  for (const k of Object.keys(out)) {
+    if (out[k] === '') out[k] = undefined;
+    if (Array.isArray(out[k]) && out[k].length === 0) out[k] = undefined;
+    if (typeof out[k] === 'object' && out[k] && Object.keys(out[k]).length === 0) {
+      out[k] = undefined;
+    }
+  }
+
+  // 2) DATE フィールドは null に統一（undefined でも OK だが意図を明確化）
+  for (const field of dateFields) {
+    if (field in out && (out[field] === '' || out[field] === undefined)) {
+      out[field] = null;
+    }
+  }
+
+  return out as T;
+}
+
+/** デバッグ用: 空文字の日付フィールドを検出 */
+export function findEmptyDateFields(obj: Record<string, any>, fields: string[]): string[] {
+  return fields.filter(f => f in obj && obj[f] === '');
+}

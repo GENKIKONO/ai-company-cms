@@ -24,7 +24,7 @@ import {
   createErrorResponse
 } from '@/lib/api/error-responses';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
-import { normalizePayload, normalizeDateFields } from '@/lib/utils/payload-normalizer';
+import { normalizePayload, normalizeDateFields, normalizeForInsert, findEmptyDateFields } from '@/lib/utils/payload-normalizer';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
@@ -369,18 +369,18 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 Complete organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
-    // ✅ 日付フィールドの正規化適用
-    organizationData = normalizeDateFields(organizationData);
-    
-    // ✅ 保険: established_at が空なら未送信にする（PostgreSQL DATE型エラー回避）
-    if (
-      organizationData.established_at === '' ||
-      organizationData.established_at === undefined ||
-      organizationData.established_at === null
-    ) {
-      delete organizationData.established_at;
-      console.log('🔍 established_at を削除（空文字回避）');
+    // 🚀 GPT恒久対策: 空文字の日付フィールドを検出（デバッグ用）
+    const emptyDates = findEmptyDateFields(organizationData, ['established_at', 'founded']);
+    if (emptyDates.length) {
+      console.warn('⚠️ Empty date fields detected, normalizing:', emptyDates);
     }
+
+    // 🚀 GPT恒久対策: INSERT直前の確実な正規化
+    organizationData = normalizeForInsert(organizationData, {
+      dateFields: ['established_at', 'founded'], // DBにある日付カラムを列挙
+    });
+
+    console.log('🔍 Normalized organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
     const { data, error } = await supabase
       .from('organizations')
@@ -524,20 +524,23 @@ export async function PUT(request: NextRequest) {
     const normalizedData = normalizeOrganizationPayload(body);
 
     // 更新データの準備（created_byは変更不可）
-    const updateData = {
+    let updateData = {
       ...normalizedData,
       updated_at: new Date().toISOString(),
     };
 
-    // ✅ 保険: established_at が空なら未送信にする（PostgreSQL DATE型エラー回避）
-    if (
-      updateData.established_at === '' ||
-      updateData.established_at === undefined ||
-      updateData.established_at === null
-    ) {
-      delete updateData.established_at;
-      console.log('🔍 UPDATE: established_at を削除（空文字回避）');
+    // 🚀 GPT恒久対策: 空文字の日付フィールドを検出（デバッグ用）
+    const emptyDatesUpdate = findEmptyDateFields(updateData, ['established_at', 'founded']);
+    if (emptyDatesUpdate.length) {
+      console.warn('⚠️ UPDATE: Empty date fields detected, normalizing:', emptyDatesUpdate);
     }
+
+    // 🚀 GPT恒久対策: UPDATE直前の確実な正規化
+    updateData = normalizeForInsert(updateData, {
+      dateFields: ['established_at', 'founded'], // DBにある日付カラムを列挙
+    });
+
+    console.log('🔍 Normalized update data:', JSON.stringify(updateData, null, 2));
 
     const { data, error } = await supabase
       .from('organizations')
