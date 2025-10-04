@@ -40,7 +40,7 @@ export function createErrorResponse(
 /**
  * 認証エラー (401)
  */
-export function unauthorizedError(message = 'Authentication required'): NextResponse<ApiErrorResponse> {
+export function unauthorizedError(message = 'ログインしてください'): NextResponse<ApiErrorResponse> {
   return createErrorResponse('UNAUTHORIZED', message, 401);
 }
 
