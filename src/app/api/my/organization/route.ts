@@ -324,19 +324,26 @@ export async function POST(request: NextRequest) {
     
     Object.entries(body).forEach(([key, value]) => {
       if (key !== 'name' && key !== 'slug' && allowedFields.includes(key)) {
-        // ✅ 完全な空文字・null・undefined除外ロジック
+        // ✅ 強化された空文字・null・undefined除外ロジック
         
         // 日付フィールド: 完全除外（DBに送信しない）
         if (dateFields.includes(key)) {
-          if (value && typeof value === 'string' && value.trim() !== '') {
-            organizationData[key] = value.trim();
+          // 空文字、null、undefined、空白のみの文字列を完全に除外
+          if (value && typeof value === 'string') {
+            const trimmedValue = value.trim();
+            if (trimmedValue !== '' && trimmedValue !== 'undefined' && trimmedValue !== 'null') {
+              // 有効な日付形式のチェック（YYYY-MM-DD）
+              if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+                organizationData[key] = trimmedValue;
+              }
+            }
           }
           // 空文字・null・undefinedの場合は完全にスキップ
         }
         // 文字列フィールド: 空文字は除外
         else if (typeof value === 'string') {
           const trimmedValue = value.trim();
-          if (trimmedValue !== '') {
+          if (trimmedValue !== '' && trimmedValue !== 'undefined' && trimmedValue !== 'null') {
             organizationData[key] = trimmedValue;
           }
         }
@@ -350,6 +357,7 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Final insert data (cleaned):', {
       keys: Object.keys(organizationData),
       hasEmptyStrings: Object.values(organizationData).some(v => v === ''),
+      foundedProcessed: body.founded ? `"${body.founded}" -> ${organizationData.founded ? `"${organizationData.founded}"` : 'FILTERED_OUT'}` : 'NOT_PROVIDED',
     });
 
     console.log('Simple organization data:', organizationData);
