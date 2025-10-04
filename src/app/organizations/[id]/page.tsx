@@ -31,7 +31,7 @@ export default function EditOrganizationPage() {
     description: '',
     legal_form: '',
     representative_name: '',
-    founded: '',
+    // founded: '',  // UIに入力欄がないため完全除去
     capital: undefined,
     employees: undefined,
     address_country: 'JP',
@@ -90,7 +90,7 @@ export default function EditOrganizationPage() {
             description: org.description || '',
             legal_form: org.legal_form || '',
             representative_name: org.representative_name || '',
-            founded: org.founded || '',
+            // founded: org.founded || '',  // UIに入力欄がないため完全除去
             capital: org.capital,
             employees: org.employees,
             address_country: org.address_country || 'JP',
@@ -488,18 +488,7 @@ export default function EditOrganizationPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-              <div>
-                <label htmlFor="founded" className="block text-sm font-medium text-gray-700 mb-2">
-                  設立年月日
-                </label>
-                <input
-                  type="date"
-                  id="founded"
-                  value={formData.founded}
-                  onChange={(e) => handleInputChange('founded', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              {/* 設立年月日入力欄は除去済み（UIに存在しない） */}
 
               <div>
                 <label htmlFor="capital" className="block text-sm font-medium text-gray-700 mb-2">

@@ -276,7 +276,7 @@ export interface OrganizationFormData {
   description: string;
   legal_form?: string;
   representative_name?: string;
-  founded?: string;
+  // founded?: string;  // UIに入力欄がないため型定義から除外
   capital?: number;
   employees?: number;
   address_country: string;

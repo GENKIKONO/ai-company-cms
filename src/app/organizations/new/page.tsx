@@ -22,7 +22,7 @@ export default function NewOrganizationPage() {
     description: '',
     legal_form: '',
     representative_name: '',
-    founded: '',
+    // founded: '',  // UIに入力欄がないため完全除去
     capital: undefined,
     employees: undefined,
     address_country: 'JP',
@@ -168,10 +168,11 @@ export default function NewOrganizationPage() {
       // ✅ 根本修正: 基本スキーマのフィールドのみ送信（拡張は本番DB未適用）
       const allowedFields = [
         // 001_initial_schema.sql で定義されたフィールド（確実に存在する）
-        'description', 'legal_form', 'representative_name', 'founded', 'capital', 'employees',
+        'description', 'legal_form', 'representative_name', /* 'founded', */ 'capital', 'employees',
         'address_country', 'address_region', 'address_locality', 'address_postal_code', 'address_street',
         'telephone', 'email', 'email_public', 'url', 'logo_url', 'industries', 'same_as', 'status',
         'meta_title', 'meta_description', 'meta_keywords', 'slug'
+        // foundedはUIに入力欄がないため除外
         // 拡張フィールドは本番DBに未適用のため一時的に除外
         // 'favicon_url', 'brand_color_primary', 'brand_color_secondary', 'social_media', 'business_hours',
         // 'timezone', 'languages_supported', 'certifications', 'awards', 'company_culture', 
@@ -229,22 +230,18 @@ export default function NewOrganizationPage() {
       
       const minimalData = cleanData;
       
-      // 📥 送信前の詳細ログ（日付系フィールドの状態確認）
-      const formDataAny = formData as any;
+      // 📥 送信前の詳細ログ
       console.info('🚀 送信直前のフォームデータ:', {
         name: formData.name,
         slug: formData.slug,
-        // 実際に存在する日付系フィールドのみチェック
-        ...(formDataAny.founded !== undefined && { founded: `"${formDataAny.founded}"` }),
         // 空文字かどうかもチェック
         allKeys: Object.keys(formData),
         emptyStringFields: Object.entries(formData).filter(([k, v]) => v === '').map(([k]) => k),
       });
       console.info('📤 実際の送信データ:', minimalData);
-      console.info('🔍 日付フィールド処理状況:', {
-        foundedInput: formData.founded ? `"${formData.founded}"` : 'NOT_PROVIDED',
-        foundedInOutput: 'founded' in minimalData ? `"${minimalData.founded}"` : 'FILTERED_OUT',
-        dateFieldsProcessed: dateFields.map(field => `${field}: ${formData[field] ? `"${formData[field]}"` : 'empty'} -> ${field in minimalData ? `"${minimalData[field]}"` : 'FILTERED_OUT'}`),
+      console.info('🔍 foundedフィールド除外確認:', {
+        foundedInFormData: 'founded' in formData ? 'PRESENT' : 'ABSENT',
+        foundedInOutput: 'founded' in minimalData ? 'PRESENT' : 'ABSENT',
       });
       
       // Single-Org API経由で作成
@@ -475,18 +472,7 @@ export default function NewOrganizationPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-              <div>
-                <label htmlFor="founded" className="block text-sm font-medium text-gray-700 mb-2">
-                  設立年月日
-                </label>
-                <input
-                  type="date"
-                  id="founded"
-                  value={formData.founded}
-                  onChange={(e) => handleInputChange('founded', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                />
-              </div>
+              {/* 設立年月日入力欄を除去（UIに存在しない） */}
 
               <div>
                 <label htmlFor="capital" className="block text-sm font-medium text-gray-700 mb-2">

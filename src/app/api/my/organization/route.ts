@@ -357,7 +357,7 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Final insert data (cleaned):', {
       keys: Object.keys(organizationData),
       hasEmptyStrings: Object.values(organizationData).some(v => v === ''),
-      foundedProcessed: body.founded ? `"${body.founded}" -> ${organizationData.founded ? `"${organizationData.founded}"` : 'FILTERED_OUT'}` : 'NOT_PROVIDED',
+      // foundedフィールドはUIに存在しないため除外済み
     });
 
     console.log('Simple organization data:', organizationData);
