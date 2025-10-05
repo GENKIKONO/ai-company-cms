@@ -242,7 +242,17 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 [/api/organizations] Normalized organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
-    // ホワイトリスト＆空文字スクラブ適用
+    // ✅ 最終ガード：日付は空文字の可能性が少しでもあれば null を明示して送る
+    const finalGuardDateFields = ['established_at']; // 必要に応じて他のDATE型も追記
+    for (const f of finalGuardDateFields) {
+      const v = (organizationData as any)[f];
+      if (v === '' || v === undefined) {
+        (organizationData as any)[f] = null;   // ← キーを削除せず null を明示
+        console.log(`🔧 [FINAL GUARD] Set ${f} to null (was: ${JSON.stringify(v)})`);
+      }
+    }
+
+    // ホワイトリスト処理の前にこの修正を行う
     const insertPayload = buildOrgInsert(organizationData);
     console.log('API/organizations INSERT payload (final):', insertPayload);
 

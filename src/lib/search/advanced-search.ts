@@ -136,13 +136,19 @@ async function searchOrganizations(filters: AdvancedSearchFilters) {
     query = query.in('address_region', filters.regions);
   }
 
-  // 設立年フィルター
+  // 設立年フィルター (空文字チェック強化)
   if (filters.establishedYear?.min || filters.establishedYear?.max) {
-    if (filters.establishedYear.min) {
-      query = query.gte('established_at', `${filters.establishedYear.min}-01-01`);
+    if (filters.establishedYear.min && filters.establishedYear.min > 0) {
+      const minDate = `${filters.establishedYear.min}-01-01`;
+      if (minDate !== '-01-01' && minDate !== '0-01-01') { // 空文字・無効値チェック
+        query = query.gte('established_at', minDate);
+      }
     }
-    if (filters.establishedYear.max) {
-      query = query.lte('established_at', `${filters.establishedYear.max}-12-31`);
+    if (filters.establishedYear.max && filters.establishedYear.max > 0) {
+      const maxDate = `${filters.establishedYear.max}-12-31`;
+      if (maxDate !== '-12-31' && maxDate !== '0-12-31') { // 空文字・無効値チェック
+        query = query.lte('established_at', maxDate);
+      }
     }
   }
 

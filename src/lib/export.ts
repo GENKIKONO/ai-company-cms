@@ -21,7 +21,7 @@ export class ExportService {
   exportToCSV(organizations: Organization[], options: Partial<ExportOptions> = {}): void {
     const fields = options.fields || [
       'name', 'description', 'industries', 'address_region', 
-      'address_locality', 'employees', 'founded', 'url'
+      'address_locality', 'employees', 'established_at', 'url'
     ];
 
     const headers = fields.map(field => this.getFieldLabel(field));
@@ -63,7 +63,7 @@ export class ExportService {
   // Excelファイル風のCSVエクスポート（詳細版）
   exportToExcel(organizations: Organization[], options: Partial<ExportOptions> = {}): void {
     const fields = options.fields || [
-      'name', 'description', 'legal_form', 'industries', 'founded', 'employees',
+      'name', 'description', 'legal_form', 'industries', 'established_at', 'employees',
       'capital', 'representative_name', 'address_region', 'address_locality',
       'street_address', 'postal_code', 'telephone', 'email', 'url'
     ];
@@ -149,7 +149,7 @@ export class ExportService {
     }
     
     // 日付の場合
-    if (field.includes('date') || field === 'founded') {
+    if (field.includes('date') || field === 'established_at') {
       if (value) {
         value = new Date(value).toLocaleDateString('ja-JP');
       }

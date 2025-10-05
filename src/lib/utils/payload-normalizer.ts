@@ -82,7 +82,7 @@ export function normalizeForInsert<T extends AnyObj>(
     dateFields?: string[];
   }
 ): T {
-  const dateFields = opts?.dateFields ?? ['established_at', 'founded']; // 必要なら追加
+  const dateFields = opts?.dateFields ?? ['established_at']; // founded除去済み
   const out: AnyObj = { ...obj };
 
   // 1) 全フィールドの空文字を undefined に

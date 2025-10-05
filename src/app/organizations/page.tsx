@@ -89,7 +89,10 @@ export default function OrganizationsPage() {
         case 'name':
           return a.name.localeCompare(b.name);
         case 'established':
-          return (parseInt((b.established_at as unknown) as string) || 0) - (parseInt((a.established_at as unknown) as string) || 0);
+          // 空文字チェック強化
+          const bYear = b.established_at && b.established_at !== '' ? new Date(b.established_at).getFullYear() : 0;
+          const aYear = a.established_at && a.established_at !== '' ? new Date(a.established_at).getFullYear() : 0;
+          return (bYear || 0) - (aYear || 0);
         case 'employees':
           return (parseInt((b.employees as unknown) as string) || 0) - (parseInt((a.employees as unknown) as string) || 0);
         case 'services':
@@ -233,7 +236,7 @@ export default function OrganizationsPage() {
               >
                 <option value="name">名前順</option>
                 <option value="updated">更新日順</option>
-                <option value="founded">設立年順</option>
+                <option value="established">設立年順</option>
                 <option value="employees">従業員数順</option>
                 <option value="services">サービス数順</option>
               </select>

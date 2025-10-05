@@ -2,7 +2,7 @@
  * 安全なデータ取得関数 - SSRでthrowしない実装
  */
 
-import { createInternalHeaders } from './utils/base-url';
+import { serverFetch } from './serverFetch';
 
 interface SafeOrganizationData {
   id: string;
@@ -32,15 +32,14 @@ interface SafeDataResult<T> {
  */
 async function logToDiag(errorInfo: { errorId: string; at: string; note: string }) {
   try {
-    await fetch('/api/diag/ui', {
+    await serverFetch('/api/diag/ui', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'error',
         timestamp: new Date().toISOString(),
         ...errorInfo
-      }),
-      cache: 'no-store'
+      })
     });
   } catch {
     // 診断ログ送信失敗は無視
@@ -52,13 +51,8 @@ async function logToDiag(errorInfo: { errorId: string; at: string; note: string 
  */
 export async function getMyOrganizationSafe(reqHeaders?: Headers): Promise<SafeDataResult<SafeOrganizationData>> {
   try {
-    // ✅ 相対パス使用でECONNREFUSED解決
-    const headers = await createInternalHeaders(reqHeaders);
-
-    const response = await fetch('/api/my/organization', {
-      headers,
-      cache: 'no-store'
-    });
+    // ✅ serverFetch使用でSSR安定化
+    const response = await serverFetch('/api/my/organization');
 
     if (response.status === 401) {
       // ログインしていない場合

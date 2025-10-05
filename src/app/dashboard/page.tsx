@@ -54,7 +54,7 @@ export default async function DashboardPage() {
     }
 
     // 2. 認証OK & 組織なし → 企業作成導線
-    if (!organization) {
+    if (!organization?.id) {
       console.log('[Dashboard] No organization found');
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
