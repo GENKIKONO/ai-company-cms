@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001';
 
 export async function serverFetch(path: string, init: RequestInit = {}) {
   const url = new URL(path, BASE).toString();

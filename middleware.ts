@@ -135,7 +135,7 @@ export async function middleware(req: NextRequest) {
   }
 }
 
-// API と静的は除外（最小マッチャー）
+// API と静的は除外（包括的マッチャー）
 export const config = {
-  matcher: ['/dashboard'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'],
 };

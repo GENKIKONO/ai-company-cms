@@ -3,7 +3,7 @@ import { supabaseServer } from '@/lib/supabase-server'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabaseBrowser = await supabaseServer()
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.example.com'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001'
   
   // Generate basic pages
   const staticPages: MetadataRoute.Sitemap = [

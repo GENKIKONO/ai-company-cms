@@ -73,7 +73,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: '/',
       }
     ],
-    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.com'}/sitemap.xml`,
-    host: process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.com',
+    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001'}/sitemap.xml`,
+    host: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001',
   }
 }

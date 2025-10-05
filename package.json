@@ -48,7 +48,10 @@
     "prod:validate": "npm run typecheck && npm run lint && npm run test:unit",
     "deploy:staging": "vercel --target preview",
     "deploy:production": "vercel --prod",
-    "postdeploy": "npm run health:production && npm run test:production"
+    "postdeploy": "npm run health:production && npm run test:production",
+    "verify:local": "./scripts/verify-deployment.sh development localhost:3001 || true",
+    "verify:prod": "./scripts/verify-deployment.sh production aiohub.jp || true",
+    "verify:report": "node ./scripts/verify-report.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.8",

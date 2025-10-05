@@ -1,0 +1,41 @@
+[0;36m[INFO][0m 🚀 Starting deployment verification for development environment
+[0;36m[INFO][0m Target: http://localhost:3001
+[0;36m[INFO][0m Log file: /Users/kounogenki/Documents/LuxuCare株式会社/開発/logs/verify-development-localhost-3001-20251006080452.log
+[0;36m[INFO][0m 1️⃣ Checking root connectivity...
+[0;32m[SUCCESS][0m ✅ Root endpoint (HTTP 200)
+[0;36m[INFO][0m 2️⃣ Checking well-known files...
+[0;35m[RETRY][0m Retrying robots.txt (attempt 2/3) after 1s...
+[0;35m[RETRY][0m Retrying robots.txt (attempt 3/3) after 2s...
+[0;31m[ERROR][0m ❌ robots.txt failed after 3 attempts (HTTP 500)
+[0;32m[SUCCESS][0m ✅ sitemap.xml (HTTP 200)
+[0;36m[INFO][0m 3️⃣ Running comprehensive health check API...
+[0;32m[SUCCESS][0m ✅ Health check API passed
+[0;36m[INFO][0m 4️⃣ Testing organization API...
+[0;32m[SUCCESS][0m ✅ Organization API (expecting 401 for unauthenticated or 200) (HTTP 401)
+[0;36m[INFO][0m 5️⃣ Testing authentication endpoints...
+[0;32m[SUCCESS][0m ✅ Debug whoami endpoint (HTTP 200)
+=== SUMMARY BEGIN ===
+
+🔍 DEPLOYMENT VERIFICATION SUMMARY
+==================================
+Environment: development
+Domain: localhost:3001
+Target URL: http://localhost:3001
+Timestamp: 2025年 10月 6日 月曜日 08時05分01秒 JST
+Log file: /Users/kounogenki/Documents/LuxuCare株式会社/開発/logs/verify-development-localhost-3001-20251006080452.log
+
+Results:
+  Total checks: 6
+  Passed: 5
+  Failed: 1
+  Success rate: 83%
+
+✅ Health check API: PASSED
+[0;31m[ERROR][0m ❌ Verification failed
+❌ 1/6 checks failed
+❌ Review logs before proceeding
+
+Final Result: FAILED
+=== SUMMARY END ===
+
+[0;36m[INFO][0m Verification complete. Log saved to: /Users/kounogenki/Documents/LuxuCare株式会社/開発/logs/verify-development-localhost-3001-20251006080452.log
