@@ -21,6 +21,11 @@ interface SafeStatsData {
   archived: number;
 }
 
+interface SafeCaseStudiesStats {
+  total: number;
+  published: number;
+}
+
 interface SafeDataResult<T> {
   data: T | null;
   error?: string;
@@ -127,6 +132,46 @@ export async function getOrganizationStatsSafe(): Promise<SafeDataResult<SafeSta
     // エラー時もデフォルト値を返す
     return { 
       data: { total: 0, draft: 0, published: 0, archived: 0 },
+      error: errorNote,
+      errorId
+    };
+  }
+}
+
+/**
+ * 安全な導入事例統計取得
+ */
+export async function getCaseStudiesStatsSafe(orgId?: string): Promise<SafeDataResult<SafeCaseStudiesStats>> {
+  try {
+    if (!orgId) {
+      return { data: { total: 0, published: 0 } };
+    }
+
+    const result = await serverFetch(`/api/dashboard/case-studies-stats?orgId=${orgId}`);
+    
+    if (!result.ok) {
+      console.warn('[getCaseStudiesStatsSafe] API returned non-ok status:', result.status);
+      return { data: { total: 0, published: 0 } };
+    }
+
+    const stats = await result.json();
+    return { data: stats };
+
+  } catch (error) {
+    const errorId = `case-studies-stats-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const errorNote = error instanceof Error ? error.message : 'Unknown error';
+    
+    console.error('[getCaseStudiesStatsSafe] Error:', error);
+    
+    await logToDiag({
+      errorId,
+      at: 'getCaseStudiesStatsSafe', 
+      note: errorNote
+    });
+
+    // エラー時もデフォルト値を返す
+    return { 
+      data: { total: 0, published: 0 },
       error: errorNote,
       errorId
     };

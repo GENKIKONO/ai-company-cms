@@ -364,3 +364,12 @@ export interface StripeCustomer {
   created_at: string;
   updated_at: string;
 }
+
+// organizations_with_owner view型定義 (PGRST201エラー回避用)
+export interface OrganizationWithOwner extends Organization {
+  // Owner詳細情報 (FK曖昧性エラー回避のため明示的列)
+  owner_email?: string;
+  owner_full_name?: string;
+  owner_avatar_url?: string;
+  owner_role?: UserRole;
+}

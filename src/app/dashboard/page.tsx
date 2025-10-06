@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { headers } from 'next/headers';
-import { getMyOrganizationSafe, getOrganizationStatsSafe } from '@/lib/safeData';
+import { getMyOrganizationSafe, getOrganizationStatsSafe, getCaseStudiesStatsSafe } from '@/lib/safeData';
 import PublishToggle from './components/PublishToggle';
 import TabbedDashboard from './components/TabbedDashboard';
+import PerformanceMetrics from './components/PerformanceMetrics';
+import DashboardActions from './components/DashboardActions';
 
 // 強制的に動的SSRにして、認証状態を毎回評価
 export const dynamic = 'force-dynamic';
@@ -25,6 +27,13 @@ export default async function DashboardPage() {
 
     const organization = orgResult.data;
     const stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
+
+    // 導入事例統計を取得（組織がある場合のみ）
+    const caseStudiesResult = organization?.id 
+      ? await getCaseStudiesStatsSafe(organization.id)
+      : { data: { total: 0, published: 0 } };
+    
+    const caseStudiesStats = caseStudiesResult.data || { total: 0, published: 0 };
 
     console.log('[Dashboard] Data loaded:', { 
       hasOrg: !!organization, 
@@ -179,9 +188,9 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-1">導入事例</p>
-                <p className="text-2xl font-bold text-gray-900">0</p>
+                <p className="text-2xl font-bold text-gray-900">{caseStudiesStats.total}</p>
                 <p className="text-xs text-gray-400 mt-1">
-                  公開中: 0
+                  公開中: {caseStudiesStats.published}
                 </p>
               </div>
               <div className="p-3 bg-gray-100 rounded-xl">
@@ -255,38 +264,7 @@ export default async function DashboardPage() {
           </div>
           
           {/* 追加の便利機能 */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
-                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                </svg>
-                共有リンク
-              </button>
-              
-              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
-                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                データ出力
-              </button>
-              
-              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
-                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                設定
-              </button>
-              
-              <button className="flex items-center justify-center p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
-                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                ヘルプ
-              </button>
-            </div>
-          </div>
+          <DashboardActions organization={organization} />
         </div>
 
         {/* 企業管理 */}
@@ -359,28 +337,7 @@ export default async function DashboardPage() {
               <span className="text-sm text-gray-500">過去7日間</span>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-700 mb-1">127</div>
-                <div className="text-sm text-gray-500">ページビュー</div>
-                <div className="text-xs text-gray-600 mt-1">+12%</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-700 mb-1">24</div>
-                <div className="text-sm text-gray-500">問い合わせ</div>
-                <div className="text-xs text-gray-600 mt-1">+8%</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-700 mb-1">2.4%</div>
-                <div className="text-sm text-gray-500">コンバージョン率</div>
-                <div className="text-xs text-gray-600 mt-1">-0.2%</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-700 mb-1">1:23</div>
-                <div className="text-sm text-gray-500">平均滞在時間</div>
-                <div className="text-xs text-gray-600 mt-1">+15s</div>
-              </div>
-            </div>
+            <PerformanceMetrics />
             
             <div className="mt-6 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between">
@@ -398,53 +355,16 @@ export default async function DashboardPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">最近のアクティビティ</h2>
             
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm text-gray-900">企業情報を更新しました</p>
-                  <p className="text-xs text-gray-500">2時間前</p>
-                </div>
+            <div className="text-center py-8">
+              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm text-gray-900">新しいサービスを公開しました</p>
-                  <p className="text-xs text-gray-500">1日前</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm text-gray-900">3件のお問い合わせがありました</p>
-                  <p className="text-xs text-gray-500">2日前</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm text-gray-900">ページビューが増加しています</p>
-                  <p className="text-xs text-gray-500">3日前</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-gray-400 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm text-gray-900">プロフィール画像を変更しました</p>
-                  <p className="text-xs text-gray-500">1週間前</p>
-                </div>
-              </div>
+              <p className="text-sm text-gray-500">アクティビティ追跡機能は今後実装予定です</p>
             </div>
             
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <button className="text-sm text-gray-600 hover:text-gray-800 font-medium">
-                すべてのアクティビティを表示
-              </button>
-            </div>
+            <DashboardActions organization={organization} context="activity" />
           </div>
         </div>
 

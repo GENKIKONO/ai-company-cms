@@ -1,7 +1,7 @@
 'use client';
 
 import { supabaseBrowser } from '@/lib/supabase-client';
-import { type Organization, type OrganizationFormData } from '@/types/database';
+import { type Organization, type OrganizationFormData, type OrganizationWithOwner } from '@/types/database';
 
 // 企業一覧取得
 export async function getOrganizations(options: {
@@ -57,13 +57,12 @@ export async function getOrganizations(options: {
 export async function getOrganization(id: string) {
   try {
     const { data, error } = await supabaseBrowser
-      .from('organizations')
+      .from('organizations_with_owner')
       .select(`
         *,
         services(*),
         case_studies(*),
-        faqs(*),
-        created_by:users(full_name, email)
+        faqs(*)
       `)
       .eq('id', id)
       .single();

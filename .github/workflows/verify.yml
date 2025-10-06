@@ -1,0 +1,168 @@
+name: RLS/API Verification
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+
+jobs:
+  verify-rls-and-api:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create environment file
+        run: |
+          cat > .env.local << EOF
+          NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          EOF
+
+      - name: Verify environment variables
+        run: |
+          echo "🔍 環境変数を確認中..."
+          if [ -z "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" ]; then
+            echo "❌ NEXT_PUBLIC_SUPABASE_URL が設定されていません"
+            exit 1
+          fi
+          if [ -z "${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" ]; then
+            echo "❌ NEXT_PUBLIC_SUPABASE_ANON_KEY が設定されていません"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "❌ SUPABASE_SERVICE_ROLE_KEY が設定されていません"
+            exit 1
+          fi
+          echo "✅ 全ての必須環境変数が設定されています"
+
+      - name: Create logs directory
+        run: mkdir -p logs
+
+      - name: Run RLS Schema Audit
+        run: |
+          echo "🔍 RLS/スキーマ監査を実行中..."
+          npm run audit:rls
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Run API Smoke Tests
+        run: |
+          echo "🧪 APIスモークテストを実行中..."
+          npm run smoke:api
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Upload verification logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-logs
+          path: logs/
+          retention-days: 30
+
+      - name: Verification Summary
+        if: always()
+        run: |
+          echo "📊 検証結果サマリ:"
+          echo "================================"
+          
+          # RLS監査結果の確認
+          RLS_LOGS=$(ls logs/rls-audit-* 2>/dev/null | head -1)
+          if [ -n "$RLS_LOGS" ]; then
+            echo "🔍 RLS監査ログ: $RLS_LOGS"
+            if grep -q '"ok": true' "$RLS_LOGS"; then
+              echo "✅ RLS監査: 成功"
+            else
+              echo "❌ RLS監査: 失敗"
+            fi
+          else
+            echo "⚠️  RLS監査ログが見つかりません"
+          fi
+          
+          # APIテスト結果の確認
+          SMOKE_LOGS=$(ls logs/smoke-* 2>/dev/null | head -1)
+          if [ -n "$SMOKE_LOGS" ]; then
+            echo "🧪 APIテストログ: $SMOKE_LOGS"
+            if grep -q '"ok": true' "$SMOKE_LOGS"; then
+              echo "✅ APIテスト: 成功"
+            else
+              echo "❌ APIテスト: 失敗"
+            fi
+          else
+            echo "⚠️  APIテストログが見つかりません"
+          fi
+          
+          echo "================================"
+          echo "📋 ログファイル一覧:"
+          ls -la logs/ 2>/dev/null || echo "ログファイルなし"
+
+      - name: Check for Critical Issues
+        run: |
+          echo "🚨 クリティカルな問題をチェック中..."
+          
+          # RLS無効テーブルの検出
+          RLS_LOGS=$(ls logs/rls-audit-* 2>/dev/null | head -1)
+          if [ -n "$RLS_LOGS" ]; then
+            if grep -q '"rls": false' "$RLS_LOGS"; then
+              echo "🔥 クリティカル: RLSが無効なテーブルが発見されました"
+              echo "💡 対処: ALTER TABLE <table> ENABLE ROW LEVEL SECURITY; を実行してください"
+              exit 1
+            fi
+          fi
+          
+          # 必須カラム不足の検出
+          if [ -n "$RLS_LOGS" ]; then
+            if grep -q '"hasColumns": false' "$RLS_LOGS"; then
+              echo "🔥 クリティカル: 必須カラムが不足しているテーブルが発見されました"
+              echo "💡 対処: マイグレーションを適用してください"
+              exit 1
+            fi
+          fi
+          
+          # APIアクセス制御の検証
+          SMOKE_LOGS=$(ls logs/smoke-* 2>/dev/null | head -1)
+          if [ -n "$SMOKE_LOGS" ]; then
+            # 匿名アクセスが成功している場合（セキュリティ問題）
+            if grep -q '"expect": "deny".*"pass": false' "$SMOKE_LOGS"; then
+              echo "🔥 クリティカル: 匿名アクセスが許可されています（セキュリティリスク）"
+              echo "💡 対処: RLSポリシーを確認してください"
+              exit 1
+            fi
+          fi
+          
+          echo "✅ クリティカルな問題は発見されませんでした"
+
+  # 通知ジョブ（オプション）
+  notify-on-failure:
+    runs-on: ubuntu-latest
+    needs: verify-rls-and-api
+    if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Notify on main branch failure
+        run: |
+          echo "🚨 メインブランチでRLS/API検証が失敗しました"
+          echo "🔗 詳細: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "⚠️  本番環境への影響を確認してください"
+          
+          # Slack/Discord通知などをここに追加可能
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"RLS/API verification failed on main branch"}' \
+          #   YOUR_WEBHOOK_URL
