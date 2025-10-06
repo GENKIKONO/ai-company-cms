@@ -60,14 +60,14 @@ export async function GET() {
       .not('featured_image_url', 'is', null);
 
     posts?.forEach(post => {
-      if (post.featured_image_url && post.organizations) {
+      if (post.featured_image_url && post.organizations && typeof post.organizations === 'object' && 'slug' in post.organizations) {
         items.push({
           loc: `${baseUrl}/o/${post.organizations.slug}/posts/${post.slug}`,
           lastmod: new Date(post.updated_at).toISOString(),
           images: [{
             loc: post.featured_image_url,
             title: post.title,
-            caption: `${post.title} - ${post.organizations.name}`
+            caption: `${post.title} - ${(post.organizations as any).name}`
           }]
         });
       }
@@ -90,17 +90,17 @@ export async function GET() {
       .not('media', 'is', null);
 
     services?.forEach(service => {
-      if (service.media && Array.isArray(service.media) && service.organizations) {
+      if (service.media && Array.isArray(service.media) && service.organizations && typeof service.organizations === 'object' && 'slug' in service.organizations) {
         const imageMedia = service.media.filter((m: any) => m.type === 'image' && m.url);
         
         if (imageMedia.length > 0) {
           items.push({
-            loc: `${baseUrl}/o/${service.organizations.slug}/services/${service.id}`,
+            loc: `${baseUrl}/o/${(service.organizations as any).slug}/services/${service.id}`,
             lastmod: new Date(service.updated_at).toISOString(),
             images: imageMedia.map((img: any) => ({
               loc: img.url,
               title: `${service.name} - ${img.alt || 'サービス画像'}`,
-              caption: `${service.name}のサービス画像 - ${service.organizations.name}`
+              caption: `${service.name}のサービス画像 - ${(service.organizations as any).name}`
             }))
           });
         }

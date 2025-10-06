@@ -311,6 +311,4 @@ function main(): void {
 }
 
 // スクリプト実行
-if (require.main === module) {
-  main();
-}
+main();

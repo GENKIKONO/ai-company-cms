@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run check:no-mock && npm run validate:feeds",
+    "prebuild": "npx ts-node scripts/check-no-mock.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

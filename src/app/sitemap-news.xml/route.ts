@@ -61,9 +61,9 @@ export async function GET() {
     }
 
     const items: NewsSitemapItem[] = recentPosts
-      .filter(post => post.organizations)
+      .filter(post => post.organizations && typeof post.organizations === 'object' && 'slug' in post.organizations)
       .map(post => {
-        const org = post.organizations!;
+        const org = post.organizations as any;
         
         // タグからキーワード抽出
         let keywords = '';

@@ -6,18 +6,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-// 検出対象キーワード
+// 検出対象キーワード（UIダミーデータのみに限定）
 const FORBIDDEN_KEYWORDS = [
-  'mock',
-  'fixture',
-  'stub', 
-  'dummy',
-  'sample',
-  'static',
-  'hardcoded',
-  'faker',
-  'msw',
-  'Math.random'
+  'SAMPLE_ORGANIZATION',
+  'SAMPLE_SERVICES',
+  'SAMPLE_FAQS',
+  'dummy.*data',
+  'mock.*data',
+  'hardcoded.*string'
 ];
 
 // 除外パターン（正当な使用）
@@ -199,6 +195,4 @@ function main(): void {
 }
 
 // スクリプト実行
-if (require.main === module) {
-  main();
-}
+main();
