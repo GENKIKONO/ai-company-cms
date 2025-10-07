@@ -1,0 +1,6 @@
+-- ÕË≠¸íJdãYno posts_org_fk	
+ALTER TABLE public.posts
+  DROP CONSTRAINT IF EXISTS posts_organization_id_fkey;
+
+-- PostgRESTxπ≠¸ﬁç≠ºíÂ
+SELECT pg_notify('pgrst','reload schema');

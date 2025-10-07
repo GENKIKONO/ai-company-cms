@@ -21,12 +21,16 @@ export async function GET(request: NextRequest) {
     // RPCが使えない場合のフォールバック
     let postsWithOrgs: PostWithOrg[] = [];
     if (queryError || !rawData) {
-      // フォールバック: 個別取得
+      // フォールバック: 個別取得（組織情報埋め込み）
       const { data: posts, error: postsError } = await supabase
         .from('posts')
-        .select('id, title, slug, content_markdown, content_html, published_at, created_at, organization_id')
+        .select(`
+          id, title, slug, content_markdown, content_html, 
+          published_at, created_at, organization_id,
+          organizations!posts_org_fk(name, slug, url)
+        `)
         .eq('status', 'published')
-        .order('published_at', { ascending: false, nullsLast: true })
+        .order('published_at', { ascending: false })
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -35,28 +39,12 @@ export async function GET(request: NextRequest) {
         return generateEmptyRssFeed(baseUrl, request);
       }
 
-      // 組織情報取得
-      const organizationIds = [...new Set(
-        (posts || []).map(p => p.organization_id).filter(Boolean)
-      )];
-      
-      let organizationsMap = new Map();
-      if (organizationIds.length > 0) {
-        const { data: organizations } = await supabase
-          .from('organizations')
-          .select('id, name, slug, url')
-          .in('id', organizationIds);
-        
-        if (organizations) {
-          organizations.forEach(org => {
-            organizationsMap.set(org.id, org);
-          });
-        }
-      }
-
-      // データ変換
+      // データ変換（組織情報埋め込み済み）
       postsWithOrgs = (posts || []).map(post => {
-        const org = post.organization_id ? organizationsMap.get(post.organization_id) : null;
+        // organizationsは配列またはオブジェクトの可能性があるため安全に処理
+        const org = Array.isArray(post.organizations) 
+          ? post.organizations[0] 
+          : post.organizations || null;
         return {
           id: post.id,
           title: post.title ?? '',
