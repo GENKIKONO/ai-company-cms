@@ -569,6 +569,7 @@ export async function PUT(request: NextRequest) {
     try {
       const { revalidatePath, revalidateTag } = await import('next/cache');
       revalidatePath('/dashboard');
+      revalidatePath('/organizations');
       revalidatePath(`/organizations/${existingOrg.id}`);
       if (data.slug) {
         revalidatePath(`/o/${data.slug}`);
