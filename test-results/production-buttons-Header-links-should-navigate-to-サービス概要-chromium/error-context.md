@@ -1,0 +1,175 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - link "AIO Hub AI企業CMS" [ref=e6] [cursor=pointer]:
+          - /url: /
+        - navigation [ref=e7]:
+          - link "サービスの流れ" [ref=e8] [cursor=pointer]:
+            - /url: /#service-flow
+      - generic [ref=e9]:
+        - link "ログイン" [ref=e10] [cursor=pointer]:
+          - /url: /auth/login
+        - link "無料で始める" [ref=e11] [cursor=pointer]:
+          - /url: /auth/login
+  - generic [ref=e12]:
+    - main [ref=e13]:
+      - generic [ref=e20]:
+        - heading "AIO Hub AI Company CMS" [level=1] [ref=e21]
+        - paragraph [ref=e22]: Integrated management platform for corporate information using AI technology
+        - generic [ref=e23]:
+          - generic [ref=e24]: 0+ 企業
+          - generic [ref=e26]: 0+ サービス
+          - generic [ref=e28]: 0+ 導入事例
+        - generic [ref=e30]:
+          - link "無料で始める" [ref=e31] [cursor=pointer]:
+            - /url: /auth/signup
+            - generic [ref=e32] [cursor=pointer]:
+              - text: Get Started
+              - img [ref=e33] [cursor=pointer]
+          - link "企業ディレクトリを見る" [ref=e35] [cursor=pointer]:
+            - /url: /organizations
+            - generic [ref=e36] [cursor=pointer]:
+              - text: View Company Directory
+              - img [ref=e37] [cursor=pointer]
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - heading "Comprehensive Features" [level=2] [ref=e43]
+          - paragraph [ref=e44]: Efficiently manage and utilize AI & DX company information
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - img [ref=e48]
+            - heading "Organization Management" [level=3] [ref=e50]
+            - paragraph [ref=e51]: Comprehensively manage detailed information of AI & DX companies. Centrally manage profiles, services, and case studies.
+            - generic [ref=e52]:
+              - generic [ref=e53]: 詳しく見る
+              - img [ref=e54]
+          - generic [ref=e56]:
+            - img [ref=e58]
+            - heading "Service Management" [level=3] [ref=e60]
+            - paragraph [ref=e61]: Manage detailed information of AI & DX services provided by companies. Comprehensively record features, pricing, and technical specifications.
+            - generic [ref=e62]:
+              - generic [ref=e63]: 詳しく見る
+              - img [ref=e64]
+          - generic [ref=e66]:
+            - img [ref=e68]
+            - heading "Case Study Management" [level=3] [ref=e70]
+            - paragraph [ref=e71]: Effectively manage and communicate success stories and achievements. Clearly convey customer testimonials and results.
+            - generic [ref=e72]:
+              - generic [ref=e73]: 詳しく見る
+              - img [ref=e74]
+      - generic [ref=e77]:
+        - heading "Statistics & Results" [level=2] [ref=e79]
+        - generic [ref=e80]:
+          - generic [ref=e82]:
+            - generic [ref=e83]: 0+
+            - generic [ref=e84]: Companies
+            - generic [ref=e85]: 登録企業数
+          - generic [ref=e87]:
+            - generic [ref=e88]: 0+
+            - generic [ref=e89]: Services
+            - generic [ref=e90]: 提供サービス数
+          - generic [ref=e92]:
+            - generic [ref=e93]: 0+
+            - generic [ref=e94]: Case Studies
+            - generic [ref=e95]: 成功事例数
+          - generic [ref=e97]:
+            - generic [ref=e98]: 0+
+            - generic [ref=e99]: Categories
+            - generic [ref=e100]: カテゴリー数
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - heading "サービスの流れ" [level=2] [ref=e104]
+          - paragraph [ref=e105]: 簡単3ステップで始められます
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e111]: "1"
+            - heading "アカウント作成" [level=3] [ref=e112]
+            - paragraph [ref=e113]: メールアドレスとパスワードで簡単にアカウントを作成。無料で始められます。
+          - generic [ref=e114]:
+            - generic [ref=e116]: "2"
+            - heading "企業情報登録" [level=3] [ref=e117]
+            - paragraph [ref=e118]: 企業の基本情報を入力。必要最小限の項目のみで素早く登録完了。
+          - generic [ref=e119]:
+            - generic [ref=e121]: "3"
+            - heading "コンテンツ管理開始" [level=3] [ref=e122]
+            - paragraph [ref=e123]: サービス情報や導入事例を追加して、効果的な企業PRを開始できます。
+        - generic [ref=e125]:
+          - img [ref=e126]
+          - generic [ref=e128]: 約5分で完了 • クレジットカード不要 • いつでも無料
+      - generic [ref=e130]:
+        - heading "Message from Leadership" [level=2] [ref=e131]
+        - generic [ref=e132]: We support corporate information dissemination through AI technology and help achieve better business results.
+      - generic [ref=e139]:
+        - heading "Get Started Today" [level=2] [ref=e140]
+        - paragraph [ref=e141]: We provide optimal solutions to accelerate AI & DX business growth
+        - generic [ref=e142]:
+          - link "Start Free" [ref=e143] [cursor=pointer]:
+            - /url: /auth/signup
+            - generic [ref=e144] [cursor=pointer]:
+              - text: Start Free
+              - img [ref=e145] [cursor=pointer]
+          - generic [ref=e147]:
+            - img [ref=e148]
+            - text: 無料トライアル • クレジットカード不要
+        - generic [ref=e150]:
+          - generic [ref=e151]:
+            - img [ref=e152]
+            - text: セキュリティ保証
+          - generic [ref=e154]:
+            - img [ref=e155]
+            - text: 99.9% 稼働率保証
+          - generic [ref=e157]:
+            - img [ref=e158]
+            - text: 24/7 サポート
+    - contentinfo [ref=e160]:
+      - generic [ref=e161]:
+        - generic [ref=e162]:
+          - generic [ref=e163]:
+            - heading "AIO Hub AI Company CMS" [level=3] [ref=e164]
+            - paragraph [ref=e165]: Integrated management platform for AI & DX company information
+          - generic [ref=e166]:
+            - heading "Features" [level=4] [ref=e167]
+            - list [ref=e168]:
+              - listitem [ref=e169]:
+                - link "Organization Management" [ref=e170] [cursor=pointer]:
+                  - /url: /organizations
+              - listitem [ref=e171]:
+                - link "Service Management" [ref=e172] [cursor=pointer]:
+                  - /url: /organizations
+              - listitem [ref=e173]:
+                - link "Case Study Management" [ref=e174] [cursor=pointer]:
+                  - /url: /organizations
+          - generic [ref=e175]:
+            - heading "Links" [level=4] [ref=e176]
+            - list [ref=e177]:
+              - listitem [ref=e178]:
+                - link "Company Directory" [ref=e179] [cursor=pointer]:
+                  - /url: /organizations
+              - listitem [ref=e180]:
+                - link "Search" [ref=e181] [cursor=pointer]:
+                  - /url: /search
+              - listitem [ref=e182]:
+                - link "Dashboard" [ref=e183] [cursor=pointer]:
+                  - /url: /dashboard
+          - generic [ref=e184]:
+            - heading "Support" [level=4] [ref=e185]
+            - list [ref=e186]:
+              - listitem [ref=e187]:
+                - link "Help Center" [ref=e188] [cursor=pointer]:
+                  - /url: /help
+              - listitem [ref=e189]:
+                - link "Contact" [ref=e190] [cursor=pointer]:
+                  - /url: /contact
+              - listitem [ref=e191]:
+                - link "Terms of Service" [ref=e192] [cursor=pointer]:
+                  - /url: /terms
+              - listitem [ref=e193]:
+                - link "Privacy Policy" [ref=e194] [cursor=pointer]:
+                  - /url: /privacy
+        - paragraph [ref=e196]: © 2025 AIO Hub. All rights reserved.
+  - alert [ref=e197]
+```

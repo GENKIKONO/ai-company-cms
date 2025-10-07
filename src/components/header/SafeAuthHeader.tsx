@@ -57,6 +57,24 @@ export default async function SafeAuthHeader() {
               {/* 全ユーザー向けナビゲーション表示 */}
               <nav className="ml-10 hidden md:flex space-x-8">
                 <Link 
+                  href="/about" 
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  サービス概要
+                </Link>
+                <Link 
+                  href="/pricing" 
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  料金プラン
+                </Link>
+                <Link 
+                  href="/aio" 
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  AIOとは
+                </Link>
+                <Link 
                   href="/#service-flow" 
                   className="text-gray-500 hover:text-gray-700"
                 >

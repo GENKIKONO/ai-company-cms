@@ -365,6 +365,45 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </section>
 
+        {/* AIOダイジェスト */}
+        <section className="py-20 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              🤖 AI検索最適化（AIO）対応
+            </h2>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="text-sm font-medium text-gray-900">JSON-LD</div>
+                <div className="text-xs text-gray-600">構造化データ</div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="text-sm font-medium text-gray-900">RSS/XML</div>
+                <div className="text-xs text-gray-600">フィード配信</div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="text-sm font-medium text-gray-900">OpenAPI</div>
+                <div className="text-xs text-gray-600">API仕様公開</div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="text-sm font-medium text-gray-900">サイトマップ</div>
+                <div className="text-xs text-gray-600">動的生成</div>
+              </div>
+            </div>
+            <Link 
+              href="/aio"
+              className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+            >
+              AIOについて詳しく見る
+              <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </section>
+
         {/* 代表メッセージ */}
         <section className="py-20 bg-gray-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -446,20 +485,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       {/* フッター */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-lg font-semibold mb-4">{t('ui.header.title')}</h3>
               <p className="text-gray-400">
                 {t('pages.home.footer.tagline')}
               </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">{t('pages.home.footer.features')}</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/organizations" className="hover:text-white transition-colors">{t('pages.home.features.organizationManagement.title')}</Link></li>
-                <li><Link href="/organizations" className="hover:text-white transition-colors">{t('pages.home.features.serviceManagement.title')}</Link></li>
-                <li><Link href="/organizations" className="hover:text-white transition-colors">{t('pages.home.features.caseManagement.title')}</Link></li>
-              </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">{t('pages.home.footer.links')}</h4>
