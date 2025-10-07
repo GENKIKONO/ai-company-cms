@@ -50,9 +50,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // レスポンス正規化（OpenAPIスキーマ適合）
+    const normalizedFaqs = (faqs || []).map(faq => ({
+      id: faq.id,
+      question: faq.question || '',
+      answer: faq.answer || '',
+      category: faq.category || null,
+      sort_order: faq.sort_order ?? 0, // DBマイグレーション後はデフォルト値あり
+      status: faq.status,
+      created_at: faq.created_at,
+      updated_at: faq.updated_at
+    }));
+
     return NextResponse.json(
       {
-        faqs: faqs || [],
+        faqs: normalizedFaqs,
         total: count || 0
       },
       {

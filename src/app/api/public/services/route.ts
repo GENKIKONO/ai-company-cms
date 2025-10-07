@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = await supabaseServer();
     
-    // 公開サービスを取得（count付き）
+    // 公開サービスを取得（実テーブル基準）
     const { data: services, error, count } = await supabase
       .from('services')
       .select(`
@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
         description,
         category,
         features,
-        price,
         cta_url,
         status,
         created_at,
@@ -41,9 +40,22 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // レスポンス正規化（実テーブル基準）
+    const normalizedServices = (services || []).map(service => ({
+      id: service.id,
+      name: service.name || '',
+      description: service.description || null,
+      category: service.category || null,
+      features: service.features || null,
+      cta_url: service.cta_url || null,
+      status: service.status,
+      created_at: service.created_at,
+      updated_at: service.updated_at
+    }));
+
     return NextResponse.json(
       {
-        services: services || [],
+        services: normalizedServices,
         total: count || 0
       },
       {

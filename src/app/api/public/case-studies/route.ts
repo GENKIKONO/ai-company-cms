@@ -22,22 +22,18 @@ export async function GET(request: NextRequest) {
         problem,
         solution,
         result,
-        tags,
-        status,
         created_at,
         updated_at
       `, { count: 'exact' })
-      .eq('status', 'published')
       .order('created_at', { ascending: false });
 
-    // タグフィルタ（配列の要素を検索）
-    if (tagsParam) {
-      const tags = tagsParam.split(',').map(tag => tag.trim());
-      // PostgreSQLの配列操作で任意のタグが含まれるものを検索
-      for (const tag of tags) {
-        query = query.contains('tags', [tag]);
-      }
-    }
+    // 実テーブルではtagsカラムが存在しないためタグフィルタを無効化
+    // if (tagsParam) {
+    //   const tags = tagsParam.split(',').map(tag => tag.trim());
+    //   for (const tag of tags) {
+    //     query = query.contains('tags', [tag]);
+    //   }
+    // }
 
     // 件数制限
     if (limit > 0) {
@@ -54,9 +50,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // レスポンス正規化（実テーブル基準）
+    const normalizedCaseStudies = (caseStudies || []).map(caseStudy => ({
+      id: caseStudy.id,
+      title: caseStudy.title || '',
+      problem: caseStudy.problem || null,
+      solution: caseStudy.solution || null,
+      result: caseStudy.result || null,
+      created_at: caseStudy.created_at,
+      updated_at: caseStudy.updated_at
+    }));
+
     return NextResponse.json(
       {
-        caseStudies: caseStudies || [],
+        caseStudies: normalizedCaseStudies,
         total: count || 0
       },
       {

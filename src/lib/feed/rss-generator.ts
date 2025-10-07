@@ -8,26 +8,21 @@ export interface RssFeedOptions {
   description: string;
   link: string;
   language: string;
-  posts: any[];
+  posts: PostWithOrg[];
   baseUrl: string;
   organizationSlug?: string;
 }
 
-export interface RssPost {
+// 実DBスキーマ準拠の型定義
+export interface PostWithOrg {
   id: string;
   title: string;
   slug: string;
-  excerpt?: string | null;
-  content_html?: string | null;
-  published_at: string;
-  updated_at: string;
-  featured_image_url?: string | null;
-  organizations?: {
-    name: string;
-    slug: string;
-    url?: string | null;
-    logo_url?: string | null;
-  };
+  content: string;
+  pub_date: string;
+  org_slug: string | null;
+  org_name: string | null;
+  org_url: string | null;
 }
 
 /**
@@ -66,7 +61,7 @@ function formatRfc822Date(dateString: string): string {
 }
 
 /**
- * RSS 2.0 フィードを生成
+ * RSS 2.0 フィードを生成（実DBスキーマ準拠）
  */
 export function generateRss(options: RssFeedOptions): string {
   const { title, description, link, language, posts, baseUrl, organizationSlug } = options;
@@ -78,41 +73,45 @@ export function generateRss(options: RssFeedOptions): string {
   
   // 最新記事の日時（チャンネルのlastBuildDate用）
   const latestPost = posts[0];
-  const lastBuildDate = latestPost 
-    ? formatRfc822Date(latestPost.updated_at || latestPost.published_at)
+  const lastBuildDate = latestPost?.pub_date 
+    ? formatRfc822Date(latestPost.pub_date)
     : formatRfc822Date(new Date().toISOString());
 
-  // RSS アイテム生成
-  const items = posts.map((post: RssPost) => {
-    const postUrl = organizationSlug 
-      ? `${baseUrl}/o/${organizationSlug}/posts/${post.slug}`
+  // RSS アイテム生成（実DBスキーマ準拠）
+  const items = posts.map((post: PostWithOrg) => {
+    // URL生成
+    const postUrl = post.org_slug 
+      ? `${baseUrl}/posts/${post.slug}`
       : `${baseUrl}/posts/${post.slug}`;
     
-    const postTitle = escapeXml(post.title);
-    const postDescription = post.excerpt 
-      ? escapeXml(stripHtml(post.excerpt))
-      : post.content_html 
-        ? escapeXml(stripHtml(post.content_html).substring(0, 300) + '...')
-        : '';
+    // タイトル（必須、undefinedを許容しない）
+    const postTitle = escapeXml(post.title ?? '');
     
-    const pubDate = formatRfc822Date(post.published_at);
-    const organization = post.organizations;
-    const author = organization ? escapeXml(organization.name) : 'LuxuCare CMS';
+    // 説明（content から160文字まで、undefinedを許容しない）
+    const rawContent = post.content ?? '';
+    const plainContent = stripHtml(rawContent);
+    const postDescription = plainContent.length > 160 
+      ? escapeXml(plainContent.substring(0, 160) + '...')
+      : escapeXml(plainContent || '');
+    
+    // 日付（pub_date使用、undefinedを許容しない）
+    const pubDate = post.pub_date ? formatRfc822Date(post.pub_date) : '';
+    
+    // 著者（org_nameを使用、undefinedを許容しない）
+    const author = post.org_name ?? '';
 
-    let enclosure = '';
-    if (post.featured_image_url) {
-      enclosure = `
-      <enclosure url="${escapeXml(post.featured_image_url)}" type="image/jpeg" />`;
-    }
+    // カテゴリ（組織名、undefinedを許容しない）
+    const category = post.org_name ? `
+      <category>${escapeXml(post.org_name)}</category>` : '';
 
     return `
     <item>
       <title>${postTitle}</title>
       <link>${escapeXml(postUrl)}</link>
       <description>${postDescription}</description>
-      <author>${author}</author>
+      <author>noreply@aiohub.jp (${author})</author>
       <guid isPermaLink="true">${escapeXml(postUrl)}</guid>
-      <pubDate>${pubDate}</pubDate>${enclosure}
+      <pubDate>${pubDate}</pubDate>${category}
     </item>`;
   }).join('');
 

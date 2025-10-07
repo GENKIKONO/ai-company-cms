@@ -214,23 +214,29 @@ export async function GET() {
               "type": "string"
             },
             "description": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "category": {
-              "type": "string"
+              "type": "string",
+              "nullable": true,
+              "description": "サービスカテゴリ（未設定時はnull）"
             },
             "features": {
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "nullable": true
             },
             "price": {
-              "type": "number"
+              "type": "number",
+              "nullable": true
             },
             "cta_url": {
               "type": "string",
-              "format": "url"
+              "format": "url",
+              "nullable": true
             },
             "status": {
               "type": "string",
@@ -261,10 +267,13 @@ export async function GET() {
               "type": "string"
             },
             "category": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "sort_order": {
-              "type": "integer"
+              "type": "integer",
+              "default": 0,
+              "description": "表示順序（昇順）"
             },
             "status": {
               "type": "string",
@@ -279,7 +288,7 @@ export async function GET() {
               "format": "date-time"
             }
           },
-          "required": ["id", "question", "answer", "status", "created_at", "updated_at"]
+          "required": ["id", "question", "answer", "sort_order", "status", "created_at", "updated_at"]
         },
         "CaseStudy": {
           "type": "object",
@@ -292,19 +301,24 @@ export async function GET() {
               "type": "string"
             },
             "problem": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "solution": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "result": {
-              "type": "string"
+              "type": "string",
+              "nullable": true,
+              "description": "導入結果・効果"
             },
             "tags": {
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "nullable": true
             },
             "status": {
               "type": "string",
