@@ -94,7 +94,7 @@ export async function getMyOrganizationSafe(userId?: string): Promise<SafeDataRe
 
     console.log('[getMyOrganizationSafe] Data loaded:', { 
       hasOrg: !!organization, 
-      hasApiKey: !!organization.api_key 
+      isPublished: organization.is_published 
     });
 
     return { data: safeData };

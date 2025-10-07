@@ -37,7 +37,7 @@ export default async function DashboardPage() {
       hasOrg: !!organization, 
       orgName: organization?.name,
       orgId: organization?.id,
-      apiKey: organization?.api_key ? 'present' : 'missing',
+      isPublished: organization?.is_published,
       stats: stats.total,
       orgError,
       renderingPath: !user ? 'auth-required' : !organization?.id ? 'org-creation' : 'dashboard-ui'

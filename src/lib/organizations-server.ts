@@ -29,7 +29,7 @@ export async function getOrganizationByUserId(userId: string): Promise<Organizat
       return null;
     }
 
-    console.log('[getOrganizationByUserId] Found org:', data ? { id: data.id, name: data.name, api_key: !!data.api_key } : null);
+    console.log('[getOrganizationByUserId] Found org:', data ? { id: data.id, name: data.name, is_published: data.is_published } : null);
     return data;
   } catch (error) {
     console.error('[getOrganizationByUserId] Unexpected error:', error);
@@ -38,26 +38,32 @@ export async function getOrganizationByUserId(userId: string): Promise<Organizat
 }
 
 /**
- * Cached version of organization fetch
- * ✅ FIXED: Uses stable userId-based cache key, no auth calls inside
+ * Cached version of organization fetch  
+ * ✅ FIXED: Uses per-user cache with proper invalidation
  */
-export const getOrganizationCached = unstable_cache(
-  async (userId: string) => {
-    console.log('[VERIFY] getOrganizationCached - Cache MISS for user:', userId);
-    const result = await getOrganizationByUserId(userId);
-    console.log('[VERIFY] getOrganizationCached - Cache MISS result:', {
-      hasOrg: !!result,
-      orgId: result?.id,
-      orgName: result?.name
-    });
-    return result;
-  },
-  (userId: string) => [`org:${userId}`],
-  { 
-    revalidate: 300, // 5 minute fallback
-    tags: (userId: string) => [`org:${userId}`] 
-  }
-);
+export async function getOrganizationCached(userId: string): Promise<Organization | null> {
+  const cacheKey = `org-${userId}`;
+  
+  const cachedFn = unstable_cache(
+    async () => {
+      console.log('[VERIFY] getOrganizationCached - Cache MISS for user:', userId);
+      const result = await getOrganizationByUserId(userId);
+      console.log('[VERIFY] getOrganizationCached - Cache MISS result:', {
+        hasOrg: !!result,
+        orgId: result?.id,
+        orgName: result?.name
+      });
+      return result;
+    },
+    [cacheKey],
+    { 
+      revalidate: 300, // 5 minute fallback
+      tags: [`org:${userId}`, 'organizations'] 
+    }
+  );
+  
+  return cachedFn();
+}
 
 /**
  * Safe organization fetch with proper error handling
@@ -121,7 +127,7 @@ export async function getCurrentUserOrganization(): Promise<{
       hasOrg: !!organization,
       orgName: organization?.name,
       orgId: organization?.id,
-      apiKey: organization?.api_key ? 'present' : 'missing',
+      isPublished: organization?.is_published,
       error: orgError
     });
 
