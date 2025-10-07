@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
-import { PLAN_LIMITS, PlanType, getMaterialLimitMessage } from '@/config/plans.ts';
+import { PLAN_LIMITS, PlanType, getMaterialLimitMessage } from '@/config/plans';
 import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 
 export const dynamic = 'force-dynamic';

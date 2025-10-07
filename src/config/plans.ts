@@ -181,6 +181,3 @@ export function isVerifiedBadgeAllowed(planType: PlanType): boolean {
 export function getAIReportsLevel(planType: PlanType): string | boolean {
   return PLAN_LIMITS[planType].ai_reports;
 }
-
-// Vercel compatibility: ensure getMaterialLimitMessage is always resolvable
-export { getMaterialLimitMessage as getMaterialLimitMessage };
