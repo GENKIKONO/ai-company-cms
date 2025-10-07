@@ -14,19 +14,17 @@ export async function GET(request: NextRequest) {
 
     const supabase = await supabaseServer();
     
-    // 公開サービスを取得（実テーブル基準）
+    // 公開サービスを取得（実テーブル基準 - 存在するカラムのみ）
     const { data: services, error, count } = await supabase
       .from('services')
       .select(`
         id,
         name,
         description,
-        category,
-        features,
-        cta_url,
         status,
         created_at,
-        updated_at
+        updated_at,
+        organization_id
       `, { count: 'exact' })
       .eq('status', 'published')
       .order('created_at', { ascending: false })
@@ -40,17 +38,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // レスポンス正規化（実テーブル基準）
+    // レスポンス正規化（実テーブル基準 - 安全なnull対応）
     const normalizedServices = (services || []).map(service => ({
       id: service.id,
       name: service.name || '',
       description: service.description || null,
-      category: service.category || null,
-      features: service.features || null,
-      cta_url: service.cta_url || null,
       status: service.status,
+      organization_id: service.organization_id || null,
       created_at: service.created_at,
-      updated_at: service.updated_at
+      updated_at: service.updated_at,
+      // 将来追加予定のフィールド（null安全）
+      category: null,
+      features: null,
+      price: null,
+      cta_url: null
     }));
 
     return NextResponse.json(
