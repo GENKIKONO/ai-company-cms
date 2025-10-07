@@ -1,23 +1,41 @@
-# Deploy Trigger
+# Deploy Trigger - Phase 2
 
-**Purpose**: Force production redeployment to resolve embed API 404 issue  
-**Timestamp**: 2025-10-07 13:30 JST  
+**Purpose**: FORCE COMPLETE rebuild to resolve embed API 404 issue  
+**Timestamp**: 2025-10-07 14:10 JST (Updated)  
 **Issue**: `/api/public/embed/[slug]/(widget|iframe)` returns 404 in production  
-**Root Cause**: Next.js App Router recognizes routes locally but not in production  
+**Root Cause**: Vercel cache/routing mismatch despite local build success  
 
-## Local Verification Completed ✅
+## Root Cause Analysis Completed ✅
 
-- ✅ Files exist: `src/app/api/public/embed/[slug]/(widget|iframe)/route.ts`
-- ✅ Build successful: Routes appear in Next.js build output
-- ✅ Manifest confirmed: App paths manifest includes embed routes
-- ✅ Code quality: GET signatures, Content-Types, CORS all valid
+### フェーズA: ファイル存在確認 ✅
+- ✅ All 5 embed files exist with correct paths
+- ✅ GET functions exported correctly in both widget/iframe routes
 
-## Force Redeploy
+### フェーズB: Next.js構成確認 ✅  
+- ✅ next.config.js: No blocking configuration
+- ✅ File structure follows App Router conventions
+- ✅ No .gitignore/.vercelignore exclusions
 
-This file addition will trigger Vercel automatic redeployment.
+### フェーズC: ローカルビルド検証 ✅
+- ✅ `npm run build` successful
+- ✅ Routes present in app-paths-manifest.json:
+  - `/api/public/embed/[slug]/widget/route`
+  - `/api/public/embed/[slug]/iframe/route`
+- ✅ Build output shows both routes as `ƒ (Dynamic)`
+
+## Conclusion: Vercel Deployment Gap Issue
+
+Local build works perfectly → Production deployment cache/config issue
+
+## Force Complete Rebuild
+
+**Strategy**: Update trigger file to force fresh Vercel deployment with cleared cache.
+**Build Command**: `npm run build` (verified working locally)
 
 ## Expected Result
 
-After successful deployment:
+After fresh deployment:
 - `GET /api/public/embed/luxucare-test-org/widget` → 200 + `application/javascript`
 - `GET /api/public/embed/luxucare-test-org/iframe` → 200 + `text/html`
+
+**Verification Method**: HTTP test with actual organization slug
