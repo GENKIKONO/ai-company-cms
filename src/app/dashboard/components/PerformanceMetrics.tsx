@@ -1,60 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { serverFetch } from '@/lib/serverFetch';
-
-interface DashboardStats {
-  ok: boolean;
-  counts: {
-    services: { count: number | null; missing: boolean };
-    case_studies: { count: number | null; missing: boolean };
-    posts: { count: number | null; missing: boolean };
-    faqs: { count: number | null; missing: boolean };
-    contacts: { count: number | null; missing: boolean };
-  };
-  analytics: {
-    pageViews: number | null | undefined;
-    avgDurationSec: number | null | undefined;
-    conversionRate: number | null | undefined;
-  };
-  missingTables: string[];
-}
-
-// 安全な数値正規化ヘルパー
-const nz = (value: number | null | undefined): number => {
-  return typeof value === 'number' && !isNaN(value) ? value : 0;
-};
-
-// 安全なstats正規化ヘルパー
-const normalizeStats = (stats: DashboardStats | null): DashboardStats => {
-  if (!stats) {
-    return {
-      ok: false,
-      counts: {
-        services: { count: 0, missing: true },
-        case_studies: { count: 0, missing: true },
-        posts: { count: 0, missing: true },
-        faqs: { count: 0, missing: true },
-        contacts: { count: 0, missing: true },
-      },
-      analytics: {
-        pageViews: 0,
-        avgDurationSec: 0,
-        conversionRate: 0,
-      },
-      missingTables: []
-    };
-  }
-  
-  return {
-    ...stats,
-    analytics: {
-      pageViews: nz(stats.analytics?.pageViews),
-      avgDurationSec: nz(stats.analytics?.avgDurationSec),
-      conversionRate: nz(stats.analytics?.conversionRate),
-    }
-  };
-};
+import { normalizeDashboardStats, getDefaultStats, type DashboardStats } from '@/lib/normalizers/dashboard';
 
 export default function PerformanceMetrics() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -69,34 +16,12 @@ export default function PerformanceMetrics() {
           setStats(data);
         } else {
           // API失敗時もデフォルトスキーマで表示を継続
-          setStats({
-            ok: false,
-            counts: {
-              services: { count: 0, missing: true },
-              case_studies: { count: 0, missing: true },
-              posts: { count: 0, missing: true },
-              faqs: { count: 0, missing: true },
-              contacts: { count: 0, missing: true }
-            },
-            analytics: { pageViews: 0, avgDurationSec: 0, conversionRate: 0 },
-            missingTables: []
-          });
+          setStats(getDefaultStats());
         }
       } catch (error) {
         console.error('Failed to fetch dashboard stats:', error);
         // 通信失敗時もクラッシュを防ぐ
-        setStats({
-          ok: false,
-          counts: {
-            services: { count: 0, missing: true },
-            case_studies: { count: 0, missing: true },
-            posts: { count: 0, missing: true },
-            faqs: { count: 0, missing: true },
-            contacts: { count: 0, missing: true }
-          },
-          analytics: { pageViews: 0, avgDurationSec: 0, conversionRate: 0 },
-          missingTables: []
-        });
+        setStats(getDefaultStats());
       } finally {
         setLoading(false);
       }
@@ -138,7 +63,7 @@ export default function PerformanceMetrics() {
   };
 
   // 安全に正規化されたstatsを使用
-  const safeStats = normalizeStats(stats);
+  const safeStats = normalizeDashboardStats(stats);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
