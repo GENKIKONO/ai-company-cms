@@ -114,7 +114,13 @@ export default function ServicesInfoPage() {
             </ul>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">⚙️ サービス管理</h4>
+            <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+              <svg className="w-4 h-4 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              サービス管理
+            </h4>
             <ul className="text-sm text-gray-600 space-y-1">
               <li>• サービス詳細の管理</li>
               <li>• カテゴリー別分類</li>
@@ -122,7 +128,12 @@ export default function ServicesInfoPage() {
             </ul>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">📊 導入事例管理</h4>
+            <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+              <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              導入事例管理
+            </h4>
             <ul className="text-sm text-gray-600 space-y-1">
               <li>• 成功事例の体系的管理</li>
               <li>• ビフォー・アフター表示</li>

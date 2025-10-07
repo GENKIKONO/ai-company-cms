@@ -102,18 +102,24 @@ export async function createOrganization(organizationData: OrganizationFormData)
   }
 }
 
-// 企業更新
+// 企業更新 - サーバーAPI経由でキャッシュ無効化を確実に実行
 export async function updateOrganization(id: string, organizationData: Partial<OrganizationFormData>) {
   try {
-    const { data, error } = await supabaseBrowser
-      .from('organizations')
-      .update(organizationData)
-      .eq('id', id)
-      .select()
-      .single();
+    const response = await fetch('/api/my/organization', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(organizationData),
+    });
 
-    if (error) throw error;
-    return { data, error: null };
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+    return { data: result.data, error: null };
   } catch (error) {
     console.error('Error updating organization:', error);
     return { data: null, error };
@@ -136,18 +142,30 @@ export async function deleteOrganization(id: string) {
   }
 }
 
-// 企業ステータス更新
+// 企業ステータス更新 - サーバーAPI経由でキャッシュ無効化も実行
 export async function updateOrganizationStatus(id: string, status: 'draft' | 'published' | 'archived') {
   try {
-    const { data, error } = await supabaseBrowser
-      .from('organizations')
-      .update({ status })
-      .eq('id', id)
-      .select()
-      .single();
+    // is_published フィールドも連動して更新
+    const is_published = status === 'published';
+    
+    const response = await fetch('/api/my/organization', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        status,
+        is_published
+      }),
+    });
 
-    if (error) throw error;
-    return { data, error: null };
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+    return { data: result.data, error: null };
   } catch (error) {
     console.error('Error updating organization status:', error);
     return { data: null, error };

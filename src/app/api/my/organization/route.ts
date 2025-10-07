@@ -565,6 +565,21 @@ export async function PUT(request: NextRequest) {
       return handleApiError(error);
     }
 
+    // キャッシュ無効化：編集成功後にダッシュボードと組織詳細ページを無効化
+    try {
+      const { revalidatePath, revalidateTag } = await import('next/cache');
+      revalidatePath('/dashboard');
+      revalidatePath(`/organizations/${existingOrg.id}`);
+      if (data.slug) {
+        revalidatePath(`/o/${data.slug}`);
+        revalidateTag(`org:${data.slug}`);
+      }
+      revalidateTag(`org:${existingOrg.id}`);
+      console.log('🔄 Cache invalidated for organization update');
+    } catch (cacheError) {
+      console.warn('Cache invalidation failed:', cacheError);
+    }
+
     return NextResponse.json(
       { data },
       { 
