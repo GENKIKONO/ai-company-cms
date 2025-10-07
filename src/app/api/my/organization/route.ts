@@ -228,6 +228,16 @@ export async function POST(request: NextRequest) {
 
     if (existingOrg) {
       console.log('[POST /api/my/organization] Organization already exists, returning existing one');
+      
+      // ✅ FIXED: Cache invalidation for idempotent case
+      try {
+        const { revalidateTag } = await import('next/cache');
+        revalidateTag(`org:${user.id}`); // Ensure fresh data is cached
+        console.log('🔄 Cache invalidated for existing organization fetch');
+      } catch (cacheError) {
+        console.warn('Cache invalidation failed:', cacheError);
+      }
+      
       return NextResponse.json(
         { 
           data: existingOrg,
@@ -397,6 +407,15 @@ export async function POST(request: NextRequest) {
           .maybeSingle();
         
         if (again) {
+          // ✅ FIXED: Cache invalidation for constraint violation idempotent case
+          try {
+            const { revalidateTag } = await import('next/cache');
+            revalidateTag(`org:${user.id}`); // Ensure fresh data is cached
+            console.log('🔄 Cache invalidated for constraint violation existing organization');
+          } catch (cacheError) {
+            console.warn('Cache invalidation failed:', cacheError);
+          }
+          
           return NextResponse.json(
             { 
               data: again,
@@ -426,6 +445,39 @@ export async function POST(request: NextRequest) {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
+    }
+
+    // ✅ FIXED: Add cache invalidation for organization creation
+    try {
+      const { revalidatePath, revalidateTag } = await import('next/cache');
+      
+      // パス無効化
+      revalidatePath('/dashboard');
+      revalidatePath('/organizations');
+      revalidatePath(`/organizations/${data.id}`);
+      if (data.slug) {
+        revalidatePath(`/o/${data.slug}`);
+      }
+      
+      // ✅ FIXED: User-based cache invalidation to match organizations-server.ts pattern
+      revalidateTag(`org:${user.id}`); // Match getOrganizationCached key pattern
+      revalidateTag(`org-data`); // Legacy compatibility
+      revalidateTag(`org:${data.id}`);
+      if (data.slug) {
+        revalidateTag(`org:${data.slug}`);
+        revalidateTag(`org-public:${data.slug}`);
+      }
+      revalidateTag(`org-public`);
+      
+      console.log('[VERIFY] Cache invalidation SUCCESS for organization creation:', {
+        userId: user.id,
+        orgId: data.id,
+        orgSlug: data.slug,
+        orgName: data.name,
+        tags: [`org:${user.id}`, `org:${data.id}`, data.slug ? `org:${data.slug}` : null].filter(Boolean)
+      });
+    } catch (cacheError) {
+      console.warn('Cache invalidation failed:', cacheError);
     }
 
     const debugInfo = generateDebugInfo(request, user, body);
@@ -582,7 +634,8 @@ export async function PUT(request: NextRequest) {
       
       // ✅ FIXED: Enhanced tag invalidation for stable cache keys
       // タグ無効化（データ取得ライブラリで使用）
-      revalidateTag(`org-data`); // 🔄 safeData.tsの新しい安定キャッシュで使用
+      revalidateTag(`org:${user.id}`); // Match getOrganizationCached key pattern
+      revalidateTag(`org-data`); // Legacy compatibility
       revalidateTag(`org:${existingOrg.id}`);
       if (data.slug) {
         revalidateTag(`org:${data.slug}`);
@@ -590,7 +643,14 @@ export async function PUT(request: NextRequest) {
       }
       revalidateTag(`org-public`); // 🔄 全公開ページキャッシュ
       
-      console.log('🔄 Enhanced cache invalidated for organization update (FIXED: stable keys)');
+      console.log('[VERIFY] Cache invalidation SUCCESS for organization update:', {
+        userId: user.id,
+        orgId: existingOrg.id,
+        oldSlug: existingOrg.slug,
+        newSlug: data.slug,
+        orgName: data.name,
+        tags: [`org:${user.id}`, `org:${existingOrg.id}`, data.slug ? `org:${data.slug}` : null].filter(Boolean)
+      });
     } catch (cacheError) {
       console.warn('Cache invalidation failed:', cacheError);
     }

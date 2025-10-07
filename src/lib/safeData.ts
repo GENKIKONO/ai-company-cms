@@ -53,45 +53,51 @@ async function logToDiag(errorInfo: { errorId: string; at: string; note: string 
 }
 
 /**
- * /api/my/organization から安全に組織データを取得（キャッシュ無効化対応）
- * 
- * ✅ FIXED: Removed minute-based cache key rotation that interfered with tag-based invalidation.
- * Now relies purely on revalidateTag('org-data') from API endpoints.
+ * ✅ FIXED: This function is now deprecated - use getCurrentUserOrganization() from organizations-server.ts instead
+ * This wrapper is kept for backward compatibility during transition
  */
-const getMyOrganizationCached = unstable_cache(
-  async () => {
-    console.log('[getMyOrganizationCached] Cache miss, fetching fresh data');
-    const response = await serverFetch('/api/my/organization');
-
-    if (response.status === 401) {
-      return { data: null, error: '401 Unauthorized' };
-    }
-    
-    if (response.status === 404) {
-      return { data: null };
-    }
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    const result = await response.json();
-    
-    if (!result.data) {
-      return { data: null };
-    }
-
-    return { data: result.data };
-  },
-  ['org-data-stable'],
-  { tags: ['org-data'], revalidate: 300 } // 5-minute fallback revalidation
-);
-
-export async function getMyOrganizationSafe(reqHeaders?: Headers): Promise<SafeDataResult<SafeOrganizationData>> {
+export async function getMyOrganizationSafe(userId?: string): Promise<SafeDataResult<SafeOrganizationData>> {
   try {
-    // ✅ FIXED: Use stable cache key, rely on tag-based invalidation
-    const result = await getMyOrganizationCached();
-    return result;
+    if (!userId) {
+      return { 
+        data: null, 
+        error: '401 Unauthorized - userId required' 
+      };
+    }
+
+    // Use new server-side function that properly handles caching
+    const { getOrganizationSafe } = await import('./organizations-server');
+    const result = await getOrganizationSafe(userId, true);
+    
+    if (result.error) {
+      return { 
+        data: null, 
+        error: result.error 
+      };
+    }
+
+    // Transform to match expected interface
+    const organization = result.data;
+    if (!organization) {
+      return { data: null };
+    }
+
+    const safeData: SafeOrganizationData = {
+      id: organization.id,
+      name: organization.name,
+      is_published: organization.is_published,
+      slug: organization.slug,
+      updated_at: organization.updated_at,
+      created_at: organization.created_at,
+      logo_url: organization.logo_url
+    };
+
+    console.log('[getMyOrganizationSafe] Data loaded:', { 
+      hasOrg: !!organization, 
+      hasApiKey: !!organization.api_key 
+    });
+
+    return { data: safeData };
 
   } catch (error) {
     const errorId = `org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

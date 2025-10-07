@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { headers } from 'next/headers';
-import { getMyOrganizationSafe, getOrganizationStatsSafe, getCaseStudiesStatsSafe } from '@/lib/safeData';
+import { getCurrentUserOrganization } from '@/lib/organizations-server';
+import { getOrganizationStatsSafe, getCaseStudiesStatsSafe } from '@/lib/safeData';
 import PublishToggle from './components/PublishToggle';
 import TabbedDashboard from './components/TabbedDashboard';
 import PerformanceMetrics from './components/PerformanceMetrics';
@@ -16,16 +16,13 @@ export default async function DashboardPage() {
   try {
     console.log('[Dashboard] Rendering started');
     
-    // リクエストヘッダーを取得
-    const reqHeaders = await headers();
-    
-    // 安全なデータ取得
-    const [orgResult, statsResult] = await Promise.all([
-      getMyOrganizationSafe(reqHeaders),
+    // 安全なデータ取得 - 新しい統合された関数を使用
+    const [userOrgResult, statsResult] = await Promise.all([
+      getCurrentUserOrganization(),
       getOrganizationStatsSafe()
     ]);
 
-    const organization = orgResult.data;
+    const { user, organization, error: orgError } = userOrgResult;
     const stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
 
     // 導入事例統計を取得（組織がある場合のみ）
@@ -35,16 +32,21 @@ export default async function DashboardPage() {
     
     const caseStudiesStats = caseStudiesResult.data || { total: 0, published: 0 };
 
-    console.log('[Dashboard] Data loaded:', { 
+    console.log('[VERIFY] Dashboard data flow - NEW PATTERN ACTIVE:', { 
+      hasUser: !!user,
       hasOrg: !!organization, 
       orgName: organization?.name,
-      stats: stats.total 
+      orgId: organization?.id,
+      apiKey: organization?.api_key ? 'present' : 'missing',
+      stats: stats.total,
+      orgError,
+      renderingPath: !user ? 'auth-required' : !organization?.id ? 'org-creation' : 'dashboard-ui'
     });
 
     // 3段構えのレンダリング分岐
 
     // 1. 認証状態不明 or エラー時 → サインイン導線
-    if (orgResult.error && orgResult.error.includes('401')) {
+    if (orgError && (orgError.includes('Not authenticated') || orgError.includes('401'))) {
       console.log('[Dashboard] Unauthorized access');
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
