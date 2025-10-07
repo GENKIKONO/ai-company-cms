@@ -13,12 +13,48 @@ interface DashboardStats {
     contacts: { count: number | null; missing: boolean };
   };
   analytics: {
-    pageViews: number;
-    avgDurationSec: number;
-    conversionRate: number;
+    pageViews: number | null | undefined;
+    avgDurationSec: number | null | undefined;
+    conversionRate: number | null | undefined;
   };
   missingTables: string[];
 }
+
+// 安全な数値正規化ヘルパー
+const nz = (value: number | null | undefined): number => {
+  return typeof value === 'number' && !isNaN(value) ? value : 0;
+};
+
+// 安全なstats正規化ヘルパー
+const normalizeStats = (stats: DashboardStats | null): DashboardStats => {
+  if (!stats) {
+    return {
+      ok: false,
+      counts: {
+        services: { count: 0, missing: true },
+        case_studies: { count: 0, missing: true },
+        posts: { count: 0, missing: true },
+        faqs: { count: 0, missing: true },
+        contacts: { count: 0, missing: true },
+      },
+      analytics: {
+        pageViews: 0,
+        avgDurationSec: 0,
+        conversionRate: 0,
+      },
+      missingTables: []
+    };
+  }
+  
+  return {
+    ...stats,
+    analytics: {
+      pageViews: nz(stats.analytics?.pageViews),
+      avgDurationSec: nz(stats.analytics?.avgDurationSec),
+      conversionRate: nz(stats.analytics?.conversionRate),
+    }
+  };
+};
 
 export default function PerformanceMetrics() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -31,9 +67,36 @@ export default function PerformanceMetrics() {
         if (response.ok) {
           const data = await response.json();
           setStats(data);
+        } else {
+          // API失敗時もデフォルトスキーマで表示を継続
+          setStats({
+            ok: false,
+            counts: {
+              services: { count: 0, missing: true },
+              case_studies: { count: 0, missing: true },
+              posts: { count: 0, missing: true },
+              faqs: { count: 0, missing: true },
+              contacts: { count: 0, missing: true }
+            },
+            analytics: { pageViews: 0, avgDurationSec: 0, conversionRate: 0 },
+            missingTables: []
+          });
         }
       } catch (error) {
         console.error('Failed to fetch dashboard stats:', error);
+        // 通信失敗時もクラッシュを防ぐ
+        setStats({
+          ok: false,
+          counts: {
+            services: { count: 0, missing: true },
+            case_studies: { count: 0, missing: true },
+            posts: { count: 0, missing: true },
+            faqs: { count: 0, missing: true },
+            contacts: { count: 0, missing: true }
+          },
+          analytics: { pageViews: 0, avgDurationSec: 0, conversionRate: 0 },
+          missingTables: []
+        });
       } finally {
         setLoading(false);
       }
@@ -74,14 +137,17 @@ export default function PerformanceMetrics() {
     return count.toString();
   };
 
+  // 安全に正規化されたstatsを使用
+  const safeStats = normalizeStats(stats);
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div className="text-center">
         <div className="text-2xl font-bold text-gray-700 mb-1">
-          {stats.analytics.pageViews || '—'}
+          {safeStats.analytics.pageViews || '—'}
         </div>
         <div className="text-sm text-gray-500">ページビュー</div>
-        {stats.analytics.pageViews === 0 && (
+        {safeStats.analytics.pageViews === 0 && (
           <div className="text-xs text-gray-400 mt-1" title="解析テーブル未設定">
             未設定
           </div>
@@ -90,10 +156,10 @@ export default function PerformanceMetrics() {
       
       <div className="text-center">
         <div className="text-2xl font-bold text-gray-700 mb-1">
-          {displayValue(stats.counts.contacts.count, stats.counts.contacts.missing)}
+          {displayValue(safeStats.counts.contacts.count, safeStats.counts.contacts.missing)}
         </div>
         <div className="text-sm text-gray-500">問い合わせ</div>
-        {stats.counts.contacts.missing && (
+        {safeStats.counts.contacts.missing && (
           <div className="text-xs text-gray-400 mt-1" title="contactsテーブル未作成">
             テーブル未作成
           </div>
@@ -102,13 +168,13 @@ export default function PerformanceMetrics() {
       
       <div className="text-center">
         <div className="text-2xl font-bold text-gray-700 mb-1">
-          {stats.analytics.conversionRate > 0 
-            ? `${stats.analytics.conversionRate}%` 
+          {safeStats.analytics.conversionRate > 0 
+            ? `${safeStats.analytics.conversionRate}%` 
             : '—'
           }
         </div>
         <div className="text-sm text-gray-500">コンバージョン率</div>
-        {stats.analytics.conversionRate === 0 && (
+        {safeStats.analytics.conversionRate === 0 && (
           <div className="text-xs text-gray-400 mt-1" title="解析テーブル未設定">
             未設定
           </div>
@@ -117,13 +183,13 @@ export default function PerformanceMetrics() {
       
       <div className="text-center">
         <div className="text-2xl font-bold text-gray-700 mb-1">
-          {stats.analytics.avgDurationSec > 0 
-            ? formatDuration(stats.analytics.avgDurationSec)
+          {safeStats.analytics.avgDurationSec > 0 
+            ? formatDuration(safeStats.analytics.avgDurationSec)
             : '—'
           }
         </div>
         <div className="text-sm text-gray-500">平均滞在時間</div>
-        {stats.analytics.avgDurationSec === 0 && (
+        {safeStats.analytics.avgDurationSec === 0 && (
           <div className="text-xs text-gray-400 mt-1" title="解析テーブル未設定">
             未設定
           </div>
