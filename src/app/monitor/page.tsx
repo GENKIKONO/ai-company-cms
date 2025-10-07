@@ -29,14 +29,18 @@ export default function MonitorPage() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<string>('');
 
-  // ✅ プランチェック - FIXED: Real plan data
+  // ✅ プランチェック - FIXED: Client-side plan check via API
   useEffect(() => {
     async function checkPlanAccess() {
       try {
-        const { getUserPlan } = await import('@/lib/user-plan');
-        const userPlanInfo = await getUserPlan();
+        const response = await fetch('/api/user/plan');
+        if (!response.ok) {
+          throw new Error('Failed to fetch user plan');
+        }
         
-        if (!isSystemMonitoringAllowed(userPlanInfo.plan)) {
+        const { plan } = await response.json();
+        
+        if (!isSystemMonitoringAllowed(plan)) {
           router.push('/pricing?feature=monitor');
           return;
         }

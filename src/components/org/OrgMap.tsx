@@ -34,23 +34,24 @@ export default function OrgMap({ organization, className = '' }: OrgMapProps) {
         // ✅ FIXED: Improved build stability with proper dynamic loading
         if (typeof window === 'undefined') return;
         
-        // Load Leaflet with proper typing
-        const [{ default: L }, leafletCSS] = await Promise.all([
-          import('leaflet'),
-          // ✅ FIXED: Load CSS more reliably with error handling
-          import('leaflet/dist/leaflet.css').catch(() => {
-            console.warn('Leaflet CSS import failed, falling back to CDN');
-            if (!document.querySelector('link[href*="leaflet.css"]')) {
-              const cssLink = document.createElement('link');
-              cssLink.rel = 'stylesheet';
-              cssLink.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-              cssLink.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-              cssLink.crossOrigin = 'anonymous';
-              document.head.appendChild(cssLink);
-            }
-            return null;
-          })
-        ]);
+        // ✅ FIXED: Load Leaflet with CDN CSS (build-stable)
+        const L = await import('leaflet');
+        
+        // Load CSS from CDN with integrity check
+        if (!document.querySelector('link[href*="leaflet.css"]')) {
+          const cssLink = document.createElement('link');
+          cssLink.rel = 'stylesheet';
+          cssLink.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+          cssLink.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+          cssLink.crossOrigin = 'anonymous';
+          document.head.appendChild(cssLink);
+          
+          // Wait for CSS to load
+          await new Promise(resolve => {
+            cssLink.onload = resolve;
+            cssLink.onerror = resolve; // Continue even if CSS fails
+          });
+        }
 
         if (!isMounted) return;
 
@@ -75,16 +76,16 @@ export default function OrgMap({ organization, className = '' }: OrgMapProps) {
           mapInstance.current.remove();
         }
 
-        const map = L.map(mapRef.current!).setView([lat, lng], 15);
+        const map = L.default.map(mapRef.current!).setView([lat, lng], 15);
         mapInstance.current = map;
 
         // OpenStreetMapタイル追加
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.default.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
         // ✅ FIXED: Improved marker with proper Leaflet reference and SVG icon
-        const customIcon = L.divIcon({
+        const customIcon = L.default.divIcon({
           html: `
             <div style="
               background-color: #3b82f6;
@@ -117,7 +118,7 @@ export default function OrgMap({ organization, className = '' }: OrgMapProps) {
           popupAnchor: [0, -30]
         });
 
-        L.marker([lat, lng], { icon: customIcon })
+        L.default.marker([lat, lng], { icon: customIcon })
           .addTo(map)
           .bindPopup(`
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
