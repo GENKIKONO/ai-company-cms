@@ -107,6 +107,16 @@ export function requirePartnerAccess(authContext: AuthContext): Response | null 
 }
 
 /**
+ * 管理者権限チェック
+ */
+export function requireAdminAccess(authContext: AuthContext): Response | null {
+  if (authContext.userAccess.flow !== 'admin') {
+    return forbiddenError('Admin access required');
+  }
+  return null;
+}
+
+/**
  * 組織オーナー権限チェック
  */
 export function requireOrgOwner(authContext: AuthContext, orgId: string): Response | null {
