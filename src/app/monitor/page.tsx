@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { isSystemMonitoringAllowed, getSystemMonitoringLimitMessage } from '@/config/plans';
 
 interface MonitorData {
   timestamp: string;
@@ -21,10 +23,32 @@ interface CheckResult {
 }
 
 export default function MonitorPage() {
+  const router = useRouter();
   const [data, setData] = useState<MonitorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<string>('');
+
+  // ✅ プランチェック - FIXED: Real plan data
+  useEffect(() => {
+    async function checkPlanAccess() {
+      try {
+        const { getUserPlan } = await import('@/lib/user-plan');
+        const userPlanInfo = await getUserPlan();
+        
+        if (!isSystemMonitoringAllowed(userPlanInfo.plan)) {
+          router.push('/pricing?feature=monitor');
+          return;
+        }
+      } catch (error) {
+        console.error('Plan check error:', error);
+        // Fallback to pricing page on error
+        router.push('/pricing?feature=monitor');
+      }
+    }
+    
+    checkPlanAccess();
+  }, [router]);
 
   const fetchMonitorData = async () => {
     try {

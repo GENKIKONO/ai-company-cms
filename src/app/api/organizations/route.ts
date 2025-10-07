@@ -222,6 +222,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // 法人番号の重複チェック
+    if (validatedData.corporate_number) {
+      const { data: corporateNumberCheck } = await supabase
+        .from('organizations')
+        .select('id, name')
+        .eq('corporate_number', validatedData.corporate_number)
+        .single();
+
+      if (corporateNumberCheck) {
+        return NextResponse.json(
+          {
+            error: 'CORPORATE_NUMBER_EXISTS',
+            message: `法人番号 ${validatedData.corporate_number} は既に登録されています（企業名: ${corporateNumberCheck.name}）`,
+            field: 'corporate_number'
+          },
+          { status: 409 }
+        );
+      }
+    }
+
     let organizationData: Partial<Organization> = {
       ...normalizedBody,
       created_by: (authResult as AuthContext).user.id,

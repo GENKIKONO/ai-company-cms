@@ -38,8 +38,21 @@ export async function GET(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({
         ok: false,
-        error: 'Unauthorized'
-      }, { status: 401 });
+        error: 'Unauthorized',
+        counts: {
+          services: { count: 0, missing: true },
+          case_studies: { count: 0, missing: true },
+          posts: { count: 0, missing: true },
+          faqs: { count: 0, missing: true },
+          contacts: { count: 0, missing: true }
+        },
+        analytics: {
+          pageViews: 0,
+          avgDurationSec: 0,
+          conversionRate: 0
+        },
+        missingTables: ['services', 'case_studies', 'posts', 'faqs', 'contacts']
+      }, { status: 200 });
     }
 
     // 組織情報取得
@@ -52,8 +65,21 @@ export async function GET(request: NextRequest) {
     if (orgError || !orgData) {
       return NextResponse.json({
         ok: false,
-        error: 'Organization not found'
-      });
+        error: 'Organization not found',
+        counts: {
+          services: { count: 0, missing: true },
+          case_studies: { count: 0, missing: true },
+          posts: { count: 0, missing: true },
+          faqs: { count: 0, missing: true },
+          contacts: { count: 0, missing: true }
+        },
+        analytics: {
+          pageViews: 0,
+          avgDurationSec: 0,
+          conversionRate: 0
+        },
+        missingTables: ['services', 'case_studies', 'posts', 'faqs', 'contacts']
+      }, { status: 200 });
     }
 
     const orgId = orgData.id;
@@ -113,9 +139,9 @@ export async function GET(request: NextRequest) {
         .single();
       
       if (analyticsData) {
-        analytics.pageViews = analyticsData.page_views || 0;
-        analytics.avgDurationSec = analyticsData.avg_duration || 0;
-        analytics.conversionRate = analyticsData.conversion_rate || 0;
+        analytics.pageViews = Number(analyticsData.page_views) || 0;
+        analytics.avgDurationSec = Number(analyticsData.avg_duration) || 0;
+        analytics.conversionRate = Number(analyticsData.conversion_rate) || 0;
       }
     } catch (analyticsError) {
       // 解析テーブルが存在しない場合も正常として扱う

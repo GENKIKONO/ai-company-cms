@@ -565,18 +565,32 @@ export async function PUT(request: NextRequest) {
       return handleApiError(error);
     }
 
-    // キャッシュ無効化：編集成功後にダッシュボードと組織詳細ページを無効化
+    // ✅ 強化されたキャッシュ無効化：編集成功後に全関連キャッシュを無効化
     try {
       const { revalidatePath, revalidateTag } = await import('next/cache');
+      
+      // パス無効化
       revalidatePath('/dashboard');
       revalidatePath('/organizations');
       revalidatePath(`/organizations/${existingOrg.id}`);
       if (data.slug) {
         revalidatePath(`/o/${data.slug}`);
-        revalidateTag(`org:${data.slug}`);
       }
+      if (existingOrg.slug && existingOrg.slug !== data.slug) {
+        revalidatePath(`/o/${existingOrg.slug}`); // 旧slug
+      }
+      
+      // ✅ FIXED: Enhanced tag invalidation for stable cache keys
+      // タグ無効化（データ取得ライブラリで使用）
+      revalidateTag(`org-data`); // 🔄 safeData.tsの新しい安定キャッシュで使用
       revalidateTag(`org:${existingOrg.id}`);
-      console.log('🔄 Cache invalidated for organization update');
+      if (data.slug) {
+        revalidateTag(`org:${data.slug}`);
+        revalidateTag(`org-public:${data.slug}`); // 🔄 公開ページキャッシュ
+      }
+      revalidateTag(`org-public`); // 🔄 全公開ページキャッシュ
+      
+      console.log('🔄 Enhanced cache invalidated for organization update (FIXED: stable keys)');
     } catch (cacheError) {
       console.warn('Cache invalidation failed:', cacheError);
     }

@@ -209,7 +209,7 @@ export default async function DashboardPage() {
             <span className="text-sm text-gray-500">よく使用される機能</span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <Link 
               href={`/organizations/${organization.id}`}
               data-testid="qa-edit-org"
@@ -247,18 +247,101 @@ export default async function DashboardPage() {
               organizationName={organization.name}
             />
 
+            {/* ✅ 公開ページを見るボタン追加 */}
+            {organization.slug && organization.is_published ? (
+              <Link 
+                href={`/o/${organization.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col items-center p-6 border-2 border-green-200 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all duration-300"
+              >
+                <div className="p-3 bg-green-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-gray-900 mb-1">公開ページを見る</p>
+                  <p className="text-sm text-gray-600">外部からの見え方を確認</p>
+                </div>
+              </Link>
+            ) : (
+              <button 
+                className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl opacity-50 cursor-not-allowed transition-all duration-300" 
+                title={!organization.slug ? "公開スラッグ未設定" : "企業が未公開"}
+                disabled
+              >
+                <div className="p-3 bg-gray-100 rounded-xl mb-4">
+                  <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.464 8.464l1.414-1.414L12 9.172m-2.122.707l-1.415 1.414M12 9.172l1.878-1.879m2.829 2.829l-1.414 1.414M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-gray-400 mb-1">公開ページを見る</p>
+                  <p className="text-sm text-gray-400">
+                    {!organization.slug ? "スラッグ未設定" : "未公開"}
+                  </p>
+                </div>
+              </button>
+            )}
+
+            {/* ✅ システム監視 - プラン制限対応 - FIXED: Real plan data */}
+            {(() => {
+              const { isSystemMonitoringAllowed } = require('@/config/plans');
+              const { getUserPlanClient } = require('@/lib/user-plan');
+              const userPlanInfo = getUserPlanClient(organization);
+              const isAllowed = isSystemMonitoringAllowed(userPlanInfo.plan);
+              
+              if (isAllowed) {
+                return (
+                  <Link 
+                    href="/monitor"
+                    className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
+                  >
+                    <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-semibold text-gray-900 mb-1">システム監視</p>
+                      <p className="text-sm text-gray-600">パフォーマンスを確認</p>
+                    </div>
+                  </Link>
+                );
+              } else {
+                return (
+                  <Link 
+                    href="/pricing?feature=monitor"
+                    className="group flex flex-col items-center p-6 border-2 border-orange-200 rounded-xl hover:border-orange-400 hover:bg-orange-50 transition-all duration-300"
+                  >
+                    <div className="p-3 bg-orange-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-semibold text-gray-900 mb-1">システム監視</p>
+                      <p className="text-sm text-orange-600">スタンダード以上</p>
+                    </div>
+                  </Link>
+                );
+              }
+            })()}
+
             <Link 
-              href="/monitor"
-              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
+              href={`/organizations/${organization.id}/hearing-request`}
+              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-300"
             >
-              <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              <div className="p-3 bg-blue-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h2m-4 9h10m-5-3L8 13l4-4-4-4" />
                 </svg>
               </div>
               <div className="text-center">
-                <p className="font-semibold text-gray-900 mb-1">システム監視</p>
-                <p className="text-sm text-gray-600">パフォーマンスを確認</p>
+                <p className="font-semibold text-gray-900 mb-1">ヒアリング支援依頼</p>
+                <p className="text-sm text-gray-600">専門ヒアリングを依頼</p>
               </div>
             </Link>
           </div>

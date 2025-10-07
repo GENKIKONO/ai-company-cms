@@ -21,6 +21,7 @@ export default function NewOrganizationPage() {
     slug: '',
     description: '',
     legal_form: '',
+    corporate_number: '',
     representative_name: '',
     // founded: '',  // UIに入力欄がないため完全除去
     capital: undefined,
@@ -125,6 +126,15 @@ export default function NewOrganizationPage() {
     //   newErrors.description = '企業説明は必須です';
     // }
 
+    // 法人番号バリデーション（法人格が選択されている場合）
+    const isLegalEntity = ['株式会社', '有限会社', '合同会社', '合資会社', '合名会社', '一般社団法人', '一般財団法人'].includes(formData.legal_form);
+    if (isLegalEntity && formData.corporate_number) {
+      const corporateNumber = formData.corporate_number.trim();
+      if (corporateNumber && !/^\d{13}$/.test(corporateNumber)) {
+        newErrors.corporate_number = '法人番号は13桁の数字で入力してください';
+      }
+    }
+
     // 安全な文字列処理でundefined.match()エラーを回避
     const urlValue = typeof formData.url === 'string' ? formData.url : '';
     if (urlValue && !/^https?:\/\/.+/.test(urlValue)) {
@@ -171,7 +181,7 @@ export default function NewOrganizationPage() {
         'description', 'legal_form', 'representative_name', /* 'founded', */ 'capital', 'employees',
         'address_country', 'address_region', 'address_locality', 'address_postal_code', 'address_street',
         'telephone', 'email', 'email_public', 'url', 'logo_url', 'industries', 'same_as', 'status',
-        'meta_title', 'meta_description', 'meta_keywords', 'slug'
+        'meta_title', 'meta_description', 'meta_keywords', 'slug', 'corporate_number'
         // foundedはUIに入力欄がないため除外
         // 拡張フィールドは本番DBに未適用のため一時的に除外
         // 'favicon_url', 'brand_color_primary', 'brand_color_secondary', 'social_media', 'business_hours',
@@ -480,6 +490,31 @@ export default function NewOrganizationPage() {
                 />
               </div>
             </div>
+
+            {/* 法人番号フィールド（法人の場合のみ表示） */}
+            {(['株式会社', '有限会社', '合同会社', '合資会社', '合名会社', '一般社団法人', '一般財団法人'].includes(formData.legal_form)) && (
+              <div className="mt-6">
+                <label htmlFor="corporate_number" className="block text-sm font-medium text-gray-700 mb-2">
+                  法人番号 <span className="text-blue-600 text-xs">（信頼性向上）</span>
+                </label>
+                <input
+                  type="text"
+                  id="corporate_number"
+                  value={formData.corporate_number}
+                  onChange={(e) => handleInputChange('corporate_number', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 ${
+                    errors.corporate_number ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="1234567890123"
+                  maxLength={13}
+                  pattern="[0-9]{13}"
+                />
+                {errors.corporate_number && <p className="mt-1 text-sm text-red-600">{errors.corporate_number}</p>}
+                <p className="mt-1 text-xs text-gray-500">
+                  13桁の法人番号を入力してください（国税庁法人番号公表サイトで確認可能）
+                </p>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
               {/* 設立年月日入力欄を除去（UIに存在しない） */}

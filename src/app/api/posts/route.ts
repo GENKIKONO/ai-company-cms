@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         organization_id: orgData.id,
         title,
         slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
-        content_markdown: content || null,
+        content_html: content || null, // content_markdownではなくcontent_htmlを使用
         status: status || 'draft',
         created_by: user.id, // ← ここで必ず設定（認証済みユーザーID）
       };

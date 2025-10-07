@@ -2,6 +2,7 @@
  * 安全なデータ取得関数 - SSRでthrowしない実装
  */
 
+import { unstable_cache } from 'next/cache';
 import { serverFetch } from './serverFetch';
 
 interface SafeOrganizationData {
@@ -52,20 +53,21 @@ async function logToDiag(errorInfo: { errorId: string; at: string; note: string 
 }
 
 /**
- * /api/my/organization から安全に組織データを取得
+ * /api/my/organization から安全に組織データを取得（キャッシュ無効化対応）
+ * 
+ * ✅ FIXED: Removed minute-based cache key rotation that interfered with tag-based invalidation.
+ * Now relies purely on revalidateTag('org-data') from API endpoints.
  */
-export async function getMyOrganizationSafe(reqHeaders?: Headers): Promise<SafeDataResult<SafeOrganizationData>> {
-  try {
-    // ✅ serverFetch使用でSSR安定化
+const getMyOrganizationCached = unstable_cache(
+  async () => {
+    console.log('[getMyOrganizationCached] Cache miss, fetching fresh data');
     const response = await serverFetch('/api/my/organization');
 
     if (response.status === 401) {
-      // ログインしていない場合
       return { data: null, error: '401 Unauthorized' };
     }
     
     if (response.status === 404) {
-      // 組織がない場合
       return { data: null };
     }
 
@@ -80,6 +82,16 @@ export async function getMyOrganizationSafe(reqHeaders?: Headers): Promise<SafeD
     }
 
     return { data: result.data };
+  },
+  ['org-data-stable'],
+  { tags: ['org-data'], revalidate: 300 } // 5-minute fallback revalidation
+);
+
+export async function getMyOrganizationSafe(reqHeaders?: Headers): Promise<SafeDataResult<SafeOrganizationData>> {
+  try {
+    // ✅ FIXED: Use stable cache key, rely on tag-based invalidation
+    const result = await getMyOrganizationCached();
+    return result;
 
   } catch (error) {
     const errorId = `org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

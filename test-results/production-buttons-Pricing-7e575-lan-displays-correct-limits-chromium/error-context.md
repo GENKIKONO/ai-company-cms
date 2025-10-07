@@ -29,65 +29,64 @@
       - generic [ref=e21]:
         - generic [ref=e22]:
           - heading "無料プラン" [level=3] [ref=e23]
-          - generic [ref=e24]:
-            - text: ¥0
-            - generic [ref=e25]: /月
-          - paragraph [ref=e26]: 個人や小規模企業に最適
-        - list [ref=e27]:
-          - listitem [ref=e28]:
-            - img [ref=e29]
+          - generic [ref=e24]: 無料
+          - paragraph [ref=e25]: 個人や小規模企業に最適
+        - list [ref=e26]:
+          - listitem [ref=e27]:
+            - img [ref=e28]
             - text: 基本的な企業情報管理
-          - listitem [ref=e31]:
-            - img [ref=e32]
-            - text: 最大5つのサービス
-          - listitem [ref=e34]:
-            - img [ref=e35]
+          - listitem [ref=e30]:
+            - img [ref=e31]
+            - text: サービス登録：1件まで
+          - listitem [ref=e33]:
+            - img [ref=e34]
             - text: SEO最適化
-        - button "現在のプラン" [ref=e37] [cursor=pointer]
-      - generic [ref=e38]:
-        - generic [ref=e40]: おすすめ
-        - generic [ref=e41]:
-          - heading "スタンダード" [level=3] [ref=e42]
-          - generic [ref=e43]:
-            - text: ¥4,980
-            - generic [ref=e44]: /月
-          - paragraph [ref=e45]: 成長企業に最適
-        - list [ref=e46]:
-          - listitem [ref=e47]:
-            - img [ref=e48]
-            - text: 無制限のサービス・事例
-          - listitem [ref=e50]:
-            - img [ref=e51]
-            - text: AI入力支援
-          - listitem [ref=e53]:
-            - img [ref=e54]
+          - listitem [ref=e36]:
+            - img [ref=e37]
+            - text: AIが読み取りやすい構造で自動出力
+        - button "現在のプラン" [ref=e39] [cursor=pointer]
+      - generic [ref=e40]:
+        - generic [ref=e42]: おすすめ
+        - generic [ref=e43]:
+          - heading "スタンダード" [level=3] [ref=e44]
+          - generic [ref=e45]: ¥9,800/月
+          - paragraph [ref=e46]: 成長企業に最適
+        - list [ref=e47]:
+          - listitem [ref=e48]:
+            - img [ref=e49]
+            - text: サービス登録：50件まで
+          - listitem [ref=e51]:
+            - img [ref=e52]
+            - text: AIが読み取りやすい構造で自動出力
+          - listitem [ref=e54]:
+            - img [ref=e55]
             - text: 詳細分析・レポート
-          - listitem [ref=e56]:
-            - img [ref=e57]
+          - listitem [ref=e57]:
+            - img [ref=e58]
             - text: メールサポート
-        - button "プランを選択" [ref=e59] [cursor=pointer]
-      - generic [ref=e60]:
-        - generic [ref=e61]:
-          - heading "エンタープライズ" [level=3] [ref=e62]
-          - generic [ref=e63]: お問い合わせ
-          - paragraph [ref=e64]: 大企業・カスタマイズが必要な企業に
-        - list [ref=e65]:
-          - listitem [ref=e66]:
-            - img [ref=e67]
+        - button "プランを選択" [ref=e60] [cursor=pointer]
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - heading "エンタープライズ" [level=3] [ref=e63]
+          - generic [ref=e64]: お問い合わせ
+          - paragraph [ref=e65]: 大企業・カスタマイズが必要な企業に
+        - list [ref=e66]:
+          - listitem [ref=e67]:
+            - img [ref=e68]
             - text: すべての機能
-          - listitem [ref=e69]:
-            - img [ref=e70]
+          - listitem [ref=e70]:
+            - img [ref=e71]
             - text: カスタム機能開発
-          - listitem [ref=e72]:
-            - img [ref=e73]
+          - listitem [ref=e73]:
+            - img [ref=e74]
             - text: 専任サポート
-          - listitem [ref=e75]:
-            - img [ref=e76]
+          - listitem [ref=e76]:
+            - img [ref=e77]
             - text: SLA保証
-        - button "お問い合わせ" [ref=e78] [cursor=pointer]
-    - generic [ref=e79]:
-      - paragraph [ref=e80]: まずは無料プランからお始めください。いつでもアップグレード可能です。
-      - link "無料で始める" [ref=e81] [cursor=pointer]:
+        - button "お問い合わせ" [ref=e79] [cursor=pointer]
+    - generic [ref=e80]:
+      - paragraph [ref=e81]: まずは無料プランからお始めください。いつでもアップグレード可能です。
+      - link "無料で始める" [ref=e82] [cursor=pointer]:
         - /url: /auth/signup
-  - alert [ref=e82]
+  - alert [ref=e83]
 ```

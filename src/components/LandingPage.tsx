@@ -222,7 +222,11 @@ export default function LandingPage({ stats }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* 機能1 */}
               <div className="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="text-4xl mb-4">🏢</div>
+                <div className="text-indigo-600 mb-4">
+                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">企業情報管理</h3>
                 <p className="text-gray-600">
                   企業の基本情報、サービス、導入事例、FAQを一元管理。
@@ -246,7 +250,12 @@ export default function LandingPage({ stats }: Props) {
 
               {/* 機能3 */}
               <div className="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="text-4xl mb-4">🤖</div>
+                <div className="text-blue-600 mb-4">
+                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M12 6v6m0 6h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">AIが読み取りやすい構造で自動出力</h3>
                 <p className="text-gray-600">
                   入力された情報をもとに、AI検索に最適な

@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`
-          id, title, slug, content_markdown, content_html, 
+          id, title, slug, content_html, 
           published_at, created_at, organization_id,
           organizations!posts_org_fk(name, slug, url)
         `)
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           id: post.id,
           title: post.title ?? '',
           slug: post.slug ?? '',
-          content: post.content_markdown ?? post.content_html ?? '',
+          content: post.content_html ?? '',
           pub_date: post.published_at ?? post.created_at ?? '',
           org_slug: org?.slug ?? null,
           org_name: org?.name ?? null,

@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateOrganizationPageJsonLd } from '@/lib/utils/jsonld';
 import { LogoImage } from '@/components/ui/optimized-image';
+import ReportButton from '@/components/common/ReportButton';
+import OrgMap from '@/components/org/OrgMap';
 import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/database';
 
 interface OrganizationPageData {
@@ -13,19 +15,102 @@ interface OrganizationPageData {
   faqs: FAQ[];
 }
 
+// ✅ キャッシュ対応: 公開組織データ取得
+import { unstable_cache } from 'next/cache';
+
+const getOrganizationDataCached = (slug: string) =>
+  unstable_cache(
+    async (): Promise<OrganizationPageData | null> => {
+      console.log(`[getOrganizationDataCached] Cache miss for slug: ${slug}`);
+      
+      // サーバーサイドでSupabaseから直接取得
+      const { supabaseServer } = await import('@/lib/supabase-server');
+      const supabase = await supabaseServer();
+      
+      // ✅ 厳密な取得条件（status='published'かつis_published=true の企業のみ）
+      const { data: organization, error: orgError } = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('slug', slug)
+        .eq('status', 'published')
+        .eq('is_published', true)
+        .single();
+
+      // ✅ FIXED: Enhanced debugging for 404 issues
+      if (orgError || !organization) {
+        // Check if organization exists with different status for debugging
+        const { data: debugOrg } = await supabase
+          .from('organizations')
+          .select('slug, status, is_published')
+          .eq('slug', slug)
+          .maybeSingle();
+          
+        if (debugOrg) {
+          console.warn(`🚨 Organization found but not published:`, {
+            slug,
+            status: debugOrg.status,
+            is_published: debugOrg.is_published,
+            requiredConditions: 'status=published AND is_published=true'
+          });
+        } else {
+          console.warn(`❌ Organization not found for slug: ${slug}`, orgError);
+        }
+        return null;
+      }
+
+      console.log(`✅ Public organization loaded: ${organization.name} (${slug})`);
+
+      // 公開されたコンテンツを並行取得
+      const [postsResult, servicesResult, caseStudiesResult, faqsResult] = await Promise.all([
+        supabase
+          .from('posts')
+          .select('*')
+          .eq('organization_id', organization.id)
+          .eq('is_published', true)
+          .order('created_at', { ascending: false })
+          .limit(10),
+        
+        supabase
+          .from('services')
+          .select('*')
+          .eq('organization_id', organization.id)
+          .eq('is_published', true)
+          .order('created_at', { ascending: false }),
+        
+        supabase
+          .from('case_studies')
+          .select('*')
+          .eq('organization_id', organization.id)
+          .eq('is_published', true)
+          .order('created_at', { ascending: false }),
+        
+        supabase
+          .from('faqs')
+          .select('*')
+          .eq('organization_id', organization.id)
+          .eq('is_published', true)
+          .order('created_at', { ascending: false })
+      ]);
+
+      return {
+        organization,
+        posts: postsResult.data || [],
+        services: servicesResult.data || [],
+        case_studies: caseStudiesResult.data || [],
+        faqs: faqsResult.data || []
+      };
+    },
+    [`org-public-${slug}`],
+    { 
+      tags: [`org-public:${slug}`, `org-public`], 
+      revalidate: 300 // 5分キャッシュ 
+    }
+  )();
+
 async function getOrganizationData(slug: string): Promise<OrganizationPageData | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/public/organizations/${slug}`, {
-      cache: 'no-store'
-    });
-    
-    if (!response.ok) {
-      return null;
-    }
-    
-    const result = await response.json();
-    return result.data;
+    // ✅ キャッシュ付きの取得を使用
+    return await getOrganizationDataCached(slug);
   } catch (error) {
     console.error('Failed to fetch organization data:', error);
     return null;
@@ -154,7 +239,17 @@ export default async function OrganizationDetailPage({
                     </div>
                   )}
                   <div className="ml-6">
-                    <h1 className="text-3xl font-bold text-gray-900">{organization.name}</h1>
+                    <div className="flex items-center gap-3">
+                      <h1 className="text-3xl font-bold text-gray-900">{organization.name}</h1>
+                      {organization.verified && (
+                        <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span>認証済み法人</span>
+                        </div>
+                      )}
+                    </div>
                     {organization.legal_form && (
                       <p className="text-lg text-gray-600 mt-1">{organization.legal_form}</p>
                     )}
@@ -173,16 +268,26 @@ export default async function OrganizationDetailPage({
                   </div>
                 </div>
                 
-                {organization.url && (
-                  <Link
-                    href={organization.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    公式サイトを開く
-                  </Link>
-                )}
+                <div className="flex flex-col gap-3">
+                  {organization.url && (
+                    <Link
+                      href={organization.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center"
+                    >
+                      公式サイトを開く
+                    </Link>
+                  )}
+                  
+                  {/* 通報ボタン */}
+                  <div className="flex justify-end">
+                    <ReportButton 
+                      organizationId={organization.id}
+                      organizationName={organization.name}
+                    />
+                  </div>
+                </div>
               </div>
 
               {organization.description && (
@@ -283,6 +388,13 @@ export default async function OrganizationDetailPage({
                     )}
                   </dl>
                 </div>
+              </div>
+            </div>
+
+            {/* 地図表示 */}
+            <div className="border-t border-gray-200">
+              <div className="p-6 sm:p-8">
+                <OrgMap organization={organization} />
               </div>
             </div>
 

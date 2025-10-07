@@ -42,7 +42,12 @@ export default function AboutPage() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">主な機能</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">🏢 企業情報管理</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    企業情報管理
+                  </h3>
                   <p className="text-gray-600">企業の基本情報、サービス、導入事例、FAQを一元管理できます。</p>
                 </div>
                 <div className="bg-gray-50 p-6 rounded-lg">
@@ -55,7 +60,12 @@ export default function AboutPage() {
                   <p className="text-gray-600">JSON-LD構造化データ自動生成により、検索エンジン最適化を実現します。</p>
                 </div>
                 <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">🤖 AIが読み取りやすい構造で自動出力</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    AIが読み取りやすい構造で自動出力
+                  </h3>
                   <p className="text-gray-600">入力された情報をもとに、AI検索に最適な構造化データ・フィードを自動生成します。</p>
                 </div>
                 <div className="bg-gray-50 p-6 rounded-lg">

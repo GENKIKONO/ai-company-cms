@@ -235,19 +235,55 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription): Prom
       return false;
     }
 
-    // 組織のステータスも更新
-    if (status === 'active') {
-      await supabase
-        .from('organizations')
-        .update({ status: 'published' })
-        .eq('id', organizationId)
-        .in('status', ['draft', 'paused']); // draft または paused の場合のみ published に変更
-    } else if (status === 'paused') {
-      await supabase
-        .from('organizations')
-        .update({ status: 'paused' })
-        .eq('id', organizationId)
-        .eq('status', 'published'); // published の場合のみ paused に変更
+    // ✅ FIXED: Sync users.plan with subscription status
+    // First get organization and user info
+    const { data: organization } = await supabase
+      .from('organizations')
+      .select('id, created_by, plan')
+      .eq('id', organizationId)
+      .single();
+
+    if (organization) {
+      // Determine the plan based on subscription
+      let newPlan: string = 'free';
+      if (status === 'active') {
+        // You can determine plan type from subscription.items or metadata
+        // For now, default to 'basic' for active paid subscriptions
+        newPlan = 'basic';
+      }
+
+      // Update organization status and plan
+      const orgUpdateData: any = {};
+      if (status === 'active') {
+        orgUpdateData.status = 'published';
+        orgUpdateData.plan = newPlan;
+      } else if (status === 'paused') {
+        orgUpdateData.status = 'paused';
+        orgUpdateData.plan = 'free';
+      }
+
+      if (Object.keys(orgUpdateData).length > 0) {
+        await supabase
+          .from('organizations')
+          .update(orgUpdateData)
+          .eq('id', organizationId);
+      }
+
+      // ✅ FIXED: Sync users.plan field in auth.users metadata
+      const { error: userUpdateError } = await supabase.auth.admin.updateUserById(
+        organization.created_by,
+        {
+          user_metadata: {
+            plan: newPlan
+          }
+        }
+      );
+
+      if (userUpdateError) {
+        console.error('Failed to update user plan in auth metadata:', userUpdateError);
+      } else {
+        console.log(`✅ User plan synced: ${organization.created_by} → ${newPlan}`);
+      }
     }
 
     console.log(`Subscription ${subscription.id} updated to status: ${status}`);
@@ -284,11 +320,39 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
       return false;
     }
 
-    // 組織を一時停止状態に変更
-    await supabase
+    // ✅ FIXED: Update organization and sync user plan on cancellation
+    const { data: organization } = await supabase
       .from('organizations')
-      .update({ status: 'paused' })
-      .eq('id', organizationId);
+      .select('id, created_by')
+      .eq('id', organizationId)
+      .single();
+
+    if (organization) {
+      // Update organization to paused with free plan
+      await supabase
+        .from('organizations')
+        .update({ 
+          status: 'paused',
+          plan: 'free'
+        })
+        .eq('id', organizationId);
+
+      // ✅ FIXED: Sync user plan to free on subscription cancellation
+      const { error: userUpdateError } = await supabase.auth.admin.updateUserById(
+        organization.created_by,
+        {
+          user_metadata: {
+            plan: 'free'
+          }
+        }
+      );
+
+      if (userUpdateError) {
+        console.error('Failed to update user plan on cancellation:', userUpdateError);
+      } else {
+        console.log(`✅ User plan reset to free: ${organization.created_by}`);
+      }
+    }
 
     console.log(`Subscription ${subscription.id} cancelled`);
     return true;

@@ -74,4 +74,33 @@ test.describe('Pricing page validation', () => {
     await expect(page.getByText('AIが読み取りやすい構造で自動出力')).toBeVisible();
     await expect(page.getByText('AI入力支援')).toHaveCount(0);
   });
+
+  test('Materials feature added to standard plan', async ({ page }) => {
+    await page.goto(`${base}/pricing`);
+    
+    // 営業資料機能がスタンダードプランに追加されていることを確認
+    await expect(page.getByText('営業資料を添付（最大10個）')).toBeVisible();
+    
+    // 詳細分析・レポートが削除されていることを確認
+    await expect(page.getByText('詳細分析・レポート')).toHaveCount(0);
+  });
+});
+
+test.describe('Admin access control', () => {
+  test('Admin page requires authentication', async ({ page }) => {
+    await page.goto(`${base}/admin`);
+    
+    // 管理者でない場合はリダイレクトまたは403エラー
+    const url = page.url();
+    expect(url.includes('/auth/login') || url.includes('/dashboard')).toBeTruthy();
+  });
+});
+
+test.describe('Materials API limits', () => {
+  test('Materials API exists and responds', async ({ page }) => {
+    const response = await page.request.get(`${base}/api/my/materials`);
+    
+    // 認証が必要でも401エラーで正常に応答すること
+    expect([200, 401, 403].includes(response.status())).toBeTruthy();
+  });
 });

@@ -368,8 +368,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         {/* AIOダイジェスト */}
         <section className="py-20 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              🤖 AI検索最適化（AIO）対応
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center justify-center">
+              <svg className="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M12 6v6m0 6h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              AI検索最適化（AIO）対応
             </h2>
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
               本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
@@ -444,6 +448,18 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     {t('pages.home.cta.button')}
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </span>
+                </Link>
+                
+                <Link 
+                  href="/hearing-service"
+                  className="group px-6 py-3 border-2 border-white text-white text-lg font-medium rounded-xl hover:bg-white hover:text-gray-800 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+                >
+                  <span className="flex items-center gap-2">
+                    ヒアリング代行サービス
+                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h2" />
                     </svg>
                   </span>
                 </Link>

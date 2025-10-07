@@ -12,7 +12,8 @@ export const PLAN_LIMITS = {
     category_tags: 0,
     logo_size: 'small',
     verified_badge: false,
-    ai_reports: false
+    ai_reports: false,
+    system_monitoring: false  // ✅ システム監視制限追加
   },
   standard: { 
     services: 50, 
@@ -22,7 +23,8 @@ export const PLAN_LIMITS = {
     category_tags: Number.POSITIVE_INFINITY,
     logo_size: 'large',
     verified_badge: true,
-    ai_reports: 'basic'
+    ai_reports: 'basic',
+    system_monitoring: true  // ✅ スタンダード以上は利用可能
   },
   enterprise: { 
     services: Number.POSITIVE_INFINITY, 
@@ -32,7 +34,8 @@ export const PLAN_LIMITS = {
     category_tags: Number.POSITIVE_INFINITY,
     logo_size: 'large_svg',
     verified_badge: true,
-    ai_reports: 'advanced'
+    ai_reports: 'advanced',
+    system_monitoring: true  // ✅ エンタープライズも利用可能
   }
 } as const;
 
@@ -180,4 +183,19 @@ export function isVerifiedBadgeAllowed(planType: PlanType): boolean {
  */
 export function getAIReportsLevel(planType: PlanType): string | boolean {
   return PLAN_LIMITS[planType].ai_reports;
+}
+
+/**
+ * ✅ システム監視機能チェック
+ */
+export function isSystemMonitoringAllowed(planType: PlanType): boolean {
+  return PLAN_LIMITS[planType].system_monitoring;
+}
+
+/**
+ * ✅ システム監視制限メッセージ
+ */
+export function getSystemMonitoringLimitMessage(planType: PlanType): string {
+  if (isSystemMonitoringAllowed(planType)) return '';
+  return `システム監視機能は${PLAN_NAMES.standard}以上のプランで利用可能です。`;
 }

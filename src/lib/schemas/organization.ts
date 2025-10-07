@@ -41,6 +41,7 @@ export const organizationCreateSchema = z.object({
   description: optionalString(),
   legal_form: optionalString(),
   representative_name: optionalString(),
+  corporate_number: z.string().regex(/^\d{13}$/, '法人番号は13桁の数字で入力してください').optional(),
   // founded フィールドはUIに存在しないため完全除去
   capital: z.number().optional(),
   employees: z.number().optional(),
