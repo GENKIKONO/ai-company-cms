@@ -55,8 +55,8 @@
       "description": "JSON-LD構造化データ自動生成、OGP対応、検索エンジン最適化されたページを自動作成します。"
     },
     "aiAssistance": {
-      "title": "AI入力支援",
-      "description": "PDF・URLからテキストを自動抽出し、候補データを生成して1クリックで入力できます。"
+      "title": "AIが読み取りやすい構造で自動出力",
+      "description": "入力された情報をもとに、AI検索に最適な構造化データ・フィードを自動生成します。"
     },
     "subscription": {
       "title": "サブスクリプション",

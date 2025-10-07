@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { Service, ServiceFormData } from '@/types/database';
 import { normalizeServicePayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
-import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { PLAN_LIMITS, PlanType, getServiceLimitMessage } from '@/config/plans';
 
 // エラーログ送信関数（失敗しても無視）
 async function logErrorToDiag(errorInfo: any) {
@@ -114,10 +114,11 @@ export async function POST(request: NextRequest) {
     }
 
     // プラン制限チェック
-    const currentPlan = orgData.plan || 'free';
-    const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+    const currentPlan = (orgData.plan || 'free') as PlanType;
+    const serviceLimit = PLAN_LIMITS[currentPlan].services;
     
-    if (planLimits.services > 0) {
+    // 無制限以外の場合は制限チェック
+    if (serviceLimit !== Number.POSITIVE_INFINITY) {
       const { count: currentCount, error: countError } = await supabase
         .from('services')
         .select('id', { count: 'exact' })
@@ -131,16 +132,16 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if ((currentCount || 0) >= planLimits.services) {
+      if ((currentCount || 0) >= serviceLimit) {
         return NextResponse.json(
           {
-            error: 'Plan limit exceeded',
-            message: '上限に達しました。プランをアップグレードしてください。',
+            error: 'LimitExceeded',
+            message: getServiceLimitMessage(currentPlan),
             currentCount,
-            limit: planLimits.services,
+            limit: serviceLimit,
             plan: currentPlan
           },
-          { status: 402 }
+          { status: 403 }
         );
       }
     }

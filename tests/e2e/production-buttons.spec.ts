@@ -32,3 +32,46 @@ test('Dashboard metrics resilient', async ({ page }) => {
   await expect(page.locator('text=ページビュー').first()).toBeVisible({ timeout: 10000 }).catch(() => {});
   // コンソールエラー監視（任意）：pageViews undefined が出ない
 });
+
+test.describe('Pricing page validation', () => {
+  test('Free plan displays correct limits', async ({ page }) => {
+    await page.goto(`${base}/pricing`);
+    
+    // 無料プランの表示確認
+    await expect(page.getByText('無料プラン')).toBeVisible();
+    await expect(page.getByText('サービス登録：1件まで')).toBeVisible();
+    await expect(page.getByText('基本的な企業情報管理')).toBeVisible();
+    await expect(page.getByText('SEO最適化')).toBeVisible();
+  });
+
+  test('Standard plan displays correct price and limits', async ({ page }) => {
+    await page.goto(`${base}/pricing`);
+    
+    // スタンダードプランの表示確認
+    await expect(page.getByText('スタンダード')).toBeVisible();
+    await expect(page.getByText('¥9,800/月')).toBeVisible();
+    await expect(page.getByText('サービス登録：50件まで')).toBeVisible();
+    await expect(page.getByText('詳細分析・レポート')).toBeVisible();
+    await expect(page.getByText('メールサポート')).toBeVisible();
+  });
+
+  test('Enterprise plan displays correct features', async ({ page }) => {
+    await page.goto(`${base}/pricing`);
+    
+    // エンタープライズプランの表示確認
+    await expect(page.getByText('エンタープライズ')).toBeVisible();
+    await expect(page.getByText('お問い合わせ')).toBeVisible();
+    await expect(page.getByText('すべての機能')).toBeVisible();
+    await expect(page.getByText('カスタム機能開発')).toBeVisible();
+    await expect(page.getByText('専任サポート')).toBeVisible();
+    await expect(page.getByText('SLA保証')).toBeVisible();
+  });
+
+  test('AI input assistance terminology updated', async ({ page }) => {
+    await page.goto(`${base}/pricing`);
+    
+    // 新しい文言が表示され、古い文言が表示されないことを確認
+    await expect(page.getByText('AIが読み取りやすい構造で自動出力')).toBeVisible();
+    await expect(page.getByText('AI入力支援')).toHaveCount(0);
+  });
+});

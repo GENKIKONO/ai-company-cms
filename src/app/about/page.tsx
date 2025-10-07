@@ -50,8 +50,8 @@ export default function AboutPage() {
                   <p className="text-gray-600">JSON-LD構造化データ自動生成により、検索エンジン最適化を実現します。</p>
                 </div>
                 <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">🤖 AI入力支援</h3>
-                  <p className="text-gray-600">PDF・URLからテキストを自動抽出し、効率的なデータ入力をサポートします。</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">🤖 AIが読み取りやすい構造で自動出力</h3>
+                  <p className="text-gray-600">入力された情報をもとに、AI検索に最適な構造化データ・フィードを自動生成します。</p>
                 </div>
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">📊 詳細分析</h3>

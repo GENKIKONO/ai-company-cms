@@ -240,10 +240,10 @@ export default function LandingPage({ stats }: Props) {
               {/* 機能3 */}
               <div className="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
                 <div className="text-4xl mb-4">🤖</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">AI入力支援</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">AIが読み取りやすい構造で自動出力</h3>
                 <p className="text-gray-600">
-                  PDF・URLからテキストを自動抽出し、
-                  候補データを生成して1クリックで入力できます。
+                  入力された情報をもとに、AI検索に最適な
+                  構造化データ・フィードを自動生成します。
                 </p>
               </div>
 
