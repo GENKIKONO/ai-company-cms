@@ -55,44 +55,38 @@ export default async function SafeAuthHeader() {
               </Link>
               
               {/* 全ユーザー向けナビゲーション表示 */}
-              <nav className="ml-10 hidden md:flex space-x-8">
+              <nav className="ml-10 hidden md:flex space-x-6 lg:space-x-8">
                 <Link 
                   href="/about" 
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
                 >
                   サービス概要
                 </Link>
                 <Link 
                   href="/pricing" 
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
                 >
                   料金プラン
                 </Link>
                 <Link 
                   href="/aio" 
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
                 >
                   AIOとは
                 </Link>
                 <Link 
-                  href="/#service-flow" 
-                  className="text-gray-500 hover:text-gray-700"
+                  href="/hearing-service" 
+                  className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
                 >
-                  サービスの流れ
+                  ヒアリング代行
                 </Link>
                 {isAuthenticated && (
                   <>
                     <Link 
                       href="/dashboard" 
-                      className="text-gray-500 hover:text-gray-700"
+                      className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
                     >
                       マイページ
-                    </Link>
-                    <Link 
-                      href="/dashboard/services-info" 
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      サービス紹介
                     </Link>
                   </>
                 )}

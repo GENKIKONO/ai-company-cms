@@ -232,7 +232,11 @@ export default function LandingPage({ stats }: Props) {
 
               {/* 機能2 */}
               <div className="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="text-4xl mb-4">🔍</div>
+                <div className="text-blue-600 mb-4">
+                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">SEO最適化</h3>
                 <p className="text-gray-600">
                   JSON-LD構造化データ自動生成、OGP対応、
@@ -252,7 +256,11 @@ export default function LandingPage({ stats }: Props) {
 
               {/* 機能4 */}
               <div className="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="text-4xl mb-4">🔗</div>
+                <div className="text-blue-600 mb-4">
+                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">パートナー連携</h3>
                 <p className="text-gray-600">
                   代理店・パートナー企業による企業情報管理。

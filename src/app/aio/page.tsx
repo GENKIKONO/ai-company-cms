@@ -101,11 +101,36 @@ export default function AIOPage() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">効果</h2>
               <div className="bg-gray-50 p-6 rounded-lg">
                 <ul className="space-y-2">
-                  <li>✅ AI検索エンジンでの表示率向上</li>
-                  <li>✅ リッチリザルト（Rich Results）対応</li>
-                  <li>✅ 企業情報の正確な理解・抽出</li>
-                  <li>✅ 音声検索での適切な回答生成</li>
-                  <li>✅ 検索エンジンクローラーの効率的な情報収集</li>
+                  <li className="flex items-center">
+                    <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    AI検索エンジンでの表示率向上
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    リッチリザルト（Rich Results）対応
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    企業情報の正確な理解・抽出
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    音声検索での適切な回答生成
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    検索エンジンクローラーの効率的な情報収集
+                  </li>
                 </ul>
               </div>
             </section>
