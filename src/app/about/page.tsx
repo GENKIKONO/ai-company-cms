@@ -46,7 +46,12 @@ export default function AboutPage() {
                   <p className="text-gray-600">企業の基本情報、サービス、導入事例、FAQを一元管理できます。</p>
                 </div>
                 <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">🔍 SEO最適化</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    SEO最適化
+                  </h3>
                   <p className="text-gray-600">JSON-LD構造化データ自動生成により、検索エンジン最適化を実現します。</p>
                 </div>
                 <div className="bg-gray-50 p-6 rounded-lg">
