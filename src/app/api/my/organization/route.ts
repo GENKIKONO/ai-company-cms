@@ -625,14 +625,51 @@ export async function PUT(request: NextRequest) {
       return handleApiError(error);
     }
 
-    // ✅ トランザクション完了後：統一キャッシュ無効化
-    const cacheResult = await revalidateOrgCache(user.id, data.slug, existingOrg.slug);
-    if (!cacheResult) {
-      console.warn('[VERIFY] Cache invalidation had issues but transaction succeeded');
+    // ✅ 更新後の最新データを再取得して確実な反映を保証
+    const { data: freshData, error: refetchError } = await supabase
+      .from('organizations')
+      .select('*')
+      .eq('id', existingOrg.id)
+      .eq('created_by', user.id)
+      .single();
+
+    if (refetchError) {
+      console.warn('[VERIFY] Refetch after update failed:', refetchError);
+      // フォールバック: 更新結果をそのまま使用
+    }
+
+    const finalData = freshData || data;
+
+    // ✅ 強化されたキャッシュ無効化：パス + タグ の両方を確実に実行
+    try {
+      const { revalidatePath, revalidateTag } = await import('next/cache');
+      
+      // パス無効化（即時反映用）
+      revalidatePath('/dashboard');
+      revalidatePath(`/organizations/${existingOrg.id}`);
+      if (finalData.slug) {
+        revalidatePath(`/o/${finalData.slug}`);
+      }
+      if (existingOrg.slug && existingOrg.slug !== finalData.slug) {
+        revalidatePath(`/o/${existingOrg.slug}`); // 旧slug
+      }
+      
+      // タグ無効化（ID ベース）
+      revalidateTag(`org:${existingOrg.id}`);
+      revalidateTag(`org:${user.id}`); // ユーザーベースも保持
+      
+      console.log('[VERIFY] revalidated after save', { 
+        id: finalData.id, 
+        slug: finalData.slug,
+        is_published: finalData.is_published 
+      });
+      
+    } catch (cacheError) {
+      console.warn('[VERIFY] Cache invalidation failed:', cacheError);
     }
 
     return NextResponse.json(
-      { data },
+      { data: finalData },
       { 
         status: 200,
         headers: {

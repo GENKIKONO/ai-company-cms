@@ -188,9 +188,36 @@ export default function EditOrganizationPage() {
       console.log('[VERIFY] Organization save result', result);
       
       if (result.data) {
-        // 成功時にデータを更新
+        // ✅ 成功時にデータと formData を即時更新
         setOrganization(result.data);
+        setFormData({
+          name: result.data.name || '',
+          slug: result.data.slug || '',
+          description: result.data.description || '',
+          legal_form: result.data.legal_form || '',
+          representative_name: result.data.representative_name || '',
+          capital: result.data.capital,
+          employees: result.data.employees,
+          address_country: result.data.address_country || 'JP',
+          address_region: result.data.address_region || '',
+          address_locality: result.data.address_locality || '',
+          address_street: result.data.address_street || '',
+          address_postal_code: result.data.address_postal_code || '',
+          telephone: result.data.telephone || '',
+          email: result.data.email || '',
+          email_public: result.data.email_public || false,
+          url: result.data.url || '',
+          logo_url: result.data.logo_url || '',
+          same_as: result.data.same_as || [],
+          industries: result.data.industries || []
+        });
         setErrors({ success: '企業情報を更新しました' });
+        
+        // ✅ slug変更時のURL同期
+        if (result.data.slug !== organizationId) {
+          console.log('[VERIFY] Slug changed, updating URL');
+          router.replace(`/organizations/${organizationId}`);
+        }
         
         // ✅ 即時反映のためにページをリフレッシュ
         router.refresh();
@@ -314,10 +341,10 @@ export default function EditOrganizationPage() {
                 <option value="archived">アーカイブ</option>
               </select>
               
-              {/* 公開ページへのリンク */}
-              {organization?.is_published ? (
+              {/* 公開ページへのリンク - リアルタイムslugに連動 */}
+              {organization?.is_published && formData.slug ? (
                 <Link
-                  href={`/o/${organization.slug}`}
+                  href={`/o/${formData.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
@@ -329,7 +356,7 @@ export default function EditOrganizationPage() {
                   disabled
                   className="px-4 py-2 bg-gray-300 text-gray-500 rounded-md text-sm cursor-not-allowed"
                 >
-                  未公開
+                  {!organization?.is_published ? '未公開' : 'スラッグ未設定'}
                 </button>
               )}
               

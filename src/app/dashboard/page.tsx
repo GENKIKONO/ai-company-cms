@@ -243,8 +243,8 @@ export default async function DashboardPage() {
               organizationName={org.name}
             />
 
-            {/* ✅ 公開ページを見るボタン追加 */}
-            {org.slug && org.is_published ? (
+            {/* ✅ 公開ページを見るボタン - is_published && slug で判定 */}
+            {org.is_published && org.slug ? (
               <Link 
                 href={`/o/${org.slug}`}
                 target="_blank"
