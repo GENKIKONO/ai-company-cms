@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
-import { getOrganization, updateOrganization, updateOrganizationStatus, deleteOrganization, getIndustries } from '@/lib/organizations';
+import { getOrganization, updateOrganization, updateOrganizationStatus, getIndustries } from '@/lib/organizations';
 import { type AppUser, type Organization, type OrganizationFormData } from '@/types/database';
 import ServicesTab from '@/components/ServicesTab';
 import CaseStudiesTab from '@/components/CaseStudiesTab';
@@ -50,7 +50,7 @@ export default function EditOrganizationPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  // [VERIFY][DELETE_GUARD] Delete confirmation state removed for safety
   const [activeTab, setActiveTab] = useState<'basic' | 'services' | 'casestudies' | 'faqs' | 'posts'>('basic');
 
   // 初期化は空の状態から開始
@@ -250,15 +250,7 @@ export default function EditOrganizationPage() {
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      await deleteOrganization(organizationId);
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Failed to delete organization:', error);
-      setErrors({ submit: '企業の削除に失敗しました' });
-    }
-  };
+  // [VERIFY][DELETE_GUARD] Organization delete function removed for safety
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -367,13 +359,7 @@ export default function EditOrganizationPage() {
                 </button>
               )}
               
-              {/* 削除ボタン */}
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
-              >
-                削除
-              </button>
+              {/* [VERIFY][DELETE_GUARD] Delete button removed for safety */}
             </div>
           </div>
         </div>
@@ -819,31 +805,7 @@ export default function EditOrganizationPage() {
         )}
       </main>
 
-      {/* 削除確認モーダル */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">企業を削除</h3>
-            <p className="text-gray-600 mb-4">
-              「{organization.name}」を削除してもよろしいですか？この操作は取り消せません。
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-              >
-                削除する
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* [VERIFY][DELETE_GUARD] Delete confirmation modal removed for safety */}
     </div>
   );
 }

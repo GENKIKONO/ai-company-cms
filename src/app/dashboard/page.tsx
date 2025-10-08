@@ -6,6 +6,7 @@ import PublishToggle from './components/PublishToggle';
 import TabbedDashboard from './components/TabbedDashboard';
 import PerformanceMetrics from './components/PerformanceMetrics';
 import DashboardActions from './components/DashboardActions';
+import { hasEntitlementSync } from '@/lib/feature-flags/gate';
 
 // 強制的に動的SSRにして、認証状態を毎回評価
 export const dynamic = 'force-dynamic';
@@ -282,49 +283,38 @@ export default async function DashboardPage() {
               </button>
             )}
 
-            {/* ✅ システム監視 - プラン制限対応 - FIXED: Real plan data */}
-            {(() => {
-              const { isSystemMonitoringAllowed } = require('@/config/plans');
-              const { getUserPlanClient } = require('@/lib/user-plan');
-              const userPlanInfo = getUserPlanClient(org);
-              const isAllowed = isSystemMonitoringAllowed(userPlanInfo.plan);
-              
-              if (isAllowed) {
-                return (
-                  <Link 
-                    href="/monitor"
-                    className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
-                  >
-                    <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                    </div>
-                    <div className="text-center">
-                      <p className="font-semibold text-gray-900 mb-1">システム監視</p>
-                      <p className="text-sm text-gray-600">パフォーマンスを確認</p>
-                    </div>
-                  </Link>
-                );
-              } else {
-                return (
-                  <Link 
-                    href="/pricing?feature=monitor"
-                    className="group flex flex-col items-center p-6 border-2 border-orange-200 rounded-xl hover:border-orange-400 hover:bg-orange-50 transition-all duration-300"
-                  >
-                    <div className="p-3 bg-orange-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    </div>
-                    <div className="text-center">
-                      <p className="font-semibold text-gray-900 mb-1">システム監視</p>
-                      <p className="text-sm text-orange-600">スタンダード以上</p>
-                    </div>
-                  </Link>
-                );
-              }
-            })()}
+            {/* ✅ システム監視 - Feature Gate 適用 */}
+            {hasEntitlementSync(org, 'monitoring') ? (
+              <Link 
+                href="/monitor"
+                className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
+              >
+                <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-gray-900 mb-1">システム監視</p>
+                  <p className="text-sm text-gray-600">パフォーマンスを確認</p>
+                </div>
+              </Link>
+            ) : (
+              <Link 
+                href="/pricing?feature=monitor"
+                className="group flex flex-col items-center p-6 border-2 border-orange-200 rounded-xl hover:border-orange-400 hover:bg-orange-50 transition-all duration-300"
+              >
+                <div className="p-3 bg-orange-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-gray-900 mb-1">システム監視</p>
+                  <p className="text-sm text-orange-600">スタンダード以上</p>
+                </div>
+              </Link>
+            )}
 
             <Link 
               href={`/organizations/${org.id}/hearing-request`}

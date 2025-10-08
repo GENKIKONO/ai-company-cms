@@ -86,6 +86,9 @@ export interface Organization {
   case_studies?: CaseStudy[];
   faqs?: FAQ[];
   posts?: Post[];
+  // Feature flags and entitlements
+  feature_flags?: Record<string, any>;
+  entitlements?: Record<string, any>;
   // Stripe subscription fields
   stripe_customer_id?: string;
   stripe_subscription_id?: string;

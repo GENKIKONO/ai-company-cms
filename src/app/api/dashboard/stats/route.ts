@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { hasEntitlement } from '@/lib/feature-flags/gate';
 
 interface TableCount {
   count: number | null;
@@ -133,31 +134,43 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 解析データ（実テーブルがない場合は0で返す）
-    const analytics = {
+    // 解析データ（Feature Gate適用）
+    let analytics = {
       pageViews: 0,
       avgDurationSec: 0,
       conversionRate: 0
     };
 
-    // analytics/page_views テーブルがあれば取得を試行
-    try {
-      const { data: analyticsData } = await supabase
-        .from('analytics')
-        .select('page_views, avg_duration, conversion_rate')
-        .eq('organization_id', orgId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-      
-      if (analyticsData) {
-        analytics.pageViews = Number(analyticsData.page_views) || 0;
-        analytics.avgDurationSec = Number(analyticsData.avg_duration) || 0;
-        analytics.conversionRate = Number(analyticsData.conversion_rate) || 0;
+    // [VERIFY][Gate][API] Feature gate check for monitoring
+    const hasMonitoringAccess = await hasEntitlement(orgId, 'monitoring');
+    
+    if (!hasMonitoringAccess) {
+      console.log(`[VERIFY][Gate][API] monitoring disabled for org:${orgId}`);
+      analytics = {
+        pageViews: 0,
+        avgDurationSec: 0,
+        conversionRate: 0
+      };
+    } else {
+      // analytics/page_views テーブルがあれば取得を試行
+      try {
+        const { data: analyticsData } = await supabase
+          .from('analytics')
+          .select('page_views, avg_duration, conversion_rate')
+          .eq('organization_id', orgId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (analyticsData) {
+          analytics.pageViews = Number(analyticsData.page_views) || 0;
+          analytics.avgDurationSec = Number(analyticsData.avg_duration) || 0;
+          analytics.conversionRate = Number(analyticsData.conversion_rate) || 0;
+        }
+      } catch (analyticsError) {
+        // 解析テーブルが存在しない場合も正常として扱う
+        console.log('[VERIFY] Analytics table not found or no data, using defaults');
       }
-    } catch (analyticsError) {
-      // 解析テーブルが存在しない場合も正常として扱う
-      console.log('[VERIFY] Analytics table not found or no data, using defaults');
     }
 
     const response: StatsResponse = {

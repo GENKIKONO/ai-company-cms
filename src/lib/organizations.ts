@@ -144,20 +144,11 @@ export async function updateOrganization(id: string, organizationData: Partial<O
   }
 }
 
-// 企業削除
+// 企業削除 - DISABLED FOR SAFETY
 export async function deleteOrganization(id: string) {
-  try {
-    const { error } = await supabaseBrowser
-      .from('organizations')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-    return { error: null };
-  } catch (error) {
-    console.error('Error deleting organization:', error);
-    return { error };
-  }
+  // [VERIFY][DELETE_GUARD] block organizations delete
+  console.log('[VERIFY][DELETE_GUARD] Organization delete blocked for safety', { id });
+  throw new Error('Organization deletion is disabled for safety. Use unpublish instead.');
 }
 
 // 企業ステータス更新 - 統一パブリケーションAPI経由
