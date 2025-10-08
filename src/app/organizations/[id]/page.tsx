@@ -11,6 +11,31 @@ import CaseStudiesTab from '@/components/CaseStudiesTab';
 import FAQsTab from '@/components/FAQsTab';
 import PostsTab from '@/components/PostsTab';
 
+// 共通マッパー関数: organization → formData
+function fromOrg(org?: Organization | null): OrganizationFormData {
+  return {
+    name: org?.name ?? '',
+    slug: org?.slug ?? '',
+    description: org?.description ?? '',
+    legal_form: org?.legal_form ?? '',
+    representative_name: org?.representative_name ?? '',
+    capital: org?.capital,
+    employees: org?.employees,
+    address_country: org?.address_country ?? 'JP',
+    address_region: org?.address_region ?? '',
+    address_locality: org?.address_locality ?? '',
+    address_postal_code: org?.address_postal_code ?? '',
+    address_street: org?.address_street ?? '',
+    telephone: org?.telephone ?? '',
+    email: org?.email ?? '',
+    email_public: org?.email_public ?? false,
+    url: org?.url ?? '',
+    logo_url: org?.logo_url ?? '',
+    same_as: org?.same_as ?? [],
+    industries: org?.industries ?? []
+  };
+}
+
 export default function EditOrganizationPage() {
   const router = useRouter();
   const params = useParams();
@@ -25,28 +50,8 @@ export default function EditOrganizationPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState<'basic' | 'services' | 'casestudies' | 'faqs' | 'posts'>('basic');
 
-  const [formData, setFormData] = useState<OrganizationFormData>({
-    name: '',
-    slug: '',
-    description: '',
-    legal_form: '',
-    representative_name: '',
-    // founded: '',  // UIに入力欄がないため完全除去
-    capital: undefined,
-    employees: undefined,
-    address_country: 'JP',
-    address_region: '',
-    address_locality: '',
-    address_postal_code: '',
-    address_street: '',
-    telephone: '',
-    email: '',
-    email_public: false,
-    url: '',
-    logo_url: '',
-    same_as: [],
-    industries: []
-  });
+  // 初期化は空の状態から開始
+  const [formData, setFormData] = useState<OrganizationFormData>(() => fromOrg(null));
 
   // 認証確認とデータ取得
   useEffect(() => {
@@ -82,30 +87,7 @@ export default function EditOrganizationPage() {
         if (orgResult.data) {
           const org = orgResult.data;
           setOrganization(org);
-          
-          // フォームデータを設定
-          setFormData({
-            name: org.name || '',
-            slug: org.slug || '',
-            description: org.description || '',
-            legal_form: org.legal_form || '',
-            representative_name: org.representative_name || '',
-            // founded: org.founded || '',  // UIに入力欄がないため完全除去
-            capital: org.capital,
-            employees: org.employees,
-            address_country: org.address_country || 'JP',
-            address_region: org.address_region || '',
-            address_locality: org.address_locality || '',
-            address_street: org.address_street || '',
-            address_postal_code: org.address_postal_code || '',
-            telephone: org.telephone || '',
-            email: org.email || '',
-            email_public: org.email_public || false,
-            url: org.url || '',
-            logo_url: org.logo_url || '',
-            same_as: org.same_as || [],
-            industries: org.industries || []
-          });
+          // フォームデータはuseEffectで自動同期される
         } else {
           router.push('/dashboard');
         }
@@ -125,6 +107,16 @@ export default function EditOrganizationPage() {
       fetchData();
     }
   }, [organizationId, router]);
+
+  // organization更新時のフォーム自動同期
+  useEffect(() => {
+    console.log('[VERIFY] Syncing form data from organization', {
+      orgId: organization?.id,
+      slug: organization?.slug,
+      updated_at: organization?.updated_at
+    });
+    setFormData(fromOrg(organization));
+  }, [organization?.updated_at, organization?.slug, organization?.status]);
 
   const handleInputChange = (field: keyof OrganizationFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -188,38 +180,14 @@ export default function EditOrganizationPage() {
       console.log('[VERIFY] Organization save result', result);
       
       if (result.data) {
-        console.log('[VERIFY] org saved', { 
+        console.log('[VERIFY] edit/save synced', { 
           id: result.data.id, 
           slug: result.data.slug, 
-          is_published: result.data.is_published 
+          updated_at: result.data.updated_at 
         });
         
-        // ✅ 成功時にorganizationを先に更新
+        // ✅ 成功時に organization を更新（フォームは useEffect で自動同期）
         setOrganization(result.data);
-        
-        // ✅ 次にformDataを同期（最新のslugとis_publishedを含む）
-        const syncedFormData = {
-          name: result.data.name || '',
-          slug: result.data.slug || '',
-          description: result.data.description || '',
-          legal_form: result.data.legal_form || '',
-          representative_name: result.data.representative_name || '',
-          capital: result.data.capital,
-          employees: result.data.employees,
-          address_country: result.data.address_country || 'JP',
-          address_region: result.data.address_region || '',
-          address_locality: result.data.address_locality || '',
-          address_street: result.data.address_street || '',
-          address_postal_code: result.data.address_postal_code || '',
-          telephone: result.data.telephone || '',
-          email: result.data.email || '',
-          email_public: result.data.email_public || false,
-          url: result.data.url || '',
-          logo_url: result.data.logo_url || '',
-          same_as: result.data.same_as || [],
-          industries: result.data.industries || []
-        };
-        setFormData(syncedFormData);
         setErrors({ success: '企業情報を更新しました' });
         
         // ✅ slug変更時のURL同期
@@ -228,8 +196,8 @@ export default function EditOrganizationPage() {
           router.replace(`/organizations/${organizationId}`);
         }
         
-        // ✅ 即時反映のためにページをリフレッシュ
-        router.refresh();
+        // ✅ 最後にページリフレッシュ（state反映後）
+        setTimeout(() => router.refresh(), 100);
       } else {
         console.error('[VERIFY] org save failed: no data returned');
         setErrors({ submit: '企業情報の更新に失敗しました' });
