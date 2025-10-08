@@ -1,1 +1,1 @@
-export const PUBLISH_ON_SAVE = true; // 保存＝公開を一時的に強制（将来はfalseに戻せる）
+export const PUBLISH_ON_SAVE = false; // 正常フロー: 保存と公開は独立

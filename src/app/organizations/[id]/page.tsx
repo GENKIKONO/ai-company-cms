@@ -186,11 +186,15 @@ export default function EditOrganizationPage() {
         console.log('[VERIFY] edit/save synced', { 
           id: result.data.id, 
           slug: result.data.slug, 
+          status: result.data.status,
+          is_published: result.data.is_published,
           updated_at: result.data.updated_at 
         });
         
         // ✅ 成功時に organization を更新（フォームは useEffect で自動同期）
         setOrganization(result.data);
+        // ✅ 明示的なフォーム同期（useEffectと並行して確実に反映）
+        setFormData(fromOrg(result.data));
         setErrors({ success: '企業情報を更新しました' });
         
         // ✅ slug変更時のURL同期
