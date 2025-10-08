@@ -1,5 +1,8 @@
 'use client';
 
+// 強制動的レンダリング（古いSSRキャッシュで上書きされないように）
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -116,7 +119,7 @@ export default function EditOrganizationPage() {
       updated_at: organization?.updated_at
     });
     setFormData(fromOrg(organization));
-  }, [organization?.updated_at, organization?.slug, organization?.status]);
+  }, [organization?.id, organization?.updated_at, organization?.slug, organization?.status]);
 
   const handleInputChange = (field: keyof OrganizationFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
