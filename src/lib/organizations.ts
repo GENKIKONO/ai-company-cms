@@ -56,8 +56,16 @@ export async function getOrganizations(options: {
 // 企業詳細取得
 export async function getOrganization(id: string) {
   try {
+    // 🔥 FIX: Ensure authenticated user access for consistent RLS behavior
+    const { data: { user } } = await supabaseBrowser.auth.getUser();
+    if (!user) {
+      throw new Error('Not authenticated');
+    }
+
+    // 🔥 FIX: Use direct organizations table to ensure fresh data after saves
+    // Instead of organizations_with_owner view which may have stale data
     const { data, error } = await supabaseBrowser
-      .from('organizations_with_owner')
+      .from('organizations')
       .select(`
         *,
         services(*),
@@ -65,6 +73,7 @@ export async function getOrganization(id: string) {
         faqs(*)
       `)
       .eq('id', id)
+      .eq('created_by', user.id)  // 🔥 Explicit user filter for RLS consistency
       .single();
 
     if (error) throw error;

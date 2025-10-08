@@ -82,6 +82,8 @@ export default function EditOrganizationPage() {
         }
         
         // 企業データと業界一覧を取得
+        console.log('[VERIFY] Fetching fresh organization data for edit page:', organizationId);
+        
         const [orgResult, industriesResult] = await Promise.all([
           getOrganization(organizationId),
           getIndustries()
@@ -89,9 +91,16 @@ export default function EditOrganizationPage() {
 
         if (orgResult.data) {
           const org = orgResult.data;
+          console.log('[VERIFY] Fresh organization loaded for edit:', { 
+            id: org.id, 
+            slug: org.slug, 
+            name: org.name,
+            updated_at: org.updated_at 
+          });
           setOrganization(org);
           // フォームデータはuseEffectで自動同期される
         } else {
+          console.warn('[VERIFY] No organization data found, redirecting to dashboard');
           router.push('/dashboard');
         }
         

@@ -44,7 +44,8 @@ function omitEmpty<T extends object>(obj: T): Partial<T> {
  */
 export function generateCaseStudyJsonLd(caseStudy: CaseStudy, org: Organization): CaseStudyJsonLd | null {
   // Safety guard: prevent generation when organization slug is undefined/empty
-  if (!org.slug || org.slug.trim() === '') {
+  if (!org || !org.slug || !org.slug.trim()) { 
+    console.log('[VERIFY][JSON-LD] skip because slug empty');
     return null;
   }
 
