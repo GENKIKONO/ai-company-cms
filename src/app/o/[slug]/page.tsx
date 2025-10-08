@@ -506,9 +506,9 @@ export default async function OrganizationDetailPage({
                             <Image
                               src={service.image_url}
                               alt={`${service.name}のサービス画像`}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              width={1200}
+                              height={630}
+                              className="w-full h-64 md:h-72 object-cover rounded-md shadow-sm"
                             />
                           </div>
                         ) : (

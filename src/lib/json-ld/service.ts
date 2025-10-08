@@ -90,15 +90,24 @@ export function generateServiceJsonLd(service: Service, org: Organization): Serv
     jsonLd.features = service.features;
   }
 
-  // 画像（メディアから画像のみ抽出）
+  // 画像（メイン画像 + メディアから画像のみ抽出）
+  const imageUrls: string[] = [];
+  
+  // メイン画像があれば最初に追加
+  if (service.image_url) {
+    imageUrls.push(service.image_url);
+  }
+  
+  // メディア画像を追加
   if (service.media && service.media.length > 0) {
-    const imageUrls = service.media
+    const mediaImageUrls = service.media
       .filter(m => m.type === 'image')
       .map(m => m.url);
-    
-    if (imageUrls.length > 0) {
-      jsonLd.image = imageUrls.length === 1 ? imageUrls[0] : imageUrls;
-    }
+    imageUrls.push(...mediaImageUrls);
+  }
+  
+  if (imageUrls.length > 0) {
+    jsonLd.image = imageUrls.length === 1 ? imageUrls[0] : imageUrls;
   }
 
   // 価格情報（要件定義準拠: 価格未入力時は非出力）

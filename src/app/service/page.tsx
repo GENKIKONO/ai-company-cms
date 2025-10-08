@@ -6,41 +6,41 @@ import BigIdea from './sections/BigIdea';
 import Solution from './sections/Solution';
 import Recap from './sections/Recap';
 import ClosingCTA from './sections/ClosingCTA';
-import { aioCopy } from './copy';
+import { serviceCopy } from './copy';
 
 export const metadata: Metadata = {
-  title: aioCopy.metadata.title,
-  description: aioCopy.metadata.description,
+  title: serviceCopy.metadata.title,
+  description: serviceCopy.metadata.description,
   openGraph: {
-    title: aioCopy.metadata.title,
-    description: aioCopy.metadata.description,
-    url: '/aio',
+    title: serviceCopy.metadata.title,
+    description: serviceCopy.metadata.description,
+    url: '/service',
     siteName: 'AIO Hub',
     type: 'website',
     images: [
       {
-        url: '/aio/og.png',
+        url: '/service/og.png',
         width: 1200,
         height: 630,
-        alt: aioCopy.metadata.title,
+        alt: serviceCopy.metadata.title,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: aioCopy.metadata.title,
-    description: aioCopy.metadata.description,
-    images: ['/aio/og.png'],
+    title: serviceCopy.metadata.title,
+    description: serviceCopy.metadata.description,
+    images: ['/service/og.png'],
   },
 };
 
-export default function AIOPage() {
+export default function ServicePage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: aioCopy.metadata.title,
-    description: aioCopy.metadata.description,
-    url: 'https://aiohub.jp/aio',
+    name: serviceCopy.metadata.title,
+    description: serviceCopy.metadata.description,
+    url: 'https://aiohub.jp/service',
     breadcrumb: {
       '@type': 'BreadcrumbList',
       itemListElement: [
@@ -53,8 +53,8 @@ export default function AIOPage() {
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'AIOとは',
-          item: 'https://aiohub.jp/aio',
+          name: 'サービス概要',
+          item: 'https://aiohub.jp/service',
         },
       ],
     },

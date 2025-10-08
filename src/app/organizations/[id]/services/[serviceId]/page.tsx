@@ -30,7 +30,8 @@ export default function EditServicePage() {
     price: undefined,
     duration_months: undefined,
     category: '',
-    image_url: ''
+    image_url: '',
+    video_url: ''
   });
 
   const categoryOptions = [
@@ -73,7 +74,8 @@ export default function EditServicePage() {
             price: svc.price || undefined,
             duration_months: svc.duration_months || undefined,
             category: svc.category || '',
-            image_url: svc.image_url || ''
+            image_url: svc.image_url || '',
+            video_url: svc.video_url || ''
           });
         } else {
           router.push(`/organizations/${organizationId}`);
@@ -345,6 +347,28 @@ export default function EditServicePage() {
               onImageChange={(imageUrl) => handleInputChange('image_url', imageUrl || '')}
               disabled={submitting}
             />
+          </div>
+
+          {/* 動画URL設定 */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">動画URL</h2>
+            
+            <div>
+              <label htmlFor="video_url" className="block text-sm font-medium text-gray-700 mb-2">
+                動画URL（YouTube等）
+              </label>
+              <input
+                type="url"
+                id="video_url"
+                value={formData.video_url || ''}
+                onChange={(e) => handleInputChange('video_url', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="https://www.youtube.com/watch?v=..."
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                YouTube、Vimeo等の動画URLを入力してください
+              </p>
+            </div>
           </div>
 
           {/* アクションボタン */}

@@ -381,7 +381,7 @@ export default function OrganizationsPage() {
                       alt={`${org.name}のロゴ`}
                       width={56}
                       height={56}
-                      className="w-14 h-14 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform duration-300"
+                      className="w-14 h-14 object-contain bg-white rounded-md border border-gray-200 shadow-sm group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
                     <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">

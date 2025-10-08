@@ -156,7 +156,7 @@ export function LogoImage({
       alt={alt}
       width={dimensions[size].width}
       height={dimensions[size].height}
-      className={`${sizeClasses[size]} rounded-lg object-cover ${className}`}
+      className={`${sizeClasses[size]} rounded-md object-contain bg-white border border-gray-200 ${className}`}
       fallbackText={fallbackText}
       priority={size === 'lg' || size === 'xl'}
     />

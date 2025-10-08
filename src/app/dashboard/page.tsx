@@ -137,7 +137,7 @@ export default async function DashboardPage() {
                       alt={`${org.name}のロゴ`}
                       width={32}
                       height={32}
-                      className="w-6 h-6 sm:w-8 sm:h-8 rounded object-cover"
+                      className="w-6 h-6 sm:w-8 sm:h-8 object-contain bg-white rounded-md border border-gray-200"
                     />
                   ) : (
                     <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded flex items-center justify-center">

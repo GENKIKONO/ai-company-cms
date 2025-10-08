@@ -1,7 +1,7 @@
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { vLog, vErr } from '@/lib/utils/logger';
 
-export type FeatureKey = 'monitoring' | 'business_matching_beta' | 'advanced_embed';
+export type FeatureKey = 'monitoring' | 'business_matching_beta' | 'advanced_embed' | 'service_gallery' | 'service_video';
 
 interface OrganizationForGate {
   id: string;
@@ -14,6 +14,8 @@ const ALLOWLISTS: Record<FeatureKey, string[]> = {
   monitoring: (process.env.FEATURE_ALLOWLIST_MONITORING || '').split(',').filter(Boolean),
   business_matching_beta: (process.env.FEATURE_ALLOWLIST_BM_BETA || '').split(',').filter(Boolean),
   advanced_embed: (process.env.FEATURE_ALLOWLIST_ADVANCED_EMBED || '').split(',').filter(Boolean),
+  service_gallery: (process.env.FEATURE_ALLOWLIST_SERVICE_GALLERY || '').split(',').filter(Boolean),
+  service_video: (process.env.FEATURE_ALLOWLIST_SERVICE_VIDEO || '').split(',').filter(Boolean),
 };
 
 export async function hasEntitlement(orgId: string, key: FeatureKey): Promise<boolean> {

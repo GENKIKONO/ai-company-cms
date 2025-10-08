@@ -57,7 +57,7 @@ export default async function SafeAuthHeader() {
               {/* 全ユーザー向けナビゲーション表示 */}
               <nav className="ml-10 hidden md:flex space-x-6 lg:space-x-8">
                 <Link 
-                  href="/about" 
+                  href="/service" 
                   className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
                 >
                   サービス概要

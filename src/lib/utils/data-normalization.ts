@@ -97,6 +97,7 @@ export function normalizeServicePayload(data: any) {
     'description',
     'category',
     'image_url',
+    'video_url',
     'cta_text',
     'cta_url'
   ]);
