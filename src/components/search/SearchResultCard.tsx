@@ -81,13 +81,17 @@ export default function SearchResultCard(props: SearchResultCardProps) {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  <Link 
-                    href={`/o/${org.slug}`}
-                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                    aria-label={`${org.name}の詳細ページを見る`}
-                  >
-                    {org.name}
-                  </Link>
+                  {org.slug && org.slug.trim() !== '' ? (
+                    <Link 
+                      href={`/o/${org.slug}`}
+                      className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                      aria-label={`${org.name}の詳細ページを見る`}
+                    >
+                      {org.name}
+                    </Link>
+                  ) : (
+                    <span className="text-gray-500">{org.name}</span>
+                  )}
                 </h3>
                 
                 {org.description && (
@@ -205,22 +209,30 @@ export default function SearchResultCard(props: SearchResultCardProps) {
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-              <Link 
-                href={`/o/${service.organization.slug}/services/${service.id}`}
-                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                aria-label={`サービス「${service.name}」の詳細を見る`}
-              >
-                {service.name}
-              </Link>
+              {service.organization.slug && service.organization.slug.trim() !== '' ? (
+                <Link 
+                  href={`/o/${service.organization.slug}/services/${service.id}`}
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  aria-label={`サービス「${service.name}」の詳細を見る`}
+                >
+                  {service.name}
+                </Link>
+              ) : (
+                <span className="text-gray-500">{service.name}</span>
+              )}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-              <Link 
-                href={`/o/${service.organization.slug}`}
-                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                aria-label={`${service.organization.name}の詳細ページを見る`}
-              >
-                {service.organization.name}
-              </Link>
+              {service.organization.slug && service.organization.slug.trim() !== '' ? (
+                <Link 
+                  href={`/o/${service.organization.slug}`}
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  aria-label={`${service.organization.name}の詳細ページを見る`}
+                >
+                  {service.organization.name}
+                </Link>
+              ) : (
+                <span className="text-gray-500">{service.organization.name}</span>
+              )}
             </p>
           </div>
 
@@ -286,22 +298,30 @@ export default function SearchResultCard(props: SearchResultCardProps) {
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-              <Link 
-                href={`/o/${caseStudy.organization.slug}/case-studies/${caseStudy.id}`}
-                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                aria-label={`事例「${caseStudy.title}」の詳細を見る`}
-              >
-                {caseStudy.title}
-              </Link>
+              {caseStudy.organization.slug && caseStudy.organization.slug.trim() !== '' ? (
+                <Link 
+                  href={`/o/${caseStudy.organization.slug}/case-studies/${caseStudy.id}`}
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  aria-label={`事例「${caseStudy.title}」の詳細を見る`}
+                >
+                  {caseStudy.title}
+                </Link>
+              ) : (
+                <span className="text-gray-500">{caseStudy.title}</span>
+              )}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-              <Link 
-                href={`/o/${caseStudy.organization.slug}`}
-                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                aria-label={`${caseStudy.organization.name}の詳細ページを見る`}
-              >
-                {caseStudy.organization.name}
-              </Link>
+              {caseStudy.organization.slug && caseStudy.organization.slug.trim() !== '' ? (
+                <Link 
+                  href={`/o/${caseStudy.organization.slug}`}
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  aria-label={`${caseStudy.organization.name}の詳細ページを見る`}
+                >
+                  {caseStudy.organization.name}
+                </Link>
+              ) : (
+                <span className="text-gray-500">{caseStudy.organization.name}</span>
+              )}
             </p>
           </div>
 

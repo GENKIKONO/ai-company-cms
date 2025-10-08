@@ -57,6 +57,12 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
   }, [options, organization.slug]);
 
   const generateEmbedCode = () => {
+    // Safety guard: prevent code generation when slug is undefined/empty
+    if (!organization.slug || organization.slug.trim() === '') {
+      setGeneratedCode('<!-- エラー: 企業のスラッグが設定されていません。企業情報を編集してスラッグを設定してください。 -->');
+      return;
+    }
+
     const params = new URLSearchParams();
     
     // Widget共通パラメータ

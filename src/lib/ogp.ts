@@ -36,7 +36,12 @@ export function generateOrganizationOGP(organization: {
   logo_url?: string;
   url?: string;
   industries?: string[];
-}): OGPMetadata {
+}): OGPMetadata | null {
+  // Safety guard: prevent OGP generation when slug is undefined/empty
+  if (!organization.slug || organization.slug.trim() === '') {
+    return null;
+  }
+
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aiohub.jp';
   const pageUrl = `${baseUrl}/o/${organization.slug}`;
   

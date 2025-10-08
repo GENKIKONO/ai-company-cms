@@ -53,7 +53,12 @@ function omitEmpty<T extends object>(obj: T): Partial<T> {
  * Service の JSON-LD を生成
  * 要件定義準拠: 価格未入力時はoffers非出力
  */
-export function generateServiceJsonLd(service: Service, org: Organization): ServiceJsonLd {
+export function generateServiceJsonLd(service: Service, org: Organization): ServiceJsonLd | null {
+  // Safety guard: prevent generation when organization slug is undefined/empty
+  if (!org.slug || org.slug.trim() === '') {
+    return null;
+  }
+
   const jsonLd: ServiceJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -183,7 +188,8 @@ export function validateServiceJsonLd(service: Service, org: Organization): Serv
 /**
  * Service JSON-LD をHTML用文字列として出力
  */
-export function serviceJsonLdToHtml(service: Service, org: Organization): string {
+export function serviceJsonLdToHtml(service: Service, org: Organization): string | null {
   const jsonLd = generateServiceJsonLd(service, org);
+  if (!jsonLd) return null;
   return JSON.stringify(jsonLd, null, 2);
 }

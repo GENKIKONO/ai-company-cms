@@ -640,20 +640,49 @@ export async function PUT(request: NextRequest) {
       return handleApiError(error);
     }
 
-    // ✅ 更新後の最新データを再取得して確実な反映を保証
-    const { data: freshData, error: refetchError } = await supabase
+    // 🔥 FORCED FRESH DATA: Guaranteed latest data with retry mechanism
+    let finalData = data;
+    let freshData = null;
+    let refetchError = null;
+    
+    // Try immediate refetch
+    const refetchResult = await supabase
       .from('organizations')
       .select('*')
       .eq('id', existingOrg.id)
       .eq('created_by', user.id)
       .single();
-
-    if (refetchError) {
-      console.warn('[VERIFY] Refetch after update failed:', refetchError);
-      // フォールバック: 更新結果をそのまま使用
+    
+    freshData = refetchResult.data;
+    refetchError = refetchResult.error;
+    
+    // If immediate refetch fails, try once more with small delay
+    if (refetchError || !freshData) {
+      console.warn('[FORCED_FRESH] Initial refetch failed, retrying after delay:', refetchError);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const retryResult = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('id', existingOrg.id)
+        .eq('created_by', user.id)
+        .single();
+        
+      if (retryResult.data) {
+        freshData = retryResult.data;
+        refetchError = null;
+        console.log('[FORCED_FRESH] Retry successful');
+      } else {
+        console.warn('[FORCED_FRESH] Retry also failed:', retryResult.error);
+      }
     }
 
-    const finalData = freshData || data;
+    finalData = freshData || data;
+    console.log('[FORCED_FRESH] Final data guarantees latest state:', { 
+      hadFreshData: !!freshData, 
+      finalSlug: finalData.slug,
+      finalUpdatedAt: finalData.updated_at 
+    });
 
     // ✅ 強化されたキャッシュ無効化：パス + タグ の両方を確実に実行
     try {

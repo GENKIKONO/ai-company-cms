@@ -87,6 +87,11 @@ export function generateSingleFAQJsonLd(faq: FAQ, org?: Organization): QuestionJ
  */
 export function generateFAQPageJsonLd(faqs: FAQ[], org?: Organization): FAQPageJsonLd | null {
   if (faqs.length === 0) return null;
+  
+  // Safety guard: if organization is provided but slug is undefined/empty, return null
+  if (org && (!org.slug || org.slug.trim() === '')) {
+    return null;
+  }
 
   // FAQを表示順序でソート
   const sortedFaqs = [...faqs].sort((a, b) => {
@@ -149,6 +154,11 @@ export function generateCategoryFAQPageJsonLd(
   const categoryFaqs = faqs.filter(faq => faq.category === category);
   
   if (categoryFaqs.length === 0) return null;
+  
+  // Safety guard: if organization is provided but slug is undefined/empty, return null
+  if (org && (!org.slug || org.slug.trim() === '')) {
+    return null;
+  }
 
   const jsonLd = generateFAQPageJsonLd(categoryFaqs, org);
   

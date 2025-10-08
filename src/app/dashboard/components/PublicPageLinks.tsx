@@ -30,7 +30,7 @@ export default function PublicPageLinks({ contentType, className = '' }: PublicP
     fetchOrgSlug();
   }, []);
 
-  if (loading || !orgSlug) {
+  if (loading || !orgSlug || orgSlug.trim() === '') {
     return null;
   }
 

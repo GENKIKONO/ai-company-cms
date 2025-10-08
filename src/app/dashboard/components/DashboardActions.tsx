@@ -14,7 +14,7 @@ export default function DashboardActions({ organization, context = 'quickActions
   const [copied, setCopied] = useState(false);
 
   const handleShareLink = async () => {
-    if (!organization?.slug) {
+    if (!organization?.slug || organization.slug.trim() === '') {
       alert('企業のスラッグが設定されていません。企業情報を編集してスラッグを設定してください。');
       return;
     }
@@ -103,7 +103,7 @@ export default function DashboardActions({ organization, context = 'quickActions
   };
 
   const isDisabled = !organization?.id;
-  const hasSlug = !!organization?.slug;
+  const hasSlug = !!organization?.slug && organization.slug.trim() !== '';
 
   if (context === 'activity') {
     return (

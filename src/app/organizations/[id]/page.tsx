@@ -118,8 +118,14 @@ export default function EditOrganizationPage() {
       slug: organization?.slug,
       updated_at: organization?.updated_at
     });
-    setFormData(fromOrg(organization));
-  }, [organization?.id, organization?.updated_at, organization?.slug, organization?.status]);
+    
+    // 🔥 FORCED SYNC: Always overwrite form with latest organization data
+    if (organization) {
+      const syncedFormData = fromOrg(organization);
+      console.log('[SYNC_EFFECT] Forcing form sync with organization data:', syncedFormData);
+      setFormData(syncedFormData);
+    }
+  }, [organization?.id, organization?.updated_at, organization?.slug, organization?.status, organization?.name, organization?.description]);
 
   const handleInputChange = (field: keyof OrganizationFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -191,10 +197,20 @@ export default function EditOrganizationPage() {
           updated_at: result.data.updated_at 
         });
         
-        // ✅ 成功時に organization を更新（フォームは useEffect で自動同期）
+        // 🔥 FORCED SYNCHRONIZATION: Overwrite with API response to prevent form reversion
+        const freshFormData = fromOrg(result.data);
+        console.log('[FORCED_SYNC] Overwriting form data with API response:', freshFormData);
+        
+        // Set organization state first
         setOrganization(result.data);
-        // ✅ 明示的なフォーム同期（useEffectと並行して確実に反映）
-        setFormData(fromOrg(result.data));
+        
+        // Force immediate form synchronization with setTimeout to ensure state updates
+        setFormData(freshFormData);
+        setTimeout(() => {
+          setFormData(fromOrg(result.data));
+          console.log('[FORCED_SYNC] Double-sync completed');
+        }, 0);
+        
         setErrors({ success: '企業情報を更新しました' });
         
         // ✅ slug変更時のURL同期

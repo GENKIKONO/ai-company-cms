@@ -3,6 +3,11 @@ import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/databa
 
 // Organization JSON-LD
 export function generateOrganizationJsonLd(organization: Organization) {
+  // Safety guard: prevent generation when slug is undefined/empty
+  if (!organization.slug || organization.slug.trim() === '') {
+    return null;
+  }
+
   const jsonLd: any = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -57,6 +62,11 @@ export function generateOrganizationJsonLd(organization: Organization) {
 
 // BlogPosting JSON-LD
 export function generatePostJsonLd(post: Post, organization: Organization) {
+  // Safety guard: prevent generation when slug is undefined/empty
+  if (!organization.slug || organization.slug.trim() === '') {
+    return null;
+  }
+
   const jsonLd: any = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -120,10 +130,18 @@ export function generateOrganizationPageJsonLd(
   caseStudies: CaseStudy[],
   faqs: FAQ[]
 ) {
+  // Safety guard: prevent generation when slug is undefined/empty
+  if (!organization.slug || organization.slug.trim() === '') {
+    return [];
+  }
+
   const jsonLdArray = [];
 
   // Main organization
-  jsonLdArray.push(generateOrganizationJsonLd(organization));
+  const orgJsonLd = generateOrganizationJsonLd(organization);
+  if (orgJsonLd) {
+    jsonLdArray.push(orgJsonLd);
+  }
 
   // Website structure
   if (posts.length > 0 || services.length > 0 || caseStudies.length > 0) {

@@ -42,7 +42,12 @@ function omitEmpty<T extends object>(obj: T): Partial<T> {
  * CaseStudy の JSON-LD を生成
  * @type=CaseStudy スキーマを使用
  */
-export function generateCaseStudyJsonLd(caseStudy: CaseStudy, org: Organization): CaseStudyJsonLd {
+export function generateCaseStudyJsonLd(caseStudy: CaseStudy, org: Organization): CaseStudyJsonLd | null {
+  // Safety guard: prevent generation when organization slug is undefined/empty
+  if (!org.slug || org.slug.trim() === '') {
+    return null;
+  }
+
   const jsonLd: CaseStudyJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CaseStudy',
@@ -154,7 +159,8 @@ export function validateCaseStudyJsonLd(caseStudy: CaseStudy, org: Organization)
 /**
  * CaseStudy JSON-LD をHTML用文字列として出力
  */
-export function caseStudyJsonLdToHtml(caseStudy: CaseStudy, org: Organization): string {
+export function caseStudyJsonLdToHtml(caseStudy: CaseStudy, org: Organization): string | null {
   const jsonLd = generateCaseStudyJsonLd(caseStudy, org);
+  if (!jsonLd) return null;
   return JSON.stringify(jsonLd, null, 2);
 }
