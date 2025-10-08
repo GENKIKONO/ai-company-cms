@@ -39,6 +39,14 @@ export default function PublishToggle({
         throw new Error(errorData.message || 'Failed to update publish status');
       }
 
+      const result = await response.json();
+      console.log('[VERIFY] dashboard publish toggle', {
+        organizationId,
+        previousState: currentPublishState,
+        newState: !currentPublishState,
+        result
+      });
+      
       // 状態を更新
       setCurrentPublishState(!currentPublishState);
       

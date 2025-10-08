@@ -198,9 +198,6 @@ export default function EditOrganizationPage() {
           console.log('[VERIFY] Slug changed, updating URL:', result.data.slug);
           router.replace(`/organizations/${organizationId}`);
         }
-        
-        // ✅ 最後にページリフレッシュ（state反映後）
-        setTimeout(() => router.refresh(), 100);
       } else {
         console.error('[VERIFY] org save failed: no data returned');
         setErrors({ submit: '企業情報の更新に失敗しました' });

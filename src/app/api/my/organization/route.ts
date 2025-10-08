@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { env } from '@/lib/env';
 import { z } from 'zod';
 import type { Organization, OrganizationFormData } from '@/types/database';
+import { PUBLISH_ON_SAVE } from '@/config/feature-flags';
 import { 
   organizationCreateSchema, 
   organizationUpdateSchema,
@@ -371,6 +372,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // 機能フラグ: 保存=公開の強制適用
+    if (PUBLISH_ON_SAVE) {
+      organizationData.status = 'published';
+      organizationData.is_published = true;
+      console.log('[VERIFY] PUBLISH_ON_SAVE enabled for new org: forcing publication status');
+    }
+
     // ホワイトリスト処理の前にこの修正を行う
     const insertPayload = buildOrgInsert(organizationData);
     console.log('API/my/organization INSERT payload (final):', insertPayload);
@@ -608,6 +616,13 @@ export async function PUT(request: NextRequest) {
     // 最終データ確認ログ
     console.log('🔍 FINAL update data (after emergency guard):', JSON.stringify(updateData, null, 2));
 
+    // 機能フラグ: 保存=公開の強制適用
+    if (PUBLISH_ON_SAVE) {
+      updateData.status = 'published';
+      updateData.is_published = true;
+      console.log('[VERIFY] PUBLISH_ON_SAVE enabled: forcing publication status');
+    }
+
     // ホワイトリスト＆空文字スクラブ適用
     const updatePayload = buildOrgInsert(updateData);
     console.log('API/my/organization UPDATE payload (final):', updatePayload);
@@ -658,10 +673,13 @@ export async function PUT(request: NextRequest) {
       revalidateTag(`org:${existingOrg.id}`);
       revalidateTag(`org:${user.id}`); // ユーザーベースも保持
       
-      console.log('[VERIFY] revalidated after save', { 
-        id: finalData.id, 
-        slug: finalData.slug,
-        is_published: finalData.is_published 
+      console.log('[VERIFY] org-save', { 
+        payload: updatePayload, 
+        saved: data, 
+        fresh: finalData, 
+        refetchError,
+        revalidatedPaths: ['/dashboard', `/organizations/${existingOrg.id}`, finalData.slug ? `/o/${finalData.slug}` : null].filter(Boolean),
+        revalidatedTags: [`org:${existingOrg.id}`, `org:${user.id}`]
       });
       
     } catch (cacheError) {
