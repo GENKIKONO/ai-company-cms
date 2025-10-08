@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { generateOrganizationPageJsonLd } from '@/lib/utils/jsonld';
 import { LogoImage } from '@/components/ui/optimized-image';
 import ReportButton from '@/components/common/ReportButton';
@@ -494,24 +495,49 @@ export default async function OrganizationDetailPage({
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">提供サービス</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {services.map((service) => (
-                      <div key={service.id} className="border border-gray-200 rounded-lg p-4">
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">{service.name}</h3>
-                        {service.description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                            {service.description}
-                          </p>
+                      <Link 
+                        key={service.id} 
+                        href={`/o/${organization.slug}/services/${service.id}`}
+                        className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 block"
+                      >
+                        {/* サービス画像 */}
+                        {service.image_url ? (
+                          <div className="relative w-full h-48 bg-gray-100">
+                            <Image
+                              src={service.image_url}
+                              alt={`${service.name}のサービス画像`}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                            <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
                         )}
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          {service.category && (
-                            <span className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
-                              {service.category}
-                            </span>
+                        
+                        <div className="p-4">
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">{service.name}</h3>
+                          {service.description && (
+                            <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                              {service.description}
+                            </p>
                           )}
-                          {service.price && (
-                            <span className="font-medium">¥{service.price.toLocaleString()}</span>
-                          )}
+                          <div className="flex items-center justify-between text-sm text-gray-500">
+                            {service.category && (
+                              <span className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
+                                {service.category}
+                              </span>
+                            )}
+                            {service.price && (
+                              <span className="font-medium">¥{service.price.toLocaleString()}</span>
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>

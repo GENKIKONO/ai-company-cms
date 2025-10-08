@@ -8,6 +8,7 @@ export type OrgLite = {
   slug: string | null;
   status: 'draft' | 'published' | string;
   is_published: boolean | null;
+  logo_url: string | null;
 };
 
 export type OrgFull = OrgLite & {
@@ -38,7 +39,7 @@ export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
 
   const { data, error } = await supabase
     .from('organizations')
-    .select('id,name,slug,status,is_published')
+    .select('id,name,slug,status,is_published,logo_url')
     .eq('created_by', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -88,7 +89,7 @@ export const getOrganizationByUserIdCached = (userId: string) =>
 
       const { data, error } = await supabase
         .from('organizations')
-        .select('id,name,slug,status,is_published')
+        .select('id,name,slug,status,is_published,logo_url')
         .eq('created_by', userId)
         .order('created_at', { ascending: false })
         .limit(1)

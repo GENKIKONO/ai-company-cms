@@ -66,7 +66,7 @@ export default function PublishToggle({
       onClick={handleTogglePublish}
       disabled={isLoading}
       data-testid="qa-toggle-publish"
-      className={`flex items-center p-4 border-2 border-dashed rounded-lg transition-colors ${
+      className={`flex items-center p-3 sm:p-4 border-2 border-dashed rounded-lg transition-colors min-h-0 h-20 sm:h-auto ${
         isLoading 
           ? 'border-gray-300 bg-gray-50 cursor-not-allowed opacity-50'
           : currentPublishState 
@@ -74,18 +74,18 @@ export default function PublishToggle({
             : 'border-green-300 hover:border-green-500 hover:bg-green-50'
       }`}
     >
-      <div className={`p-2 rounded-lg mr-3 ${
+      <div className={`p-2 rounded-lg mr-2 sm:mr-3 ${
         isLoading 
           ? 'bg-gray-100'
           : currentPublishState ? 'bg-red-100' : 'bg-green-100'
       }`}>
         {isLoading ? (
-          <svg className="w-6 h-6 text-gray-600 animate-spin" fill="none" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-6 sm:h-6 text-gray-600 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
         ) : (
-          <svg className={`w-6 h-6 ${
+          <svg className={`w-4 h-4 sm:w-6 sm:h-6 ${
             currentPublishState ? 'text-red-600' : 'text-green-600'
           }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             {currentPublishState ? (
@@ -96,8 +96,8 @@ export default function PublishToggle({
           </svg>
         )}
       </div>
-      <div className="text-left">
-        <p className={`font-medium ${isLoading ? 'text-gray-600' : 'text-gray-900'}`}>
+      <div className="text-left min-w-0 flex-1">
+        <p className={`font-medium text-xs sm:text-base ${isLoading ? 'text-gray-600' : 'text-gray-900'} truncate`}>
           {isLoading 
             ? '更新中...' 
             : currentPublishState 
@@ -105,7 +105,7 @@ export default function PublishToggle({
               : 'サイトを公開する'
           }
         </p>
-        <p className={`text-sm ${isLoading ? 'text-gray-500' : 'text-gray-600'}`}>
+        <p className={`text-xs sm:text-sm ${isLoading ? 'text-gray-500' : 'text-gray-600'} hidden sm:block`}>
           {isLoading 
             ? `${organizationName}の公開状態を更新しています`
             : currentPublishState 

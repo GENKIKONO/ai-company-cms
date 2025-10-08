@@ -1,4 +1,5 @@
 import { supabaseBrowser } from '@/lib/supabase-client';
+import { vLog, vErr } from '@/lib/utils/logger';
 
 export type FeatureKey = 'monitoring' | 'business_matching_beta' | 'advanced_embed';
 
@@ -21,7 +22,7 @@ export async function hasEntitlement(orgId: string, key: FeatureKey): Promise<bo
     const allowlistHit = ALLOWLISTS[key].includes(orgId);
     
     if (allowlistHit) {
-      console.log('[VERIFY][Gate]', { orgId, key, allowlistHit: true, entitlementsHit: false, plan: 'allowlist' });
+      vLog('[Gate]', { orgId, key, allowlistHit: true, entitlementsHit: false, plan: 'allowlist' });
       return true;
     }
 
@@ -33,14 +34,14 @@ export async function hasEntitlement(orgId: string, key: FeatureKey): Promise<bo
       .single();
 
     if (error || !org) {
-      console.log('[VERIFY][Gate]', { orgId, key, allowlistHit: false, entitlementsHit: false, plan: 'not_found', error });
+      vLog('[Gate]', { orgId, key, allowlistHit: false, entitlementsHit: false, plan: 'not_found', error });
       return false;
     }
 
     // Check entitlements JSONB
     const entitlementsHit = org.entitlements && org.entitlements[key] === true;
     
-    console.log('[VERIFY][Gate]', { 
+    vLog('[Gate]', { 
       orgId, 
       key, 
       allowlistHit: false, 
@@ -50,7 +51,7 @@ export async function hasEntitlement(orgId: string, key: FeatureKey): Promise<bo
 
     return !!entitlementsHit;
   } catch (error) {
-    console.error('[VERIFY][Gate] Error checking entitlement:', { orgId, key, error });
+    vErr('[Gate] Error checking entitlement:', { orgId, key, error });
     return false;
   }
 }
@@ -63,14 +64,14 @@ export function hasEntitlementSync(org: OrganizationForGate | null, key: Feature
   const allowlistHit = ALLOWLISTS[key].includes(org.id);
   
   if (allowlistHit) {
-    console.log('[VERIFY][Gate][Sync]', { orgId: org.id, key, allowlistHit: true, entitlementsHit: false, plan: org.plan || 'unknown' });
+    vLog('[Gate][Sync]', { orgId: org.id, key, allowlistHit: true, entitlementsHit: false, plan: org.plan || 'unknown' });
     return true;
   }
 
   // Check entitlements
   const entitlementsHit = org.entitlements && org.entitlements[key] === true;
   
-  console.log('[VERIFY][Gate][Sync]', { 
+  vLog('[Gate][Sync]', { 
     orgId: org.id, 
     key, 
     allowlistHit: false, 

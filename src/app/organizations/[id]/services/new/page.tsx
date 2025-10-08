@@ -7,6 +7,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
 import { createService, generateServiceSlug, getServiceCategories } from '@/lib/services';
 import { type AppUser, type Organization, type ServiceFormData } from '@/types/database';
+import ServiceImageUploader from '@/components/ServiceImageUploader';
 
 export default function NewServicePage() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function NewServicePage() {
     category: '',
     features: [],
     media: [],
+    image_url: '',
     cta_text: '',
     cta_url: ''
   });
@@ -306,6 +308,18 @@ export default function NewServicePage() {
                 </select>
               </div>
             </div>
+          </div>
+
+          {/* サービス画像設定 */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">サービス画像</h2>
+            
+            <ServiceImageUploader
+              serviceId={undefined}
+              currentImageUrl={formData.image_url}
+              onImageChange={(imageUrl) => handleInputChange('image_url', imageUrl || '')}
+              disabled={submitting}
+            />
           </div>
 
           {/* 機能・特徴 */}

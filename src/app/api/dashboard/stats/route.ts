@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { hasEntitlement } from '@/lib/feature-flags/gate';
+import { vLog } from '@/lib/utils/logger';
 
 interface TableCount {
   count: number | null;
@@ -107,11 +108,11 @@ export async function GET(request: NextRequest) {
         if (error) {
           // Postgres error 42P01 = relation does not exist
           if (error.code === '42P01') {
-            console.log(`[VERIFY] Table ${table} does not exist, marking as missing`);
+            vLog(`Table ${table} does not exist, marking as missing`);
             counts[table as keyof typeof counts] = { count: null, missing: true };
             missingTables.push(table);
           } else {
-            console.error(`[VERIFY] Dashboard stats error for ${table}:`, {
+            console.error(`Dashboard stats error for ${table}:`, {
               orgId,
               table,
               error: error.message,
@@ -120,11 +121,11 @@ export async function GET(request: NextRequest) {
             throw error;
           }
         } else {
-          console.log(`[VERIFY] Dashboard stats for ${table}: ${count} items`);
+          vLog(`Dashboard stats for ${table}: ${count} items`);
           counts[table as keyof typeof counts] = { count: count || 0, missing: false };
         }
       } catch (err) {
-        console.error(`[VERIFY] Unexpected error checking table ${table}:`, {
+        console.error(`Unexpected error checking table ${table}:`, {
           orgId,
           table,
           error: err instanceof Error ? err.message : 'Unknown error'
@@ -145,7 +146,7 @@ export async function GET(request: NextRequest) {
     const hasMonitoringAccess = await hasEntitlement(orgId, 'monitoring');
     
     if (!hasMonitoringAccess) {
-      console.log(`[VERIFY][Gate][API] monitoring disabled for org:${orgId}`);
+      vLog(`[Gate][API] monitoring disabled for org:${orgId}`);
       analytics = {
         pageViews: 0,
         avgDurationSec: 0,
@@ -169,7 +170,7 @@ export async function GET(request: NextRequest) {
         }
       } catch (analyticsError) {
         // 解析テーブルが存在しない場合も正常として扱う
-        console.log('[VERIFY] Analytics table not found or no data, using defaults');
+        vLog('Analytics table not found or no data, using defaults');
       }
     }
 

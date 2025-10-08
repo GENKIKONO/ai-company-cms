@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { generateServiceJsonLd } from '@/lib/utils/jsonld';
 import type { Organization, Service } from '@/types/database';
 import { LogoImage } from '@/components/ui/optimized-image';
@@ -200,6 +201,21 @@ export default async function ServiceDetailPage({
                 </p>
               )}
             </div>
+
+            {/* サービス画像 */}
+            {service.image_url && (
+              <div className="px-6 py-8 border-b border-gray-200">
+                <div className="relative aspect-video max-w-2xl mx-auto rounded-lg overflow-hidden">
+                  <Image
+                    src={service.image_url}
+                    alt={`${service.name}のサービス画像`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* サービス詳細情報 */}
             <div className="px-6 py-8">

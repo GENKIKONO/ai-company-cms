@@ -7,6 +7,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { getIndustries } from '@/lib/organizations';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
 import { type AppUser, type OrganizationFormData } from '@/types/database';
+import OrgLogoUploader from '@/components/OrgLogoUploader';
 
 export default function NewOrganizationPage() {
   const router = useRouter();
@@ -760,19 +761,11 @@ export default function NewOrganizationPage() {
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">ブランド設定</h2>
             
-            <div>
-              <label htmlFor="logo_url" className="block text-sm font-medium text-gray-700 mb-2">
-                ロゴURL
-              </label>
-              <input
-                type="url"
-                id="logo_url"
-                value={formData.logo_url}
-                onChange={(e) => handleInputChange('logo_url', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                placeholder="https://example.com/logo.png"
-              />
-            </div>
+            <OrgLogoUploader
+              currentLogoUrl={formData.logo_url}
+              onLogoChange={(logoUrl) => handleInputChange('logo_url', logoUrl || '')}
+              disabled={submitting}
+            />
           </div>
 
           {/* SEO・メタ情報 */}

@@ -7,6 +7,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
 import { getService, updateService, deleteService, getServiceCategories } from '@/lib/services';
 import { type AppUser, type Organization, type Service, type ServiceFormData } from '@/types/database';
+import ServiceImageUploader from '@/components/ServiceImageUploader';
 
 export default function EditServicePage() {
   const router = useRouter();
@@ -28,7 +29,8 @@ export default function EditServicePage() {
     description: '',
     price: undefined,
     duration_months: undefined,
-    category: ''
+    category: '',
+    image_url: ''
   });
 
   const categoryOptions = [
@@ -70,7 +72,8 @@ export default function EditServicePage() {
             description: svc.description || '',
             price: svc.price || undefined,
             duration_months: svc.duration_months || undefined,
-            category: svc.category || ''
+            category: svc.category || '',
+            image_url: svc.image_url || ''
           });
         } else {
           router.push(`/organizations/${organizationId}`);
@@ -332,6 +335,17 @@ export default function EditServicePage() {
             </div>
           </div>
 
+          {/* サービス画像設定 */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">サービス画像</h2>
+            
+            <ServiceImageUploader
+              serviceId={service?.id}
+              currentImageUrl={formData.image_url}
+              onImageChange={(imageUrl) => handleInputChange('image_url', imageUrl || '')}
+              disabled={submitting}
+            />
+          </div>
 
           {/* アクションボタン */}
           <div className="p-6">

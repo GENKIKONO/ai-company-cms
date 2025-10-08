@@ -13,6 +13,7 @@ import ServicesTab from '@/components/ServicesTab';
 import CaseStudiesTab from '@/components/CaseStudiesTab';
 import FAQsTab from '@/components/FAQsTab';
 import PostsTab from '@/components/PostsTab';
+import OrgLogoUploader from '@/components/OrgLogoUploader';
 
 // 共通マッパー関数: organization → formData
 function fromOrg(org?: Organization | null): OrganizationFormData {
@@ -719,6 +720,18 @@ export default function EditOrganizationPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+          </div>
+
+          {/* ブランド設定 */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">ブランド設定</h2>
+            
+            <OrgLogoUploader
+              orgId={organization?.id}
+              currentLogoUrl={formData.logo_url}
+              onLogoChange={(logoUrl) => handleInputChange('logo_url', logoUrl || '')}
+              disabled={submitting}
+            />
           </div>
 
           {/* 業界・分類 */}

@@ -1,6 +1,7 @@
 'use client';
 
 import { supabaseBrowser } from '@/lib/supabase-client';
+import { vLog } from '@/lib/utils/logger';
 import { type Organization, type OrganizationFormData, type OrganizationWithOwner } from '@/types/database';
 
 // 企業一覧取得
@@ -147,7 +148,7 @@ export async function updateOrganization(id: string, organizationData: Partial<O
 // 企業削除 - DISABLED FOR SAFETY
 export async function deleteOrganization(id: string) {
   // [VERIFY][DELETE_GUARD] block organizations delete
-  console.log('[VERIFY][DELETE_GUARD] Organization delete blocked for safety', { id });
+  vLog('[DELETE_GUARD] Organization delete blocked for safety', { id });
   throw new Error('Organization deletion is disabled for safety. Use unpublish instead.');
 }
 

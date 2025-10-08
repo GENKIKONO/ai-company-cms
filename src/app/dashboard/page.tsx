@@ -16,6 +16,7 @@ export const revalidate = 0;
 export default async function DashboardPage() {
   try {
     console.log('[Dashboard] Rendering started');
+    console.log('[VERIFY][MOBILE_UI] Dashboard with mobile optimizations loading');
     
     // 🚫 非キャッシュの組織取得に差し替え
     const [org, statsResult] = await Promise.all([
@@ -85,7 +86,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* ヒーローセクション */}
-      <section className="relative py-16 overflow-hidden bg-gray-50">
+      <section className="relative py-8 sm:py-12 overflow-hidden bg-gray-50">
         {/* 背景装飾 */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-10 left-10 w-72 h-72 bg-gray-300 rounded-full mix-blend-multiply filter blur-xl"></div>
@@ -93,17 +94,17 @@ export default async function DashboardPage() {
           <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gray-200 rounded-full mix-blend-multiply filter blur-xl"></div>
         </div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
               ダッシュボード
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-prose mx-auto leading-relaxed">
               {org.name} の企業情報管理と公開状況を確認できます
             </p>
             
             {/* ステータス表示 */}
-            <div className="flex justify-center items-center gap-6 mb-8 text-sm text-gray-500">
+            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-6 mb-6 sm:mb-8 text-xs sm:text-sm text-gray-500">
               <span className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${org.is_published ? 'bg-gray-600' : 'bg-gray-400'}`}></span>
                 {org.is_published ? '公開中' : '下書き'}
@@ -121,32 +122,49 @@ export default async function DashboardPage() {
         </div>
       </section>
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
 
         {/* 統計カード */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300 min-w-0">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">企業情報</p>
-                <p className="text-2xl font-bold text-gray-900">{org.name}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">企業情報</p>
+                <div className="flex items-center gap-2 sm:gap-3 mb-1">
+                  {org.logo_url ? (
+                    <Image
+                      src={org.logo_url}
+                      alt={`${org.name}のロゴ`}
+                      width={32}
+                      height={32}
+                      className="w-6 h-6 sm:w-8 sm:h-8 rounded object-cover"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded flex items-center justify-center">
+                      <span className="text-gray-600 font-semibold text-xs sm:text-sm">
+                        {org.name.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{org.name}</p>
+                </div>
                 <p className="text-xs text-gray-400 mt-1">
                   作成済み
                 </p>
               </div>
-              <div className="p-3 bg-gray-100 rounded-xl">
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-2 sm:p-3 bg-gray-100 rounded-xl ml-2">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300 min-w-0">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">公開ステータス</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">公開ステータス</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {org.is_published ? '公開中' : '下書き'}
                 </p>
                 <div className="flex items-center mt-1">
@@ -156,42 +174,42 @@ export default async function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <div className="p-3 bg-gray-100 rounded-xl">
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-2 sm:p-3 bg-gray-100 rounded-xl ml-2">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300 min-w-0">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">サービス数</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total || 0}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">サービス数</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.total || 0}</p>
                 <p className="text-xs text-gray-400 mt-1">
                   公開中: {stats.published || 0}
                 </p>
               </div>
-              <div className="p-3 bg-gray-100 rounded-xl">
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-2 sm:p-3 bg-gray-100 rounded-xl ml-2">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300 min-w-0">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">導入事例</p>
-                <p className="text-2xl font-bold text-gray-900">{caseStudiesStats.total}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">導入事例</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{caseStudiesStats.total}</p>
                 <p className="text-xs text-gray-400 mt-1">
                   公開中: {caseStudiesStats.published}
                 </p>
               </div>
-              <div className="p-3 bg-gray-100 rounded-xl">
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-2 sm:p-3 bg-gray-100 rounded-xl ml-2">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
@@ -200,41 +218,41 @@ export default async function DashboardPage() {
         </div>
 
         {/* クイックアクション */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">クイックアクション</h2>
-            <span className="text-sm text-gray-500">よく使用される機能</span>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">クイックアクション</h2>
+            <span className="text-xs sm:text-sm text-gray-500 hidden sm:inline">よく使用される機能</span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
             <Link 
               href={`/organizations/${org.id}`}
               data-testid="qa-edit-org"
-              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
+              className="group flex flex-col items-center p-4 sm:p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 min-h-0 h-20 sm:h-auto"
             >
-              <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-2 sm:p-3 bg-gray-100 rounded-xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-4 h-4 sm:w-6 sm:h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </div>
               <div className="text-center">
-                <p className="font-semibold text-gray-900 mb-1">企業情報を編集</p>
-                <p className="text-sm text-gray-600">基本情報や詳細を更新</p>
+                <p className="font-semibold text-gray-900 mb-1 text-xs sm:text-base">企業情報を編集</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">基本情報や詳細を更新</p>
               </div>
             </Link>
 
             <Link 
               href={`/organizations/${org.id}/services/new`}
-              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
+              className="group flex flex-col items-center p-4 sm:p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 min-h-0 h-20 sm:h-auto"
             >
-              <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-2 sm:p-3 bg-gray-100 rounded-xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-4 h-4 sm:w-6 sm:h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
               <div className="text-center">
-                <p className="font-semibold text-gray-900 mb-1">サービス追加</p>
-                <p className="text-sm text-gray-600">新しいサービスを登録</p>
+                <p className="font-semibold text-gray-900 mb-1 text-xs sm:text-base">サービス追加</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">新しいサービスを登録</p>
               </div>
             </Link>
 
@@ -250,33 +268,33 @@ export default async function DashboardPage() {
                 href={`/o/${org.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex flex-col items-center p-6 border-2 border-green-200 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all duration-300"
+                className="group flex flex-col items-center p-4 sm:p-6 border-2 border-green-200 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all duration-300 min-h-0 h-20 sm:h-auto"
               >
-                <div className="p-3 bg-green-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-2 sm:p-3 bg-green-100 rounded-xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </div>
                 <div className="text-center">
-                  <p className="font-semibold text-gray-900 mb-1">公開ページを見る</p>
-                  <p className="text-sm text-gray-600">外部からの見え方を確認</p>
+                  <p className="font-semibold text-gray-900 mb-1 text-xs sm:text-base">公開ページを見る</p>
+                  <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">外部からの見え方を確認</p>
                 </div>
               </Link>
             ) : (
               <button 
-                className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl opacity-50 cursor-not-allowed transition-all duration-300" 
+                className="group flex flex-col items-center p-4 sm:p-6 border-2 border-gray-200 rounded-xl opacity-50 cursor-not-allowed transition-all duration-300 min-h-0 h-20 sm:h-auto" 
                 title={!org.slug ? "公開スラッグ未設定" : "企業が未公開"}
                 disabled
               >
-                <div className="p-3 bg-gray-100 rounded-xl mb-4">
-                  <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-2 sm:p-3 bg-gray-100 rounded-xl mb-2 sm:mb-4">
+                  <svg className="w-4 h-4 sm:w-6 sm:h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.464 8.464l1.414-1.414L12 9.172m-2.122.707l-1.415 1.414M12 9.172l1.878-1.879m2.829 2.829l-1.414 1.414M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
                 <div className="text-center">
-                  <p className="font-semibold text-gray-400 mb-1">公開ページを見る</p>
-                  <p className="text-sm text-gray-400">
+                  <p className="font-semibold text-gray-400 mb-1 text-xs sm:text-base">公開ページを見る</p>
+                  <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">
                     {!org.slug ? "スラッグ未設定" : "未公開"}
                   </p>
                 </div>
@@ -287,47 +305,47 @@ export default async function DashboardPage() {
             {hasEntitlementSync(org, 'monitoring') ? (
               <Link 
                 href="/monitor"
-                className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
+                className="group flex flex-col items-center p-4 sm:p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 min-h-0 h-20 sm:h-auto"
               >
-                <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-2 sm:p-3 bg-gray-100 rounded-xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-4 h-4 sm:w-6 sm:h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
                 <div className="text-center">
-                  <p className="font-semibold text-gray-900 mb-1">システム監視</p>
-                  <p className="text-sm text-gray-600">パフォーマンスを確認</p>
+                  <p className="font-semibold text-gray-900 mb-1 text-xs sm:text-base">システム監視</p>
+                  <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">パフォーマンスを確認</p>
                 </div>
               </Link>
             ) : (
               <Link 
                 href="/pricing?feature=monitor"
-                className="group flex flex-col items-center p-6 border-2 border-orange-200 rounded-xl hover:border-orange-400 hover:bg-orange-50 transition-all duration-300"
+                className="group flex flex-col items-center p-4 sm:p-6 border-2 border-orange-200 rounded-xl hover:border-orange-400 hover:bg-orange-50 transition-all duration-300 min-h-0 h-20 sm:h-auto"
               >
-                <div className="p-3 bg-orange-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-2 sm:p-3 bg-orange-100 rounded-xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-4 h-4 sm:w-6 sm:h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
                 <div className="text-center">
-                  <p className="font-semibold text-gray-900 mb-1">システム監視</p>
-                  <p className="text-sm text-orange-600">スタンダード以上</p>
+                  <p className="font-semibold text-gray-900 mb-1 text-xs sm:text-base">システム監視</p>
+                  <p className="text-xs sm:text-sm text-orange-600 hidden sm:block">スタンダード以上</p>
                 </div>
               </Link>
             )}
 
             <Link 
               href={`/organizations/${org.id}/hearing-request`}
-              className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-300"
+              className="group flex flex-col items-center p-4 sm:p-6 border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 min-h-0 h-20 sm:h-auto"
             >
-              <div className="p-3 bg-blue-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h2m-4 9h10m-5-3L8 13l4-4-4-4" />
                 </svg>
               </div>
               <div className="text-center">
-                <p className="font-semibold text-gray-900 mb-1">ヒアリング支援依頼</p>
-                <p className="text-sm text-gray-600">専門ヒアリングを依頼</p>
+                <p className="font-semibold text-gray-900 mb-1 text-xs sm:text-base">ヒアリング支援依頼</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">専門ヒアリングを依頼</p>
               </div>
             </Link>
           </div>
@@ -337,12 +355,12 @@ export default async function DashboardPage() {
         </div>
 
         {/* 企業管理 */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">企業管理</h2>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 sm:mb-8">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">企業管理</h2>
           </div>
           
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -388,12 +406,12 @@ export default async function DashboardPage() {
         </div>
 
         {/* パフォーマンス概要とアクティビティ */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 mb-6 sm:mb-8">
           {/* パフォーマンス概要 */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">パフォーマンス概要</h2>
-              <span className="text-sm text-gray-500">過去7日間</span>
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900">パフォーマンス概要</h2>
+              <span className="text-xs sm:text-sm text-gray-500">過去7日間</span>
             </div>
             
             <PerformanceMetrics />
@@ -411,8 +429,8 @@ export default async function DashboardPage() {
           </div>
 
           {/* 最近のアクティビティ */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">最近のアクティビティ</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">最近のアクティビティ</h2>
             
             <div className="text-center py-8">
               <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
@@ -437,12 +455,12 @@ export default async function DashboardPage() {
 
         {/* サブスクリプション管理 */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">サービス紹介</h2>
-            <p className="text-sm text-gray-500 mt-1">機能とプランについて詳しく説明します</p>
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">サービス紹介</h2>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">機能とプランについて詳しく説明します</p>
           </div>
           
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <Link
               href="/dashboard/services-info"
               className="group block p-4 border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-all"

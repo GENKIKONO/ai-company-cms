@@ -96,6 +96,7 @@ export function normalizeServicePayload(data: any) {
   let normalized = normalizeEmptyStrings(data, [
     'description',
     'category',
+    'image_url',
     'cta_text',
     'cta_url'
   ]);

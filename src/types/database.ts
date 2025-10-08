@@ -107,6 +107,7 @@ export interface Service {
   description?: string;
   features?: string[]; // List of service features
   media?: ServiceMedia[]; // Associated media (images, videos)
+  image_url?: string; // Service main image URL
   cta_text?: string; // Call-to-action text
   cta_url?: string; // Call-to-action URL
   created_at: string;
@@ -322,6 +323,7 @@ export interface ServiceFormData {
   description?: string;
   features?: string[];
   media?: ServiceMedia[];
+  image_url?: string;
   cta_text?: string;
   cta_url?: string;
 }
