@@ -5,14 +5,19 @@ import SignOutButton from './SignOutButton';
 
 interface AuthHeaderProps {
   currentPage?: 'dashboard' | 'billing';
+  pathname?: string; // アクティブ判定強化のためのパス情報
 }
 
-export default async function AuthHeader({ currentPage }: AuthHeaderProps) {
+export default async function AuthHeader({ currentPage, pathname }: AuthHeaderProps) {
   // サーバーサイドで認証状態を取得
   const supabase = await supabaseServer();
   const { data: { user }, error } = await supabase.auth.getUser();
 
   const isAuthenticated = !error && !!user;
+
+  // ✅ マイページ領域のアクティブ判定強化（組織編集も含む）
+  const isMyPageActive = currentPage === 'dashboard' || 
+    (pathname && (pathname.startsWith('/dashboard') || pathname.startsWith('/organizations')));
 
   return (
     <header className="bg-white shadow-sm">
@@ -29,9 +34,9 @@ export default async function AuthHeader({ currentPage }: AuthHeaderProps) {
               <nav className="ml-10 hidden md:flex space-x-8">
                 <Link 
                   href="/dashboard" 
-                  className={currentPage === 'dashboard' ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}
+                  className={isMyPageActive ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}
                 >
-                  ダッシュボード
+                  マイページ
                 </Link>
                 <Link 
                   href="/dashboard/billing" 

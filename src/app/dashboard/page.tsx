@@ -16,38 +16,32 @@ export default async function DashboardPage() {
   try {
     console.log('[Dashboard] Rendering started');
     
-    // 安全なデータ取得 - 新しい統合された関数を使用
-    const [userOrgResult, statsResult] = await Promise.all([
+    // 🚫 非キャッシュの組織取得に差し替え
+    const [org, statsResult] = await Promise.all([
       getCurrentUserOrganization(),
       getOrganizationStatsSafe()
     ]);
 
-    const { user, organization, error: orgError } = userOrgResult;
+    console.log('[VERIFY] Dashboard fetched organization', {
+      hasOrg: !!org,
+      slug: org?.slug,
+      status: org?.status,
+    });
+
     const stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
 
     // 導入事例統計を取得（組織がある場合のみ）
-    const caseStudiesResult = organization?.id 
-      ? await getCaseStudiesStatsSafe(organization.id)
+    const caseStudiesResult = org?.id 
+      ? await getCaseStudiesStatsSafe(org.id)
       : { data: { total: 0, published: 0 } };
     
     const caseStudiesStats = caseStudiesResult.data || { total: 0, published: 0 };
 
-    console.log('[VERIFY] Dashboard data flow - NEW PATTERN ACTIVE:', { 
-      hasUser: !!user,
-      hasOrg: !!organization, 
-      orgName: organization?.name,
-      orgId: organization?.id,
-      isPublished: organization?.is_published,
-      stats: stats.total,
-      orgError,
-      renderingPath: !user ? 'auth-required' : !organization?.id ? 'org-creation' : 'dashboard-ui'
-    });
-
     // 3段構えのレンダリング分岐
 
-    // 1. 認証状態不明 or エラー時 → サインイン導線
-    if (orgError && (orgError.includes('Not authenticated') || orgError.includes('401'))) {
-      console.log('[Dashboard] Unauthorized access');
+    // 1. 認証状態不明 or エラー時 → サインイン導線  
+    if (org === null) {
+      console.log('[Dashboard] No authentication or access denied');
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
@@ -65,7 +59,7 @@ export default async function DashboardPage() {
     }
 
     // 2. 認証OK & 組織なし → 企業作成導線
-    if (!organization?.id) {
+    if (!org?.id) {
       console.log('[Dashboard] No organization found');
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -104,14 +98,14 @@ export default async function DashboardPage() {
               ダッシュボード
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              {organization.name} の企業情報管理と公開状況を確認できます
+              {org.name} の企業情報管理と公開状況を確認できます
             </p>
             
             {/* ステータス表示 */}
             <div className="flex justify-center items-center gap-6 mb-8 text-sm text-gray-500">
               <span className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${organization.is_published ? 'bg-gray-600' : 'bg-gray-400'}`}></span>
-                {organization.is_published ? '公開中' : '下書き'}
+                <span className={`w-2 h-2 rounded-full ${org.is_published ? 'bg-gray-600' : 'bg-gray-400'}`}></span>
+                {org.is_published ? '公開中' : '下書き'}
               </span>
               <span className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
@@ -134,9 +128,9 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-1">企業情報</p>
-                <p className="text-2xl font-bold text-gray-900">{organization.name}</p>
+                <p className="text-2xl font-bold text-gray-900">{org.name}</p>
                 <p className="text-xs text-gray-400 mt-1">
-                  登録日: {new Date(organization.created_at).toLocaleDateString()}
+                  作成済み
                 </p>
               </div>
               <div className="p-3 bg-gray-100 rounded-xl">
@@ -152,12 +146,12 @@ export default async function DashboardPage() {
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-1">公開ステータス</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {organization.is_published ? '公開中' : '下書き'}
+                  {org.is_published ? '公開中' : '下書き'}
                 </p>
                 <div className="flex items-center mt-1">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${organization.is_published ? 'bg-gray-600' : 'bg-gray-400'}`}></div>
+                  <div className={`w-2 h-2 rounded-full mr-2 ${org.is_published ? 'bg-gray-600' : 'bg-gray-400'}`}></div>
                   <p className="text-xs text-gray-400">
-                    {organization.is_published ? 'オンライン' : '準備中'}
+                    {org.is_published ? 'オンライン' : '準備中'}
                   </p>
                 </div>
               </div>
@@ -213,7 +207,7 @@ export default async function DashboardPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <Link 
-              href={`/organizations/${organization.id}`}
+              href={`/organizations/${org.id}`}
               data-testid="qa-edit-org"
               className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
             >
@@ -229,7 +223,7 @@ export default async function DashboardPage() {
             </Link>
 
             <Link 
-              href={`/organizations/${organization.id}/services/new`}
+              href={`/organizations/${org.id}/services/new`}
               className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
             >
               <div className="p-3 bg-gray-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -244,15 +238,15 @@ export default async function DashboardPage() {
             </Link>
 
             <PublishToggle 
-              organizationId={organization.id}
-              isPublished={organization.is_published}
-              organizationName={organization.name}
+              organizationId={org.id}
+              isPublished={org.is_published}
+              organizationName={org.name}
             />
 
             {/* ✅ 公開ページを見るボタン追加 */}
-            {organization.slug && organization.is_published ? (
+            {org.slug && org.is_published ? (
               <Link 
-                href={`/o/${organization.slug}`}
+                href={`/o/${org.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex flex-col items-center p-6 border-2 border-green-200 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all duration-300"
@@ -271,7 +265,7 @@ export default async function DashboardPage() {
             ) : (
               <button 
                 className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl opacity-50 cursor-not-allowed transition-all duration-300" 
-                title={!organization.slug ? "公開スラッグ未設定" : "企業が未公開"}
+                title={!org.slug ? "公開スラッグ未設定" : "企業が未公開"}
                 disabled
               >
                 <div className="p-3 bg-gray-100 rounded-xl mb-4">
@@ -282,7 +276,7 @@ export default async function DashboardPage() {
                 <div className="text-center">
                   <p className="font-semibold text-gray-400 mb-1">公開ページを見る</p>
                   <p className="text-sm text-gray-400">
-                    {!organization.slug ? "スラッグ未設定" : "未公開"}
+                    {!org.slug ? "スラッグ未設定" : "未公開"}
                   </p>
                 </div>
               </button>
@@ -292,7 +286,7 @@ export default async function DashboardPage() {
             {(() => {
               const { isSystemMonitoringAllowed } = require('@/config/plans');
               const { getUserPlanClient } = require('@/lib/user-plan');
-              const userPlanInfo = getUserPlanClient(organization);
+              const userPlanInfo = getUserPlanClient(org);
               const isAllowed = isSystemMonitoringAllowed(userPlanInfo.plan);
               
               if (isAllowed) {
@@ -333,7 +327,7 @@ export default async function DashboardPage() {
             })()}
 
             <Link 
-              href={`/organizations/${organization.id}/hearing-request`}
+              href={`/organizations/${org.id}/hearing-request`}
               className="group flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-300"
             >
               <div className="p-3 bg-blue-100 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -349,7 +343,7 @@ export default async function DashboardPage() {
           </div>
           
           {/* 追加の便利機能 */}
-          <DashboardActions organization={organization} />
+          <DashboardActions organization={org} />
         </div>
 
         {/* 企業管理 */}
@@ -361,47 +355,37 @@ export default async function DashboardPage() {
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                {organization.logo_url ? (
-                  <Image
-                    src={organization.logo_url}
-                    alt={`${organization.name}のロゴ`}
-                    width={48}
-                    height={48}
-                    className="w-12 h-12 rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-600 font-semibold text-lg">
-                      {organization.name.charAt(0)}
-                    </span>
-                  </div>
-                )}
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <span className="text-gray-600 font-semibold text-lg">
+                    {org.name?.charAt(0) || 'O'}
+                  </span>
+                </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">
-                    {organization.name}
+                    {org.name}
                   </h3>
                   <p className="text-sm text-gray-500">
-                    最終更新: {new Date(organization.updated_at).toLocaleDateString()}
+                    作成済み
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-                  organization.is_published 
+                  org.is_published 
                     ? 'bg-gray-100 text-gray-800' 
                     : 'bg-gray-100 text-gray-600'
                 }`}>
-                  {organization.is_published ? '公開中' : '下書き'}
+                  {org.is_published ? '公開中' : '下書き'}
                 </span>
                 <Link
-                  href={`/organizations/${organization.id}`}
+                  href={`/organizations/${org.id}`}
                   className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 text-sm font-medium"
                 >
                   編集
                 </Link>
-                {organization.is_published && organization.slug && (
+                {org.is_published && org.slug && (
                   <Link
-                    href={`/o/${organization.slug}`}
+                    href={`/o/${org.slug}`}
                     className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 text-sm font-medium"
                     target="_blank"
                   >
@@ -449,16 +433,16 @@ export default async function DashboardPage() {
               <p className="text-sm text-gray-500">アクティビティ追跡機能は今後実装予定です</p>
             </div>
             
-            <DashboardActions organization={organization} context="activity" />
+            <DashboardActions organization={org} context="activity" />
           </div>
         </div>
 
         {/* 統合コンテンツ管理 - タブ式ダッシュボード */}
         <TabbedDashboard 
-          organizationId={organization.id}
-          organizationSlug={organization.slug}
-          organizationName={organization.name}
-          isPublished={organization.is_published}
+          organizationId={org.id}
+          organizationSlug={org.slug}
+          organizationName={org.name}
+          isPublished={org.is_published}
         />
 
         {/* サブスクリプション管理 */}

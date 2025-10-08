@@ -38,7 +38,7 @@ export default async function SafeAuthHeader() {
 
     const getCtaText = () => {
       if (!isAuthenticated) return '無料で始める';
-      return hasOrganization ? 'ダッシュボード' : '企業を作成';
+      return hasOrganization ? 'マイページ' : '企業を作成';
     };
 
     return (

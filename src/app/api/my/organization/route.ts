@@ -229,14 +229,8 @@ export async function POST(request: NextRequest) {
     if (existingOrg) {
       console.log('[POST /api/my/organization] Organization already exists, returning existing one');
       
-      // ✅ FIXED: Cache invalidation for idempotent case
-      try {
-        const { revalidateTag } = await import('next/cache');
-        revalidateTag(`org:${user.id}`); // Ensure fresh data is cached
-        console.log('🔄 Cache invalidated for existing organization fetch');
-      } catch (cacheError) {
-        console.warn('Cache invalidation failed:', cacheError);
-      }
+      // ✅ FIXED: 統一キャッシュ無効化 for idempotent case
+      await revalidateOrgCache(user.id, existingOrg.slug);
       
       return NextResponse.json(
         { 
@@ -407,14 +401,8 @@ export async function POST(request: NextRequest) {
           .maybeSingle();
         
         if (again) {
-          // ✅ FIXED: Cache invalidation for constraint violation idempotent case
-          try {
-            const { revalidateTag } = await import('next/cache');
-            revalidateTag(`org:${user.id}`); // Ensure fresh data is cached
-            console.log('🔄 Cache invalidated for constraint violation existing organization');
-          } catch (cacheError) {
-            console.warn('Cache invalidation failed:', cacheError);
-          }
+          // ✅ FIXED: 統一キャッシュ無効化 for constraint violation case
+          await revalidateOrgCache(user.id, again.slug);
           
           return NextResponse.json(
             { 
@@ -447,37 +435,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // ✅ FIXED: Add cache invalidation for organization creation
-    try {
-      const { revalidatePath, revalidateTag } = await import('next/cache');
-      
-      // パス無効化
-      revalidatePath('/dashboard');
-      revalidatePath('/organizations');
-      revalidatePath(`/organizations/${data.id}`);
-      if (data.slug) {
-        revalidatePath(`/o/${data.slug}`);
-      }
-      
-      // ✅ FIXED: User-based cache invalidation to match organizations-server.ts pattern
-      revalidateTag(`org:${user.id}`); // Match getOrganizationCached key pattern
-      revalidateTag(`org-data`); // Legacy compatibility
-      revalidateTag(`org:${data.id}`);
-      if (data.slug) {
-        revalidateTag(`org:${data.slug}`);
-        revalidateTag(`org-public:${data.slug}`);
-      }
-      revalidateTag(`org-public`);
-      
-      console.log('[VERIFY] Cache invalidation SUCCESS for organization creation:', {
-        userId: user.id,
-        orgId: data.id,
-        orgSlug: data.slug,
-        orgName: data.name,
-        tags: [`org:${user.id}`, `org:${data.id}`, data.slug ? `org:${data.slug}` : null].filter(Boolean)
-      });
-    } catch (cacheError) {
-      console.warn('Cache invalidation failed:', cacheError);
+    // ✅ 作成完了後：統一キャッシュ無効化
+    const cacheResult = await revalidateOrgCache(user.id, data.slug);
+    if (!cacheResult) {
+      console.warn('[VERIFY] Cache invalidation had issues but creation succeeded');
     }
 
     const debugInfo = generateDebugInfo(request, user, body);
@@ -513,8 +474,46 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT - 既存の企業情報を更新
+// ✅ 共通キャッシュ無効化関数（transactional save用）
+async function revalidateOrgCache(userId: string, orgSlug?: string, oldSlug?: string) {
+  try {
+    const { revalidatePath, revalidateTag } = await import('next/cache');
+    
+    // パス無効化（一括実行）
+    const pathsToRevalidate = [
+      '/dashboard',
+      '/organizations'
+    ];
+    
+    if (orgSlug) {
+      pathsToRevalidate.push(`/o/${orgSlug}`);
+    }
+    if (oldSlug && oldSlug !== orgSlug) {
+      pathsToRevalidate.push(`/o/${oldSlug}`);
+    }
+    
+    pathsToRevalidate.forEach(path => revalidatePath(path));
+    
+    // 統一タグ再検証
+    const tag = `org:${userId}`;
+    revalidateTag(tag);
+    
+    console.log('[VERIFY] Transaction cache invalidation completed', { 
+      tag, 
+      paths: pathsToRevalidate.length,
+      slug: orgSlug 
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('[VERIFY] Transaction cache invalidation failed', error);
+    return false;
+  }
+}
+
+// PUT - 既存の企業情報を更新（トランザクション強化）
 export async function PUT(request: NextRequest) {
+  let transaction: any = null;
   try {
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await supabaseServer();
@@ -568,6 +567,15 @@ export async function PUT(request: NextRequest) {
     // データの正規化
     const normalizedData = normalizeOrganizationPayload(body);
 
+    // 🚫 公開フラグの同期処理: is_published=true の時は status='published' に統一
+    if ('is_published' in normalizedData && normalizedData.is_published === true) {
+      normalizedData.status = 'published';
+      console.log('[VERIFY] Auto-sync: is_published=true → status=published');
+    } else if ('is_published' in normalizedData && normalizedData.is_published === false) {
+      normalizedData.status = 'draft';
+      console.log('[VERIFY] Auto-sync: is_published=false → status=draft');
+    }
+
     // 更新データの準備（created_byは変更不可）
     let updateData = {
       ...normalizedData,
@@ -617,42 +625,10 @@ export async function PUT(request: NextRequest) {
       return handleApiError(error);
     }
 
-    // ✅ 強化されたキャッシュ無効化：編集成功後に全関連キャッシュを無効化
-    try {
-      const { revalidatePath, revalidateTag } = await import('next/cache');
-      
-      // パス無効化
-      revalidatePath('/dashboard');
-      revalidatePath('/organizations');
-      revalidatePath(`/organizations/${existingOrg.id}`);
-      if (data.slug) {
-        revalidatePath(`/o/${data.slug}`);
-      }
-      if (existingOrg.slug && existingOrg.slug !== data.slug) {
-        revalidatePath(`/o/${existingOrg.slug}`); // 旧slug
-      }
-      
-      // ✅ FIXED: Enhanced tag invalidation for stable cache keys
-      // タグ無効化（データ取得ライブラリで使用）
-      revalidateTag(`org:${user.id}`); // Match getOrganizationCached key pattern
-      revalidateTag(`org-data`); // Legacy compatibility
-      revalidateTag(`org:${existingOrg.id}`);
-      if (data.slug) {
-        revalidateTag(`org:${data.slug}`);
-        revalidateTag(`org-public:${data.slug}`); // 🔄 公開ページキャッシュ
-      }
-      revalidateTag(`org-public`); // 🔄 全公開ページキャッシュ
-      
-      console.log('[VERIFY] Cache invalidation SUCCESS for organization update:', {
-        userId: user.id,
-        orgId: existingOrg.id,
-        oldSlug: existingOrg.slug,
-        newSlug: data.slug,
-        orgName: data.name,
-        tags: [`org:${user.id}`, `org:${existingOrg.id}`, data.slug ? `org:${data.slug}` : null].filter(Boolean)
-      });
-    } catch (cacheError) {
-      console.warn('Cache invalidation failed:', cacheError);
+    // ✅ トランザクション完了後：統一キャッシュ無効化
+    const cacheResult = await revalidateOrgCache(user.id, data.slug, existingOrg.slug);
+    if (!cacheResult) {
+      console.warn('[VERIFY] Cache invalidation had issues but transaction succeeded');
     }
 
     return NextResponse.json(

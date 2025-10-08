@@ -24,7 +24,7 @@ export default function PublishToggle({
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/my/organization', {
+      const response = await fetch('/api/my/organization/publish', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -179,7 +179,7 @@ export default function EditServicePage() {
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">サービスが見つかりません</h2>
           <Link href="/dashboard" className="mt-4 text-blue-600 hover:text-blue-700">
-            ダッシュボードに戻る
+マイページに戻る
           </Link>
         </div>
       </div>
@@ -194,7 +194,7 @@ export default function EditServicePage() {
           <ol className="flex items-center space-x-4">
             <li>
               <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
-                ダッシュボード
+                マイページ
               </Link>
             </li>
             <li>

@@ -61,7 +61,7 @@ export default function LandingPage({ stats }: Props) {
                 className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
                 onClick={() => handleCTAClick('header_dashboard')}
               >
-                ダッシュボード
+                マイページ
               </Link>
             </nav>
           </div>
@@ -385,7 +385,7 @@ export default function LandingPage({ stats }: Props) {
             </div>
             <div className="flex space-x-6">
               <Link href="/directory" className="text-gray-400 hover:text-white">企業一覧</Link>
-              <Link href="/dashboard" className="text-gray-400 hover:text-white">ダッシュボード</Link>
+              <Link href="/dashboard" className="text-gray-400 hover:text-white">マイページ</Link>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">

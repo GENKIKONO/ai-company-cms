@@ -151,30 +151,53 @@ export async function deleteOrganization(id: string) {
   }
 }
 
-// 企業ステータス更新 - サーバーAPI経由でキャッシュ無効化も実行
+// 企業ステータス更新 - 統一パブリケーションAPI経由
 export async function updateOrganizationStatus(id: string, status: 'draft' | 'published' | 'archived') {
   try {
-    // is_published フィールドも連動して更新
-    const is_published = status === 'published';
+    // published/draft の場合は統一パブリケーションAPIを使用
+    if (status === 'published' || status === 'draft') {
+      const is_published = status === 'published';
+      
+      const response = await fetch('/api/my/organization/publish', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          is_published
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      return { data: result.data, error: null };
+    } 
     
-    const response = await fetch('/api/my/organization', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        status,
-        is_published
-      }),
-    });
+    // archived の場合は従来の汎用APIを使用
+    else {
+      const response = await fetch('/api/my/organization', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          status,
+          is_published: false // archived時は必ず非公開
+        }),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP ${response.status}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      return { data: result.data, error: null };
     }
-
-    const result = await response.json();
-    return { data: result.data, error: null };
   } catch (error) {
     console.error('Error updating organization status:', error);
     return { data: null, error };

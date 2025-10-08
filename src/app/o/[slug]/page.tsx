@@ -23,9 +23,9 @@ const getOrganizationDataCached = (slug: string) =>
     async (): Promise<OrganizationPageData | null> => {
       console.log(`[getOrganizationDataCached] Cache miss for slug: ${slug}`);
       
-      // サーバーサイドでSupabaseから直接取得
-      const { supabaseServer } = await import('@/lib/supabase-server');
-      const supabase = await supabaseServer();
+      // 🚫 匿名クライアントで公開データのみ取得（cookies/auth依存禁止）
+      const { supabasePublic } = await import('@/lib/supabase-public');
+      const supabase = supabasePublic();
       
       // ✅ 厳密な取得条件（status='published'かつis_published=true の企業のみ）
       const { data: organization, error: orgError } = await supabase
@@ -36,29 +36,69 @@ const getOrganizationDataCached = (slug: string) =>
         .eq('is_published', true)
         .single();
 
-      // ✅ FIXED: Enhanced debugging for 404 issues
+      // ✅ VERIFY: Enhanced debugging for 404 issues with fallback diagnosis
       if (orgError || !organization) {
-        // Check if organization exists with different status for debugging
-        const { data: debugOrg } = await supabase
-          .from('organizations')
-          .select('slug, status, is_published')
-          .eq('slug', slug)
-          .maybeSingle();
+        console.error(`[VERIFY] Public page failed for slug: ${slug}`, {
+          error: orgError?.message,
+          requiredConditions: 'status=published AND is_published=true',
+          client: 'anonymous'
+        });
+        
+        // 🔍 Diagnostic fallback: Check individual conditions to identify mismatch
+        const [statusCheck, publishedCheck, generalCheck] = await Promise.all([
+          // Check if organization exists with status='published' only
+          supabase
+            .from('organizations')
+            .select('slug, status, is_published')
+            .eq('slug', slug)
+            .eq('status', 'published')
+            .maybeSingle(),
           
-        if (debugOrg) {
-          console.warn(`🚨 Organization found but not published:`, {
-            slug,
-            status: debugOrg.status,
-            is_published: debugOrg.is_published,
-            requiredConditions: 'status=published AND is_published=true'
+          // Check if organization exists with is_published=true only  
+          supabase
+            .from('organizations')
+            .select('slug, status, is_published')
+            .eq('slug', slug)
+            .eq('is_published', true)
+            .maybeSingle(),
+            
+          // Check if organization exists at all
+          supabase
+            .from('organizations')
+            .select('slug, status, is_published')
+            .eq('slug', slug)
+            .maybeSingle()
+        ]);
+        
+        if (generalCheck.data) {
+          const org = generalCheck.data;
+          console.error(`[VERIFY] 404 ROOT CAUSE IDENTIFIED for ${slug}:`, {
+            exists: true,
+            status: org.status,
+            is_published: org.is_published,
+            hasStatusPublished: org.status === 'published',
+            hasIsPublishedTrue: org.is_published === true,
+            diagnosis: org.status !== 'published' 
+              ? 'STATUS_NOT_PUBLISHED' 
+              : org.is_published !== true 
+                ? 'IS_PUBLISHED_FALSE'
+                : 'UNKNOWN_ISSUE'
           });
+          
+          // 🚨 Data inconsistency detected - log for fixing
+          if (org.status === 'published' && org.is_published === false) {
+            console.error(`[VERIFY] DATA INCONSISTENCY: ${slug} has status=published but is_published=false`);
+          } else if (org.status === 'draft' && org.is_published === true) {
+            console.error(`[VERIFY] DATA INCONSISTENCY: ${slug} has status=draft but is_published=true`);
+          }
         } else {
-          console.warn(`❌ Organization not found for slug: ${slug}`, orgError);
+          console.warn(`[VERIFY] Organization not found at all: ${slug}`);
         }
+        
         return null;
       }
 
-      console.log(`✅ Public organization loaded: ${organization.name} (${slug})`);
+      console.log(`[VERIFY] Public organization loaded successfully: ${organization.name} (${slug})`);
 
       // 公開されたコンテンツを並行取得
       const [postsResult, servicesResult, caseStudiesResult, faqsResult] = await Promise.all([

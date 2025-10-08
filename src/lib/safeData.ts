@@ -5,6 +5,9 @@
 import { unstable_cache } from 'next/cache';
 import { serverFetch } from './serverFetch';
 
+// 🚫 キャッシュを使わない組織取得を re-export
+export { getCurrentUserOrganization } from './organizations-server';
+
 interface SafeOrganizationData {
   id: string;
   name: string;
@@ -53,71 +56,14 @@ async function logToDiag(errorInfo: { errorId: string; at: string; note: string 
 }
 
 /**
- * ✅ FIXED: This function is now deprecated - use getCurrentUserOrganization() from organizations-server.ts instead
- * This wrapper is kept for backward compatibility during transition
+ * ❌ DEPRECATED: Use getCurrentUserOrganization() from organizations-server.ts instead
+ * This function is kept only for backward compatibility and will be removed
  */
-export async function getMyOrganizationSafe(userId?: string): Promise<SafeDataResult<SafeOrganizationData>> {
-  try {
-    if (!userId) {
-      return { 
-        data: null, 
-        error: '401 Unauthorized - userId required' 
-      };
-    }
-
-    // Use new server-side function that properly handles caching
-    const { getOrganizationSafe } = await import('./organizations-server');
-    const result = await getOrganizationSafe(userId, true);
-    
-    if (result.error) {
-      return { 
-        data: null, 
-        error: result.error 
-      };
-    }
-
-    // Transform to match expected interface
-    const organization = result.data;
-    if (!organization) {
-      return { data: null };
-    }
-
-    const safeData: SafeOrganizationData = {
-      id: organization.id,
-      name: organization.name,
-      is_published: organization.is_published,
-      slug: organization.slug,
-      updated_at: organization.updated_at,
-      created_at: organization.created_at,
-      logo_url: organization.logo_url
-    };
-
-    console.log('[getMyOrganizationSafe] Data loaded:', { 
-      hasOrg: !!organization, 
-      isPublished: organization.is_published 
-    });
-
-    return { data: safeData };
-
-  } catch (error) {
-    const errorId = `org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const errorNote = error instanceof Error ? error.message : 'Unknown error';
-    
-    console.error('[getMyOrganizationSafe] Error:', error);
-    
-    // 診断ログ送信
-    await logToDiag({
-      errorId,
-      at: 'getMyOrganizationSafe',
-      note: errorNote
-    });
-
-    return { 
-      data: null, 
-      error: errorNote,
-      errorId 
-    };
-  }
+export async function getMyOrganizationSafe(): Promise<SafeDataResult<SafeOrganizationData>> {
+  return { 
+    data: null, 
+    error: 'Function deprecated - use getCurrentUserOrganization() instead' 
+  };
 }
 
 /**
