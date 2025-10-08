@@ -96,9 +96,16 @@ export default async function SafeAuthHeader() {
             <div className="flex items-center space-x-4">
               {isAuthenticated ? (
                 <>
-                  {/* デスクトップ: メール表示、モバイル: 非表示 */}
-                  <div className="hidden sm:block text-sm text-gray-700 max-w-[200px] truncate">
-                    こんにちは、{user?.user_metadata?.full_name || user?.email}さん
+                  {/* デスクトップ: アイコン + メール表示、モバイル: 非表示 */}
+                  <div className="hidden sm:flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-gray-700">
+                        {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-700 truncate max-w-[120px]">
+                      {user?.user_metadata?.full_name || user?.email}
+                    </span>
                   </div>
                   
                   {/* モバイル: Avatarメニュー、デスクトップ: サインアウトボタン */}

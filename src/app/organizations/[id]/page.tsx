@@ -185,11 +185,15 @@ export default function EditOrganizationPage() {
     setSubmitting(true);
     try {
       const result = await updateOrganization(organizationId, formData);
+      console.log('[VERIFY] Organization save result', result);
       
       if (result.data) {
         // 成功時にデータを更新
         setOrganization(result.data);
         setErrors({ success: '企業情報を更新しました' });
+        
+        // ✅ 即時反映のためにページをリフレッシュ
+        router.refresh();
       } else {
         setErrors({ submit: '企業情報の更新に失敗しました' });
       }
@@ -311,14 +315,22 @@ export default function EditOrganizationPage() {
               </select>
               
               {/* 公開ページへのリンク */}
-              {organization.status === 'published' && (
+              {organization?.is_published ? (
                 <Link
                   href={`/o/${organization.slug}`}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
                 >
-                  公開ページを表示
+                  公開ページを見る
                 </Link>
+              ) : (
+                <button
+                  disabled
+                  className="px-4 py-2 bg-gray-300 text-gray-500 rounded-md text-sm cursor-not-allowed"
+                >
+                  未公開
+                </button>
               )}
               
               {/* 削除ボタン */}

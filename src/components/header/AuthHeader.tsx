@@ -51,9 +51,16 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                {/* PC表示: メールアドレス + サインアウトボタン */}
-                <div className="hidden md:block text-sm text-gray-700 max-w-[200px] truncate">
-                  こんにちは、{user?.user_metadata?.full_name || user?.email}さん
+                {/* PC表示: アイコン + メールアドレス + サインアウトボタン */}
+                <div className="hidden md:flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-gray-700">
+                      {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-700 truncate max-w-[120px]">
+                    {user?.user_metadata?.full_name || user?.email}
+                  </span>
                 </div>
                 <div className="hidden md:block">
                   <SignOutButton />
