@@ -34,7 +34,7 @@ const getOrganizationDataCached = (slug: string) =>
         .eq('slug', slug)
         .eq('status', 'published')
         .eq('is_published', true)
-        .single();
+        .maybeSingle();
 
       // ✅ VERIFY: Enhanced debugging for 404 issues with fallback diagnosis
       if (orgError || !organization) {
@@ -207,9 +207,17 @@ export default async function OrganizationDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const resolvedParams = await params;
+  
+  // ✅ slug未定義なら即座に404
+  if (!resolvedParams.slug || resolvedParams.slug === 'undefined') {
+    console.error('[VERIFY] slug missing or undefined:', resolvedParams.slug);
+    notFound();
+  }
+  
   const data = await getOrganizationData(resolvedParams.slug);
 
   if (!data) {
+    console.error('[VERIFY] organization data not found for slug:', resolvedParams.slug);
     notFound();
   }
 

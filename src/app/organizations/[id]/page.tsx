@@ -188,9 +188,17 @@ export default function EditOrganizationPage() {
       console.log('[VERIFY] Organization save result', result);
       
       if (result.data) {
-        // ✅ 成功時にデータと formData を即時更新
+        console.log('[VERIFY] org saved', { 
+          id: result.data.id, 
+          slug: result.data.slug, 
+          is_published: result.data.is_published 
+        });
+        
+        // ✅ 成功時にorganizationを先に更新
         setOrganization(result.data);
-        setFormData({
+        
+        // ✅ 次にformDataを同期（最新のslugとis_publishedを含む）
+        const syncedFormData = {
           name: result.data.name || '',
           slug: result.data.slug || '',
           description: result.data.description || '',
@@ -210,18 +218,20 @@ export default function EditOrganizationPage() {
           logo_url: result.data.logo_url || '',
           same_as: result.data.same_as || [],
           industries: result.data.industries || []
-        });
+        };
+        setFormData(syncedFormData);
         setErrors({ success: '企業情報を更新しました' });
         
         // ✅ slug変更時のURL同期
-        if (result.data.slug !== organizationId) {
-          console.log('[VERIFY] Slug changed, updating URL');
+        if (result.data.slug && result.data.slug !== organizationId) {
+          console.log('[VERIFY] Slug changed, updating URL:', result.data.slug);
           router.replace(`/organizations/${organizationId}`);
         }
         
         // ✅ 即時反映のためにページをリフレッシュ
         router.refresh();
       } else {
+        console.error('[VERIFY] org save failed: no data returned');
         setErrors({ submit: '企業情報の更新に失敗しました' });
       }
     } catch (error) {

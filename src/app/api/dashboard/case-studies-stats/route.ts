@@ -36,7 +36,11 @@ export async function GET(req: Request) {
         .eq('is_published', true);
 
       if (publishedError) {
-        console.error('Published count error:', publishedError);
+        console.error('[VERIFY] Published count error for case studies:', {
+          orgId,
+          error: publishedError.message,
+          code: publishedError.code
+        });
         // エラーの場合は総数のみ返す
         return NextResponse.json({ total: totalCount ?? 0, published: 0 });
       }

@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('created_by', user.id)
       .single();
 
     if (orgError || !orgData) {
@@ -101,21 +101,33 @@ export async function GET(request: NextRequest) {
         const { count, error } = await supabase
           .from(table)
           .select('*', { count: 'exact', head: true })
-          .eq('org_id', orgId);
+          .eq('organization_id', orgId);
         
         if (error) {
           // Postgres error 42P01 = relation does not exist
           if (error.code === '42P01') {
+            console.log(`[VERIFY] Table ${table} does not exist, marking as missing`);
             counts[table as keyof typeof counts] = { count: null, missing: true };
             missingTables.push(table);
           } else {
+            console.error(`[VERIFY] Dashboard stats error for ${table}:`, {
+              orgId,
+              table,
+              error: error.message,
+              code: error.code
+            });
             throw error;
           }
         } else {
+          console.log(`[VERIFY] Dashboard stats for ${table}: ${count} items`);
           counts[table as keyof typeof counts] = { count: count || 0, missing: false };
         }
       } catch (err) {
-        console.error(`Error checking table ${table}:`, err);
+        console.error(`[VERIFY] Unexpected error checking table ${table}:`, {
+          orgId,
+          table,
+          error: err instanceof Error ? err.message : 'Unknown error'
+        });
         counts[table as keyof typeof counts] = { count: null, missing: true };
         missingTables.push(table);
       }
@@ -133,7 +145,7 @@ export async function GET(request: NextRequest) {
       const { data: analyticsData } = await supabase
         .from('analytics')
         .select('page_views, avg_duration, conversion_rate')
-        .eq('org_id', orgId)
+        .eq('organization_id', orgId)
         .order('created_at', { ascending: false })
         .limit(1)
         .single();
@@ -145,7 +157,7 @@ export async function GET(request: NextRequest) {
       }
     } catch (analyticsError) {
       // 解析テーブルが存在しない場合も正常として扱う
-      console.log('Analytics table not found, using defaults');
+      console.log('[VERIFY] Analytics table not found or no data, using defaults');
     }
 
     const response: StatsResponse = {
