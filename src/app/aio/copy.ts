@@ -1,67 +1,216 @@
-// /aio ページのコピー定数
+// /aio ページのコピー定数（LP構造対応）
 
 export const aioCopy = {
-  // Stage (舞台)
-  stage: {
-    title: 'AIO（AI Information Optimization）とは',
-    description: 'AIが情報を理解・引用しやすい形に整える考え方。AIO Hubはこの実践を、誰でも扱えるフォーム入力で実現します。',
-  },
-
-  // Characters (登場人物)
-  characters: {
-    title: 'AIOを支える3者',
-    items: [
-      '企業：事実情報を継続更新',
-      'プラットフォーム（AIO Hub）：構造化・公開・最適化を担保',
-      'AI/検索：構造化情報を参照し、回答の中に要約/引用',
+  // Hero Section
+  hero: {
+    title: 'ゼロクリック時代でも\n見つかり続ける企業情報へ',
+    subtitle: 'AIO（AI Information Optimization）',
+    description: 'AIが理解・引用しやすい形に情報を最適化。JSON-LD自動生成とCMS管理で、検索からAI回答まで一貫して見つかる企業情報を実現します。',
+    features: [
+      { icon: 'Database', text: 'JSON-LD自動生成' },
+      { icon: 'Search', text: 'AI検索最適化' },
+      { icon: 'Zap', text: 'ゼロクリック対応' }
     ],
+    stats: [
+      { value: '200+', label: '導入企業数' },
+      { value: '300%', label: 'AI言及率向上' },
+      { value: '24h', label: '自動更新対応' }
+    ]
   },
 
-  // Conflict (衝突)
-  conflict: {
-    title: '"情報はある"のに、AIに届かない',
-    items: [
-      '形式がバラバラ/更新負荷が高い',
-      'JSON-LDやセマンティックHTMLの整備コスト',
-      '結果として、AIの回答に企業が登場しづらい',
+  // Flow Section - JSON-LD生成プロセス
+  flow: {
+    title: 'シンプルな3ステップで\nAI最適化を実現',
+    description: 'フォーム入力だけで、企業情報が自動的にJSON-LDとして構造化。\n技術知識不要でAI時代の情報発信が始められます。',
+    steps: [
+      {
+        step: 1,
+        title: '企業情報入力',
+        description: '直感的なフォームで基本情報・サービス・実績を入力するだけ。',
+        details: [
+          '会社概要・沿革・理念',
+          'サービス詳細・料金・特徴',
+          '導入事例・実績・認定資格'
+        ],
+        color: 'blue'
+      },
+      {
+        step: 2,
+        title: 'JSON-LD自動生成',
+        description: 'Schema.orgに準拠した構造化データを自動生成・最適化。',
+        details: [
+          'Organization・Service・Offer構造',
+          'セマンティックHTMLとの連携',
+          'AI理解に最適化された項目設計'
+        ],
+        color: 'purple'
+      },
+      {
+        step: 3,
+        title: '公開・運用開始',
+        description: 'SEO・AI検索・OGP・サイトマップまで自動対応で即座に効果発揮。',
+        details: [
+          '検索エンジン・AI向けサイトマップ',
+          'OGP・Twitter Card自動生成',
+          'リアルタイム更新・バージョン管理'
+        ],
+        color: 'indigo'
+      }
     ],
+    beforeAfter: {
+      title: 'Before → After: 情報構造の変化',
+      description: 'バラバラな情報がAI理解に最適な構造に変わります',
+      before: {
+        title: '従来の情報発信',
+        items: [
+          '"総合的なITソリューションを提供..."',
+          '"お客様のニーズに合わせたサービス..."',
+          '"高品質で安心・安全なシステム..."'
+        ],
+        problem: '抽象的でAIが理解困難'
+      },
+      after: {
+        title: 'AIO対応後',
+        items: [
+          '{ "@type": "Service", "name": "ECサイト構築", "priceRange": "月額5万円〜" }',
+          '{ "targetIndustry": ["製造業", "小売業"], "customerSize": "中小企業" }',
+          '{ "serviceOutput": { "metric": "売上向上", "value": "平均30%" } }'
+        ],
+        benefit: 'AI・検索エンジンが正確に理解'
+      }
+    }
   },
 
-  // BigIdea (ビッグアイデア)
-  bigIdea: {
-    title: '"AIOを標準装備"した企業ディレクトリ',
-    description: 'AIO Hub上で企業が集まるほど、全体のドメインパワーが強化。個社にとっても"引用される確率"が上がります。',
-  },
-
-  // Solution (解決策)
-  solution: {
-    title: 'AIO Hubが提供すること',
-    items: [
-      '構造化データ（JSON-LD）/見出し構造の自動整備',
-      '公開/非公開・スラッグ・OGPなどの基本運用',
-      '無料：ロゴ/サービス1件。有料：複数サービスや外部CTAなど',
+  // Pricing Section
+  pricing: {
+    title: 'シンプルで明確な料金体系',
+    description: 'まずは無料でAIOの効果を実感。本格運用は月額9,800円で始められます。',
+    plans: [
+      {
+        name: 'フリープラン',
+        description: 'AIOの基本機能を体験',
+        price: '0',
+        period: '永続無料',
+        icon: 'Star',
+        popular: false,
+        features: [
+          '企業ロゴ・基本情報の登録',
+          '主力サービス1件の詳細登録',
+          'JSON-LD自動生成・公開',
+          '基本的なSEO最適化',
+          'OGP・Twitter Card自動生成',
+          'コミュニティサポート'
+        ],
+        limitations: [
+          '登録サービス数は1件まで',
+          '外部CTA・問い合わせフォーム連携なし'
+        ],
+        color: 'blue',
+        buttonText: '無料で始める'
+      },
+      {
+        name: 'スタンダードプラン',
+        description: '本格的なAI最適化運用',
+        price: '9,800',
+        period: '月額',
+        icon: 'Crown',
+        popular: true,
+        features: [
+          'フリープランの全機能',
+          'サービス登録数無制限',
+          '外部サイト・CTAリンク連携',
+          '問い合わせフォーム・予約システム連携',
+          'カスタムOGP・メタデータ設定',
+          'アクセス解析・改善レポート',
+          'マルチ言語対応（英語・中国語）',
+          '優先サポート・個別相談'
+        ],
+        limitations: [],
+        color: 'purple',
+        buttonText: 'スタンダードプランを選択'
+      }
     ],
-    note: '閲覧レポート/マッチングは（予定）。実装後に提供します。',
+    notes: {
+      included: [
+        '消費税込みの価格表示',
+        '初期費用・セットアップ費用無料',
+        'JSON-LD・Schema.org準拠保証',
+        'デザイン・レスポンシブ対応'
+      ],
+      payment: [
+        'クレジットカード・銀行振込対応',
+        'いつでもプラン変更・解約可能',
+        '年間契約で10%割引適用',
+        '30日間返金保証'
+      ]
+    }
   },
 
-  // Recap (再主張)
-  recap: {
-    title: '"選ばれない理由"を、構造から解消',
-    description: '情報を"AIが読める"形にしておく。それがAIOです。',
+  // FAQ Section
+  faq: {
+    title: 'よくあるご質問',
+    description: 'AIO・JSON-LD・構造化データに関する技術的な質問にお答えします。',
+    categories: [
+      {
+        title: 'AIO・基本概念',
+        items: [
+          {
+            question: 'AIO（AI Information Optimization）とは何ですか？',
+            answer: 'AIが情報を理解・引用しやすい形に整える考え方です。JSON-LDによる構造化データ、セマンティックHTML、メタデータ最適化を通じて、AI検索・生成AI・音声アシスタントから正確に参照される情報環境を構築します。'
+          },
+          {
+            question: 'なぜ今AIOが必要なのですか？',
+            answer: 'ゼロクリック検索の普及により、AIが直接回答を生成する機会が急増。従来のSEOだけでは不十分で、AIが理解しやすい構造化された情報提供が企業の発見性向上に不可欠になっています。'
+          }
+        ]
+      },
+      {
+        title: 'JSON-LD・技術仕様',
+        items: [
+          {
+            question: 'JSON-LDとは何ですか？',
+            answer: 'Linked Dataを表現するJSON形式のフォーマット。Schema.orgの語彙を使用して、企業情報・サービス・イベントなどを機械が理解できる形で構造化します。GoogleやBingなどの検索エンジンが推奨する標準仕様です。'
+          },
+          {
+            question: '自社サイトにJSON-LDを設置する必要がありますか？',
+            answer: 'いいえ。AIO HubではホストされたページとしてJSON-LDが自動生成・公開されます。自社サイトへの技術的な変更は不要で、既存サイトとの連携も可能です。'
+          }
+        ]
+      },
+      {
+        title: 'プラン・機能',
+        items: [
+          {
+            question: 'フリープランでも効果はありますか？',
+            answer: 'はい。基本的なJSON-LD生成・SEO最適化により、主力サービス1件の検索性向上を実感いただけます。本格運用にはスタンダードプランでの複数サービス登録を推奨します。'
+          },
+          {
+            question: 'データの更新頻度はどの程度ですか？',
+            answer: 'リアルタイム更新に対応。フォームでの情報変更が即座にJSON-LD・OGP・サイトマップに反映され、検索エンジンとAIプラットフォームへの情報提供が自動化されます。'
+          }
+        ]
+      }
+    ]
   },
 
-  // ClosingCTA (CTA)
-  closingCTA: {
-    title: 'AIOを、今から',
-    primaryText: '無料で始める',
+  // CTA Section
+  cta: {
+    title: 'AIOで、今すぐ始める\n企業情報の最適化',
+    description: 'フリープランなら永続無料。5分の入力で、あなたの企業情報がAI時代に対応します。',
+    primaryText: '無料でAIOを始める',
     primaryHref: '/organizations',
-    secondaryText: 'サービス概要',
-    secondaryHref: '/service',
+    secondaryText: 'ヒアリング代行を利用する',
+    secondaryHref: '/hearing-service',
+    features: [
+      'クレジットカード登録不要',
+      'いつでもプラン変更可能',
+      'JSON-LD・Schema.org準拠保証'
+    ]
   },
 
   // メタデータ
   metadata: {
-    title: 'AIOとは - AIO Hub',
-    description: 'AIO（AI Information Optimization）はAIが情報を理解・引用しやすい形に整える考え方。AIO Hubで企業情報のAIO対策を始めましょう。',
+    title: 'AIOとは - AI情報最適化でゼロクリック時代に対応 | AIO Hub',
+    description: 'AIO（AI Information Optimization）でゼロクリック時代に対応。JSON-LD自動生成とCMS管理で、AI検索・生成AIから見つかり続ける企業情報を実現。フリープラン永続無料。',
   },
 } as const;
