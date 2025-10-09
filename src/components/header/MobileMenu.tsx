@@ -44,10 +44,10 @@ export default function MobileMenu({
         aria-controls="primary-navigation"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm hover:bg-gray-50 active:scale-95 transition"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm hover:bg-gray-50 active:scale-95 transition-all duration-200 min-h-[44px] min-w-[44px]"
       >
         <span className="sr-only">メニュー</span>
-        <svg width="22" height="22" viewBox="0 0 24 24" className="text-gray-700">
+        <svg width="24" height="24" viewBox="0 0 24 24" className="text-gray-700">
           {open ? (
             <path fill="currentColor" d="M6 6L18 18M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           ) : (
@@ -67,7 +67,7 @@ export default function MobileMenu({
           <nav
             id="primary-navigation"
             aria-label="メインナビゲーション"
-            className="fixed inset-x-0 top-16 z-50 origin-top rounded-b-xl border-t bg-white shadow-lg"
+            className="fixed inset-x-4 top-16 z-50 origin-top rounded-xl border bg-white shadow-lg max-w-sm mx-auto"
           >
             <div ref={panelRef} className="py-2">
               {links.map((l, i) => (
@@ -76,7 +76,7 @@ export default function MobileMenu({
                   href={l.href}
                   ref={i === 0 ? firstLinkRef : undefined}
                   onClick={close}
-                  className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="block px-5 py-4 text-base font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-h-[44px] flex items-center transition-colors duration-200"
                 >
                   {l.label}
                 </Link>
@@ -85,17 +85,17 @@ export default function MobileMenu({
                 <Link
                   href={auth.dashboardHref}
                   onClick={close}
-                  className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="block px-5 py-4 text-base font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-h-[44px] flex items-center transition-colors duration-200"
                 >
                   マイページ
                 </Link>
               )}
-              <div className="my-2 border-t" />
+              <div className="my-2 border-t border-gray-200" />
               {auth.loggedIn ? (
                 <Link
                   href={auth.logoutHref}
                   onClick={close}
-                  className="block px-5 py-3 text-base font-medium text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                  className="block px-5 py-4 text-base font-medium text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 min-h-[44px] flex items-center transition-colors duration-200"
                 >
                   ログアウト
                 </Link>
@@ -103,7 +103,7 @@ export default function MobileMenu({
                 <Link
                   href={auth.loginHref}
                   onClick={close}
-                  className="block px-5 py-3 text-base font-medium text-indigo-600 hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="block px-5 py-4 text-base font-medium text-indigo-600 hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-h-[44px] flex items-center transition-colors duration-200"
                 >
                   ログイン
                 </Link>

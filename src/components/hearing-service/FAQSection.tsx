@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 const faqData = [
   {
@@ -69,37 +70,39 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-20 bg-white">
+    <section id="faq" className="py-10 sm:py-16 lg:py-20 bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* セクションヘッダー */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium mb-4">
             <HelpCircle className="w-4 h-4" />
             <span>よくある質問</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
             お客様からよくいただくご質問
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600">
             ご不明な点がございましたら、お気軽にお問い合わせください。
           </p>
         </div>
 
         {/* カテゴリフィルター */}
-        <div className="flex flex-wrap gap-2 justify-center mb-12">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setActiveCategory(category.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                activeCategory === category.id
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {category.label}
-            </button>
-          ))}
+        <div className="mb-8 sm:mb-12">
+          <HorizontalScroller ariaLabel="FAQカテゴリフィルター" className="justify-center">
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setActiveCategory(category.id)}
+                className={`snap-start min-w-max px-4 py-2 min-h-[44px] rounded-full text-sm font-medium transition-colors duration-200 ${
+                  activeCategory === category.id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {category.label}
+              </button>
+            ))}
+          </HorizontalScroller>
         </div>
 
         {/* FAQ リスト */}
@@ -111,9 +114,9 @@ export default function FAQSection() {
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
+                className="w-full px-4 sm:px-6 py-4 sm:py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 min-h-[44px]"
               >
-                <h3 className="text-lg font-semibold text-gray-900 pr-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 pr-4 leading-6 sm:leading-7">
                   {faq.question}
                 </h3>
                 <div className="flex-shrink-0">
@@ -126,8 +129,8 @@ export default function FAQSection() {
               </button>
               
               {openIndex === index && (
-                <div className="px-6 pb-5 border-t border-gray-100">
-                  <div className="pt-4 text-gray-700 leading-relaxed whitespace-pre-line">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-gray-100">
+                  <div className="pt-4 text-[15px] sm:text-base text-gray-700 leading-7 sm:leading-8 whitespace-pre-line">
                     {faq.answer}
                   </div>
                 </div>
@@ -137,24 +140,24 @@ export default function FAQSection() {
         </div>
 
         {/* 追加サポート */}
-        <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
+        <div className="mt-12 sm:mt-16 text-center">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 lg:p-8 border border-blue-200">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">
               他にもご質問がございますか？
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-[15px] sm:text-base text-gray-600 mb-6 leading-6 sm:leading-7">
               お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <a
                 href="mailto:support@luxucare.jp"
-                className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 min-h-[44px] bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 メールで問い合わせ
               </a>
               <a
                 href="tel:03-1234-5678"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white text-blue-600 border border-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 min-h-[44px] bg-white text-blue-600 border border-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
               >
                 電話で問い合わせ
               </a>

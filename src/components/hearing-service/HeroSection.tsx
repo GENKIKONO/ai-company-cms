@@ -2,10 +2,11 @@
 
 import { ArrowRight, Sparkles, Brain, Target } from 'lucide-react';
 import Link from 'next/link';
+import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 export default function HeroSection() {
   return (
-    <section className="relative pt-20 pb-16 overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <section className="relative py-10 sm:py-16 lg:py-20 overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* 背景装飾 */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
@@ -22,7 +23,7 @@ export default function HeroSection() {
           </div>
           
           {/* メインタイトル */}
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
             <span className="block">AIに</span>
             <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               伝わる企業情報へ
@@ -30,14 +31,14 @@ export default function HeroSection() {
           </h1>
           
           {/* サブタイトル */}
-          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-[15px] sm:text-base md:text-xl text-gray-600 mb-8 max-w-4xl mx-auto leading-7 sm:leading-8">
             1時間のヒアリングで、あなたの会社の魅力を
             <br className="hidden md:block" />
             <span className="font-semibold text-blue-600">AIが理解しやすい構造</span>に最適化します
           </p>
           
           {/* 特徴ポイント */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12 text-gray-700">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8 text-gray-700">
             <div className="flex items-center gap-2">
               <Brain className="w-5 h-5 text-blue-500" />
               <span className="text-sm font-medium">専任スタッフがヒアリング</span>
@@ -53,10 +54,10 @@ export default function HeroSection() {
           </div>
           
           {/* CTAボタン */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <Link
               href="#pricing"
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="group inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors duration-200"
             >
               <span>サービス詳細を見る</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -64,26 +65,28 @@ export default function HeroSection() {
             
             <Link
               href="#faq"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl font-semibold border border-gray-200 hover:bg-white hover:border-gray-300 transition-all duration-300"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-white/80 backdrop-blur-sm text-gray-700 rounded-lg font-medium border border-gray-200 hover:bg-white hover:border-gray-300 transition-colors duration-200"
             >
               よくある質問
             </Link>
           </div>
           
           {/* サービス特徴 */}
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/50">
-              <div className="text-lg font-bold text-blue-600 mb-2">専門ヒアリング</div>
-              <div className="text-gray-700 font-medium">AI最適化の専門スタッフが企業情報を丁寧にヒアリング</div>
-            </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/50">
-              <div className="text-lg font-bold text-purple-600 mb-2">構造化登録</div>
-              <div className="text-gray-700 font-medium">ヒアリング内容をJSON-LD形式で構造化・最適化して登録</div>
-            </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/50">
-              <div className="text-lg font-bold text-indigo-600 mb-2">継続改善</div>
-              <div className="text-gray-700 font-medium">定期的な情報更新とAI検索最適化のサポート</div>
-            </div>
+          <div className="mt-12 sm:mt-16">
+            <HorizontalScroller ariaLabel="サービス特徴" className="sm:grid-cols-2 lg:grid-cols-3">
+              <div className="snap-start min-w-[280px] sm:min-w-0 bg-white/60 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/50">
+                <div className="text-lg font-bold text-blue-600 mb-2">専門ヒアリング</div>
+                <div className="text-[15px] sm:text-base text-gray-700 leading-6 sm:leading-7">AI最適化の専門スタッフが企業情報を丁寧にヒアリング</div>
+              </div>
+              <div className="snap-start min-w-[280px] sm:min-w-0 bg-white/60 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/50">
+                <div className="text-lg font-bold text-purple-600 mb-2">構造化登録</div>
+                <div className="text-[15px] sm:text-base text-gray-700 leading-6 sm:leading-7">ヒアリング内容をJSON-LD形式で構造化・最適化して登録</div>
+              </div>
+              <div className="snap-start min-w-[280px] sm:min-w-0 bg-white/60 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/50">
+                <div className="text-lg font-bold text-indigo-600 mb-2">継続改善</div>
+                <div className="text-[15px] sm:text-base text-gray-700 leading-6 sm:leading-7">定期的な情報更新とAI検索最適化のサポート</div>
+              </div>
+            </HorizontalScroller>
           </div>
         </div>
       </div>

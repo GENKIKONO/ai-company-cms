@@ -1,6 +1,8 @@
 'use client';
 
 import { FileText, MessageCircle, Sparkles, ArrowRight, CheckCircle } from 'lucide-react';
+import HorizontalScroller from '@/components/ui/HorizontalScroller';
+import StatCard from '@/components/ui/StatCard';
 
 const flowSteps = [
   {
@@ -70,62 +72,57 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="py-20 bg-white">
+    <section className="py-10 sm:py-16 lg:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* セクションヘッダー */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-10 sm:mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
             シンプルな3ステップ
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            複雑な作業は一切不要。専門スタッフがすべて代行し、<br className="hidden md:block" />
+          <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 max-w-3xl mx-auto">
+            複雑な作業は一切不要。専門スタッフがすべて代行し、
             あなたの企業情報をAI時代に最適な形でお届けします。
           </p>
         </div>
 
         {/* フローステップ */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          {flowSteps.map((step, index) => {
-            const colors = getColorClasses(step.color);
-            const IconComponent = step.icon;
-            
-            return (
-              <div key={step.step} className="relative">
-                {/* 接続線（デスクトップのみ） */}
-                {index < flowSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-16 -right-6 w-12 h-px bg-gray-300">
-                    <ArrowRight className="absolute -top-2 right-0 w-4 h-4 text-gray-400" />
+        <div className="mb-16 sm:mb-20">
+          <HorizontalScroller ariaLabel="ヒアリング代行の流れ" className="lg:grid-cols-3">
+            {flowSteps.map((step, index) => {
+              const colors = getColorClasses(step.color);
+              const IconComponent = step.icon;
+              
+              return (
+                <div key={step.step} className="snap-start min-w-[300px] sm:min-w-0 relative">
+                  <div className={`relative bg-white border-2 ${colors.border} rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 group h-full`}>
+                    {/* ステップ番号 */}
+                    <div className={`absolute -top-3 left-4 w-6 h-6 sm:w-8 sm:h-8 ${colors.step} text-white rounded-full flex items-center justify-center font-bold text-xs sm:text-sm`}>
+                      {step.step}
+                    </div>
+                    
+                    {/* アイコン */}
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-4 sm:mb-6 motion-reduce:transition-none group-hover:scale-110 transition-transform duration-300`}>
+                      <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${colors.icon}`} />
+                    </div>
+                    
+                    {/* タイトル・説明 */}
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">{step.title}</h3>
+                    <p className="text-[15px] sm:text-base text-gray-600 mb-4 sm:mb-6 leading-6 sm:leading-7">{step.description}</p>
+                    
+                    {/* 詳細リスト */}
+                    <ul className="space-y-2 sm:space-y-2.5">
+                      {step.details.map((detail, detailIndex) => (
+                        <li key={detailIndex} className="flex items-start gap-2">
+                          <CheckCircle className={`w-4 h-4 ${colors.accent} mt-0.5 flex-shrink-0`} />
+                          <span className="text-[13px] sm:text-sm text-gray-700 leading-5">{detail}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                )}
-                
-                <div className={`relative bg-white border-2 ${colors.border} rounded-2xl p-8 hover:shadow-lg transition-all duration-300 group`}>
-                  {/* ステップ番号 */}
-                  <div className={`absolute -top-4 left-8 w-8 h-8 ${colors.step} text-white rounded-full flex items-center justify-center font-bold text-sm`}>
-                    {step.step}
-                  </div>
-                  
-                  {/* アイコン */}
-                  <div className={`w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className={`w-8 h-8 ${colors.icon}`} />
-                  </div>
-                  
-                  {/* タイトル・説明 */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">{step.description}</p>
-                  
-                  {/* 詳細リスト */}
-                  <ul className="space-y-2">
-                    {step.details.map((detail, detailIndex) => (
-                      <li key={detailIndex} className="flex items-start gap-2">
-                        <CheckCircle className={`w-4 h-4 ${colors.accent} mt-0.5 flex-shrink-0`} />
-                        <span className="text-sm text-gray-700">{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </HorizontalScroller>
         </div>
 
         {/* Before/After セクション */}

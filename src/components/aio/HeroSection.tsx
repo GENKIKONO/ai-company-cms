@@ -2,6 +2,8 @@ import { ArrowRight, Database, Search, Zap } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getSetting } from '@/lib/settings';
+import HorizontalScroller from '@/components/ui/HorizontalScroller';
+import StatCard from '@/components/ui/StatCard';
 
 interface HeroSectionProps {
   title: string;
@@ -33,7 +35,7 @@ export default async function HeroSection({
     ? heroImageUrl 
     : '/hero/zero-click-shift.png';
   return (
-    <section className="py-24 md:py-32 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <section className="py-10 sm:py-16 lg:py-20 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
           {/* Left Column - Content */}
@@ -45,7 +47,7 @@ export default async function HeroSection({
             </div>
             
             {/* メインタイトル */}
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tight mb-6">
               {title.split('\n').map((line, index) => (
                 <span key={index} className="block">
                   {index === 1 ? (
@@ -60,15 +62,15 @@ export default async function HeroSection({
             </h1>
             
             {/* 説明文 */}
-            <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-8">
+            <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 mb-8">
               AIO Hubは、AIが理解・引用しやすい形に企業情報を最適化するCMS。
-              フォーム入力だけで<strong>JSON-LD自動生成</strong>と
+              フォーム入力だけで<strong>JSON‑LD自動生成</strong>と
               <strong>構造化公開</strong>を実現し、検索からAI回答までの導線で
               企業が"選ばれる"状態をつくります。
             </p>
 
             {/* 特徴ポイント */}
-            <div className="flex flex-col sm:flex-row gap-6 mb-8 text-gray-700">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 text-gray-700">
               {features.map((feature, index) => {
                 const IconComponent = iconComponents[feature.icon as keyof typeof iconComponents];
                 const colors = ['text-blue-500', 'text-purple-500', 'text-indigo-500'];
@@ -83,17 +85,17 @@ export default async function HeroSection({
             </div>
 
             {/* CTAボタン */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link 
                 href={primaryCta.href} 
-                className="inline-flex justify-center items-center rounded-lg bg-indigo-600 px-6 py-3 text-white font-medium hover:bg-indigo-700 transition"
+                className="inline-flex justify-center items-center rounded-lg bg-indigo-600 px-6 py-3 min-h-[44px] text-white font-medium hover:bg-indigo-700 transition-colors duration-200"
               >
                 {primaryCta.text}
               </Link>
               {secondaryCta && (
                 <Link 
                   href={secondaryCta.href} 
-                  className="inline-flex justify-center items-center rounded-lg border border-gray-300 px-6 py-3 text-gray-700 font-medium hover:bg-gray-50 transition"
+                  className="inline-flex justify-center items-center rounded-lg border border-gray-300 px-6 py-3 min-h-[44px] text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
                 >
                   {secondaryCta.text}
                 </Link>
@@ -120,18 +122,20 @@ export default async function HeroSection({
         </div>
 
         {/* 価値訴求カード */}
-        <section className="mt-24 md:mt-32">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-8 md:mb-10">
+        <section className="mt-16 sm:mt-20 lg:mt-24">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 text-center mb-8 tracking-tight">
             AIO Hubで実現する価値
           </h2>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" role="list">
+          <HorizontalScroller ariaLabel="AIO Hubの主なメリット" className="sm:grid-cols-2 lg:grid-cols-4">
             {benefits.map((benefit, index) => (
-              <li key={index} className="rounded-xl border border-gray-200/80 bg-white shadow-sm p-5 md:p-6">
-                <h3 className="text-lg font-semibold text-indigo-900 mb-3">{benefit.title}</h3>
-                <p className="text-base md:text-lg leading-relaxed text-gray-600">{benefit.description}</p>
-              </li>
+              <StatCard
+                key={index}
+                value={benefit.title}
+                title={benefit.description}
+                className="snap-start min-w-[280px] sm:min-w-0"
+              />
             ))}
-          </ul>
+          </HorizontalScroller>
         </section>
       </div>
     </section>

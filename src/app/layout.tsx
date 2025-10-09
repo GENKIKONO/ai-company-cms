@@ -14,6 +14,23 @@ export const fetchCache = 'force-no-store';
 export const metadata = {
   title: 'AIO Hub AI企業CMS',
   description: 'AI-powered enterprise CMS for company directory and service management',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 }
 
 export default function RootLayout({
@@ -29,6 +46,10 @@ export default function RootLayout({
       <body>
         <I18nProvider initialLocale="ja">
           <ToastProvider>
+            {/* Skip to main content link for accessibility */}
+            <a href="#main-content" className="skip-link">
+              メインコンテンツにスキップ
+            </a>
             {env.SHOW_BUILD_BANNER && (
               <BuildBanner 
                 commit={process.env.VERCEL_GIT_COMMIT_SHA}
@@ -37,7 +58,9 @@ export default function RootLayout({
               />
             )}
             <SafeAuthHeader />
-            {children}
+            <main id="main-content">
+              {children}
+            </main>
             <WebVitalsReporter />
           </ToastProvider>
         </I18nProvider>

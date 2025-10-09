@@ -6,6 +6,7 @@
 import Link from 'next/link';
 import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
 import { formatJPY, getCampaignStarter, PRICING_CONFIG } from '@/lib/pricing';
+import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 interface PlanFeature {
   text: string;
@@ -112,23 +113,23 @@ const PLANS: PricingPlan[] = [
 
 export default function PricingTable() {
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-10 sm:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        <div className="text-center mb-10 sm:mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
             シンプルで明確な料金体系
           </h2>
-          <p className="text-base md:text-lg leading-relaxed text-gray-600 max-w-3xl mx-auto">
+          <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 max-w-3xl mx-auto">
             無料から始めて、必要になったら拡張。<br/>
             最小の入力で、AIに"引用されやすい"企業情報を実現します。
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        <HorizontalScroller ariaLabel="料金プラン一覧" className="lg:grid-cols-4">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative rounded-2xl border-2 bg-white p-6 shadow-sm transition-all hover:shadow-lg min-h-[600px] flex flex-col ${
+              className={`snap-start min-w-[280px] sm:min-w-0 relative rounded-2xl border-2 bg-white p-4 sm:p-6 shadow-sm transition-all hover:shadow-lg min-h-[500px] sm:min-h-[600px] flex flex-col ${
                 plan.popular
                   ? 'border-purple-500 ring-2 ring-purple-500/20'
                   : 'border-gray-200 hover:border-gray-300'
@@ -172,7 +173,7 @@ export default function PricingTable() {
                 </div>
               </div>
 
-              <ul className="mb-8 space-y-3 flex-1">
+              <ul className="mb-8 space-y-2 sm:space-y-2.5 flex-1">
                 {plan.inheritedFeatures && (
                   <li className="mb-4 pb-3 border-b border-gray-100">
                     <span className="text-sm font-medium text-purple-600">
@@ -183,20 +184,20 @@ export default function PricingTable() {
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
                     <Check
-                      className={`h-5 w-5 shrink-0 mt-0.5 mr-3 ${
+                      className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 mr-2 sm:mr-3 ${
                         feature.included ? 'text-green-500' : 'text-gray-300'
                       }`}
                     />
                     <div className="flex-1">
                       <span
-                        className={`text-sm ${
+                        className={`text-[15px] leading-7 ${
                           feature.included ? 'text-gray-700' : 'text-gray-400'
                         }`}
                       >
                         {feature.text}
                       </span>
                       {feature.subtext && (
-                        <div className="mt-1 text-xs text-gray-500 pl-2 border-l-2 border-gray-200">
+                        <div className="mt-1 text-xs sm:text-sm text-gray-500 pl-2 border-l-2 border-gray-200 leading-5">
                           {feature.subtext}
                         </div>
                       )}
@@ -227,7 +228,7 @@ export default function PricingTable() {
               )}
             </div>
           ))}
-        </div>
+        </HorizontalScroller>
 
         <div className="mt-12 text-center">
           <p className="text-sm text-gray-500 leading-relaxed">
