@@ -10,6 +10,7 @@ import { formatJPY, getCampaignStarter, PRICING_CONFIG } from '@/lib/pricing';
 interface PlanFeature {
   text: string;
   included: boolean;
+  subtext?: string;
 }
 
 interface PricingPlan {
@@ -21,6 +22,7 @@ interface PricingPlan {
   badge?: string;
   icon: typeof Star;
   popular?: boolean;
+  inheritedFeatures?: string;
   features: PlanFeature[];
   ctaText: string;
   ctaHref: string;
@@ -39,11 +41,11 @@ const PLANS: PricingPlan[] = [
     icon: Star,
     popular: false,
     features: [
-      { text: 'ロゴ・企業情報を構造化公開（JSON-LD）', included: true },
+      { text: 'ロゴ・企業情報を構造化公開（JSON‑LD）', included: true },
       { text: 'ディレクトリ掲載（最下層・タグ1件）', included: true },
-      { text: 'サービス1件', included: true },
-      { text: '公開/非公開設定', included: true },
-      { text: '上位露出・特集枠は対象外', included: false }
+      { text: 'サービス1件登録', included: true },
+      { text: '公開 / 非公開の切替', included: true },
+      { text: '上位掲載・特集枠は対象外', included: false }
     ],
     ctaText: '無料で始める',
     ctaHref: '/organizations',
@@ -58,11 +60,12 @@ const PLANS: PricingPlan[] = [
     badge: campaignStarter.isCampaign ? '今だけ' : undefined,
     icon: Crown,
     popular: true,
+    inheritedFeatures: 'Freeプランのすべての機能に加えて',
     features: [
       { text: 'ディレクトリ掲載（通常順位・タグ複数）', included: true },
-      { text: 'サービス上限アップ（例: 10件）', included: true },
-      { text: 'FAQ・外部リンク', included: true },
-      { text: 'SNSシェア最適化（OGP対応・順次拡張予定）', included: true }
+      { text: 'サービス上限：10件', included: true },
+      { text: 'FAQ・外部リンクの追加', included: true },
+      { text: 'SNSシェア最適化（OGP対応／順次拡張予定）', included: true }
     ],
     ctaText: 'このプランで始める',
     ctaHref: '/organizations',
@@ -75,10 +78,11 @@ const PLANS: PricingPlan[] = [
     price: PRICING_CONFIG.business.displayPrice,
     icon: Building2,
     popular: false,
+    inheritedFeatures: 'Starterのすべての機能に加えて',
     features: [
       { text: '上位掲載（おすすめ・特集枠）', included: true },
-      { text: 'ブログCMS（AIO Hubドメイン配下で発信強化）', included: true },
-      { text: 'タグ複数露出', included: true },
+      { text: 'ブログCMS（AIO Hub配下で配信）', included: true, subtext: '構造化済みの記事を自動生成・公開でき、AIに"読まれやすい"情報資産を継続的に蓄積' },
+      { text: 'タグ複数露出（関連カテゴリでの表示強化）', included: true },
       { text: 'カスタムOGP設定（順次拡張予定）', included: true }
     ],
     ctaText: 'このプランで始める',
@@ -93,10 +97,12 @@ const PLANS: PricingPlan[] = [
     price: PRICING_CONFIG.enterprise.displayPrice,
     icon: Zap,
     popular: false,
+    inheritedFeatures: 'Businessのすべての機能に加えて',
     features: [
-      { text: '複数ブランド・承認フロー', included: true },
-      { text: 'API/SSO 連携支援', included: true },
-      { text: '優先サポート / SLA', included: true }
+      { text: '複数ブランド管理・承認フロー', included: true },
+      { text: 'API / SSO 連携支援・優先サポート / SLA', included: true },
+      { text: '専属コンサルティング（情報設計・AIO運用設計）', included: true },
+      { text: '個別要件・外部データ連携などの拡張相談に対応', included: true }
     ],
     ctaText: 'お問い合わせ',
     ctaHref: '/contact',
@@ -122,7 +128,7 @@ export default function PricingTable() {
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative rounded-2xl border-2 bg-white p-6 shadow-sm transition-all hover:shadow-lg ${
+              className={`relative rounded-2xl border-2 bg-white p-6 shadow-sm transition-all hover:shadow-lg min-h-[600px] flex flex-col ${
                 plan.popular
                   ? 'border-purple-500 ring-2 ring-purple-500/20'
                   : 'border-gray-200 hover:border-gray-300'
@@ -166,7 +172,14 @@ export default function PricingTable() {
                 </div>
               </div>
 
-              <ul className="mb-8 space-y-3">
+              <ul className="mb-8 space-y-3 flex-1">
+                {plan.inheritedFeatures && (
+                  <li className="mb-4 pb-3 border-b border-gray-100">
+                    <span className="text-sm font-medium text-purple-600">
+                      {plan.inheritedFeatures}
+                    </span>
+                  </li>
+                )}
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
                     <Check
@@ -174,27 +187,36 @@ export default function PricingTable() {
                         feature.included ? 'text-green-500' : 'text-gray-300'
                       }`}
                     />
-                    <span
-                      className={`text-sm ${
-                        feature.included ? 'text-gray-700' : 'text-gray-400'
-                      }`}
-                    >
-                      {feature.text}
-                    </span>
+                    <div className="flex-1">
+                      <span
+                        className={`text-sm ${
+                          feature.included ? 'text-gray-700' : 'text-gray-400'
+                        }`}
+                      >
+                        {feature.text}
+                      </span>
+                      {feature.subtext && (
+                        <div className="mt-1 text-xs text-gray-500 pl-2 border-l-2 border-gray-200">
+                          {feature.subtext}
+                        </div>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
 
-              <Link
-                href={plan.ctaHref}
-                className={`block w-full rounded-lg px-4 py-3 text-center text-sm font-medium transition-colors ${
-                  plan.popular
-                    ? 'bg-purple-600 text-white hover:bg-purple-700'
-                    : 'bg-gray-900 text-white hover:bg-gray-800'
-                }`}
-              >
-                {plan.ctaText}
-              </Link>
+              <div className="mt-auto">
+                <Link
+                  href={plan.ctaHref}
+                  className={`block w-full rounded-lg px-4 py-3 text-center text-sm font-medium transition-colors ${
+                    plan.popular
+                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      : 'bg-gray-900 text-white hover:bg-gray-800'
+                  }`}
+                >
+                  {plan.ctaText}
+                </Link>
+              </div>
 
               {plan.comingSoon && (
                 <div className="mt-4 text-xs text-gray-500">
