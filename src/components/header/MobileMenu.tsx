@@ -60,54 +60,60 @@ export default function MobileMenu({
 
       {open && (
         <div
-          className="fixed inset-0 z-50 bg-black/30"
+          className="fixed inset-0 z-50 bg-white/95 backdrop-blur-sm"
           onClick={onOverlayClick}
           role="presentation"
         >
           <nav
             id="primary-navigation"
             aria-label="メインナビゲーション"
-            className="fixed inset-x-4 top-16 z-50 origin-top rounded-xl border bg-white shadow-lg max-w-sm mx-auto"
+            className="fixed inset-0 z-50 bg-white/95 backdrop-blur-sm"
           >
-            <div ref={panelRef} className="py-2">
-              {links.map((l, i) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  ref={i === 0 ? firstLinkRef : undefined}
-                  onClick={close}
-                  className="block px-5 py-4 text-base font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-h-[44px] flex items-center transition-colors duration-200"
-                >
-                  {l.label}
-                </Link>
-              ))}
-              {auth.loggedIn && (
-                <Link
-                  href={auth.dashboardHref}
-                  onClick={close}
-                  className="block px-5 py-4 text-base font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-h-[44px] flex items-center transition-colors duration-200"
-                >
-                  マイページ
-                </Link>
-              )}
-              <div className="my-2 border-t border-gray-200" />
-              {auth.loggedIn ? (
-                <Link
-                  href={auth.logoutHref}
-                  onClick={close}
-                  className="block px-5 py-4 text-base font-medium text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 min-h-[44px] flex items-center transition-colors duration-200"
-                >
-                  ログアウト
-                </Link>
-              ) : (
-                <Link
-                  href={auth.loginHref}
-                  onClick={close}
-                  className="block px-5 py-4 text-base font-medium text-indigo-600 hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-h-[44px] flex items-center transition-colors duration-200"
-                >
-                  ログイン
-                </Link>
-              )}
+            <div ref={panelRef} className="flex flex-col h-full justify-between">
+              <div className="px-6 pt-6 space-y-6">
+                <div className="text-xl font-bold text-indigo-600">AIO Hub</div>
+                <nav className="space-y-3">
+                  {links.map((l, i) => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      ref={i === 0 ? firstLinkRef : undefined}
+                      onClick={close}
+                      className="block text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200 text-lg py-2"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                  {auth.loggedIn && (
+                    <Link
+                      href={auth.dashboardHref}
+                      onClick={close}
+                      className="block text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200 text-lg py-2"
+                    >
+                      マイページ
+                    </Link>
+                  )}
+                </nav>
+              </div>
+              <div className="p-6 border-t border-gray-100">
+                {auth.loggedIn ? (
+                  <Link
+                    href={auth.logoutHref}
+                    onClick={close}
+                    className="w-full block text-center bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                  >
+                    ログアウト
+                  </Link>
+                ) : (
+                  <Link
+                    href={auth.loginHref}
+                    onClick={close}
+                    className="w-full block text-center bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-200"
+                  >
+                    ログイン
+                  </Link>
+                )}
+              </div>
             </div>
           </nav>
         </div>

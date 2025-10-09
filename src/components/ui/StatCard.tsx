@@ -13,7 +13,7 @@ export default function StatCard({
 }) {
   return (
     <div className={clsx(
-      'snap-start min-w-[240px] sm:min-w-0',
+      'snap-center min-w-[85%] sm:min-w-0',
       'rounded-2xl border border-gray-200 bg-white shadow-sm',
       'p-4 sm:p-6',
       'transition-all duration-200 hover:shadow-md hover:scale-[1.02]',

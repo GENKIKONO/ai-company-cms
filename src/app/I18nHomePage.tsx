@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { useI18n } from '@/components/layout/I18nProvider';
 import { useABTest } from '@/lib/utils/ab-testing';
 import { useSEO } from '@/hooks/useSEO';
+import HorizontalScroller from '@/components/ui/HorizontalScroller';
+import StatCard from '@/components/ui/StatCard';
 
 interface SiteSettings {
   hero_title: string;
@@ -149,8 +151,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 機能紹介 */}
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 sm:py-16 lg:py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
                 {t('pages.home.features.title')}
@@ -160,9 +162,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <HorizontalScroller ariaLabel="管理機能セクション" className="lg:grid-cols-3">
               {/* 企業管理 */}
-              <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+              <div className="snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
                 <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -183,7 +185,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
 
               {/* サービス管理 */}
-              <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+              <div className="snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
                 <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -204,7 +206,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
 
               {/* 導入事例管理 */}
-              <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+              <div className="snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
                 <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -223,73 +225,41 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   </svg>
                 </div>
               </div>
-            </div>
+            </HorizontalScroller>
           </div>
         </section>
 
         {/* 統計情報 */}
-        <section className="py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 sm:py-16 lg:py-24 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
                 {t('pages.home.stats.title')}
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div className="text-center group">
-                <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                  <div className="text-4xl font-bold text-gray-700 mb-2 group-hover:scale-110 transition-transform duration-300">
-                    {formatNumber(dynamicStats.organizations)}+
-                  </div>
-                  <div className="text-gray-600 font-medium">
-                    {t('pages.home.stats.organizations')}
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    登録企業数
-                  </div>
-                </div>
-              </div>
-              <div className="text-center group">
-                <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                  <div className="text-4xl font-bold text-gray-700 mb-2 group-hover:scale-110 transition-transform duration-300">
-                    {formatNumber(dynamicStats.services)}+
-                  </div>
-                  <div className="text-gray-600 font-medium">
-                    {t('pages.home.stats.services')}
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    提供サービス数
-                  </div>
-                </div>
-              </div>
-              <div className="text-center group">
-                <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                  <div className="text-4xl font-bold text-gray-700 mb-2 group-hover:scale-110 transition-transform duration-300">
-                    {formatNumber(dynamicStats.cases)}+
-                  </div>
-                  <div className="text-gray-600 font-medium">
-                    {t('pages.home.stats.cases')}
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    成功事例数
-                  </div>
-                </div>
-              </div>
-              <div className="text-center group">
-                <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                  <div className="text-4xl font-bold text-gray-700 mb-2 group-hover:scale-110 transition-transform duration-300">
-                    {dynamicStats.categories}+
-                  </div>
-                  <div className="text-gray-600 font-medium">
-                    {t('pages.home.stats.categories')}
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    カテゴリー数
-                  </div>
-                </div>
-              </div>
-            </div>
+            <HorizontalScroller ariaLabel="実績統計セクション" className="md:grid-cols-4">
+              <StatCard
+                value={`${formatNumber(dynamicStats.organizations)}+`}
+                title={t('pages.home.stats.organizations')}
+                subtitle="登録企業数"
+              />
+              <StatCard
+                value={`${formatNumber(dynamicStats.services)}+`}
+                title={t('pages.home.stats.services')}
+                subtitle="提供サービス数"
+              />
+              <StatCard
+                value={`${formatNumber(dynamicStats.cases)}+`}
+                title={t('pages.home.stats.cases')}
+                subtitle="成功事例数"
+              />
+              <StatCard
+                value={`${dynamicStats.categories}+`}
+                title={t('pages.home.stats.categories')}
+                subtitle="カテゴリー数"
+              />
+            </HorizontalScroller>
           </div>
         </section>
 
@@ -378,22 +348,22 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
               本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm font-medium text-gray-900">JSON-LD</div>
-                <div className="text-xs text-gray-600">構造化データ</div>
+            <div className="space-y-6 sm:space-y-8 mb-8 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0">
+              <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-indigo-400">
+                <div className="text-lg font-bold text-gray-900 mb-2">JSON-LD</div>
+                <div className="text-sm text-gray-600 leading-6">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm font-medium text-gray-900">RSS/XML</div>
-                <div className="text-xs text-gray-600">フィード配信</div>
+              <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-purple-400">
+                <div className="text-lg font-bold text-gray-900 mb-2">RSS/XML</div>
+                <div className="text-sm text-gray-600 leading-6">フィード配信により継続的な情報更新をクローラーに通知</div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm font-medium text-gray-900">OpenAPI</div>
-                <div className="text-xs text-gray-600">API仕様公開</div>
+              <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-blue-400">
+                <div className="text-lg font-bold text-gray-900 mb-2">OpenAPI</div>
+                <div className="text-sm text-gray-600 leading-6">API仕様を公開し、第三者システムとの連携可能性を提示</div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm font-medium text-gray-900">サイトマップ</div>
-                <div className="text-xs text-gray-600">動的生成</div>
+              <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-green-400">
+                <div className="text-lg font-bold text-gray-900 mb-2">サイトマップ</div>
+                <div className="text-sm text-gray-600 leading-6">動的生成によりページ構造を検索エンジンに効率的に伝達</div>
               </div>
             </div>
             <Link 

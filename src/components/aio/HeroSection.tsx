@@ -35,8 +35,8 @@ export default async function HeroSection({
     ? heroImageUrl 
     : '/hero/zero-click-shift.png';
   return (
-    <section className="py-10 sm:py-16 lg:py-20 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
           {/* Left Column - Content */}
           <div>
@@ -132,7 +132,7 @@ export default async function HeroSection({
                 key={index}
                 value={benefit.title}
                 title={benefit.description}
-                className="snap-start min-w-[280px] sm:min-w-0"
+                className="snap-center min-w-[85%] sm:min-w-0"
               />
             ))}
           </HorizontalScroller>

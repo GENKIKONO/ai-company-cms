@@ -72,8 +72,8 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="py-10 sm:py-16 lg:py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-12 sm:py-16 lg:py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         {/* セクションヘッダー */}
         <div className="text-center mb-10 sm:mb-12">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -93,7 +93,7 @@ export default function FlowSection() {
               const IconComponent = step.icon;
               
               return (
-                <div key={step.step} className="snap-start min-w-[300px] sm:min-w-0 relative">
+                <div key={step.step} className="snap-center min-w-[85%] sm:min-w-0 relative">
                   <div className={`relative bg-white border-2 ${colors.border} rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 group h-full`}>
                     {/* ステップ番号 */}
                     <div className={`absolute -top-3 left-4 w-6 h-6 sm:w-8 sm:h-8 ${colors.step} text-white rounded-full flex items-center justify-center font-bold text-xs sm:text-sm`}>
