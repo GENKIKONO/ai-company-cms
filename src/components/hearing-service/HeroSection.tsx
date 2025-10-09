@@ -23,7 +23,7 @@ export default function HeroSection() {
           </div>
           
           {/* メインタイトル */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
+          <h1 className="jp-heading text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
             <span className="block">AIに</span>
             <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               伝わる企業情報へ
@@ -31,25 +31,23 @@ export default function HeroSection() {
           </h1>
           
           {/* サブタイトル */}
-          <p className="text-[15px] sm:text-base md:text-xl text-gray-600 mb-8 max-w-4xl mx-auto leading-7 sm:leading-8">
-            1時間のヒアリングで、あなたの会社の魅力を
-            <br className="hidden md:block" />
-            <span className="font-semibold text-blue-600">AIが理解しやすい構造</span>に最適化します
+          <p className="jp-body text-[15px] sm:text-base md:text-xl text-gray-600 mb-8 max-w-4xl mx-auto leading-7 sm:leading-8">
+            1時間のヒアリングで、<br className="sm:hidden" />あなたの会社の魅力を<br className="hidden md:block" /><span className="font-semibold text-blue-600">AIが理解しやすい構造</span>に最適化します
           </p>
           
           {/* 特徴ポイント */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8 text-gray-700">
             <div className="flex items-center gap-2">
               <Brain className="w-5 h-5 text-blue-500" />
-              <span className="text-sm font-medium">専任スタッフがヒアリング</span>
+              <span className="text-sm font-medium whitespace-nowrap">専任スタッフがヒアリング</span>
             </div>
             <div className="flex items-center gap-2">
               <Target className="w-5 h-5 text-purple-500" />
-              <span className="text-sm font-medium">AI最適化構造で登録</span>
+              <span className="text-sm font-medium whitespace-nowrap">AI最適化構造で登録</span>
             </div>
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-indigo-500" />
-              <span className="text-sm font-medium">検索性・発見性向上</span>
+              <span className="text-sm font-medium whitespace-nowrap">検索性・発見性向上</span>
             </div>
           </div>
           
@@ -75,16 +73,16 @@ export default function HeroSection() {
           <div className="mt-12 sm:mt-16">
             <HorizontalScroller ariaLabel="サービス特徴" className="sm:grid-cols-2 lg:grid-cols-3">
               <div className="snap-start min-w-[280px] sm:min-w-0 bg-white/60 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/50">
-                <div className="text-lg font-bold text-blue-600 mb-2">専門ヒアリング</div>
-                <div className="text-[15px] sm:text-base text-gray-700 leading-6 sm:leading-7">AI最適化の専門スタッフが企業情報を丁寧にヒアリング</div>
+                <div className="jp-heading text-lg font-bold text-blue-600 mb-2">専門ヒアリング</div>
+                <div className="jp-body text-[15px] sm:text-base text-gray-700 leading-6 sm:leading-7">AI最適化の専門スタッフが<br className="sm:hidden" />企業情報を丁寧にヒアリング</div>
               </div>
               <div className="snap-start min-w-[280px] sm:min-w-0 bg-white/60 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/50">
-                <div className="text-lg font-bold text-purple-600 mb-2">構造化登録</div>
-                <div className="text-[15px] sm:text-base text-gray-700 leading-6 sm:leading-7">ヒアリング内容をJSON-LD形式で構造化・最適化して登録</div>
+                <div className="jp-heading text-lg font-bold text-purple-600 mb-2">構造化登録</div>
+                <div className="jp-body text-[15px] sm:text-base text-gray-700 leading-6 sm:leading-7">ヒアリング内容を<br className="sm:hidden" />JSON-LD形式で構造化・最適化して登録</div>
               </div>
               <div className="snap-start min-w-[280px] sm:min-w-0 bg-white/60 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/50">
-                <div className="text-lg font-bold text-indigo-600 mb-2">継続改善</div>
-                <div className="text-[15px] sm:text-base text-gray-700 leading-6 sm:leading-7">定期的な情報更新とAI検索最適化のサポート</div>
+                <div className="jp-heading text-lg font-bold text-indigo-600 mb-2">継続改善</div>
+                <div className="jp-body text-[15px] sm:text-base text-gray-700 leading-6 sm:leading-7">定期的な情報更新と<br className="sm:hidden" />AI検索最適化のサポート</div>
               </div>
             </HorizontalScroller>
           </div>

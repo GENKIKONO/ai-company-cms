@@ -140,6 +140,22 @@ html {
     text-wrap: balance;
     orphans: 2;
     widows: 2;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  
+  /* Specific improvements for Japanese single-character line breaks */
+  .jp-body, .jp-heading {
+    line-height: 1.75;
+    letter-spacing: 0.025em;
+  }
+  
+  /* Prevent single-character orphans in Japanese text */
+  .jp-body::after {
+    content: "";
+    display: inline-block;
+    width: 0;
+    white-space: nowrap;
   }
   
   /* Specific card text optimization */
@@ -237,6 +253,30 @@ html {
   .focus-clean:focus-visible {
     outline: 2px solid transparent;
     box-shadow: 0 0 0 2px rgb(99 102 241 / 0.5);
+  }
+  
+  /* Japanese text utilities to prevent unnatural breaks */
+  .jp-avoid-break {
+    white-space: nowrap;
+    word-break: keep-all;
+  }
+  
+  .jp-number-unit {
+    white-space: nowrap;
+  }
+  
+  /* Specific patterns that should never break */
+  .jp-step-number {
+    white-space: nowrap;
+    word-break: keep-all;
+  }
+  
+  /* Better handling of punctuation and particles */
+  .jp-text-natural {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+    hanging-punctuation: allow-end;
   }
   
   /* Hide scrollbars for better mobile experience */

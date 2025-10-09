@@ -185,9 +185,9 @@ export default function OrganizationsPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ページタイトル */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">企業ディレクトリ</h1>
-          <p className="text-lg text-gray-600">
-            AIO Hubに登録された{organizations.length}社の企業情報を検索・閲覧できます
+          <h1 className="jp-heading text-3xl font-bold text-gray-900 mb-2">企業ディレクトリ</h1>
+          <p className="jp-body text-lg text-gray-600">
+            AIO Hubに登録された<span className="whitespace-nowrap">{organizations.length}社</span>の企業情報を<br className="sm:hidden" />検索・閲覧できます
           </p>
         </div>
 
@@ -408,9 +408,9 @@ export default function OrganizationsPage() {
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">企業が見つかりませんでした</h3>
-            <p className="mt-2 text-gray-500">
-              検索条件を変更してお試しください
+            <h3 className="jp-heading mt-4 text-lg font-medium text-gray-900">企業が見つかりませんでした</h3>
+            <p className="jp-body mt-2 text-gray-500">
+              検索条件を変更して<br className="sm:hidden" />お試しください
             </p>
           </div>
         ) : (
@@ -439,7 +439,7 @@ export default function OrganizationsPage() {
                   )}
                   <div className="ml-4 flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-1">
-                      <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-gray-700 transition-colors pr-2">
+                      <h3 className="jp-heading text-lg font-semibold text-gray-900 truncate group-hover:text-gray-700 transition-colors pr-2">
                         {org.name}
                       </h3>
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border shadow-sm ${getPlanBadgeStyle(org.plan)} flex-shrink-0`}>
@@ -462,7 +462,7 @@ export default function OrganizationsPage() {
                 </div>
 
                 {org.description && (
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+                  <p className="jp-body text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
                     {org.description}
                   </p>
                 )}

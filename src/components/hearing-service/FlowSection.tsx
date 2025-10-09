@@ -76,12 +76,11 @@ export default function FlowSection() {
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         {/* セクションヘッダー */}
         <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
-            シンプルな3ステップ
+          <h2 className="jp-heading text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight whitespace-nowrap">
+            シンプルな<span className="whitespace-nowrap">3ステップ</span>
           </h2>
-          <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 max-w-3xl mx-auto">
-            複雑な作業は一切不要。専門スタッフがすべて代行し、
-            あなたの企業情報をAI時代に最適な形でお届けします。
+          <p className="jp-body text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 max-w-3xl mx-auto">
+            複雑な作業は一切不要。<br className="sm:hidden" />専門スタッフがすべて代行し、<br className="sm:hidden" />あなたの企業情報をAI時代に最適な形でお届けします。
           </p>
         </div>
 
@@ -106,8 +105,8 @@ export default function FlowSection() {
                     </div>
                     
                     {/* タイトル・説明 */}
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">{step.title}</h3>
-                    <p className="text-[15px] sm:text-base text-gray-600 mb-4 sm:mb-6 leading-6 sm:leading-7">{step.description}</p>
+                    <h3 className="jp-heading text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">{step.title}</h3>
+                    <p className="jp-body text-[15px] sm:text-base text-gray-600 mb-4 sm:mb-6 leading-6 sm:leading-7">{step.description}</p>
                     
                     {/* 詳細リスト */}
                     <ul className="space-y-2 sm:space-y-2.5">
@@ -128,11 +127,11 @@ export default function FlowSection() {
         {/* Before/After セクション */}
         <div className="mt-20 bg-gradient-to-r from-gray-50 to-blue-50 rounded-3xl p-8 lg:p-12">
           <div className="text-center mb-12">
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              構造化前後の違い
+            <h3 className="jp-heading text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              構造化前後の<span className="whitespace-nowrap">違い</span>
             </h3>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              ヒアリングによってあなたの企業情報がどのように変わるかをご覧ください
+            <p className="jp-body text-gray-600 max-w-2xl mx-auto">
+              ヒアリングによって<br className="sm:hidden" />あなたの企業情報が<br className="sm:hidden" />どのように変わるかをご覧ください
             </p>
           </div>
 

@@ -122,7 +122,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <Link 
                   href="/auth/signup" 
                   onClick={handleCtaClick}
-                  className="group px-8 py-4 bg-gray-800 text-white text-lg rounded-lg hover:bg-gray-900 text-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                  className="group px-8 py-4 bg-gray-800 text-white text-lg rounded-lg hover:bg-gray-900 text-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 whitespace-nowrap min-w-fit"
                   aria-label="無料で始める"
                 >
                   <span className="flex items-center justify-center gap-2 whitespace-nowrap">
@@ -409,10 +409,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           
           <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+              <h2 className="jp-heading text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
                 {t('pages.home.cta.title')}
               </h2>
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+              <p className="jp-body text-xl text-gray-300 mb-8 leading-relaxed">
                 {t('pages.home.cta.subtitle')}
               </p>
               
@@ -435,8 +435,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   className="group px-6 py-3 border-2 border-white text-white text-lg font-medium rounded-xl hover:bg-white hover:text-gray-800 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
                 >
                   <span className="flex items-center gap-2 whitespace-nowrap">
-                    <span className="hidden sm:inline">ヒアリング<wbr/>代行サービス</span>
-                    <span className="sm:hidden">ヒアリング代行サービス</span>
+                    <span className="hidden sm:inline">ヒアリング代行<br className="sm:hidden" />サービス</span>
+                    <span className="sm:hidden">ヒアリング<br className="hidden" />代行サービス</span>
                     <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h2" />
                     </svg>
@@ -484,13 +484,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">{t('ui.header.title')}</h3>
-              <p className="text-gray-400">
+              <h3 className="jp-heading text-lg font-semibold mb-4">{t('ui.header.title')}</h3>
+              <p className="jp-body text-gray-400">
                 {t('pages.home.footer.tagline')}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">{t('pages.home.footer.links')}</h4>
+              <h4 className="jp-heading font-semibold mb-4">{t('pages.home.footer.links')}</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/organizations">{t('pages.home.footer.directory')}</Link></li>
                 <li><Link href="/search">{t('pages.home.footer.search')}</Link></li>
@@ -498,7 +498,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">{t('pages.home.footer.support')}</h4>
+              <h4 className="jp-heading font-semibold mb-4">{t('pages.home.footer.support')}</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/help" className="hover:text-white transition-colors">{t('pages.home.footer.helpCenter')}</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors">{t('pages.home.footer.contact')}</Link></li>
