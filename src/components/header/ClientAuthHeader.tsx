@@ -78,7 +78,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
             {/* ロゴは常に / に遷移 */}
             <Link 
               href="/" 
-              className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 hover:text-blue-600 min-h-[44px] flex items-center"
+              className="focus-clean text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 hover:text-blue-600 min-h-[44px] flex items-center"
             >
               AIO Hub AI企業CMS
             </Link>
@@ -89,7 +89,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                 <Link 
                   key={link.href}
                   href={link.href} 
-                  className="text-gray-500 hover:text-gray-700 whitespace-nowrap min-h-[44px] flex items-center px-2 py-2 rounded-md transition-colors duration-200"
+                  className="focus-clean text-gray-500 hover:text-gray-700 whitespace-nowrap min-h-[44px] flex items-center px-2 py-2 rounded-md transition-colors duration-200"
                 >
                   {link.label}
                 </Link>
@@ -104,7 +104,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                 <div className="hidden md:block relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="focus-clean flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
                     aria-label="ユーザーメニューを開く"
                     aria-expanded={dropdownOpen}
                     aria-haspopup="true"
@@ -184,7 +184,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                 <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
                   <Link
                     href="/auth/login"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 lg:px-4 py-2 rounded-md text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200 whitespace-nowrap"
+                    className="focus-clean bg-blue-600 hover:bg-blue-700 text-white px-3 lg:px-4 py-2 rounded-md text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200 whitespace-nowrap"
                     aria-label="ログイン"
                   >
                     ログイン

@@ -164,7 +164,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             <HorizontalScroller ariaLabel="管理機能セクション" className="lg:grid-cols-3">
               {/* 企業管理 */}
-              <div className="snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
                 <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -185,7 +185,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
 
               {/* サービス管理 */}
-              <div className="snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
                 <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -206,7 +206,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
 
               {/* 導入事例管理 */}
-              <div className="snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
                 <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -346,37 +346,37 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               AI検索最適化（AIO）対応
             </h2>
             <p className="jp-body text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
-              本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
+              本プラットフォームは、AI検索エンジンが<br className="sm:hidden" />理解しやすい構造化データを自動生成します
             </p>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 items-stretch auto-rows-fr mb-8">
-              <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+              <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
-                  <p className="jp-body text-[15px] leading-7 text-gray-600">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</p>
+                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">構造化データを自動生成し、AI検索エンジンが<br className="sm:hidden" />理解しやすい形式で情報を公開</p>
                 </div>
               </div>
-              <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+              <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">RSS/XML</h3>
-                  <p className="jp-body text-[15px] leading-7 text-gray-600">フィード配信により継続的な情報更新をクローラーに通知</p>
+                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">フィード配信により継続的な情報更新を<br className="sm:hidden" />クローラーに通知</p>
                 </div>
               </div>
-              <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+              <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">公開プロフィール（直リンク）</h3>
-                  <p className="jp-body text-[15px] leading-7 text-gray-600">企業・サービスごとに公開URLを自動生成。検索・AIから直接参照されやすい構成で配信します。</p>
+                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">企業・サービスごとに公開URLを自動生成。<br className="sm:hidden" />検索・AIから直接参照されやすい構成で<br className="sm:hidden" />配信します。</p>
                 </div>
               </div>
-              <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+              <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">サイトマップ</h3>
-                  <p className="jp-body text-[15px] leading-7 text-gray-600">動的生成によりページ構造を検索エンジンに効率的に伝達</p>
+                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">動的生成によりページ構造を検索エンジンに<br className="sm:hidden" />効率的に伝達</p>
                 </div>
               </div>
             </div>
             <Link 
               href="/aio"
-              className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+              className="focus-clean inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
             >
               AIOについて詳しく見る
               <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

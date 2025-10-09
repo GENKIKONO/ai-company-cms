@@ -131,3 +131,140 @@ html {
     scroll-behavior: auto;
   }
 }
+
+/* Widow text prevention and enhanced Japanese typography */
+@layer base {
+  /* Enhanced widow prevention for Japanese text */
+  p, .jp-body {
+    hanging-punctuation: allow-end;
+    text-wrap: balance;
+    orphans: 2;
+    widows: 2;
+  }
+  
+  /* Specific card text optimization */
+  .card-text {
+    text-wrap: balance;
+    hanging-punctuation: allow-end;
+    min-height: fit-content;
+  }
+}
+
+/* Container Queries Support */
+@container (min-width: 320px) {
+  .card-container {
+    padding: 1rem;
+  }
+}
+
+@container (min-width: 768px) {
+  .card-container {
+    padding: 1.5rem;
+  }
+}
+
+/* Clamp functions for responsive scaling */
+@layer utilities {
+  /* Responsive text sizing with clamp */
+  .text-clamp-sm {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+  
+  .text-clamp-base {
+    font-size: clamp(1rem, 3vw, 1.125rem);
+  }
+  
+  .text-clamp-lg {
+    font-size: clamp(1.125rem, 3.5vw, 1.25rem);
+  }
+  
+  .text-clamp-xl {
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
+  }
+  
+  .text-clamp-2xl {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+  
+  .text-clamp-3xl {
+    font-size: clamp(1.875rem, 6vw, 2.5rem);
+  }
+  
+  .text-clamp-4xl {
+    font-size: clamp(2.25rem, 7vw, 3rem);
+  }
+  
+  /* Responsive spacing with clamp */
+  .space-clamp-sm {
+    gap: clamp(0.5rem, 2vw, 1rem);
+  }
+  
+  .space-clamp-md {
+    gap: clamp(1rem, 3vw, 1.5rem);
+  }
+  
+  .space-clamp-lg {
+    gap: clamp(1.5rem, 4vw, 2rem);
+  }
+  
+  /* Card icon positioning utilities */
+  .card-icon-top-right {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    transform: translateY(0);
+  }
+  
+  .card-icon-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .card-icon-static {
+    position: static;
+    margin: 0 auto 1rem auto;
+    transform: none;
+  }
+  
+  /* Mobile-optimized focus states without blue rings */
+  .focus-clean:focus {
+    outline: 2px solid transparent;
+    box-shadow: 0 0 0 2px rgb(99 102 241 / 0.5);
+  }
+  
+  .focus-clean:focus-visible {
+    outline: 2px solid transparent;
+    box-shadow: 0 0 0 2px rgb(99 102 241 / 0.5);
+  }
+  
+  /* Hide scrollbars for better mobile experience */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Enhanced snap behavior for carousels */
+  .snap-card {
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+  }
+  
+  /* Improved card layout utilities */
+  .card-grid {
+    display: grid;
+    grid-template-rows: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  @media (max-width: 640px) {
+    .card-grid {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+}
