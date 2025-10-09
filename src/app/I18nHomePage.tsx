@@ -95,10 +95,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           
           <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className={`text-center transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 lg:leading-tight tracking-normal break-keep [text-wrap:balance]">
+              <h1 className="jp-heading text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 lg:leading-tight tracking-normal break-keep">
                 {t('pages.home.hero.title', { fallback: siteSettings.hero_title })}
               </h1>
-              <p className="text-[15px] sm:text-base lg:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
+              <p className="jp-body text-[15px] sm:text-base lg:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-7 sm:leading-8 break-keep">
                 {t('pages.home.hero.subtitle', { fallback: siteSettings.hero_subtitle })}
               </p>
               
@@ -154,10 +154,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <section className="py-12 sm:py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className="text-center mb-16">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
+              <h2 className="jp-heading text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                 {t('pages.home.features.title')}
               </h2>
-              <p className="text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
+              <p className="jp-body text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8 break-keep">
                 {t('pages.home.features.subtitle')}
               </p>
             </div>
@@ -170,10 +170,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
+                <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                   {t('pages.home.features.organizationManagement.title')}
                 </h3>
-                <p className="text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
+                <p className="jp-body text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
                   {t('pages.home.features.organizationManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -233,7 +233,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <section className="py-12 sm:py-16 lg:py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className="text-center mb-16">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
+              <h2 className="jp-heading text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                 {t('pages.home.stats.title')}
               </h2>
             </div>
@@ -338,32 +338,40 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         {/* AIOダイジェスト */}
         <section className="py-12 sm:py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center justify-center">
+            <h2 className="jp-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 flex items-center justify-center tracking-tight break-keep">
               <svg className="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               AI検索最適化（AIO）対応
             </h2>
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+            <p className="jp-body text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8 break-keep">
               本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
             </p>
-            <div className="space-y-6 sm:space-y-8 mb-8 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0">
-              <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-indigo-400">
-                <div className="text-lg font-bold text-gray-900 mb-2">JSON-LD</div>
-                <div className="text-sm text-gray-600 leading-6">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</div>
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 items-stretch auto-rows-fr mb-8">
+              <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+                <div>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
+                  <p className="jp-body text-gray-600">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</p>
+                </div>
               </div>
-              <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-purple-400">
-                <div className="text-lg font-bold text-gray-900 mb-2">RSS/XML</div>
-                <div className="text-sm text-gray-600 leading-6">フィード配信により継続的な情報更新をクローラーに通知</div>
+              <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+                <div>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">RSS/XML</h3>
+                  <p className="jp-body text-gray-600">フィード配信により継続的な情報更新をクローラーに通知</p>
+                </div>
               </div>
-              <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-blue-400">
-                <div className="text-lg font-bold text-gray-900 mb-2">OpenAPI</div>
-                <div className="text-sm text-gray-600 leading-6">API仕様を公開し、第三者システムとの連携可能性を提示</div>
+              <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+                <div>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">OpenAPI</h3>
+                  <p className="jp-body text-gray-600">API仕様を公開し、第三者システムとの連携可能性を提示</p>
+                </div>
               </div>
-              <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-green-400">
-                <div className="text-lg font-bold text-gray-900 mb-2">サイトマップ</div>
-                <div className="text-sm text-gray-600 leading-6">動的生成によりページ構造を検索エンジンに効率的に伝達</div>
+              <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+                <div>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">サイトマップ</h3>
+                  <p className="jp-body text-gray-600">動的生成によりページ構造を検索エンジンに効率的に伝達</p>
+                </div>
               </div>
             </div>
             <Link 

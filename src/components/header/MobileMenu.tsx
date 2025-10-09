@@ -17,12 +17,17 @@ export default function MobileMenu({
   const panelRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
 
-  // Close on ESC
+  // Close on ESC and scroll lock
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    document.addEventListener('keydown', onKey);
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { 
+      document.removeEventListener('keydown', onKey); 
+      document.body.style.overflow = oldOverflow; 
+    };
   }, [open]);
 
   // Focus trap (very light)
@@ -60,8 +65,8 @@ export default function MobileMenu({
 
       {open && (
         <div
-          className="fixed inset-0 z-50 bg-white/95 backdrop-blur-sm"
-          onClick={onOverlayClick}
+          className="fixed inset-0 z-50 bg-black/40"
+          onClick={() => setOpen(false)}
           role="presentation"
         >
           <nav
@@ -95,7 +100,7 @@ export default function MobileMenu({
                   )}
                 </nav>
               </div>
-              <div className="p-6 border-t border-gray-100">
+              <div className="p-6 border-t border-gray-100 space-y-4">
                 {auth.loggedIn ? (
                   <Link
                     href={auth.logoutHref}
@@ -113,6 +118,18 @@ export default function MobileMenu({
                     ログイン
                   </Link>
                 )}
+                <button
+                  onClick={() => setOpen(false)}
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold shadow-lg active:scale-[.98] transition-transform duration-200"
+                  aria-label="メニューを閉じる"
+                >
+                  <span className="inline-flex items-center gap-2 justify-center">
+                    <svg aria-hidden="true" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M6 18L18 6M6 6l12 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    閉じる
+                  </span>
+                </button>
               </div>
             </div>
           </nav>

@@ -116,12 +116,11 @@ export default function PricingTable() {
     <section className="py-12 sm:py-16 lg:py-24">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
+          <h2 className="jp-heading text-xl sm:text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 tracking-normal break-keep">
             シンプルで明確な料金体系
           </h2>
-          <p className="text-[15px] sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
-            無料から始めて、必要になったら拡張。
-            最小の入力で、AIに"引用されやすい"企業情報を実現します。
+          <p className="jp-body text-[15px] sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto leading-7 sm:leading-8 break-keep">
+            無料から始めて、必要になったら拡張。最小の入力で、AIに"引用されやすい"企業情報を実現します。
           </p>
         </div>
 
@@ -155,8 +154,8 @@ export default function PricingTable() {
                 <div className="mb-4">
                   <plan.icon className={`h-8 w-8 text-${plan.color}-600`} />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">{plan.name}</h3>
-                <p className="text-[13px] sm:text-sm text-gray-600 mb-4 leading-6 sm:leading-7 break-keep [text-wrap:pretty]">{plan.description}</p>
+                <h3 className="jp-heading text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-7 sm:leading-8 tracking-normal break-keep">{plan.name}</h3>
+                <p className="jp-body text-[13px] sm:text-sm text-gray-600 mb-4 leading-6 sm:leading-7 break-keep">{plan.description}</p>
                 
                 <div className="mb-4">
                   {plan.originalPrice && (

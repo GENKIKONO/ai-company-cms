@@ -55,23 +55,41 @@
   }
 }
 
+/* Natural Japanese line-wrapping defaults */
+:root {
+  --heading-balance: balance;
+  --body-wrap: pretty;
+}
+
 /* Font optimization and Typography defaults */
 @layer base {
   html, body {
     font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
     text-rendering: optimizeLegibility;
-    word-break: keep-all;
-    overflow-wrap: anywhere;
-    text-wrap: pretty;
+    word-break: keep-all;         /* 単語途中で折り返さない */
+    overflow-wrap: anywhere;      /* 行末で安全に折返し */
+    text-wrap: var(--body-wrap);  /* 段落は自然に */
   }
   
   h1, h2, h3, h4, h5, h6 {
-    text-wrap: balance;
+    text-wrap: var(--heading-balance);
   }
   
   p {
     text-wrap: pretty;
   }
+}
+
+/* 見出し専用（日本語タイトルのバランス改行） */
+.jp-heading {
+  text-wrap: var(--heading-balance);
+  letter-spacing: .01em;
+}
+
+/* 本文用の行間・文字組み */
+.jp-body {
+  text-wrap: pretty;
+  line-height: 1.75;
 }
 
 /* Smooth scrolling with motion preference respect */
