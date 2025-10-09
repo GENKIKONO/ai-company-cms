@@ -4,6 +4,7 @@
 
 /* 統一デザインシステム */
 @import '../styles/design-tokens.css';
+@import '../styles/marketing.css';
 
 /* Line clamp utilities */
 .line-clamp-2 {

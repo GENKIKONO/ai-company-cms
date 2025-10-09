@@ -1,11 +1,12 @@
 import { aioCopy } from '../copy';
+import VisualCard from '../../../components/marketing/VisualCard';
 
 export default function Conflict() {
   return (
-    <section className="py-24 md:py-32 bg-orange-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="section bg-orange-50">
+      <div className="container-mk">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
+          <h2 className="h2 mb-8">
             {aioCopy.conflict.title}
           </h2>
         </div>
@@ -19,7 +20,7 @@ export default function Conflict() {
                     ⚠
                   </span>
                 </div>
-                <p className="text-lg text-gray-700 flex-1 leading-relaxed">
+                <p className="copy text-lg text-gray-700 flex-1">
                   {item}
                 </p>
               </li>
@@ -27,17 +28,16 @@ export default function Conflict() {
           </ul>
         </div>
 
-        {/* 図版プレースホルダー */}
         <div className="mt-16 max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="aspect-video flex items-center justify-center p-12">
-              <div className="text-center text-gray-600">
-                <div className="text-6xl mb-6">📄💸❌</div>
-                <p className="text-xl font-medium mb-2">情報があってもAIに届かない問題</p>
-                <p className="text-gray-500">企業情報のサイロ化と決発性の低下</p>
-              </div>
-            </div>
-          </div>
+          <VisualCard
+            src="/illustrations/jsonld-automation.svg"
+            alt="情報があってもAIに届かない問題 - 企業情報のサイロ化と発見性の低下"
+            ratio="16:9"
+            caption="今のAI時代の情報流通課題"
+            contain={true}
+            width={800}
+            height={500}
+          />
         </div>
       </div>
     </section>

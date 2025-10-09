@@ -3,20 +3,20 @@ import { aioCopy } from '../copy';
 
 export default function ClosingCTA() {
   return (
-    <section className="py-24 md:py-32 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
+    <section className="section bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
       {/* 背景装飾 */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
       </div>
       
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative container-mk max-w-6xl">
         <div className="text-center">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+          <h2 className="h2 text-white mb-6">
             {aioCopy.closingCTA.title}
           </h2>
           
-          <p className="text-xl text-blue-100 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="copy text-xl text-blue-100 mb-12 max-w-3xl mx-auto">
             AIO対応で、あなたの企業情報をAI時代に最適化しましょう
           </p>
 

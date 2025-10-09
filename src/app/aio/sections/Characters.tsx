@@ -1,11 +1,12 @@
 import { aioCopy } from '../copy';
+import VisualCard from '../../../components/marketing/VisualCard';
 
 export default function Characters() {
   return (
-    <section className="py-24 md:py-32 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="section bg-white">
+      <div className="container-mk">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
+          <h2 className="h2 mb-8">
             {aioCopy.characters.title}
           </h2>
         </div>
@@ -19,7 +20,7 @@ export default function Characters() {
                     {index + 1}
                   </span>
                 </div>
-                <p className="text-lg text-gray-700 flex-1 leading-relaxed">
+                <p className="copy text-lg text-gray-700 flex-1">
                   {item}
                 </p>
               </li>
@@ -27,17 +28,16 @@ export default function Characters() {
           </ul>
         </div>
 
-        {/* 図版プレースホルダー */}
         <div className="mt-16 max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="aspect-video flex items-center justify-center p-12">
-              <div className="text-center text-gray-600">
-                <div className="text-6xl mb-6">🏢⚙️🤖</div>
-                <p className="text-xl font-medium mb-2">企業・プラットフォーム・AIの連携図</p>
-                <p className="text-gray-500">統合プラットフォームによる情報連携</p>
-              </div>
-            </div>
-          </div>
+          <VisualCard
+            src="/illustrations/aio-architecture.svg"
+            alt="企業・プラットフォーム・AIの連携図 - 統合プラットフォームによる情報連携"
+            ratio="16:9"
+            caption="AIO Hubによる情報連携図"
+            contain={true}
+            width={800}
+            height={500}
+          />
         </div>
       </div>
     </section>

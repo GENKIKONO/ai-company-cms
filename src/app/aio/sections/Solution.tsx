@@ -3,10 +3,10 @@ import VisualCard from '../../../components/marketing/VisualCard';
 
 export default function Solution() {
   return (
-    <section className="py-16 md:py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="section bg-white">
+      <div className="container-mk">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+          <h2 className="h2 mb-8">
             {aioCopy.solution.title}
           </h2>
         </div>
@@ -20,7 +20,7 @@ export default function Solution() {
                     ✓
                   </span>
                 </div>
-                <p className="text-lg text-gray-700 flex-1">
+                <p className="copy text-lg text-gray-700 flex-1">
                   {item}
                 </p>
               </li>
@@ -28,20 +28,21 @@ export default function Solution() {
           </ul>
           
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-            <p className="text-sm text-yellow-800">
+            <p className="copy text-sm text-yellow-800">
               <strong>注：</strong> {aioCopy.solution.note}
             </p>
           </div>
         </div>
 
-        {/* [CLEANUP] remove placeholder diagram */}
         <div className="mt-16 max-w-4xl mx-auto">
           <VisualCard
-            src="/illustrations/aio-architecture.svg"
+            src="/illustrations/jsonld-automation.svg"
             alt="AIO Hub が提供する自動整備機能 - 情報を自動で構造化しAI検索に最適化"
-            width={600}
-            height={400}
-            className="p-8"
+            ratio="16:9"
+            caption="JSON-LD 自動生成システム"
+            contain={true}
+            width={800}
+            height={500}
           />
         </div>
       </div>

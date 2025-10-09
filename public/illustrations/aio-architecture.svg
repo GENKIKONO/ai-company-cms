@@ -1,113 +1,150 @@
-<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#e0e7ff;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#f8fafc;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#f3e8ff;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#eef2ff"/>
+      <stop offset="50%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#f5f3ff"/>
     </linearGradient>
     <linearGradient id="companyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#34d399;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#1d4ed8"/>
     </linearGradient>
     <linearGradient id="aioGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#818cf8;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#4f46e5"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
     </linearGradient>
     <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
     </linearGradient>
   </defs>
   
   <!-- Background -->
-  <rect width="600" height="400" fill="url(#bgGradient)" />
+  <rect width="800" height="500" fill="url(#bgGradient)"/>
   
   <!-- Title -->
-  <text x="300" y="30" font-family="system-ui" font-size="20" font-weight="bold" fill="#4f46e5" text-anchor="middle">
-    AIO Information Optimization Architecture
-  </text>
+  <text x="400" y="50" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="28" font-weight="700" fill="#1f2937">AIO Architecture</text>
+  <text x="400" y="80" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="16" fill="#6b7280">企業情報と AI サービスを最適化接続する統合プラットフォーム</text>
   
-  <!-- Company Layer (Bottom) -->
-  <g transform="translate(50, 280)">
-    <rect x="0" y="0" width="120" height="80" rx="8" fill="url(#companyGradient)" opacity="0.9" />
-    <text x="60" y="25" font-family="system-ui" font-size="14" font-weight="bold" fill="white" text-anchor="middle">企業情報</text>
-    <text x="60" y="45" font-family="system-ui" font-size="11" fill="white" text-anchor="middle">• 会社概要</text>
-    <text x="60" y="58" font-family="system-ui" font-size="11" fill="white" text-anchor="middle">• サービス詳細</text>
-    <text x="60" y="71" font-family="system-ui" font-size="11" fill="white" text-anchor="middle">• FAQ・実績</text>
-  </g>
-  
-  <g transform="translate(430, 280)">
-    <rect x="0" y="0" width="120" height="80" rx="8" fill="url(#companyGradient)" opacity="0.9" />
-    <text x="60" y="25" font-family="system-ui" font-size="14" font-weight="bold" fill="white" text-anchor="middle">企業情報</text>
-    <text x="60" y="45" font-family="system-ui" font-size="11" fill="white" text-anchor="middle">• 会社概要</text>
-    <text x="60" y="58" font-family="system-ui" font-size="11" fill="white" text-anchor="middle">• サービス詳細</text>
-    <text x="60" y="71" font-family="system-ui" font-size="11" fill="white" text-anchor="middle">• FAQ・実績</text>
-  </g>
-  
-  <!-- AIO Hub Layer (Middle) -->
-  <g transform="translate(200, 150)">
-    <rect x="0" y="0" width="200" height="100" rx="12" fill="url(#aioGradient)" />
-    <text x="100" y="25" font-family="system-ui" font-size="16" font-weight="bold" fill="white" text-anchor="middle">AIO Hub</text>
-    <text x="100" y="45" font-family="system-ui" font-size="12" fill="white" text-anchor="middle">Information Optimization</text>
+  <!-- Layer 1: Companies -->
+  <g transform="translate(80, 140)">
+    <rect x="0" y="0" width="160" height="240" rx="16" fill="url(#companyGradient)" opacity="0.1" stroke="#3b82f6" stroke-width="2"/>
+    <text x="80" y="30" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="18" font-weight="600" fill="#1d4ed8">企業情報</text>
     
-    <!-- Internal processes -->
-    <rect x="20" y="55" width="50" height="25" rx="4" fill="white" opacity="0.9" />
-    <text x="45" y="70" font-family="system-ui" font-size="10" fill="#4f46e5" text-anchor="middle">構造化</text>
+    <!-- Company boxes -->
+    <rect x="20" y="50" width="120" height="35" rx="8" fill="url(#companyGradient)" opacity="0.8"/>
+    <text x="80" y="72" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="12" font-weight="500" fill="white">AI開発企業</text>
     
-    <rect x="75" y="55" width="50" height="25" rx="4" fill="white" opacity="0.9" />
-    <text x="100" y="70" font-family="system-ui" font-size="10" fill="#4f46e5" text-anchor="middle">JSON-LD</text>
+    <rect x="20" y="95" width="120" height="35" rx="8" fill="url(#companyGradient)" opacity="0.8"/>
+    <text x="80" y="117" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="12" font-weight="500" fill="white">DX支援企業</text>
     
-    <rect x="130" y="55" width="50" height="25" rx="4" fill="white" opacity="0.9" />
-    <text x="155" y="70" font-family="system-ui" font-size="10" fill="#4f46e5" text-anchor="middle">最適化</text>
+    <rect x="20" y="140" width="120" height="35" rx="8" fill="url(#companyGradient)" opacity="0.8"/>
+    <text x="80" y="162" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="12" font-weight="500" fill="white">システム開発</text>
+    
+    <rect x="20" y="185" width="120" height="35" rx="8" fill="url(#companyGradient)" opacity="0.8"/>
+    <text x="80" y="207" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="12" font-weight="500" fill="white">コンサル</text>
   </g>
   
-  <!-- AI Layer (Top) -->
-  <g transform="translate(150, 70)">
-    <rect x="0" y="0" width="80" height="60" rx="8" fill="url(#aiGradient)" />
-    <circle cx="40" cy="30" r="12" fill="white" />
-    <text x="40" y="35" font-family="system-ui" font-size="12" font-weight="bold" fill="#6366f1" text-anchor="middle">AI</text>
-    <text x="40" y="50" font-family="system-ui" font-size="10" fill="white" text-anchor="middle">ChatGPT</text>
+  <!-- Layer 2: AIO Hub -->
+  <g transform="translate(320, 140)">
+    <rect x="0" y="0" width="160" height="240" rx="16" fill="url(#aioGradient)" opacity="0.9"/>
+    <text x="80" y="30" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="18" font-weight="600" fill="white">AIO Hub</text>
+    <text x="80" y="50" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="14" fill="white">統合プラットフォーム</text>
+    
+    <!-- AIO Features -->
+    <g transform="translate(20, 70)">
+      <rect x="0" y="0" width="120" height="25" rx="4" fill="white" opacity="0.2"/>
+      <text x="60" y="17" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="11" fill="white">情報整備・最適化</text>
+      
+      <rect x="0" y="35" width="120" height="25" rx="4" fill="white" opacity="0.2"/>
+      <text x="60" y="52" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="11" fill="white">JSON-LD 生成</text>
+      
+      <rect x="0" y="70" width="120" height="25" rx="4" fill="white" opacity="0.2"/>
+      <text x="60" y="87" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="11" fill="white">SEO最適化</text>
+      
+      <rect x="0" y="105" width="120" height="25" rx="4" fill="white" opacity="0.2"/>
+      <text x="60" y="122" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="11" fill="white">統合管理</text>
+      
+      <rect x="0" y="140" width="120" height="25" rx="4" fill="white" opacity="0.2"/>
+      <text x="60" y="157" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="11" fill="white">API連携</text>
+    </g>
   </g>
   
-  <g transform="translate(270, 70)">
-    <rect x="0" y="0" width="80" height="60" rx="8" fill="url(#aiGradient)" />
-    <circle cx="40" cy="30" r="12" fill="white" />
-    <text x="40" y="35" font-family="system-ui" font-size="12" font-weight="bold" fill="#6366f1" text-anchor="middle">AI</text>
-    <text x="40" y="50" font-family="system-ui" font-size="10" fill="white" text-anchor="middle">Gemini</text>
+  <!-- Layer 3: AI Services -->
+  <g transform="translate(560, 140)">
+    <rect x="0" y="0" width="160" height="240" rx="16" fill="url(#aiGradient)" opacity="0.1" stroke="#10b981" stroke-width="2"/>
+    <text x="80" y="30" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="18" font-weight="600" fill="#059669">AI サービス</text>
+    
+    <!-- AI Service boxes -->
+    <rect x="20" y="50" width="120" height="35" rx="8" fill="url(#aiGradient)" opacity="0.8"/>
+    <text x="80" y="72" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="12" font-weight="500" fill="white">ChatGPT</text>
+    
+    <rect x="20" y="95" width="120" height="35" rx="8" fill="url(#aiGradient)" opacity="0.8"/>
+    <text x="80" y="117" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="12" font-weight="500" fill="white">Gemini</text>
+    
+    <rect x="20" y="140" width="120" height="35" rx="8" fill="url(#aiGradient)" opacity="0.8"/>
+    <text x="80" y="162" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="12" font-weight="500" fill="white">Claude</text>
+    
+    <rect x="20" y="185" width="120" height="35" rx="8" fill="url(#aiGradient)" opacity="0.8"/>
+    <text x="80" y="207" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="12" font-weight="500" fill="white">Perplexity</text>
   </g>
   
-  <g transform="translate(370, 70)">
-    <rect x="0" y="0" width="80" height="60" rx="8" fill="url(#aiGradient)" />
-    <circle cx="40" cy="30" r="12" fill="white" />
-    <text x="40" y="35" font-family="system-ui" font-size="12" font-weight="bold" fill="#6366f1" text-anchor="middle">AI</text>
-    <text x="40" y="50" font-family="system-ui" font-size="10" fill="white" text-anchor="middle">Claude</text>
+  <!-- Data Flow Arrows -->
+  <!-- Companies to AIO -->
+  <g>
+    <path d="M 250 180 L 310 200" stroke="#3b82f6" stroke-width="3" fill="none" marker-end="url(#arrowblue)"/>
+    <path d="M 250 220 L 310 240" stroke="#3b82f6" stroke-width="3" fill="none" marker-end="url(#arrowblue)"/>
+    <path d="M 250 260 L 310 280" stroke="#3b82f6" stroke-width="3" fill="none" marker-end="url(#arrowblue)"/>
+    <path d="M 250 300 L 310 320" stroke="#3b82f6" stroke-width="3" fill="none" marker-end="url(#arrowblue)"/>
+    
+    <text x="275" y="200" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="10" fill="#3b82f6">データ登録</text>
   </g>
   
-  <!-- Arrows from companies to AIO Hub -->
-  <path d="M 170 290 Q 200 270 250 250" stroke="#10b981" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrowhead1)" />
-  <path d="M 430 290 Q 400 270 350 250" stroke="#10b981" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrowhead1)" />
+  <!-- AIO to AI Services -->
+  <g>
+    <path d="M 490 200 L 550 180" stroke="#10b981" stroke-width="3" fill="none" marker-end="url(#arrowgreen)"/>
+    <path d="M 490 240 L 550 220" stroke="#10b981" stroke-width="3" fill="none" marker-end="url(#arrowgreen)"/>
+    <path d="M 490 280 L 550 260" stroke="#10b981" stroke-width="3" fill="none" marker-end="url(#arrowgreen)"/>
+    <path d="M 490 320 L 550 300" stroke="#10b981" stroke-width="3" fill="none" marker-end="url(#arrowgreen)"/>
+    
+    <text x="520" y="240" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="10" fill="#10b981">構造化データ</text>
+  </g>
   
-  <!-- Arrows from AIO Hub to AIs -->
-  <path d="M 270 150 Q 220 120 190 130" stroke="#4f46e5" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrowhead2)" />
-  <path d="M 300 150 L 310 130" stroke="#4f46e5" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrowhead2)" />
-  <path d="M 330 150 Q 380 120 410 130" stroke="#4f46e5" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrowhead2)" />
+  <!-- Benefits -->
+  <g transform="translate(100, 420)">
+    <circle cx="0" cy="0" r="6" fill="#4f46e5"/>
+    <text x="15" y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="14" fill="#1f2937">一元管理</text>
+    
+    <circle cx="120" cy="0" r="6" fill="#4f46e5"/>
+    <text x="135" y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="14" fill="#1f2937">自動最適化</text>
+    
+    <circle cx="250" cy="0" r="6" fill="#4f46e5"/>
+    <text x="265" y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="14" fill="#1f2937">AI連携強化</text>
+    
+    <circle cx="380" cy="0" r="6" fill="#4f46e5"/>
+    <text x="395" y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif" font-size="14" fill="#1f2937">検索ランキング向上</text>
+  </g>
+  
+  <!-- Sync indicators -->
+  <g opacity="0.6">
+    <circle cx="400" cy="120" r="4" fill="#4f46e5">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="415" cy="120" r="4" fill="#4f46e5">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" begin="0.7s"/>
+    </circle>
+    <circle cx="430" cy="120" r="4" fill="#4f46e5">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" begin="1.4s"/>
+    </circle>
+  </g>
   
   <!-- Arrow markers -->
   <defs>
-    <marker id="arrowhead1" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
+    <marker id="arrowblue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
     </marker>
-    <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#4f46e5" />
+    <marker id="arrowgreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#10b981"/>
     </marker>
   </defs>
-  
-  <!-- Labels -->
-  <text x="120" y="275" font-family="system-ui" font-size="12" fill="#059669" text-anchor="middle">入力</text>
-  <text x="300" y="140" font-family="system-ui" font-size="12" fill="#4f46e5" text-anchor="middle">配信</text>
-  
-  <!-- Bottom description -->
-  <text x="300" y="385" font-family="system-ui" font-size="14" fill="#6b7280" text-anchor="middle">
-    企業情報を構造化し、AIが理解・引用しやすい形で最適化
-  </text>
 </svg>
