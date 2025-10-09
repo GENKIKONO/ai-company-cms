@@ -12,8 +12,8 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 export const metadata = {
-  title: 'AIO Hub AI企業CMS',
-  description: 'AI-powered enterprise CMS for company directory and service management',
+  title: 'AIO Hub | AI情報最適化CMS',
+  description: 'AIO Hub は企業情報をAIが理解しやすい形に最適化するプラットフォーム。JSON-LD自動生成で、ChatGPTやGeminiの回答に企業が引用されやすくなります。',
 }
 
 export default function RootLayout({

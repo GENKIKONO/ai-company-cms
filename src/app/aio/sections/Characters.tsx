@@ -3,10 +3,10 @@ import VisualCard from '../../../components/marketing/VisualCard';
 
 export default function Characters() {
   return (
-    <section className="section bg-white">
-      <div className="container-mk">
+    <section className="py-24 md:py-32 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="h2 mb-8">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight tracking-wide">
             {aioCopy.characters.title}
           </h2>
         </div>
@@ -20,7 +20,7 @@ export default function Characters() {
                     {index + 1}
                   </span>
                 </div>
-                <p className="copy text-lg text-gray-700 flex-1">
+                <p className="text-lg text-gray-700 flex-1 leading-relaxed tracking-normal">
                   {item}
                 </p>
               </li>

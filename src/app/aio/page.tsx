@@ -53,7 +53,7 @@ export default function AIOPage() {
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'AIOとは',
+          name: 'AIO Hubとは',
           item: 'https://aiohub.jp/aio',
         },
       ],

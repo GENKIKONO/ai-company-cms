@@ -23,9 +23,8 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization }
 
   const links = useMemo(
     () => [
-      { href: '/service', label: 'サービス概要' },
+      { href: '/aio', label: 'AIO Hubとは' },
       { href: '/pricing', label: '料金プラン' },
-      { href: '/aio', label: 'AIOとは' },
       { href: '/hearing-service', label: 'ヒアリング代行' },
     ],
     []

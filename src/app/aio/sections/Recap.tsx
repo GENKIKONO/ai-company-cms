@@ -3,13 +3,13 @@ import VisualCard from '../../../components/marketing/VisualCard';
 
 export default function Recap() {
   return (
-    <section className="section bg-gray-50">
-      <div className="container-mk">
+    <section className="py-24 md:py-32 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="h2 mb-8">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight tracking-wide">
             {aioCopy.recap.title}
           </h2>
-          <p className="copy text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed tracking-normal">
             {aioCopy.recap.description}
           </p>
         </div>

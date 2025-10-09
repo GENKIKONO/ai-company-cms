@@ -1,67 +1,67 @@
-// /aio ページのコピー定数
+// AIO Hub とは ページのコピー定数
 
 export const aioCopy = {
   // Stage (舞台)
   stage: {
-    title: 'AIO（AI Information Optimization）とは',
-    description: 'AIが情報を理解・引用しやすい形に整える考え方。AIO Hubはこの実践を、誰でも扱えるフォーム入力で実現します。',
+    title: 'AIO Hubとは',
+    description: 'AIが情報を理解・引用しやすい形に整える「AIO（AI Information Optimization）」を、誰でも扱えるフォーム入力で実現するプラットフォーム。',
   },
 
-  // Characters (登場人物)
+  // Characters (課題提示 - ゼロクリック時代)
   characters: {
-    title: 'AIOを支える3者',
+    title: 'ゼロクリック時代の到来',
     items: [
-      '企業：事実情報を継続更新',
-      'プラットフォーム（AIO Hub）：構造化・公開・最適化を担保',
-      'AI/検索：構造化情報を参照し、回答の中に要約/引用',
+      'ユーザーはChatGPTやGeminiに「調べてもらう」のが当たり前に',
+      'AIは構造化された情報を優先的に引用・参照',
+      '従来のWebサイトだけでは、AI回答に企業が登場しづらい状況',
     ],
   },
 
-  // Conflict (衝突)
+  // Conflict (解決策 - 情報最適化)
   conflict: {
-    title: '"情報はある"のに、AIに届かない',
+    title: 'AIO Hubによる情報最適化',
     items: [
-      '形式がバラバラ/更新負荷が高い',
-      'JSON-LDやセマンティックHTMLの整備コスト',
-      '結果として、AIの回答に企業が登場しづらい',
+      '企業情報をAIが理解しやすい構造化データ（JSON-LD）に自動変換',
+      'フォーム入力だけで、専門知識不要でAI最適化を実現',
+      'ディレクトリ効果により、個社の検索ランキングも向上',
     ],
   },
 
-  // BigIdea (ビッグアイデア)
+  // BigIdea (仕組み - JSON-LD自動生成)
   bigIdea: {
-    title: '"AIOを標準装備"した企業ディレクトリ',
-    description: 'AIO Hub上で企業が集まるほど、全体のドメインパワーが強化。個社にとっても"引用される確率"が上がります。',
+    title: 'JSON-LD自動生成システム',
+    description: '企業情報をフォーム入力するだけで、AIが理解できる構造化データ（JSON-LD）を自動生成。手動作業不要で、専門知識なしでもAI最適化を実現。',
   },
 
-  // Solution (解決策)
+  // Solution (成果 - ディレクトリ効果)
   solution: {
-    title: 'AIO Hubが提供すること',
+    title: 'ディレクトリ効果による相乗効果',
     items: [
-      '構造化データ（JSON-LD）/見出し構造の自動整備',
-      '公開/非公開・スラッグ・OGPなどの基本運用',
-      '無料：ロゴ/サービス1件。有料：複数サービスや外部CTAなど',
+      'AIO Hub上に企業が集まることで、全体のドメインパワーが強化',
+      '個社にとっても「AI回答に引用される確率」が向上',
+      '構造化データの品質向上により、検索ランキングも上昇',
     ],
-    note: '閲覧レポート/マッチングは（予定）。実装後に提供します。',
+    note: 'プラットフォーム全体の信頼性向上が、参加企業全体にメリットをもたらします。',
   },
 
-  // Recap (再主張)
+  // Recap (料金プラン)
   recap: {
-    title: '"選ばれない理由"を、構造から解消',
-    description: '情報を"AIが読める"形にしておく。それがAIOです。',
+    title: '始めやすい料金プラン',
+    description: '基本機能は無料。企業ロゴとサービス1件まで登録可能。より多くのサービスや高度な機能は有料プランで。',
   },
 
-  // ClosingCTA (CTA)
+  // ClosingCTA (CTA - 無料で始める)
   closingCTA: {
-    title: 'AIOを、今から',
+    title: 'AI時代の企業情報管理を、今すぐ',
     primaryText: '無料で始める',
     primaryHref: '/organizations',
-    secondaryText: 'サービス概要',
-    secondaryHref: '/service',
+    secondaryText: 'ヒアリング代行サービス',
+    secondaryHref: '/hearing-service',
   },
 
   // メタデータ
   metadata: {
-    title: 'AIOとは - AIO Hub',
-    description: 'AIO（AI Information Optimization）はAIが情報を理解・引用しやすい形に整える考え方。AIO Hubで企業情報のAIO対策を始めましょう。',
+    title: 'AIO Hubとは | AI情報最適化CMS',
+    description: 'AIO Hub は企業情報をAIが理解しやすい形に最適化するプラットフォーム。JSON-LD自動生成で、ChatGPTやGeminiの回答に企業が引用されやすくなります。',
   },
 } as const;
