@@ -87,7 +87,7 @@ export const aioCopy = {
         items: [
           '{ "@type": "Service", "name": "ECサイト構築", "priceRange": "月額5万円〜" }',
           '{ "targetIndustry": ["製造業", "小売業"], "customerSize": "中小企業" }',
-          '{ "serviceOutput": { "metric": "売上向上", "value": "平均30%" } }'
+          '{ "serviceOutput": { "metric": "売上向上", "value": "実績あり" } }'
         ],
         benefit: 'AI・検索エンジンが正確に理解'
       }

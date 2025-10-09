@@ -484,7 +484,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  99.9% 稼働率保証
+                  高い安定性保証
                 </div>
                 <div className="flex items-center text-gray-300 text-sm">
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">

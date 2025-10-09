@@ -136,7 +136,7 @@ export default function CaseStudyForm({
             value={formData.title}
             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="例: 営業効率を300%向上させたCRMシステム導入事例"
+            placeholder="例: 業務効率を大幅に向上させたCRMシステム導入事例"
           />
           {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
         </div>
@@ -259,7 +259,7 @@ export default function CaseStudyForm({
                 type="text"
                 value={metricValue}
                 onChange={(e) => setMetricValue(e.target.value)}
-                placeholder="値（例: 300%）"
+                placeholder="値（例: 大幅増加）"
                 className="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               />
               <button

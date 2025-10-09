@@ -6,7 +6,7 @@
 import { Metadata } from 'next';
 import HeroSection from '@/components/aio/HeroSection';
 import FlowSection from '@/components/aio/FlowSection';
-import PricingSection from '@/components/aio/PricingSection';
+import PricingTable from '@/components/pricing/PricingTable';
 import FAQSection from '@/components/aio/FAQSection';
 import CTASection from '@/components/aio/CTASection';
 import { aioCopy } from './copy';
@@ -125,12 +125,7 @@ export default function AIOPage() {
         />
         
         {/* 料金プラン */}
-        <PricingSection
-          title={aioCopy.pricing.title}
-          description={aioCopy.pricing.description}
-          plans={aioCopy.pricing.plans}
-          notes={aioCopy.pricing.notes}
-        />
+        <PricingTable />
         
         {/* よくある質問 */}
         <FAQSection

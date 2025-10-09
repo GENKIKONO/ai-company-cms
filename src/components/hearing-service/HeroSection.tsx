@@ -70,19 +70,19 @@ export default function HeroSection() {
             </Link>
           </div>
           
-          {/* 統計情報 */}
+          {/* サービス特徴 */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/50">
-              <div className="text-3xl font-bold text-blue-600 mb-2">127+</div>
-              <div className="text-gray-700 font-medium">企業様にご利用</div>
+              <div className="text-lg font-bold text-blue-600 mb-2">専門ヒアリング</div>
+              <div className="text-gray-700 font-medium">AI最適化の専門スタッフが企業情報を丁寧にヒアリング</div>
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/50">
-              <div className="text-3xl font-bold text-purple-600 mb-2">60分</div>
-              <div className="text-gray-700 font-medium">平均ヒアリング時間</div>
+              <div className="text-lg font-bold text-purple-600 mb-2">構造化登録</div>
+              <div className="text-gray-700 font-medium">ヒアリング内容をJSON-LD形式で構造化・最適化して登録</div>
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/50">
-              <div className="text-3xl font-bold text-indigo-600 mb-2">4.8★</div>
-              <div className="text-gray-700 font-medium">満足度評価</div>
+              <div className="text-lg font-bold text-indigo-600 mb-2">継続改善</div>
+              <div className="text-gray-700 font-medium">定期的な情報更新とAI検索最適化のサポート</div>
             </div>
           </div>
         </div>

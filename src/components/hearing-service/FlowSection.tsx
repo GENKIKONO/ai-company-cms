@@ -176,8 +176,8 @@ export default function FlowSection() {
                   <strong>主力サービス:</strong> ECサイト構築・在庫管理システム
                 </div>
                 <div className="bg-purple-50 rounded p-3 border-l-4 border-purple-400">
-                  <strong>導入実績:</strong> 中小企業200社・売上30%向上平均<br />
-                  <strong>特徴:</strong> 3ヶ月でROI150%達成
+                  <strong>導入実績:</strong> 中小企業への豊富な導入経験<br />
+                  <strong>特徴:</strong> 短期間での効果実現を重視
                 </div>
                 <div className="bg-indigo-50 rounded p-3 border-l-4 border-indigo-400">
                   <strong>差別化:</strong> ノーコード対応・24時間サポート<br />
