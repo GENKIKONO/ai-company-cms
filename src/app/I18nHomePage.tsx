@@ -351,26 +351,26 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 items-stretch auto-rows-fr mb-8">
               <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
-                  <p className="jp-body text-gray-600">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</p>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-balance">JSON-LD</h3>
+                  <p className="jp-body text-[15px] leading-7 text-gray-600 [text-wrap:pretty] break-keep">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</p>
                 </div>
               </div>
               <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">RSS/XML</h3>
-                  <p className="jp-body text-gray-600">フィード配信により継続的な情報更新をクローラーに通知</p>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-balance">RSS/XML</h3>
+                  <p className="jp-body text-[15px] leading-7 text-gray-600 [text-wrap:pretty] break-keep">フィード配信により継続的な情報更新をクローラーに通知</p>
                 </div>
               </div>
               <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">OpenAPI</h3>
-                  <p className="jp-body text-gray-600">API仕様を公開し、第三者システムとの連携可能性を提示</p>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-balance">公開プロフィール（直リンク）</h3>
+                  <p className="jp-body text-[15px] leading-7 text-gray-600 [text-wrap:pretty] break-keep">企業・サービスごとに公開URLを自動生成。検索・AIから直接参照されやすい構成で配信します。</p>
                 </div>
               </div>
               <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">サイトマップ</h3>
-                  <p className="jp-body text-gray-600">動的生成によりページ構造を検索エンジンに効率的に伝達</p>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-balance">サイトマップ</h3>
+                  <p className="jp-body text-[15px] leading-7 text-gray-600 [text-wrap:pretty] break-keep">動的生成によりページ構造を検索エンジンに効率的に伝達</p>
                 </div>
               </div>
             </div>
