@@ -125,7 +125,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   className="group px-8 py-4 bg-gray-800 text-white text-lg rounded-lg hover:bg-gray-900 text-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                   aria-label="無料で始める"
                 >
-                  <span className="flex items-center justify-center gap-2">
+                  <span className="flex items-center justify-center gap-2 whitespace-nowrap">
                     {getCtaText()}
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -137,7 +137,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   className="group px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg rounded-lg hover:bg-gray-50 text-center transition-all duration-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
                   aria-label="企業ディレクトリを見る"
                 >
-                  <span className="flex items-center justify-center gap-2">
+                  <span className="flex items-center justify-center gap-2 whitespace-nowrap">
                     {t('pages.home.hero.viewDirectory')}
                     <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -338,39 +338,39 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         {/* AIOダイジェスト */}
         <section className="py-12 sm:py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
-            <h2 className="jp-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 flex items-center justify-center tracking-tight break-keep">
+            <h2 className="jp-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 flex items-center justify-center tracking-tight">
               <svg className="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               AI検索最適化（AIO）対応
             </h2>
-            <p className="jp-body text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8 break-keep">
+            <p className="jp-body text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
               本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
             </p>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 items-stretch auto-rows-fr mb-8">
               <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-balance">JSON-LD</h3>
-                  <p className="jp-body text-[15px] leading-7 text-gray-600 [text-wrap:pretty] break-keep">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</p>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
+                  <p className="jp-body text-[15px] leading-7 text-gray-600">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</p>
                 </div>
               </div>
               <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-balance">RSS/XML</h3>
-                  <p className="jp-body text-[15px] leading-7 text-gray-600 [text-wrap:pretty] break-keep">フィード配信により継続的な情報更新をクローラーに通知</p>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">RSS/XML</h3>
+                  <p className="jp-body text-[15px] leading-7 text-gray-600">フィード配信により継続的な情報更新をクローラーに通知</p>
                 </div>
               </div>
               <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-balance">公開プロフィール（直リンク）</h3>
-                  <p className="jp-body text-[15px] leading-7 text-gray-600 [text-wrap:pretty] break-keep">企業・サービスごとに公開URLを自動生成。検索・AIから直接参照されやすい構成で配信します。</p>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">公開プロフィール（直リンク）</h3>
+                  <p className="jp-body text-[15px] leading-7 text-gray-600">企業・サービスごとに公開URLを自動生成。検索・AIから直接参照されやすい構成で配信します。</p>
                 </div>
               </div>
               <div className="h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-balance">サイトマップ</h3>
-                  <p className="jp-body text-[15px] leading-7 text-gray-600 [text-wrap:pretty] break-keep">動的生成によりページ構造を検索エンジンに効率的に伝達</p>
+                  <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">サイトマップ</h3>
+                  <p className="jp-body text-[15px] leading-7 text-gray-600">動的生成によりページ構造を検索エンジンに効率的に伝達</p>
                 </div>
               </div>
             </div>

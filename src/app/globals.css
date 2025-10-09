@@ -59,6 +59,7 @@
 :root {
   --heading-balance: balance;
   --body-wrap: pretty;
+  text-wrap: pretty; /* Global default for natural text wrapping */
 }
 
 /* Font optimization and Typography defaults */
@@ -90,6 +91,34 @@
 .jp-body {
   text-wrap: pretty;
   line-height: 1.75;
+  line-break: strict;
+  word-break: keep-all;
+}
+
+/* 最新日本語フレーズ対応（対応ブラウザのみ） */
+@supports (word-break: auto-phrase) {
+  .jp-body, .jp-heading {
+    word-break: auto-phrase;
+  }
+}
+
+/* 統一テキストユーティリティ */
+@layer utilities {
+  /* 見出し用：バランス改行 */
+  .jp-heading {
+    text-wrap: balance;
+  }
+  
+  /* 本文用：自然改行 + 単語境界保持 */
+  .jp-body {
+    word-break: keep-all;
+    text-wrap: pretty;
+  }
+  
+  /* 数値・価格用：改行禁止 */
+  .no-wrap {
+    white-space: nowrap;
+  }
 }
 
 /* Smooth scrolling with motion preference respect */

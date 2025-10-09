@@ -208,7 +208,7 @@ export default function PricingTable() {
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className={`block w-full rounded-lg px-4 py-3 text-center text-sm font-medium transition-colors ${
+                  className={`block w-full rounded-lg px-4 py-3 text-center text-sm font-medium transition-colors whitespace-nowrap ${
                     plan.popular
                       ? 'bg-purple-600 text-white hover:bg-purple-700'
                       : 'bg-gray-900 text-white hover:bg-gray-800'
