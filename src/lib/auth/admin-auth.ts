@@ -100,6 +100,14 @@ async function checkAdminPermission(userId: string, email?: string): Promise<boo
     return true;
   }
 
+  // ADMIN_EMAILS環境変数（カンマ区切り）でのチェック
+  if (email && process.env.ADMIN_EMAILS) {
+    const adminEmails = process.env.ADMIN_EMAILS.split(',').map(e => e.trim());
+    if (adminEmails.includes(email)) {
+      return true;
+    }
+  }
+
   // 追加の管理者権限チェックロジックをここに実装
   // 例: データベースでユーザーの role を確認
   

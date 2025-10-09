@@ -18,6 +18,9 @@ const PUBLIC_PATHS = new Set([
 // 要ログインのプレフィックス  
 const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/profile'];
 
+// 管理者専用パス（admin判定が必要）
+const ADMIN_PATHS = ['/admin'];
+
 // 半公開ルート（ディレクトリ表示は公開、編集は要ログイン）
 const SEMI_PUBLIC_PREFIXES = ['/organizations'];
 
@@ -99,6 +102,7 @@ export async function middleware(req: NextRequest) {
   const isProtected = PROTECTED_PREFIXES.some(p => pathname.startsWith(p));
   const isSemiPublic = SEMI_PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
   const isAuthPage = AUTH_PAGES.has(pathname);
+  const isAdminPath = ADMIN_PATHS.some(p => pathname.startsWith(p));
 
   console.log(`[Middleware] Auth check: ${pathname}, isAuthed: ${isAuthed}, isProtected: ${isProtected}, isAuthPage: ${isAuthPage}`);
 
@@ -109,11 +113,21 @@ export async function middleware(req: NextRequest) {
     pathname.match(/\/organizations\/[^\/]+\/(edit|settings)$/)
   );
 
-  // 未ログインで保護ページ、または半公開の編集ページに来たら /auth/login に intended redirect 付きで送る
-  if (!isAuthed && (isProtected || requiresAuthInSemiPublic)) {
+  // 未ログインで保護ページ、または半公開の編集ページ、または管理者ページに来たら /auth/login に intended redirect 付きで送る
+  if (!isAuthed && (isProtected || requiresAuthInSemiPublic || isAdminPath)) {
     const loginUrl = new URL('/auth/login', req.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // 管理者ページの場合は追加チェック（ログイン済みでも非管理者は /dashboard へ）
+  if (isAdminPath && isAuthed) {
+    const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(email => email.trim()) || [];
+    const isAdmin = user?.app_metadata?.role === 'admin' || adminEmails.includes(user?.email || '');
+    
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
   }
 
   // ログイン済みで認証系ページに来たら /dashboard へ

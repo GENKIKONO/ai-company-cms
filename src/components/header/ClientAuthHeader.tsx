@@ -7,9 +7,10 @@ import { User } from '@supabase/supabase-js';
 interface ClientAuthHeaderProps {
   initialUser?: User | null;
   initialHasOrganization?: boolean;
+  initialIsAdmin?: boolean;
 }
 
-export default function ClientAuthHeader({ initialUser, initialHasOrganization }: ClientAuthHeaderProps) {
+export default function ClientAuthHeader({ initialUser, initialHasOrganization, initialIsAdmin }: ClientAuthHeaderProps) {
   const [mounted, setMounted] = useState(false);
 
   // クライアントサイドでのみレンダリング（ハイドレーション不整合回避）
@@ -20,6 +21,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization }
   const user = mounted ? initialUser : null;
   const hasOrganization = mounted ? initialHasOrganization : false;
   const isAuthenticated = mounted && !!user;
+  const isAdmin = mounted ? initialIsAdmin : false;
 
   const links = useMemo(
     () => [
@@ -71,6 +73,14 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization }
                   className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
                 >
                   マイページ
+                </Link>
+              )}
+              {isAuthenticated && isAdmin && (
+                <Link 
+                  href="/admin" 
+                  className="text-gray-500 hover:text-gray-700 whitespace-nowrap"
+                >
+                  管理者
                 </Link>
               )}
             </nav>

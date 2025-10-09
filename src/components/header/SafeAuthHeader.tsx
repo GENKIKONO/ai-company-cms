@@ -1,20 +1,20 @@
 // 安全なAuthHeader - Server Component with Client Component integration
 import FallbackHeader from './FallbackHeader';
 import ClientAuthHeader from './ClientAuthHeader';
+import { getUserWithAdmin } from '@/lib/auth/server';
 
 export default async function SafeAuthHeader() {
   try {
-    // Supabaseクライアント作成を安全に実行
-    const { supabaseServer } = await import('@/lib/supabase-server');
-    const supabase = await supabaseServer();
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
-    const isAuthenticated = !error && !!user;
+    // 認証と管理者権限チェック
+    const { user, isAdmin } = await getUserWithAdmin();
+    const isAuthenticated = !!user;
     
     // 企業の存在確認（認証済みの場合のみ）
     let hasOrganization = false;
     if (isAuthenticated) {
       try {
+        const { supabaseServer } = await import('@/lib/supabase-server');
+        const supabase = await supabaseServer();
         const { data: orgData } = await supabase
           .from('organizations')
           .select('id')
@@ -28,7 +28,11 @@ export default async function SafeAuthHeader() {
     }
 
     // Client Componentにデータを渡してレンダリング
-    return <ClientAuthHeader initialUser={user} initialHasOrganization={hasOrganization} />;
+    return <ClientAuthHeader 
+      initialUser={user} 
+      initialHasOrganization={hasOrganization} 
+      initialIsAdmin={isAdmin}
+    />;
   } catch (e) {
     console.error('[SafeAuthHeader] AuthHeader render failed:', e);
     return <FallbackHeader />;

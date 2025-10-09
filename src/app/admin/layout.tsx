@@ -4,25 +4,21 @@
  */
 
 import { redirect } from 'next/navigation';
-import { supabaseServer } from '@/lib/supabase-server';
+import { getUserWithAdmin } from '@/lib/auth/server';
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await supabaseServer();
+  // 認証と管理者権限の統合チェック
+  const { user, isAdmin } = await getUserWithAdmin();
   
-  // 認証チェック
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !authData.user) {
+  if (!user) {
     redirect('/auth/login?redirect=/admin');
   }
 
-  // 管理者権限チェック
-  const userRole = authData.user.user_metadata?.role;
-  if (userRole !== 'admin') {
+  if (!isAdmin) {
     redirect('/dashboard');
   }
 
