@@ -1,4 +1,5 @@
 import { aioCopy } from '../copy';
+import VisualCard from '../../../components/marketing/VisualCard';
 
 export default function Solution() {
   return (
@@ -33,17 +34,15 @@ export default function Solution() {
           </div>
         </div>
 
-        {/* 図版プレースホルダー */}
+        {/* [CLEANUP] remove placeholder diagram */}
         <div className="mt-16 max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="aspect-video flex items-center justify-center p-12">
-              <div className="text-center text-gray-600">
-                <div className="text-6xl mb-6">⚙️🔧📊</div>
-                <p className="text-xl font-medium mb-2">AIO Hub が提供する自動整備機能</p>
-                <p className="text-gray-500">情報を自動で構造化しAI検索に最適化</p>
-              </div>
-            </div>
-          </div>
+          <VisualCard
+            src="/illustrations/aio-architecture.svg"
+            alt="AIO Hub が提供する自動整備機能 - 情報を自動で構造化しAI検索に最適化"
+            width={600}
+            height={400}
+            className="p-8"
+          />
         </div>
       </div>
     </section>

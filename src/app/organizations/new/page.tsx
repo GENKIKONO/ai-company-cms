@@ -762,8 +762,10 @@ export default function NewOrganizationPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">ブランド設定</h2>
             
             <OrgLogoUploader
+              organizationId="temp-new"
+              organizationName={formData.name || '新規企業'}
               currentLogoUrl={formData.logo_url}
-              onLogoChange={(logoUrl) => handleInputChange('logo_url', logoUrl || '')}
+              onUploadComplete={(logoUrl) => handleInputChange('logo_url', logoUrl)}
               disabled={submitting}
             />
           </div>

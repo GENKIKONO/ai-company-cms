@@ -1,4 +1,5 @@
 import { aioCopy } from '../copy';
+import VisualCard from '../../../components/marketing/VisualCard';
 
 export default function Recap() {
   return (
@@ -13,17 +14,15 @@ export default function Recap() {
           </p>
         </div>
 
-        {/* 図版プレースホルダー */}
+        {/* [CLEANUP] remove placeholder diagram */}
         <div className="mt-16 max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="aspect-video flex items-center justify-center p-12">
-              <div className="text-center text-gray-600">
-                <div className="text-6xl mb-6">🏗️🤖💡</div>
-                <p className="text-xl font-medium mb-2">構造から解消されるAI時代の情報問題</p>
-                <p className="text-gray-500">企業ディレクトリプラットフォームで解決</p>
-              </div>
-            </div>
-          </div>
+          <VisualCard
+            src="/illustrations/jsonld-automation.svg"
+            alt="構造から解消されるAI時代の情報問題 - 企業ディレクトリプラットフォームで解決"
+            width={600}
+            height={400}
+            className="p-8"
+          />
         </div>
       </div>
     </section>

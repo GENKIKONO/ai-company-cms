@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import Link from 'next/link';
+import VisualCard from './VisualCard';
 
 interface HeroProps {
   title: string;
@@ -62,17 +62,14 @@ export default function Hero({
           
           {/* Right Column - Image */}
           <div className="mt-12 md:mt-0">
-            <div className="relative bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-8 overflow-hidden">
-              <Image
-                src={imageSrc}
-                alt={imageAlt}
-                width={600}
-                height={400}
-                sizes="(min-width: 768px) 50vw, 100vw"
-                className="w-full h-auto"
-                priority
-              />
-            </div>
+            <VisualCard
+              src={imageSrc}
+              alt={imageAlt}
+              width={600}
+              height={400}
+              priority
+              className="p-8"
+            />
           </div>
         </div>
       </div>

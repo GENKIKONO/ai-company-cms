@@ -3,207 +3,226 @@
 import { useState, useRef } from 'react';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import Image from 'next/image';
+import LetterAvatar from './ui/LetterAvatar';
+import { useToast } from './ui/toast';
 
 interface OrgLogoUploaderProps {
-  orgId?: string; // 新規作成時はundefined
-  currentLogoUrl?: string;
-  onLogoChange: (logoUrl: string | null) => void;
+  organizationId: string;
+  organizationName: string;
+  currentLogoUrl?: string | null;
+  onUploadComplete?: (logoUrl: string) => void;
   disabled?: boolean;
 }
 
-export default function OrgLogoUploader({ 
-  orgId, 
-  currentLogoUrl, 
-  onLogoChange, 
-  disabled = false 
+export default function OrgLogoUploader({
+  organizationId,
+  organizationName,
+  currentLogoUrl,
+  onUploadComplete,
+  disabled = false,
 }: OrgLogoUploaderProps) {
   const [uploading, setUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentLogoUrl || null);
-  const [error, setError] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState(currentLogoUrl);
+  const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const supabase = supabaseBrowser;
+  const { addToast } = useToast();
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+  const MAX_SIZE = 1 * 1024 * 1024; // 1MB
 
-    setError(null);
-
-    // ファイルサイズチェック (512KB = 512 * 1024 bytes)
-    const maxSize = 512 * 1024;
-    if (file.size > maxSize) {
-      setError('ファイルサイズが512KBを超えています');
-      return;
+  const validateFile = (file: File): string | null => {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return 'PNG/JPG/WebP 形式のみ対応しています。';
     }
+    
+    if (file.size > MAX_SIZE) {
+      return '1MBまでの画像をご利用ください（PNG/JPG/WebP）。';
+    }
+    
+    return null;
+  };
 
-    // ファイル形式チェック
-    if (!file.type.startsWith('image/')) {
-      setError('画像ファイルを選択してください');
+  const getFileExtension = (file: File): string => {
+    const type = file.type;
+    if (type === 'image/png') return '.png';
+    if (type === 'image/jpeg') return '.jpg';
+    if (type === 'image/webp') return '.webp';
+    return '.png'; // fallback
+  };
+
+  const uploadLogo = async (file: File) => {
+    const validationError = validateFile(file);
+    if (validationError) {
+      addToast({
+        type: 'error',
+        title: 'アップロードエラー',
+        message: validationError,
+      });
       return;
     }
 
     setUploading(true);
 
     try {
-      // プレビュー表示用のローカルURL作成
-      const localPreviewUrl = URL.createObjectURL(file);
-      setPreviewUrl(localPreviewUrl);
+      const fileExtension = getFileExtension(file);
+      const fileName = `${organizationId}/logo${fileExtension}`;
 
-      // WebP変換 (簡易実装 - そのままアップロード)
-      const timestamp = Date.now();
-      const randomId = Math.random().toString(36).substring(2, 8);
-      const tempOrgId = orgId || `temp-${timestamp}-${randomId}`;
-      const key = `${tempOrgId}/logo.webp`;
-
-      // 既存ファイルがあれば削除
-      if (currentLogoUrl) {
-        try {
-          await supabaseBrowser.storage
-            .from('org-logos')
-            .remove([key]);
-        } catch (removeError) {
-          console.warn('Failed to remove existing logo:', removeError);
-        }
-      }
-
-      // 新しいファイルをアップロード
-      const { data, error: uploadError } = await supabaseBrowser.storage
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('org-logos')
-        .upload(key, file, {
-          upsert: true,
-          contentType: 'image/webp'
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true, // Replace existing file
         });
 
       if (uploadError) {
-        throw uploadError;
+        console.error('[UPLOAD]', { 
+          message: uploadError.message, 
+          bucket: 'org-logos', 
+          path: fileName 
+        });
+        
+        // ユーザー向けエラーメッセージ
+        addToast({
+          type: 'error',
+          title: 'アップロード失敗',
+          message: '一時的にアップロードに失敗しました。少し時間をおいて再度お試しください。',
+        });
+        return;
       }
 
-      // 公開URLを取得
-      const { data: publicUrlData } = supabaseBrowser.storage
+      // Get public URL
+      const { data: urlData } = supabase.storage
         .from('org-logos')
-        .getPublicUrl(key);
+        .getPublicUrl(fileName);
 
-      const publicUrl = publicUrlData.publicUrl;
-      
-      // 親コンポーネントに通知
-      onLogoChange(publicUrl);
-      
-      // プレビューを更新
-      setPreviewUrl(publicUrl);
+      const publicUrl = urlData.publicUrl;
 
-    } catch (uploadError) {
-      console.error('Logo upload error:', uploadError);
-      setError('ロゴのアップロードに失敗しました');
-      setPreviewUrl(currentLogoUrl || null);
+      // Update organization logo_url in database
+      const { error: updateError } = await supabase
+        .from('organizations')
+        .update({ logo_url: publicUrl })
+        .eq('id', organizationId);
+
+      if (updateError) {
+        console.error('[UPLOAD] Database update error:', updateError);
+        addToast({
+          type: 'error',
+          title: 'アップロード失敗',
+          message: '画像のアップロードは成功しましたが、データベースの更新に失敗しました。',
+        });
+        return;
+      }
+
+      setLogoUrl(publicUrl);
+      setImageError(false);
+      onUploadComplete?.(publicUrl);
+
+      addToast({
+        type: 'success',
+        title: 'ロゴアップロード完了',
+        message: '企業ロゴが正常にアップロードされました。',
+      });
+
+    } catch (error) {
+      console.error('[UPLOAD] Unexpected error:', error);
+      addToast({
+        type: 'error',
+        title: 'アップロード失敗',
+        message: '予期しないエラーが発生しました。',
+      });
     } finally {
       setUploading(false);
     }
   };
 
-  const handleClear = async () => {
-    if (!orgId) {
-      // 新規作成時はプレビューのみクリア
-      setPreviewUrl(null);
-      onLogoChange(null);
-      return;
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      uploadLogo(file);
     }
+  };
 
-    setUploading(true);
-    setError(null);
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
 
-    try {
-      const key = `${orgId}/logo.webp`;
-      
-      // Storageから削除
-      const { error: removeError } = await supabaseBrowser.storage
-        .from('org-logos')
-        .remove([key]);
-
-      if (removeError) {
-        console.warn('Failed to remove logo from storage:', removeError);
-      }
-
-      // プレビューをクリア
-      setPreviewUrl(null);
-      
-      // 親コンポーネントに通知 (logo_url = null で保存APIを呼ぶ)
-      onLogoChange(null);
-
-    } catch (clearError) {
-      console.error('Logo clear error:', clearError);
-      setError('ロゴの削除に失敗しました');
-    } finally {
-      setUploading(false);
+  const renderLogo = () => {
+    if (logoUrl && !imageError) {
+      return (
+        <Image
+          src={logoUrl}
+          alt={`${organizationName}のロゴ`}
+          width={120}
+          height={120}
+          className="w-full h-full object-contain bg-white ring-1 ring-gray-200 rounded"
+          onError={() => setImageError(true)}
+        />
+      );
+    } else {
+      return (
+        <LetterAvatar
+          name={organizationName}
+          size={120}
+          rounded="lg"
+        />
+      );
     }
   };
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+    <div className="space-y-4">
+      <label className="block text-sm font-medium text-gray-700">
         企業ロゴ
       </label>
       
-      {/* プレビュー表示 */}
-      {previewUrl ? (
-        <div className="mb-4">
-          <div className="relative w-32 h-32 border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
-            <Image
-              src={previewUrl}
-              alt="企業ロゴ"
-              fill
-              className="object-contain"
-              sizes="128px"
-            />
-          </div>
+      <div className="flex items-center space-x-4">
+        {/* Logo Display */}
+        <div className="flex-shrink-0 w-30 h-30">
+          {renderLogo()}
+        </div>
+
+        {/* Upload Controls */}
+        <div className="flex-1">
           <button
             type="button"
-            onClick={handleClear}
+            onClick={handleClick}
             disabled={uploading || disabled}
-            className="mt-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+            className="inline-flex items-center px-4 py-2 border border-indigo-600 text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {uploading ? '処理中...' : 'ロゴを削除'}
+            {uploading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                アップロード中...
+              </>
+            ) : (
+              <>
+                <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                ロゴをアップロード
+              </>
+            )}
           </button>
+          
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            onChange={handleFileSelect}
+            disabled={uploading || disabled}
+            className="hidden"
+          />
+          
+          <p className="mt-2 text-sm text-gray-500">
+            PNG、JPG、WebP形式、最大1MB
+          </p>
         </div>
-      ) : (
-        <div className="mb-4">
-          <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-            <div className="text-center">
-              <svg className="mx-auto h-8 w-8 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <p className="mt-2 text-xs text-gray-500">ロゴなし</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ファイル選択 */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileSelect}
-        disabled={uploading || disabled}
-        className="hidden"
-      />
-      
-      <button
-        type="button"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={uploading || disabled}
-        className="btn-secondary text-sm disabled:opacity-50"
-      >
-        {uploading ? 'アップロード中...' : previewUrl ? 'ロゴを変更' : 'ロゴをアップロード'}
-      </button>
-
-      {/* エラー表示 */}
-      {error && (
-        <p className="mt-2 text-sm text-red-600">{error}</p>
-      )}
-
-      {/* 説明テキスト */}
-      <p className="mt-2 text-xs text-gray-500">
-        最大512KB、JPG・PNG・WebP形式をサポート
-      </p>
+      </div>
     </div>
   );
 }
