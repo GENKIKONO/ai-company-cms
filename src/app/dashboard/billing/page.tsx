@@ -214,8 +214,9 @@ export default function BillingPage() {
             <div className="text-sm text-gray-500 mb-1">プラン</div>
             <div className="text-lg font-medium text-gray-900 capitalize">
               {currentPlan === 'free' ? 'フリープラン' : 
-               currentPlan === 'basic' ? 'ベーシックプラン (¥5,000/月)' : 
-               currentPlan === 'pro' ? 'プロプラン' : currentPlan}
+               currentPlan === 'starter' ? 'スタータープラン (¥9,800/月)' : 
+               currentPlan === 'business' ? 'ビジネスプラン' : 
+               currentPlan === 'enterprise' ? 'エンタープライズプラン' : currentPlan}
             </div>
           </div>
           

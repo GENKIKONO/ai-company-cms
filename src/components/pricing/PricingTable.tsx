@@ -39,14 +39,11 @@ const PLANS: PricingPlan[] = [
     icon: Star,
     popular: false,
     features: [
-      { text: 'ロゴアップロード', included: true },
-      { text: 'サービス1件登録', included: true },
+      { text: 'ロゴ・企業情報を構造化公開（JSON-LD）', included: true },
+      { text: 'ディレクトリ掲載（最下層・タグ1件）', included: true },
+      { text: 'サービス1件', included: true },
       { text: '公開/非公開設定', included: true },
-      { text: 'AI掲載（基本枠）', included: true },
-      { text: 'JSON-LD自動生成', included: true },
-      { text: '外部リンク連携', included: false },
-      { text: 'ディレクトリ掲載', included: false },
-      { text: '上位掲載', included: false }
+      { text: '上位露出・特集枠は対象外', included: false }
     ],
     ctaText: '無料で始める',
     ctaHref: '/organizations',
@@ -62,14 +59,10 @@ const PLANS: PricingPlan[] = [
     icon: Crown,
     popular: true,
     features: [
-      { text: 'Freeプランの全機能', included: true },
-      { text: '構造化CMS機能', included: true },
-      { text: '企業・サービス・FAQ無制限', included: true },
-      { text: '画像1枚アップロード', included: true },
-      { text: '外部リンク連携', included: true },
-      { text: 'ディレクトリ掲載', included: true },
-      { text: '上位掲載', included: false },
-      { text: '詳細レポート', included: false }
+      { text: 'ディレクトリ掲載（通常順位・タグ複数）', included: true },
+      { text: 'サービス上限アップ（例: 10件）', included: true },
+      { text: 'FAQ・外部リンク', included: true },
+      { text: 'SNSシェア最適化（OGP対応・順次拡張予定）', included: true }
     ],
     ctaText: 'このプランで始める',
     ctaHref: '/organizations',
@@ -83,14 +76,10 @@ const PLANS: PricingPlan[] = [
     icon: Building2,
     popular: false,
     features: [
-      { text: 'Starterプランの全機能', included: true },
-      { text: '上位掲載（編集部レビュー）', included: true },
-      { text: '構造化テンプレート拡張', included: true },
-      { text: '簡易レポート機能', included: true },
-      { text: '画像複数アップロード', included: true },
-      { text: 'カスタムOGP設定', included: true },
-      { text: 'API連携', included: false },
-      { text: '複数ブランド管理', included: false }
+      { text: '上位掲載（おすすめ・特集枠）', included: true },
+      { text: 'ブログCMS（AIO Hubドメイン配下で発信強化）', included: true },
+      { text: 'タグ複数露出', included: true },
+      { text: 'カスタムOGP設定（順次拡張予定）', included: true }
     ],
     ctaText: 'このプランで始める',
     ctaHref: '/organizations',
@@ -105,14 +94,9 @@ const PLANS: PricingPlan[] = [
     icon: Zap,
     popular: false,
     features: [
-      { text: 'Businessプランの全機能', included: true },
-      { text: '複数ブランド管理', included: true },
-      { text: '担当者権限設定', included: true },
-      { text: 'API連携・開発支援', included: true },
-      { text: '優先サポート', included: true },
-      { text: 'カスタマイズ対応', included: true },
-      { text: 'SLA保証', included: true },
-      { text: '専属コンサルティング', included: true }
+      { text: '複数ブランド・承認フロー', included: true },
+      { text: 'API/SSO 連携支援', included: true },
+      { text: '優先サポート / SLA', included: true }
     ],
     ctaText: 'お問い合わせ',
     ctaHref: '/contact',

@@ -27,7 +27,7 @@ export default function OrganizationsPage() {
     size: '',
     hasServices: false,
     hasCaseStudies: false,
-    sortBy: 'name'
+    sortBy: 'plan' // デフォルトをプラン順に変更
   });
 
   // 公開済み企業データの取得
@@ -35,8 +35,9 @@ export default function OrganizationsPage() {
     async function fetchData() {
       setLoading(true);
       try {
+        // 公開済み企業とis_publishedがtrueの企業を取得（Free企業も含む）
         const [orgsResult, industriesResult] = await Promise.all([
-          getOrganizations({ status: 'published', limit: 100 }),
+          getOrganizations({ limit: 100 }),
           getIndustries()
         ]);
 
@@ -55,6 +56,18 @@ export default function OrganizationsPage() {
 
     fetchData();
   }, []);
+
+  // プラン重み付けソート関数
+  const getOrganizationWeight = (org: Organization) => {
+    const plan = org.plan || 'free';
+    switch (plan) {
+      case 'enterprise': return 4;
+      case 'business': return 3;
+      case 'starter': return 2;
+      case 'free': return 1;
+      default: return 1;
+    }
+  };
 
   // フィルタリング済みの企業一覧
   const filteredOrganizations = useMemo(() => {
@@ -86,6 +99,13 @@ export default function OrganizationsPage() {
     // ソート
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
+        case 'plan':
+          // プラン重み付けソート: enterprise > business > starter > free
+          const weightA = getOrganizationWeight(a);
+          const weightB = getOrganizationWeight(b);
+          if (weightA !== weightB) return weightB - weightA;
+          // 同じプランの場合は更新日順
+          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
         case 'name':
           return a.name.localeCompare(b.name);
         case 'established':
@@ -107,6 +127,32 @@ export default function OrganizationsPage() {
 
     return filtered;
   }, [organizations, filters]);
+
+  // プランバッジのスタイルを取得
+  const getPlanBadgeStyle = (plan?: string) => {
+    switch (plan) {
+      case 'enterprise':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-300 ring-1 ring-emerald-200';
+      case 'business':
+        return 'bg-purple-50 text-purple-700 border-purple-300 ring-1 ring-purple-200';
+      case 'starter':
+        return 'bg-indigo-50 text-indigo-700 border-indigo-300 ring-1 ring-indigo-200';
+      case 'free':
+      default:
+        return 'bg-gray-50 text-gray-600 border-gray-300 ring-1 ring-gray-200';
+    }
+  };
+
+  // プラン表示名を取得
+  const getPlanDisplayName = (plan?: string) => {
+    switch (plan) {
+      case 'enterprise': return 'Enterprise';
+      case 'business': return 'Business';
+      case 'starter': return 'Starter';
+      case 'free':
+      default: return 'Free';
+    }
+  };
 
   // 地域一覧の抽出
   const regions = useMemo(() => {
@@ -130,7 +176,7 @@ export default function OrganizationsPage() {
       size: '', 
       hasServices: false, 
       hasCaseStudies: false, 
-      sortBy: 'name' 
+      sortBy: 'plan' 
     });
   };
 
@@ -234,6 +280,7 @@ export default function OrganizationsPage() {
                 onChange={(e) => handleFilterChange('sortBy', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               >
+                <option value="plan">プラン順（Enterprise → Free）</option>
                 <option value="name">名前順</option>
                 <option value="updated">更新日順</option>
                 <option value="established">設立年順</option>
@@ -391,9 +438,14 @@ export default function OrganizationsPage() {
                     </div>
                   )}
                   <div className="ml-4 flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-gray-700 transition-colors">
-                      {org.name}
-                    </h3>
+                    <div className="flex items-start justify-between mb-1">
+                      <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-gray-700 transition-colors pr-2">
+                        {org.name}
+                      </h3>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border shadow-sm ${getPlanBadgeStyle(org.plan)} flex-shrink-0`}>
+                        {getPlanDisplayName(org.plan)}
+                      </span>
+                    </div>
                     {org.industries && org.industries.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
                         <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">

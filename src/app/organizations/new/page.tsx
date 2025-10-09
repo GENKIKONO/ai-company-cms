@@ -9,6 +9,14 @@ import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
 import { type AppUser, type OrganizationFormData } from '@/types/database';
 import OrgLogoUploader from '@/components/OrgLogoUploader';
 
+// プラン別タグ数制限
+const TAG_LIMIT: Record<string, number | 'unlimited'> = {
+  free: 1,
+  starter: 3,
+  business: 5,
+  enterprise: 'unlimited'
+};
+
 export default function NewOrganizationPage() {
   const router = useRouter();
   const [user, setUser] = useState<AppUser | null>(null);
@@ -40,6 +48,7 @@ export default function NewOrganizationPage() {
     same_as: [],
     industries: [],
     status: 'draft',
+    plan: 'free',
     meta_title: '',
     meta_description: '',
     meta_keywords: []
@@ -105,6 +114,18 @@ export default function NewOrganizationPage() {
   };
 
   const handleArrayChange = (field: 'same_as' | 'industries' | 'meta_keywords', value: string[]) => {
+    // プラン制限チェック（industriesフィールドのみ）
+    if (field === 'industries') {
+      const currentPlan = formData.plan || 'free';
+      const limit = TAG_LIMIT[currentPlan];
+      
+      if (limit !== 'unlimited' && value.length > limit) {
+        // 制限を超える場合はトースト表示（ここでは単純にalertで代替）
+        alert(`${currentPlan}プランでは業界タグは${limit}個まで選択できます。`);
+        return;
+      }
+    }
+    
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

@@ -20,8 +20,11 @@ export async function getOrganizations(options: {
         services(count),
         case_studies(count),
         faqs(count)
-      `)
-      .order('created_at', { ascending: false });
+      `);
+    
+    // プラン重み付けソートではなく、デフォルトの更新日ソートを使用
+    // プラン重み付けは別途フロント側で実装
+    query = query.order('updated_at', { ascending: false });
 
     // 検索条件の適用
     if (options.search) {
@@ -30,6 +33,9 @@ export async function getOrganizations(options: {
 
     if (options.status) {
       query = query.eq('status', options.status);
+    } else {
+      // デフォルトでは公開済み企業のみ取得（Freeプランも含む）
+      query = query.eq('is_published', true);
     }
 
     if (options.industries && options.industries.length > 0) {

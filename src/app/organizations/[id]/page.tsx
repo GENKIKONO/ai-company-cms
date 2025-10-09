@@ -15,6 +15,14 @@ import FAQsTab from '@/components/FAQsTab';
 import PostsTab from '@/components/PostsTab';
 import OrgLogoUploader from '@/components/OrgLogoUploader';
 
+// プラン別タグ数制限
+const TAG_LIMIT: Record<string, number | 'unlimited'> = {
+  free: 1,
+  starter: 3,
+  business: 5,
+  enterprise: 'unlimited'
+};
+
 // 共通マッパー関数: organization → formData
 function fromOrg(org?: Organization | null): OrganizationFormData {
   return {
@@ -36,7 +44,8 @@ function fromOrg(org?: Organization | null): OrganizationFormData {
     url: org?.url ?? '',
     logo_url: org?.logo_url ?? '',
     same_as: org?.same_as ?? [],
-    industries: org?.industries ?? []
+    industries: org?.industries ?? [],
+    plan: org?.plan ?? 'free'
   };
 }
 
@@ -151,6 +160,18 @@ export default function EditOrganizationPage() {
   };
 
   const handleArrayChange = (field: 'same_as' | 'industries', value: string[]) => {
+    // プラン制限チェック（industriesフィールドのみ）
+    if (field === 'industries') {
+      const currentPlan = organization?.plan || 'free';
+      const limit = TAG_LIMIT[currentPlan];
+      
+      if (limit !== 'unlimited' && value.length > limit) {
+        // 制限を超える場合はトースト表示（ここでは単純にalertで代替）
+        alert(`${currentPlan}プランでは業界タグは${limit}個まで選択できます。`);
+        return;
+      }
+    }
+    
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
