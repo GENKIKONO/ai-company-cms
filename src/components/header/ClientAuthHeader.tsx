@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import MobileMenu from './MobileMenu';
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, useRef } from 'react';
 import { User } from '@supabase/supabase-js';
 
 interface ClientAuthHeaderProps {
@@ -12,11 +12,38 @@ interface ClientAuthHeaderProps {
 
 export default function ClientAuthHeader({ initialUser, initialHasOrganization, initialIsAdmin }: ClientAuthHeaderProps) {
   const [mounted, setMounted] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // クライアントサイドでのみレンダリング（ハイドレーション不整合回避）
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // ドロップダウンの外側クリック・ESCキーで閉じる
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [dropdownOpen]);
 
   const user = mounted ? initialUser : null;
   const hasOrganization = mounted ? initialHasOrganization : false;
@@ -67,48 +94,88 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                   {link.label}
                 </Link>
               ))}
-              {isAuthenticated && (
-                <Link 
-                  href="/dashboard" 
-                  className="text-gray-500 hover:text-gray-700 whitespace-nowrap min-h-[44px] flex items-center px-2 py-2 rounded-md transition-colors duration-200"
-                >
-                  マイページ
-                </Link>
-              )}
-              {isAuthenticated && isAdmin && (
-                <Link 
-                  href="/admin" 
-                  className="text-gray-500 hover:text-gray-700 whitespace-nowrap min-h-[44px] flex items-center px-2 py-2 rounded-md transition-colors duration-200"
-                >
-                  管理者
-                </Link>
-              )}
             </nav>
           </div>
           
           <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
             {mounted && isAuthenticated ? (
               <>
-                {/* デスクトップ: アイコン + メール表示 */}
-                <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
-                  <div className="w-8 h-8 lg:w-9 lg:h-9 bg-gray-200 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-gray-700">
-                      {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <span className="text-sm lg:text-base text-gray-700 truncate max-w-[100px] lg:max-w-[140px]">
-                    {user?.user_metadata?.full_name || user?.email}
-                  </span>
-                </div>
-                
-                {/* デスクトップ: サインアウトリンク */}
-                <div className="hidden md:block">
-                  <Link
-                    href="/auth/signout"
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 lg:px-4 py-2 rounded-md text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200"
+                {/* デスクトップ: アバター + ドロップダウン */}
+                <div className="hidden md:block relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    aria-label="ユーザーメニューを開く"
+                    aria-expanded={dropdownOpen}
+                    aria-haspopup="true"
                   >
-                    ログアウト
-                  </Link>
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-white">
+                        {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <svg 
+                      className={`w-4 h-4 text-gray-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* ドロップダウンメニュー */}
+                  {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                      <div className="py-1">
+                        {/* ユーザー情報 */}
+                        <div className="px-4 py-3 border-b border-gray-100">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {user?.user_metadata?.full_name || 'ユーザー'}
+                          </p>
+                          <p className="text-sm text-gray-500 truncate">
+                            {user?.email}
+                          </p>
+                        </div>
+                        
+                        {/* メニュー項目 */}
+                        <Link
+                          href="/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          マイページ
+                        </Link>
+                        <Link
+                          href="/organizations"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          企業情報
+                        </Link>
+                        {isAdmin && (
+                          <Link
+                            href="/admin"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
+                            onClick={() => setDropdownOpen(false)}
+                          >
+                            管理者
+                          </Link>
+                        )}
+                        
+                        {/* ログアウト */}
+                        <div className="border-t border-gray-100">
+                          <Link
+                            href="/auth/signout"
+                            className="block px-4 py-2 text-sm text-red-700 hover:bg-red-50 hover:text-red-900 transition-colors duration-200"
+                            onClick={() => setDropdownOpen(false)}
+                          >
+                            ログアウト
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
@@ -117,15 +184,10 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                 <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
                   <Link
                     href="/auth/login"
-                    className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 lg:px-4 py-2 rounded-md text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200 whitespace-nowrap"
+                    aria-label="ログイン"
                   >
                     ログイン
-                  </Link>
-                  <Link
-                    href={getCtaHref()}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 lg:px-4 py-2 rounded-md text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200"
-                  >
-                    {getCtaText()}
                   </Link>
                 </div>
               </>

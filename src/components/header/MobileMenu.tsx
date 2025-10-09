@@ -77,6 +77,23 @@ export default function MobileMenu({
             <div ref={panelRef} className="flex flex-col h-full justify-between">
               <div className="px-6 pt-6 space-y-6">
                 <div className="text-xl font-bold text-indigo-600">AIO Hub</div>
+                
+                {/* ログイン済みユーザー情報 */}
+                {auth.loggedIn && (
+                  <div className="flex items-center space-x-3 p-3 bg-indigo-50 rounded-lg">
+                    <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-white">
+                        U
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        ログイン中
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
                 <nav className="space-y-3">
                   {links.map((l, i) => (
                     <Link

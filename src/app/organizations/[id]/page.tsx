@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization, updateOrganization, updateOrganizationStatus, getIndustries } from '@/lib/organizations';
 import { type AppUser, type Organization, type OrganizationFormData } from '@/types/database';
+import { geocodeJP, isValidJapaneseCoordinates } from '@/lib/geocode';
+import { type Coordinates } from '@/types/geo';
 import ServicesTab from '@/components/ServicesTab';
 import CaseStudiesTab from '@/components/CaseStudiesTab';
 import FAQsTab from '@/components/FAQsTab';
@@ -62,6 +64,11 @@ export default function EditOrganizationPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   // [VERIFY][DELETE_GUARD] Delete confirmation state removed for safety
   const [activeTab, setActiveTab] = useState<'basic' | 'services' | 'casestudies' | 'faqs' | 'posts'>('basic');
+  
+  // 座標管理
+  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+  const [geocoding, setGeocoding] = useState(false);
+  const [showManualCoords, setShowManualCoords] = useState(false);
 
   // 初期化は空の状態から開始
   const [formData, setFormData] = useState<OrganizationFormData>(() => fromOrg(null));
@@ -273,6 +280,56 @@ export default function EditOrganizationPage() {
   };
 
   // [VERIFY][DELETE_GUARD] Organization delete function removed for safety
+
+  // 住所から座標を取得
+  const handleDetectLocation = async () => {
+    const fullAddress = `${formData.address_region}${formData.address_locality}${formData.address_street}`;
+    
+    if (!fullAddress.trim()) {
+      setErrors({ address: '住所を入力してください' });
+      return;
+    }
+    
+    setGeocoding(true);
+    setErrors({ ...errors, address: '' });
+    
+    try {
+      const result = await geocodeJP(fullAddress);
+      setCoordinates({ lat: result.lat, lng: result.lng });
+      
+      // 成功メッセージを表示
+      const successElement = document.getElementById('geocode-success');
+      if (successElement) {
+        successElement.style.display = 'block';
+        setTimeout(() => {
+          successElement.style.display = 'none';
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Geocoding failed:', error);
+      setErrors({ 
+        ...errors, 
+        address: error instanceof Error ? error.message : '位置の特定に失敗しました' 
+      });
+    } finally {
+      setGeocoding(false);
+    }
+  };
+
+  // 手動座標入力の処理
+  const handleManualCoordinates = (lat: number, lng: number) => {
+    if (isValidJapaneseCoordinates(lat, lng)) {
+      setCoordinates({ lat, lng });
+      setErrors({ ...errors, coordinates: '' });
+    } else {
+      setErrors({ ...errors, coordinates: '日本国内の座標を入力してください' });
+    }
+  };
+
+  // 完全な住所文字列を生成
+  const getFullAddress = () => {
+    return `${formData.address_region}${formData.address_locality}${formData.address_street}`.trim();
+  };
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -733,13 +790,122 @@ export default function EditOrganizationPage() {
               <label htmlFor="address_street" className="block text-sm font-medium text-gray-700 mb-2">
                 番地・建物名
               </label>
-              <input
-                type="text"
-                id="address_street"
-                value={formData.address_street}
-                onChange={(e) => handleInputChange('address_street', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  id="address_street"
+                  value={formData.address_street}
+                  onChange={(e) => handleInputChange('address_street', e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleDetectLocation}
+                  disabled={geocoding || !getFullAddress()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                  aria-label="住所から位置を検出"
+                >
+                  {geocoding ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      検出中...
+                    </>
+                  ) : (
+                    <>
+                      🔎 位置を検出
+                    </>
+                  )}
+                </button>
+              </div>
+              
+              {/* 住所入力ヒント */}
+              <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+                ※ '〇丁目' は '4丁目' または '4-' 表記が推奨です。うまく位置が合わない場合は'位置を検出'で補正できます。
+              </p>
+              
+              {/* エラーメッセージ */}
+              {errors.address && (
+                <p className="mt-2 text-sm text-red-600">{errors.address}</p>
+              )}
+              
+              {/* 成功メッセージ */}
+              <div id="geocode-success" className="mt-2 text-sm text-green-600" style={{ display: 'none' }}>
+                ✅ 位置を特定しました！地図が更新されました。
+              </div>
+            </div>
+
+            {/* 手動座標入力（折りたたみ） */}
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={() => setShowManualCoords(!showManualCoords)}
+                className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+              >
+                <svg 
+                  className={`w-4 h-4 transition-transform ${showManualCoords ? 'rotate-90' : ''}`} 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                手動で緯度経度を入力
+              </button>
+              
+              {showManualCoords && (
+                <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="manual_lat" className="block text-sm font-medium text-gray-700 mb-2">
+                        緯度
+                      </label>
+                      <input
+                        type="number"
+                        step="0.000001"
+                        id="manual_lat"
+                        value={coordinates?.lat || ''}
+                        onChange={(e) => {
+                          const lat = parseFloat(e.target.value);
+                          if (!isNaN(lat) && coordinates) {
+                            handleManualCoordinates(lat, coordinates.lng);
+                          } else if (!isNaN(lat)) {
+                            setCoordinates({ lat, lng: coordinates?.lng || 0 });
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="例: 35.681236"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="manual_lng" className="block text-sm font-medium text-gray-700 mb-2">
+                        経度
+                      </label>
+                      <input
+                        type="number"
+                        step="0.000001"
+                        id="manual_lng"
+                        value={coordinates?.lng || ''}
+                        onChange={(e) => {
+                          const lng = parseFloat(e.target.value);
+                          if (!isNaN(lng) && coordinates) {
+                            handleManualCoordinates(coordinates.lat, lng);
+                          } else if (!isNaN(lng)) {
+                            setCoordinates({ lat: coordinates?.lat || 0, lng });
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="例: 139.767052"
+                      />
+                    </div>
+                  </div>
+                  {errors.coordinates && (
+                    <p className="mt-2 text-sm text-red-600">{errors.coordinates}</p>
+                  )}
+                  <p className="mt-2 text-xs text-gray-500">
+                    手動で入力した座標は住所検出より優先されます。日本国内の座標を入力してください。
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

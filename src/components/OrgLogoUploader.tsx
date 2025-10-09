@@ -83,12 +83,22 @@ export default function OrgLogoUploader({
           path: fileName 
         });
         
-        // ユーザー向けエラーメッセージ
-        addToast({
-          type: 'error',
-          title: 'アップロード失敗',
-          message: '一時的にアップロードに失敗しました。少し時間をおいて再度お試しください。',
-        });
+        // バケット未作成エラーの場合の分岐
+        if (uploadError.message.includes('Bucket not found') || 
+            uploadError.message.includes('bucket does not exist')) {
+          addToast({
+            type: 'error',
+            title: 'ストレージ設定エラー',
+            message: 'バケット未作成のため失敗しました。管理者へご連絡ください。',
+          });
+        } else {
+          // その他のエラーの場合
+          addToast({
+            type: 'error',
+            title: 'アップロード失敗',
+            message: '一時的にアップロードに失敗しました。少し時間をおいて再度お試しください。',
+          });
+        }
         return;
       }
 

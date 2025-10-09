@@ -61,14 +61,19 @@ export default function CTASection() {
             <Link
               href="/dashboard"
               className="group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] bg-gradient-to-r from-white to-blue-50 text-gray-900 rounded-lg font-bold hover:from-blue-50 hover:to-white transition-colors duration-200"
+              aria-label="今すぐヒアリングを申し込む"
             >
-              <span>今すぐヒアリングを申し込む</span>
+              <span className="whitespace-nowrap">
+                <span className="hidden sm:inline">今すぐヒアリング<wbr/>を申し込む</span>
+                <span className="sm:hidden">ヒアリング申し込み</span>
+              </span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             
             <Link
               href="#pricing"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-white/10 backdrop-blur-sm text-white rounded-lg font-medium border border-white/30 hover:bg-white/20 transition-colors duration-200"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-white/10 backdrop-blur-sm text-white rounded-lg font-medium border border-white/30 hover:bg-white/20 transition-colors duration-200 whitespace-nowrap"
+              aria-label="料金プランを確認"
             >
               料金プランを確認
             </Link>
@@ -107,10 +112,10 @@ export default function CTASection() {
 
           {/* 追加情報 */}
           <div className="mt-8 sm:mt-12 text-center">
-            <p className="text-blue-200 text-[13px] sm:text-sm mb-4 leading-5">
+            <p className="jp-body text-blue-200 text-[13px] sm:text-sm mb-4 leading-5 break-keep">
               ✓ 初回相談無料　✓ 契約前のお見積もり無料　✓ オンライン対応可能
             </p>
-            <p className="text-blue-300 text-xs leading-4">
+            <p className="jp-body text-blue-300 text-xs leading-4 break-keep">
               ※ お申し込み後、担当者より24時間以内にご連絡いたします
             </p>
           </div>

@@ -434,19 +434,22 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   href="/hearing-service"
                   className="group px-6 py-3 border-2 border-white text-white text-lg font-medium rounded-xl hover:bg-white hover:text-gray-800 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
                 >
-                  <span className="flex items-center gap-2">
-                    ヒアリング代行サービス
+                  <span className="flex items-center gap-2 whitespace-nowrap">
+                    <span className="hidden sm:inline">ヒアリング<wbr/>代行サービス</span>
+                    <span className="sm:hidden">ヒアリング代行サービス</span>
                     <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h2" />
                     </svg>
                   </span>
                 </Link>
                 
-                <div className="flex items-center text-gray-300 text-sm">
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                  無料トライアル • クレジットカード不要
+                <div className="flex items-center text-gray-300 text-sm gap-6 sm:gap-8">
+                  <div className="flex items-center jp-body break-keep">
+                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    無料トライアル • クレジットカード不要
+                  </div>
                 </div>
               </div>
               
