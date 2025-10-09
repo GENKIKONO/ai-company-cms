@@ -1,8 +1,7 @@
-'use client';
-
 import { ArrowRight, Database, Search, Zap } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getSetting } from '@/lib/settings';
 
 interface HeroSectionProps {
   title: string;
@@ -20,7 +19,7 @@ const iconComponents = {
   Zap,
 };
 
-export default function HeroSection({
+export default async function HeroSection({
   title,
   subtitle,
   description,
@@ -29,6 +28,10 @@ export default function HeroSection({
   primaryCta,
   secondaryCta
 }: HeroSectionProps) {
+  const heroImageUrl = await getSetting('hero_image_url');
+  const imageSrc = heroImageUrl && heroImageUrl.trim().length > 0 
+    ? heroImageUrl 
+    : '/hero/zero-click-shift.png';
   return (
     <section className="py-24 md:py-32 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -100,13 +103,13 @@ export default function HeroSection({
 
           {/* Right Column - Image */}
           <div className="mt-10 md:mt-0">
-            <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-2">
+            <div className="relative w-full aspect-video rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
               <Image
-                src="/hero/zero-click-shift.png"
+                src={imageSrc}
                 alt="検索からAI直接回答へのシフト図（ゼロクリック時代の可視化）"
-                width={1200}
-                height={800}
-                className="w-full h-auto rounded-lg"
+                fill
+                className="object-contain md:object-cover"
+                sizes="(max-width: 768px) 100vw, 640px"
                 priority
               />
             </div>

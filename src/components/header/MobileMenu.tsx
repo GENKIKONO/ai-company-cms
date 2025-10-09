@@ -4,9 +4,8 @@ import Link from 'next/link';
 
 export default function MobileMenu({
   links = [
-    { href: '/service', label: 'サービス概要' },
+    { href: '/aio', label: 'AIO Hubとは' },
     { href: '/pricing', label: '料金プラン' },
-    { href: '/aio', label: 'AIOとは' },
     { href: '/hearing-service', label: 'ヒアリング代行' },
   ],
   auth = { loggedIn: undefined, loginHref: '/auth/login', logoutHref: '/auth/signout', dashboardHref: '/dashboard' },

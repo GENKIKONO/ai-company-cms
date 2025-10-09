@@ -4,7 +4,11 @@
 const nextConfig = {
   // 画像最適化設定
   images: {
-    domains: ['localhost', 'via.placeholder.com', 'images.unsplash.com', 'aiohub.jp', 'chyicolujwhkycpkxbej.supabase.co'],
+    domains: ['localhost', 'via.placeholder.com', 'images.unsplash.com', 'aiohub.jp'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'chyicolujwhkycpkxbej.supabase.co' },
+      { protocol: 'https', hostname: '*.supabase.co' }
+    ],
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
