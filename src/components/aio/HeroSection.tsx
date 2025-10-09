@@ -8,7 +8,7 @@ interface HeroSectionProps {
   subtitle: string;
   description: string;
   features: ReadonlyArray<{ readonly icon: string; readonly text: string }>;
-  stats: ReadonlyArray<{ readonly value: string; readonly label: string }>;
+  benefits: ReadonlyArray<{ readonly title: string; readonly description: string }>;
   primaryCta: { href: string; text: string };
   secondaryCta?: { href: string; text: string };
 }
@@ -24,7 +24,7 @@ export default async function HeroSection({
   subtitle,
   description,
   features,
-  stats,
+  benefits,
   primaryCta,
   secondaryCta
 }: HeroSectionProps) {
@@ -119,19 +119,20 @@ export default async function HeroSection({
           </div>
         </div>
 
-        {/* 統計情報 */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          {stats.map((stat, index) => {
-            const colors = ['text-blue-600', 'text-purple-600', 'text-indigo-600'];
-            
-            return (
-              <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/50 text-center">
-                <div className={`text-3xl font-bold ${colors[index]} mb-2`}>{stat.value}</div>
-                <div className="text-gray-700 font-medium">{stat.label}</div>
-              </div>
-            );
-          })}
-        </div>
+        {/* 価値訴求カード */}
+        <section className="mt-24 md:mt-32">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-8 md:mb-10">
+            AIO Hubで実現する価値
+          </h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" role="list">
+            {benefits.map((benefit, index) => (
+              <li key={index} className="rounded-xl border border-gray-200/80 bg-white shadow-sm p-5 md:p-6">
+                <h3 className="text-lg font-semibold text-indigo-900 mb-3">{benefit.title}</h3>
+                <p className="text-base md:text-lg leading-relaxed text-gray-600">{benefit.description}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
     </section>
   );

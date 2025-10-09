@@ -11,10 +11,23 @@ export const aioCopy = {
       { icon: 'Search', text: 'AI検索最適化' },
       { icon: 'Zap', text: 'ゼロクリック対応' }
     ],
-    stats: [
-      { value: '200+', label: '導入企業数' },
-      { value: '300%', label: 'AI言及率向上' },
-      { value: '24h', label: '自動更新対応' }
+    benefits: [
+      { 
+        title: 'JSON-LD自動生成', 
+        description: '入力だけで構造化データを自動生成し、AIに引用されやすい形へ。' 
+      },
+      { 
+        title: 'AI検索最適化', 
+        description: 'ゼロクリック時代でも外されないための情報設計を提供。' 
+      },
+      { 
+        title: 'CMS一元管理', 
+        description: '会社・サービス・実績・FAQをまとめて管理。公開/非公開も簡単。' 
+      },
+      { 
+        title: '無料で開始', 
+        description: '会社ロゴとサービス画像1枚から。必要に応じて機能拡張が可能。' 
+      }
     ]
   },
 

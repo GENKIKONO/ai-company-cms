@@ -111,7 +111,7 @@ export default function AIOPage() {
           subtitle={aioCopy.hero.subtitle}
           description={aioCopy.hero.description}
           features={aioCopy.hero.features}
-          stats={aioCopy.hero.stats}
+          benefits={aioCopy.hero.benefits}
           primaryCta={{ href: aioCopy.cta.primaryHref, text: aioCopy.cta.primaryText }}
           secondaryCta={{ href: aioCopy.cta.secondaryHref, text: aioCopy.cta.secondaryText }}
         />
