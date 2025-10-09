@@ -7,6 +7,13 @@ module.exports = {
   ],
   theme: {
     extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            textWrap: 'balance',
+          },
+        },
+      },
       animation: {
         'blob': 'blob 7s infinite',
         'float': 'float 6s ease-in-out infinite',

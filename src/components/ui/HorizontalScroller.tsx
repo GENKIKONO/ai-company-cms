@@ -26,7 +26,7 @@ export default function HorizontalScroller({
         className
       )}
     >
-      <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 justify-start sm:justify-normal">
+      <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 justify-start sm:justify-normal items-stretch auto-rows-fr">
         {children}
       </div>
     </div>

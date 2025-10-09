@@ -93,12 +93,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gray-200 rounded-full mix-blend-multiply filter blur-xl"></div>
           </div>
           
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className={`text-center transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 lg:leading-tight tracking-normal break-keep [text-wrap:balance]">
                 {t('pages.home.hero.title', { fallback: siteSettings.hero_title })}
               </h1>
-              <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-[15px] sm:text-base lg:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
                 {t('pages.home.hero.subtitle', { fallback: siteSettings.hero_subtitle })}
               </p>
               
@@ -154,10 +154,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <section className="py-12 sm:py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                 {t('pages.home.features.title')}
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
                 {t('pages.home.features.subtitle')}
               </p>
             </div>
@@ -170,10 +170,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                   {t('pages.home.features.organizationManagement.title')}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
                   {t('pages.home.features.organizationManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -191,10 +191,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                   {t('pages.home.features.serviceManagement.title')}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
                   {t('pages.home.features.serviceManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -212,10 +212,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                   {t('pages.home.features.caseManagement.title')}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
                   {t('pages.home.features.caseManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -233,7 +233,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <section className="py-12 sm:py-16 lg:py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                 {t('pages.home.stats.title')}
               </h2>
             </div>
@@ -264,13 +264,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* サービスの流れ */}
-        <section id="service-flow" className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="service-flow" className="py-12 sm:py-16 lg:py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                 サービスの流れ
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
                 簡単3ステップで始められます
               </p>
             </div>
@@ -336,8 +336,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* AIOダイジェスト */}
-        <section className="py-20 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <section className="py-12 sm:py-16 lg:py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center justify-center">
               <svg className="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -379,8 +379,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 代表メッセージ */}
-        <section className="py-20 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <section className="py-12 sm:py-16 lg:py-24 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">
               {t('pages.home.message.title')}
             </h2>
@@ -391,7 +391,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* CTA */}
-        <section className="relative py-20 bg-gray-800 overflow-hidden">
+        <section className="relative py-12 sm:py-16 lg:py-24 bg-gray-800 overflow-hidden">
           {/* 背景パターン */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute -top-40 -right-40 w-80 h-80 bg-white rounded-full"></div>
@@ -399,7 +399,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white rounded-full opacity-5"></div>
           </div>
           
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
                 {t('pages.home.cta.title')}
@@ -470,7 +470,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
       {/* フッター */}
       <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-lg font-semibold mb-4">{t('ui.header.title')}</h3>

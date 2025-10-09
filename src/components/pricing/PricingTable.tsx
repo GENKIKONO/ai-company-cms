@@ -116,11 +116,11 @@ export default function PricingTable() {
     <section className="py-12 sm:py-16 lg:py-24">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+          <h2 className="text-xl sm:text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
             シンプルで明確な料金体系
           </h2>
-          <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 max-w-3xl mx-auto">
-            無料から始めて、必要になったら拡張。<br/>
+          <p className="text-[15px] sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
+            無料から始めて、必要になったら拡張。
             最小の入力で、AIに"引用されやすい"企業情報を実現します。
           </p>
         </div>
@@ -155,20 +155,20 @@ export default function PricingTable() {
                 <div className="mb-4">
                   <plan.icon className={`h-8 w-8 text-${plan.color}-600`} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                <p className="text-sm text-gray-600 mb-4">{plan.description}</p>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">{plan.name}</h3>
+                <p className="text-[13px] sm:text-sm text-gray-600 mb-4 leading-6 sm:leading-7 break-keep [text-wrap:pretty]">{plan.description}</p>
                 
                 <div className="mb-4">
                   {plan.originalPrice && (
-                    <span className="text-lg text-gray-400 line-through mr-2">
+                    <span className="text-base sm:text-lg text-gray-400 line-through mr-2 whitespace-nowrap">
                       {plan.originalPrice}
                     </span>
                   )}
-                  <span className="text-3xl font-bold text-gray-900">
+                  <span className="text-2xl sm:text-3xl font-bold text-gray-900 whitespace-nowrap">
                     {plan.price}
                   </span>
                   {plan.id !== 'free' && (
-                    <span className="text-gray-600 ml-1">/月</span>
+                    <span className="text-gray-600 ml-1 whitespace-nowrap">/月</span>
                   )}
                 </div>
               </div>
@@ -190,14 +190,14 @@ export default function PricingTable() {
                     />
                     <div className="flex-1">
                       <span
-                        className={`text-[15px] leading-7 ${
+                        className={`text-[13px] sm:text-[15px] leading-6 sm:leading-7 break-keep [text-wrap:pretty] ${
                           feature.included ? 'text-gray-700' : 'text-gray-400'
                         }`}
                       >
                         {feature.text}
                       </span>
                       {feature.subtext && (
-                        <div className="mt-1 text-xs sm:text-sm text-gray-500 pl-2 border-l-2 border-gray-200 leading-5">
+                        <div className="mt-1 text-xs sm:text-sm text-gray-500 pl-2 border-l-2 border-gray-200 leading-5 break-keep [text-wrap:pretty]">
                           {feature.subtext}
                         </div>
                       )}
