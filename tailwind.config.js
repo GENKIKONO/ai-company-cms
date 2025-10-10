@@ -37,7 +37,12 @@ module.exports = {
     'measure-34',
     'measure-36',
     'widow-fix',
-    'has-fab-bottom-pad'
+    'has-fab-bottom-pad',
+    'measure-28',
+    'measure-32',
+    'measure-fluid',
+    'widow-tweak',
+    'center-paragraph'
   ],
   corePlugins: {
     textWrap: true,
