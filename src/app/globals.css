@@ -356,6 +356,15 @@ html {
     font-variant-numeric: tabular-nums;
   }
   
+  /* ボタンテキスト専用：絶対改行禁止 */
+  .btn-nowrap {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+    text-wrap: nowrap !important;
+    hyphens: none !important;
+  }
+  
   /* Hide scrollbars for better mobile experience */
   .scrollbar-hide {
     -ms-overflow-style: none;
