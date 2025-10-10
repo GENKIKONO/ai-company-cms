@@ -463,31 +463,31 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="jp-heading text-lg font-semibold mb-4">{t('ui.header.title')}</h3>
-              <p className="jp-body text-gray-400">
+              <JPHeading as="h3" className="text-lg font-semibold mb-4">{t('ui.header.title')}</JPHeading>
+              <JPBody as="p" className="text-gray-400">
                 {t('pages.home.footer.tagline')}
-              </p>
+              </JPBody>
             </div>
             <div>
-              <h4 className="jp-heading font-semibold mb-4">{t('pages.home.footer.links')}</h4>
+              <JPHeading as="h4" className="font-semibold mb-4">{t('pages.home.footer.links')}</JPHeading>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/organizations">{t('pages.home.footer.directory')}</Link></li>
-                <li><Link href="/search">{t('pages.home.footer.search')}</Link></li>
-                <li><Link href="/dashboard">{t('ui.header.dashboard')}</Link></li>
+                <li><Link href="/organizations" className="btn-nowrap">{t('pages.home.footer.directory')}</Link></li>
+                <li><Link href="/search" className="btn-nowrap">{t('pages.home.footer.search')}</Link></li>
+                <li><Link href="/dashboard" className="btn-nowrap">{t('ui.header.dashboard')}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="jp-heading font-semibold mb-4">{t('pages.home.footer.support')}</h4>
+              <JPHeading as="h4" className="font-semibold mb-4">{t('pages.home.footer.support')}</JPHeading>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/help" className="hover:text-white transition-colors">{t('pages.home.footer.helpCenter')}</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors">{t('pages.home.footer.contact')}</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors">{t('pages.home.footer.terms')}</Link></li>
-                <li><Link href="/privacy" className="hover:text-white transition-colors">{t('pages.home.footer.privacy')}</Link></li>
+                <li><Link href="/help" className="hover:text-white transition-colors btn-nowrap">{t('pages.home.footer.helpCenter')}</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors btn-nowrap">{t('pages.home.footer.contact')}</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors btn-nowrap">{t('pages.home.footer.terms')}</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors btn-nowrap">{t('pages.home.footer.privacy')}</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>{t('pages.home.footer.copyright')}</p>
+            <JPBody as="p" className="text-center">{t('pages.home.footer.copyright')}</JPBody>
           </div>
         </div>
       </footer>
