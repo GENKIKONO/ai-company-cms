@@ -629,4 +629,70 @@ html {
       padding-bottom: max(var(--fab-gap), env(safe-area-inset-bottom)); 
     }
   }
+
+  /* --- 文節優先改行：対応環境で有効（Safari/Chrome新しめ） --- */
+  @supports (word-break: auto-phrase) {
+    .jp-body, .jp-heading, .card-text { 
+      word-break: auto-phrase; 
+    }
+  }
+
+  /* 見出しは行末を均す。本文は自然改行。 */
+  .jp-heading { 
+    text-wrap: balance; 
+  }
+  
+  .jp-body { 
+    text-wrap: pretty; 
+  }
+
+  /* 行長を制御（センター段落の"1文字だけの最終行"を減らす） */
+  .measure-28 { 
+    max-width: 28ch; 
+  }
+  
+  .measure-32 { 
+    max-width: 32ch; 
+  }
+  
+  .measure-36 { 
+    max-width: 36ch; 
+  }
+
+  /* 画面幅で行長を流体制御 */
+  @media (max-width: 390px) {
+    .measure-fluid { 
+      max-width: 26ch; 
+    }
+  }
+  
+  @media (min-width: 391px) and (max-width: 480px) {
+    .measure-fluid { 
+      max-width: 30ch; 
+    }
+  }
+  
+  @media (min-width: 481px) {
+    .measure-fluid { 
+      max-width: 36ch; 
+    }
+  }
+
+  /* 微調整（孤立1文字を起こしにくくする） */
+  .widow-tweak { 
+    letter-spacing: .003em; 
+  }
+
+  /* CTAは折り返さないが、左右パディングで詰まりを防ぐ */
+  .btn-nowrap { 
+    white-space: nowrap; 
+    word-break: keep-all; 
+  }
+
+  /* スマホ本文を中央寄せにする場合でも左右内側余白を確保 */
+  .center-paragraph { 
+    margin-left: auto; 
+    margin-right: auto; 
+    padding-inline: 8px; 
+  }
 }

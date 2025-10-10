@@ -93,10 +93,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="relative mx-auto max-w-7xl px-6 sm:px-8">
             <div className="py-16 sm:py-20 lg:py-28">
               <div className={`text-center transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <h1 className="jp-heading text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 [text-wrap:balance]">
+                <h1 className="jp-heading measure-fluid widow-tweak mx-auto text-center text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 mb-6">
                   AIO Hub AI企業CMS
                 </h1>
-                <p className="jp-body text-base sm:text-lg text-gray-500 max-w-[36ch] mx-auto mb-10 [text-wrap:pretty]">
+                <p className="jp-body center-paragraph measure-fluid widow-tweak text-center text-base sm:text-lg text-gray-500 mb-10">
                   AI技術を活用した企業情報の統合管理プラットフォーム
                 </p>
                 
@@ -136,7 +136,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <h2 className="jp-heading text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                 {t('pages.home.features.title')}
               </h2>
-              <p className="fluid-lead measure-34 text-gray-600 no-widow widow-fix break-keep">
+              <p className="jp-body center-paragraph measure-fluid widow-tweak text-center text-gray-600 break-keep">
                 {t('pages.home.features.subtitle')}
               </p>
             </div>
@@ -152,7 +152,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                   {t('pages.home.features.organizationManagement.title')}
                 </h3>
-                <p className="jp-body text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
+                <p className="jp-body center-paragraph measure-fluid widow-tweak text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
                   {t('pages.home.features.organizationManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -173,7 +173,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                   {t('pages.home.features.serviceManagement.title')}
                 </h3>
-                <p className="jp-body text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
+                <p className="jp-body center-paragraph measure-fluid widow-tweak text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
                   {t('pages.home.features.serviceManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -194,7 +194,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                   {t('pages.home.features.caseManagement.title')}
                 </h3>
-                <p className="jp-body text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
+                <p className="jp-body center-paragraph measure-fluid widow-tweak text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
                   {t('pages.home.features.caseManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -298,25 +298,25 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
-                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</p>
+                  <p className="jp-body center-paragraph measure-fluid widow-tweak text-[15px] leading-7 text-gray-600">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">RSS/XML</h3>
-                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">フィード配信により継続的な情報更新をクローラーに通知</p>
+                  <p className="jp-body center-paragraph measure-fluid widow-tweak text-[15px] leading-7 text-gray-600">フィード配信により継続的な情報更新をクローラーに通知</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">公開プロフィール（直リンク）</h3>
-                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">企業・サービスごとに公開URLを自動生成。検索・AIから直接参照されやすい構成で配信します。</p>
+                  <p className="jp-body center-paragraph measure-fluid widow-tweak text-[15px] leading-7 text-gray-600">企業・サービスごとに公開URLを自動生成。検索・AIから直接参照されやすい構成で配信します。</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">サイトマップ</h3>
-                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">動的生成によりページ構造を検索エンジンに効率的に伝達</p>
+                  <p className="jp-body center-paragraph measure-fluid widow-tweak text-[15px] leading-7 text-gray-600">動的生成によりページ構造を検索エンジンに効率的に伝達</p>
                 </div>
               </div>
             </div>

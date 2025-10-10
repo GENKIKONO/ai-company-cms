@@ -53,7 +53,7 @@ export default function FAB() {
       className="
         sm:hidden
         fixed z-[60] 
-        h-12 w-12 
+        h-14 w-14 
         rounded-full 
         right-[clamp(12px,3vw,20px)] 
         bottom-[calc(env(safe-area-inset-bottom)+16px)]
@@ -71,6 +71,7 @@ export default function FAB() {
         focus:ring-opacity-75
         focus:ring-offset-2
         focus:ring-offset-white
+        leading-none
       "
       style={{
         // Ensure proper touch target size
@@ -82,23 +83,16 @@ export default function FAB() {
         {open ? "メニューを閉じる" : "メニューを開く"}
       </span>
       
-      {/* Animated icon toggle */}
-      <div className="relative">
-        <div 
-          className={`absolute inset-0 transition-all duration-200 ${
-            open ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
-          }`}
-        >
-          <MenuIcon />
-        </div>
-        <div 
-          className={`absolute inset-0 transition-all duration-200 ${
-            open ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
-          }`}
-        >
-          <CloseIcon />
-        </div>
-      </div>
+      {/* SVGでアイコンを厳密センタリング */}
+      {open ? (
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6 L18 18 M18 6 L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      ) : (
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      )}
     </button>
   );
 }
