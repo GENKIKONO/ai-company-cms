@@ -61,7 +61,7 @@ export default function CTASection({
             href={primaryHref}
             className="group inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl"
           >
-            <span className="btn-nowrap">{primaryText}</span>
+            <span className="jp-cta">{primaryText}</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           

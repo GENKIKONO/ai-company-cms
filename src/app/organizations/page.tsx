@@ -187,7 +187,7 @@ export default function OrganizationsPage() {
         <div className="mb-8">
           <h1 className="jp-heading text-3xl font-bold text-gray-900 mb-2">企業ディレクトリ</h1>
           <p className="jp-body text-lg text-gray-600">
-            AIO Hubに登録された<span className="whitespace-nowrap">{organizations.length}社</span>の企業情報を<br className="sm:hidden" />検索・閲覧できます
+            AIO Hubに登録された<span className="jp-number-unit">{organizations.length}社</span>の企業情報を検索・閲覧できます
           </p>
         </div>
 
@@ -410,7 +410,7 @@ export default function OrganizationsPage() {
             </svg>
             <h3 className="jp-heading mt-4 text-lg font-medium text-gray-900">企業が見つかりませんでした</h3>
             <p className="jp-body mt-2 text-gray-500">
-              検索条件を変更して<br className="sm:hidden" />お試しください
+              検索条件を変更してお試しください
             </p>
           </div>
         ) : (

@@ -9,9 +9,16 @@ module.exports = {
   safelist: [
     'jp-heading',
     'jp-body',
+    'jp-cta',
     'btn-nowrap',
     'footer-link-nowrap',
-    'card-text'
+    'card-text',
+    'jp-avoid-break',
+    'jp-number-unit',
+    'jp-step-number',
+    'jp-text-natural',
+    'jp-punctuation-safe',
+    'jp-faq-question'
   ],
   corePlugins: {
     textWrap: true,

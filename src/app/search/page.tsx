@@ -278,7 +278,7 @@ function SearchPageContent() {
                   </svg>
                   <h3 className="jp-heading mt-4 text-lg font-medium text-gray-900">結果が見つかりませんでした</h3>
                   <p className="jp-body mt-2 text-gray-500">
-                    検索条件を変更して<br className="sm:hidden" />お試しください
+                    検索条件を変更してお試しください
                   </p>
                 </div>
               ) : (

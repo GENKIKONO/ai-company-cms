@@ -7,6 +7,7 @@ import { useABTest } from '@/lib/utils/ab-testing';
 import { useSEO } from '@/hooks/useSEO';
 import HorizontalScroller from '@/components/ui/HorizontalScroller';
 import StatCard from '@/components/ui/StatCard';
+import LayoutDebugger from '@/components/debug/LayoutDebugger';
 
 interface SiteSettings {
   hero_title: string;
@@ -111,7 +112,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   aria-label="無料で始める"
                 >
                   <span className="flex items-center justify-center gap-2 btn-nowrap">
-                    <span className="btn-nowrap">無料で始める</span>
+                    <span className="jp-cta">無料で始める</span>
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -300,7 +301,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <p className="jp-body text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
               本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
             </p>
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 items-stretch auto-rows-fr mb-8">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 items-stretch auto-rows-fr mb-8">
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
@@ -463,6 +464,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </div>
       </footer>
+      
+      {/* Debug Overlay - Only in development */}
+      {process.env.NODE_ENV === 'development' && <LayoutDebugger />}
     </div>
   );
 }
