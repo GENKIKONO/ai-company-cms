@@ -62,7 +62,7 @@
   text-wrap: pretty; /* Global default for natural text wrapping */
 }
 
-/* Font optimization and Typography defaults */
+/* Mobile horizontal scroll prevention and font optimization */
 @layer base {
   html, body {
     font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
@@ -70,6 +70,16 @@
     word-break: keep-all;         /* 単語途中で折り返さない */
     overflow-wrap: anywhere;      /* 行末で安全に折返し */
     text-wrap: var(--body-wrap);  /* 段落は自然に */
+    /* Mobile horizontal scroll prevention */
+    max-width: 100%;
+    overflow-x: hidden;          /* 横方向のはみ出しを物理的に禁止 */
+    overscroll-behavior-x: none; /* 横方向のバウンス/連鎖スクロール防止 */
+    touch-action: pan-y;         /* 横ジェスチャーをページに渡さない（縦スクロールのみ） */
+  }
+  
+  /* iOSの横方向ゴム戻り対策 */
+  :root { 
+    overscroll-behavior-inline: contain; 
   }
   
   /* 日本語専用の組版設定 */
@@ -411,6 +421,46 @@ html {
   .snap-card {
     scroll-snap-align: start;
     scroll-snap-stop: normal;
+  }
+  
+  /* カルーセルの中だけ横スクロールを許可＋連鎖を遮断 */
+  .carousel-inline {
+    overflow-x: auto;
+    overflow-y: visible;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  /* 予防：最外ラッパの僅かな計算誤差による横はみ出しを無効化 */
+  .no-inline-overflow { 
+    inline-size: 100%; 
+    max-inline-size: 100vw; 
+  }
+  
+  /* ハンバーガーメニュー高速化 */
+  .tap-highlight-transparent { 
+    -webkit-tap-highlight-color: transparent; 
+  }
+  
+  /* iOSでの合成ヒント */
+  .gpu-hint { 
+    will-change: transform; 
+    transform: translateZ(0); 
+  }
+  
+  /* ヘッダーリンクのフォーカス制御 */
+  .nav-link { 
+    outline: none; 
+  }
+  
+  .nav-link:focus { 
+    outline: none; 
+  }
+  
+  .nav-link:focus-visible {
+    box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35); /* ごく薄いリング */
+    border-radius: .5rem;
   }
   
   /* Improved card layout utilities */

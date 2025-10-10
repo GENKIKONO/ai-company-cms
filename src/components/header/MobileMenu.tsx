@@ -49,7 +49,7 @@ export default function MobileMenu({
         aria-controls="primary-navigation"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="focus-clean inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm hover:bg-gray-50 active:scale-95 transition-all duration-200 min-h-[44px] min-w-[44px]"
+        className="focus-clean inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm hover:bg-gray-50 active:scale-95 transition-all duration-200 min-h-[44px] min-w-[44px] tap-highlight-transparent gpu-hint"
       >
         <span className="sr-only">メニュー</span>
         <svg width="24" height="24" viewBox="0 0 24 24" className="text-gray-700">

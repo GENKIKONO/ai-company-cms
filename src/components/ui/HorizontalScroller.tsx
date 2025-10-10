@@ -19,12 +19,11 @@ export default function HorizontalScroller({
       aria-label={ariaLabel || '横スクロールリスト'}
       role="region"
       className={clsx(
-        'overflow-x-auto overflow-y-visible sm:overflow-visible scroll-smooth snap-x snap-mandatory',
+        'carousel-inline no-inline-overflow scroll-smooth snap-x snap-mandatory',
+        'overflow-y-visible sm:overflow-visible',
         '[-webkit-overflow-scrolling:touch]',
         'px-6 -mx-6 sm:mx-0 sm:px-0',
         'pb-4 sm:pb-0 pt-6', // Add top padding for badge space
-        // Enhanced mobile scroll behavior
-        'overscroll-x-contain',
         'scrollbar-hide',
         'isolate', // Create stacking context for z-index
         className

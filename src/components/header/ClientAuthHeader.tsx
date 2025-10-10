@@ -89,7 +89,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                 <Link 
                   key={link.href}
                   href={link.href} 
-                  className="focus-clean text-gray-500 hover:text-gray-700 whitespace-nowrap min-h-[44px] flex items-center px-2 py-2 rounded-md transition-colors duration-200"
+                  className="nav-link text-gray-500 hover:text-gray-700 whitespace-nowrap min-h-[44px] flex items-center px-2 py-2 rounded-md transition-colors duration-200"
                 >
                   {link.label}
                 </Link>
