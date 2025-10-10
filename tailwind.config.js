@@ -30,7 +30,13 @@ module.exports = {
     'no-widow',
     'nav-link',
     'nav-item',
-    'tap-highlight-transparent'
+    'tap-highlight-transparent',
+    'fluid-h1',
+    'fluid-lead',
+    'measure-30',
+    'measure-34',
+    'measure-36',
+    'widow-fix'
   ],
   corePlugins: {
     textWrap: true,

@@ -96,10 +96,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           
           <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className={`text-center transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 lg:leading-tight tracking-normal jp-heading">
+              <h1 className="fluid-h1 measure-36 font-bold text-gray-900 mb-6 tracking-normal">
                 {t('pages.home.hero.title', { fallback: siteSettings.hero_title })}
               </h1>
-              <p className="text-[15px] sm:text-base lg:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-7 sm:leading-8 jp-body no-widow">
+              <p className="fluid-lead measure-34 text-gray-600 mb-8 max-w-3xl mx-auto no-widow widow-fix">
                 {t('pages.home.hero.subtitle', { fallback: siteSettings.hero_subtitle })}
               </p>
               
@@ -143,7 +143,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <h2 className="jp-heading text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                 {t('pages.home.features.title')}
               </h2>
-              <p className="jp-body no-widow text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8 break-keep">
+              <p className="fluid-lead measure-34 text-gray-600 no-widow widow-fix break-keep">
                 {t('pages.home.features.subtitle')}
               </p>
             </div>

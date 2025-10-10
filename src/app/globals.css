@@ -524,63 +524,98 @@ html {
     text-wrap: nowrap !important;
   }
   
-  /* --- Japanese typography defaults (scoped to main) --- */
-  main, main * {
-    /* CJK 基本 */
-    line-break: strict;
-    word-break: normal;
+  /* ===== Fluid Typography & Typesetting ===== */
+  :root {
+    /* 基本文字サイズを画面に追従（14px〜17px）*/
+    font-size: clamp(14px, 1.2vw + 0.25rem, 17px);
+    --measure-30: 30ch;
+    --measure-34: 34ch;
+    --measure-36: 36ch;
+  }
+
+  /* 見出し・本文の既定（main配下だけで十分） */
+  main, main * { 
+    line-break: strict; 
+    word-break: normal; 
   }
   
-  main :where(h1,h2,h3) {
-    /* 見出しは自動でバランス */
-    text-wrap: balance;
-    letter-spacing: .01em;
-    word-break: keep-all;
-    hanging-punctuation: allow-end;
+  main :where(h1,h2,h3) { 
+    text-wrap: balance; 
   }
   
-  main :where(p,li,dd) {
-    /* 段落は自然改行＋英数字URLのみ折返し */
-    text-wrap: pretty;
-    overflow-wrap: anywhere;
-    word-break: keep-all;
+  main :where(p,li,dd) { 
+    text-wrap: pretty; 
+  }
+
+  /* 行長（1行の理想幅）を揃える */
+  .measure-30 { max-width: var(--measure-30); }
+  .measure-34 { max-width: var(--measure-34); }
+  .measure-36 { max-width: var(--measure-36); }
+
+  /* 流体フォント（よく使う2種） */
+  .fluid-h1 { 
+    font-size: clamp(28px, 6vw, 38px); 
+    line-height: 1.2; 
   }
   
-  /* 1文字行（孤立行）を出しにくくする軽い調整 */
-  main .no-widow { 
-    letter-spacing: .005em; 
-    orphans: 2;
-    widows: 2;
+  .fluid-lead { 
+    font-size: clamp(15px, 1.6vw + .6rem, 18px); 
+    line-height: 1.75; 
   }
-  
-  /* CTA は絶対改行しない */
+
+  /* CTAは絶対に改行させない */
   .btn-nowrap { 
     white-space: nowrap; 
     word-break: keep-all; 
   }
+
+  /* Widow guard：最終行1–2文字対策の微調整用 */
+  .no-widow { 
+    letter-spacing: .005em; 
+  }
+
+  /* text-wrap未対応ブラウザのフォールバック */
+  @supports not (text-wrap: balance) {
+    main :where(h1,h2,h3) { text-align: center; }
+  }
   
-  /* iOSの選択ハイライトとフォーカスリングを全面無効化 */
-  :root, body { 
-    -webkit-tap-highlight-color: transparent; 
+  @supports not (text-wrap: pretty) {
+    main :where(p,li,dd) { line-height: 1.8; }
+  }
+
+  /* サイドナビの選択枠/リング完全無効化 */
+  .nav-link, .nav-item {
+    outline: 0 !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
   }
   
   a, button { 
     outline: none; 
   }
   
-  a:focus, button:focus { 
+  a:focus, button:focus,
+  a:focus-visible, button:focus-visible {
     outline: none; 
+    box-shadow: none;
   }
   
-  a:focus-visible, button:focus-visible { 
-    outline: none; 
-    box-shadow: none; 
+  :root, body { 
+    -webkit-tap-highlight-color: transparent; 
   }
-  
-  /* サイドナビの "選択枠" を完全禁止（上書き用） */
-  .nav-link, .nav-item {
-    outline: 0 !important;
-    box-shadow: none !important;
-    border-color: transparent !important;
+
+  /* 横揺れ防止（保険） */
+  html, body { 
+    overflow-x: hidden; 
+    overscroll-behavior-x: none; 
+    touch-action: pan-y; 
+  }
+
+  /* ===== Optional: widow-fix（最後の保険・軽量JSと組） ===== */
+  .widow-fix { 
+    --widow-scale: 1; 
+    transform: scale(var(--widow-scale)); 
+    transform-origin: left bottom; 
+    transition: transform 120ms ease; 
   }
 }
