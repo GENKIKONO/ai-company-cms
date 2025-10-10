@@ -86,51 +86,44 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     <div className="min-h-screen bg-white">
       <main>
         {/* ヒーローセクション */}
-        <section className="relative py-20 overflow-hidden bg-gray-50">
-          {/* 背景装飾 - より控えめに */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-10 left-10 w-72 h-72 bg-gray-300 rounded-full mix-blend-multiply filter blur-xl"></div>
-            <div className="absolute top-10 right-10 w-72 h-72 bg-gray-400 rounded-full mix-blend-multiply filter blur-xl"></div>
-            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gray-200 rounded-full mix-blend-multiply filter blur-xl"></div>
-          </div>
+        <section className="relative overflow-hidden">
+          {/* 背景装飾 - 控えめなラジアルグラデーション */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
-          <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-            <div className={`text-center transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <h1 className="fluid-h1 measure-36 font-bold text-gray-900 mb-6 tracking-normal">
-                {t('pages.home.hero.title', { fallback: siteSettings.hero_title })}
-              </h1>
-              <p className="fluid-lead measure-34 text-gray-600 mb-8 max-w-3xl mx-auto no-widow widow-fix">
-                {t('pages.home.hero.subtitle', { fallback: siteSettings.hero_subtitle })}
-              </p>
-              
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link 
-                  href="/auth/signup" 
-                  onClick={handleCtaClick}
-                  className="btn-nowrap group px-8 py-4 bg-gray-800 text-white text-lg rounded-lg hover:bg-gray-900 text-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 min-w-[220px] sm:min-w-[240px]"
-                  aria-label="無料で始める"
-                >
-                  <span className="flex items-center justify-center gap-2 btn-nowrap">
-                    <span className="jp-cta">無料で始める</span>
+          <div className="relative mx-auto max-w-7xl px-6 sm:px-8">
+            <div className="py-16 sm:py-20 lg:py-28">
+              <div className={`text-center transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                <h1 className="jp-heading text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 [text-wrap:balance]">
+                  AIO Hub AI企業CMS
+                </h1>
+                <p className="jp-body text-base sm:text-lg text-gray-500 max-w-[36ch] mx-auto mb-10 [text-wrap:pretty]">
+                  AI技術を活用した企業情報の統合管理プラットフォーム
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
+                  <Link 
+                    href="/auth/signup" 
+                    onClick={handleCtaClick}
+                    className="btn-nowrap group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-800 text-white text-lg font-semibold rounded-lg hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                    aria-label="無料で始める"
+                  >
+                    <span>無料で始める</span>
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
-                  </span>
-                </Link>
-                <Link 
-                  href="/organizations" 
-                  className="btn-nowrap group px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg rounded-lg hover:bg-gray-50 text-center transition-all duration-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 min-w-[220px] sm:min-w-[240px]"
-                  aria-label="企業ディレクトリを見る"
-                >
-                  <span className="flex items-center justify-center gap-2 whitespace-nowrap">
-                    <span className="whitespace-nowrap">{t('pages.home.hero.viewDirectory')}</span>
+                  </Link>
+                  <Link 
+                    href="/organizations" 
+                    className="btn-nowrap group inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                    aria-label="企業ディレクトリを見る"
+                  >
+                    <span>企業ディレクトリを見る</span>
                     <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
-                  </span>
-                </Link>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

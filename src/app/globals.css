@@ -618,4 +618,15 @@ html {
     transform-origin: left bottom; 
     transition: transform 120ms ease; 
   }
+
+  /* ===== FAB Safe Area Support ===== */
+  :root { 
+    --fab-gap: 16px; 
+  }
+
+  @supports (padding: max(0px)) {
+    .has-fab-bottom-pad { 
+      padding-bottom: max(var(--fab-gap), env(safe-area-inset-bottom)); 
+    }
+  }
 }

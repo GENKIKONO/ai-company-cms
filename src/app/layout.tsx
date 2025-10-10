@@ -1,6 +1,8 @@
 import './globals.css'
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 import { ToastProvider } from '@/components/ui/toast'
+import { MenuProvider } from '@/components/ui/MenuProvider'
+import FAB from '@/components/ui/FAB'
 import BuildBanner from '@/components/BuildBanner'
 import { env } from '@/lib/env'
 import WebVitalsReporter from '@/components/performance/WebVitalsReporter'
@@ -43,25 +45,28 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body>
+      <body className="has-fab-bottom-pad">
         <I18nProvider initialLocale="ja">
           <ToastProvider>
-            {/* Skip to main content link for accessibility */}
-            <a href="#main-content" className="skip-link">
-              メインコンテンツにスキップ
-            </a>
-            {env.SHOW_BUILD_BANNER && (
-              <BuildBanner 
-                commit={process.env.VERCEL_GIT_COMMIT_SHA}
-                deployUrl={process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined}
-                environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
-              />
-            )}
-            <SafeAuthHeader />
-            <main id="main-content">
-              {children}
-            </main>
-            <WebVitalsReporter />
+            <MenuProvider>
+              {/* Skip to main content link for accessibility */}
+              <a href="#main-content" className="skip-link">
+                メインコンテンツにスキップ
+              </a>
+              {env.SHOW_BUILD_BANNER && (
+                <BuildBanner 
+                  commit={process.env.VERCEL_GIT_COMMIT_SHA}
+                  deployUrl={process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined}
+                  environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
+                />
+              )}
+              <SafeAuthHeader />
+              <main id="main-content">
+                {children}
+              </main>
+              <FAB />
+              <WebVitalsReporter />
+            </MenuProvider>
           </ToastProvider>
         </I18nProvider>
       </body>
