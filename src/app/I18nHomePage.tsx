@@ -102,21 +102,6 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 {t('pages.home.hero.subtitle', { fallback: siteSettings.hero_subtitle })}
               </p>
               
-              {/* 動的統計情報のプレビュー - グレー基調に */}
-              <div className="flex flex-wrap justify-center gap-6 mb-12 text-sm text-gray-500">
-                <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
-                  {formatNumber(dynamicStats.organizations)}+ 企業
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
-                  {formatNumber(dynamicStats.services)}+ サービス
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-gray-700 rounded-full"></span>
-                  {formatNumber(dynamicStats.cases)}+ 導入事例
-                </span>
-              </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
@@ -313,31 +298,31 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <span className="jp-punctuation-safe">AI検索最適化（AIO）対応</span>
             </h2>
             <p className="jp-body text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
-              本プラットフォームは、AI検索エンジンが<br className="sm:hidden" />理解しやすい構造化データを自動生成します
+              本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
             </p>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 items-stretch auto-rows-fr mb-8">
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
-                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">構造化データを自動生成し、AI検索エンジンが<br className="sm:hidden" />理解しやすい形式で情報を公開</p>
+                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">構造化データを自動生成し、AI検索エンジンが理解しやすい形式で情報を公開</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">RSS/XML</h3>
-                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">フィード配信により継続的な情報更新を<br className="sm:hidden" />クローラーに通知</p>
+                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">フィード配信により継続的な情報更新をクローラーに通知</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">公開プロフィール（直リンク）</h3>
-                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">企業・サービスごとに公開URLを自動生成。<br className="sm:hidden" />検索・AIから直接参照されやすい構成で<br className="sm:hidden" />配信します。</p>
+                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">企業・サービスごとに公開URLを自動生成。検索・AIから直接参照されやすい構成で配信します。</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-heading text-lg sm:text-xl font-semibold text-gray-900 mb-2">サイトマップ</h3>
-                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">動的生成によりページ構造を検索エンジンに<br className="sm:hidden" />効率的に伝達</p>
+                  <p className="card-text jp-body text-[15px] leading-7 text-gray-600">動的生成によりページ構造を検索エンジンに効率的に伝達</p>
                 </div>
               </div>
             </div>

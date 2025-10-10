@@ -126,6 +126,19 @@
   }
 }
 
+/* text-wrap未対応ブラウザのフォールバック */
+@supports not (text-wrap: balance) {
+  .jp-heading {
+    text-align: center;
+  }
+}
+
+@supports not (text-wrap: pretty) {
+  .jp-body {
+    line-height: 1.8;
+  }
+}
+
 /* Smooth scrolling with motion preference respect */
 html {
   scroll-behavior: smooth;
@@ -315,16 +328,12 @@ html {
     font-variant-numeric: tabular-nums;
   }
   
-  /* ボタンテキスト専用：絶対改行禁止 */
+  /* ボタンテキスト専用：軽量改行禁止 */
   .btn-nowrap {
     white-space: nowrap !important;
     word-break: keep-all !important;
-    overflow-wrap: normal !important;
-    text-wrap: nowrap !important;
-    hyphens: none !important;
-    /* 改行制御文字も無効化 */
-    line-break: auto !important;
-    word-wrap: normal !important;
+    line-break: auto;
+    word-wrap: normal;
   }
   
   /* フッターリンク専用：最強改行防止 */

@@ -66,7 +66,7 @@ export default function MobileMenu({
       {open && (
         <div
           className="fixed inset-0 z-50 bg-black/40"
-          onClick={() => setOpen(false)}
+          onClick={(e) => { e.stopPropagation(); close(); }}
           role="presentation"
         >
           <nav
@@ -136,7 +136,7 @@ export default function MobileMenu({
                   </Link>
                 )}
                 <button
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => { e.stopPropagation(); close(); }}
                   className="focus-clean w-full h-12 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold shadow-lg active:scale-[.98] transition-transform duration-200"
                   aria-label="メニューを閉じる"
                 >
