@@ -475,4 +475,52 @@ html {
       flex-direction: row;
     }
   }
+  
+  /* 日本語タイポグラフィ統一システム - スマホの不自然改行を解消 */
+  
+  /* 基本設定 */
+  html[lang="ja"] {
+    line-break: strict;      /* 日本語の禁則処理 */
+    word-break: normal;      /* 日本語は単語途中で折り返さない */
+  }
+  
+  /* 見出し系：バランス改行 + 文字詰め */
+  .jp-heading {
+    text-wrap: balance;      /* 見出しの行末を均す（対応環境） */
+    letter-spacing: .01em;
+    word-break: keep-all;
+    hanging-punctuation: allow-end;
+  }
+  
+  /* 本文系：自然改行 + 長い英数対応 */
+  .jp-body {
+    text-wrap: pretty;       /* 文の自然な折返し */
+    overflow-wrap: anywhere; /* 長い英数やURLだけ安全に折返し */
+    word-break: keep-all;
+    line-height: 1.75;
+  }
+  
+  /* フォールバック：text-wrap未対応ブラウザ向け */
+  @supports not (text-wrap: balance) {
+    .jp-heading { text-align: center; }
+  }
+  
+  @supports not (text-wrap: pretty) {
+    .jp-body { line-height: 1.8; }
+  }
+  
+  /* 1文字だけの改行を避けたい段落に任意で付与（末尾2文字を結合） */
+  .no-widow:where(p) {
+    /* CSSだけでは完全制御できないため緩和策：文字間をやや詰める */
+    letter-spacing: .005em;
+    orphans: 2;
+    widows: 2;
+  }
+  
+  /* ボタンやCTAは絶対に折り返さない */
+  .btn-nowrap {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    text-wrap: nowrap !important;
+  }
 }

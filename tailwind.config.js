@@ -26,7 +26,10 @@ module.exports = {
     'step-badge',
     'section-pad',
     'section-gap',
-    'section-spacing'
+    'section-spacing',
+    'no-widow',
+    'nav-link',
+    'tap-highlight-transparent'
   ],
   corePlugins: {
     textWrap: true,

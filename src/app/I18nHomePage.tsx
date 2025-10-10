@@ -108,7 +108,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <Link 
                   href="/auth/signup" 
                   onClick={handleCtaClick}
-                  className="group px-8 py-4 bg-gray-800 text-white text-lg rounded-lg hover:bg-gray-900 text-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 min-w-[220px] sm:min-w-[240px]"
+                  className="btn-nowrap group px-8 py-4 bg-gray-800 text-white text-lg rounded-lg hover:bg-gray-900 text-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 min-w-[220px] sm:min-w-[240px]"
                   aria-label="無料で始める"
                 >
                   <span className="flex items-center justify-center gap-2 btn-nowrap">
@@ -120,7 +120,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </Link>
                 <Link 
                   href="/organizations" 
-                  className="group px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg rounded-lg hover:bg-gray-50 text-center transition-all duration-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 min-w-[220px] sm:min-w-[240px]"
+                  className="btn-nowrap group px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg rounded-lg hover:bg-gray-50 text-center transition-all duration-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 min-w-[220px] sm:min-w-[240px]"
                   aria-label="企業ディレクトリを見る"
                 >
                   <span className="flex items-center justify-center gap-2 whitespace-nowrap">
@@ -180,7 +180,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                   {t('pages.home.features.serviceManagement.title')}
                 </h3>
-                <p className="text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
+                <p className="jp-body text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
                   {t('pages.home.features.serviceManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -201,7 +201,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
                   {t('pages.home.features.caseManagement.title')}
                 </h3>
-                <p className="text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
+                <p className="jp-body text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
                   {t('pages.home.features.caseManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -241,7 +241,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
                     アカウント作成
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="jp-body text-gray-600 leading-relaxed">
                     メールアドレスとパスワードで簡単にアカウントを作成。無料で始められます。
                   </p>
                 </div>
@@ -254,7 +254,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
                     企業情報登録
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="jp-body text-gray-600 leading-relaxed">
                     企業の基本情報を入力。必要最小限の項目のみで素早く登録完了。
                   </p>
                 </div>
@@ -267,7 +267,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
                     コンテンツ管理開始
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="jp-body text-gray-600 leading-relaxed">
                     サービス情報や導入事例を追加して、効果的な企業PRを開始できます。
                   </p>
                 </div>
@@ -342,10 +342,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         {/* 代表メッセージ */}
         <section className="py-12 sm:py-16 lg:py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            <h2 className="jp-heading text-3xl font-bold text-gray-900 mb-8">
               {t('pages.home.message.title')}
             </h2>
-            <div className="text-lg text-gray-700 leading-relaxed">
+            <div className="jp-body text-lg text-gray-700 leading-relaxed">
               {t('pages.home.message.content', { fallback: siteSettings.representative_message })}
             </div>
           </div>
