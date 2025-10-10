@@ -9,6 +9,7 @@ interface ServiceJsonLd {
   '@context': string;
   '@type': string;
   name: string;
+  inLanguage: string;
   provider: {
     '@type': string;
     name: string;
@@ -64,6 +65,7 @@ export function generateServiceJsonLd(service: Service, org: Organization): Serv
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: service.name,
+    inLanguage: 'ja',
     provider: {
       '@type': 'Organization',
       name: org.name,

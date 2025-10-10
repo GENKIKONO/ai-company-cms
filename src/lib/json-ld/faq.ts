@@ -8,6 +8,7 @@ import type { Organization, FAQ } from '@/types/database';
 interface FAQPageJsonLd {
   '@context': string;
   '@type': string;
+  inLanguage: string;
   mainEntity: QuestionJsonLd[];
   author?: {
     '@type': string;
@@ -105,6 +106,7 @@ export function generateFAQPageJsonLd(faqs: FAQ[], org?: Organization): FAQPageJ
   const jsonLd: FAQPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    inLanguage: 'ja',
     mainEntity: sortedFaqs.map(faq => generateSingleFAQJsonLd(faq, org))
   };
 

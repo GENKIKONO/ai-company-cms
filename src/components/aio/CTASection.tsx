@@ -2,7 +2,6 @@
 
 import { ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
-import { JPHeading, JPBody, JPButton } from '@/components/common/JPText';
 
 interface CTASectionProps {
   title: string;
@@ -42,12 +41,9 @@ export default function CTASection({
         </h2>
         
         {/* 説明文 */}
-        <JPBody 
-          as="p" 
-          className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
-        >
+        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed jp-body">
           {description}
-        </JPBody>
+        </p>
         
         {/* 特徴リスト */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-12">
