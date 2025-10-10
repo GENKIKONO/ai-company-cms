@@ -343,7 +343,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              AI検索最適化（AIO）対応
+              <span className="jp-punctuation-safe">AI検索最適化（AIO）対応</span>
             </h2>
             <p className="jp-body text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
               本プラットフォームは、AI検索エンジンが<br className="sm:hidden" />理解しやすい構造化データを自動生成します

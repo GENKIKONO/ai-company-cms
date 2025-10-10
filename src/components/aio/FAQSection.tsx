@@ -73,7 +73,7 @@ export default function FAQSection({ title, description, categories }: FAQSectio
                         onClick={() => toggleItem(categoryIndex, itemIndex)}
                         className="w-full px-6 py-4 text-left flex items-center justify-between group"
                       >
-                        <span className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 leading-relaxed">
+                        <span className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 leading-relaxed jp-faq-question">
                           {item.question}
                         </span>
                         <div className="flex-shrink-0 ml-4">

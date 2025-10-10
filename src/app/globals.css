@@ -167,15 +167,35 @@ html {
 }
 
 /* Container Queries Support */
-@container (min-width: 320px) {
-  .card-container {
-    padding: 1rem;
+@layer utilities {
+  .container-card {
+    container-type: inline-size;
+    container-name: card;
+  }
+  
+  .container-section {
+    container-type: inline-size;
+    container-name: section;
   }
 }
 
-@container (min-width: 768px) {
+@container card (min-width: 320px) {
   .card-container {
-    padding: 1.5rem;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+}
+
+@container card (min-width: 480px) {
+  .card-container {
+    padding: clamp(1.25rem, 4vw, 1.5rem);
+    font-size: clamp(1rem, 3vw, 1.125rem);
+  }
+}
+
+@container section (min-width: 768px) {
+  .section-container {
+    padding: clamp(2rem, 5vw, 3rem);
   }
 }
 
@@ -277,6 +297,33 @@ html {
     overflow-wrap: anywhere;
     text-wrap: pretty;
     hanging-punctuation: allow-end;
+  }
+  
+  /* 句読点・疑問符の単独改行防止 */
+  .jp-punctuation-safe {
+    word-break: keep-all;
+    text-wrap: balance;
+    line-break: strict;
+    /* 疑問符・感嘆符の単独改行を防ぐ */
+    white-space: pre-wrap;
+  }
+  
+  /* FAQ質問文専用：長文でも疑問符を安全に保持 */
+  .jp-faq-question {
+    word-break: keep-all;
+    text-wrap: balance;
+    line-break: strict;
+    hanging-punctuation: allow-end;
+    /* 疑問符前の文字とくっつけて改行 */
+    white-space: pre-wrap;
+  }
+  
+  /* カルーセル番号表示の最適化 */
+  .carousel-number {
+    min-width: 2.5rem;
+    text-align: center;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
   
   /* Hide scrollbars for better mobile experience */

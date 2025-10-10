@@ -95,7 +95,7 @@ export default function FlowSection() {
                 <div key={step.step} className="snap-center min-w-[85%] sm:min-w-0 relative">
                   <div className={`relative bg-white border-2 ${colors.border} rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 group h-full`}>
                     {/* ステップ番号 */}
-                    <div className={`absolute -top-3 left-4 w-6 h-6 sm:w-8 sm:h-8 ${colors.step} text-white rounded-full flex items-center justify-center font-bold text-xs sm:text-sm`}>
+                    <div className={`absolute -top-2 left-4 carousel-number w-8 h-8 sm:w-10 sm:h-10 ${colors.step} text-white rounded-full flex items-center justify-center font-bold text-sm sm:text-base shadow-lg`}>
                       {step.step}
                     </div>
                     
