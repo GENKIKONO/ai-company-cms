@@ -42,7 +42,10 @@ module.exports = {
     'measure-32',
     'measure-fluid',
     'widow-tweak',
-    'center-paragraph'
+    'center-paragraph',
+    'nb',
+    'only-mobile',
+    'jp-phrase-aware'
   ],
   corePlugins: {
     textWrap: true,

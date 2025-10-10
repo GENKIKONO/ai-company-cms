@@ -154,8 +154,13 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
                   </div>
                 ))}
               </div>
-              <div className="mt-4 text-xs sm:text-sm text-red-600 text-center leading-5">
-                ❌ {beforeAfter.before.problem}
+              <div className="mt-4 text-xs sm:text-sm text-red-600 text-center leading-5 flex items-center justify-center gap-1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="m15 9-6 6"></path>
+                  <path d="m9 9 6 6"></path>
+                </svg>
+                {beforeAfter.before.problem}
               </div>
             </div>
 
@@ -173,8 +178,12 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
                   </div>
                 ))}
               </div>
-              <div className="mt-4 text-xs sm:text-sm text-green-600 text-center leading-5">
-                ✅ {beforeAfter.after.benefit}
+              <div className="mt-4 text-xs sm:text-sm text-green-600 text-center leading-5 flex items-center justify-center gap-1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="m9 12 2 2 4-4"></path>
+                </svg>
+                {beforeAfter.after.benefit}
               </div>
             </div>
           </div>

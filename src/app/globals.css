@@ -695,4 +695,55 @@ html {
     margin-right: auto; 
     padding-inline: 8px; 
   }
+
+  /* ===== 手動改行制御システム ===== */
+  /* 改行禁止 */
+  .nb { 
+    white-space: nowrap; 
+  }
+
+  /* モバイル専用改行 */
+  .only-mobile { 
+    display: none; 
+  }
+
+  @media (max-width: 640px) {
+    .only-mobile { 
+      display: inline; 
+    }
+  }
+
+  /* 文節改行最適化：phrase-awareが使えるブラウザでより自然に */
+  @supports (word-break: auto-phrase) {
+    .jp-phrase-aware {
+      word-break: auto-phrase;
+      text-wrap: pretty;
+      line-height: 1.75;
+    }
+  }
+
+  @supports not (word-break: auto-phrase) {
+    .jp-phrase-aware {
+      word-break: keep-all;
+      text-wrap: pretty;
+      line-height: 1.8;
+    }
+  }
+
+  /* 行長制御の強化 */
+  .measure-fluid {
+    max-width: 32ch;
+  }
+
+  @media (max-width: 390px) {
+    .measure-fluid {
+      max-width: 26ch;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .measure-fluid {
+      max-width: 36ch;
+    }
+  }
 }
