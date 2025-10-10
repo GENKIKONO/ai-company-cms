@@ -129,11 +129,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <Link 
                   href="/auth/signup" 
                   onClick={handleCtaClick}
-                  className="group px-8 py-4 bg-gray-800 text-white text-lg rounded-lg hover:bg-gray-900 text-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 whitespace-nowrap min-w-fit"
+                  className="group px-8 py-4 bg-gray-800 text-white text-lg rounded-lg hover:bg-gray-900 text-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 min-w-[220px] sm:min-w-[240px]"
                   aria-label="無料で始める"
                 >
-                  <span className="flex items-center justify-center gap-2">
-                    <JPButton>{getCtaText()}</JPButton>
+                  <span className="flex items-center justify-center gap-2 whitespace-nowrap">
+                    <span className="whitespace-nowrap">無料で始める</span>
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -141,11 +141,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </Link>
                 <Link 
                   href="/organizations" 
-                  className="group px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg rounded-lg hover:bg-gray-50 text-center transition-all duration-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                  className="group px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg rounded-lg hover:bg-gray-50 text-center transition-all duration-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 min-w-[220px] sm:min-w-[240px]"
                   aria-label="企業ディレクトリを見る"
                 >
                   <span className="flex items-center justify-center gap-2 whitespace-nowrap">
-                    {t('pages.home.hero.viewDirectory')}
+                    <span className="whitespace-nowrap">{t('pages.home.hero.viewDirectory')}</span>
                     <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
