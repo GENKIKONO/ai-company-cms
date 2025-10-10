@@ -72,6 +72,13 @@
     text-wrap: var(--body-wrap);  /* 段落は自然に */
   }
   
+  /* 日本語専用の組版設定 */
+  html[lang="ja"] {
+    line-break: strict;           /* 厳格な改行ルール */
+    word-break: normal;           /* 通常の単語分割 */
+    hanging-punctuation: allow-end; /* 句読点のはみ出し許可 */
+  }
+  
   h1, h2, h3, h4, h5, h6 {
     text-wrap: var(--heading-balance);
   }
@@ -118,6 +125,29 @@
   /* 数値・価格用：改行禁止 */
   .no-wrap {
     white-space: nowrap;
+  }
+  
+  /* 新規追加：日本語組版ユーティリティ */
+  .u-nowrap {
+    white-space: nowrap;
+  }
+  
+  .u-tight {
+    letter-spacing: 0.01em;
+  }
+  
+  /* 改行制御の強化 */
+  .jp-heading {
+    text-wrap: balance;
+    word-break: keep-all;
+    hanging-punctuation: allow-end;
+  }
+  
+  .jp-body {
+    text-wrap: pretty;
+    word-break: keep-all;
+    line-height: 1.75;
+    hanging-punctuation: allow-end;
   }
 }
 

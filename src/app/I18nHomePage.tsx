@@ -7,6 +7,7 @@ import { useABTest } from '@/lib/utils/ab-testing';
 import { useSEO } from '@/hooks/useSEO';
 import HorizontalScroller from '@/components/ui/HorizontalScroller';
 import StatCard from '@/components/ui/StatCard';
+import { JPHeading, JPBody, JPButton } from '@/components/common/JPText';
 
 interface SiteSettings {
   hero_title: string;
@@ -95,12 +96,18 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           
           <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className={`text-center transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <h1 className="jp-heading text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 lg:leading-tight tracking-normal break-keep">
+              <JPHeading 
+                as="h1" 
+                className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 lg:leading-tight tracking-normal"
+              >
                 {t('pages.home.hero.title', { fallback: siteSettings.hero_title })}
-              </h1>
-              <p className="jp-body text-[15px] sm:text-base lg:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-7 sm:leading-8 break-keep">
+              </JPHeading>
+              <JPBody 
+                as="p" 
+                className="text-[15px] sm:text-base lg:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-7 sm:leading-8"
+              >
                 {t('pages.home.hero.subtitle', { fallback: siteSettings.hero_subtitle })}
-              </p>
+              </JPBody>
               
               {/* 動的統計情報のプレビュー - グレー基調に */}
               <div className="flex flex-wrap justify-center gap-6 mb-12 text-sm text-gray-500">
@@ -125,8 +132,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   className="group px-8 py-4 bg-gray-800 text-white text-lg rounded-lg hover:bg-gray-900 text-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 whitespace-nowrap min-w-fit"
                   aria-label="無料で始める"
                 >
-                  <span className="flex items-center justify-center gap-2 whitespace-nowrap">
-                    {getCtaText()}
+                  <span className="flex items-center justify-center gap-2">
+                    <JPButton>{getCtaText()}</JPButton>
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -229,50 +236,23 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </section>
 
-        {/* 統計情報 */}
-        <section className="py-12 sm:py-16 lg:py-24 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-            <div className="text-center mb-16">
-              <h2 className="jp-heading text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
-                {t('pages.home.stats.title')}
-              </h2>
-            </div>
-
-            <HorizontalScroller ariaLabel="実績統計セクション" className="md:grid-cols-4">
-              <StatCard
-                value={`${formatNumber(dynamicStats.organizations)}+`}
-                title={t('pages.home.stats.organizations')}
-                subtitle="登録企業数"
-              />
-              <StatCard
-                value={`${formatNumber(dynamicStats.services)}+`}
-                title={t('pages.home.stats.services')}
-                subtitle="提供サービス数"
-              />
-              <StatCard
-                value={`${formatNumber(dynamicStats.cases)}+`}
-                title={t('pages.home.stats.cases')}
-                subtitle="成功事例数"
-              />
-              <StatCard
-                value={`${dynamicStats.categories}+`}
-                title={t('pages.home.stats.categories')}
-                subtitle="カテゴリー数"
-              />
-            </HorizontalScroller>
-          </div>
-        </section>
 
         {/* サービスの流れ */}
         <section id="service-flow" className="py-12 sm:py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className="text-center mb-16">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">
+              <JPHeading 
+                as="h2" 
+                className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal"
+              >
                 サービスの流れ
-              </h2>
-              <p className="text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8 break-keep [text-wrap:pretty]">
+              </JPHeading>
+              <JPBody 
+                as="p" 
+                className="text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8"
+              >
                 簡単3ステップで始められます
-              </p>
+              </JPBody>
             </div>
 
             <div className="relative">

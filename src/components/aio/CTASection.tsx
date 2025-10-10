@@ -2,6 +2,7 @@
 
 import { ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
+import { JPHeading, JPBody, JPButton } from '@/components/common/JPText';
 
 interface CTASectionProps {
   title: string;
@@ -26,7 +27,7 @@ export default function CTASection({
     <section className="py-24 md:py-32 bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* メインタイトル */}
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-wide">
+        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-wide jp-heading">
           {title.split('\n').map((line, index) => (
             <span key={index} className="block">
               {index === 1 ? (
@@ -41,9 +42,12 @@ export default function CTASection({
         </h2>
         
         {/* 説明文 */}
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+        <JPBody 
+          as="p" 
+          className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
+        >
           {description}
-        </p>
+        </JPBody>
         
         {/* 特徴リスト */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-12">
@@ -61,7 +65,7 @@ export default function CTASection({
             href={primaryHref}
             className="group inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl"
           >
-            <span>{primaryText}</span>
+            <JPButton>{primaryText}</JPButton>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           
@@ -69,7 +73,7 @@ export default function CTASection({
             href={secondaryHref}
             className="inline-flex items-center gap-2 px-10 py-5 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:bg-white hover:border-gray-300 transition-all duration-300"
           >
-            {secondaryText}
+            <JPButton>{secondaryText}</JPButton>
           </Link>
         </div>
         
