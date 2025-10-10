@@ -29,6 +29,7 @@ module.exports = {
     'section-spacing',
     'no-widow',
     'nav-link',
+    'nav-item',
     'tap-highlight-transparent'
   ],
   corePlugins: {

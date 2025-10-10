@@ -523,4 +523,64 @@ html {
     word-break: keep-all !important;
     text-wrap: nowrap !important;
   }
+  
+  /* --- Japanese typography defaults (scoped to main) --- */
+  main, main * {
+    /* CJK 基本 */
+    line-break: strict;
+    word-break: normal;
+  }
+  
+  main :where(h1,h2,h3) {
+    /* 見出しは自動でバランス */
+    text-wrap: balance;
+    letter-spacing: .01em;
+    word-break: keep-all;
+    hanging-punctuation: allow-end;
+  }
+  
+  main :where(p,li,dd) {
+    /* 段落は自然改行＋英数字URLのみ折返し */
+    text-wrap: pretty;
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+  }
+  
+  /* 1文字行（孤立行）を出しにくくする軽い調整 */
+  main .no-widow { 
+    letter-spacing: .005em; 
+    orphans: 2;
+    widows: 2;
+  }
+  
+  /* CTA は絶対改行しない */
+  .btn-nowrap { 
+    white-space: nowrap; 
+    word-break: keep-all; 
+  }
+  
+  /* iOSの選択ハイライトとフォーカスリングを全面無効化 */
+  :root, body { 
+    -webkit-tap-highlight-color: transparent; 
+  }
+  
+  a, button { 
+    outline: none; 
+  }
+  
+  a:focus, button:focus { 
+    outline: none; 
+  }
+  
+  a:focus-visible, button:focus-visible { 
+    outline: none; 
+    box-shadow: none; 
+  }
+  
+  /* サイドナビの "選択枠" を完全禁止（上書き用） */
+  .nav-link, .nav-item {
+    outline: 0 !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
 }

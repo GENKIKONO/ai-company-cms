@@ -101,7 +101,7 @@ export default function MobileMenu({
                       href={l.href}
                       ref={i === 0 ? firstLinkRef : undefined}
                       onClick={close}
-                      className="focus-clean block text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200 text-lg py-2"
+                      className="focus-clean nav-link nav-item block text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200 text-lg py-2"
                     >
                       {l.label}
                     </Link>
@@ -110,7 +110,7 @@ export default function MobileMenu({
                     <Link
                       href={auth.dashboardHref}
                       onClick={close}
-                      className="focus-clean block text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200 text-lg py-2"
+                      className="focus-clean nav-link nav-item block text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200 text-lg py-2"
                     >
                       マイページ
                     </Link>
@@ -122,7 +122,7 @@ export default function MobileMenu({
                   <Link
                     href={auth.logoutHref}
                     onClick={close}
-                    className="focus-clean w-full block text-center bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                    className="focus-clean nav-link nav-item w-full block text-center bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors duration-200"
                   >
                     ログアウト
                   </Link>
@@ -130,14 +130,14 @@ export default function MobileMenu({
                   <Link
                     href={auth.loginHref}
                     onClick={close}
-                    className="focus-clean w-full block text-center bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-200"
+                    className="focus-clean nav-link nav-item w-full block text-center bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-200"
                   >
                     ログイン
                   </Link>
                 )}
                 <button
                   onClick={(e) => { e.stopPropagation(); close(); }}
-                  className="focus-clean w-full h-12 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold shadow-lg active:scale-[.98] transition-transform duration-200"
+                  className="focus-clean nav-link nav-item w-full h-12 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold shadow-lg active:scale-[.98] transition-transform duration-200"
                   aria-label="メニューを閉じる"
                 >
                   <span className="inline-flex items-center gap-2 justify-center">
