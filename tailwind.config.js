@@ -23,7 +23,10 @@ module.exports = {
     'cta-btn--primary',
     'cta-btn--outline',
     'step-card',
-    'step-badge'
+    'step-badge',
+    'section-pad',
+    'section-gap',
+    'section-spacing'
   ],
   corePlugins: {
     textWrap: true,

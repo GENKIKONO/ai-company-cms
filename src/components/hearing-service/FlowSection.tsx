@@ -72,8 +72,8 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="py-12 sm:py-16 lg:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+    <section className="section-spacing bg-white">
+      <div className="max-w-7xl mx-auto section-pad">
         {/* セクションヘッダー */}
         <div className="text-center mb-10 sm:mb-12">
           <h2 className="jp-heading text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight whitespace-nowrap">
@@ -92,12 +92,23 @@ export default function FlowSection() {
               const IconComponent = step.icon;
               
               return (
-                <div key={step.step} className="snap-center min-w-[85%] sm:min-w-0 relative">
-                  <div className={`relative bg-white border-2 ${colors.border} rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 group h-full`}>
-                    {/* ステップ番号 */}
-                    <div className={`absolute -top-2 left-4 carousel-number w-8 h-8 sm:w-10 sm:h-10 ${colors.step} text-white rounded-full flex items-center justify-center font-bold text-sm sm:text-base shadow-lg`}>
+                <div key={step.step} className="step-card relative overflow-visible snap-center min-w-[85%] sm:min-w-0">
+                  {/* Step Badge - positioned outside to prevent clipping */}
+                  <div className="step-badge absolute -top-4 -left-4 z-10 pointer-events-none">
+                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white shadow-md`}>
                       {step.step}
-                    </div>
+                    </span>
+                  </div>
+                  
+                  {/* Inner card panel with fixed border and ring states */}
+                  <div className={`
+                    relative rounded-2xl bg-white shadow-sm overflow-hidden h-full p-5 sm:p-6 lg:p-7
+                    border border-blue-200/60
+                    ring-0 hover:ring-2 hover:ring-blue-300/60
+                    focus:ring-2 focus:ring-blue-400/60
+                    aria-[selected=true]:ring-2 aria-[selected=true]:ring-blue-500
+                    transition-shadow duration-300 group
+                  `}>
                     
                     {/* アイコン */}
                     <div className={`w-12 h-12 sm:w-16 sm:h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-4 sm:mb-6 motion-reduce:transition-none group-hover:scale-110 transition-transform duration-300`}>
@@ -125,7 +136,7 @@ export default function FlowSection() {
         </div>
 
         {/* Before/After セクション */}
-        <div className="mt-20 bg-gradient-to-r from-gray-50 to-blue-50 rounded-3xl p-8 lg:p-12">
+        <div className="section-gap bg-gradient-to-r from-gray-50 to-blue-50 rounded-3xl p-8 lg:p-12">
           <div className="text-center mb-12">
             <h3 className="jp-heading text-2xl md:text-3xl font-bold text-gray-900 mb-4">
               構造化前後の<span className="whitespace-nowrap">違い</span>

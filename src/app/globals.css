@@ -206,6 +206,21 @@ html {
   }
 }
 
+/* Section Layout Utilities - consistent spacing across pages */
+@layer utilities {
+  .section-pad {
+    padding-inline: clamp(1.25rem, 2vw, 2rem);
+  }
+  
+  .section-gap {
+    margin-top: clamp(2.5rem, 4vw, 5rem);
+  }
+  
+  .section-spacing {
+    @apply py-12 sm:py-16 lg:py-20;
+  }
+}
+
 /* Container Queries Support */
 @layer utilities {
   .container-card {
