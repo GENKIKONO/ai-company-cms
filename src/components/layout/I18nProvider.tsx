@@ -35,32 +35,25 @@ export function I18nProvider({ children, initialLocale }: I18nProviderProps) {
     return detectInitialLocale() || initialLocale || 'ja';
   });
 
-  // ロケール変更時の処理
+  // ロケール変更時の処理（日本語専用 - no-op）
   const setLocale = (newLocale: Locale) => {
-    setLocaleState(newLocale);
-    i18nManager.setLocale(newLocale);
-    
-    // ローカルストレージに保存
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('preferred-locale', newLocale);
-      
-      // HTML lang属性の更新
-      document.documentElement.lang = newLocale;
-      
-      // directionの更新（RTL言語対応）
-      document.documentElement.dir = getRTLLanguages().includes(newLocale) ? 'rtl' : 'ltr';
-    }
+    // 日本語専用運用のため、lang属性の動的変更は無効化
+    // setLocaleState(newLocale); // 削除
+    // i18nManager.setLocale(newLocale); // 削除
+    // document.documentElement.lang は変更しない
+    console.log('setLocale called but ignored (Japanese-only mode):', newLocale);
   };
 
   useEffect(() => {
-    // 初期化時にi18nManagerのロケールを設定
-    i18nManager.setLocale(locale);
+    // 初期化時にi18nManagerのロケールを設定（日本語固定）
+    i18nManager.setLocale('ja');
     
+    // 日本語専用運用のため、lang属性とdir属性は固定
     if (typeof window !== 'undefined') {
-      document.documentElement.lang = locale;
-      document.documentElement.dir = getRTLLanguages().includes(locale) ? 'rtl' : 'ltr';
+      document.documentElement.lang = 'ja';
+      document.documentElement.dir = 'ltr';
     }
-  }, [i18nManager, locale]);
+  }, [i18nManager]);
 
   const contextValue: I18nContextType = {
     locale,

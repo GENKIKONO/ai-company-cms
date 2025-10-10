@@ -7,7 +7,6 @@ import { useABTest } from '@/lib/utils/ab-testing';
 import { useSEO } from '@/hooks/useSEO';
 import HorizontalScroller from '@/components/ui/HorizontalScroller';
 import StatCard from '@/components/ui/StatCard';
-import { JPHeading, JPBody, JPButton } from '@/components/common/JPText';
 
 interface SiteSettings {
   hero_title: string;
@@ -96,18 +95,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           
           <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className={`text-center transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <JPHeading 
-                as="h1" 
-                className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 lg:leading-tight tracking-normal"
-              >
+              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-7 sm:leading-8 lg:leading-tight tracking-normal jp-heading">
                 {t('pages.home.hero.title', { fallback: siteSettings.hero_title })}
-              </JPHeading>
-              <JPBody 
-                as="p" 
-                className="text-[15px] sm:text-base lg:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-7 sm:leading-8"
-              >
+              </h1>
+              <p className="text-[15px] sm:text-base lg:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-7 sm:leading-8 jp-body">
                 {t('pages.home.hero.subtitle', { fallback: siteSettings.hero_subtitle })}
-              </JPBody>
+              </p>
               
               {/* 動的統計情報のプレビュー - グレー基調に */}
               <div className="flex flex-wrap justify-center gap-6 mb-12 text-sm text-gray-500">
@@ -241,18 +234,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <section id="service-flow" className="py-12 sm:py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <div className="text-center mb-16">
-              <JPHeading 
-                as="h2" 
-                className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal"
-              >
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal jp-heading">
                 サービスの流れ
-              </JPHeading>
-              <JPBody 
-                as="p" 
-                className="text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8"
-              >
+              </h2>
+              <p className="text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8 jp-body">
                 簡単3ステップで始められます
-              </JPBody>
+              </p>
             </div>
 
             <div className="relative">
@@ -463,13 +450,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <JPHeading as="h3" className="text-lg font-semibold mb-4">{t('ui.header.title')}</JPHeading>
-              <JPBody as="p" className="text-gray-400">
+              <h3 className="text-lg font-semibold mb-4 jp-heading">{t('ui.header.title')}</h3>
+              <p className="text-gray-400 jp-body">
                 {t('pages.home.footer.tagline')}
-              </JPBody>
+              </p>
             </div>
             <div>
-              <JPHeading as="h4" className="font-semibold mb-4">{t('pages.home.footer.links')}</JPHeading>
+              <h4 className="font-semibold mb-4 jp-heading">{t('pages.home.footer.links')}</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/organizations" className="footer-link-nowrap">{t('pages.home.footer.directory')}</Link></li>
                 <li><Link href="/search" className="footer-link-nowrap">{t('pages.home.footer.search')}</Link></li>
@@ -477,7 +464,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </ul>
             </div>
             <div>
-              <JPHeading as="h4" className="font-semibold mb-4">{t('pages.home.footer.support')}</JPHeading>
+              <h4 className="font-semibold mb-4 jp-heading">{t('pages.home.footer.support')}</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/help" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.helpCenter')}</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.contact')}</Link></li>
@@ -487,7 +474,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <JPBody as="p" className="text-center">{t('pages.home.footer.copyright')}</JPBody>
+            <p className="text-center jp-body">{t('pages.home.footer.copyright')}</p>
           </div>
         </div>
       </footer>
