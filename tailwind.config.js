@@ -21,7 +21,9 @@ module.exports = {
     'jp-faq-question',
     'cta-btn',
     'cta-btn--primary',
-    'cta-btn--outline'
+    'cta-btn--outline',
+    'step-card',
+    'step-badge'
   ],
   corePlugins: {
     textWrap: true,

@@ -92,12 +92,16 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
               const IconComponent = iconComponents[step.step as keyof typeof iconComponents];
               
               return (
-                <div key={step.step} className="snap-center min-w-[85%] sm:min-w-0 relative">
-                  <div className={`relative bg-white border-2 ${colors.border} rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 group h-full`}>
-                    {/* ステップ番号 */}
-                    <div className={`absolute -top-3 left-4 w-6 h-6 sm:w-8 sm:h-8 ${colors.step} text-white rounded-full flex items-center justify-center font-bold text-xs sm:text-sm`}>
+                <div key={step.step} className="step-card relative overflow-visible snap-center min-w-[85%] sm:min-w-0">
+                  {/* Step Badge - positioned outside to prevent clipping */}
+                  <div className="step-badge absolute -top-4 -left-4 z-10 pointer-events-none">
+                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white shadow-md`}>
                       {step.step}
-                    </div>
+                    </span>
+                  </div>
+                  
+                  {/* Inner card panel with overflow-hidden for content */}
+                  <div className={`rounded-2xl ring-1 ring-blue-200/60 bg-white shadow-sm overflow-hidden border-2 ${colors.border} hover:shadow-lg transition-all duration-300 group h-full p-5 sm:p-6 lg:p-7`}>
                     
                     {/* アイコン */}
                     <div className={`w-12 h-12 sm:w-16 sm:h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-4 sm:mb-6 motion-reduce:transition-none group-hover:scale-110 transition-transform duration-300`}>
