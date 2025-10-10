@@ -363,6 +363,17 @@ html {
     overflow-wrap: normal !important;
     text-wrap: nowrap !important;
     hyphens: none !important;
+    /* 改行制御文字も無効化 */
+    line-break: auto !important;
+    word-wrap: normal !important;
+  }
+  
+  /* フッターリンク専用：最強改行防止 */
+  .footer-link-nowrap {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    display: inline-block !important;
+    text-wrap: nowrap !important;
   }
   
   /* Hide scrollbars for better mobile experience */

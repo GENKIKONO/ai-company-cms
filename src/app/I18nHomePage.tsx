@@ -471,18 +471,18 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div>
               <JPHeading as="h4" className="font-semibold mb-4">{t('pages.home.footer.links')}</JPHeading>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/organizations" className="btn-nowrap">{t('pages.home.footer.directory')}</Link></li>
-                <li><Link href="/search" className="btn-nowrap">{t('pages.home.footer.search')}</Link></li>
-                <li><Link href="/dashboard" className="btn-nowrap">{t('ui.header.dashboard')}</Link></li>
+                <li><Link href="/organizations" className="footer-link-nowrap">{t('pages.home.footer.directory')}</Link></li>
+                <li><Link href="/search" className="footer-link-nowrap">{t('pages.home.footer.search')}</Link></li>
+                <li><Link href="/dashboard" className="footer-link-nowrap">{t('ui.header.dashboard')}</Link></li>
               </ul>
             </div>
             <div>
               <JPHeading as="h4" className="font-semibold mb-4">{t('pages.home.footer.support')}</JPHeading>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/help" className="hover:text-white transition-colors btn-nowrap">{t('pages.home.footer.helpCenter')}</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors btn-nowrap">{t('pages.home.footer.contact')}</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors btn-nowrap">{t('pages.home.footer.terms')}</Link></li>
-                <li><Link href="/privacy" className="hover:text-white transition-colors btn-nowrap">{t('pages.home.footer.privacy')}</Link></li>
+                <li><Link href="/help" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.helpCenter')}</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.contact')}</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.terms')}</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.privacy')}</Link></li>
               </ul>
             </div>
           </div>
