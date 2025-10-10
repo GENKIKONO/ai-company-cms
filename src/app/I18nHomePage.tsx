@@ -373,7 +373,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <Link 
                   href="/auth/signup" 
                   onClick={handleCtaClick}
-                  className="group px-8 py-4 bg-white text-gray-800 text-lg font-semibold rounded-xl hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+                  className="group cta-btn cta-btn--primary text-lg"
                 >
                   <span className="flex items-center gap-3">
                     {t('pages.home.cta.button')}
@@ -385,10 +385,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 
                 <Link 
                   href="/hearing-service"
-                  className="group px-6 py-3 border-2 border-white text-white text-lg font-medium rounded-xl hover:bg-white hover:text-gray-800 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50 min-w-[220px] sm:min-w-[240px]"
+                  className="group cta-btn cta-btn--outline text-lg"
                 >
-                  <span className="flex items-center gap-2 btn-nowrap">
-                    <span className="btn-nowrap">ヒアリング代行サービス</span>
+                  <span className="flex items-center gap-2">
+                    <span>ヒアリング代行サービス</span>
                     <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h2" />
                     </svg>

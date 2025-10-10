@@ -18,7 +18,10 @@ module.exports = {
     'jp-step-number',
     'jp-text-natural',
     'jp-punctuation-safe',
-    'jp-faq-question'
+    'jp-faq-question',
+    'cta-btn',
+    'cta-btn--primary',
+    'cta-btn--outline'
   ],
   corePlugins: {
     textWrap: true,

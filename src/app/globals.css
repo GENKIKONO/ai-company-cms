@@ -181,6 +181,31 @@ html {
   }
 }
 
+/* CTA Button System - PC/Mobile 統一サイズ */
+@layer utilities {
+  .cta-btn {
+    @apply inline-flex items-center justify-center leading-none rounded-xl whitespace-nowrap;
+    min-height: 3.25rem;       /* h-13 相当 */
+    padding: .875rem 1.5rem;   /* py-3.5 px-6 */
+    word-break: keep-all;
+    text-wrap: nowrap;
+  }
+  
+  @screen lg {
+    .cta-btn {
+      width: 18rem; /* PC で同じ幅に統一 */
+    }
+  }
+  
+  .cta-btn--primary {
+    @apply bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50;
+  }
+  
+  .cta-btn--outline {
+    @apply border-2 border-white text-white font-medium hover:bg-white hover:text-gray-800 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50;
+  }
+}
+
 /* Container Queries Support */
 @layer utilities {
   .container-card {
