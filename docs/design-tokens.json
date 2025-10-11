@@ -1,0 +1,272 @@
+{
+  "colors": {
+    "brand": {
+      "value": "#4F46E5",
+      "type": "color",
+      "description": "メインブランドカラー - インディゴ"
+    },
+    "accent": {
+      "value": "#06B6D4",
+      "type": "color", 
+      "description": "アクセントカラー - シアン"
+    },
+    "text": {
+      "value": "#0F172A",
+      "type": "color",
+      "description": "メインテキストカラー - ダークスレート"
+    },
+    "muted": {
+      "value": "#475569",
+      "type": "color",
+      "description": "補助テキストカラー - スレートグレー"
+    },
+    "bg": {
+      "value": "#FFFFFF",
+      "type": "color",
+      "description": "背景色 - ホワイト"
+    },
+    "error": {
+      "value": "#EF4444",
+      "type": "color",
+      "description": "エラー表示色 - レッド"
+    },
+    "success": {
+      "value": "#10B981",
+      "type": "color",
+      "description": "成功表示色 - エメラルド"
+    },
+    "warning": {
+      "value": "#F59E0B",
+      "type": "color",
+      "description": "警告表示色 - アンバー"
+    }
+  },
+  "typography": {
+    "fontSize": {
+      "h1": {
+        "value": "clamp(28px, 6vw, 38px)",
+        "type": "fontSizes",
+        "description": "H1見出しサイズ - レスポンシブ"
+      },
+      "h2": {
+        "value": "clamp(22px, 4.5vw, 30px)",
+        "type": "fontSizes",
+        "description": "H2見出しサイズ - レスポンシブ"
+      },
+      "h3": {
+        "value": "clamp(18px, 3.5vw, 24px)",
+        "type": "fontSizes",
+        "description": "H3見出しサイズ - レスポンシブ"
+      },
+      "body": {
+        "value": "15px",
+        "type": "fontSizes",
+        "description": "本文テキストサイズ"
+      },
+      "small": {
+        "value": "13px",
+        "type": "fontSizes", 
+        "description": "小さなテキストサイズ"
+      }
+    },
+    "lineHeight": {
+      "tight": {
+        "value": "1.2",
+        "type": "lineHeights",
+        "description": "見出し用行間 - タイト"
+      },
+      "body": {
+        "value": "1.7",
+        "type": "lineHeights",
+        "description": "本文用行間 - 標準"
+      },
+      "relaxed": {
+        "value": "1.8",
+        "type": "lineHeights",
+        "description": "リード文用行間 - ゆったり"
+      }
+    }
+  },
+  "spacing": {
+    "xs": {
+      "value": "clamp(4px, 1vw, 8px)",
+      "type": "spacing",
+      "description": "極小余白 - レスポンシブ"
+    },
+    "s": {
+      "value": "clamp(8px, 1.5vw, 16px)",
+      "type": "spacing",
+      "description": "小余白 - レスポンシブ"
+    },
+    "m": {
+      "value": "clamp(16px, 3vw, 24px)",
+      "type": "spacing",
+      "description": "中余白 - レスポンシブ"
+    },
+    "l": {
+      "value": "clamp(24px, 4vw, 40px)",
+      "type": "spacing",
+      "description": "大余白 - レスポンシブ"
+    },
+    "xl": {
+      "value": "clamp(32px, 6vw, 64px)",
+      "type": "spacing",
+      "description": "特大余白 - レスポンシブ"
+    },
+    "2xl": {
+      "value": "clamp(48px, 8vw, 96px)",
+      "type": "spacing",
+      "description": "超特大余白 - レスポンシブ"
+    }
+  },
+  "borderRadius": {
+    "s": {
+      "value": "6px",
+      "type": "borderRadius",
+      "description": "小角丸"
+    },
+    "m": {
+      "value": "12px",
+      "type": "borderRadius",
+      "description": "中角丸"
+    },
+    "l": {
+      "value": "16px",
+      "type": "borderRadius",
+      "description": "大角丸"
+    }
+  },
+  "boxShadow": {
+    "card": {
+      "value": "0 8px 24px rgba(2, 6, 23, .06)",
+      "type": "boxShadow",
+      "description": "カード用シャドウ - 軽い"
+    },
+    "hover": {
+      "value": "0 12px 32px rgba(2, 6, 23, .12)",
+      "type": "boxShadow",
+      "description": "ホバー用シャドウ - 強調"
+    }
+  },
+  "zIndex": {
+    "fab": {
+      "value": "1000",
+      "type": "zIndex",
+      "description": "フローティングアクションボタン"
+    },
+    "fabBackdrop": {
+      "value": "999",
+      "type": "zIndex",
+      "description": "FAB背景"
+    },
+    "modal": {
+      "value": "1100",
+      "type": "zIndex",
+      "description": "モーダル"
+    },
+    "toast": {
+      "value": "1200",
+      "type": "zIndex",
+      "description": "トースト通知"
+    }
+  },
+  "utilityClasses": {
+    "typography": {
+      "ui-h1": {
+        "description": "H1見出しスタイル",
+        "usage": "大見出し、ヒーロータイトル",
+        "tokens": ["fontSize.h1", "lineHeight.tight", "spacing.l"]
+      },
+      "ui-h2": {
+        "description": "H2見出しスタイル",
+        "usage": "セクション見出し",
+        "tokens": ["fontSize.h2", "lineHeight.tight", "spacing.m"]
+      },
+      "ui-h3": {
+        "description": "H3見出しスタイル", 
+        "usage": "小見出し",
+        "tokens": ["fontSize.h3", "lineHeight.tight", "spacing.s"]
+      },
+      "ui-body": {
+        "description": "標準本文スタイル",
+        "usage": "通常の段落テキスト",
+        "tokens": ["fontSize.body", "lineHeight.body"]
+      },
+      "ui-lead": {
+        "description": "リード文スタイル",
+        "usage": "導入文、説明文",
+        "tokens": ["fontSize.body", "lineHeight.relaxed", "colors.muted"]
+      }
+    },
+    "layout": {
+      "ui-rail": {
+        "description": "左基準統一メインコンテナ",
+        "usage": "ページメインコンテンツ",
+        "properties": ["max-width: 1280px", "margin: auto", "text-align: left"]
+      },
+      "ui-measure-hero": {
+        "description": "ヒーロー用短い行長",
+        "usage": "インパクトあるタイトル",
+        "properties": ["max-width: 30ch"]
+      },
+      "ui-measure-lead": {
+        "description": "リード文用行長",
+        "usage": "導入文の可読性",
+        "properties": ["max-width: 44ch", "line-height: 1.6"]
+      },
+      "ui-measure-body": {
+        "description": "本文用行長",
+        "usage": "長文コンテンツ",
+        "properties": ["max-width: 65ch"]
+      }
+    },
+    "spacing": {
+      "ui-section-gap": {
+        "description": "セクション間余白",
+        "tokens": ["spacing.xl"]
+      },
+      "ui-paragraph-gap": {
+        "description": "段落間余白",
+        "tokens": ["spacing.m"]
+      },
+      "ui-bottom-content": {
+        "description": "FAB重複回避用下部余白",
+        "usage": "ページ下部コンテンツ"
+      }
+    },
+    "zIndex": {
+      "ui-fab-layer": {
+        "description": "FAB z-index適用",
+        "tokens": ["zIndex.fab"]
+      },
+      "ui-fab-backdrop": {
+        "description": "FAB背景 z-index適用",
+        "tokens": ["zIndex.fabBackdrop"]
+      }
+    }
+  },
+  "responsiveBreakpoints": {
+    "sm": "640px",
+    "md": "768px", 
+    "lg": "1024px",
+    "xl": "1280px",
+    "2xl": "1536px"
+  },
+  "implementation": {
+    "cssVariables": {
+      "location": "src/app/globals.css",
+      "scope": ":root",
+      "naming": "--{category}-{name}"
+    },
+    "tailwindIntegration": {
+      "location": "tailwind.config.js",
+      "method": "theme.extend with var() references",
+      "safelist": "Design Token classes protected from purge"
+    },
+    "usage": {
+      "preferred": "Utility classes (ui-*)",
+      "direct": "CSS variables for custom components",
+      "tailwind": "Token-based theme extensions"
+    }
+  }
+}
