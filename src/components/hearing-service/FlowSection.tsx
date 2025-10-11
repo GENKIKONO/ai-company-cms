@@ -88,13 +88,26 @@ export default function FlowSection() {
 
         {/* フローステップ */}
         <div className="mb-16 sm:mb-20">
-          <HorizontalScroller ariaLabel="ヒアリング代行の流れ" className="lg:grid-cols-3" showHintOnce={true}>
+          {/* スマホ専用スワイプヒント */}
+          <div className="lg:hidden text-center mb-6">
+            <div className="inline-flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-200">
+              <div className="flex gap-1">
+                <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                <span className="w-2 h-2 rounded-full bg-blue-200"></span>
+                <span className="w-2 h-2 rounded-full bg-blue-200"></span>
+              </div>
+              <span className="text-sm text-blue-700 font-medium">←→ スワイプで次へ</span>
+            </div>
+          </div>
+          
+          <HorizontalScroller ariaLabel="ヒアリング代行の流れ" className="lg:grid-cols-3" showDots={true} showHintOnce={true}>
             {flowSteps.map((step, index) => {
               const colors = getColorClasses(step.color);
               const IconComponent = step.icon;
+              const isLast = index === flowSteps.length - 1;
               
               return (
-                <div key={step.step} className="step-card relative overflow-visible snap-center min-w-[85%] sm:min-w-0">
+                <div key={step.step} className="step-card relative overflow-visible snap-center min-w-[90%] sm:min-w-[85%] lg:min-w-0">
                   {/* Step Badge - positioned outside to prevent clipping */}
                   <div className="step-badge absolute -top-4 -left-4 z-10 pointer-events-none">
                     <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white shadow-md`}>
@@ -131,6 +144,15 @@ export default function FlowSection() {
                       ))}
                     </ul>
                   </div>
+                  
+                  {/* デスクトップ専用: 次ステップへの矢印 */}
+                  {!isLast && (
+                    <div className="hidden lg:block absolute -right-6 top-1/2 transform -translate-y-1/2 z-20">
+                      <div className="bg-white rounded-full p-2 shadow-lg border border-gray-200">
+                        <ArrowRight className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
