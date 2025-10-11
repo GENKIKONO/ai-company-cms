@@ -52,7 +52,7 @@ export default function FAB() {
       onKeyDown={handleKeyDown}
       className="
         sm:hidden
-        fixed z-[60] 
+        fixed z-[1000] 
         h-14 w-14 
         rounded-full 
         right-[clamp(12px,3vw,20px)] 

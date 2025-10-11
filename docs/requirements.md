@@ -111,6 +111,185 @@ AIO Hub implements a comprehensive design system based on **CSS Design Tokens** 
 
 ---
 
+## Section 2.3: Design: Visual & Typography Baseline
+
+### 2.3.1 整列ルール (Alignment Rules)
+
+**Center Column + Left Text 原則**:
+
+| ブレークポイント | コンテナ | テキスト配置 | 実装 |
+|-----------------|----------|-------------|------|
+| **All Sizes** | `.center-col` (max-width: 72rem, margin: auto) | `.text-left` | 基本レール |
+| **PC (lg+)** | justify-center for cards | text-left for content | 2カードの中央配置 |
+| **Mobile (〜lg)** | horizontal scroll | text-left maintained | 1.1枚見せパターン |
+
+**許容誤差基準**:
+- Hero見出し・本文左端一致: ±4px以内
+- PC Pricing 2カード中央線: ±16px以内
+- Mobile カード右端余白: ±4px以内
+
+### 2.3.2 行長基準 (Line Length Standards)
+
+| 要素タイプ | 理想値 | 許容範囲 | 適用条件 |
+|-----------|--------|---------|---------|
+| **Hero見出し** | 30ch | 28-32ch | `.measure-hero` |
+| **Lead文・セクション見出し** | 44ch | 42-46ch | `.measure-lead` |
+| **本文段落** | 38ch | 36-40ch | `.measure-body` |
+| **Mobile調整** | 32ch | 30-34ch | SP時 `.measure-tight` |
+
+### 2.3.3 余白システム (Spacing System)
+
+#### セクション縦間隔
+```css
+/* 標準セクション */
+paddingBlock: clamp(2.5rem, 4vw, 5rem)
+
+/* ヒーローセクション */  
+paddingBlock: clamp(3rem, 6vw, 7rem)
+
+/* 最終セクション（FAB考慮） */
+paddingBottom: calc(clamp(2.5rem, 4vw, 5rem) + 120px)
+```
+
+#### 水平パディング
+```css
+.center-col {
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+```
+
+### 2.3.4 日本語改行システム (Japanese Text Wrapping)
+
+#### 基本設定
+```css
+/* 見出し: バランス改行 */
+.jp-heading, .headline {
+  text-wrap: balance;
+  word-break: keep-all;
+  line-break: strict;
+}
+
+/* 本文: 自然改行 */
+.jp-body, .copy {
+  text-wrap: pretty;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+```
+
+#### auto-phrase対応
+```css
+@supports (word-break: auto-phrase) {
+  .jp-heading, .jp-body {
+    word-break: auto-phrase;
+  }
+}
+
+/* フォールバック */
+@supports not (word-break: auto-phrase) {
+  .jp-heading { word-break: keep-all; line-break: strict; }
+  .jp-body { word-break: keep-all; line-height: 1.8; }
+}
+```
+
+### 2.3.5 カルーセル仕様 (Carousel Specifications)
+
+#### Mobile (1.1枚見せ)
+```tsx
+<HorizontalScroller
+  className="lg:grid lg:grid-cols-2"
+  showDots={true}
+  showArrowsOnMobile={true} 
+  showHintOnce={true}
+  scrollPaddingInlineEnd="24px"
+>
+  <div className="min-w-[85vw] sm:min-w-0">
+```
+
+#### PC (中央配置)
+```css
+@media (min-width: 1024px) {
+  .lg:grid-cols-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: center;
+    max-width: calc(2 * 360px + 2rem);
+    margin: 0 auto;
+  }
+}
+```
+
+#### 表示条件・ARIA仕様
+| 要素 | Mobile表示 | PC表示 | ARIA属性 |
+|------|-----------|--------|----------|
+| **ドット** | 表示 (3+ items) | 非表示 | `role="tablist"` |
+| **矢印** | 表示 (overflow時) | 非表示 | `aria-label="前/次へ"` |
+| **スワイプヒント** | 初回のみ (localStorage管理) | 非表示 | `aria-live="polite"` |
+
+### 2.3.6 FAB仕様 (Floating Action Button)
+
+#### 配置・Safe Area対応
+```css
+.fab {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom) + 80px);
+  right: clamp(12px, 3vw, 20px);
+  z-index: 1000; /* Design Token: --z-fab */
+  min-height: 44px; /* Touch target */
+  min-width: 44px;
+}
+```
+
+#### z-index層管理
+| レイヤー | z-index | 用途 | 競合回避 |
+|----------|---------|------|---------|
+| **FAB** | 1000 | メインボタン | modal(1100)未満 |
+| **FAB Backdrop** | 999 | メニュー展開時背景 | FAB直下 |
+| **Header** | 50 | ナビゲーション | FAB未満 |
+
+### 2.3.7 禁則処理 (Line Breaking Rules)
+
+#### 強制改行の禁止
+**原則**: `<br>`タグの使用を禁止し、CSS `text-wrap`による自然改行を優先
+
+#### 例外許可とクラス適用
+| 要素タイプ | 適用クラス | 条件 | 承認要件 |
+|-----------|-----------|------|---------|
+| **CTA Button** | `.cta-nowrap` | 必須適用 | 自動適用 |
+| **価格表示** | `.jp-number-unit` | 数値+単位の結合 | 自動適用 |
+| **ナビリンク** | `.footer-link-nowrap` | フッターリンク | 自動適用 |
+| **段落内強制改行** | 使用禁止 | 特別な事情がある場合 | デザインレビュー必須 |
+
+---
+
+### 2.3.8 検収チェックリスト (Acceptance Criteria)
+
+#### 必須合格基準
+
+| 項目 | 合格基準 | 計測方法 | 許容誤差 |
+|------|---------|---------|---------|
+| **Hero 見出し・本文左端一致** | 左端が揃っている | DevTools計測 | ±4px |
+| **PC Pricing 2カード中央** | 画面中央線と一致 | 画面幅半分位置計測 | ±16px |
+| **Mobile カルーセル** | 1.1枚見せ表示 | 右端に次カード見切れ | ±4px |
+| **行長範囲** | 36-46ch以内 | 文字数換算計測 | ±2ch |
+| **section間余白** | clamp値による統一 | 縦間隔計測 | clamp範囲内 |
+| **Safe Area対応** | iOS下部余白確保 | iPhone実機確認 | 必須 |
+| **禁則処理** | `<br>`タグ不使用 | ソースコード検索 | 0件 |
+
+#### Lighthouse基準
+- **Performance**: 90点以上
+- **Accessibility**: 95点以上  
+- **Best Practices**: 95点以上
+- **SEO**: 90点以上
+
+#### 不合格時の対応フロー
+1. **±誤差範囲外**: 即座にコード修正
+2. **Lighthouse基準未達**: 原因特定→修正→再測定
+3. **禁則違反発見**: 該当箇所を`.cta-nowrap`等で修正
+4. **Safe Area未対応**: FAB位置を`calc(env+80px)`で修正
+
+---
+
 ## Section 3: 機能一覧 (Feature Specifications)
 
 ### 3.1 Core Components
