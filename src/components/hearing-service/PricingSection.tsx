@@ -88,14 +88,14 @@ export default function PricingSection() {
 
         {/* 料金プラン */}
         <div className="mb-12 sm:mb-16">
-          <div className="flex flex-col lg:flex-row lg:justify-center lg:items-stretch gap-6 lg:gap-10 max-w-6xl mx-auto">
-            <HorizontalScroller ariaLabel="料金プラン" className="lg:grid lg:grid-cols-2 lg:gap-8 lg:justify-center" showDots={false} showArrowsOnMobile={true}>
+          <div className="max-w-6xl mx-auto px-6">
+            <HorizontalScroller ariaLabel="料金プラン" className="lg:grid lg:grid-cols-2 lg:gap-16 lg:justify-items-stretch lg:items-start lg:auto-rows-fr" showDots={true} showArrowsOnMobile={true}>
             {pricingPlans.map((plan) => {
               const colors = getColorClasses(plan.color, plan.popular);
               const IconComponent = plan.icon;
               
               return (
-                <div key={plan.name} className="snap-start min-w-[85vw] max-w-[320px] sm:min-w-0 relative">
+                <div key={plan.name} className="snap-start min-w-[85vw] max-w-[320px] sm:min-w-0 lg:w-full lg:flex-1 relative">
                   {/* 人気バッジ */}
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
@@ -113,10 +113,10 @@ export default function PricingSection() {
                         <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${plan.popular ? 'text-white' : colors.accent}`} />
                       </div>
                       <h3 className={`text-xl sm:text-2xl font-bold ${colors.text} mb-2`}>{plan.name}</h3>
-                      <p className={`text-[15px] sm:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 leading-6 sm:leading-7`}>{plan.description}</p>
+                      <p className={`text-[15px] sm:text-base lg:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 leading-6 sm:leading-7 lg:leading-7 measure-pricing`}>{plan.description}</p>
                       
-                      <div className="flex items-baseline justify-center gap-1">
-                        <span className={`text-3xl sm:text-4xl font-bold ${colors.text}`}>¥{plan.price}</span>
+                      <div className="flex items-baseline justify-center gap-1 price-nowrap">
+                        <span className={`text-3xl sm:text-4xl font-bold ${colors.text} tabular-nums`}>¥{plan.price}</span>
                         <span className={`text-sm sm:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'}`}>/ {plan.period}</span>
                       </div>
                     </div>
@@ -126,7 +126,7 @@ export default function PricingSection() {
                       {plan.features.map((feature, index) => (
                         <div key={index} className="flex items-start gap-3">
                           <Check className={`w-4 h-4 sm:w-5 sm:h-5 ${plan.popular ? 'text-white' : 'text-green-500'} mt-0.5 flex-shrink-0`} />
-                          <span className={`text-[13px] sm:text-sm ${plan.popular ? 'text-white/90' : 'text-gray-700'} leading-5`}>{feature}</span>
+                          <span className={`text-[13px] sm:text-sm lg:text-sm ${plan.popular ? 'text-white/90' : 'text-gray-700'} leading-5 lg:leading-6 measure-pricing`}>{feature}</span>
                         </div>
                       ))}
                       

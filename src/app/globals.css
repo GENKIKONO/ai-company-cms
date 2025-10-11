@@ -827,6 +827,35 @@ html {
     max-width: 44ch; 
     line-height: 1.6;
   }
+
+  /* Pricing-specific tokens */
+  .measure-pricing { 
+    max-width: 46ch; 
+    line-height: 1.6; 
+    text-wrap: pretty; 
+  }
+  
+  .price-nowrap { 
+    white-space: nowrap; 
+    font-variant-numeric: tabular-nums; 
+  }
+
+  /* Feature card text optimization */
+  .measure-card { 
+    max-width: 38ch; 
+    line-height: 1.65; 
+    text-wrap: pretty; 
+  }
+  
+  .jp-kinsoku { 
+    letter-spacing: .0025em; 
+    word-spacing: .02em; 
+  }
+
+  /* Progressive enhancement for auto-phrase */
+  @supports (word-break: auto-phrase) {
+    .jp-phrase { word-break: auto-phrase; }
+  }
   
   .ui-measure-title { 
     max-width: 20ch; 

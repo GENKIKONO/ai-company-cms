@@ -97,30 +97,31 @@ export default function HorizontalScroller({
   };
 
   return (
-    <div
-      ref={ref}
-      aria-label={ariaLabel || '横スクロールリスト'}
-      role="region"
-      className={clsx(
-        'carousel-inline no-inline-overflow scroll-smooth snap-x snap-mandatory',
-        'overflow-y-visible sm:overflow-visible',
-        '[-webkit-overflow-scrolling:touch]',
-        'px-6 -mx-6 sm:mx-0 sm:px-0',
-        'pb-4 sm:pb-0 pt-6', // Add top padding for badge space
-        'scrollbar-hide',
-        'isolate', // Create stacking context for z-index
-        className
-      )}
-      style={{
-        // Ensure natural snap behavior
-        scrollSnapStop: 'normal',
-        // Better mobile scroll momentum
-        WebkitOverflowScrolling: 'touch',
-        // Custom scroll padding for cleaner edges
-        scrollPaddingInlineStart,
-        scrollPaddingInlineEnd,
-      }}
-    >
+    <div className="relative">
+      <div
+        ref={ref}
+        aria-label={ariaLabel || '横スクロールリスト'}
+        role="region"
+        className={clsx(
+          'carousel-inline no-inline-overflow scroll-smooth snap-x snap-mandatory',
+          'overflow-y-visible sm:overflow-visible',
+          '[-webkit-overflow-scrolling:touch]',
+          'px-6 -mx-6 sm:mx-0 sm:px-0',
+          'pb-4 sm:pb-0 pt-6', // Add top padding for badge space
+          'scrollbar-hide',
+          'isolate', // Create stacking context for z-index
+          className
+        )}
+        style={{
+          // Ensure natural snap behavior
+          scrollSnapStop: 'normal',
+          // Better mobile scroll momentum
+          WebkitOverflowScrolling: 'touch',
+          // Custom scroll padding for cleaner edges
+          scrollPaddingInlineStart,
+          scrollPaddingInlineEnd,
+        }}
+      >
       <div className={clsx(
         'flex sm:grid gap-4 sm:gap-6 items-stretch',
         'min-h-fit',
@@ -145,27 +146,6 @@ export default function HorizontalScroller({
 
       {/* Mobile-only swipe affordance */}
       <div className="sm:hidden">
-        {/* Dots indicator */}
-        {showDots && childrenCount > 1 && (
-          <div className="flex justify-center gap-2 mt-4" role="tablist" aria-label="ページインジケーター">
-            {Array.from({ length: childrenCount }).map((_, index) => (
-              <button
-                key={index}
-                role="tab"
-                aria-selected={currentIndex === index}
-                aria-label={`${index + 1}ページ目`}
-                onClick={() => scrollToIndex(index)}
-                className={clsx(
-                  'w-2 h-2 rounded-full transition-all duration-300',
-                  currentIndex === index
-                    ? 'bg-blue-600 w-6'
-                    : 'bg-gray-300 hover:bg-gray-400'
-                )}
-              />
-            ))}
-          </div>
-        )}
-
         {/* Navigation arrows */}
         {showArrowsOnMobile && childrenCount > 1 && (
           <>
@@ -230,6 +210,29 @@ export default function HorizontalScroller({
           </div>
         )}
       </div>
+      </div>
+      
+      {/* Dots indicator - always positioned outside scroller */}
+      {showDots && childrenCount > 1 && (
+        <div className="sm:hidden absolute left-1/2 -translate-x-1/2 bottom-4 z-[900] flex gap-2" role="tablist" aria-label="ページインジケーター">
+          {Array.from({ length: childrenCount }).map((_, index) => (
+            <button
+              key={index}
+              role="tab"
+              aria-selected={currentIndex === index}
+              aria-label={`${index + 1}ページ目`}
+              onClick={() => scrollToIndex(index)}
+              className={clsx(
+                'w-2 h-2 rounded-full transition-all duration-300',
+                'opacity-60 hover:opacity-100', // Persistent fade effect
+                currentIndex === index
+                  ? 'bg-blue-600 w-6 opacity-100'
+                  : 'bg-gray-300 hover:bg-gray-400'
+              )}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
