@@ -1183,4 +1183,77 @@ html {
     --z-toast: 1200;
   }
 
+  /* === 321web Layout Refresh - Unified Design System === */
+  
+  /* Container System */
+  .container-article {
+    max-width: 1000px;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 40px);
+  }
+
+  .container-hero {
+    max-width: 1140px;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 40px);
+  }
+
+  /* Typography & Line Length (overrides existing) */
+  .measure-lead {
+    max-width: 44ch;
+    line-height: 1.58;
+    text-wrap: balance;
+  }
+
+  .measure-body {
+    max-width: 38ch;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  /* Auto-phrase support for Japanese text */
+  @supports (word-break: auto-phrase) {
+    .jp-phrase {
+      word-break: auto-phrase;
+    }
+  }
+
+  /* Spacing System */
+  .section-gap {
+    margin-block: clamp(2.5rem, 4vw, 5rem);
+  }
+
+  .hero-gap {
+    margin-block: clamp(3rem, 6vw, 7rem);
+  }
+
+  .p-gap {
+    margin-block: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  /* Pricing & Numbers */
+  .price-nowrap {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* FAB & Safe Area */
+  .ui-bottom-content {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 88px);
+  }
+
+  /* Grid System */
+  .grid-12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 24px;
+  }
+
+  /* Card System (overrides existing) */
+  .card {
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  }
+
 }

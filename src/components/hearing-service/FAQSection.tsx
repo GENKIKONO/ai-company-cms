@@ -70,18 +70,18 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-10 sm:py-16 lg:py-20 bg-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="faq" className="section-gap bg-white">
+      <div className="container-article">
         {/* セクションヘッダー */}
-        <div className="text-center mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium mb-4">
+        <div className="section-gap">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium mb-4 mx-auto">
             <HelpCircle className="w-4 h-4" />
-            <span>よくある質問</span>
+            <span className="jp-phrase">よくある質問</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
-            お客様からよくいただくご質問
+          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+            <span className="block jp-phrase">お客様からよくいただくご質問</span>
           </h2>
-          <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600">
+          <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
             ご不明な点がございましたら、お気軽にお問い合わせください。
           </p>
         </div>

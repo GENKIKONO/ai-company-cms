@@ -36,14 +36,14 @@ export default function FAQSection({ title, description, categories }: FAQSectio
   };
 
   return (
-    <section id="faq" className="py-24 md:py-32 bg-white">
-      <div className="balanced-container">
+    <section id="faq" className="section-gap bg-white">
+      <div className="container-article">
         {/* セクションヘッダー */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight tracking-wide">
-            {title}
+        <div className="section-gap">
+          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+            <span className="block jp-phrase">{title}</span>
           </h2>
-          <p className="text-xl text-gray-600 leading-relaxed">
+          <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
             {description}
           </p>
         </div>
@@ -53,7 +53,7 @@ export default function FAQSection({ title, description, categories }: FAQSectio
           {categories.map((category, categoryIndex) => (
             <div key={categoryIndex}>
               {/* カテゴリータイトル */}
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-blue-100">
+              <h3 className="headline text-xl sm:text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-blue-100 jp-phrase">
                 {category.title}
               </h3>
               
@@ -73,7 +73,7 @@ export default function FAQSection({ title, description, categories }: FAQSectio
                         onClick={() => toggleItem(categoryIndex, itemIndex)}
                         className="w-full px-6 py-4 text-left flex items-center justify-between group"
                       >
-                        <span className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 leading-relaxed jp-faq-question">
+                        <span className="headline text-base sm:text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 jp-phrase">
                           {item.question}
                         </span>
                         <div className="flex-shrink-0 ml-4">
@@ -89,7 +89,7 @@ export default function FAQSection({ title, description, categories }: FAQSectio
                       {isOpen && (
                         <div className="px-6 pb-4">
                           <div className="pt-2 border-t border-gray-200">
-                            <p className="text-gray-700 leading-relaxed">
+                            <p className="copy measure-body text-gray-700 jp-phrase">
                               {item.answer}
                             </p>
                           </div>
@@ -104,12 +104,12 @@ export default function FAQSection({ title, description, categories }: FAQSectio
         </div>
         
         {/* 追加サポート */}
-        <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+        <div className="section-gap text-center">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 sm:p-8 border border-blue-100">
+            <h3 className="headline text-lg sm:text-xl font-bold text-gray-900 mb-2 jp-phrase">
               その他のご質問がございましたら
             </h3>
-            <p className="text-gray-600 mb-4 leading-relaxed">
+            <p className="copy measure-lead text-gray-600 mb-4 mx-auto jp-phrase">
               AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
             </p>
             <a

@@ -2,7 +2,6 @@ import { ArrowRight, Database, Search, Zap } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getSetting } from '@/lib/settings';
-import HorizontalScroller from '@/components/ui/HorizontalScroller';
 import StatCard from '@/components/ui/StatCard';
 
 interface HeroSectionProps {
@@ -35,21 +34,21 @@ export default async function HeroSection({
     ? heroImageUrl 
     : '/hero/zero-click-shift.png';
   return (
-    <section className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="balanced-container">
+    <section className="hero-gap bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="container-hero">
         <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
           {/* Left Column - Content */}
           <div>
             {/* バッジ */}
             <div className="inline-flex items-center gap-2 text-indigo-700/80 bg-indigo-50 px-3 py-1 rounded-full text-sm font-medium mb-4">
               <Zap className="w-4 h-4" />
-              <span>{subtitle}</span>
+              <span className="jp-phrase">{subtitle}</span>
             </div>
             
             {/* メインタイトル */}
-            <h1 className="ui-h1 text-gray-900 tracking-tight mb-6">
+            <h1 className="headline measure-hero text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 text-left">
               {title.split('\n').map((line, index) => (
-                <span key={index} className="block">
+                <span key={index} className="block jp-phrase">
                   {index === 1 ? (
                     <span className="text-indigo-600">
                       {line}
@@ -62,7 +61,7 @@ export default async function HeroSection({
             </h1>
             
             {/* 説明文 */}
-            <p className="ui-measure-lead ui-text-left text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 mb-8">
+            <p className="copy measure-lead text-left text-[15px] sm:text-base text-gray-600 mb-8 jp-phrase">
               AIO Hubは、AIが理解・引用しやすい形に企業情報を最適化するCMS。
               フォーム入力だけで<strong>JSON‑LD自動生成</strong>と
               <strong>構造化公開</strong>を実現し、検索からAI回答までの導線で
@@ -88,14 +87,14 @@ export default async function HeroSection({
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link 
                 href={primaryCta.href} 
-                className="inline-flex justify-center items-center rounded-lg bg-indigo-600 px-6 py-3 min-h-[44px] text-white font-medium hover:bg-indigo-700 transition-colors duration-200"
+                className="cta-nowrap inline-flex justify-center items-center rounded-lg bg-indigo-600 px-6 py-3 min-h-[44px] text-white font-medium hover:bg-indigo-700 transition-colors duration-200"
               >
                 {primaryCta.text}
               </Link>
               {secondaryCta && (
                 <Link 
                   href={secondaryCta.href} 
-                  className="inline-flex justify-center items-center rounded-lg border border-gray-300 px-6 py-3 min-h-[44px] text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
+                  className="cta-nowrap inline-flex justify-center items-center rounded-lg border border-gray-300 px-6 py-3 min-h-[44px] text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
                 >
                   {secondaryCta.text}
                 </Link>
@@ -122,20 +121,20 @@ export default async function HeroSection({
         </div>
 
         {/* 価値訴求カード */}
-        <section className="mt-16 sm:mt-20 lg:mt-24">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 text-center mb-8 tracking-tight">
+        <section className="section-gap">
+          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 text-left mb-8">
             AIO Hubで実現する価値
           </h2>
-          <HorizontalScroller ariaLabel="AIO Hubの主なメリット" className="sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {benefits.map((benefit, index) => (
               <StatCard
                 key={index}
                 value={benefit.title}
                 title={benefit.description}
-                className="snap-center min-w-[85%] sm:min-w-0"
+                className=""
               />
             ))}
-          </HorizontalScroller>
+          </div>
         </section>
       </div>
     </section>

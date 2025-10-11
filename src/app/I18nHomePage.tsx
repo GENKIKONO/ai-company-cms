@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useI18n } from '@/components/layout/I18nProvider';
 import { useABTest } from '@/lib/utils/ab-testing';
 import { useSEO } from '@/hooks/useSEO';
-import HorizontalScroller from '@/components/ui/HorizontalScroller';
 import StatCard from '@/components/ui/StatCard';
 import LayoutDebugger from '@/components/debug/LayoutDebugger';
 import { applyJapaneseSoftBreaks } from '@/lib/widow-fix-runtime';
@@ -167,7 +166,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
+          <div className="container-hero">
             <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
               {/* Left Column - Content */}
               <div>
@@ -293,92 +292,74 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="wide-container">
-            <div className="mb-16 lg:mb-20">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 lg:mb-6 text-center lg:text-left">
+          <div className="container-article">
+            <div className="section-gap">
+              <h2 className="headline text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 lg:mb-6 text-left">
                 {t('pages.home.features.title')}
               </h2>
-              <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl text-gray-600 text-center lg:text-left max-w-4xl">
+              <p className="copy measure-lead text-lg sm:text-xl md:text-2xl lg:text-2xl text-gray-600 text-left">
                 {t('pages.home.features.subtitle')}
               </p>
             </div>
 
-            <HorizontalScroller ariaLabel="管理機能セクション" className="lg:grid-cols-3">
+            <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {/* 企業管理 */}
-              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-10 lg:p-12 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300">
+              <div className="card group p-6 sm:p-7">
+                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
-                <h3 className="text-left text-balance jp-phrase text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-4 measure-card jp-kinsoku">
+                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase">
                   {t('pages.home.features.organizationManagement.title')}
                 </h3>
-                <p className="text-left text-balance jp-phrase text-base sm:text-lg lg:text-lg text-gray-600 measure-card jp-kinsoku tabular-nums leading-relaxed">
+                <p className="copy measure-body text-left text-gray-600 jp-phrase">
                   {t('pages.home.features.organizationManagement.description')}
                 </p>
-                <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-sm font-medium">詳しく見る</span>
-                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </div>
               </div>
 
               {/* サービス管理 */}
-              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-10 lg:p-12 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300">
+              <div className="card group p-6 sm:p-7">
+                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-left text-balance jp-phrase text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 mb-6 measure-card jp-kinsoku">
+                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase">
                   {t('pages.home.features.serviceManagement.title')}
                 </h3>
-                <p className="text-left text-balance jp-phrase text-lg sm:text-xl lg:text-2xl text-gray-600 measure-card jp-kinsoku tabular-nums leading-relaxed">
+                <p className="copy measure-body text-left text-gray-600 jp-phrase">
                   {t('pages.home.features.serviceManagement.description')}
                 </p>
-                <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-sm font-medium">詳しく見る</span>
-                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </div>
               </div>
 
               {/* 導入事例管理 */}
-              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-10 lg:p-12 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300">
+              <div className="card group p-6 sm:p-7">
+                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-left text-balance jp-phrase text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 mb-6 measure-card jp-kinsoku">
+                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase">
                   {t('pages.home.features.caseManagement.title')}
                 </h3>
-                <p className="text-left text-balance jp-phrase text-lg sm:text-xl lg:text-2xl text-gray-600 measure-card jp-kinsoku tabular-nums leading-relaxed">
+                <p className="copy measure-body text-left text-gray-600 jp-phrase">
                   {t('pages.home.features.caseManagement.description')}
                 </p>
-                <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-sm font-medium">詳しく見る</span>
-                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </div>
               </div>
-            </HorizontalScroller>
+            </div>
           </div>
         </section>
 
 
         {/* サービスの流れ */}
-        <section id="service-flow" className="compact-section bg-white">
-          <div className="wide-container">
-            <div className="mb-12">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+        <section id="service-flow" className="section-gap bg-white">
+          <div className="container-article">
+            <div className="section-gap">
+              <h2 className="headline text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 text-left">
                 サービスの流れ
               </h2>
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-600 leading-relaxed">
+              <p className="copy measure-lead text-lg sm:text-xl md:text-2xl text-gray-600 text-left">
                 簡単3ステップで始められます
               </p>
             </div>
@@ -444,7 +425,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* AIOダイジェスト */}
-        <section className="compact-section bg-white relative overflow-hidden">
+        <section className="section-gap bg-white relative overflow-hidden">
           {/* AI Processing Visualization Background */}
           <div className="absolute top-0 left-0 opacity-[0.02]">
             <svg width="300" height="200" viewBox="0 0 300 200">
@@ -502,18 +483,18 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="wide-container">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 flex items-center justify-center lg:justify-start">
+          <div className="container-article">
+            <h2 className="headline text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 flex items-center text-left">
               <svg className="w-12 h-12 lg:w-16 lg:h-16 mr-4 lg:mr-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              <span className="jp-punctuation-safe">AI検索最適化（AIO）対応</span>
+              <span className="jp-phrase">AI検索最適化（AIO）対応</span>
             </h2>
-            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed text-center lg:text-left">
+            <p className="copy measure-lead text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 text-left">
               本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
             </p>
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 items-stretch auto-rows-fr mb-8">
+            <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 mb-8">
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-phrase-aware ui-measure-body widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
@@ -552,19 +533,19 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 代表メッセージ */}
-        <section className="compact-section bg-gray-50">
-          <div className="wide-container">
-            <h2 className="jp-heading text-3xl font-bold text-gray-900 mb-8">
+        <section className="section-gap bg-gray-50">
+          <div className="container-article">
+            <h2 className="headline text-3xl font-bold text-gray-900 mb-8 text-left">
               {t('pages.home.message.title')}
             </h2>
-            <div className="jp-body text-lg text-gray-700 leading-relaxed max-w-4xl">
+            <div className="copy measure-lead text-lg text-gray-700 jp-phrase text-left">
               {t('pages.home.message.content', { fallback: siteSettings.representative_message })}
             </div>
           </div>
         </section>
 
         {/* CTA */}
-        <section className="relative compact-section bg-gray-800 overflow-hidden">
+        <section className="relative section-gap bg-gray-800 overflow-hidden">
           {/* 背景パターン */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute -top-40 -right-40 w-80 h-80 bg-white rounded-full"></div>
@@ -611,12 +592,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="relative wide-container text-center">
+          <div className="relative container-article text-center">
             <div className="max-w-3xl mx-auto">
-              <h2 className="jp-heading text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+              <h2 className="headline text-3xl md:text-4xl font-bold text-white mb-6 jp-phrase">
                 {t('pages.home.cta.title')}
               </h2>
-              <p className="jp-body text-xl text-gray-300 mb-8 leading-relaxed">
+              <p className="copy measure-lead text-xl text-gray-300 mb-8 jp-phrase">
                 {t('pages.home.cta.subtitle')}
               </p>
               
@@ -683,35 +664,35 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </main>
 
       {/* フッター */}
-      <footer className="bg-gray-900 text-white compact-section">
-        <div className="wide-container">
+      <footer className="bg-gray-900 text-white section-gap ui-bottom-content">
+        <div className="container-article">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4 jp-heading">{t('ui.header.title')}</h3>
-              <p className="text-gray-400 jp-body">
+              <h3 className="headline text-lg font-semibold mb-4 jp-phrase">{t('ui.header.title')}</h3>
+              <p className="copy measure-body text-gray-400 jp-phrase">
                 {t('pages.home.footer.tagline')}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 jp-heading">{t('pages.home.footer.links')}</h4>
+              <h4 className="headline font-semibold mb-4 jp-phrase">{t('pages.home.footer.links')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/organizations" className="footer-link-nowrap">{t('pages.home.footer.directory')}</Link></li>
-                <li><Link href="/search" className="footer-link-nowrap">{t('pages.home.footer.search')}</Link></li>
-                <li><Link href="/dashboard" className="footer-link-nowrap">{t('ui.header.dashboard')}</Link></li>
+                <li><Link href="/organizations" className="cta-nowrap hover:text-white transition-colors">{t('pages.home.footer.directory')}</Link></li>
+                <li><Link href="/search" className="cta-nowrap hover:text-white transition-colors">{t('pages.home.footer.search')}</Link></li>
+                <li><Link href="/dashboard" className="cta-nowrap hover:text-white transition-colors">{t('ui.header.dashboard')}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 jp-heading">{t('pages.home.footer.support')}</h4>
+              <h4 className="headline font-semibold mb-4 jp-phrase">{t('pages.home.footer.support')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/help" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.helpCenter')}</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.contact')}</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.terms')}</Link></li>
-                <li><Link href="/privacy" className="hover:text-white transition-colors footer-link-nowrap">{t('pages.home.footer.privacy')}</Link></li>
+                <li><Link href="/help" className="cta-nowrap hover:text-white transition-colors">{t('pages.home.footer.helpCenter')}</Link></li>
+                <li><Link href="/contact" className="cta-nowrap hover:text-white transition-colors">{t('pages.home.footer.contact')}</Link></li>
+                <li><Link href="/terms" className="cta-nowrap hover:text-white transition-colors">{t('pages.home.footer.terms')}</Link></li>
+                <li><Link href="/privacy" className="cta-nowrap hover:text-white transition-colors">{t('pages.home.footer.privacy')}</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p className="text-center jp-body">{t('pages.home.footer.copyright')}</p>
+            <p className="copy text-center jp-phrase">{t('pages.home.footer.copyright')}</p>
           </div>
         </div>
       </footer>

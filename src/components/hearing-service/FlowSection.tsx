@@ -1,8 +1,6 @@
 'use client';
 
 import { FileText, MessageCircle, Sparkles, ArrowRight, CheckCircle } from 'lucide-react';
-import HorizontalScroller from '@/components/ui/HorizontalScroller';
-import StatCard from '@/components/ui/StatCard';
 
 const flowSteps = [
   {
@@ -72,110 +70,85 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="bg-white compact-section">
-      <div className="wide-container">
+    <section className="bg-white section-gap">
+      <div className="container-article">
         {/* セクションヘッダー */}
-        <div className="text-center mb-10 sm:mb-12">
-          <div className="measure-lead mx-auto">
-            <h2 className="ui-h2 jp-heading text-gray-900 tracking-tight mb-6">
-              シンプルな3ステップ
-            </h2>
-            <p className="copy text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600">
-              複雑な作業は一切不要。専門スタッフがすべて代行し、あなたの企業情報をAI時代に最適な形でお届けします。
-            </p>
-          </div>
+        <div className="section-gap">
+          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+            <span className="block jp-phrase">シンプルな3ステップ</span>
+          </h2>
+          <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
+            複雑な作業は一切不要。専門スタッフがすべて代行し、あなたの企業情報をAI時代に最適な形でお届けします。
+          </p>
         </div>
 
         {/* フローステップ */}
-        <div className="mb-16 sm:mb-20 relative">
-          <HorizontalScroller ariaLabel="ヒアリング代行の流れ" className="lg:grid-cols-3" showDots={true} showArrowsOnMobile={true}>
+        <div className="section-gap">
+          <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {flowSteps.map((step, index) => {
               const colors = getColorClasses(step.color);
               const IconComponent = step.icon;
-              const isLast = index === flowSteps.length - 1;
               
               return (
-                <div key={step.step} className="step-card relative overflow-visible snap-center min-w-[90%] sm:min-w-[85%] lg:min-w-0">
+                <div key={step.step} className="card relative overflow-visible group p-6 sm:p-7">
                   {/* Step Badge - positioned outside to prevent clipping */}
-                  <div className="step-badge absolute -top-4 -left-4 z-10 pointer-events-none">
+                  <div className="absolute -top-4 -left-4 z-10 pointer-events-none">
                     <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white shadow-md`}>
                       {step.step}
                     </span>
                   </div>
                   
-                  {/* Inner card panel with fixed border and ring states */}
-                  <div className={`
-                    relative rounded-2xl bg-white shadow-sm overflow-hidden h-full p-5 sm:p-6 lg:p-7
-                    border border-blue-200/60
-                    ring-0 hover:ring-2 hover:ring-blue-300/60
-                    focus:ring-2 focus:ring-blue-400/60
-                    aria-[selected=true]:ring-2 aria-[selected=true]:ring-blue-500
-                    transition-shadow duration-300 group
-                  `}>
-                    
-                    {/* アイコン */}
-                    <div className={`w-12 h-12 sm:w-16 sm:h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-4 sm:mb-6 motion-reduce:transition-none group-hover:scale-110 transition-transform duration-300`}>
-                      <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${colors.icon}`} />
-                    </div>
-                    
-                    {/* タイトル・説明 */}
-                    <h3 className="jp-heading text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">{step.title}</h3>
-                    <p className="jp-body text-[15px] sm:text-base text-gray-600 mb-4 sm:mb-6 leading-6 sm:leading-7">{step.description}</p>
-                    
-                    {/* 詳細リスト */}
-                    <ul className="space-y-2 sm:space-y-2.5">
-                      {step.details.map((detail, detailIndex) => (
-                        <li key={detailIndex} className="flex items-start gap-2">
-                          <CheckCircle className={`w-4 h-4 ${colors.accent} mt-0.5 flex-shrink-0`} />
-                          <span className="text-[13px] sm:text-sm text-gray-700 leading-5">{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  {/* アイコン */}
+                  <div className={`w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <IconComponent className={`w-8 h-8 ${colors.icon}`} />
                   </div>
                   
-                  {/* デスクトップ専用: 次ステップへの矢印 */}
-                  {!isLast && (
-                    <div className="hidden lg:block absolute -right-6 top-1/2 transform -translate-y-1/2 z-20">
-                      <div className="bg-white rounded-full p-2 shadow-lg border border-gray-200">
-                        <ArrowRight className="w-4 h-4 text-gray-400" />
-                      </div>
-                    </div>
-                  )}
+                  {/* タイトル・説明 */}
+                  <h3 className="headline text-xl font-bold text-gray-900 mb-3 text-left jp-phrase">{step.title}</h3>
+                  <p className="copy measure-body text-left text-gray-600 mb-6 jp-phrase">{step.description}</p>
+                  
+                  {/* 詳細リスト */}
+                  <ul className="space-y-2.5">
+                    {step.details.map((detail, detailIndex) => (
+                      <li key={detailIndex} className="flex items-start gap-2">
+                        <CheckCircle className={`w-4 h-4 ${colors.accent} mt-0.5 flex-shrink-0`} />
+                        <span className="copy text-sm text-gray-700 jp-phrase">{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               );
             })}
-          </HorizontalScroller>
+          </div>
         </div>
 
         {/* Before/After セクション */}
         <div className="section-gap bg-gradient-to-r from-gray-50 to-blue-50 rounded-3xl p-8 lg:p-12">
           <div className="text-center mb-12">
-            <div className="measure-lead mx-auto">
-              <h3 className="jp-heading text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                構造化前後の違い
-              </h3>
-              <p className="copy text-gray-600">
-                ヒアリングによってあなたの企業情報がどのように変わるかをご覧ください
-              </p>
-            </div>
+            <h3 className="headline text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <span className="block jp-phrase">構造化前後の違い</span>
+            </h3>
+            <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
+              ヒアリングによってあなたの企業情報がどのように変わるかをご覧ください
+            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Before */}
             <div className="bg-white rounded-2xl p-6 border-2 border-red-200">
               <div className="text-center mb-4">
-                <span className="inline-block px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
+                <span className="inline-block px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium jp-phrase">
                   構造化前
                 </span>
               </div>
               <div className="space-y-3 text-sm text-gray-600">
-                <div className="bg-gray-100 rounded p-3">
+                <div className="bg-gray-100 rounded p-3 copy jp-phrase">
                   "弊社は総合的なITソリューションを提供しています..."
                 </div>
-                <div className="bg-gray-100 rounded p-3">
+                <div className="bg-gray-100 rounded p-3 copy jp-phrase">
                   "様々な業界のお客様にご利用いただいております..."
                 </div>
-                <div className="bg-gray-100 rounded p-3">
+                <div className="bg-gray-100 rounded p-3 copy jp-phrase">
                   "高品質なサービスで満足度向上を実現..."
                 </div>
               </div>
@@ -185,29 +158,29 @@ export default function FlowSection() {
                   <path d="m15 9-6 6"></path>
                   <path d="m9 9 6 6"></path>
                 </svg>
-                抽象的で検索されにくい
+                <span className="copy jp-phrase">抽象的で検索されにくい</span>
               </div>
             </div>
 
             {/* After */}
             <div className="bg-white rounded-2xl p-6 border-2 border-green-200">
               <div className="text-center mb-4">
-                <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium jp-phrase">
                   構造化後
                 </span>
               </div>
               <div className="space-y-3 text-sm text-gray-600">
-                <div className="bg-blue-50 rounded p-3 border-l-4 border-blue-400">
-                  <strong>対象業界:</strong> 製造業・小売業・サービス業<br />
-                  <strong>主力サービス:</strong> ECサイト構築・在庫管理システム
+                <div className="bg-blue-50 rounded p-3 border-l-4 border-blue-400 copy jp-phrase space-y-1">
+                  <div><strong>対象業界:</strong> 製造業・小売業・サービス業</div>
+                  <div><strong>主力サービス:</strong> ECサイト構築・在庫管理システム</div>
                 </div>
-                <div className="bg-purple-50 rounded p-3 border-l-4 border-purple-400">
-                  <strong>導入実績:</strong> 中小企業への豊富な導入経験<br />
-                  <strong>特徴:</strong> 短期間での効果実現を重視
+                <div className="bg-purple-50 rounded p-3 border-l-4 border-purple-400 copy jp-phrase space-y-1">
+                  <div><strong>導入実績:</strong> 中小企業への豊富な導入経験</div>
+                  <div><strong>特徴:</strong> 短期間での効果実現を重視</div>
                 </div>
-                <div className="bg-indigo-50 rounded p-3 border-l-4 border-indigo-400">
-                  <strong>差別化:</strong> ノーコード対応・24時間サポート<br />
-                  <strong>価格:</strong> 月額5万円〜・初期費用無料
+                <div className="bg-indigo-50 rounded p-3 border-l-4 border-indigo-400 copy jp-phrase space-y-1">
+                  <div><strong>差別化:</strong> ノーコード対応・24時間サポート</div>
+                  <div><strong>価格:</strong> 月額5万円〜・初期費用無料</div>
                 </div>
               </div>
               <div className="mt-4 text-xs text-green-600 text-center flex items-center justify-center gap-1">
@@ -215,7 +188,7 @@ export default function FlowSection() {
                   <circle cx="12" cy="12" r="10"></circle>
                   <path d="m9 12 2 2 4-4"></path>
                 </svg>
-                具体的でAIが理解しやすい
+                <span className="copy jp-phrase">具体的でAIが理解しやすい</span>
               </div>
             </div>
           </div>

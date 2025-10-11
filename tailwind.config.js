@@ -64,7 +64,20 @@ module.exports = {
     'ui-fab-backdrop',
     'ui-carousel-pricing',
     'ui-carousel-center-2',
-    'ui-pricing-grid'
+    'ui-pricing-grid',
+    // 321web Layout Refresh classes
+    'container-article',
+    'container-hero',
+    'measure-lead',
+    'measure-body',
+    'jp-phrase',
+    'section-gap',
+    'hero-gap',
+    'p-gap',
+    'price-nowrap',
+    'ui-bottom-content',
+    'grid-12',
+    'card'
   ],
   corePlugins: {
     textWrap: true,
