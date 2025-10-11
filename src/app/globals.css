@@ -103,6 +103,7 @@
   /* 見出し専用：バランス改行＋文字詰め - manual break override protection */
   .jp-heading {
     text-wrap: balance;
+    text-align: left; /* 商用サイト基準：見出しも基本左寄せ */
     word-break: keep-all;
     letter-spacing: 0.01em;
     hanging-punctuation: allow-end;
@@ -125,6 +126,7 @@
   /* 本文用：自然改行＋読みやすい行間 */
   .jp-body {
     text-wrap: pretty;
+    text-align: left; /* 本文は常に左寄せで可読性優先 */
     word-break: keep-all;
     line-height: 1.75;
     line-break: strict;
@@ -152,7 +154,7 @@
 /* text-wrap未対応ブラウザのフォールバック */
 @supports not (text-wrap: balance) {
   .jp-heading {
-    text-align: center;
+    text-align: left; /* レガシー中央寄せを削除 */
   }
 }
 
@@ -487,6 +489,7 @@ html {
   /* 見出し系：バランス改行 + 文字詰め */
   .jp-heading {
     text-wrap: balance;      /* 見出しの行末を均す（対応環境） */
+    text-align: left;        /* 見出しも左寄せに統一 */
     letter-spacing: .01em;
     word-break: keep-all;
     hanging-punctuation: allow-end;
@@ -495,6 +498,7 @@ html {
   /* 本文系：自然改行 + 長い英数対応 */
   .jp-body {
     text-wrap: pretty;       /* 文の自然な折返し */
+    text-align: left;        /* 本文は左寄せで読み線を統一 */
     overflow-wrap: anywhere; /* 長い英数やURLだけ安全に折返し */
     word-break: keep-all;
     line-height: 1.75;
@@ -502,7 +506,7 @@ html {
   
   /* フォールバック：text-wrap未対応ブラウザ向け */
   @supports not (text-wrap: balance) {
-    .jp-heading { text-align: center; }
+    .jp-heading { text-align: left; /* 中央寄せ依存を廃止 */ }
   }
   
   @supports not (text-wrap: pretty) {
@@ -639,11 +643,13 @@ html {
 
   /* 見出しは行末を均す。本文は自然改行。 */
   .jp-heading { 
-    text-wrap: balance; 
+    text-wrap: balance;
+    text-align: left; /* モバイル含む全環境で左寄せ */
   }
   
   .jp-body { 
-    text-wrap: pretty; 
+    text-wrap: pretty;
+    text-align: left; /* モバイル本文も左寄せで統一 */
   }
 
   /* 行長を制御（センター段落の"1文字だけの最終行"を減らす） */
@@ -689,11 +695,12 @@ html {
     word-break: keep-all; 
   }
 
-  /* スマホ本文を中央寄せにする場合でも左右内側余白を確保 */
+  /* 廃止: center-paragraph による中央寄せを左寄せに変更 */
   .center-paragraph { 
-    margin-left: auto; 
+    text-align: left; /* 可読性重視で左寄せに統一 */
+    margin-left: 0; 
     margin-right: auto; 
-    padding-inline: 8px; 
+    padding-inline: 0; 
   }
 
   /* ===== 手動改行制御システム ===== */
@@ -750,10 +757,10 @@ html {
   /* 小幅端末は中央寄せをやめて左寄せ＆行長を少し伸ばす */
   @media (max-width: 390px) {
     .jp-body-mobile-left { text-align: left !important; }
-    .measure-tight { max-width: 32ch; } /* 既存 measure-fluid(26/30/36ch) の "間" を用意 */
+    .measure-tight { max-width: 36ch; } /* 本文用：読みやすい行長に統一 */
   }
   @media (min-width: 391px) and (max-width: 414px) {
     .jp-body-mobile-left { text-align: left !important; }
-    .measure-tight { max-width: 34ch; }
+    .measure-tight { max-width: 36ch; } /* 統一：36ch固定 */
   }
 }

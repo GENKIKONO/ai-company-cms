@@ -98,8 +98,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           
           <div className="relative mx-auto max-w-7xl px-6 sm:px-8">
             <div className="py-16 sm:py-20 lg:py-28">
-              <div className={`text-center transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <h1 className="jp-phrase-aware measure-fluid widow-tweak mx-auto text-center text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 mb-6">
+              <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                <h1 className="jp-phrase-aware measure-tight widow-tweak text-left sm:text-center text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 mb-6">
                   AIO Hub AI企業CMS
                 </h1>
                 <p className="jp-body jp-body-mobile-left measure-tight widow-tweak sm:text-center text-base sm:text-lg text-gray-500 mb-10">
@@ -138,8 +138,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         {/* 機能紹介 */}
         <section className="py-12 sm:py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-            <div className="text-center mb-16">
-              <h2 className="jp-phrase-aware measure-fluid widow-tweak text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
+            <div className="mb-16">
+              <h2 className="jp-phrase-aware measure-tight widow-tweak text-left sm:text-center text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                 {t('pages.home.features.title')}
               </h2>
               <p className="jp-body jp-body-mobile-left measure-tight widow-tweak sm:text-center text-gray-600 break-keep">
@@ -155,10 +155,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
-                <h3 className="jp-phrase-aware measure-fluid widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
+                <h3 className="jp-phrase-aware measure-tight widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                   {t('pages.home.features.organizationManagement.title')}
                 </h3>
-                <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
+                <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
                   {t('pages.home.features.organizationManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -176,10 +176,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="jp-phrase-aware measure-fluid widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
+                <h3 className="jp-phrase-aware measure-tight widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                   {t('pages.home.features.serviceManagement.title')}
                 </h3>
-                <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
+                <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
                   {t('pages.home.features.serviceManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -197,10 +197,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="jp-phrase-aware measure-fluid widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
+                <h3 className="jp-phrase-aware measure-tight widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                   {t('pages.home.features.caseManagement.title')}
                 </h3>
-                <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
+                <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-8 break-keep">
                   {t('pages.home.features.caseManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -218,11 +218,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         {/* サービスの流れ */}
         <section id="service-flow" className="py-12 sm:py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-            <div className="text-center mb-16">
-              <h2 className="jp-phrase-aware measure-fluid widow-tweak text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal">
+            <div className="mb-16">
+              <h2 className="jp-phrase-aware measure-tight widow-tweak text-left sm:text-center text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal">
                 サービスの流れ
               </h2>
-              <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8">
+              <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8">
                 簡単3ステップで始められます
               </p>
             </div>
@@ -233,40 +233,40 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               
               <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* ステップ1: アカウント作成 */}
-                <div className="text-center group">
+                <div className="group">
                   <div className="relative mx-auto w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                     <span className="text-2xl font-bold text-white">1</span>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
                     アカウント作成
                   </h3>
-                  <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-gray-600 leading-relaxed">
+                  <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-gray-600 leading-relaxed">
                     メールアドレスとパスワードで簡単にアカウントを作成。<span className="nb">無料で始められます。</span>
                   </p>
                 </div>
 
                 {/* ステップ2: 企業情報登録 */}
-                <div className="text-center group">
+                <div className="group">
                   <div className="relative mx-auto w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                     <span className="text-2xl font-bold text-white">2</span>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
                     企業情報登録
                   </h3>
-                  <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-gray-600 leading-relaxed">
+                  <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-gray-600 leading-relaxed">
                     企業の基本情報を入力。<span className="nb">必要最小限の項目のみで</span>素早く登録完了。
                   </p>
                 </div>
 
                 {/* ステップ3: コンテンツ管理開始 */}
-                <div className="text-center group">
+                <div className="group">
                   <div className="relative mx-auto w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                     <span className="text-2xl font-bold text-white">3</span>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
                     コンテンツ管理開始
                   </h3>
-                  <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-gray-600 leading-relaxed">
+                  <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-gray-600 leading-relaxed">
                     サービス情報や導入事例を追加して、<span className="nb">効果的な企業PR</span>を開始できます。
                   </p>
                 </div>
@@ -289,8 +289,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
         {/* AIOダイジェスト */}
         <section className="py-12 sm:py-16 lg:py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
-            <h2 className="jp-phrase-aware measure-fluid widow-tweak text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 flex items-center justify-center tracking-tight">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+            <h2 className="jp-phrase-aware measure-tight widow-tweak text-left sm:text-center text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 flex items-center sm:justify-center tracking-tight">
               <svg className="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -303,26 +303,26 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 items-stretch auto-rows-fr mb-8">
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-phrase-aware measure-fluid widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
-                  <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-[15px] leading-7 text-gray-600">構造化データを自動生成し、<span className="nb">AI検索エンジンが</span>理解しやすい形式で情報を公開</p>
+                  <h3 className="jp-phrase-aware measure-tight widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
+                  <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-[15px] leading-7 text-gray-600">構造化データを自動生成し、<span className="nb">AI検索エンジンが</span>理解しやすい形式で情報を公開</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-phrase-aware measure-fluid widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">RSS/XML</h3>
-                  <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-[15px] leading-7 text-gray-600">フィード配信により<span className="nb">継続的な情報更新を</span>クローラーに通知</p>
+                  <h3 className="jp-phrase-aware measure-tight widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">RSS/XML</h3>
+                  <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-[15px] leading-7 text-gray-600">フィード配信により<span className="nb">継続的な情報更新を</span>クローラーに通知</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-phrase-aware measure-fluid widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">公開プロフィール（直リンク）</h3>
-                  <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-[15px] leading-7 text-gray-600">企業・サービスごとに<span className="nb">公開URLを</span>自動生成。<br className="only-mobile" />検索・AIから直接参照されやすい構成で配信します。</p>
+                  <h3 className="jp-phrase-aware measure-tight widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">公開プロフィール（直リンク）</h3>
+                  <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-[15px] leading-7 text-gray-600">企業・サービスごとに<span className="nb">公開URLを</span>自動生成。<br className="only-mobile" />検索・AIから直接参照されやすい構成で配信します。</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
-                  <h3 className="jp-phrase-aware measure-fluid widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">サイトマップ</h3>
-                  <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-[15px] leading-7 text-gray-600">動的生成により<span className="nb">ページ構造を</span>検索エンジンに効率的に伝達</p>
+                  <h3 className="jp-phrase-aware measure-tight widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">サイトマップ</h3>
+                  <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-[15px] leading-7 text-gray-600">動的生成により<span className="nb">ページ構造を</span>検索エンジンに効率的に伝達</p>
                 </div>
               </div>
             </div>
@@ -340,11 +340,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
         {/* 代表メッセージ */}
         <section className="py-12 sm:py-16 lg:py-24 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             <h2 className="jp-heading text-3xl font-bold text-gray-900 mb-8">
               {t('pages.home.message.title')}
             </h2>
-            <div className="jp-body text-lg text-gray-700 leading-relaxed">
+            <div className="jp-body text-lg text-gray-700 leading-relaxed max-w-4xl">
               {t('pages.home.message.content', { fallback: siteSettings.representative_message })}
             </div>
           </div>
