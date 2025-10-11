@@ -353,10 +353,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
 
         {/* サービスの流れ */}
-        <section id="service-flow" className="section-gap bg-white">
-          <div className="container-article">
+        <section id="service-flow" className="section-layer section-safe-top section-safe-btm surface-fade-btm section-gap bg-white">
+          <div className="container-article section-content">
             <div className="section-gap">
-              <h2 className="headline text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 text-left">
+              <h2 className="headline heading-guard-top heading-guard-btm text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 text-left">
                 サービスの流れ
               </h2>
               <p className="copy measure-lead text-lg sm:text-xl md:text-2xl text-gray-600 text-left">
@@ -425,9 +425,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* AIOダイジェスト */}
-        <section className="section-gap bg-white relative overflow-hidden">
+        <section className="section-layer section-safe-top surface-fade-top section-gap bg-white relative overflow-hidden">
           {/* AI Processing Visualization Background */}
-          <div className="absolute top-0 left-0 opacity-[0.02]">
+          <div className="section-deco top-0 left-0 opacity-[0.02]">
             <svg width="300" height="200" viewBox="0 0 300 200">
               {/* AI processing blocks */}
               <g fill="none" stroke="currentColor" strokeWidth="1" className="text-gray-600">
@@ -451,7 +451,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           {/* Geometric AI Pattern */}
-          <div className="absolute bottom-0 right-0 opacity-[0.025]">
+          <div className="section-deco bottom-0 right-0 opacity-[0.025]">
             <svg width="250" height="180" viewBox="0 0 250 180">
               <g fill="none" stroke="currentColor" strokeWidth="0.8" className="text-gray-600">
                 {/* Hexagonal AI processing grid */}
@@ -483,8 +483,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="container-article">
-            <h2 className="headline text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 flex items-center text-left">
+          <div className="container-article section-content">
+            <h2 className="headline heading-guard-top heading-guard-btm text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 flex items-center text-left">
               <svg className="w-12 h-12 lg:w-16 lg:h-16 mr-4 lg:mr-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

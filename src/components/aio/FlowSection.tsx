@@ -68,11 +68,11 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection({ title, description, steps, beforeAfter }: FlowSectionProps) {
   return (
-    <section className="section-gap bg-white">
-      <div className="container-article">
+    <section className="section-layer section-safe-top section-safe-btm surface-fade-btm section-gap bg-white">
+      <div className="container-article section-content">
         {/* セクションヘッダー */}
         <div className="section-gap">
-          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-left">
+          <h2 className="headline heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-left">
             {title.split('\n').map((line, index) => (
               <span key={index} className="block jp-phrase">{line}</span>
             ))}

@@ -113,10 +113,10 @@ const PLANS: PricingPlan[] = [
 
 export default function PricingTable() {
   return (
-    <section className="py-12 sm:py-16 lg:py-24">
-      <div className="wide-container">
+    <section className="section-layer section-safe-top section-safe-btm surface-fade-top py-12 sm:py-16 lg:py-24">
+      <div className="wide-container section-content">
         <div className="text-center mb-10 sm:mb-12">
-          <h2 className="ui-h2 jp-heading text-gray-900 mb-6 ui-measure-hero">
+          <h2 className="ui-h2 heading-guard-top heading-guard-btm jp-heading text-gray-900 mb-6 ui-measure-hero">
             シンプルで明確な料金体系
           </h2>
           <p className="ui-lead jp-body ui-measure-lead max-w-3xl mx-auto break-keep">

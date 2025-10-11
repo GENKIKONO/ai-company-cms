@@ -131,11 +131,11 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="bg-gray-50 section-gap">
-      <div className="container-article">
+    <section id="pricing" className="section-layer section-safe-top section-safe-btm surface-fade-top bg-gray-50 section-gap">
+      <div className="container-article section-content">
         {/* セクションヘッダー */}
         <div className="section-gap">
-          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+          <h2 className="headline heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
             <span className="block jp-phrase">シンプルで明確な料金体系</span>
           </h2>
           <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
@@ -155,7 +155,7 @@ export default function PricingSection() {
         </div>
 
         {/* 追加情報 */}
-        <div className="section-gap text-center">
+        <div className="section-gap section-safe-top section-safe-btm text-center">
           <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm border border-gray-200 max-w-4xl mx-auto">
             <h3 className="headline text-lg sm:text-xl font-bold text-gray-900 mb-4 jp-phrase">料金に関する補足</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 text-[13px] sm:text-sm text-gray-700">
