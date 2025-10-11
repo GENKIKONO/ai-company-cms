@@ -3,7 +3,7 @@
 export const aioCopy = {
   // Hero Section
   hero: {
-    title: 'ゼロクリック時代でも\n見つかり続ける企業情報へ',
+    title: 'ゼロクリック時代でも\n見つかり続ける\n企業情報へ',
     subtitle: 'AIO（AI Information Optimization）',
     description: 'AIが理解・引用しやすい形に情報を最適化。JSON-LD自動生成とCMS管理で、検索からAI回答まで一貫して見つかる企業情報を実現します。',
     features: [

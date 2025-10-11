@@ -34,8 +34,8 @@ export default async function HeroSection({
     ? heroImageUrl 
     : '/hero/zero-click-shift.png';
   return (
-    <section className="deco-wrap hero-gap bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="container-hero content-above-deco">
+    <section className="section-layer section-hero-pad surface-fade-btm deco-wrap hero-gap bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="container-hero section-content content-above-deco">
         <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
           {/* Left Column - Content */}
           <div>

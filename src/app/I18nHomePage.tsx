@@ -533,7 +533,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 代表メッセージ */}
-        <section className="section-layer section-safe-top surface-fade-top section-gap bg-gray-50">
+        <section className="section-layer section-safe-top section-safe-btm surface-fade-top surface-fade-btm section-gap bg-gray-50">
           <div className="container-article section-content">
             <h2 className="headline heading-guard-top heading-guard-btm text-3xl font-bold text-gray-900 mb-8 text-left">
               {t('pages.home.message.title')}
@@ -545,7 +545,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* CTA */}
-        <section className="section-layer section-safe-top section-safe-btm deco-wrap cta-safe-minh bg-gray-800">
+        <section className="section-layer section-safe-top section-safe-btm surface-fade-top surface-fade-btm deco-wrap cta-safe-minh bg-gray-800">
           {/* 背景パターン - 安全な配置で切り取り防止 */}
           <div className="deco-img opacity-10">
             <svg width="100%" height="100%" viewBox="0 0 800 600" className="media-contain">
@@ -596,11 +596,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           
           <div className="relative container-article text-center content-above-deco">
             <div className="max-w-3xl mx-auto">
-              <h2 className="headline text-3xl md:text-4xl font-bold text-white mb-6 jp-phrase">
+              <h2 className="headline text-3xl md:text-4xl font-bold text-white mb-6 jp-phrase break-keep">
                 {t('pages.home.cta.title')}
               </h2>
-              <p className="copy measure-lead text-xl text-gray-300 mb-8 jp-phrase">
-                {t('pages.home.cta.subtitle')}
+              <p className="copy measure-lead text-lg md:text-xl text-gray-300 mb-8 jp-phrase break-keep">
+                {t('pages.home.cta.subtitle').split('\n').map((line, index) => (
+                  <span key={index} className="block">{line}</span>
+                ))}
               </p>
               
               <div className="flex flex-col sm:flex-row flex-nowrap gap-4 justify-center items-center">

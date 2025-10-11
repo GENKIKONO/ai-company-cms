@@ -525,7 +525,7 @@ export const translations: Record<SupportedLocale, TranslationDictionary> = {
         },
         cta: {
           title: '今すぐ始めましょう',
-          subtitle: 'AI・DXビジネスの成長を加速させる最適なソリューションをご提供します',
+          subtitle: 'AI・DXビジネスの成長を加速させる\n最適なソリューションをご提供します',
           button: '無料で始める'
         },
         footer: {
