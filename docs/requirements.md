@@ -67,7 +67,7 @@ AIO Hub implements a comprehensive design system based on **CSS Design Tokens** 
 | **Colors** | `--color-brand: #4F46E5`<br>`--color-accent: #06B6D4`<br>`--color-text: #0F172A` | Brand colors, text colors |
 | **Typography** | `--font-size-h1: clamp(28px, 6vw, 38px)`<br>`--font-size-h2: clamp(22px, 4.5vw, 30px)` | Responsive typography |
 | **Spacing** | `--space-xs: clamp(4px, 1vw, 8px)`<br>`--space-xl: clamp(32px, 6vw, 64px)` | Consistent spacing rhythm |
-| **Layout** | `--measure-hero: 30ch`<br>`--measure-lead: 44ch`<br>`--measure-body: 38ch` | Optimal line lengths |
+| **Layout** | `--measure-hero: 30ch`<br>`--measure-lead: 44ch`<br>`--measure-body: 38ch`<br>`--container-max-pc: 960px` | Optimal line lengths & content width |
 
 #### 2.1.2 Visual Alignment Standards
 
@@ -79,6 +79,11 @@ AIO Hub implements a comprehensive design system based on **CSS Design Tokens** 
 | **Body Text** | Aligned with headlines | ±4px | `.measure-lead .copy` |
 | **Pricing Cards (PC)** | Screen centerline | ±16px | `lg:grid-cols-2 justify-center` |
 | **Mobile Cards** | 1.1-card display | ±4px | `min-w-[85vw]` |
+
+**Container Width Evolution (A/B Testing Candidates)**:
+- Current: `--container-max-pc: 960px` (beautiful default, 200px gutters @ 1440px)
+- Alternative A: `--container-max-pc: 920px` (compact, 260px gutters @ 1440px)  
+- Alternative B: `--container-max-pc: 1000px` (balanced, 180px gutters @ 1440px)
 
 ### 2.2 Typography System
 

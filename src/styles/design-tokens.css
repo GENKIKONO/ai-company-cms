@@ -56,6 +56,10 @@
   --color-error-100: rgb(254 226 226);
   --color-error-500: rgb(239 68 68);
   --color-error-600: rgb(220 38 38);
+
+  /* === Layout Containers === */
+  --container-max-pc: 960px;
+  --container-max-mobile: 100vw;
 }
 
 /* === タイポグラフィ === */
@@ -94,6 +98,13 @@
 
 .content-wrapper {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Center column with design token */
+.center-col {
+  max-width: var(--container-max-pc);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
 }
 
 .card {
