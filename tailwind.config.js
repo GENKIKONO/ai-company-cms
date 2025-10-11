@@ -47,13 +47,75 @@ module.exports = {
     'only-mobile',
     'jp-phrase-aware',
     'jp-body-mobile-left',
-    'measure-tight'
+    'measure-tight',
+    'ui-rail',
+    'ui-h1',
+    'ui-h2',
+    'ui-h3',
+    'ui-lead',
+    'ui-body',
+    'ui-measure-hero',
+    'ui-measure-lead',
+    'ui-measure-body',
+    'ui-section-gap',
+    'ui-paragraph-gap',
+    'ui-bottom-content',
+    'ui-fab-layer',
+    'ui-fab-backdrop',
+    'ui-carousel-pricing',
+    'ui-carousel-center-2',
+    'ui-pricing-grid'
   ],
   corePlugins: {
     textWrap: true,
   },
   theme: {
     extend: {
+      colors: {
+        brand: 'var(--color-brand)',
+        accent: 'var(--color-accent)',
+        text: 'var(--color-text)',
+        muted: 'var(--color-muted)',
+        bg: 'var(--color-bg)',
+        error: 'var(--color-error)',
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+      },
+      fontSize: {
+        'h1': 'var(--font-size-h1)',
+        'h2': 'var(--font-size-h2)',
+        'h3': 'var(--font-size-h3)',
+        'body': 'var(--font-size-body)',
+        'small': 'var(--font-size-small)',
+      },
+      lineHeight: {
+        'tight': 'var(--line-height-tight)',
+        'body': 'var(--line-height-body)',
+        'relaxed': 'var(--line-height-relaxed)',
+      },
+      spacing: {
+        'xs': 'var(--space-xs)',
+        's': 'var(--space-s)',
+        'm': 'var(--space-m)',
+        'l': 'var(--space-l)',
+        'xl': 'var(--space-xl)',
+        '2xl': 'var(--space-2xl)',
+      },
+      borderRadius: {
+        's': 'var(--radius-s)',
+        'm': 'var(--radius-m)',
+        'l': 'var(--radius-l)',
+      },
+      boxShadow: {
+        'card': 'var(--shadow-card)',
+        'hover': 'var(--shadow-hover)',
+      },
+      zIndex: {
+        'fab': 'var(--z-fab)',
+        'fab-backdrop': 'var(--z-fab-backdrop)',
+        'modal': 'var(--z-modal)',
+        'toast': 'var(--z-toast)',
+      },
       typography: {
         DEFAULT: {
           css: {

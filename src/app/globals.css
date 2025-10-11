@@ -791,6 +791,7 @@ html {
   
   .ui-measure-lead { 
     max-width: 44ch; 
+    line-height: 1.6;
   }
   
   .ui-measure-title { 
@@ -798,43 +799,95 @@ html {
     text-wrap: balance; 
   }
   
-  /* 階層原則 */
+  /* 階層原則 - Design Tokens適用 */
   .ui-h1 { 
-    font-size: clamp(2rem, 4vw, 2.5rem); 
-    margin-bottom: 2rem; 
+    font-size: var(--font-size-h1); 
+    margin-bottom: var(--space-l); 
     font-weight: bold;
-    line-height: 1.2;
+    line-height: var(--line-height-tight);
   }
   
   .ui-h2 { 
-    font-size: clamp(1.75rem, 3.5vw, 2rem); 
-    margin-bottom: 1.5rem; 
+    font-size: var(--font-size-h2); 
+    margin-bottom: var(--space-m); 
     font-weight: bold;
-    line-height: 1.3;
+    line-height: var(--line-height-tight);
   }
   
   .ui-h3 { 
-    font-size: clamp(1.25rem, 3vw, 1.5rem); 
-    margin-bottom: 1rem; 
+    font-size: var(--font-size-h3); 
+    margin-bottom: var(--space-s); 
     font-weight: 600;
-    line-height: 1.4;
+    line-height: var(--line-height-tight);
   }
   
-  /* 余白リズム */
+  .ui-body { 
+    font-size: var(--font-size-body); 
+    line-height: var(--line-height-body);
+  }
+  
+  .ui-lead { 
+    font-size: var(--font-size-body); 
+    line-height: var(--line-height-relaxed);
+    color: var(--color-muted);
+  }
+  
+  /* 余白リズム - Design Tokens適用 */
   .ui-section { 
-    padding: clamp(3rem, 8vw, 6rem) 0; 
+    padding: var(--space-2xl) 0; 
   }
   
   .ui-section-gap { 
-    margin-bottom: 1.5rem; 
+    margin-bottom: var(--space-xl); 
   }
   
   .ui-paragraph-gap { 
-    margin-bottom: 1rem; 
+    margin-bottom: var(--space-m); 
   }
   
   .ui-cta-gap { 
     margin-top: 2rem; 
+  }
+
+  /* レール配置（左基準統一） */
+  .ui-rail {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  /* ui-rail 内タイポグラフィ統一 */
+  .ui-rail h1, .ui-rail h2 { 
+    margin-bottom: 0.6em; 
+  }
+
+  .ui-rail p + p { 
+    margin-top: 0.5em; 
+  }
+
+  @media (min-width: 640px) {
+    .ui-rail {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .ui-rail {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  /* ヒーロー専用行長 */
+  .measure-hero {
+    max-width: 30ch;
   }
   
   /* 版面軸統一 */
@@ -879,12 +932,31 @@ html {
   .ui-carousel-pricing { 
     padding-left: 5vw;
     padding-right: 20vw; /* 0.1カード分を見せる */
+    scroll-padding-inline-start: 1rem;
+    scroll-padding-inline-end: 1rem;
   }
   
   @media (min-width: 640px) {
     .ui-carousel-pricing { 
       padding-left: 0;
       padding-right: 0;
+    }
+  }
+
+  /* 料金カードPC配置 */
+  .ui-pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    justify-items: center;
+    place-items: stretch;
+    max-width: calc(2 * 360px + 2rem);
+    margin: 0 auto;
+  }
+
+  @media (max-width: 639px) {
+    .ui-pricing-grid {
+      display: flex;
     }
   }
   
@@ -894,8 +966,28 @@ html {
     z-index: 60;
   }
   
-  .ui-bottom-content { 
+  /* FAB安全地帯 - 下部余白 */
+  .ui-bottom-spacing { 
     margin-bottom: 120px; /* FAB領域確保 */ 
+  }
+
+  /* メニュー展開時のFAB重なり回避 */
+  .ui-menu-expanded-padding {
+    padding-bottom: calc(112px + env(safe-area-inset-bottom));
+  }
+
+  /* FAB安全地帯 - コンテンツ下部 */
+  .ui-bottom-content {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+
+  /* FAB微調整 - Design Tokens適用 */
+  .ui-fab-layer {
+    z-index: var(--z-fab);
+  }
+
+  .ui-fab-backdrop {
+    z-index: var(--z-fab-backdrop);
   }
 
   /* Animations */
@@ -912,6 +1004,50 @@ html {
 
   .animate-fade-in {
     animation: fade-in 0.3s ease-out forwards;
+  }
+
+  /* Design Tokens */
+  :root {
+    /* Colors */
+    --color-brand: #4F46E5;
+    --color-accent: #06B6D4;
+    --color-text: #0F172A;
+    --color-muted: #475569;
+    --color-bg: #FFFFFF;
+    --color-error: #EF4444;
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+
+    /* Typography */
+    --font-size-h1: clamp(28px, 6vw, 38px);
+    --font-size-h2: clamp(22px, 4.5vw, 30px);
+    --font-size-h3: clamp(18px, 3.5vw, 24px);
+    --font-size-body: 15px;
+    --font-size-small: 13px;
+    --line-height-tight: 1.2;
+    --line-height-body: 1.7;
+    --line-height-relaxed: 1.8;
+
+    /* Spacing */
+    --space-xs: clamp(4px, 1vw, 8px);
+    --space-s: clamp(8px, 1.5vw, 16px);
+    --space-m: clamp(16px, 3vw, 24px);
+    --space-l: clamp(24px, 4vw, 40px);
+    --space-xl: clamp(32px, 6vw, 64px);
+    --space-2xl: clamp(48px, 8vw, 96px);
+
+    /* Radius & Shadow */
+    --radius-s: 6px;
+    --radius-m: 12px;
+    --radius-l: 16px;
+    --shadow-card: 0 8px 24px rgba(2, 6, 23, .06);
+    --shadow-hover: 0 12px 32px rgba(2, 6, 23, .12);
+
+    /* Z-index scale */
+    --z-fab: 1000;
+    --z-fab-backdrop: 999;
+    --z-modal: 1100;
+    --z-toast: 1200;
   }
 
 }
