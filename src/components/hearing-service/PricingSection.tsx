@@ -70,6 +70,66 @@ const getColorClasses = (color: string, popular: boolean = false) => {
   return colors[color as keyof typeof colors];
 };
 
+const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
+  const colors = getColorClasses(plan.color, plan.popular);
+  const IconComponent = plan.icon;
+  
+  return (
+    <>
+      {/* 人気バッジ */}
+      {plan.popular && (
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+          <span className="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-medium shadow-lg">
+            <Zap className="w-4 h-4" />
+            おすすめ
+          </span>
+        </div>
+      )}
+      
+      <div className={`relative ${colors.bg} ${plan.popular ? '' : 'border-2 ' + colors.border} rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-300 h-full`}>
+        {/* プランヘッダー */}
+        <div className="text-center mb-6 sm:mb-8">
+          <div className={`w-12 h-12 sm:w-16 sm:h-16 ${plan.popular ? 'bg-white/20' : 'bg-gray-100'} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+            <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${plan.popular ? 'text-white' : colors.accent}`} />
+          </div>
+          <h3 className={`text-xl sm:text-2xl font-bold ${colors.text} mb-2`}>{plan.name}</h3>
+          <p className={`text-[15px] sm:text-base lg:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 leading-6 sm:leading-7 lg:leading-7 measure-pricing`}>{plan.description}</p>
+          
+          <div className="flex items-baseline justify-center gap-1 price-nowrap">
+            <span className={`text-3xl sm:text-4xl font-bold ${colors.text} tabular-nums`}>¥{plan.price}</span>
+            <span className={`text-sm sm:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'}`}>/ {plan.period}</span>
+          </div>
+        </div>
+
+        {/* 機能リスト */}
+        <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+          {plan.features.map((feature, index) => (
+            <div key={index} className="flex items-start gap-3">
+              <Check className={`w-4 h-4 sm:w-5 sm:h-5 ${plan.popular ? 'text-white' : 'text-green-500'} mt-0.5 flex-shrink-0`} />
+              <span className={`text-[13px] sm:text-sm lg:text-sm ${plan.popular ? 'text-white/90' : 'text-gray-700'} leading-5 lg:leading-6 measure-pricing`}>{feature}</span>
+            </div>
+          ))}
+          
+          {plan.limitations.map((limitation, index) => (
+            <div key={index} className="flex items-start gap-3 opacity-70">
+              <div className={`w-4 h-4 sm:w-5 sm:h-5 ${plan.popular ? 'text-white' : 'text-gray-400'} mt-0.5 flex-shrink-0 text-center text-sm`}>×</div>
+              <span className={`text-[13px] sm:text-sm ${plan.popular ? 'text-white/70' : 'text-gray-500'} leading-5`}>{limitation}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* CTAボタン */}
+        <Link
+          href="/dashboard"
+          className={`block w-full text-center px-6 py-3 min-h-[44px] ${colors.button} rounded-lg font-medium transition-colors duration-200`}
+        >
+          {plan.buttonText}
+        </Link>
+      </div>
+    </>
+  );
+};
+
 export default function PricingSection() {
   return (
     <section id="pricing" className="bg-gray-50" style={{paddingBlock: 'clamp(2.5rem, 4vw, 5rem)'}}>
@@ -88,68 +148,26 @@ export default function PricingSection() {
 
         {/* 料金プラン */}
         <div className="mb-12 sm:mb-16">
-          <div className="max-w-7xl mx-auto px-8 lg:px-12">
-            <HorizontalScroller ariaLabel="料金プラン" className="grid grid-cols-1 lg:grid-cols-2 gap-24 justify-center items-start" showDots={true} showArrowsOnMobile={true}>
-            {pricingPlans.map((plan) => {
-              const colors = getColorClasses(plan.color, plan.popular);
-              const IconComponent = plan.icon;
-              
-              return (
-                <div key={plan.name} className="snap-start min-w-[85vw] max-w-[320px] sm:min-w-0 w-full max-w-[560px] lg:flex-1 relative">
-                  {/* 人気バッジ */}
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                      <span className="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-medium shadow-lg">
-                        <Zap className="w-4 h-4" />
-                        おすすめ
-                      </span>
-                    </div>
-                  )}
-                  
-                  <div className={`relative ${colors.bg} ${plan.popular ? '' : 'border-2 ' + colors.border} rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-300 h-full`}>
-                    {/* プランヘッダー */}
-                    <div className="text-center mb-6 sm:mb-8">
-                      <div className={`w-12 h-12 sm:w-16 sm:h-16 ${plan.popular ? 'bg-white/20' : 'bg-gray-100'} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
-                        <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${plan.popular ? 'text-white' : colors.accent}`} />
-                      </div>
-                      <h3 className={`text-xl sm:text-2xl font-bold ${colors.text} mb-2`}>{plan.name}</h3>
-                      <p className={`text-[15px] sm:text-base lg:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 leading-6 sm:leading-7 lg:leading-7 measure-pricing`}>{plan.description}</p>
-                      
-                      <div className="flex items-baseline justify-center gap-1 price-nowrap">
-                        <span className={`text-3xl sm:text-4xl font-bold ${colors.text} tabular-nums`}>¥{plan.price}</span>
-                        <span className={`text-sm sm:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'}`}>/ {plan.period}</span>
-                      </div>
-                    </div>
-
-                    {/* 機能リスト */}
-                    <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                      {plan.features.map((feature, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <Check className={`w-4 h-4 sm:w-5 sm:h-5 ${plan.popular ? 'text-white' : 'text-green-500'} mt-0.5 flex-shrink-0`} />
-                          <span className={`text-[13px] sm:text-sm lg:text-sm ${plan.popular ? 'text-white/90' : 'text-gray-700'} leading-5 lg:leading-6 measure-pricing`}>{feature}</span>
-                        </div>
-                      ))}
-                      
-                      {plan.limitations.map((limitation, index) => (
-                        <div key={index} className="flex items-start gap-3 opacity-70">
-                          <div className={`w-4 h-4 sm:w-5 sm:h-5 ${plan.popular ? 'text-white' : 'text-gray-400'} mt-0.5 flex-shrink-0 text-center text-sm`}>×</div>
-                          <span className={`text-[13px] sm:text-sm ${plan.popular ? 'text-white/70' : 'text-gray-500'} leading-5`}>{limitation}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* CTAボタン */}
-                    <Link
-                      href="/dashboard"
-                      className={`block w-full text-center px-6 py-3 min-h-[44px] ${colors.button} rounded-lg font-medium transition-colors duration-200`}
-                    >
-                      {plan.buttonText}
-                    </Link>
-                  </div>
+          {/* モバイル: HorizontalScroller */}
+          <div className="lg:hidden max-w-6xl mx-auto px-6">
+            <HorizontalScroller ariaLabel="料金プラン" showDots={true} showArrowsOnMobile={true}>
+              {pricingPlans.map((plan) => (
+                <div key={plan.name} className="snap-start min-w-[85vw] max-w-[320px] sm:min-w-0 relative">
+                  <PricingCard plan={plan} />
                 </div>
-              );
-            })}
-          </HorizontalScroller>
+              ))}
+            </HorizontalScroller>
+          </div>
+          
+          {/* デスクトップ: 直接グリッド */}
+          <div className="hidden lg:block max-w-7xl mx-auto px-8 lg:px-12">
+            <div className="grid grid-cols-2 gap-24 justify-center items-start">
+              {pricingPlans.map((plan) => (
+                <div key={plan.name} className="w-full max-w-[560px] mx-auto relative">
+                  <PricingCard plan={plan} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
