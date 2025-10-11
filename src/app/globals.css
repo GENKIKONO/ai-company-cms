@@ -371,9 +371,9 @@ html {
   
   /* Balanced container with appropriate margins */
   .balanced-container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding-inline: max(1.5rem, 2.5vw);
+    padding-inline: 1.5rem;
   }
   
   /* Ultra-wide container for hero sections */
