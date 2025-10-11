@@ -327,6 +327,24 @@
   }
 }
 
+/* === Focus Management for Accessibility === */
+.focus-clean {
+  outline: none;
+}
+
+.focus-clean:focus-visible {
+  outline: 2px solid rgb(59 130 246);
+  outline-offset: 2px;
+}
+
+/* === CTA Button Utilities === */
+.cta-nowrap {
+  white-space: nowrap;
+  word-break: keep-all;
+  text-wrap: nowrap;
+  min-height: 52px;
+}
+
 /* === STANDARDIZED LAYOUT SYSTEM === */
 
 /* Container utilities - Recomposed */

@@ -67,7 +67,7 @@ export default function PricingSection({ title, description, plans, notes }: Pri
 
         {/* 料金プラン */}
         <div className="section-gap">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-24 max-w-5xl mx-auto">
           {plans.map((plan) => {
             const colors = getColorClasses(plan.color, plan.popular);
             const IconComponent = iconComponents[plan.icon as keyof typeof iconComponents];

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Pricing Cards Center Alignment and Gap', () => {
   test('pricing cards are properly centered on the page', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/aio');
     await page.waitForLoadState('networkidle');
     
     // Set desktop viewport
@@ -21,12 +21,12 @@ test.describe('Pricing Cards Center Alignment and Gap', () => {
     const maxWidth = await pricingGrid.evaluate((el) => 
       getComputedStyle(el).maxWidth
     );
-    // Should be max-w-4xl (896px)
-    expect(maxWidth).toBe('896px');
+    // Should be max-w-5xl (1024px)
+    expect(maxWidth).toBe('1024px');
   });
 
   test('pricing cards have consistent gap spacing', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/aio');
     await page.waitForLoadState('networkidle');
     
     // Set desktop viewport to ensure 2-column layout
@@ -36,19 +36,19 @@ test.describe('Pricing Cards Center Alignment and Gap', () => {
     
     // Check gap classes
     const containerClasses = await pricingGrid.getAttribute('class');
-    expect(containerClasses).toContain('gap-8');
-    expect(containerClasses).toContain('lg:gap-16');
+    expect(containerClasses).toContain('gap-20');
+    expect(containerClasses).toContain('lg:gap-24');
     
     // Verify actual gap spacing
     const gap = await pricingGrid.evaluate((el) => 
       getComputedStyle(el).gap
     );
-    // On desktop should be 64px (gap-16)
-    expect(gap).toBe('64px');
+    // On desktop should be 96px (gap-24)
+    expect(gap).toBe('96px');
   });
 
   test('pricing cards maintain 2-column layout on desktop', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/aio');
     await page.waitForLoadState('networkidle');
     
     // Set desktop viewport
@@ -71,7 +71,7 @@ test.describe('Pricing Cards Center Alignment and Gap', () => {
   });
 
   test('pricing cards stack on mobile viewport', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/aio');
     await page.waitForLoadState('networkidle');
     
     // Set mobile viewport
@@ -89,11 +89,11 @@ test.describe('Pricing Cards Center Alignment and Gap', () => {
     const gap = await pricingGrid.evaluate((el) => 
       getComputedStyle(el).gap
     );
-    expect(gap).toBe('32px'); // gap-8
+    expect(gap).toBe('80px'); // gap-20
   });
 
   test('pricing cards are visually centered within viewport', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/aio');
     await page.waitForLoadState('networkidle');
     
     // Set desktop viewport
@@ -114,7 +114,7 @@ test.describe('Pricing Cards Center Alignment and Gap', () => {
   });
 
   test('pricing cards have proper card styling and spacing', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/aio');
     await page.waitForLoadState('networkidle');
     
     await page.setViewportSize({ width: 1024, height: 768 });
@@ -143,7 +143,7 @@ test.describe('Pricing Cards Center Alignment and Gap', () => {
   });
 
   test('popular badge positioning on centered cards', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/aio');
     await page.waitForLoadState('networkidle');
     
     await page.setViewportSize({ width: 1024, height: 768 });
@@ -167,7 +167,7 @@ test.describe('Pricing Cards Center Alignment and Gap', () => {
   });
 
   test('pricing section responsive behavior', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/aio');
     await page.waitForLoadState('networkidle');
     
     const viewports = [
@@ -196,7 +196,7 @@ test.describe('Pricing Cards Center Alignment and Gap', () => {
   });
 
   test('additional plans link is properly centered below cards', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/aio');
     await page.waitForLoadState('networkidle');
     
     await page.setViewportSize({ width: 1024, height: 768 });

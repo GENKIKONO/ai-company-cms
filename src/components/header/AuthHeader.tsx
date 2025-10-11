@@ -26,7 +26,7 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
           <div className="flex items-center">
             <Link 
               href="/" 
-              className="text-2xl font-bold text-gray-900 hover:text-blue-600"
+              className="focus-clean text-2xl font-bold text-gray-900 hover:text-blue-600"
             >
               AIO Hub AI企業CMS
             </Link>
@@ -34,13 +34,13 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
               <nav className="ml-10 hidden md:flex space-x-8">
                 <Link 
                   href="/dashboard" 
-                  className={isMyPageActive ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}
+                  className={`focus-clean ${isMyPageActive ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                   マイページ
                 </Link>
                 <Link 
                   href="/dashboard/billing" 
-                  className={currentPage === 'billing' ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}
+                  className={`focus-clean ${currentPage === 'billing' ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                   サブスクリプション
                 </Link>
@@ -69,7 +69,7 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
                 {/* モバイル表示: アバターメニュー */}
                 <div className="md:hidden relative">
                   <details className="group">
-                    <summary className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300">
+                    <summary className="focus-clean flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300">
                       <span className="text-sm font-medium text-gray-700">
                         {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
                       </span>
@@ -91,13 +91,13 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
               <>
                 <Link
                   href="/auth/login"
-                  className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                  className="focus-clean text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   ログイン
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="focus-clean bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
                 >
                   新規登録
                 </Link>
