@@ -96,14 +96,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           {/* 背景装飾 - 控えめなラジアルグラデーション */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
-          <div className="ui-axis-main px-6 sm:px-8">
-            <div className="py-16 sm:py-20 lg:py-28">
+          <div className="center-col">
+            <div className="py-16 sm:py-20 lg:py-28 text-left">
               <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <h1 className="ui-h1 ui-section-title text-gray-900 mb-6">
+                <h1 className="headline measure-hero text-gray-900 mb-6 ui-h1">
                   AIO Hub AI企業CMS
                 </h1>
-                <p className="ui-measure-lead ui-text-left text-base sm:text-lg text-gray-500 mb-10">
-                  AI技術を活用した<br className="only-mobile" />企業情報の統合管理プラットフォーム
+                <p className="copy measure-lead text-base sm:text-lg text-gray-500 mb-10">
+                  AI技術を活用した企業情報の統合管理プラットフォーム
                 </p>
                 
                 <div className="flex flex-col sm:flex-row flex-nowrap gap-4 sm:gap-6 justify-start">

@@ -14,8 +14,7 @@ export default function HeroSection() {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
       </div>
       
-      <div className="ui-axis-main px-4 sm:px-6 lg:px-8">
-        <div className="ui-section-title">
+      <div className="center-col text-left">
           {/* バッジ */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
@@ -23,7 +22,7 @@ export default function HeroSection() {
           </div>
           
           {/* メインタイトル */}
-          <h1 className="ui-h1 jp-heading text-gray-900 leading-tight tracking-tight">
+          <h1 className="headline measure-hero ui-h1 jp-heading text-gray-900 leading-tight tracking-tight mb-6">
             <span className="block">AIに</span>
             <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               伝わる企業情報へ
@@ -31,12 +30,12 @@ export default function HeroSection() {
           </h1>
           
           {/* サブタイトル */}
-          <p className="ui-measure-lead ui-text-left jp-body text-[15px] sm:text-base md:text-xl text-gray-600 mb-8 mx-auto leading-7 sm:leading-8">
-            1時間のヒアリングで、<br className="sm:hidden" />あなたの会社の魅力を<br className="hidden md:block" /><span className="font-semibold text-blue-600">AIが理解しやすい構造</span>に最適化します
+          <p className="copy measure-lead text-[15px] sm:text-base md:text-xl text-gray-600 mb-8 leading-7 sm:leading-8">
+            1時間のヒアリングで、あなたの会社の魅力を<span className="font-semibold text-blue-600">AIが理解しやすい構造</span>に最適化します
           </p>
           
           {/* 特徴ポイント */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8 text-gray-700">
+          <div className="flex flex-col sm:flex-row items-start justify-start gap-4 sm:gap-6 mb-8 text-gray-700">
             <div className="flex items-center gap-2">
               <Brain className="w-5 h-5 text-blue-500" />
               <span className="text-sm font-medium whitespace-nowrap">専任スタッフがヒアリング</span>
@@ -52,10 +51,10 @@ export default function HeroSection() {
           </div>
           
           {/* CTAボタン */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+          <div className="flex flex-col sm:flex-row items-start justify-start gap-3 sm:gap-4">
             <Link
               href="#pricing"
-              className="group inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors duration-200"
+              className="cta-nowrap group inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors duration-200"
             >
               <span>サービス詳細を見る</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -63,7 +62,7 @@ export default function HeroSection() {
             
             <Link
               href="#faq"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-white/80 backdrop-blur-sm text-gray-700 rounded-lg font-medium border border-gray-200 hover:bg-white hover:border-gray-300 transition-colors duration-200"
+              className="cta-nowrap inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-white/80 backdrop-blur-sm text-gray-700 rounded-lg font-medium border border-gray-200 hover:bg-white hover:border-gray-300 transition-colors duration-200"
             >
               よくある質問
             </Link>
@@ -86,7 +85,6 @@ export default function HeroSection() {
               </div>
             </HorizontalScroller>
           </div>
-        </div>
       </div>
     </section>
   );

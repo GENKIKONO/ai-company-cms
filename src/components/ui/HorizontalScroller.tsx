@@ -11,12 +11,16 @@ export default function HorizontalScroller({
   showDots = true,
   showArrowsOnMobile = true,
   showHintOnce = true,
+  scrollPaddingInlineStart = '24px',
+  scrollPaddingInlineEnd = '24px',
 }: PropsWithChildren<{
   className?: string; 
   ariaLabel?: string;
   showDots?: boolean;
   showArrowsOnMobile?: boolean;
   showHintOnce?: boolean;
+  scrollPaddingInlineStart?: string;
+  scrollPaddingInlineEnd?: string;
 }>) {
   const ref = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -31,13 +35,14 @@ export default function HorizontalScroller({
       
       // Show hint only on mobile and if not shown before
       if (showHintOnce && window.innerWidth < 640) {
-        const hasSeenHint = localStorage.getItem('hs-hint');
+        const hintKey = ariaLabel === 'ヒアリング代行の流れ' ? 'hs-flow-hint' : 'hs-hint';
+        const hasSeenHint = localStorage.getItem(hintKey);
         if (!hasSeenHint) {
           setShowHint(true);
         }
       }
     }
-  }, [children, showHintOnce]);
+  }, [children, showHintOnce, ariaLabel]);
 
   // Intersection Observer for scroll position tracking
   useEffect(() => {
@@ -68,7 +73,8 @@ export default function HorizontalScroller({
   // Handle hint dismissal
   const dismissHint = () => {
     setShowHint(false);
-    localStorage.setItem('hs-hint', 'seen');
+    const hintKey = ariaLabel === 'ヒアリング代行の流れ' ? 'hs-flow-hint' : 'hs-hint';
+    localStorage.setItem(hintKey, 'seen');
   };
 
   // Navigation functions
@@ -110,6 +116,9 @@ export default function HorizontalScroller({
         scrollSnapStop: 'normal',
         // Better mobile scroll momentum
         WebkitOverflowScrolling: 'touch',
+        // Custom scroll padding for cleaner edges
+        scrollPaddingInlineStart,
+        scrollPaddingInlineEnd,
       }}
     >
       <div className={clsx(

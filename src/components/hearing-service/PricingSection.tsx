@@ -73,13 +73,13 @@ const getColorClasses = (color: string, popular: boolean = false) => {
 export default function PricingSection() {
   return (
     <section id="pricing" className="py-10 sm:py-16 lg:py-20 bg-gray-50">
-      <div className="ui-axis-main px-4 sm:px-6 lg:px-8">
+      <div className="ui-rail px-4 sm:px-6 lg:px-8">
         {/* セクションヘッダー */}
-        <div className="ui-section-title ui-section-gap">
-          <h2 className="ui-h2 text-gray-900 tracking-tight">
+        <div className="text-center mb-10 sm:mb-12">
+          <h2 className="ui-h2 text-gray-900 tracking-tight mb-6">
             シンプルで明確な料金体系
           </h2>
-          <p className="ui-measure-lead ui-text-left text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 mx-auto">
+          <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 max-w-2xl mx-auto">
             単発のヒアリングから継続的な支援まで、<br className="hidden md:block" />
             お客様のニーズに合わせて選択いただけます。
           </p>
@@ -87,7 +87,8 @@ export default function PricingSection() {
 
         {/* 料金プラン */}
         <div className="mb-12 sm:mb-16">
-          <HorizontalScroller ariaLabel="料金プラン" className="lg:grid-cols-2 ui-carousel-center-2 ui-carousel-pricing">
+          <div className="flex flex-col lg:flex-row lg:justify-center lg:items-stretch gap-6 lg:gap-8 max-w-5xl mx-auto">
+            <HorizontalScroller ariaLabel="料金プラン" className="lg:grid lg:grid-cols-2 lg:gap-8 lg:justify-center" showDots={false} showArrowsOnMobile={true}>
             {pricingPlans.map((plan) => {
               const colors = getColorClasses(plan.color, plan.popular);
               const IconComponent = plan.icon;
@@ -148,6 +149,7 @@ export default function PricingSection() {
               );
             })}
           </HorizontalScroller>
+          </div>
         </div>
 
         {/* 追加情報 */}

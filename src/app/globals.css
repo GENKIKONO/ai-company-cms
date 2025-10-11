@@ -768,6 +768,40 @@ html {
    * UI統一ユーティリティ（商用水準配置）
    * ======================================== */
   
+  /* Center Column, Left Text 原則 */
+  .center-col {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 40px);
+  }
+  
+  .headline {
+    text-wrap: balance;
+  }
+  
+  .copy {
+    text-wrap: pretty;
+    line-height: 1.65;
+    word-break: normal;
+  }
+  
+  .measure-hero {
+    max-width: 30ch;
+  }
+  
+  .measure-lead {
+    max-width: 44ch;
+  }
+  
+  .measure-body {
+    max-width: 38ch;
+  }
+  
+  .cta-nowrap {
+    white-space: nowrap;
+    word-break: keep-all;
+  }
+
   /* 揃え原則 */
   .ui-text-left { 
     text-align: left !important; 

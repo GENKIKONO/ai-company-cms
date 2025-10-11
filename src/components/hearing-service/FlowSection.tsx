@@ -86,7 +86,7 @@ export default function FlowSection() {
 
         {/* フローステップ */}
         <div className="mb-16 sm:mb-20">
-          <HorizontalScroller ariaLabel="ヒアリング代行の流れ" className="lg:grid-cols-3">
+          <HorizontalScroller ariaLabel="ヒアリング代行の流れ" className="lg:grid-cols-3" showHintOnce={true}>
             {flowSteps.map((step, index) => {
               const colors = getColorClasses(step.color);
               const IconComponent = step.icon;

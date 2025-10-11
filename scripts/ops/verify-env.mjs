@@ -199,10 +199,6 @@ console.log('='.repeat(80));
 console.log('🎯 総合判定');
 console.log('='.repeat(50));
 
-const passCount = results.filter(r => r.status === 'PASS').length;
-const failCount = results.filter(r => r.status === 'FAIL' || r.status === 'MISSING').length;
-const optionalCount = results.filter(r => r.status === 'OPTIONAL').length;
-
 console.log(`✅ PASS: ${passCount} 件`);
 if (failCount > 0) {
   console.log(`❌ FAIL: ${failCount} 件`);
