@@ -12,11 +12,12 @@ const customJestConfig = {
   // If using TypeScript with a baseUrl set to the root directory then you need the below for alias' to work
   moduleDirectories: ['node_modules', '<rootDir>/'],
   
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   
   // Test patterns
   testMatch: [
     '<rootDir>/src/tests/**/*.test.{js,jsx,ts,tsx}',
+    '<rootDir>/src/**/__tests__/**/*.test.{js,jsx,ts,tsx}',
   ],
   
   // Module name mapping for absolute imports
