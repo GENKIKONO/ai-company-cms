@@ -57,18 +57,24 @@
   --color-error-500: rgb(239 68 68);
   --color-error-600: rgb(220 38 38);
 
-  /* === Layout Containers === */
-  --container-max-pc: 960px;
-  --container-max-mobile: 100vw;
+  /* === Layout Containers - Responsive + Fluid === */
+  --container-mobile: 100%;
+  --container-tablet: 800px;
+  --container-pc: min(80vw, 1120px);
+  --container-large: 1280px;
 }
 
-/* === タイポグラフィ === */
+/* === Responsive Typography === */
 .text-heading-1 {
-  @apply text-4xl md:text-6xl font-bold leading-tight;
+  font-size: clamp(2rem, 3vw, 3.5rem);
+  font-weight: bold;
+  line-height: 1.2;
 }
 
 .text-heading-2 {
-  @apply text-3xl md:text-4xl font-bold leading-tight;
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  font-weight: bold;
+  line-height: 1.3;
 }
 
 .text-heading-3 {
@@ -84,11 +90,31 @@
 }
 
 .text-body {
-  @apply text-base leading-relaxed;
+  font-size: clamp(1rem, 1vw + 0.8rem, 1.25rem);
+  line-height: 1.65;
 }
 
 .text-body-small {
   @apply text-sm leading-relaxed;
+}
+
+/* Optimized measure classes for readability */
+.measure-body {
+  max-width: 40ch;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.measure-lead {
+  max-width: 44ch;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.measure-hero {
+  max-width: 30ch;
+  line-height: 1.2;
+  text-wrap: balance;
 }
 
 /* === レイアウト === */
@@ -100,11 +126,49 @@
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
-/* Center column with design token */
+/* Responsive center column with fluid layout */
 .center-col {
-  max-width: var(--container-max-pc);
+  width: var(--container-mobile);
   margin-inline: auto;
-  padding-inline: clamp(16px, 4vw, 40px);
+  padding-inline: clamp(16px, 5vw, 40px);
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .center-col {
+    max-width: var(--container-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .center-col {
+    max-width: var(--container-pc);
+  }
+}
+
+@media (min-width: 1600px) {
+  .center-col {
+    max-width: var(--container-large);
+  }
+}
+
+/* Responsive grid system */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 3vw, 5rem);
+}
+
+@media (min-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .card {

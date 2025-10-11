@@ -65,9 +65,9 @@ AIO Hub implements a comprehensive design system based on **CSS Design Tokens** 
 | Token Category | Values | Usage |
 |----------------|---------|--------|
 | **Colors** | `--color-brand: #4F46E5`<br>`--color-accent: #06B6D4`<br>`--color-text: #0F172A` | Brand colors, text colors |
-| **Typography** | `--font-size-h1: clamp(28px, 6vw, 38px)`<br>`--font-size-h2: clamp(22px, 4.5vw, 30px)` | Responsive typography |
-| **Spacing** | `--space-xs: clamp(4px, 1vw, 8px)`<br>`--space-xl: clamp(32px, 6vw, 64px)` | Consistent spacing rhythm |
-| **Layout** | `--measure-hero: 30ch`<br>`--measure-lead: 44ch`<br>`--measure-body: 38ch`<br>`--container-max-pc: 960px` | Optimal line lengths & content width |
+| **Typography** | `--font-size-h1: clamp(2rem, 3vw, 3.5rem)`<br>`--font-size-h2: clamp(1.5rem, 2.5vw, 2.25rem)`<br>`--font-body: clamp(1rem, 1vw + 0.8rem, 1.25rem)` | Responsive typography with fluid scaling |
+| **Spacing** | `--space-xs: clamp(4px, 1vw, 8px)`<br>`--space-xl: clamp(32px, 6vw, 64px)`<br>`--gap-responsive: clamp(1.5rem, 3vw, 5rem)` | Consistent spacing rhythm |
+| **Layout** | `--container-mobile: 100%`<br>`--container-tablet: 800px`<br>`--container-pc: min(80vw, 1120px)`<br>`--container-large: 1280px`<br>`--measure-hero: 30ch`<br>`--measure-lead: 44ch`<br>`--measure-body: 40ch` | Responsive container system & optimal line lengths |
 
 #### 2.1.2 Visual Alignment Standards
 
@@ -109,10 +109,11 @@ AIO Hub implements a comprehensive design system based on **CSS Design Tokens** 
 
 | Pattern | CSS Implementation | Breakpoints |
 |---------|-------------------|-------------|
-| **Container** | `.center-col { max-width: 72rem; margin-inline: auto; }` | All sizes |
+| **Container** | `.center-col { width: var(--container-mobile); max-width: var(--container-pc); margin-inline: auto; }` | Mobile→Tablet→PC→Large |
 | **Section Padding** | `clamp(2.5rem, 4vw, 5rem)` | Standard sections |
 | **Hero Padding** | `clamp(3rem, 6vw, 7rem)` | Hero sections |
-| **Text Sizing** | `clamp(15px, 1.6vw + .6rem, 18px)` | Body text |
+| **Text Sizing** | `clamp(1rem, 1vw + 0.8rem, 1.25rem)` | Fluid body text |
+| **Grid System** | `.responsive-grid { grid-template-columns: 1fr; gap: clamp(1.5rem, 3vw, 5rem); }` | 1→2→3 columns |
 
 ---
 
@@ -124,9 +125,10 @@ AIO Hub implements a comprehensive design system based on **CSS Design Tokens** 
 
 | ブレークポイント | コンテナ | テキスト配置 | 実装 |
 |-----------------|----------|-------------|------|
-| **All Sizes** | `.center-col` (max-width: 72rem, margin: auto) | `.text-left` | 基本レール |
-| **PC (lg+)** | justify-center for cards | text-left for content | 2カードの中央配置 |
-| **Mobile (〜lg)** | horizontal scroll | text-left maintained | 1.1枚見せパターン |
+| **Mobile (375px)** | `width: 100%`, `padding-inline: clamp(16px, 5vw, 40px)` | `.text-left` | 基本レール |
+| **Tablet (768px)** | `max-width: 800px`, `.center-col` | `.text-left` | タブレット最適化 |
+| **PC (1024px+)** | `max-width: min(80vw, 1120px)` | `.text-left` | レスポンシブ幅 |
+| **Large (1600px+)** | `max-width: 1280px` | `.text-left` | 大画面対応 |
 
 **許容誤差基準**:
 - Hero見出し・本文左端一致: ±4px以内
@@ -156,10 +158,24 @@ paddingBlock: clamp(3rem, 6vw, 7rem)
 paddingBottom: calc(clamp(2.5rem, 4vw, 5rem) + 120px)
 ```
 
-#### 水平パディング
+#### 水平パディング（レスポンシブシステム）
 ```css
 .center-col {
-  padding-inline: clamp(16px, 4vw, 40px);
+  width: var(--container-mobile);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 5vw, 40px);
+}
+
+@media (min-width: 768px) {
+  .center-col { max-width: var(--container-tablet); }
+}
+
+@media (min-width: 1024px) {
+  .center-col { max-width: var(--container-pc); }
+}
+
+@media (min-width: 1600px) {
+  .center-col { max-width: var(--container-large); }
 }
 ```
 

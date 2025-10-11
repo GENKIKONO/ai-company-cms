@@ -369,11 +369,30 @@ html {
     padding-inline: max(1.5rem, 3vw);
   }
   
-  /* Balanced container with beautiful default width - ensuring 240px gutters on 1440px */
+  /* Responsive balanced container with fluid layout */
   .balanced-container {
-    max-width: var(--container-max-pc);
+    width: 100%;
     margin: 0 auto;
-    padding-inline: clamp(16px, 4vw, 40px);
+    padding-inline: clamp(16px, 5vw, 40px);
+    text-align: left;
+  }
+  
+  @media (min-width: 768px) {
+    .balanced-container {
+      max-width: 800px;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .balanced-container {
+      max-width: min(80vw, 1120px);
+    }
+  }
+  
+  @media (min-width: 1600px) {
+    .balanced-container {
+      max-width: 1280px;
+    }
   }
   
   /* Ultra-wide container for hero sections */
