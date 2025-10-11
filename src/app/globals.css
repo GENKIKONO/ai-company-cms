@@ -856,6 +856,13 @@ html {
   @supports (word-break: auto-phrase) {
     .jp-phrase { word-break: auto-phrase; }
   }
+
+  /* Pricing text optimization */
+  .measure-pricing {
+    max-width: 44ch;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
   
   .ui-measure-title { 
     max-width: 20ch; 

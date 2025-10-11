@@ -88,14 +88,14 @@ export default function PricingSection() {
 
         {/* 料金プラン */}
         <div className="mb-12 sm:mb-16">
-          <div className="max-w-6xl mx-auto px-6">
-            <HorizontalScroller ariaLabel="料金プラン" className="lg:grid lg:grid-cols-2 lg:gap-16 lg:justify-items-stretch lg:items-start lg:auto-rows-fr" showDots={true} showArrowsOnMobile={true}>
+          <div className="max-w-7xl mx-auto px-8 lg:px-12">
+            <HorizontalScroller ariaLabel="料金プラン" className="grid grid-cols-1 lg:grid-cols-2 gap-24 justify-center items-start" showDots={true} showArrowsOnMobile={true}>
             {pricingPlans.map((plan) => {
               const colors = getColorClasses(plan.color, plan.popular);
               const IconComponent = plan.icon;
               
               return (
-                <div key={plan.name} className="snap-start min-w-[85vw] max-w-[320px] sm:min-w-0 lg:w-full lg:flex-1 relative">
+                <div key={plan.name} className="snap-start min-w-[85vw] max-w-[320px] sm:min-w-0 w-full max-w-[560px] lg:flex-1 relative">
                   {/* 人気バッジ */}
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
