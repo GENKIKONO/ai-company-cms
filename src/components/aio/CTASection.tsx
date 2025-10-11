@@ -23,7 +23,7 @@ export default function CTASection({
   features
 }: CTASectionProps) {
   return (
-    <section className="py-24 md:py-32 bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50">
+    <section className="py-24 md:py-32 bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 ui-bottom-content">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* メインタイトル */}
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-wide jp-heading">

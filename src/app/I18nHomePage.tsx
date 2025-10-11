@@ -96,13 +96,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           {/* 背景装飾 - 控えめなラジアルグラデーション */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
-          <div className="relative mx-auto max-w-7xl px-6 sm:px-8">
+          <div className="ui-axis-main px-6 sm:px-8">
             <div className="py-16 sm:py-20 lg:py-28">
               <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <h1 className="jp-phrase-aware measure-tight widow-tweak text-left sm:text-center text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 mb-6">
+                <h1 className="ui-h1 ui-section-title text-gray-900 mb-6">
                   AIO Hub AI企業CMS
                 </h1>
-                <p className="jp-body jp-body-mobile-left measure-tight widow-tweak sm:text-center text-base sm:text-lg text-gray-500 mb-10">
+                <p className="ui-measure-lead ui-text-left text-base sm:text-lg text-gray-500 mb-10">
                   AI技術を活用した<br className="only-mobile" />企業情報の統合管理プラットフォーム
                 </p>
                 
@@ -137,12 +137,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
         {/* 機能紹介 */}
         <section className="py-12 sm:py-16 lg:py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
             <div className="mb-16">
-              <h2 className="jp-phrase-aware measure-tight widow-tweak text-left sm:text-center text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
+              <h2 className="ui-h2 ui-section-title text-gray-900 mb-4">
                 {t('pages.home.features.title')}
               </h2>
-              <p className="jp-body jp-body-mobile-left measure-tight widow-tweak sm:text-center text-gray-600 break-keep">
+              <p className="ui-measure-body ui-text-left text-gray-600">
                 {t('pages.home.features.subtitle')}
               </p>
             </div>
@@ -217,12 +217,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
         {/* サービスの流れ */}
         <section id="service-flow" className="py-12 sm:py-16 lg:py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
             <div className="mb-16">
-              <h2 className="jp-phrase-aware measure-tight widow-tweak text-left sm:text-center text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal">
+              <h2 className="ui-h2 ui-section-title text-gray-900 mb-4">
                 サービスの流れ
               </h2>
-              <p className="jp-phrase-aware jp-body measure-tight widow-tweak text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8">
+              <p className="ui-measure-body ui-text-left text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8">
                 簡単3ステップで始められます
               </p>
             </div>
@@ -289,15 +289,15 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
         {/* AIOダイジェスト */}
         <section className="py-12 sm:py-16 lg:py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-            <h2 className="jp-phrase-aware measure-tight widow-tweak text-left sm:text-center text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 flex items-center sm:justify-center tracking-tight">
+          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
+            <h2 className="ui-h2 ui-section-title text-gray-900 mb-6 flex items-center sm:justify-center">
               <svg className="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <span className="jp-punctuation-safe">AI検索最適化（AIO）対応</span>
             </h2>
-            <p className="jp-body jp-body-mobile-left measure-tight widow-tweak sm:text-center text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
+            <p className="ui-measure-body ui-text-left text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
               本プラットフォームは、<br className="only-mobile" />AI検索エンジンが理解しやすい<br className="only-mobile" />構造化データを自動生成します
             </p>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 items-stretch auto-rows-fr mb-8">
@@ -340,7 +340,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
         {/* 代表メッセージ */}
         <section className="py-12 sm:py-16 lg:py-24 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
             <h2 className="jp-heading text-3xl font-bold text-gray-900 mb-8">
               {t('pages.home.message.title')}
             </h2>

@@ -87,13 +87,13 @@ export default function PricingSection() {
 
         {/* 料金プラン */}
         <div className="mb-12 sm:mb-16">
-          <HorizontalScroller ariaLabel="料金プラン" className="lg:grid-cols-2 ui-carousel-center-2">
+          <HorizontalScroller ariaLabel="料金プラン" className="lg:grid-cols-2 ui-carousel-center-2 ui-carousel-pricing">
             {pricingPlans.map((plan) => {
               const colors = getColorClasses(plan.color, plan.popular);
               const IconComponent = plan.icon;
               
               return (
-                <div key={plan.name} className="snap-start min-w-[320px] sm:min-w-0 relative">
+                <div key={plan.name} className="snap-start min-w-[85vw] max-w-[320px] sm:min-w-0 relative">
                   {/* 人気バッジ */}
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">

@@ -875,6 +875,19 @@ html {
     padding-right: 10%;
   }
   
+  /* 料金プラン専用の1.1カード表示 */
+  .ui-carousel-pricing { 
+    padding-left: 5vw;
+    padding-right: 20vw; /* 0.1カード分を見せる */
+  }
+  
+  @media (min-width: 640px) {
+    .ui-carousel-pricing { 
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+  
   /* FAB安全域 */
   .ui-fab { 
     bottom: calc(env(safe-area-inset-bottom) + 80px); 
@@ -883,6 +896,22 @@ html {
   
   .ui-bottom-content { 
     margin-bottom: 120px; /* FAB領域確保 */ 
+  }
+
+  /* Animations */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
   }
 
 }
