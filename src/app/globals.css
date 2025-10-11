@@ -369,11 +369,11 @@ html {
     padding-inline: max(1.5rem, 3vw);
   }
   
-  /* Balanced container with appropriate margins */
+  /* Balanced container with appropriate margins - ensuring 160px+ gutters on 1440px */
   .balanced-container {
-    max-width: 1000px;
+    max-width: 1080px;
     margin: 0 auto;
-    padding-inline: 1.5rem;
+    padding-inline: clamp(16px, 2.5vw, 24px);
   }
   
   /* Ultra-wide container for hero sections */
