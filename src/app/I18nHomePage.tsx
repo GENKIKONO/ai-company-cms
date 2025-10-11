@@ -92,7 +92,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     <div className="min-h-screen bg-white">
       <main>
         {/* ヒーローセクション */}
-        <section className="relative overflow-hidden ultra-compact-section">
+        <section className="relative overflow-hidden py-12 sm:py-16 lg:py-24">
           {/* 背景装飾 - 控えめなラジアルグラデーション */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
@@ -167,71 +167,113 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="ultra-wide-container text-center">
-              <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <div className="measure-lead relative">
-                  {/* AI Brain Icon Enhancement */}
-                  <div className="absolute -top-8 -right-8 opacity-[0.12] hidden sm:block">
-                    <svg width="120" height="120" viewBox="0 0 120 120">
-                      <g fill="currentColor" className="text-gray-600">
-                        {/* AI brain silhouette */}
-                        <path d="M60,20 C70,20 80,25 85,35 C90,30 95,28 100,35 C100,45 95,50 90,55 C95,65 90,75 85,80 C80,85 70,90 60,90 C50,90 40,85 35,80 C30,75 25,65 30,55 C25,50 20,45 20,35 C25,28 30,30 35,35 C40,25 50,20 60,20 Z" opacity="0.3"/>
-                        
-                        {/* Neural pathways */}
-                        <g stroke="currentColor" strokeWidth="0.5" fill="none" opacity="0.6">
-                          <path d="M45,40 Q55,35 65,40 M50,50 Q60,45 70,50 M45,60 Q55,55 65,60" />
-                          <path d="M40,45 Q50,50 60,45 M55,60 Q65,55 75,60" />
+          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
+            <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
+              {/* Left Column - Content */}
+              <div>
+                <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                  <div className="measure-lead relative">
+                    {/* AI Brain Icon Enhancement */}
+                    <div className="absolute -top-8 -right-8 opacity-[0.12] hidden sm:block">
+                      <svg width="120" height="120" viewBox="0 0 120 120">
+                        <g fill="currentColor" className="text-gray-600">
+                          {/* AI brain silhouette */}
+                          <path d="M60,20 C70,20 80,25 85,35 C90,30 95,28 100,35 C100,45 95,50 90,55 C95,65 90,75 85,80 C80,85 70,90 60,90 C50,90 40,85 35,80 C30,75 25,65 30,55 C25,50 20,45 20,35 C25,28 30,30 35,35 C40,25 50,20 60,20 Z" opacity="0.3"/>
+                          
+                          {/* Neural pathways */}
+                          <g stroke="currentColor" strokeWidth="0.5" fill="none" opacity="0.6">
+                            <path d="M45,40 Q55,35 65,40 M50,50 Q60,45 70,50 M45,60 Q55,55 65,60" />
+                            <path d="M40,45 Q50,50 60,45 M55,60 Q65,55 75,60" />
+                          </g>
+                          
+                          {/* Processing nodes */}
+                          <circle cx="45" cy="40" r="1" />
+                          <circle cx="60" cy="35" r="1.5" />
+                          <circle cx="75" cy="40" r="1" />
+                          <circle cx="40" cy="55" r="1" />
+                          <circle cx="55" cy="50" r="1.5" />
+                          <circle cx="70" cy="55" r="1" />
+                          <circle cx="45" cy="70" r="1" />
+                          <circle cx="60" cy="65" r="1.5" />
+                          <circle cx="75" cy="70" r="1" />
                         </g>
-                        
-                        {/* Processing nodes */}
-                        <circle cx="45" cy="40" r="1" />
-                        <circle cx="60" cy="35" r="1.5" />
-                        <circle cx="75" cy="40" r="1" />
-                        <circle cx="40" cy="55" r="1" />
-                        <circle cx="55" cy="50" r="1.5" />
-                        <circle cx="70" cy="55" r="1" />
-                        <circle cx="45" cy="70" r="1" />
-                        <circle cx="60" cy="65" r="1.5" />
-                        <circle cx="75" cy="70" r="1" />
-                      </g>
-                    </svg>
+                      </svg>
+                    </div>
+                    
+                    <h1 className="headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 lg:mb-6 leading-tight">
+                      AIO Hub AI企業CMS
+                    </h1>
+                    <p className="copy text-lg sm:text-xl md:text-2xl text-gray-500 mb-8 lg:mb-10 leading-relaxed">
+                      AI技術を活用した企業情報の統合管理プラットフォーム
+                    </p>
                   </div>
                   
-                  <h1 className="headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 lg:mb-6 leading-tight">
-                    AIO Hub AI企業CMS
-                  </h1>
-                  <p className="copy text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-500 mb-8 lg:mb-10 leading-relaxed max-w-4xl">
-                    AI技術を活用した企業情報の統合管理プラットフォーム
-                  </p>
-                </div>
-                
-                <div className="measure-lead">
-                  <div className="flex flex-col sm:flex-row flex-nowrap gap-4 sm:gap-6 justify-start">
-                    <Link 
-                      href="/auth/signup" 
-                      onClick={handleCtaClick}
-                      className="cta-nowrap group inline-flex items-center justify-center gap-3 px-8 py-4 lg:px-10 lg:py-5 bg-gray-800 text-white text-lg lg:text-xl font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-                      aria-label="無料で始める"
-                    >
-                      <span>無料で始める</span>
-                      <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </Link>
-                    <Link 
-                      href="/organizations" 
-                      className="cta-nowrap group inline-flex items-center justify-center gap-3 px-8 py-4 lg:px-10 lg:py-5 border-2 border-gray-300 text-gray-700 text-lg lg:text-xl font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
-                      aria-label="企業ディレクトリを見る"
-                    >
-                      <span>企業ディレクトリを見る</span>
-                      <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </Link>
+                  <div className="measure-lead">
+                    <div className="flex flex-col sm:flex-row flex-nowrap gap-4 sm:gap-6 justify-start">
+                      <Link 
+                        href="/auth/signup" 
+                        onClick={handleCtaClick}
+                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] bg-gray-800 text-white text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                        aria-label="無料で始める"
+                      >
+                        <span>無料で始める</span>
+                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </Link>
+                      <Link 
+                        href="/organizations" 
+                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] border-2 border-gray-300 text-gray-700 text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                        aria-label="企業ディレクトリを見る"
+                      >
+                        <span>企業ディレクトリを見る</span>
+                        <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* Right Column - Visualization */}
+              <div className="mt-10 md:mt-0">
+                <div className="relative w-full aspect-video rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 shadow-sm ring-1 ring-black/5 overflow-hidden">
+                  {/* AI Information Flow Visualization */}
+                  <div className="absolute inset-4 flex flex-col justify-center items-center">
+                    <div className="text-center space-y-6">
+                      <div className="flex items-center justify-center space-x-4">
+                        <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                          <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                        </div>
+                        <div className="w-8 h-0.5 bg-gray-300"></div>
+                        <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                          <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div className="w-8 h-0.5 bg-gray-300"></div>
+                        <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                          <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <div>企業情報 → AI最適化 → 検索表示</div>
+                        <div className="text-xs text-gray-500">構造化データで検索AI時代に対応</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-3 text-center text-sm text-gray-500">
+                  企業情報をAI検索エンジンが理解しやすい形で構造化
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
