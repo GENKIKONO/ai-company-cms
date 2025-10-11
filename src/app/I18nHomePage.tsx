@@ -91,7 +91,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     <div className="min-h-screen bg-white">
       <main>
         {/* ヒーローセクション */}
-        <section className="section-layer section-hero-pad section-safe-btm surface-fade-btm relative overflow-hidden">
+        <section className="section-gap-hero relative overflow-hidden">
           {/* 背景装飾 - 控えめなラジアルグラデーション */}
           <div className="section-deco bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
@@ -166,7 +166,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="container-hero section-content">
+          <div className="container-hero">
             <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
               {/* Left Column - Content */}
               <div>
@@ -212,7 +212,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       <Link 
                         href="/auth/signup" 
                         onClick={handleCtaClick}
-                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] bg-gray-800 text-white text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] bg-gray-800 text-white text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none ui-flat--no-border"
                         aria-label="無料で始める"
                       >
                         <span>無料で始める</span>
@@ -222,7 +222,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       </Link>
                       <Link 
                         href="/organizations" 
-                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] border-2 border-gray-300 text-gray-700 text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] border-2 border-gray-300 text-gray-700 text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none ui-flat"
                         aria-label="企業ディレクトリを見る"
                       >
                         <span>企業ディレクトリを見る</span>
@@ -238,7 +238,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
               {/* Right Column - Visualization */}
               <div className="mt-10 md:mt-0">
-                <div className="relative w-full aspect-video rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 shadow-sm ring-1 ring-black/5 overflow-hidden">
+                <div className="relative w-full aspect-video rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 ui-flat overflow-hidden">
                   {/* AI Information Flow Visualization */}
                   <div className="absolute inset-4 flex flex-col justify-center items-center">
                     <div className="text-center space-y-6">
@@ -277,7 +277,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 機能紹介 */}
-        <section className="section-layer section-safe surface-fade-btm compact-section bg-white relative overflow-hidden">
+        <section className="section-gap bg-white">
           {/* AI Grid Pattern Background */}
           <div className="section-deco top-1/2 left-4 opacity-[0.015] -translate-y-1/2">
             <svg width="160" height="200" viewBox="0 0 160 200">
@@ -292,7 +292,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="container-article section-content">
+          <div className="container-article">
             <div className="section-gap">
               <h2 className="headline heading-guard-top heading-guard-btm text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 lg:mb-6 text-left">
                 {t('pages.home.features.title')}
@@ -354,7 +354,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
         {/* サービスの流れ */}
         <section id="service-flow" className="section-layer section-safe-top section-safe-btm surface-fade-btm section-gap bg-white">
-          <div className="container-article section-content">
+          <div className="container-article">
             <div className="section-gap">
               <h2 className="headline heading-guard-top heading-guard-btm text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 text-left">
                 サービスの流れ
@@ -425,7 +425,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* AIOダイジェスト */}
-        <section className="section-layer section-safe-top surface-fade-top section-gap bg-white relative overflow-hidden">
+        <section className="section-gap bg-white">
           {/* AI Processing Visualization Background */}
           <div className="section-deco top-0 left-0 opacity-[0.02]">
             <svg width="300" height="200" viewBox="0 0 300 200">
@@ -483,7 +483,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="container-article section-content">
+          <div className="container-article">
             <h2 className="headline heading-guard-top heading-guard-btm text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 flex items-center text-left">
               <svg className="w-12 h-12 lg:w-16 lg:h-16 mr-4 lg:mr-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -495,25 +495,25 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
             </p>
             <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 mb-8">
-              <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+              <div className="card-container h-full rounded-2xl ui-card px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-phrase-aware ui-measure-body widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">JSON-LD</h3>
                   <p className="jp-phrase-aware jp-body ui-measure-body widow-tweak text-[15px] leading-7 text-gray-600">構造化データを自動生成し、<span className="nb">AI検索エンジンが</span>理解しやすい形式で情報を公開</p>
                 </div>
               </div>
-              <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+              <div className="card-container h-full rounded-2xl ui-card px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-phrase-aware ui-measure-body widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">RSS/XML</h3>
                   <p className="jp-phrase-aware jp-body ui-measure-body widow-tweak text-[15px] leading-7 text-gray-600">フィード配信により<span className="nb">継続的な情報更新を</span>クローラーに通知</p>
                 </div>
               </div>
-              <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+              <div className="card-container h-full rounded-2xl ui-card px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-phrase-aware ui-measure-body widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">公開プロフィール（直リンク）</h3>
                   <p className="jp-phrase-aware jp-body ui-measure-body widow-tweak text-[15px] leading-7 text-gray-600">企業・サービスごとに<span className="nb">公開URLを</span>自動生成。検索・AIから直接参照されやすい構成で配信します。</p>
                 </div>
               </div>
-              <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
+              <div className="card-container h-full rounded-2xl ui-card px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-phrase-aware ui-measure-body widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">サイトマップ</h3>
                   <p className="jp-phrase-aware jp-body ui-measure-body widow-tweak text-[15px] leading-7 text-gray-600">動的生成により<span className="nb">ページ構造を</span>検索エンジンに効率的に伝達</p>
@@ -532,9 +532,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </section>
 
+        {/* Section Buffer */}
+        <div className="section-buffer"></div>
+
         {/* 代表メッセージ */}
-        <section className="section-layer section-safe-top section-safe-btm surface-fade-top surface-fade-btm section-gap bg-gray-50">
-          <div className="container-article section-content">
+        <section className="section-gap bg-gray-50">
+          <div className="container-article">
             <h2 className="headline heading-guard-top heading-guard-btm text-3xl font-bold text-gray-900 mb-8 text-left">
               {t('pages.home.message.title')}
             </h2>
@@ -544,57 +547,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </section>
 
+        {/* Section Buffer */}
+        <div className="section-buffer"></div>
+
         {/* CTA */}
-        <section className="section-layer section-safe-top section-safe-btm surface-fade-top surface-fade-btm deco-wrap cta-safe-minh bg-gray-800">
-          {/* 背景パターン - 安全な配置で切り取り防止 */}
-          <div className="deco-img opacity-10">
-            <svg width="100%" height="100%" viewBox="0 0 800 600" className="media-contain">
-              <circle cx="200" cy="150" r="80" fill="white" opacity="0.8"/>
-              <circle cx="600" cy="450" r="80" fill="white" opacity="0.8"/>
-              <circle cx="400" cy="300" r="96" fill="white" opacity="0.3"/>
-            </svg>
-          </div>
+        <section className="section-gap-hero bg-gray-800">
           
-          {/* AI Circuit Pattern */}
-          <div className="section-deco opacity-[0.03]">
-            <svg className="w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
-              {/* Circuit board traces */}
-              <g fill="none" stroke="white" strokeWidth="1">
-                <path d="M100,150 L200,150 L200,250 L350,250 L350,180 L500,180" />
-                <path d="M150,100 L150,200 L300,200 L300,300 L450,300 L450,220" />
-                <path d="M250,120 L400,120 L400,280 L550,280 L550,160" />
-                <path d="M50,300 L150,300 L150,400 L300,400 L300,350 L500,350" />
-                <path d="M200,50 L200,100 L400,100 L400,200 L600,200" />
-                
-                {/* Branching circuits */}
-                <path d="M300,200 L320,180 M300,200 L320,220" />
-                <path d="M400,250 L420,230 M400,250 L420,270" />
-                <path d="M200,150 L180,130 M200,150 L180,170" />
-                <path d="M350,180 L330,160 M350,180 L330,200" />
-              </g>
-              
-              {/* Circuit nodes and components */}
-              <g fill="white" opacity="0.6">
-                <circle cx="200" cy="150" r="3" />
-                <circle cx="350" cy="250" r="3" />
-                <circle cx="150" cy="200" r="2.5" />
-                <circle cx="300" cy="300" r="3" />
-                <circle cx="400" cy="120" r="2.5" />
-                <circle cx="500" cy="180" r="3" />
-                <circle cx="300" cy="200" r="2" />
-                <circle cx="450" cy="300" r="2.5" />
-                <circle cx="550" cy="280" r="3" />
-                
-                {/* Micro-processors */}
-                <rect x="190" y="140" width="20" height="20" rx="2" opacity="0.4" />
-                <rect x="340" y="240" width="20" height="20" rx="2" opacity="0.4" />
-                <rect x="290" y="290" width="20" height="20" rx="2" opacity="0.4" />
-                <rect x="490" y="170" width="20" height="20" rx="2" opacity="0.4" />
-              </g>
-            </svg>
-          </div>
-          
-          <div className="relative container-article text-center content-above-deco">
+          <div className="container-article section-content text-center">
             <div className="max-w-3xl mx-auto">
               <h2 className="headline text-3xl md:text-4xl font-bold text-white mb-6 jp-phrase break-keep">
                 {t('pages.home.cta.title')}

@@ -110,7 +110,7 @@ export default function FAQSection() {
           {filteredFAQs.map((faq, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all duration-300"
+              className="bg-white border border-gray-200 rounded-xl overflow-hidden ui-card transition-all duration-300"
             >
               <button
                 onClick={() => toggleFAQ(index)}

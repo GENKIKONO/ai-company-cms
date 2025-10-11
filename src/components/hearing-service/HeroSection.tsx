@@ -86,15 +86,15 @@ export default function HeroSection() {
           {/* サービス特徴 */}
           <div className="section-gap">
             <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="card group p-6 sm:p-7 bg-white/70 backdrop-blur-sm border border-white/60 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="card group p-6 sm:p-7 bg-white/70 backdrop-blur-sm border border-white/60 ui-card transition-all duration-300">
                 <h3 className="headline text-lg font-bold text-blue-600 mb-2 text-left jp-phrase">専門ヒアリング</h3>
                 <p className="copy measure-body text-[15px] sm:text-base text-gray-700 text-left jp-phrase">AI最適化の専門スタッフが企業情報を丁寧にヒアリング</p>
               </div>
-              <div className="card group p-6 sm:p-7 bg-white/70 backdrop-blur-sm border border-white/60 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="card group p-6 sm:p-7 bg-white/70 backdrop-blur-sm border border-white/60 ui-card transition-all duration-300">
                 <h3 className="headline text-lg font-bold text-purple-600 mb-2 text-left jp-phrase">構造化登録</h3>
                 <p className="copy measure-body text-[15px] sm:text-base text-gray-700 text-left jp-phrase">ヒアリング内容をJSON-LD形式で構造化・最適化して登録</p>
               </div>
-              <div className="card group p-6 sm:p-7 bg-white/70 backdrop-blur-sm border border-white/60 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="card group p-6 sm:p-7 bg-white/70 backdrop-blur-sm border border-white/60 ui-card transition-all duration-300">
                 <h3 className="headline text-lg font-bold text-indigo-600 mb-2 text-left jp-phrase">継続改善</h3>
                 <p className="copy measure-body text-[15px] sm:text-base text-gray-700 text-left jp-phrase">定期的な情報更新とAI検索最適化のサポート</p>
               </div>

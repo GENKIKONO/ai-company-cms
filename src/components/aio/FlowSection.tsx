@@ -95,7 +95,7 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
                 <div key={step.step} className="card relative overflow-visible group p-6 sm:p-7">
                   {/* Step Badge - positioned outside to prevent clipping */}
                   <div className="absolute -top-4 -left-4 z-10 pointer-events-none">
-                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white shadow-md`}>
+                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white ui-flat`}>
                       {step.step}
                     </span>
                   </div>

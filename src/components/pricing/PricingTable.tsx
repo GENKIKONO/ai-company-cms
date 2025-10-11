@@ -6,7 +6,6 @@
 import Link from 'next/link';
 import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
 import { formatJPY, getCampaignStarter, PRICING_CONFIG } from '@/lib/pricing';
-import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 interface PlanFeature {
   text: string;
@@ -112,25 +111,29 @@ const PLANS: PricingPlan[] = [
 ];
 
 export default function PricingTable() {
+  // Focus on the main 2 plans for the standardized layout
+  const mainPlans = PLANS.filter(plan => plan.id === 'free' || plan.id === 'starter');
+  
   return (
-    <section className="section-layer section-safe-top section-safe-btm surface-fade-top py-12 sm:py-16 lg:py-24">
-      <div className="wide-container section-content">
+    <section className="section-gap bg-gray-50">
+      <div className="container-wide">
         <div className="text-center mb-10 sm:mb-12">
-          <h2 className="ui-h2 heading-guard-top heading-guard-btm jp-heading text-gray-900 mb-6 ui-measure-hero">
+          <h2 className="heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 measure-hero mx-auto jp-phrase">
             シンプルで明確な料金体系
           </h2>
-          <p className="ui-lead jp-body ui-measure-lead max-w-3xl mx-auto break-keep">
+          <p className="measure-lead mx-auto text-lg text-gray-600 jp-phrase">
             無料から始めて、必要になったら拡張。最小の入力で、AIに"引用されやすい"企業情報を実現します。
           </p>
         </div>
 
-        <HorizontalScroller ariaLabel="料金プラン一覧" className="lg:grid-cols-4">
-          {PLANS.map((plan) => (
+        {/* 2-column pricing layout for PC */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[80px] xl:gap-[96px] justify-center items-stretch max-w-5xl mx-auto mb-12">
+          {mainPlans.map((plan) => (
             <div
               key={plan.id}
-              className={`snap-start min-w-[280px] sm:min-w-0 relative rounded-2xl border-2 bg-white p-4 sm:p-6 shadow-sm transition-all hover:shadow-lg min-h-[500px] sm:min-h-[600px] flex flex-col ${
+              className={`ui-card flex flex-col relative rounded-2xl p-6 transition-all duration-300 ${
                 plan.popular
-                  ? 'border-purple-500 ring-2 ring-purple-500/20'
+                  ? 'border-purple-500'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
@@ -155,15 +158,15 @@ export default function PricingTable() {
                   <plan.icon className={`h-8 w-8 text-${plan.color}-600`} />
                 </div>
                 <h3 className="jp-heading text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-7 sm:leading-8 tracking-normal break-keep">{plan.name}</h3>
-                <p className="jp-body text-[13px] sm:text-sm text-gray-600 mb-4 leading-6 sm:leading-7 break-keep">{plan.description}</p>
+                <p className="measure-body text-sm text-gray-600 mb-4 jp-phrase">{plan.description}</p>
                 
                 <div className="mb-4">
                   {plan.originalPrice && (
-                    <span className="text-base sm:text-lg text-gray-400 line-through mr-2 whitespace-nowrap">
+                    <span className="text-base sm:text-lg text-gray-400 line-through mr-2 whitespace-nowrap tabular-nums">
                       {plan.originalPrice}
                     </span>
                   )}
-                  <span className="text-2xl sm:text-3xl font-bold text-gray-900 whitespace-nowrap">
+                  <span className="text-2xl sm:text-3xl font-bold text-gray-900 whitespace-nowrap tabular-nums">
                     {plan.price}
                   </span>
                   {plan.id !== 'free' && (
@@ -208,7 +211,7 @@ export default function PricingTable() {
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className={`block w-full rounded-lg px-4 py-3 text-center text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`ui-flat block w-full rounded-lg px-4 py-3 text-center text-sm font-medium transition-colors whitespace-nowrap ${
                     plan.popular
                       ? 'bg-purple-600 text-white hover:bg-purple-700'
                       : 'bg-gray-900 text-white hover:bg-gray-800'
@@ -227,7 +230,17 @@ export default function PricingTable() {
               )}
             </div>
           ))}
-        </HorizontalScroller>
+        </div>
+        
+        {/* Additional plans link */}
+        <div className="text-center mb-8">
+          <p className="text-sm text-gray-600 mb-4">
+            その他のプラン（Business・Enterprise）はお問い合わせください
+          </p>
+          <Link href="/contact" className="ui-flat inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            詳細プランを見る
+          </Link>
+        </div>
 
         <div className="mt-12 text-center">
           <p className="text-sm text-gray-500 leading-relaxed">

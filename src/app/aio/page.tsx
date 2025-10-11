@@ -116,6 +116,9 @@ export default function AIOPage() {
           secondaryCta={{ href: aioCopy.cta.secondaryHref, text: aioCopy.cta.secondaryText }}
         />
         
+        {/* Section Buffer */}
+        <div className="section-buffer"></div>
+        
         {/* サービス流れ説明 */}
         <FlowSection
           title={aioCopy.flow.title}
@@ -133,6 +136,9 @@ export default function AIOPage() {
           description={aioCopy.faq.description}
           categories={aioCopy.faq.categories}
         />
+        
+        {/* Section Buffer */}
+        <div className="section-buffer"></div>
         
         {/* CTA（申込導線） */}
         <CTASection

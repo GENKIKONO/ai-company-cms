@@ -58,7 +58,7 @@ AIO Hub is an AI-powered enterprise CMS platform designed to optimize company in
 
 ### 2.1 Design System Foundation
 
-AIO Hub implements a comprehensive design system based on **CSS Design Tokens** and **Visual Alignment Standards**.
+AIO Hub implements a comprehensive **flat design system** based on **CSS Design Tokens**, **Standardized Container System**, and **Section Rhythm**.
 
 #### 2.1.1 Design Tokens
 
@@ -66,8 +66,9 @@ AIO Hub implements a comprehensive design system based on **CSS Design Tokens** 
 |----------------|---------|--------|
 | **Colors** | `--color-brand: #4F46E5`<br>`--color-accent: #06B6D4`<br>`--color-text: #0F172A` | Brand colors, text colors |
 | **Typography** | `--font-size-h1: clamp(2rem, 3vw, 3.5rem)`<br>`--font-size-h2: clamp(1.5rem, 2.5vw, 2.25rem)`<br>`--font-body: clamp(1rem, 1vw + 0.8rem, 1.25rem)` | Responsive typography with fluid scaling |
-| **Spacing** | `--space-xs: clamp(4px, 1vw, 8px)`<br>`--space-xl: clamp(32px, 6vw, 64px)`<br>`--gap-responsive: clamp(1.5rem, 3vw, 5rem)` | Consistent spacing rhythm |
-| **Layout** | `--container-mobile: 100%`<br>`--container-tablet: 800px`<br>`--container-pc: min(80vw, 1120px)`<br>`--container-large: 1280px`<br>`--measure-hero: 30ch`<br>`--measure-lead: 44ch`<br>`--measure-body: 40ch` | Responsive container system & optimal line lengths |
+| **Containers** | `--container-article: 960px`<br>`--container-hero: 1080px`<br>`--container-wide: 1200px` | Standardized layout containers |
+| **Section Spacing** | `--space-section-min: 48px`<br>`--space-section-max: 96px`<br>`--space-section-hero-min: 64px`<br>`--space-section-hero-max: 112px` | Consistent section rhythm |
+| **Flat Design** | `box-shadow: none !important`<br>`filter: none !important` | Complete elimination of 3D effects |
 
 #### 2.1.2 Visual Alignment Standards
 
@@ -80,10 +81,10 @@ AIO Hub implements a comprehensive design system based on **CSS Design Tokens** 
 | **Pricing Cards (PC)** | Screen centerline | ±16px | `lg:grid-cols-2 justify-center` |
 | **Mobile Cards** | 1.1-card display | ±4px | `min-w-[85vw]` |
 
-**Container Width Evolution (A/B Testing Candidates)**:
-- Current: `--container-max-pc: 960px` (beautiful default, 200px gutters @ 1440px)
-- Alternative A: `--container-max-pc: 920px` (compact, 260px gutters @ 1440px)  
-- Alternative B: `--container-max-pc: 1000px` (balanced, 180px gutters @ 1440px)
+**Container System Standards**:
+- Article Content: `--container-article: 960px` (standard content width)
+- Hero Sections: `--container-hero: 1080px` (hero-specific width)  
+- Wide Content: `--container-wide: 1200px` (pricing 2-column, wide layouts)
 
 ### 2.2 Typography System
 
@@ -114,6 +115,97 @@ AIO Hub implements a comprehensive design system based on **CSS Design Tokens** 
 | **Hero Padding** | `clamp(3rem, 6vw, 7rem)` | Hero sections |
 | **Text Sizing** | `clamp(1rem, 1vw + 0.8rem, 1.25rem)` | Fluid body text |
 | **Grid System** | `.responsive-grid { grid-template-columns: 1fr; gap: clamp(1.5rem, 3vw, 5rem); }` | 1→2→3 columns |
+
+### 2.3 Flat Design System
+
+#### 2.3.1 Design Philosophy
+
+AIO Hub implements a **complete flat design approach** eliminating all 3D visual effects including shadows, gradients as depth, and elevated elements. This creates a clean, modern, and professional appearance optimized for AI-first content presentation.
+
+#### 2.3.2 Flat Design Utilities
+
+**Core Flat Classes**:
+```css
+.ui-flat, .ui-card {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Prohibit all shadow/elevation effects */
+[class*="shadow-"],
+[class*="drop-shadow-"],
+[class*="ring-"] {
+  box-shadow: none !important;
+}
+```
+
+**Card Design**:
+```css
+.ui-card {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  background: #fff;
+}
+```
+
+#### 2.3.3 Section Rhythm System
+
+**Standardized Section Spacing**:
+```css
+/* Standard sections */
+.section-gap {
+  margin-block: clamp(48px, 6vw, 96px);
+}
+
+/* Hero/CTA sections */
+.section-gap-hero {
+  margin-block: clamp(64px, 8vw, 112px);
+}
+```
+
+**Section Buffers for Color Transitions**:
+```css
+.section-buffer {
+  background: #f7f7f7;
+  height: clamp(32px, 5vw, 56px);
+}
+```
+
+#### 2.3.4 Container System Implementation
+
+**Three-Tier Container System**:
+```css
+.container-article {
+  max-width: 960px;    /* Standard content */
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+.container-hero {
+  max-width: 1080px;   /* Hero sections */
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+.container-wide {
+  max-width: 1200px;   /* 2-column pricing, wide content */
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+```
+
+#### 2.3.5 Text-Boundary Distance Standards
+
+**Heading Guards**:
+```css
+.heading-guard-top {
+  padding-top: clamp(24px, 4vw, 48px);    /* ≥48px standard, ≥64px hero/CTA */
+}
+
+.heading-guard-btm {
+  padding-bottom: clamp(24px, 4vw, 48px);
+}
+```
 
 ---
 
@@ -338,22 +430,24 @@ paddingBottom: calc(clamp(2.5rem, 4vw, 5rem) + 120px)
 </section>
 ```
 
-#### 3.1.2 PricingSection Component
+#### 3.1.2 PricingTable Component
 
-**File**: `src/components/hearing-service/PricingSection.tsx`
+**File**: `src/components/pricing/PricingTable.tsx`
 
 **Features**:
-- Two-tier pricing (Single + Continuous plans)
-- Popular plan highlighting with badges
-- Feature comparison with checkmarks
-- Mobile-optimized horizontal scrolling
-- PC center-aligned grid layout
-- Payment information section
+- **2-Column Layout**: Free + Starter plans prominently featured
+- **Flat Design**: `ui-card` and `ui-flat` classes applied
+- **Standardized Container**: Uses `container-wide` (1200px max-width)
+- **Equal Width Columns**: `lg:grid-cols-2` with 80-96px gap
+- **Tabular Numbers**: `tabular-nums` for consistent price alignment
+- **Campaign Pricing**: Dynamic pricing with strikethrough original prices
+- **Additional Plans Link**: Link to Business/Enterprise consultation
 
 **Key Implementation**:
-- **Mobile**: `min-w-[85vw]` cards with horizontal scroll
-- **Desktop**: `lg:grid-cols-2 justify-center` with `max-w-6xl`
-- **Pricing Data**: Structured plan objects with features/limitations
+- **Mobile**: Full-width stacked cards
+- **Desktop**: `grid-cols-2 gap-8 lg:gap-[80px] xl:gap-[96px] justify-center`
+- **Container**: `container-wide max-w-5xl mx-auto`
+- **Pricing Display**: Structured with campaign pricing support
 
 #### 3.1.3 FlowSection Component
 

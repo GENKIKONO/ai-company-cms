@@ -40,7 +40,7 @@ export default function FAQSection({ title, description, categories }: FAQSectio
       <div className="container-article">
         {/* セクションヘッダー */}
         <div className="section-gap">
-          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center heading-guard-top heading-guard-btm">
             <span className="block jp-phrase">{title}</span>
           </h2>
           <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
