@@ -45,7 +45,9 @@ module.exports = {
     'center-paragraph',
     'nb',
     'only-mobile',
-    'jp-phrase-aware'
+    'jp-phrase-aware',
+    'jp-body-mobile-left',
+    'measure-tight'
   ],
   corePlugins: {
     textWrap: true,

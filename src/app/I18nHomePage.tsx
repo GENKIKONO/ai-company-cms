@@ -8,6 +8,7 @@ import { useSEO } from '@/hooks/useSEO';
 import HorizontalScroller from '@/components/ui/HorizontalScroller';
 import StatCard from '@/components/ui/StatCard';
 import LayoutDebugger from '@/components/debug/LayoutDebugger';
+import { applyJapaneseSoftBreaks } from '@/lib/widow-fix-runtime';
 
 interface SiteSettings {
   hero_title: string;
@@ -53,6 +54,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     
     fetchDynamicStats();
     setIsVisible(true);
+    
+    // 文節ソフトブレーク機能を適用
+    setTimeout(() => {
+      applyJapaneseSoftBreaks();
+    }, 100);
   }, []);
   
   // SEO設定
@@ -96,11 +102,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <h1 className="jp-phrase-aware measure-fluid widow-tweak mx-auto text-center text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-gray-900 mb-6">
                   AIO Hub AI企業CMS
                 </h1>
-                <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-center text-base sm:text-lg text-gray-500 mb-10">
+                <p className="jp-body jp-body-mobile-left measure-tight widow-tweak sm:text-center text-base sm:text-lg text-gray-500 mb-10">
                   AI技術を活用した<br className="only-mobile" />企業情報の統合管理プラットフォーム
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
+                <div className="flex flex-col sm:flex-row flex-nowrap gap-4 sm:gap-6 justify-center">
                   <Link 
                     href="/auth/signup" 
                     onClick={handleCtaClick}
@@ -136,7 +142,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <h2 className="jp-phrase-aware measure-fluid widow-tweak text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-7 sm:leading-8 tracking-normal break-keep">
                 {t('pages.home.features.title')}
               </h2>
-              <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-center text-gray-600 break-keep">
+              <p className="jp-body jp-body-mobile-left measure-tight widow-tweak sm:text-center text-gray-600 break-keep">
                 {t('pages.home.features.subtitle')}
               </p>
             </div>
@@ -291,7 +297,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </svg>
               <span className="jp-punctuation-safe">AI検索最適化（AIO）対応</span>
             </h2>
-            <p className="jp-phrase-aware center-paragraph measure-fluid widow-tweak text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
+            <p className="jp-body jp-body-mobile-left measure-tight widow-tweak sm:text-center text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
               本プラットフォームは、<br className="only-mobile" />AI検索エンジンが理解しやすい<br className="only-mobile" />構造化データを自動生成します
             </p>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 items-stretch auto-rows-fr mb-8">
@@ -362,7 +368,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 {t('pages.home.cta.subtitle')}
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <div className="flex flex-col sm:flex-row flex-nowrap gap-4 justify-center items-center">
                 <Link 
                   href="/auth/signup" 
                   onClick={handleCtaClick}

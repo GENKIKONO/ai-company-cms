@@ -51,7 +51,7 @@ export default function MobileMenu({
           onClick={(e) => e.stopPropagation()}
         >
           {/* コンテンツラッパ - FABとの重なり防止 */}
-          <div className="overflow-y-auto pb-[calc(88px+env(safe-area-inset-bottom))] h-full">
+          <div className="overflow-y-auto pb-[calc(96px+env(safe-area-inset-bottom))] h-full">
             <div className="px-6 pt-6 space-y-6">
               <div className="text-xl font-bold text-indigo-600">AIO Hub</div>
               

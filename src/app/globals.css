@@ -746,4 +746,14 @@ html {
       max-width: 36ch;
     }
   }
+
+  /* 小幅端末は中央寄せをやめて左寄せ＆行長を少し伸ばす */
+  @media (max-width: 390px) {
+    .jp-body-mobile-left { text-align: left !important; }
+    .measure-tight { max-width: 32ch; } /* 既存 measure-fluid(26/30/36ch) の "間" を用意 */
+  }
+  @media (min-width: 391px) and (max-width: 414px) {
+    .jp-body-mobile-left { text-align: left !important; }
+    .measure-tight { max-width: 34ch; }
+  }
 }

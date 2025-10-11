@@ -72,6 +72,7 @@ export default function FAB() {
         focus:ring-offset-2
         focus:ring-offset-white
         leading-none
+        select-none
       "
       style={{
         // Ensure proper touch target size
@@ -85,11 +86,11 @@ export default function FAB() {
       
       {/* SVGでアイコンを厳密センタリング */}
       {open ? (
-        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="block" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M6 6 L18 18 M18 6 L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
         </svg>
       ) : (
-        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="block" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
         </svg>
       )}
