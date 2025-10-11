@@ -212,7 +212,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       <Link 
                         href="/auth/signup" 
                         onClick={handleCtaClick}
-                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] bg-gray-800 text-white text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none ui-flat--no-border"
+                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[52px] bg-gray-800 text-white text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none ui-flat--no-border"
                         aria-label="無料で始める"
                       >
                         <span>無料で始める</span>
@@ -222,7 +222,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       </Link>
                       <Link 
                         href="/organizations" 
-                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] border-2 border-gray-300 text-gray-700 text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none ui-flat"
+                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[52px] border-2 border-gray-300 text-gray-700 text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none ui-flat"
                         aria-label="企業ディレクトリを見る"
                       >
                         <span>企業ディレクトリを見る</span>

@@ -127,7 +127,7 @@ export default function PricingTable() {
         </div>
 
         {/* 2-column pricing layout for PC */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 xl:gap-24 justify-center items-stretch max-w-5xl mx-auto mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 justify-center items-stretch max-w-4xl mx-auto mb-12">
           {mainPlans.map((plan) => (
             <div
               key={plan.id}
@@ -211,7 +211,7 @@ export default function PricingTable() {
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className={`ui-flat block w-full rounded-lg px-4 py-3 text-center text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`ui-flat block w-full rounded-lg px-4 py-3 min-h-[52px] text-center text-sm font-medium transition-colors whitespace-nowrap ${
                     plan.popular
                       ? 'bg-purple-600 text-white hover:bg-purple-700'
                       : 'bg-gray-900 text-white hover:bg-gray-800'
@@ -237,7 +237,7 @@ export default function PricingTable() {
           <p className="text-sm text-gray-600 mb-4">
             その他のプラン（Business・Enterprise）はお問い合わせください
           </p>
-          <Link href="/contact" className="ui-flat inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          <Link href="/contact" className="ui-flat inline-flex items-center px-6 py-3 min-h-[52px] border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
             詳細プランを見る
           </Link>
         </div>

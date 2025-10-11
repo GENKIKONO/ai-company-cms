@@ -51,16 +51,12 @@ export default function FAB() {
       onClick={toggle}
       onKeyDown={handleKeyDown}
       className="
-        sm:hidden
+        ui-fab
         fixed z-[1000] 
-        h-14 w-14 
+        w-14 h-14 
         rounded-full 
-        right-[clamp(12px,3vw,20px)] 
-        bottom-[calc(env(safe-area-inset-bottom)+80px)]
         bg-gradient-to-r from-indigo-500 to-fuchsia-500 
         text-white 
-        shadow-lg shadow-indigo-500/25
-        hover:shadow-xl hover:shadow-indigo-500/40
         active:scale-95
         grid place-items-center 
         will-change-transform
@@ -75,9 +71,10 @@ export default function FAB() {
         select-none
       "
       style={{
-        // Ensure proper touch target size
-        minHeight: '44px',
-        minWidth: '44px'
+        right: 'clamp(16px, 3vw, 24px)',
+        bottom: 'calc(env(safe-area-inset-bottom) + 20px)',
+        minHeight: '56px',
+        minWidth: '56px'
       }}
     >
       <span className="sr-only">

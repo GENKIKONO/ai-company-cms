@@ -331,10 +331,10 @@ html {
     transform: none;
   }
   
-  /* Mobile-optimized focus states without blue rings */
+  /* Focus-visible only styling - hide outlines except for keyboard navigation */
   .focus-clean:focus {
-    outline: 2px solid transparent;
-    box-shadow: 0 0 0 2px rgb(99 102 241 / 0.5);
+    outline: none;
+    box-shadow: none;
   }
   
   .focus-clean:focus-visible {
