@@ -38,17 +38,24 @@ export default function HorizontalScroller({
 
     const observer = new IntersectionObserver(
       (entries) => {
+        let maxIntersectionRatio = 0;
+        let activeIndex = 0;
+        
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = parseInt(entry.target.getAttribute('data-index') || '0');
-            setCurrentIndex(index);
+          if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
+            maxIntersectionRatio = entry.intersectionRatio;
+            activeIndex = parseInt(entry.target.getAttribute('data-index') || '0');
           }
         });
+        
+        if (maxIntersectionRatio > 0) {
+          setCurrentIndex(activeIndex);
+        }
       },
       {
         root: ref.current,
-        threshold: 0.6,
-        rootMargin: '0px -20% 0px -20%'
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        rootMargin: '0px -10% 0px -10%'
       }
     );
 
@@ -56,6 +63,36 @@ export default function HorizontalScroller({
     children.forEach((child) => observer.observe(child));
 
     return () => observer.disconnect();
+  }, [childrenCount]);
+
+  // Scroll event fallback for better tracking
+  useEffect(() => {
+    const scrollContainer = ref.current;
+    if (!scrollContainer || childrenCount === 0) return;
+
+    const handleScroll = () => {
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const containerCenterX = containerRect.left + containerRect.width / 2;
+      
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+      
+      scrollContainer.querySelectorAll('[data-index]').forEach((element, index) => {
+        const elementRect = element.getBoundingClientRect();
+        const elementCenterX = elementRect.left + elementRect.width / 2;
+        const distance = Math.abs(containerCenterX - elementCenterX);
+        
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+      
+      setCurrentIndex(closestIndex);
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
   }, [childrenCount]);
 
   const scrollToIndex = (index: number) => {
