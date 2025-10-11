@@ -96,9 +96,107 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           {/* 背景装飾 - 控えめなラジアルグラデーション */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
+          {/* AI Neural Network Background */}
+          <div className="absolute inset-0 opacity-[0.03]">
+            <svg className="w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+              {/* Neural network nodes */}
+              <g fill="currentColor" className="text-gray-600">
+                <circle cx="80" cy="60" r="3" />
+                <circle cx="120" cy="40" r="2" />
+                <circle cx="160" cy="80" r="2.5" />
+                <circle cx="200" cy="50" r="3" />
+                <circle cx="240" cy="90" r="2" />
+                <circle cx="280" cy="70" r="2.5" />
+                <circle cx="320" cy="45" r="2" />
+                
+                <circle cx="100" cy="120" r="2.5" />
+                <circle cx="140" cy="140" r="2" />
+                <circle cx="180" cy="110" r="3" />
+                <circle cx="220" cy="130" r="2.5" />
+                <circle cx="260" cy="120" r="2" />
+                <circle cx="300" cy="105" r="2.5" />
+                
+                <circle cx="90" cy="180" r="2" />
+                <circle cx="130" cy="200" r="2.5" />
+                <circle cx="170" cy="190" r="2" />
+                <circle cx="210" cy="170" r="3" />
+                <circle cx="250" cy="185" r="2.5" />
+                <circle cx="290" cy="195" r="2" />
+                <circle cx="330" cy="175" r="2.5" />
+              </g>
+              
+              {/* Connecting lines */}
+              <g stroke="currentColor" strokeWidth="0.5" fill="none" className="text-gray-400" opacity="0.6">
+                <path d="M80,60 L120,40 M120,40 L160,80 M160,80 L200,50 M200,50 L240,90 M240,90 L280,70 M280,70 L320,45" />
+                <path d="M100,120 L140,140 M140,140 L180,110 M180,110 L220,130 M220,130 L260,120 M260,120 L300,105" />
+                <path d="M90,180 L130,200 M130,200 L170,190 M170,190 L210,170 M210,170 L250,185 M250,185 L290,195 M290,195 L330,175" />
+                
+                {/* Vertical connections */}
+                <path d="M80,60 L100,120 M120,40 L140,140 M160,80 L180,110 M200,50 L220,130 M240,90 L260,120 M280,70 L300,105" />
+                <path d="M100,120 L90,180 M140,140 L130,200 M180,110 L170,190 M220,130 L210,170 M260,120 L250,185 M300,105 L290,195" />
+              </g>
+            </svg>
+          </div>
+          
+          {/* AI Data Flow Pattern */}
+          <div className="absolute top-10 right-10 opacity-[0.04]">
+            <svg width="200" height="150" viewBox="0 0 200 150">
+              <defs>
+                <pattern id="dataflow" patternUnits="userSpaceOnUse" width="40" height="40">
+                  <rect width="40" height="40" fill="none"/>
+                  <circle cx="20" cy="20" r="1" fill="currentColor" className="text-gray-600"/>
+                </pattern>
+              </defs>
+              <rect width="200" height="150" fill="url(#dataflow)"/>
+              
+              {/* Flowing data streams */}
+              <g stroke="currentColor" strokeWidth="1" fill="none" className="text-gray-500" opacity="0.3">
+                <path d="M20,30 Q100,10 180,50">
+                  <animate attributeName="stroke-dasharray" values="0,20;20,20;40,20" dur="4s" repeatCount="indefinite"/>
+                  <animate attributeName="stroke-dashoffset" values="0;-40" dur="4s" repeatCount="indefinite"/>
+                </path>
+                <path d="M20,70 Q100,90 180,50">
+                  <animate attributeName="stroke-dasharray" values="0,20;20,20;40,20" dur="3s" repeatCount="indefinite"/>
+                  <animate attributeName="stroke-dashoffset" values="0;-40" dur="3s" repeatCount="indefinite"/>
+                </path>
+                <path d="M20,110 Q100,130 180,90">
+                  <animate attributeName="stroke-dasharray" values="0,20;20,20;40,20" dur="5s" repeatCount="indefinite"/>
+                  <animate attributeName="stroke-dashoffset" values="0;-40" dur="5s" repeatCount="indefinite"/>
+                </path>
+              </g>
+            </svg>
+          </div>
+          
           <div className="center-col text-left">
               <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <div className="measure-lead">
+                <div className="measure-lead relative">
+                  {/* AI Brain Icon Enhancement */}
+                  <div className="absolute -top-8 -right-8 opacity-[0.04] hidden sm:block">
+                    <svg width="120" height="120" viewBox="0 0 120 120">
+                      <g fill="currentColor" className="text-gray-600">
+                        {/* AI brain silhouette */}
+                        <path d="M60,20 C70,20 80,25 85,35 C90,30 95,28 100,35 C100,45 95,50 90,55 C95,65 90,75 85,80 C80,85 70,90 60,90 C50,90 40,85 35,80 C30,75 25,65 30,55 C25,50 20,45 20,35 C25,28 30,30 35,35 C40,25 50,20 60,20 Z" opacity="0.3"/>
+                        
+                        {/* Neural pathways */}
+                        <g stroke="currentColor" strokeWidth="0.5" fill="none" opacity="0.6">
+                          <path d="M45,40 Q55,35 65,40 M50,50 Q60,45 70,50 M45,60 Q55,55 65,60" />
+                          <path d="M40,45 Q50,50 60,45 M55,60 Q65,55 75,60" />
+                        </g>
+                        
+                        {/* Processing nodes */}
+                        <circle cx="45" cy="40" r="1" />
+                        <circle cx="60" cy="35" r="1.5" />
+                        <circle cx="75" cy="40" r="1" />
+                        <circle cx="40" cy="55" r="1" />
+                        <circle cx="55" cy="50" r="1.5" />
+                        <circle cx="70" cy="55" r="1" />
+                        <circle cx="45" cy="70" r="1" />
+                        <circle cx="60" cy="65" r="1.5" />
+                        <circle cx="75" cy="70" r="1" />
+                      </g>
+                    </svg>
+                  </div>
+                  
                   <h1 className="headline ui-h1 text-gray-900 mb-6">
                     AIO Hub AI企業CMS
                   </h1>
@@ -138,7 +236,21 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 機能紹介 */}
-        <section className="py-12 sm:py-16 lg:py-24 bg-white">
+        <section className="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
+          {/* AI Grid Pattern Background */}
+          <div className="absolute top-1/2 left-4 opacity-[0.015] -translate-y-1/2">
+            <svg width="160" height="200" viewBox="0 0 160 200">
+              <defs>
+                <pattern id="ai-grid" patternUnits="userSpaceOnUse" width="30" height="30">
+                  <rect width="30" height="30" fill="none"/>
+                  <circle cx="15" cy="15" r="0.8" fill="currentColor" className="text-gray-600"/>
+                  <rect x="12" y="12" width="6" height="6" fill="none" stroke="currentColor" strokeWidth="0.3" className="text-gray-500"/>
+                </pattern>
+              </defs>
+              <rect width="160" height="200" fill="url(#ai-grid)"/>
+            </svg>
+          </div>
+          
           <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
             <div className="mb-16">
               <h2 className="ui-h2 ui-section-title text-gray-900 mb-4">
@@ -290,7 +402,64 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* AIOダイジェスト */}
-        <section className="py-12 sm:py-16 lg:py-24 bg-white">
+        <section className="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
+          {/* AI Processing Visualization Background */}
+          <div className="absolute top-0 left-0 opacity-[0.02]">
+            <svg width="300" height="200" viewBox="0 0 300 200">
+              {/* AI processing blocks */}
+              <g fill="none" stroke="currentColor" strokeWidth="1" className="text-gray-600">
+                <rect x="20" y="30" width="60" height="40" rx="4" />
+                <rect x="100" y="20" width="80" height="60" rx="6" />
+                <rect x="200" y="35" width="70" height="50" rx="5" />
+                
+                <rect x="30" y="100" width="50" height="30" rx="3" />
+                <rect x="110" y="110" width="90" height="50" rx="4" />
+                <rect x="220" y="120" width="60" height="35" rx="4" />
+              </g>
+              
+              {/* Data flow arrows */}
+              <g fill="currentColor" className="text-gray-500" opacity="0.4">
+                <path d="M85,50 L95,50 L92,45 M92,55 L95,50" />
+                <path d="M185,50 L195,50 L192,45 M192,55 L195,50" />
+                <path d="M85,115 L100,115 L97,110 M97,120 L100,115" />
+                <path d="M205,135 L215,135 L212,130 M212,140 L215,135" />
+              </g>
+            </svg>
+          </div>
+          
+          {/* Geometric AI Pattern */}
+          <div className="absolute bottom-0 right-0 opacity-[0.025]">
+            <svg width="250" height="180" viewBox="0 0 250 180">
+              <g fill="none" stroke="currentColor" strokeWidth="0.8" className="text-gray-600">
+                {/* Hexagonal AI processing grid */}
+                <polygon points="50,30 70,20 90,30 90,50 70,60 50,50" />
+                <polygon points="90,30 110,20 130,30 130,50 110,60 90,50" />
+                <polygon points="130,30 150,20 170,30 170,50 150,60 130,50" />
+                <polygon points="170,30 190,20 210,30 210,50 190,60 170,50" />
+                
+                <polygon points="70,60 90,50 110,60 110,80 90,90 70,80" />
+                <polygon points="110,60 130,50 150,60 150,80 130,90 110,80" />
+                <polygon points="150,60 170,50 190,60 190,80 170,90 150,80" />
+                
+                <polygon points="90,90 110,80 130,90 130,110 110,120 90,110" />
+                <polygon points="130,90 150,80 170,90 170,110 150,120 130,110" />
+              </g>
+              
+              {/* Center processing nodes */}
+              <g fill="currentColor" className="text-gray-600" opacity="0.6">
+                <circle cx="70" cy="40" r="1.5" />
+                <circle cx="110" cy="40" r="1.5" />
+                <circle cx="150" cy="40" r="1.5" />
+                <circle cx="190" cy="40" r="1.5" />
+                <circle cx="90" cy="70" r="1.5" />
+                <circle cx="130" cy="70" r="1.5" />
+                <circle cx="170" cy="70" r="1.5" />
+                <circle cx="110" cy="100" r="1.5" />
+                <circle cx="150" cy="100" r="1.5" />
+              </g>
+            </svg>
+          </div>
+          
           <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
             <h2 className="ui-h2 ui-section-title text-gray-900 mb-6 flex items-center sm:justify-center">
               <svg className="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,6 +528,45 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="absolute -top-40 -right-40 w-80 h-80 bg-white rounded-full"></div>
             <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white rounded-full"></div>
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white rounded-full opacity-5"></div>
+          </div>
+          
+          {/* AI Circuit Pattern */}
+          <div className="absolute inset-0 opacity-[0.03]">
+            <svg className="w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+              {/* Circuit board traces */}
+              <g fill="none" stroke="white" strokeWidth="1">
+                <path d="M100,150 L200,150 L200,250 L350,250 L350,180 L500,180" />
+                <path d="M150,100 L150,200 L300,200 L300,300 L450,300 L450,220" />
+                <path d="M250,120 L400,120 L400,280 L550,280 L550,160" />
+                <path d="M50,300 L150,300 L150,400 L300,400 L300,350 L500,350" />
+                <path d="M200,50 L200,100 L400,100 L400,200 L600,200" />
+                
+                {/* Branching circuits */}
+                <path d="M300,200 L320,180 M300,200 L320,220" />
+                <path d="M400,250 L420,230 M400,250 L420,270" />
+                <path d="M200,150 L180,130 M200,150 L180,170" />
+                <path d="M350,180 L330,160 M350,180 L330,200" />
+              </g>
+              
+              {/* Circuit nodes and components */}
+              <g fill="white" opacity="0.6">
+                <circle cx="200" cy="150" r="3" />
+                <circle cx="350" cy="250" r="3" />
+                <circle cx="150" cy="200" r="2.5" />
+                <circle cx="300" cy="300" r="3" />
+                <circle cx="400" cy="120" r="2.5" />
+                <circle cx="500" cy="180" r="3" />
+                <circle cx="300" cy="200" r="2" />
+                <circle cx="450" cy="300" r="2.5" />
+                <circle cx="550" cy="280" r="3" />
+                
+                {/* Micro-processors */}
+                <rect x="190" y="140" width="20" height="20" rx="2" opacity="0.4" />
+                <rect x="340" y="240" width="20" height="20" rx="2" opacity="0.4" />
+                <rect x="290" y="290" width="20" height="20" rx="2" opacity="0.4" />
+                <rect x="490" y="170" width="20" height="20" rx="2" opacity="0.4" />
+              </g>
+            </svg>
           </div>
           
           <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
