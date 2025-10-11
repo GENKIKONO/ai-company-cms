@@ -2,10 +2,10 @@
 
 ## Release Information
 
-**Current Release**: `v1.0.0-flat-design`
+**Current Release**: `v1.1.0-recomposed-design`
 **Deployment Date**: October 11, 2025
 **Production URL**: https://aiohub.jp
-**Commit SHA**: `7e7f5b1`
+**Commit SHA**: `aadb8d1`
 
 ## Quick Rollback Commands
 
@@ -166,7 +166,8 @@ Is the issue critical?
 
 | Tag | Date | Commit | Status | Notes |
 |-----|------|--------|--------|-------|
-| `v1.0.0-flat-design` | 2025-10-11 | `7e7f5b1` | Current | Flat design implementation |
+| `v1.1.0-recomposed-design` | 2025-10-11 | `aadb8d1` | Current | Recomposed design system - addresses spacing, layout issues |
+| `v1.0.0-flat-design` | 2025-10-11 | `7e7f5b1` | Stable | Original flat design implementation |
 | `v0.9.x-pre-flat` | 2025-10-10 | `325487d` | Stable | Pre-flat design state |
 
 ## Emergency Contacts

@@ -51,7 +51,6 @@ export default function FAB() {
       onClick={toggle}
       onKeyDown={handleKeyDown}
       className="
-        sm:hidden
         fixed z-[1000] 
         h-14 w-14 
         rounded-full 
@@ -59,7 +58,6 @@ export default function FAB() {
         bottom-[calc(env(safe-area-inset-bottom)+80px)]
         bg-gradient-to-r from-indigo-500 to-fuchsia-500 
         text-white 
-        shadow-lg shadow-indigo-500/25
         hover:shadow-xl hover:shadow-indigo-500/40
         active:scale-95
         grid place-items-center 
