@@ -74,7 +74,7 @@ export default function FlowSection() {
       <div className="container-article section-content">
         {/* セクションヘッダー */}
         <div className="section-gap">
-          <h2 className="headline heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+          <h2 className="text-heading-2 text-gray-900 mb-4 text-center measure-heading text-balance">
             <span className="block jp-phrase">シンプルな3ステップ</span>
           </h2>
           <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
@@ -99,7 +99,7 @@ export default function FlowSection() {
                   </div>
                   
                   {/* アイコン */}
-                  <div className={`media-frame w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-300`} style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                  <div className={`media-frame w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 `} style={{'--media-ar': '1/1'} as React.CSSProperties}>
                     <IconComponent className={`w-8 h-8 ${colors.icon} media-contain`} />
                   </div>
                   

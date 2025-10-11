@@ -34,7 +34,7 @@ export default async function HeroSection({
     ? heroImageUrl 
     : '/hero/zero-click-shift.png';
   return (
-    <section className="section-layer section-hero-pad surface-fade-btm deco-wrap hero-gap bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <section className="section-layer section-hero-pad surface-fade-btm deco-wrap hero-gap bg-gray-50">
       <div className="container-hero section-content content-above-deco">
         <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
           {/* Left Column - Content */}
@@ -46,7 +46,7 @@ export default async function HeroSection({
             </div>
             
             {/* メインタイトル */}
-            <h1 className="headline measure-hero text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 text-left heading-guard-top heading-guard-btm">
+            <h1 className="text-heading-1 text-gray-900 mb-6 text-left measure-heading text-balance">
               {title.split('\n').map((line, index) => (
                 <span key={index} className="block jp-phrase">
                   {index === 1 ? (
@@ -122,7 +122,7 @@ export default async function HeroSection({
 
         {/* 価値訴求カード */}
         <section className="section-gap">
-          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 text-left mb-8 heading-guard-top heading-guard-btm">
+          <h2 className="text-heading-2 text-gray-900 text-left mb-8 measure-heading text-balance">
             AIO Hubで実現する価値
           </h2>
           <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

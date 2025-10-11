@@ -72,7 +72,7 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
       <div className="container-article section-content">
         {/* セクションヘッダー */}
         <div className="section-gap">
-          <h2 className="headline heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-left">
+          <h2 className="text-heading-2 text-gray-900 mb-4 text-left measure-heading text-balance">
             {title.split('\n').map((line, index) => (
               <span key={index} className="block jp-phrase">{line}</span>
             ))}
@@ -101,12 +101,12 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
                   </div>
                   
                   {/* アイコン */}
-                  <div className={`w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 `}>
                     <IconComponent className={`w-8 h-8 ${colors.icon}`} />
                   </div>
                   
                   {/* タイトル・説明 */}
-                  <h3 className="headline text-xl font-bold text-gray-900 mb-3 text-left jp-phrase">{step.title}</h3>
+                  <h3 className="text-heading-3 text-gray-900 mb-3 text-left jp-phrase">{step.title}</h3>
                   <p className="copy measure-body text-left text-gray-600 mb-6 jp-phrase">{step.description}</p>
                   
                   {/* 詳細リスト */}
@@ -125,9 +125,9 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
         </div>
 
         {/* Before/After セクション */}
-        <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 lg:p-12">
+        <div className="bg-gray-50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 lg:p-12">
           <div className="text-center mb-8 sm:mb-12">
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+            <h3 className="text-heading-2 text-gray-900 mb-4 measure-heading text-balance">
               {beforeAfter.title}
             </h3>
             <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 max-w-2xl mx-auto">

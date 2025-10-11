@@ -57,46 +57,57 @@
   --color-error-500: rgb(239 68 68);
   --color-error-600: rgb(220 38 38);
 
-  /* === Layout Containers - Recomposed === */
-  --container-content: 920px;  /* 本文・カード群 */
-  --container-hero: 1040px;    /* ヒーロー */
-  --container-wide: 1120px;    /* 2枚カード等幅時 */
+  /* === AIO Hub Style v2 - Layout Containers === */
+  --container-content: 960px;  /* 本文・カード群（読書行長最適化） */
+  --container-hero: 1080px;    /* ヒーロー（視覚的バランス） */
+  --container-wide: 1200px;    /* 2枚カード等幅時（余裕ある配置） */
   
-  /* === Section Spacing - Recomposed === */
-  --space-section-min: 40px;
-  --space-section-max: 72px;
+  /* === AIO Hub Style v2 - Section Spacing === */
+  --space-section-min: 56px;   /* 黄金比ベース基準値 */
+  --space-section-max: 96px;   /* 統一された最大値 */
   --space-section-hero-min: 64px;
-  --space-section-hero-max: 96px;
+  --space-section-hero-max: 112px;
+  
+  /* === AIO Hub Style v2 - Typography Scale === */
+  --font-size-h1: clamp(2rem, 4vw, 2.5rem);     /* 40px基準 */
+  --font-size-h2: clamp(1.5rem, 3vw, 2rem);     /* 32px基準 */
+  --font-size-h3: clamp(1.25rem, 2.5vw, 1.5rem); /* 24px基準 */
+  --font-size-body: clamp(1rem, 1vw, 1.125rem);   /* 16-18px */
+  --font-size-lead: clamp(1.125rem, 1.5vw, 1.25rem); /* 18-20px */
+  
+  /* === AIO Hub Style v2 - Line Heights === */
+  --line-height-heading: 1.4;  /* 見出し用 */
+  --line-height-body: 1.6;     /* 本文用 */
+  --line-height-lead: 1.8;     /* リード文用 */
 }
 
-/* === Responsive Typography === */
+/* === AIO Hub Style v2 - Unified Typography === */
 .text-heading-1 {
-  font-size: clamp(2rem, 3vw, 3.5rem);
+  font-size: var(--font-size-h1);
   font-weight: bold;
-  line-height: 1.2;
+  line-height: var(--line-height-heading);
 }
 
 .text-heading-2 {
-  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  font-size: var(--font-size-h2);
   font-weight: bold;
-  line-height: 1.3;
+  line-height: var(--line-height-heading);
 }
 
 .text-heading-3 {
-  @apply text-2xl md:text-3xl font-semibold leading-tight;
+  font-size: var(--font-size-h3);
+  font-weight: 600;
+  line-height: var(--line-height-heading);
 }
 
-.text-heading-4 {
-  @apply text-xl md:text-2xl font-semibold leading-tight;
-}
-
-.text-body-large {
-  @apply text-lg leading-relaxed;
+.text-body-lead {
+  font-size: var(--font-size-lead);
+  line-height: var(--line-height-lead);
 }
 
 .text-body {
-  font-size: clamp(1rem, 1vw + 0.8rem, 1.25rem);
-  line-height: 1.65;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
 }
 
 .text-body-small {
@@ -337,7 +348,45 @@
   outline-offset: 2px;
 }
 
-/* === CTA Button Utilities === */
+/* === AIO Hub Style v2 - CTA Button System === */
+.cta-unified {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  min-height: 52px;
+  white-space: nowrap;
+  word-break: keep-all;
+  text-wrap: nowrap;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.cta-unified--primary {
+  background: var(--color-primary-600);
+  color: white;
+  border-color: var(--color-primary-600);
+}
+
+.cta-unified--primary:hover {
+  background: var(--color-primary-700);
+  border-color: var(--color-primary-700);
+}
+
+.cta-unified--secondary {
+  background: transparent;
+  color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+.cta-unified--secondary:hover {
+  background: var(--color-primary-50);
+}
+
+/* Legacy support */
 .cta-nowrap {
   white-space: nowrap;
   word-break: keep-all;
@@ -394,18 +443,48 @@
   width: 100%;
 }
 
-/* Recomposed card system */
+/* === AIO Hub Style v2 - Flat Card System === */
 .ui-card {
   border: 1px solid #E7E9EE;
   border-radius: 12px;
   background: #fff;
-  /* Minimal shadow option if needed */
-  /* box-shadow: 0 1px 2px rgba(16,24,40,.06); */
+  box-shadow: none;
+  transform: none;
+  transition: border-color 0.2s ease;
+}
+
+.ui-card:hover {
+  border-color: #D1D5DB;
+  transform: none;
+  box-shadow: none;
+}
+
+.ui-flat {
+  box-shadow: none !important;
+  transform: none !important;
+  border: 1px solid #E7E9EE;
+  border-radius: 12px;
 }
 
 .ui-on-dark .ui-card {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+/* Section background transitions */
+.section-buffer {
+  background: #F7F7F7;
+  height: clamp(32px, 5vw, 40px);
+  width: 100%;
+}
+
+.section-fade-transition {
+  background: linear-gradient(to bottom, 
+    rgba(255, 255, 255, 1) 0%, 
+    rgba(249, 250, 251, 1) 100%);
+  height: 24px;
+  width: 100%;
 }
 
 /* Heading guards for text-boundary distance - Recomposed */
