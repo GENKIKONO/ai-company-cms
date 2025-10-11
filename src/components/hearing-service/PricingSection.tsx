@@ -88,8 +88,8 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
       <div className={`relative ${colors.bg} ${plan.popular ? '' : 'border-2 ' + colors.border} rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-300 h-full`}>
         {/* プランヘッダー */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className={`w-12 h-12 sm:w-16 sm:h-16 ${plan.popular ? 'bg-white/20' : 'bg-gray-100'} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
-            <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${plan.popular ? 'text-white' : colors.accent}`} />
+          <div className={`media-frame w-12 h-12 sm:w-16 sm:h-16 ${plan.popular ? 'bg-white/20' : 'bg-gray-100'} rounded-2xl flex items-center justify-center mx-auto mb-4`} style={{'--media-ar': '1/1'} as React.CSSProperties}>
+            <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${plan.popular ? 'text-white' : colors.accent} media-contain`} />
           </div>
           <h3 className={`headline text-xl sm:text-2xl font-bold ${colors.text} mb-2 jp-phrase`}>{plan.name}</h3>
           <p className={`copy measure-body text-[15px] sm:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 text-center jp-phrase`}>{plan.description}</p>

@@ -99,8 +99,8 @@ export default function FlowSection() {
                   </div>
                   
                   {/* アイコン */}
-                  <div className={`w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className={`w-8 h-8 ${colors.icon}`} />
+                  <div className={`media-frame w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`} style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                    <IconComponent className={`w-8 h-8 ${colors.icon} media-contain`} />
                   </div>
                   
                   {/* タイトル・説明 */}

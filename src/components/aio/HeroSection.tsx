@@ -34,8 +34,8 @@ export default async function HeroSection({
     ? heroImageUrl 
     : '/hero/zero-click-shift.png';
   return (
-    <section className="hero-gap bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="container-hero">
+    <section className="deco-wrap hero-gap bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="container-hero content-above-deco">
         <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
           {/* Left Column - Content */}
           <div>
@@ -104,12 +104,12 @@ export default async function HeroSection({
 
           {/* Right Column - Image */}
           <div className="mt-10 md:mt-0">
-            <div className="relative w-full aspect-video rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+            <div className="media-frame relative w-full rounded-xl bg-white shadow-sm ring-1 ring-black/5" style={{'--media-ar': '16/9'} as React.CSSProperties}>
               <Image
                 src={imageSrc}
                 alt="検索からAI直接回答へのシフト図（ゼロクリック時代の可視化）"
                 fill
-                className="object-contain md:object-cover"
+                className="media-contain"
                 sizes="(max-width: 768px) 100vw, 640px"
                 priority
               />

@@ -5,15 +5,23 @@ import Link from 'next/link';
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 hero-gap">
-      {/* 背景装飾 */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
+    <section className="deco-wrap bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 hero-gap">
+      {/* 背景装飾 - 安全な配置で切り取り防止 */}
+      <div className="deco-img opacity-30">
+        <svg width="100%" height="100%" viewBox="0 0 1200 800" className="media-contain">
+          <circle cx="300" cy="200" r="120" fill="#bfdbfe" opacity="0.8">
+            <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="900" cy="300" r="120" fill="#c4b5fd" opacity="0.8">
+            <animate attributeName="opacity" values="0.8;0.4;0.8" dur="5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="200" cy="600" r="120" fill="#a5b4fc" opacity="0.8">
+            <animate attributeName="opacity" values="0.4;0.9;0.4" dur="6s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
       </div>
       
-      <div className="container-hero text-left">
+      <div className="container-hero text-left content-above-deco">
           {/* バッジ */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />

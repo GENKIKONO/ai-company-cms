@@ -305,8 +305,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {/* 企業管理 */}
               <div className="card group p-6 sm:p-7">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                  <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
@@ -320,8 +320,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
               {/* サービス管理 */}
               <div className="card group p-6 sm:p-7">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                  <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
@@ -335,8 +335,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
               {/* 導入事例管理 */}
               <div className="card group p-6 sm:p-7">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                  <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -545,12 +545,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* CTA */}
-        <section className="relative section-gap bg-gray-800 overflow-hidden">
-          {/* 背景パターン */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-white rounded-full"></div>
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white rounded-full"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white rounded-full opacity-5"></div>
+        <section className="deco-wrap cta-safe-minh bg-gray-800">
+          {/* 背景パターン - 安全な配置で切り取り防止 */}
+          <div className="deco-img opacity-10">
+            <svg width="100%" height="100%" viewBox="0 0 800 600" className="media-contain">
+              <circle cx="200" cy="150" r="80" fill="white" opacity="0.8"/>
+              <circle cx="600" cy="450" r="80" fill="white" opacity="0.8"/>
+              <circle cx="400" cy="300" r="96" fill="white" opacity="0.3"/>
+            </svg>
           </div>
           
           {/* AI Circuit Pattern */}
@@ -592,7 +594,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="relative container-article text-center">
+          <div className="relative container-article text-center content-above-deco">
             <div className="max-w-3xl mx-auto">
               <h2 className="headline text-3xl md:text-4xl font-bold text-white mb-6 jp-phrase">
                 {t('pages.home.cta.title')}

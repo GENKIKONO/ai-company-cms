@@ -23,8 +23,8 @@ export default function CTASection({
   features
 }: CTASectionProps) {
   return (
-    <section className="section-gap bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 ui-bottom-content">
-      <div className="container-article text-center">
+    <section className="deco-wrap cta-safe-minh bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 ui-bottom-content">
+      <div className="container-article text-center content-above-deco">
         {/* メインタイトル */}
         <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center">
           {title.split('\n').map((line, index) => (

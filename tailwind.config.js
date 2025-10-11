@@ -77,7 +77,16 @@ module.exports = {
     'price-nowrap',
     'ui-bottom-content',
     'grid-12',
-    'card'
+    'card',
+    // Media & Image Cropping Prevention classes
+    'media-contain',
+    'media-cover',
+    'bg-deco-safe',
+    'deco-wrap',
+    'deco-img',
+    'media-frame',
+    'cta-safe-minh',
+    'content-above-deco'
   ],
   corePlugins: {
     textWrap: true,
