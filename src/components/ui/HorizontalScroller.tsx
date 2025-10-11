@@ -49,6 +49,7 @@ export default function HorizontalScroller({
         });
         
         if (maxIntersectionRatio > 0) {
+          console.log('[HorizontalScroller] Setting index:', activeIndex, 'ratio:', maxIntersectionRatio);
           setCurrentIndex(activeIndex);
         }
       },
@@ -88,6 +89,7 @@ export default function HorizontalScroller({
         }
       });
       
+      console.log('[HorizontalScroller] Scroll fallback setting index:', closestIndex);
       setCurrentIndex(closestIndex);
     };
 

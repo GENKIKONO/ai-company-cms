@@ -97,7 +97,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
           {/* AI Neural Network Background */}
-          <div className="absolute inset-0 opacity-[0.03]">
+          <div className="absolute inset-0 opacity-[0.08]">
             <svg className="w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
               {/* Neural network nodes */}
               <g fill="currentColor" className="text-gray-600">
@@ -139,7 +139,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           {/* AI Data Flow Pattern */}
-          <div className="absolute top-10 right-10 opacity-[0.04]">
+          <div className="absolute top-10 right-10 opacity-[0.1]">
             <svg width="200" height="150" viewBox="0 0 200 150">
               <defs>
                 <pattern id="dataflow" patternUnits="userSpaceOnUse" width="40" height="40">
@@ -171,7 +171,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className="measure-lead relative">
                   {/* AI Brain Icon Enhancement */}
-                  <div className="absolute -top-8 -right-8 opacity-[0.04] hidden sm:block">
+                  <div className="absolute -top-8 -right-8 opacity-[0.12] hidden sm:block">
                     <svg width="120" height="120" viewBox="0 0 120 120">
                       <g fill="currentColor" className="text-gray-600">
                         {/* AI brain silhouette */}
@@ -197,10 +197,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     </svg>
                   </div>
                   
-                  <h1 className="headline ui-h1 text-gray-900 mb-6">
+                  <h1 className="headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-6 lg:mb-8 leading-tight">
                     AIO Hub AI企業CMS
                   </h1>
-                  <p className="copy text-base sm:text-lg text-gray-500 mb-10">
+                  <p className="copy text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-500 mb-10 lg:mb-12 leading-relaxed max-w-4xl">
                     AI技術を活用した企業情報の統合管理プラットフォーム
                   </p>
                 </div>
@@ -210,7 +210,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <Link 
                       href="/auth/signup" 
                       onClick={handleCtaClick}
-                      className="cta-nowrap group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-800 text-white text-lg font-semibold rounded-lg hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                      className="cta-nowrap group inline-flex items-center justify-center gap-3 px-10 py-5 lg:px-12 lg:py-6 bg-gray-800 text-white text-lg lg:text-xl xl:text-2xl font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                       aria-label="無料で始める"
                     >
                       <span>無料で始める</span>
@@ -220,7 +220,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     </Link>
                     <Link 
                       href="/organizations" 
-                      className="cta-nowrap group inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                      className="cta-nowrap group inline-flex items-center justify-center gap-3 px-10 py-5 lg:px-12 lg:py-6 border-2 border-gray-300 text-gray-700 text-lg lg:text-xl xl:text-2xl font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
                       aria-label="企業ディレクトリを見る"
                     >
                       <span>企業ディレクトリを見る</span>
@@ -252,11 +252,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
-            <div className="mb-16">
-              <h2 className="ui-h2 ui-section-title text-gray-900 mb-4">
+            <div className="mb-16 lg:mb-20">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 lg:mb-8 text-center lg:text-left">
                 {t('pages.home.features.title')}
               </h2>
-              <p className="ui-measure-body ui-text-left text-gray-600">
+              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 text-center lg:text-left max-w-4xl">
                 {t('pages.home.features.subtitle')}
               </p>
             </div>
