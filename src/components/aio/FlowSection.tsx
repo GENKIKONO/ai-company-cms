@@ -69,7 +69,7 @@ const getColorClasses = (color: string) => {
 export default function FlowSection({ title, description, steps, beforeAfter }: FlowSectionProps) {
   return (
     <section className="py-12 sm:py-16 lg:py-24 bg-white">
-      <div className="wide-container">
+      <div className="balanced-container">
         {/* セクションヘッダー */}
         <div className="text-center mb-10 sm:mb-12">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight tracking-tight">

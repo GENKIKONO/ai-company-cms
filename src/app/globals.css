@@ -369,6 +369,13 @@ html {
     padding-inline: max(1.5rem, 3vw);
   }
   
+  /* Balanced container with better margins */
+  .balanced-container {
+    max-width: 88vw;
+    margin: 0 auto;
+    padding-inline: max(2rem, 4vw);
+  }
+  
   /* Ultra-wide container for hero sections */
   .ultra-wide-container {
     max-width: 98vw;

@@ -36,7 +36,7 @@ export default async function HeroSection({
     : '/hero/zero-click-shift.png';
   return (
     <section className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
+      <div className="balanced-container">
         <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
           {/* Left Column - Content */}
           <div>
