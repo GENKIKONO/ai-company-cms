@@ -70,11 +70,11 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="bg-white section-gap">
-      <div className="container-article">
+    <section className="section-layer section-safe-top section-safe-btm surface-fade-top bg-white section-gap">
+      <div className="container-article section-content">
         {/* セクションヘッダー */}
         <div className="section-gap">
-          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+          <h2 className="headline heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
             <span className="block jp-phrase">シンプルな3ステップ</span>
           </h2>
           <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
@@ -90,7 +90,7 @@ export default function FlowSection() {
               const IconComponent = step.icon;
               
               return (
-                <div key={step.step} className="card relative overflow-visible group p-6 sm:p-7">
+                <div key={step.step} className="card relative overflow-visible group p-6 sm:p-7 bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
                   {/* Step Badge - positioned outside to prevent clipping */}
                   <div className="absolute -top-4 -left-4 z-10 pointer-events-none">
                     <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white shadow-md`}>
@@ -99,7 +99,7 @@ export default function FlowSection() {
                   </div>
                   
                   {/* アイコン */}
-                  <div className={`media-frame w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`} style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                  <div className={`media-frame w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-300`} style={{'--media-ar': '1/1'} as React.CSSProperties}>
                     <IconComponent className={`w-8 h-8 ${colors.icon} media-contain`} />
                   </div>
                   
@@ -123,7 +123,7 @@ export default function FlowSection() {
         </div>
 
         {/* Before/After セクション */}
-        <div className="section-gap bg-gradient-to-r from-gray-50 to-blue-50 rounded-3xl p-8 lg:p-12">
+        <div className="section-gap bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-6 sm:p-8 lg:p-12">
           <div className="text-center mb-12">
             <h3 className="headline text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               <span className="block jp-phrase">構造化前後の違い</span>
