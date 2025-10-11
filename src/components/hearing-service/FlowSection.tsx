@@ -73,13 +73,13 @@ const getColorClasses = (color: string) => {
 export default function FlowSection() {
   return (
     <section className="section-spacing bg-white">
-      <div className="max-w-7xl mx-auto section-pad">
+      <div className="ui-axis-main section-pad">
         {/* セクションヘッダー */}
-        <div className="text-center mb-10 sm:mb-12">
-          <h2 className="jp-heading text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight whitespace-nowrap">
+        <div className="ui-section-title ui-section-gap">
+          <h2 className="ui-h2 jp-heading text-gray-900 tracking-tight whitespace-nowrap">
             シンプルな<span className="whitespace-nowrap">3ステップ</span>
           </h2>
-          <p className="jp-body text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 max-w-3xl mx-auto">
+          <p className="ui-measure-lead ui-text-left jp-body text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 mx-auto">
             複雑な作業は一切不要。<br className="sm:hidden" />専門スタッフがすべて代行し、<br className="sm:hidden" />あなたの企業情報をAI時代に最適な形でお届けします。
           </p>
         </div>

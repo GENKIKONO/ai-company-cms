@@ -36,10 +36,14 @@ export default function HorizontalScroller({
       }}
     >
       <div className={clsx(
-        'flex sm:grid gap-4 sm:gap-6 justify-start sm:justify-normal items-stretch',
+        'flex sm:grid gap-4 sm:gap-6 items-stretch',
         'min-h-fit',
-        // Dynamic grid based on className prop
-        className?.includes('md:grid-cols-4') ? 'sm:grid-cols-2 md:grid-cols-4' : 'sm:grid-cols-2 lg:grid-cols-3',
+        // Dynamic grid based on className prop with centering for 2-column layouts
+        className?.includes('lg:grid-cols-2') 
+          ? 'sm:grid-cols-1 lg:grid-cols-2 justify-center sm:justify-center'
+          : className?.includes('md:grid-cols-4') 
+            ? 'sm:grid-cols-2 md:grid-cols-4 justify-start sm:justify-normal'
+            : 'sm:grid-cols-2 lg:grid-cols-3 justify-start sm:justify-normal',
         // Ensure equal height cards
         'auto-rows-fr'
       )}>

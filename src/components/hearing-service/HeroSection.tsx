@@ -14,8 +14,8 @@ export default function HeroSection() {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
+      <div className="ui-axis-main px-4 sm:px-6 lg:px-8">
+        <div className="ui-section-title">
           {/* バッジ */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
@@ -23,7 +23,7 @@ export default function HeroSection() {
           </div>
           
           {/* メインタイトル */}
-          <h1 className="jp-heading text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
+          <h1 className="ui-h1 jp-heading text-gray-900 leading-tight tracking-tight">
             <span className="block">AIに</span>
             <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               伝わる企業情報へ
@@ -31,7 +31,7 @@ export default function HeroSection() {
           </h1>
           
           {/* サブタイトル */}
-          <p className="jp-body text-[15px] sm:text-base md:text-xl text-gray-600 mb-8 max-w-4xl mx-auto leading-7 sm:leading-8">
+          <p className="ui-measure-lead ui-text-left jp-body text-[15px] sm:text-base md:text-xl text-gray-600 mb-8 mx-auto leading-7 sm:leading-8">
             1時間のヒアリングで、<br className="sm:hidden" />あなたの会社の魅力を<br className="hidden md:block" /><span className="font-semibold text-blue-600">AIが理解しやすい構造</span>に最適化します
           </p>
           

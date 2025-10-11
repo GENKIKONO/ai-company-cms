@@ -763,4 +763,126 @@ html {
     .jp-body-mobile-left { text-align: left !important; }
     .measure-tight { max-width: 36ch; } /* 統一：36ch固定 */
   }
+
+  /* ========================================
+   * UI統一ユーティリティ（商用水準配置）
+   * ======================================== */
+  
+  /* 揃え原則 */
+  .ui-text-left { 
+    text-align: left !important; 
+  }
+  
+  .ui-section-title { 
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .ui-cta-center { 
+    text-align: center; 
+    justify-content: center; 
+  }
+  
+  /* 行長原則 */
+  .ui-measure-body { 
+    max-width: 37ch; 
+  }
+  
+  .ui-measure-lead { 
+    max-width: 44ch; 
+  }
+  
+  .ui-measure-title { 
+    max-width: 20ch; 
+    text-wrap: balance; 
+  }
+  
+  /* 階層原則 */
+  .ui-h1 { 
+    font-size: clamp(2rem, 4vw, 2.5rem); 
+    margin-bottom: 2rem; 
+    font-weight: bold;
+    line-height: 1.2;
+  }
+  
+  .ui-h2 { 
+    font-size: clamp(1.75rem, 3.5vw, 2rem); 
+    margin-bottom: 1.5rem; 
+    font-weight: bold;
+    line-height: 1.3;
+  }
+  
+  .ui-h3 { 
+    font-size: clamp(1.25rem, 3vw, 1.5rem); 
+    margin-bottom: 1rem; 
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  
+  /* 余白リズム */
+  .ui-section { 
+    padding: clamp(3rem, 8vw, 6rem) 0; 
+  }
+  
+  .ui-section-gap { 
+    margin-bottom: 1.5rem; 
+  }
+  
+  .ui-paragraph-gap { 
+    margin-bottom: 1rem; 
+  }
+  
+  .ui-cta-gap { 
+    margin-top: 2rem; 
+  }
+  
+  /* 版面軸統一 */
+  .ui-axis-main { 
+    max-width: 1280px; /* 7xl */
+    margin-left: auto; 
+    margin-right: auto; 
+  }
+  
+  .ui-axis-content { 
+    max-width: 896px; /* 4xl */
+    margin-left: auto; 
+    margin-right: auto; 
+  }
+  
+  .ui-axis-text { 
+    max-width: 768px; /* 3xl */
+    margin-left: auto; 
+    margin-right: auto; 
+  }
+  
+  /* カルーセル配置 */
+  .ui-carousel-center-2 { 
+    justify-content: center; 
+    gap: 2rem;
+    max-width: calc(2 * 320px + 2rem);
+    margin: 0 auto;
+  }
+  
+  @media (min-width: 1024px) {
+    .ui-carousel-center-2 { 
+      max-width: calc(2 * 400px + 2rem);
+    }
+  }
+  
+  .ui-carousel-mobile { 
+    scroll-snap-type: x mandatory;
+    padding-right: 10%;
+  }
+  
+  /* FAB安全域 */
+  .ui-fab { 
+    bottom: calc(env(safe-area-inset-bottom) + 80px); 
+    z-index: 60;
+  }
+  
+  .ui-bottom-content { 
+    margin-bottom: 120px; /* FAB領域確保 */ 
+  }
+
 }

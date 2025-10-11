@@ -56,7 +56,7 @@ export default function FAB() {
         h-14 w-14 
         rounded-full 
         right-[clamp(12px,3vw,20px)] 
-        bottom-[calc(env(safe-area-inset-bottom)+16px)]
+        bottom-[calc(env(safe-area-inset-bottom)+80px)]
         bg-gradient-to-r from-indigo-500 to-fuchsia-500 
         text-white 
         shadow-lg shadow-indigo-500/25
