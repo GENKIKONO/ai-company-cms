@@ -91,12 +91,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     <div className="min-h-screen bg-white">
       <main>
         {/* ヒーローセクション */}
-        <section className="relative overflow-hidden py-12 sm:py-16 lg:py-24">
+        <section className="section-layer section-hero-pad section-safe-btm surface-fade-btm relative overflow-hidden">
           {/* 背景装飾 - 控えめなラジアルグラデーション */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
+          <div className="section-deco bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
           {/* AI Neural Network Background */}
-          <div className="absolute inset-0 opacity-[0.08]">
+          <div className="section-deco opacity-[0.08]">
             <svg className="w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
               {/* Neural network nodes */}
               <g fill="currentColor" className="text-gray-600">
@@ -166,7 +166,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="container-hero">
+          <div className="container-hero section-content">
             <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
               {/* Left Column - Content */}
               <div>
@@ -199,10 +199,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       </svg>
                     </div>
                     
-                    <h1 className="headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 lg:mb-6 leading-tight">
+                    <h1 className="headline heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 lg:mb-6 leading-tight">
                       AIO Hub AI企業CMS
                     </h1>
-                    <p className="copy text-lg sm:text-xl md:text-2xl text-gray-500 mb-8 lg:mb-10 leading-relaxed">
+                    <p className="copy heading-guard-btm text-lg sm:text-xl md:text-2xl text-gray-500 mb-8 lg:mb-10 leading-relaxed">
                       AI技術を活用した企業情報の統合管理プラットフォーム
                     </p>
                   </div>
@@ -277,9 +277,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 機能紹介 */}
-        <section className="compact-section bg-white relative overflow-hidden">
+        <section className="section-layer section-safe surface-fade-btm compact-section bg-white relative overflow-hidden">
           {/* AI Grid Pattern Background */}
-          <div className="absolute top-1/2 left-4 opacity-[0.015] -translate-y-1/2">
+          <div className="section-deco top-1/2 left-4 opacity-[0.015] -translate-y-1/2">
             <svg width="160" height="200" viewBox="0 0 160 200">
               <defs>
                 <pattern id="ai-grid" patternUnits="userSpaceOnUse" width="30" height="30">
@@ -292,9 +292,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="container-article">
+          <div className="container-article section-content">
             <div className="section-gap">
-              <h2 className="headline text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 lg:mb-6 text-left">
+              <h2 className="headline heading-guard-top heading-guard-btm text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 lg:mb-6 text-left">
                 {t('pages.home.features.title')}
               </h2>
               <p className="copy measure-lead text-lg sm:text-xl md:text-2xl lg:text-2xl text-gray-600 text-left">
@@ -533,9 +533,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 代表メッセージ */}
-        <section className="section-gap bg-gray-50">
-          <div className="container-article">
-            <h2 className="headline text-3xl font-bold text-gray-900 mb-8 text-left">
+        <section className="section-layer section-safe-top surface-fade-top section-gap bg-gray-50">
+          <div className="container-article section-content">
+            <h2 className="headline heading-guard-top heading-guard-btm text-3xl font-bold text-gray-900 mb-8 text-left">
               {t('pages.home.message.title')}
             </h2>
             <div className="copy measure-lead text-lg text-gray-700 jp-phrase text-left">
@@ -545,7 +545,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* CTA */}
-        <section className="deco-wrap cta-safe-minh bg-gray-800">
+        <section className="section-layer section-safe-top section-safe-btm deco-wrap cta-safe-minh bg-gray-800">
           {/* 背景パターン - 安全な配置で切り取り防止 */}
           <div className="deco-img opacity-10">
             <svg width="100%" height="100%" viewBox="0 0 800 600" className="media-contain">
@@ -556,7 +556,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           {/* AI Circuit Pattern */}
-          <div className="absolute inset-0 opacity-[0.03]">
+          <div className="section-deco opacity-[0.03]">
             <svg className="w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
               {/* Circuit board traces */}
               <g fill="none" stroke="white" strokeWidth="1">

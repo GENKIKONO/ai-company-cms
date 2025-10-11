@@ -86,7 +86,19 @@ module.exports = {
     'deco-img',
     'media-frame',
     'cta-safe-minh',
-    'content-above-deco'
+    'content-above-deco',
+    // Section boundary safe spacing classes
+    'section-safe',
+    'section-safe-top',
+    'section-safe-btm',
+    'section-hero-pad',
+    'surface-fade-top',
+    'surface-fade-btm',
+    'section-layer',
+    'section-content',
+    'section-deco',
+    'heading-guard-top',
+    'heading-guard-btm'
   ],
   corePlugins: {
     textWrap: true,

@@ -497,6 +497,37 @@ html {
     scroll-snap-type: x mandatory;
   }
 
+  /* ===== Section boundary safe space ===== */
+  .section-safe      { padding-block: clamp(32px, 6vw, 72px); }
+  .section-safe-top  { padding-top:   clamp(28px, 5vw, 56px); }
+  .section-safe-btm  { padding-bottom:clamp(28px, 5vw, 56px); }
+
+  /* ヒーローだけ少し厚め（バッジやリード文が近いケース対策） */
+  .section-hero-pad  { padding-top: clamp(40px, 8vw, 88px); }
+
+  /* 境界フェード（色の段差をソフトに見せる任意オプション） */
+  .surface-fade-top::before,
+  .surface-fade-btm::after {
+    content: ""; position: absolute; left: 0; right: 0; height: 16px; pointer-events: none;
+  }
+  .surface-fade-top { position: relative; }
+  .surface-fade-top::before {
+    top: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.06), transparent);
+  }
+  .surface-fade-btm { position: relative; }
+  .surface-fade-btm::after {
+    bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.06), transparent);
+  }
+
+  /* コンテンツと背景装飾の重なり順序を安定化 */
+  .section-layer    { position: relative; }
+  .section-content  { position: relative; z-index: 10; }
+  .section-deco     { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+
+  /* 見出しの直上/直下の最小余白（見切れ防止の保険） */
+  .heading-guard-top  { margin-top:  clamp(16px, 3vw, 32px); }
+  .heading-guard-btm  { margin-bottom:clamp(16px, 3vw, 28px); }
+
   /* 予防：最外ラッパの僅かな計算誤差による横はみ出しを無効化 */
   .no-inline-overflow { 
     inline-size: 100%; 
