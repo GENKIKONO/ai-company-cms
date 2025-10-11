@@ -90,10 +90,10 @@ export default function FlowSection() {
               const IconComponent = step.icon;
               
               return (
-                <div key={step.step} className="card relative overflow-visible group p-6 sm:p-7 bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div key={step.step} className="card relative overflow-visible group p-6 sm:p-7 bg-white border border-gray-100 ui-card transition-all duration-300">
                   {/* Step Badge - positioned outside to prevent clipping */}
                   <div className="absolute -top-4 -left-4 z-10 pointer-events-none">
-                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white shadow-md`}>
+                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white ui-flat`}>
                       {step.step}
                     </span>
                   </div>

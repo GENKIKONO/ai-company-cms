@@ -78,14 +78,14 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
       {/* 人気バッジ */}
       {plan.popular && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-          <span className="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-medium shadow-lg">
+          <span className="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-medium ui-flat">
             <Zap className="w-4 h-4" />
             <span className="jp-phrase">おすすめ</span>
           </span>
         </div>
       )}
       
-      <div className={`relative ${colors.bg} ${plan.popular ? '' : 'border-2 ' + colors.border} rounded-xl p-4 sm:p-6 lg:p-8 shadow-sm hover:shadow-md transition-shadow duration-300 h-full`}>
+      <div className={`relative ${colors.bg} ${plan.popular ? 'ui-card' : 'ui-card border-2 ' + colors.border} rounded-xl p-4 sm:p-6 lg:p-8 transition-all duration-300 h-full`}>
         {/* プランヘッダー */}
         <div className="text-center mb-6 sm:mb-8">
           <div className={`media-frame w-12 h-12 sm:w-16 sm:h-16 ${plan.popular ? 'bg-white/20' : 'bg-gray-100'} rounded-xl flex items-center justify-center mx-auto mb-4`} style={{'--media-ar': '1/1'} as React.CSSProperties}>
@@ -156,7 +156,7 @@ export default function PricingSection() {
 
         {/* 追加情報 */}
         <div className="section-gap section-safe-top section-safe-btm text-center">
-          <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm border border-gray-200 max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 ui-flat max-w-4xl mx-auto">
             <h3 className="headline text-lg sm:text-xl font-bold text-gray-900 mb-4 jp-phrase">料金に関する補足</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 text-[13px] sm:text-sm text-gray-700">
               <div className="space-y-2 text-left">

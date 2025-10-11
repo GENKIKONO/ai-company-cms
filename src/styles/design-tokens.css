@@ -57,11 +57,16 @@
   --color-error-500: rgb(239 68 68);
   --color-error-600: rgb(220 38 38);
 
-  /* === Layout Containers - Responsive + Fluid === */
-  --container-mobile: 100%;
-  --container-tablet: 800px;
-  --container-pc: min(80vw, 1120px);
-  --container-large: 1280px;
+  /* === Layout Containers - Standardized === */
+  --container-article: 960px;  /* 本文・カード群の標準 */
+  --container-hero: 1080px;     /* ヒーロー限定 */
+  --container-wide: 1200px;     /* 価格2カラム等のワイド用途のみ */
+  
+  /* === Section Spacing === */
+  --space-section-min: 48px;
+  --space-section-max: 96px;
+  --space-section-hero-min: 64px;
+  --space-section-hero-max: 112px;
 }
 
 /* === Responsive Typography === */
@@ -100,7 +105,7 @@
 
 /* Optimized measure classes for readability */
 .measure-body {
-  max-width: 40ch;
+  max-width: 38ch;
   line-height: 1.65;
   text-wrap: pretty;
 }
@@ -112,7 +117,7 @@
 }
 
 .measure-hero {
-  max-width: 30ch;
+  max-width: clamp(30ch, 32ch, 34ch);
   line-height: 1.2;
   text-wrap: balance;
 }
@@ -172,12 +177,12 @@
 }
 
 .card {
-  @apply bg-white rounded-xl shadow-sm border border-gray-200;
+  @apply bg-white rounded-xl border border-gray-200;
 }
 
 /* フォーム専用の明るいカード */
 .card-light {
-  @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6;
+  @apply bg-white rounded-xl border border-gray-200 p-6;
 }
 
 .card-padding {
@@ -252,8 +257,8 @@
 }
 
 /* === ホバー・フォーカス効果 === */
-.hover-lift {
-  @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
+.hover-flat {
+  @apply transition-all duration-200 hover:bg-gray-50 hover:border-gray-300;
 }
 
 .focus-ring {
@@ -320,4 +325,85 @@
   .form-label {
     @apply text-gray-300;
   }
+}
+
+/* === STANDARDIZED LAYOUT SYSTEM === */
+
+/* Container utilities */
+.container-article {
+  max-width: var(--container-article);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+.container-hero {
+  max-width: var(--container-hero);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+.container-wide {
+  max-width: var(--container-wide);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+/* Section spacing utilities */
+.section-gap {
+  margin-block: clamp(var(--space-section-min), 6vw, var(--space-section-max));
+}
+
+.section-gap-hero {
+  margin-block: clamp(var(--space-section-hero-min), 8vw, var(--space-section-hero-max));
+}
+
+/* Section buffer for color transitions */
+.section-buffer {
+  background: #f7f7f7;
+  height: clamp(32px, 5vw, 56px);
+}
+
+/* FLAT DESIGN UTILITIES */
+.ui-flat,
+.ui-card {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.ui-card {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.ui-on-dark .ui-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Heading guards for text-boundary distance */
+.heading-guard-top {
+  padding-top: clamp(24px, 4vw, 48px);
+}
+
+.heading-guard-btm {
+  padding-bottom: clamp(24px, 4vw, 48px);
+}
+
+/* Japanese typography utilities */
+.jp-phrase {
+  text-wrap: pretty;
+}
+
+@supports (word-break: auto-phrase) {
+  .jp-phrase {
+    word-break: auto-phrase;
+  }
+}
+
+/* Prohibit shadow/elevation effects */
+[class*="shadow-"],
+[class*="drop-shadow-"],
+[class*="ring-"] {
+  box-shadow: none !important;
 }

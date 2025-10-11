@@ -2,7 +2,7 @@
 
 ## 概要
 
-AIO Hubのデザインシステムは、CSS Design Tokensを基盤としたスケーラブルな設計手法を採用しています。CSS変数とTailwind CSSの組み合わせにより、一元化されたデザイン管理と保守性の向上を実現しています。
+AIO Hubのデザインシステムは、**フラットデザイン原則**と**CSS Design Tokens**を基盤としたスケーラブルな設計手法を採用しています。完全な3D効果排除、標準化されたコンテナシステム、セクションリズムにより、一元化されたデザイン管理と保守性の向上を実現しています。
 
 ## Design Tokens
 
@@ -47,13 +47,24 @@ AIO Hubのデザインシステムは、CSS Design Tokensを基盤としたス�
 - `--space-xl`: clamp(32px, 6vw, 64px)
 - `--space-2xl`: clamp(48px, 8vw, 96px)
 
-### 角丸とシャドウ
+### レイアウトコンテナ
 
-- `--radius-s`: 6px - 小さな角丸
-- `--radius-m`: 12px - 中程度の角丸
-- `--radius-l`: 16px - 大きな角丸
-- `--shadow-card`: 0 8px 24px rgba(2, 6, 23, .06) - カード用影
-- `--shadow-hover`: 0 12px 32px rgba(2, 6, 23, .12) - ホバー用影
+- `--container-article`: 960px - 本文・カード群の標準
+- `--container-hero`: 1080px - ヒーロー限定
+- `--container-wide`: 1200px - 価格2カラム等のワイド用途のみ
+
+### セクション間隔
+
+- `--space-section-min`: 48px - セクション間隔最小値
+- `--space-section-max`: 96px - セクション間隔最大値
+- `--space-section-hero-min`: 64px - ヒーロー/CTA間隔最小値
+- `--space-section-hero-max`: 112px - ヒーロー/CTA間隔最大値
+
+### フラットデザイン原則
+
+- **影・エフェクト完全排除**: `box-shadow: none !important; filter: none !important;`
+- **角丸**: 12px統一（`.ui-card`）
+- **境界線**: 1px solid rgba(0, 0, 0, 0.06)統一
 
 ### Z-index
 
@@ -82,16 +93,19 @@ AIO Hubのデザインシステムは、CSS Design Tokensを基盤としたス�
 
 ### レイアウト
 
-#### レール配置
-- `.ui-rail`: 左基準統一のメインコンテナ
-  - 最大幅1280px
-  - レスポンシブな左右パディング
-  - 左寄せテキスト配置
+#### 標準化コンテナ
+- `.container-article`: 本文・カード用960px最大幅コンテナ
+- `.container-hero`: ヒーロー用1080px最大幅コンテナ  
+- `.container-wide`: ワイド用1200px最大幅コンテナ（価格2カラム等）
 
-#### 余白管理
-- `.ui-section-gap`: セクション間余白
-- `.ui-paragraph-gap`: 段落間余白
-- `.ui-cta-gap`: CTA要素上余白
+#### セクション間隔管理
+- `.section-gap`: 標準セクション間隔（48-96px）
+- `.section-gap-hero`: ヒーロー/CTA間隔（64-112px）
+- `.section-buffer`: セクション間カラー遷移バッファ（#f7f7f7、32-56px高さ）
+
+#### フラットデザインユーティリティ
+- `.ui-flat`: 完全フラット化（影・エフェクト排除）
+- `.ui-card`: フラットカードスタイル（境界線のみ、12px角丸）
 
 #### FAB安全域
 - `.ui-bottom-content`: FAB重複回避用下部余白
@@ -129,16 +143,36 @@ theme: {
 }
 ```
 
-### コンポーネント適用例
+### フラットデザイン適用例
 
 ```jsx
-// PricingTable.tsx
-<h2 className="ui-h2 jp-heading text-gray-900 mb-6 ui-measure-hero">
-  シンプルで明確な料金体系
-</h2>
-<p className="ui-lead jp-body ui-measure-lead max-w-3xl mx-auto break-keep">
-  無料から始めて、必要になったら拡張。
-</p>
+// PricingTable.tsx - 2カラムフラット価格表
+<section className="section-gap bg-gray-50">
+  <div className="container-wide">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[80px] xl:gap-[96px] max-w-5xl mx-auto">
+      {plans.map((plan) => (
+        <div className="ui-card flex flex-col relative rounded-2xl p-6">
+          <h3 className="jp-heading text-lg font-bold text-gray-900 mb-2">
+            {plan.name}
+          </h3>
+          <span className="text-2xl font-bold text-gray-900 tabular-nums">
+            {plan.price}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+```
+
+```jsx
+// セクションバッファー適用例
+<HeroSection />
+<div className="section-buffer"></div>
+<FlowSection />
+<PricingTable />
+<div className="section-buffer"></div>
+<CTASection />
 ```
 
 ## 拡張方針
@@ -219,8 +253,8 @@ style={{paddingBlock: 'clamp(3rem, 6vw, 7rem)'}}
 
 ## 今後の拡張予定
 
-1. ダークモード対応トークン
-2. アニメーション用トークン
-3. ブレークポイント統一
-4. フォーカス状態の標準化
-5. より詳細なコンポーネントライブラリ化
+1. **ダークモード対応**: フラットデザインを保持したダークテーマトークン
+2. **アニメーション統一**: 控えめなトランジション・マイクロインタラクション
+3. **セクションテンプレート**: 標準化されたセクション構成パターンライブラリ
+4. **フォーカス状態**: アクセシビリティを考慮したフラットフォーカススタイル
+5. **コンポーネント体系化**: フラットデザイン原則に基づいたライブラリ拡張

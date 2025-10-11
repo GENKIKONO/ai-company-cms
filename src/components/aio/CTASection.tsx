@@ -26,7 +26,7 @@ export default function CTASection({
     <section className="deco-wrap cta-safe-minh bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 ui-bottom-content">
       <div className="container-article text-center content-above-deco">
         {/* メインタイトル */}
-        <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center">
+        <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center heading-guard-top heading-guard-btm">
           {title.split('\n').map((line, index) => (
             <span key={index} className="block jp-phrase">
               {index === 1 ? (
@@ -59,7 +59,7 @@ export default function CTASection({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
           <Link
             href={primaryHref}
-            className="group inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl"
+            className="group inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 ui-flat"
           >
             <span className="cta-nowrap">{primaryText}</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

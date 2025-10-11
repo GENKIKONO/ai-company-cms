@@ -46,7 +46,7 @@ export default async function HeroSection({
             </div>
             
             {/* メインタイトル */}
-            <h1 className="headline measure-hero text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 text-left">
+            <h1 className="headline measure-hero text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 text-left heading-guard-top heading-guard-btm">
               {title.split('\n').map((line, index) => (
                 <span key={index} className="block jp-phrase">
                   {index === 1 ? (
@@ -104,7 +104,7 @@ export default async function HeroSection({
 
           {/* Right Column - Image */}
           <div className="mt-10 md:mt-0">
-            <div className="media-frame relative w-full rounded-xl bg-white shadow-sm ring-1 ring-black/5" style={{'--media-ar': '16/9'} as React.CSSProperties}>
+            <div className="media-frame relative w-full rounded-xl bg-white ui-flat" style={{'--media-ar': '16/9'} as React.CSSProperties}>
               <Image
                 src={imageSrc}
                 alt="検索からAI直接回答へのシフト図（ゼロクリック時代の可視化）"
@@ -122,7 +122,7 @@ export default async function HeroSection({
 
         {/* 価値訴求カード */}
         <section className="section-gap">
-          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 text-left mb-8">
+          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 text-left mb-8 heading-guard-top heading-guard-btm">
             AIO Hubで実現する価値
           </h2>
           <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
