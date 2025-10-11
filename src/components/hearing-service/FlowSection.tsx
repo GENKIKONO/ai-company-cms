@@ -72,16 +72,18 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="section-spacing bg-white">
-      <div className="ui-axis-main section-pad">
+    <section className="bg-white" style={{paddingBlock: 'clamp(2.5rem, 4vw, 5rem)'}}>
+      <div className="center-col">
         {/* セクションヘッダー */}
-        <div className="ui-section-title ui-section-gap">
-          <h2 className="ui-h2 jp-heading text-gray-900 tracking-tight whitespace-nowrap">
-            シンプルな<span className="whitespace-nowrap">3ステップ</span>
-          </h2>
-          <p className="ui-measure-lead ui-text-left jp-body text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 mx-auto">
-            複雑な作業は一切不要。<br className="sm:hidden" />専門スタッフがすべて代行し、<br className="sm:hidden" />あなたの企業情報をAI時代に最適な形でお届けします。
-          </p>
+        <div className="text-center mb-10 sm:mb-12">
+          <div className="measure-lead mx-auto">
+            <h2 className="ui-h2 jp-heading text-gray-900 tracking-tight mb-6">
+              シンプルな3ステップ
+            </h2>
+            <p className="copy text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600">
+              複雑な作業は一切不要。専門スタッフがすべて代行し、あなたの企業情報をAI時代に最適な形でお届けします。
+            </p>
+          </div>
         </div>
 
         {/* フローステップ */}
@@ -138,12 +140,14 @@ export default function FlowSection() {
         {/* Before/After セクション */}
         <div className="section-gap bg-gradient-to-r from-gray-50 to-blue-50 rounded-3xl p-8 lg:p-12">
           <div className="text-center mb-12">
-            <h3 className="jp-heading text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              構造化前後の<span className="whitespace-nowrap">違い</span>
-            </h3>
-            <p className="jp-body text-gray-600 max-w-2xl mx-auto">
-              ヒアリングによって<br className="sm:hidden" />あなたの企業情報が<br className="sm:hidden" />どのように変わるかをご覧ください
-            </p>
+            <div className="measure-lead mx-auto">
+              <h3 className="jp-heading text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                構造化前後の違い
+              </h3>
+              <p className="copy text-gray-600">
+                ヒアリングによってあなたの企業情報がどのように変わるかをご覧ください
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">

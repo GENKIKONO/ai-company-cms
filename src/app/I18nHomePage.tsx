@@ -92,46 +92,48 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     <div className="min-h-screen bg-white">
       <main>
         {/* ヒーローセクション */}
-        <section className="relative overflow-hidden">
+        <section className="relative overflow-hidden" style={{paddingBlock: 'clamp(3rem, 6vw, 7rem)'}}>
           {/* 背景装飾 - 控えめなラジアルグラデーション */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
-          <div className="center-col">
-            <div className="py-16 sm:py-20 lg:py-28 text-left">
+          <div className="center-col text-left">
               <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <h1 className="headline measure-hero text-gray-900 mb-6 ui-h1">
-                  AIO Hub AI企業CMS
-                </h1>
-                <p className="copy measure-lead text-base sm:text-lg text-gray-500 mb-10">
-                  AI技術を活用した企業情報の統合管理プラットフォーム
-                </p>
+                <div className="measure-lead">
+                  <h1 className="headline ui-h1 text-gray-900 mb-6">
+                    AIO Hub AI企業CMS
+                  </h1>
+                  <p className="copy text-base sm:text-lg text-gray-500 mb-10">
+                    AI技術を活用した企業情報の統合管理プラットフォーム
+                  </p>
+                </div>
                 
-                <div className="flex flex-col sm:flex-row flex-nowrap gap-4 sm:gap-6 justify-start">
-                  <Link 
-                    href="/auth/signup" 
-                    onClick={handleCtaClick}
-                    className="btn-nowrap group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-800 text-white text-lg font-semibold rounded-lg hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-                    aria-label="無料で始める"
-                  >
-                    <span>無料で始める</span>
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </Link>
-                  <Link 
-                    href="/organizations" 
-                    className="btn-nowrap group inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
-                    aria-label="企業ディレクトリを見る"
-                  >
-                    <span>企業ディレクトリを見る</span>
-                    <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </Link>
+                <div className="measure-lead">
+                  <div className="flex flex-col sm:flex-row flex-nowrap gap-4 sm:gap-6 justify-start">
+                    <Link 
+                      href="/auth/signup" 
+                      onClick={handleCtaClick}
+                      className="cta-nowrap group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-800 text-white text-lg font-semibold rounded-lg hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                      aria-label="無料で始める"
+                    >
+                      <span>無料で始める</span>
+                      <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </Link>
+                    <Link 
+                      href="/organizations" 
+                      className="cta-nowrap group inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                      aria-label="企業ディレクトリを見る"
+                    >
+                      <span>企業ディレクトリを見る</span>
+                      <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
           </div>
         </section>
 
