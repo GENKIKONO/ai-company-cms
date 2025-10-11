@@ -53,20 +53,21 @@ const getColorClasses = (color: string, popular: boolean = false) => {
 
 export default function PricingSection({ title, description, plans, notes }: PricingSectionProps) {
   return (
-    <section id="pricing" className="py-24 md:py-32 bg-gray-50">
-      <div className="balanced-container">
+    <section id="pricing" className="section-gap bg-gray-50">
+      <div className="container-wide">
         {/* セクションヘッダー */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight tracking-wide heading-guard-top heading-guard-btm">
+        <div className="text-center heading-guard-top heading-guard-btm">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 measure-heading mx-auto text-balance">
             {title}
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 measure-lead mx-auto text-pretty">
             {description}
           </p>
         </div>
 
         {/* 料金プラン */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
+        <div className="section-gap">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {plans.map((plan) => {
             const colors = getColorClasses(plan.color, plan.popular);
             const IconComponent = iconComponents[plan.icon as keyof typeof iconComponents];
@@ -83,19 +84,19 @@ export default function PricingSection({ title, description, plans, notes }: Pri
                   </div>
                 )}
                 
-                <div className={`relative ${colors.bg} ${plan.popular ? 'ui-card' : 'ui-card border-2 ' + colors.border} rounded-3xl p-8 transition-all duration-300 h-full`}>
+                <div className={`relative ${colors.bg} ui-card p-8 transition-all duration-300 h-full card-min-height-lg ${plan.popular ? '' : 'border-2 ' + colors.border}`}>
                   {/* プランヘッダー */}
                   <div className="text-center mb-8">
                     <div className={`w-16 h-16 ${plan.popular ? 'bg-white/20' : 'bg-gray-100'} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
                       <IconComponent className={`w-8 h-8 ${plan.popular ? 'text-white' : colors.accent}`} />
                     </div>
-                    <h3 className={`text-2xl font-bold ${colors.text} mb-2`}>{plan.name}</h3>
-                    <p className={`${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 leading-relaxed`}>
+                    <h3 className={`text-2xl font-bold ${colors.text} mb-2 measure-heading mx-auto text-balance`}>{plan.name}</h3>
+                    <p className={`${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 measure-body mx-auto text-pretty`}>
                       {plan.description}
                     </p>
                     
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className={`text-4xl font-bold ${colors.text}`}>
+                      <span className={`text-4xl font-bold ${colors.text} tabular-nums`}>
                         {plan.price === '0' ? '無料' : `¥${plan.price}`}
                       </span>
                       <span className={`${plan.popular ? 'text-white/80' : 'text-gray-600'}`}>
@@ -136,12 +137,13 @@ export default function PricingSection({ title, description, plans, notes }: Pri
               </div>
             );
           })}
+          </div>
         </div>
 
         {/* 追加情報 */}
-        <div className="text-center">
-          <div className="bg-white rounded-2xl p-8 ui-flat max-w-4xl mx-auto">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 heading-guard-top heading-guard-btm">料金に関する補足</h3>
+        <div className="section-gap text-center">
+          <div className="ui-card p-8 max-w-4xl mx-auto">
+            <h3 className="text-xl font-bold text-gray-900 mb-6 measure-heading mx-auto text-balance">料金に関する補足</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-900">含まれるもの</h4>

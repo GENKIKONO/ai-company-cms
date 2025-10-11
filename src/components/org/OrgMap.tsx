@@ -97,7 +97,7 @@ export default function OrgMap({ organization, className = '' }: OrgMapProps) {
               display: flex;
               align-items: center;
               justify-content: center;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+              box-shadow: none;
             ">
               <div style="
                 color: white;

@@ -57,16 +57,16 @@
   --color-error-500: rgb(239 68 68);
   --color-error-600: rgb(220 38 38);
 
-  /* === Layout Containers - Standardized === */
-  --container-article: 960px;  /* 本文・カード群の標準 */
-  --container-hero: 1080px;     /* ヒーロー限定 */
-  --container-wide: 1200px;     /* 価格2カラム等のワイド用途のみ */
+  /* === Layout Containers - Recomposed === */
+  --container-content: 920px;  /* 本文・カード群 */
+  --container-hero: 1040px;    /* ヒーロー */
+  --container-wide: 1120px;    /* 2枚カード等幅時 */
   
-  /* === Section Spacing === */
-  --space-section-min: 48px;
-  --space-section-max: 96px;
+  /* === Section Spacing - Recomposed === */
+  --space-section-min: 40px;
+  --space-section-max: 72px;
   --space-section-hero-min: 64px;
-  --space-section-hero-max: 112px;
+  --space-section-hero-max: 96px;
 }
 
 /* === Responsive Typography === */
@@ -329,23 +329,30 @@
 
 /* === STANDARDIZED LAYOUT SYSTEM === */
 
-/* Container utilities */
-.container-article {
-  max-width: var(--container-article);
+/* Container utilities - Recomposed */
+.container-content {
+  max-width: var(--container-content);
   margin-inline: auto;
-  padding-inline: clamp(16px, 4vw, 40px);
+  padding-inline: clamp(16px, 4vw, 32px);
 }
 
 .container-hero {
   max-width: var(--container-hero);
   margin-inline: auto;
-  padding-inline: clamp(16px, 4vw, 40px);
+  padding-inline: clamp(16px, 4vw, 32px);
 }
 
 .container-wide {
   max-width: var(--container-wide);
   margin-inline: auto;
-  padding-inline: clamp(16px, 4vw, 40px);
+  padding-inline: clamp(16px, 4vw, 32px);
+}
+
+/* Legacy support */
+.container-article {
+  max-width: var(--container-content);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 32px);
 }
 
 /* Section spacing utilities */
@@ -357,23 +364,25 @@
   margin-block: clamp(var(--space-section-hero-min), 8vw, var(--space-section-hero-max));
 }
 
-/* Section buffer for color transitions */
-.section-buffer {
-  background: #f7f7f7;
-  height: clamp(32px, 5vw, 56px);
+/* Recomposed dividers and cards */
+.divider {
+  border-top: 1px solid #ECEFF3;
+  width: 100%;
 }
 
-/* FLAT DESIGN UTILITIES */
-.ui-flat,
-.ui-card {
-  box-shadow: none !important;
-  filter: none !important;
+.neutral-band {
+  background: #FAFBFC;
+  height: 8px;
+  width: 100%;
 }
 
+/* Recomposed card system */
 .ui-card {
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid #E7E9EE;
   border-radius: 12px;
   background: #fff;
+  /* Minimal shadow option if needed */
+  /* box-shadow: 0 1px 2px rgba(16,24,40,.06); */
 }
 
 .ui-on-dark .ui-card {
@@ -381,16 +390,38 @@
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Heading guards for text-boundary distance */
+/* Heading guards for text-boundary distance - Recomposed */
 .heading-guard-top {
-  padding-top: clamp(24px, 4vw, 48px);
+  padding-top: clamp(32px, 4vw, 48px);
 }
 
 .heading-guard-btm {
-  padding-bottom: clamp(24px, 4vw, 48px);
+  padding-bottom: clamp(32px, 4vw, 48px);
 }
 
-/* Japanese typography utilities */
+.hero-guard-top {
+  padding-top: clamp(48px, 6vw, 64px);
+}
+
+.hero-guard-btm {
+  padding-bottom: clamp(48px, 6vw, 64px);
+}
+
+/* Typography and layout utilities - Recomposed */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+@supports (word-break: auto-phrase) {
+  .text-auto-phrase {
+    word-break: auto-phrase;
+  }
+}
+
 .jp-phrase {
   text-wrap: pretty;
 }
@@ -401,9 +432,47 @@
   }
 }
 
-/* Prohibit shadow/elevation effects */
-[class*="shadow-"],
-[class*="drop-shadow-"],
-[class*="ring-"] {
-  box-shadow: none !important;
+/* Measure utilities for optimal line length */
+.measure-heading {
+  max-width: 24ch;
+}
+
+.measure-lead {
+  max-width: 42ch;
+}
+
+.measure-body {
+  max-width: 38ch;
+}
+
+/* Card layout utilities */
+.card-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .card-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+}
+
+.card-min-height-sm {
+  min-height: 180px;
+}
+
+.card-min-height-md {
+  min-height: 200px;
+}
+
+.card-min-height-lg {
+  min-height: 220px;
 }

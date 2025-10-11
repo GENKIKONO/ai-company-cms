@@ -91,7 +91,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     <div className="min-h-screen bg-white">
       <main>
         {/* ヒーローセクション */}
-        <section className="section-gap-hero relative overflow-hidden">
+        <section className="relative overflow-hidden pt-8 pb-16 md:pt-12 md:pb-20 lg:pt-16 lg:pb-24">
           {/* 背景装飾 - 控えめなラジアルグラデーション */}
           <div className="section-deco bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
@@ -167,7 +167,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           <div className="container-hero">
-            <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
+            <div className="md:grid md:grid-cols-[58%_42%] lg:grid-cols-[55%_45%] md:gap-8 lg:gap-12 items-center">
               {/* Left Column - Content */}
               <div>
                 <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
@@ -199,16 +199,16 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       </svg>
                     </div>
                     
-                    <h1 className="headline heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 lg:mb-6 leading-tight">
+                    <h1 className="headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 lg:mb-5 leading-tight measure-heading text-balance">
                       AIO Hub AI企業CMS
                     </h1>
-                    <p className="copy heading-guard-btm text-lg sm:text-xl md:text-2xl text-gray-500 mb-8 lg:mb-10 leading-relaxed">
+                    <p className="copy text-lg sm:text-xl md:text-2xl text-gray-500 mb-6 lg:mb-8 leading-relaxed measure-lead text-pretty">
                       AI技術を活用した企業情報の統合管理プラットフォーム
                     </p>
                   </div>
                   
                   <div className="measure-lead">
-                    <div className="flex flex-col sm:flex-row flex-nowrap gap-4 sm:gap-6 justify-start">
+                    <div className="flex flex-col sm:flex-row flex-nowrap gap-3 sm:gap-4 justify-start">
                       <Link 
                         href="/auth/signup" 
                         onClick={handleCtaClick}
@@ -302,49 +302,64 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </p>
             </div>
 
-            <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="card-grid-4">
               {/* 企業管理 */}
-              <div className="card group p-6 sm:p-7">
+              <div className="card group p-6 sm:p-7 card-min-height-md">
                 <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
                   <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
-                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase">
+                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase measure-heading text-balance">
                   {t('pages.home.features.organizationManagement.title')}
                 </h3>
-                <p className="copy measure-body text-left text-gray-600 jp-phrase">
+                <p className="copy measure-body text-left text-gray-600 jp-phrase text-pretty">
                   {t('pages.home.features.organizationManagement.description')}
                 </p>
               </div>
 
               {/* サービス管理 */}
-              <div className="card group p-6 sm:p-7">
+              <div className="card group p-6 sm:p-7 card-min-height-md">
                 <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
                   <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase">
+                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase measure-heading text-balance">
                   {t('pages.home.features.serviceManagement.title')}
                 </h3>
-                <p className="copy measure-body text-left text-gray-600 jp-phrase">
+                <p className="copy measure-body text-left text-gray-600 jp-phrase text-pretty">
                   {t('pages.home.features.serviceManagement.description')}
                 </p>
               </div>
 
               {/* 導入事例管理 */}
-              <div className="card group p-6 sm:p-7">
+              <div className="card group p-6 sm:p-7 card-min-height-md">
                 <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
                   <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase">
+                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase measure-heading text-balance">
                   {t('pages.home.features.caseManagement.title')}
                 </h3>
-                <p className="copy measure-body text-left text-gray-600 jp-phrase">
+                <p className="copy measure-body text-left text-gray-600 jp-phrase text-pretty">
                   {t('pages.home.features.caseManagement.description')}
+                </p>
+              </div>
+
+              {/* AI最適化 */}
+              <div className="card group p-6 sm:p-7 card-min-height-md">
+                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                  <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="headline text-left text-xl font-semibold text-gray-900 mb-4 jp-phrase measure-heading text-balance">
+                  AI検索最適化
+                </h3>
+                <p className="copy measure-body text-left text-gray-600 jp-phrase text-pretty">
+                  構造化データの自動生成により、AI検索エンジンでの発見性を向上させます。
                 </p>
               </div>
             </div>

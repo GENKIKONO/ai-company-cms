@@ -85,14 +85,14 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
         </div>
       )}
       
-      <div className={`relative ${colors.bg} ${plan.popular ? 'ui-card' : 'ui-card border-2 ' + colors.border} rounded-xl p-4 sm:p-6 lg:p-8 transition-all duration-300 h-full`}>
+      <div className={`relative ${colors.bg} ui-card p-6 lg:p-8 transition-all duration-300 h-full card-min-height-lg ${plan.popular ? '' : 'border-2 ' + colors.border}`}>
         {/* プランヘッダー */}
         <div className="text-center mb-6 sm:mb-8">
           <div className={`media-frame w-12 h-12 sm:w-16 sm:h-16 ${plan.popular ? 'bg-white/20' : 'bg-gray-100'} rounded-xl flex items-center justify-center mx-auto mb-4`} style={{'--media-ar': '1/1'} as React.CSSProperties}>
             <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${plan.popular ? 'text-white' : colors.accent} media-contain`} />
           </div>
-          <h3 className={`headline text-xl sm:text-2xl font-bold ${colors.text} mb-2 jp-phrase`}>{plan.name}</h3>
-          <p className={`copy measure-body text-[15px] sm:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 text-center jp-phrase`}>{plan.description}</p>
+          <h3 className={`headline text-xl sm:text-2xl font-bold ${colors.text} mb-2 jp-phrase measure-heading mx-auto text-balance`}>{plan.name}</h3>
+          <p className={`copy measure-body text-[15px] sm:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 text-center jp-phrase text-pretty mx-auto`}>{plan.description}</p>
           
           <div className="flex items-baseline justify-center gap-1 price-nowrap">
             <span className={`text-3xl sm:text-4xl font-bold ${colors.text} tabular-nums`}>¥{plan.price}</span>
@@ -131,21 +131,21 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="section-layer section-safe-top section-safe-btm surface-fade-top bg-gray-50 section-gap">
-      <div className="container-article section-content">
+    <section id="pricing" className="section-gap bg-gray-50">
+      <div className="container-wide">
         {/* セクションヘッダー */}
-        <div className="section-gap">
-          <h2 className="headline heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+        <div className="heading-guard-top heading-guard-btm">
+          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center measure-heading mx-auto text-balance">
             <span className="block jp-phrase">シンプルで明確な料金体系</span>
           </h2>
-          <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
+          <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase text-pretty">
             単発のヒアリングから継続的な支援まで、お客様のニーズに合わせて選択いただけます。
           </p>
         </div>
 
         {/* 料金プラン */}
         <div className="section-gap">
-          <div className="grid gap-6 md:gap-8 grid-cols-1 md:grid-cols-2 max-w-6xl mx-auto">
+          <div className="grid gap-8 grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto">
             {pricingPlans.map((plan) => (
               <div key={plan.name} className="relative">
                 <PricingCard plan={plan} />
@@ -155,10 +155,10 @@ export default function PricingSection() {
         </div>
 
         {/* 追加情報 */}
-        <div className="section-gap section-safe-top section-safe-btm text-center">
-          <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 ui-flat max-w-4xl mx-auto">
-            <h3 className="headline text-lg sm:text-xl font-bold text-gray-900 mb-4 jp-phrase">料金に関する補足</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 text-[13px] sm:text-sm text-gray-700">
+        <div className="section-gap text-center">
+          <div className="ui-card p-6 lg:p-8 max-w-4xl mx-auto">
+            <h3 className="headline text-lg sm:text-xl font-bold text-gray-900 mb-6 jp-phrase measure-heading mx-auto text-balance">料金に関する補足</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
               <div className="space-y-2 text-left">
                 <h4 className="headline font-semibold text-gray-900 jp-phrase">含まれるもの</h4>
                 <ul className="space-y-1">

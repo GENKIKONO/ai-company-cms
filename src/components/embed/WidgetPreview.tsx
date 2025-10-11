@@ -68,7 +68,7 @@ export function WidgetPreview({ organization, services = [], options, baseUrl }:
           
           .widget-preview-content {
             transform-origin: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: none;
           }
           
           /* レスポンシブ対応 */
@@ -194,7 +194,7 @@ export function WidgetPreviewThumbnail({
           background: white;
           border: 1px solid #e2e8f0;
           border-radius: 6px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: none;
           font-size: ${config.fontSize};
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           display: flex;

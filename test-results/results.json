@@ -1,0 +1,153 @@
+{
+  "config": {
+    "configFile": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/playwright.config.ts",
+    "rootDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/global-setup.ts",
+    "globalTeardown": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/junit.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "mobile-chrome",
+        "name": "mobile-chrome",
+        "testDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "mobile-safari",
+        "name": "mobile-safari",
+        "testDir": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 5,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "Error: Missing Supabase environment variables for tests",
+      "stack": "Error: Missing Supabase environment variables for tests\n    at createTestSupabaseClient (/Users/kounogenki/Documents/LuxuCare株式会社/開発/src/lib/supabase-test.ts:13:11)\n    at Object.<anonymous> (/Users/kounogenki/Documents/LuxuCare株式会社/開発/src/lib/supabase-test.ts:24:29)\n    at Object.<anonymous> (/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/global-setup.ts:2:1)",
+      "location": {
+        "file": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/src/lib/supabase-test.ts",
+        "column": 11,
+        "line": 13
+      },
+      "snippet": "\u001b[90m   at \u001b[39m../../src/lib/supabase-test.ts:13\n\n  11 |\n  12 |   if (!supabaseUrl || !supabaseServiceKey) {\n> 13 |     throw new Error('Missing Supabase environment variables for tests');\n     |           ^\n  14 |   }\n  15 |\n  16 |   return createClient(supabaseUrl, supabaseServiceKey, {"
+    },
+    {
+      "message": "Error: Missing Supabase environment variables for tests",
+      "stack": "Error: Missing Supabase environment variables for tests\n    at createTestSupabaseClient (/Users/kounogenki/Documents/LuxuCare株式会社/開発/src/lib/supabase-test.ts:13:11)\n    at Object.<anonymous> (/Users/kounogenki/Documents/LuxuCare株式会社/開発/src/lib/supabase-test.ts:24:29)\n    at Object.<anonymous> (/Users/kounogenki/Documents/LuxuCare株式会社/開発/tests/global-teardown.ts:2:1)",
+      "location": {
+        "file": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/src/lib/supabase-test.ts",
+        "column": 11,
+        "line": 13
+      },
+      "snippet": "\u001b[90m   at \u001b[39m../../src/lib/supabase-test.ts:13\n\n  11 |\n  12 |   if (!supabaseUrl || !supabaseServiceKey) {\n> 13 |     throw new Error('Missing Supabase environment variables for tests');\n     |           ^\n  14 |   }\n  15 |\n  16 |   return createClient(supabaseUrl, supabaseServiceKey, {"
+    }
+  ],
+  "stats": {
+    "startTime": "2025-10-11T14:36:37.841Z",
+    "duration": 6026.343999999999,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

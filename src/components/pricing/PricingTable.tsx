@@ -127,7 +127,7 @@ export default function PricingTable() {
         </div>
 
         {/* 2-column pricing layout for PC */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[80px] xl:gap-[96px] justify-center items-stretch max-w-5xl mx-auto mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 xl:gap-24 justify-center items-stretch max-w-5xl mx-auto mb-12">
           {mainPlans.map((plan) => (
             <div
               key={plan.id}
