@@ -342,10 +342,47 @@ html {
     box-shadow: 0 0 0 2px rgb(99 102 241 / 0.5);
   }
   
+  /* Header logo no selection */
+  .logo-no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .logo-no-select:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
   /* Japanese text utilities to prevent unnatural breaks */
   .jp-avoid-break {
     white-space: nowrap;
     word-break: keep-all;
+  }
+  
+  /* Wide container system - more space utilization */
+  .wide-container {
+    max-width: 95vw;
+    margin: 0 auto;
+    padding-inline: max(1.5rem, 3vw);
+  }
+  
+  /* Ultra-wide container for hero sections */
+  .ultra-wide-container {
+    max-width: 98vw;
+    margin: 0 auto;
+    padding-inline: max(1rem, 2vw);
+  }
+  
+  /* Reduced vertical spacing for more content */
+  .compact-section {
+    padding-block: clamp(1.5rem, 3vw, 3rem);
+  }
+  
+  .ultra-compact-section {
+    padding-block: clamp(1rem, 2vw, 2rem);
   }
   
   .jp-number-unit {
@@ -1089,22 +1126,22 @@ html {
     --color-warning: #F59E0B;
 
     /* Typography */
-    --font-size-h1: clamp(28px, 6vw, 38px);
-    --font-size-h2: clamp(22px, 4.5vw, 30px);
-    --font-size-h3: clamp(18px, 3.5vw, 24px);
-    --font-size-body: 15px;
-    --font-size-small: 13px;
+    --font-size-h1: clamp(32px, 7vw, 42px);
+    --font-size-h2: clamp(24px, 5vw, 32px);
+    --font-size-h3: clamp(20px, 4vw, 26px);
+    --font-size-body: 17px;
+    --font-size-small: 15px;
     --line-height-tight: 1.2;
     --line-height-body: 1.7;
     --line-height-relaxed: 1.8;
 
     /* Spacing */
-    --space-xs: clamp(4px, 1vw, 8px);
-    --space-s: clamp(8px, 1.5vw, 16px);
-    --space-m: clamp(16px, 3vw, 24px);
-    --space-l: clamp(24px, 4vw, 40px);
-    --space-xl: clamp(32px, 6vw, 64px);
-    --space-2xl: clamp(48px, 8vw, 96px);
+    --space-xs: clamp(3px, 0.8vw, 6px);
+    --space-s: clamp(6px, 1.2vw, 12px);
+    --space-m: clamp(12px, 2.5vw, 18px);
+    --space-l: clamp(18px, 3vw, 28px);
+    --space-xl: clamp(24px, 4vw, 40px);
+    --space-2xl: clamp(32px, 6vw, 56px);
 
     /* Radius & Shadow */
     --radius-s: 6px;

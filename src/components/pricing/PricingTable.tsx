@@ -114,7 +114,7 @@ const PLANS: PricingPlan[] = [
 export default function PricingTable() {
   return (
     <section className="py-12 sm:py-16 lg:py-24">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+      <div className="wide-container">
         <div className="text-center mb-10 sm:mb-12">
           <h2 className="ui-h2 jp-heading text-gray-900 mb-6 ui-measure-hero">
             シンプルで明確な料金体系

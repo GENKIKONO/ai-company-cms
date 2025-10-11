@@ -72,8 +72,8 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="bg-white" style={{paddingBlock: 'clamp(2.5rem, 4vw, 5rem)'}}>
-      <div className="center-col">
+    <section className="bg-white compact-section">
+      <div className="wide-container">
         {/* セクションヘッダー */}
         <div className="text-center mb-10 sm:mb-12">
           <div className="measure-lead mx-auto">

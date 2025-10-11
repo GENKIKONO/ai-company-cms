@@ -78,7 +78,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
             {/* ロゴは常に / に遷移 */}
             <Link 
               href="/" 
-              className="focus-clean text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 hover:text-blue-600 min-h-[44px] flex items-center"
+              className="focus-clean logo-no-select text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 hover:text-blue-600 min-h-[44px] flex items-center"
             >
               AIO Hub AI企業CMS
             </Link>

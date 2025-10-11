@@ -6,7 +6,7 @@ import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50" style={{paddingBlock: 'clamp(3rem, 6vw, 7rem)'}}>
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 compact-section">
       {/* 背景装飾 */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
@@ -14,7 +14,7 @@ export default function HeroSection() {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
       </div>
       
-      <div className="center-col text-left">
+      <div className="wide-container text-left">
           {/* バッジ */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />

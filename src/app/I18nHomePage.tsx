@@ -92,7 +92,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     <div className="min-h-screen bg-white">
       <main>
         {/* ヒーローセクション */}
-        <section className="relative overflow-hidden" style={{paddingBlock: 'clamp(3rem, 6vw, 7rem)'}}>
+        <section className="relative overflow-hidden ultra-compact-section">
           {/* 背景装飾 - 控えめなラジアルグラデーション */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 to-transparent"></div>
           
@@ -167,7 +167,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="center-col text-left">
+          <div className="ultra-wide-container text-center">
               <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <div className="measure-lead relative">
                   {/* AI Brain Icon Enhancement */}
@@ -197,10 +197,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     </svg>
                   </div>
                   
-                  <h1 className="headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-6 lg:mb-8 leading-tight">
+                  <h1 className="headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 lg:mb-6 leading-tight">
                     AIO Hub AI企業CMS
                   </h1>
-                  <p className="copy text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-500 mb-10 lg:mb-12 leading-relaxed max-w-4xl">
+                  <p className="copy text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-500 mb-8 lg:mb-10 leading-relaxed max-w-4xl">
                     AI技術を活用した企業情報の統合管理プラットフォーム
                   </p>
                 </div>
@@ -210,7 +210,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <Link 
                       href="/auth/signup" 
                       onClick={handleCtaClick}
-                      className="cta-nowrap group inline-flex items-center justify-center gap-3 px-10 py-5 lg:px-12 lg:py-6 bg-gray-800 text-white text-lg lg:text-xl xl:text-2xl font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                      className="cta-nowrap group inline-flex items-center justify-center gap-3 px-8 py-4 lg:px-10 lg:py-5 bg-gray-800 text-white text-lg lg:text-xl font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                       aria-label="無料で始める"
                     >
                       <span>無料で始める</span>
@@ -220,7 +220,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     </Link>
                     <Link 
                       href="/organizations" 
-                      className="cta-nowrap group inline-flex items-center justify-center gap-3 px-10 py-5 lg:px-12 lg:py-6 border-2 border-gray-300 text-gray-700 text-lg lg:text-xl xl:text-2xl font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                      className="cta-nowrap group inline-flex items-center justify-center gap-3 px-8 py-4 lg:px-10 lg:py-5 border-2 border-gray-300 text-gray-700 text-lg lg:text-xl font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
                       aria-label="企業ディレクトリを見る"
                     >
                       <span>企業ディレクトリを見る</span>
@@ -236,7 +236,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 機能紹介 */}
-        <section className="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
+        <section className="compact-section bg-white relative overflow-hidden">
           {/* AI Grid Pattern Background */}
           <div className="absolute top-1/2 left-4 opacity-[0.015] -translate-y-1/2">
             <svg width="160" height="200" viewBox="0 0 160 200">
@@ -251,28 +251,28 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
+          <div className="wide-container">
             <div className="mb-16 lg:mb-20">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 lg:mb-8 text-center lg:text-left">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 lg:mb-6 text-center lg:text-left">
                 {t('pages.home.features.title')}
               </h2>
-              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 text-center lg:text-left max-w-4xl">
+              <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl text-gray-600 text-center lg:text-left max-w-4xl">
                 {t('pages.home.features.subtitle')}
               </p>
             </div>
 
             <HorizontalScroller ariaLabel="管理機能セクション" className="lg:grid-cols-3">
               {/* 企業管理 */}
-              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-10 lg:p-12 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+                <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
-                <h3 className="text-left text-balance jp-phrase text-lg sm:text-xl font-semibold text-gray-900 mb-4 measure-card jp-kinsoku">
+                <h3 className="text-left text-balance jp-phrase text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-4 measure-card jp-kinsoku">
                   {t('pages.home.features.organizationManagement.title')}
                 </h3>
-                <p className="text-left text-balance jp-phrase text-[15px] sm:text-base text-gray-600 measure-card jp-kinsoku tabular-nums">
+                <p className="text-left text-balance jp-phrase text-base sm:text-lg lg:text-lg text-gray-600 measure-card jp-kinsoku tabular-nums leading-relaxed">
                   {t('pages.home.features.organizationManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -284,16 +284,16 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
 
               {/* サービス管理 */}
-              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-10 lg:p-12 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+                <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-left text-balance jp-phrase text-lg sm:text-xl font-semibold text-gray-900 mb-4 measure-card jp-kinsoku">
+                <h3 className="text-left text-balance jp-phrase text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 mb-6 measure-card jp-kinsoku">
                   {t('pages.home.features.serviceManagement.title')}
                 </h3>
-                <p className="text-left text-balance jp-phrase text-[15px] sm:text-base text-gray-600 measure-card jp-kinsoku tabular-nums">
+                <p className="text-left text-balance jp-phrase text-lg sm:text-xl lg:text-2xl text-gray-600 measure-card jp-kinsoku tabular-nums leading-relaxed">
                   {t('pages.home.features.serviceManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -305,16 +305,16 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
 
               {/* 導入事例管理 */}
-              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="snap-card snap-center min-w-[85%] sm:min-w-0 group bg-white rounded-2xl p-10 lg:p-12 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+                <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-left text-balance jp-phrase text-lg sm:text-xl font-semibold text-gray-900 mb-4 measure-card jp-kinsoku">
+                <h3 className="text-left text-balance jp-phrase text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 mb-6 measure-card jp-kinsoku">
                   {t('pages.home.features.caseManagement.title')}
                 </h3>
-                <p className="text-left text-balance jp-phrase text-[15px] sm:text-base text-gray-600 measure-card jp-kinsoku tabular-nums">
+                <p className="text-left text-balance jp-phrase text-lg sm:text-xl lg:text-2xl text-gray-600 measure-card jp-kinsoku tabular-nums leading-relaxed">
                   {t('pages.home.features.caseManagement.description')}
                 </p>
                 <div className="mt-4 flex items-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -330,13 +330,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
 
         {/* サービスの流れ */}
-        <section id="service-flow" className="py-12 sm:py-16 lg:py-24 bg-white">
-          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
-            <div className="mb-16">
-              <h2 className="ui-h2 ui-section-title text-gray-900 mb-4">
+        <section id="service-flow" className="compact-section bg-white">
+          <div className="wide-container">
+            <div className="mb-12">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
                 サービスの流れ
               </h2>
-              <p className="ui-measure-body ui-text-left text-[15px] sm:text-base lg:text-lg text-gray-600 leading-7 sm:leading-8">
+              <p className="text-lg sm:text-xl md:text-2xl text-gray-600 leading-relaxed">
                 簡単3ステップで始められます
               </p>
             </div>
@@ -348,39 +348,39 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* ステップ1: アカウント作成 */}
                 <div className="group">
-                  <div className="relative mx-auto w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-2xl font-bold text-white">1</span>
+                  <div className="relative mx-auto w-24 h-24 lg:w-32 lg:h-32 bg-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-3xl lg:text-4xl font-bold text-white">1</span>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
                     アカウント作成
                   </h3>
-                  <p className="jp-phrase-aware jp-body ui-measure-body widow-tweak text-gray-600 leading-relaxed">
+                  <p className="jp-phrase-aware jp-body text-base lg:text-lg text-gray-600 leading-relaxed">
                     メールアドレスとパスワードで簡単にアカウントを作成。<span className="nb">無料で始められます。</span>
                   </p>
                 </div>
 
                 {/* ステップ2: 企業情報登録 */}
                 <div className="group">
-                  <div className="relative mx-auto w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-2xl font-bold text-white">2</span>
+                  <div className="relative mx-auto w-24 h-24 lg:w-32 lg:h-32 bg-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-3xl lg:text-4xl font-bold text-white">2</span>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
                     企業情報登録
                   </h3>
-                  <p className="jp-phrase-aware jp-body ui-measure-body widow-tweak text-gray-600 leading-relaxed">
+                  <p className="jp-phrase-aware jp-body text-base lg:text-lg text-gray-600 leading-relaxed">
                     企業の基本情報を入力。<span className="nb">必要最小限の項目のみで</span>素早く登録完了。
                   </p>
                 </div>
 
                 {/* ステップ3: コンテンツ管理開始 */}
                 <div className="group">
-                  <div className="relative mx-auto w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-2xl font-bold text-white">3</span>
+                  <div className="relative mx-auto w-24 h-24 lg:w-32 lg:h-32 bg-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-3xl lg:text-4xl font-bold text-white">3</span>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
                     コンテンツ管理開始
                   </h3>
-                  <p className="jp-phrase-aware jp-body ui-measure-body widow-tweak text-gray-600 leading-relaxed">
+                  <p className="jp-phrase-aware jp-body text-base lg:text-lg text-gray-600 leading-relaxed">
                     サービス情報や導入事例を追加して、<span className="nb">効果的な企業PR</span>を開始できます。
                   </p>
                 </div>
@@ -402,7 +402,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* AIOダイジェスト */}
-        <section className="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
+        <section className="compact-section bg-white relative overflow-hidden">
           {/* AI Processing Visualization Background */}
           <div className="absolute top-0 left-0 opacity-[0.02]">
             <svg width="300" height="200" viewBox="0 0 300 200">
@@ -460,16 +460,16 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
-            <h2 className="ui-h2 ui-section-title text-gray-900 mb-6 flex items-center sm:justify-center">
-              <svg className="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="wide-container">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 flex items-center justify-center lg:justify-start">
+              <svg className="w-12 h-12 lg:w-16 lg:h-16 mr-4 lg:mr-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <span className="jp-punctuation-safe">AI検索最適化（AIO）対応</span>
             </h2>
-            <p className="ui-measure-body ui-text-left text-[15px] sm:text-base lg:text-lg text-gray-600 mb-8 leading-7 sm:leading-8">
-              本プラットフォームは、<br className="only-mobile" />AI検索エンジンが理解しやすい<br className="only-mobile" />構造化データを自動生成します
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed text-center lg:text-left">
+              本プラットフォームは、AI検索エンジンが理解しやすい構造化データを自動生成します
             </p>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 items-stretch auto-rows-fr mb-8">
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
@@ -487,7 +487,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
                 <div>
                   <h3 className="jp-phrase-aware ui-measure-body widow-tweak text-lg sm:text-xl font-semibold text-gray-900 mb-2">公開プロフィール（直リンク）</h3>
-                  <p className="jp-phrase-aware jp-body ui-measure-body widow-tweak text-[15px] leading-7 text-gray-600">企業・サービスごとに<span className="nb">公開URLを</span>自動生成。<br className="only-mobile" />検索・AIから直接参照されやすい構成で配信します。</p>
+                  <p className="jp-phrase-aware jp-body ui-measure-body widow-tweak text-[15px] leading-7 text-gray-600">企業・サービスごとに<span className="nb">公開URLを</span>自動生成。検索・AIから直接参照されやすい構成で配信します。</p>
                 </div>
               </div>
               <div className="card-container h-full rounded-2xl bg-white shadow-sm border border-gray-200 px-5 py-6 sm:px-6 sm:py-7 flex flex-col justify-between">
@@ -510,8 +510,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* 代表メッセージ */}
-        <section className="py-12 sm:py-16 lg:py-24 bg-gray-50">
-          <div className="ui-axis-main px-6 sm:px-8 lg:px-10">
+        <section className="compact-section bg-gray-50">
+          <div className="wide-container">
             <h2 className="jp-heading text-3xl font-bold text-gray-900 mb-8">
               {t('pages.home.message.title')}
             </h2>
@@ -522,7 +522,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* CTA */}
-        <section className="relative py-12 sm:py-16 lg:py-24 bg-gray-800 overflow-hidden">
+        <section className="relative compact-section bg-gray-800 overflow-hidden">
           {/* 背景パターン */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute -top-40 -right-40 w-80 h-80 bg-white rounded-full"></div>
@@ -569,7 +569,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </svg>
           </div>
           
-          <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
+          <div className="relative wide-container text-center">
             <div className="max-w-3xl mx-auto">
               <h2 className="jp-heading text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
                 {t('pages.home.cta.title')}
@@ -641,8 +641,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </main>
 
       {/* フッター */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+      <footer className="bg-gray-900 text-white compact-section">
+        <div className="wide-container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-lg font-semibold mb-4 jp-heading">{t('ui.header.title')}</h3>

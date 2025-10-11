@@ -132,8 +132,8 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="bg-gray-50" style={{paddingBlock: 'clamp(2.5rem, 4vw, 5rem)'}}>
-      <div className="center-col">
+    <section id="pricing" className="bg-gray-50 compact-section">
+      <div className="wide-container">
         {/* セクションヘッダー */}
         <div className="text-center mb-10 sm:mb-12">
           <div className="measure-lead mx-auto">
@@ -149,7 +149,7 @@ export default function PricingSection() {
         {/* 料金プラン */}
         <div className="mb-12 sm:mb-16">
           {/* モバイル: HorizontalScroller */}
-          <div className="lg:hidden max-w-6xl mx-auto px-6">
+          <div className="lg:hidden wide-container">
             <HorizontalScroller ariaLabel="料金プラン" showDots={true} showArrowsOnMobile={true}>
               {pricingPlans.map((plan) => (
                 <div key={plan.name} className="snap-start min-w-[85vw] max-w-[320px] sm:min-w-0 relative">
@@ -160,7 +160,7 @@ export default function PricingSection() {
           </div>
           
           {/* デスクトップ: 直接グリッド */}
-          <div className="hidden lg:block max-w-7xl mx-auto px-8 lg:px-12">
+          <div className="hidden lg:block wide-container">
             <div className="grid grid-cols-2 gap-24 justify-center items-start">
               {pricingPlans.map((plan) => (
                 <div key={plan.name} className="w-full max-w-[560px] mx-auto relative">
