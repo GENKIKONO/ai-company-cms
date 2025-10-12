@@ -221,45 +221,88 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <h3 className="text-h2 text-neutral-900 mb-6 jp-text text-center">検索体験の変化</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Traditional Search */}
-                <div className="card p-6">
+                <div className="card p-6 bg-neutral-50 border-l-4 border-neutral-400">
                   <div className="mb-4">
                     <div className="badge badge-neutral mb-2">従来の検索</div>
-                    <h4 className="text-h3 text-neutral-900 jp-text">クリック型の情報取得</h4>
+                    <h4 className="text-h3 text-neutral-900 jp-text flex items-center gap-2">
+                      <svg className="w-6 h-6 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                      </svg>
+                      クリック型の情報取得
+                    </h4>
                   </div>
                   <div className="space-y-4">
-                    <div>
-                      <h5 className="text-body font-medium text-neutral-900 mb-2 jp-text">情報取得方法</h5>
+                    <div className="bg-white p-3 rounded-lg border border-neutral-200">
+                      <h5 className="text-body font-medium text-neutral-900 mb-2 jp-text flex items-center gap-2">
+                        <svg className="w-4 h-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        情報取得方法
+                      </h5>
                       <p className="text-body-small text-neutral-600 jp-text">検索結果をクリックしてサイト訪問</p>
                     </div>
-                    <div>
-                      <h5 className="text-body font-medium text-neutral-900 mb-2 jp-text">企業への影響</h5>
+                    <div className="bg-white p-3 rounded-lg border border-neutral-200">
+                      <h5 className="text-body font-medium text-neutral-900 mb-2 jp-text flex items-center gap-2">
+                        <svg className="w-4 h-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        企業への影響
+                      </h5>
                       <p className="text-body-small text-neutral-600 jp-text">SEO順位とクリック率が重要</p>
                     </div>
-                    <div>
-                      <h5 className="text-body font-medium text-neutral-900 mb-2 jp-text">必要な対策</h5>
+                    <div className="bg-white p-3 rounded-lg border border-neutral-200">
+                      <h5 className="text-body font-medium text-neutral-900 mb-2 jp-text flex items-center gap-2">
+                        <svg className="w-4 h-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        必要な対策
+                      </h5>
                       <p className="text-body-small text-neutral-600 jp-text">キーワード最適化、コンテンツSEO</p>
                     </div>
                   </div>
                 </div>
 
                 {/* AI Era Search */}
-                <div className="card p-6 bg-primary-50">
-                  <div className="mb-4">
-                    <div className="badge badge-primary mb-2">AI時代の検索</div>
-                    <h4 className="text-h3 text-primary-700 jp-text">ゼロクリック情報提供</h4>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <h5 className="text-body font-medium text-primary-700 mb-2 jp-text">情報取得方法</h5>
-                      <p className="text-body-small text-primary-600 jp-text">AIが情報を直接引用・要約して回答</p>
+                <div className="card p-6 bg-primary-50 border-l-4 border-primary-600 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
+                  <div className="relative">
+                    <div className="mb-4">
+                      <div className="badge badge-primary mb-2">AI時代の検索</div>
+                      <h4 className="text-h3 text-primary-700 jp-text flex items-center gap-2">
+                        <svg className="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        ゼロクリック情報提供
+                      </h4>
                     </div>
-                    <div>
-                      <h5 className="text-body font-medium text-primary-700 mb-2 jp-text">企業への影響</h5>
-                      <p className="text-body-small text-primary-600 jp-text">AIに引用されるかが重要</p>
-                    </div>
-                    <div>
-                      <h5 className="text-body font-medium text-primary-700 mb-2 jp-text">必要な対策</h5>
-                      <p className="text-body-small text-primary-600 jp-text">構造化データ、AI理解最適化</p>
+                    <div className="space-y-4">
+                      <div className="bg-white p-3 rounded-lg border border-primary-200 shadow-sm">
+                        <h5 className="text-body font-medium text-primary-700 mb-2 jp-text flex items-center gap-2">
+                          <svg className="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          情報取得方法
+                        </h5>
+                        <p className="text-body-small text-primary-600 jp-text">AIが情報を直接引用・要約して回答</p>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-primary-200 shadow-sm">
+                        <h5 className="text-body font-medium text-primary-700 mb-2 jp-text flex items-center gap-2">
+                          <svg className="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          企業への影響
+                        </h5>
+                        <p className="text-body-small text-primary-600 jp-text">AIに引用されるかが重要</p>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-primary-200 shadow-sm">
+                        <h5 className="text-body font-medium text-primary-700 mb-2 jp-text flex items-center gap-2">
+                          <svg className="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                          必要な対策
+                        </h5>
+                        <p className="text-body-small text-primary-600 jp-text">構造化データ、AI理解最適化</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -269,14 +312,17 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             {/* Challenge and Solution */}
             <div className="grid md:grid-cols-2 gap-8">
               {/* Challenge */}
-              <div className="card p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
+              <div className="card p-6 bg-red-50 border-t-4 border-red-400 relative">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-red-100 rounded-full -translate-y-12 translate-x-12 opacity-30"></div>
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center border-2 border-red-200">
+                      <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-h3 text-red-900 jp-text">課題：発見機会の減少リスク</h3>
                   </div>
-                  <h3 className="text-h3 text-red-900 jp-text">課題：発見機会の減少リスク</h3>
                 </div>
                 <ul className="space-y-3 text-body-small text-red-800 jp-text">
                   <li className="flex items-start gap-2">
@@ -295,14 +341,17 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
 
               {/* Solution */}
-              <div className="card p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+              <div className="card p-6 bg-blue-50 border-t-4 border-blue-400 relative">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -translate-y-12 translate-x-12 opacity-30"></div>
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center border-2 border-blue-200">
+                      <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-h3 text-blue-900 jp-text">解決策：AIO対応で発見機会を確保</h3>
                   </div>
-                  <h3 className="text-h3 text-blue-900 jp-text">解決策：AIO対応で発見機会を確保</h3>
                 </div>
                 <ul className="space-y-3 text-body-small text-blue-800 jp-text">
                   <li className="flex items-start gap-2">
