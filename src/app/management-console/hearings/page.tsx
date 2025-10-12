@@ -228,7 +228,7 @@ export default function AdminHearingsPage() {
         })
       });
 
-      alert(`✅ ${drafts.length}件の代行コンテンツ下書きを作成し、承認依頼を送信しました！`);
+      alert(`${drafts.length}件の代行コンテンツ下書きを作成し、承認依頼を送信しました！`);
       
       // モーダルを閉じて画面をリフレッシュ
       setShowModal(false);
@@ -236,7 +236,7 @@ export default function AdminHearingsPage() {
 
     } catch (error) {
       console.error('Content creation error:', error);
-      alert('❌ 代行コンテンツ作成に失敗しました');
+      alert('代行コンテンツ作成に失敗しました');
     } finally {
       setIsCreatingContent(false);
     }
@@ -355,20 +355,26 @@ export default function AdminHearingsPage() {
               <button
                 onClick={() => {
                   // 新規ヒアリング作成機能（管理者用）
-                  alert('🚧 管理者用ヒアリング作成機能を実装予定です');
+                  alert('管理者用ヒアリング作成機能を実装予定です');
                 }}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
               >
-                ➕ 新規ヒアリング作成
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                新規ヒアリング作成
               </button>
               <button
                 onClick={() => {
                   // ヒアリング一覧をリフレッシュ
                   fetchHearingRequests();
                 }}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
               >
-                🔄 更新
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                更新
               </button>
             </div>
           </div>
@@ -684,7 +690,12 @@ export default function AdminHearingsPage() {
                               }))}
                               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                             />
-                            <span className="ml-2 text-sm text-gray-700">📝 ブログ記事</span>
+                            <span className="flex items-center gap-1 ml-2 text-sm text-gray-700">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              </svg>
+                              ブログ記事
+                            </span>
                           </label>
                         </div>
                       </div>

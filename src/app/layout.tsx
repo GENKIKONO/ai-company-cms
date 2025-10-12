@@ -2,7 +2,6 @@ import './globals.css'
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 import { ToastProvider } from '@/components/ui/toast'
 import { MenuProvider } from '@/components/ui/MenuProvider'
-import FAB from '@/components/ui/FAB'
 import BuildBanner from '@/components/BuildBanner'
 import { env } from '@/lib/env'
 import WebVitalsReporter from '@/components/performance/WebVitalsReporter'
@@ -45,7 +44,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="has-fab-bottom-pad">
+      <body>
         <I18nProvider initialLocale="ja">
           <ToastProvider>
             <MenuProvider>
@@ -64,7 +63,6 @@ export default function RootLayout({
               <main id="main-content">
                 {children}
               </main>
-              <FAB />
               <WebVitalsReporter />
             </MenuProvider>
           </ToastProvider>
