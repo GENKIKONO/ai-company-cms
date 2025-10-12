@@ -15,7 +15,7 @@ export default async function AdminLayout({
   const { user, isAdmin } = await getUserWithAdmin();
   
   if (!user || !isAdmin) {
-    redirect('/management-console/login');
+    redirect('/admin-login');
   }
 
   return (
