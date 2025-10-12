@@ -26,18 +26,20 @@ export default function AdminLoginPage() {
       });
 
       if (error) {
+        console.error('Login error:', error);
         errorToast('ログインに失敗しました: ' + error.message);
         return;
       }
 
       // 管理者権限チェック
       const response = await fetch('/api/admin/verify');
-      const { isAdmin } = await response.json();
+      const result = await response.json();
+      console.log('Admin verification result:', result);
 
-      if (!isAdmin) {
+      if (!result.isAdmin) {
         // 管理者でない場合はログアウト
         await supabase.auth.signOut();
-        errorToast('管理者権限がありません');
+        errorToast(`管理者権限がありません。デバッグ情報: ${JSON.stringify(result.debug)}`);
         return;
       }
 
