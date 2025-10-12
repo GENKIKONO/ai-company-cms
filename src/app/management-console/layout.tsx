@@ -30,9 +30,18 @@ export default async function AdminLayout({
                 Admin
               </span>
             </div>
-            <nav className="flex space-x-4">
+            <nav className="flex space-x-2">
               <a href="/management-console" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
                 ダッシュボード
+              </a>
+              <a href="/management-console/settings" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+                設定
+              </a>
+              <a href="/management-console/reports" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+                通報
+              </a>
+              <a href="/management-console/hearings" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+                ヒアリング
               </a>
               <a href="/dashboard" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
                 ユーザー画面
