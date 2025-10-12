@@ -45,7 +45,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
         disallow: [
           '/api/auth/',
-          '/admin/',
+          '/management-console/',
           '/dashboard/settings/',
           '/_next/',
           '/private/',

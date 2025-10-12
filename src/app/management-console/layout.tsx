@@ -15,7 +15,7 @@ export default async function AdminLayout({
   const { user, isAdmin } = await getUserWithAdmin();
   
   if (!user) {
-    redirect('/auth/login?redirect=/admin');
+    redirect('/auth/login?redirect=/management-console');
   }
 
   if (!isAdmin) {
@@ -29,13 +29,13 @@ export default async function AdminLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">LuxuCare CMS 管理者</h1>
+              <h1 className="text-xl font-semibold text-gray-900">AIO Hub 管理コンソール</h1>
               <span className="ml-3 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
                 Admin
               </span>
             </div>
             <nav className="flex space-x-4">
-              <a href="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+              <a href="/management-console" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
                 ダッシュボード
               </a>
               <a href="/dashboard" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">

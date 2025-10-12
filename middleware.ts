@@ -19,7 +19,7 @@ const PUBLIC_PATHS = new Set([
 const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/profile'];
 
 // 管理者専用パス（admin判定が必要）
-const ADMIN_PATHS = ['/admin'];
+const ADMIN_PATHS = ['/management-console'];
 
 // 半公開ルート（ディレクトリ表示は公開、編集は要ログイン）
 const SEMI_PUBLIC_PREFIXES = ['/organizations'];

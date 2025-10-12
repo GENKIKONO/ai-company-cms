@@ -127,8 +127,8 @@ export default function AdminReportsPage() {
       {/* ヘッダー */}
       <div className="mb-8">
         <nav className="flex mb-4">
-          <Link href="/admin" className="text-blue-600 hover:text-blue-700">
-            管理画面
+          <Link href="/management-console" className="text-blue-600 hover:text-blue-700">
+            管理コンソール
           </Link>
           <span className="mx-2 text-gray-500">/</span>
           <span className="text-gray-900">通報管理</span>

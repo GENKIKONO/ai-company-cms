@@ -6,8 +6,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '管理者ダッシュボード | LuxuCare CMS',
-  description: '顧客管理・分析・運用監視',
+  title: '管理コンソール | AIO Hub',
+  description: 'システム管理・ユーザー管理・セキュリティ監視',
 };
 
 export default function AdminDashboard() {
@@ -15,8 +15,8 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">管理者ダッシュボード</h1>
-          <p className="text-gray-600 mt-2">顧客管理・分析・システム監視</p>
+          <h1 className="text-3xl font-bold text-gray-900">管理コンソール</h1>
+          <p className="text-gray-600 mt-2">システム管理・ユーザー管理・セキュリティ監視</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -130,8 +130,8 @@ export default function AdminDashboard() {
             <div>
               <h4 className="text-sm font-medium text-yellow-800">実装ステータス</h4>
               <p className="text-sm text-yellow-700 mt-1">
-                管理者ダッシュボードの基本構造が実装されました。データ集計機能は次フェーズで実装予定です。
-                現在は管理者のみアクセス可能な状態で、APIエンドポイントは固定値（—）を返却しています。
+                管理コンソールの基本構造が実装されました。データ集計機能は計画中です。<br/>
+                権限チェック済みで、管理者のみアクセス可能です。URL: /management-console
               </p>
             </div>
           </div>

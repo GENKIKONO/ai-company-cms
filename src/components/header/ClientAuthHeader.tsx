@@ -154,11 +154,11 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                         </Link>
                         {isAdmin && (
                           <Link
-                            href="/admin"
+                            href="/management-console"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
                             onClick={() => setDropdownOpen(false)}
                           >
-                            管理者
+                            管理コンソール
                           </Link>
                         )}
                         

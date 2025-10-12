@@ -238,7 +238,7 @@ export function EmbedLimitCard() {
                   {/* アクション */}
                   <div className="ml-4 flex flex-col space-y-2">
                     <a
-                      href={`/admin/organizations/${org.id}`}
+                      href={`/management-console/organizations/${org.id}`}
                       className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                     >
                       詳細
