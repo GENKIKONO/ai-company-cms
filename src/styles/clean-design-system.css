@@ -339,6 +339,21 @@
   color: var(--neutral-700);
 }
 
+.badge-accent {
+  background: #dc2626;
+  color: white;
+}
+
+.badge-warning {
+  background: #fbbf24;
+  color: #92400e;
+}
+
+.badge-success {
+  background: #10b981;
+  color: white;
+}
+
 /* === Focus & Accessibility === */
 .btn:focus,
 .card:focus {

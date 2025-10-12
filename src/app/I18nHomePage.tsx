@@ -163,6 +163,93 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </section>
 
+        {/* Zero-Click Era Story Section */}
+        <section className="section">
+          <div className="container">
+            <div className="text-center mb-12">
+              <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
+                ゼロクリック時代の変化
+              </h2>
+              <p className="text-body-large text-neutral-600 jp-text">
+                検索の仕組みが根本的に変わりました。企業が「見つからない」時代が始まっています。
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 mb-12">
+              {/* Before */}
+              <div className="card p-6 border-l-4 border-red-400">
+                <div className="badge badge-accent mb-4">従来の検索</div>
+                <h3 className="text-h3 text-neutral-900 mb-4 jp-text">検索→クリック→サイト訪問</h3>
+                <ul className="space-y-2 text-body text-neutral-600 jp-text">
+                  <li>• 検索結果をクリックして詳細確認</li>
+                  <li>• 企業サイトで情報収集</li>
+                  <li>• SEO対策で上位表示を狙う</li>
+                </ul>
+              </div>
+
+              {/* Transition */}
+              <div className="card p-6 border-l-4 border-yellow-400">
+                <div className="badge badge-warning mb-4">変化の兆し</div>
+                <h3 className="text-h3 text-neutral-900 mb-4 jp-text">AIが直接回答する時代</h3>
+                <ul className="space-y-2 text-body text-neutral-600 jp-text">
+                  <li>• ChatGPT、Google SGEの普及</li>
+                  <li>• 検索結果をクリックしない行動</li>
+                  <li>• AIが「選んだ」情報のみ表示</li>
+                </ul>
+              </div>
+
+              {/* After */}
+              <div className="card p-6 border-l-4 border-green-400">
+                <div className="badge badge-success mb-4">ゼロクリック時代</div>
+                <h3 className="text-h3 text-neutral-900 mb-4 jp-text">検索→AI回答→完結</h3>
+                <ul className="space-y-2 text-body text-neutral-600 jp-text">
+                  <li>• AIが直接企業情報を引用・紹介</li>
+                  <li>• 「信頼できる」企業のみ選択される</li>
+                  <li>• 構造化データが引用の鍵</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Risk Alert */}
+            <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-red-600 text-lg">⚠</span>
+                </div>
+                <div>
+                  <h3 className="text-h3 text-red-900 mb-2 jp-text">このままでは企業が「見つからない」リスク</h3>
+                  <div className="grid sm:grid-cols-2 gap-4 text-body text-red-800 jp-text">
+                    <div>
+                      <strong>• 機会損失の拡大</strong><br/>
+                      AIに選ばれない企業は、潜在顧客からの発見機会を失い続ける
+                    </div>
+                    <div>
+                      <strong>• 競合他社との格差</strong><br/>
+                      早期対応した企業とそうでない企業で、大きな差が生まれる
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Solution Preview */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 text-lg">💡</span>
+                </div>
+                <div>
+                  <h3 className="text-h3 text-blue-900 mb-2 jp-text">AIO Hubでゼロクリック時代に対応</h3>
+                  <p className="text-body text-blue-800 jp-text">
+                    企業情報を<strong>AI が理解しやすい構造化データ</strong>に変換し、検索・AI回答で優先的に引用される仕組みを構築。
+                    さらに信頼性の高いプラットフォームに集約することで、<strong>ドメインパワーを活用した露出向上</strong>を実現します。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="section bg-subtle">
           <div className="container">
