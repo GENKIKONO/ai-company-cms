@@ -76,6 +76,7 @@ export default function FAB() {
         focus:ring-offset-white
         leading-none
         select-none
+        md:hidden
       "
       style={{
         right: 'clamp(16px, 3vw, 24px)',
