@@ -41,6 +41,8 @@ function fromOrg(org?: Organization | null): OrganizationFormData {
     address_locality: org?.address_locality ?? '',
     address_postal_code: org?.address_postal_code ?? '',
     address_street: org?.address_street ?? '',
+    lat: org?.lat,
+    lng: org?.lng,
     telephone: org?.telephone ?? '',
     email: org?.email ?? '',
     email_public: org?.email_public ?? false,
@@ -151,8 +153,20 @@ export default function EditOrganizationPage() {
       const syncedFormData = fromOrg(organization);
       console.log('[SYNC_EFFECT] Forcing form sync with organization data:', syncedFormData);
       setFormData(syncedFormData);
+      
+      // 🔥 Initialize coordinates from database if available
+      if (organization.lat && organization.lng) {
+        console.log('[SYNC_EFFECT] Initializing coordinates from database:', {
+          lat: organization.lat,
+          lng: organization.lng
+        });
+        setCoordinates({
+          lat: organization.lat,
+          lng: organization.lng
+        });
+      }
     }
-  }, [organization?.id, organization?.updated_at, organization?.slug, organization?.status, organization?.name, organization?.description]);
+  }, [organization?.id, organization?.updated_at, organization?.slug, organization?.status, organization?.name, organization?.description, organization?.lat, organization?.lng]);
 
   const handleInputChange = (field: keyof OrganizationFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -297,6 +311,8 @@ export default function EditOrganizationPage() {
     try {
       const result = await geocodeJP(fullAddress);
       setCoordinates({ lat: result.lat, lng: result.lng });
+      // 🔥 Update formData to include coordinates for saving
+      setFormData(prev => ({ ...prev, lat: result.lat, lng: result.lng }));
       
       // 成功メッセージを表示
       const successElement = document.getElementById('geocode-success');
@@ -321,6 +337,8 @@ export default function EditOrganizationPage() {
   const handleManualCoordinates = (lat: number, lng: number) => {
     if (isValidJapaneseCoordinates(lat, lng)) {
       setCoordinates({ lat, lng });
+      // 🔥 Update formData to include coordinates for saving
+      setFormData(prev => ({ ...prev, lat, lng }));
       setErrors({ ...errors, coordinates: '' });
     } else {
       setErrors({ ...errors, coordinates: '日本国内の座標を入力してください' });

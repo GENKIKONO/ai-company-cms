@@ -49,6 +49,8 @@ export interface Organization {
   address_locality?: string;
   address_postal_code?: string;
   address_street?: string;
+  lat?: number;
+  lng?: number;
   telephone?: string;
   email?: string;
   email_public: boolean;
@@ -293,6 +295,8 @@ export interface OrganizationFormData {
   address_locality?: string;
   address_postal_code?: string;
   address_street?: string;
+  lat?: number;
+  lng?: number;
   telephone?: string;
   email?: string;
   email_public: boolean;

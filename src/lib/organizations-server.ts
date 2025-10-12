@@ -22,6 +22,8 @@ export type OrgFull = OrgLite & {
   address_locality: string | null;
   address_postal_code: string | null;
   address_street: string | null;
+  lat: number | null;
+  lng: number | null;
   telephone: string | null;
   email: string | null;
   email_public: boolean | null;
