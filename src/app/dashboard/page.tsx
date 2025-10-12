@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getCurrentUserOrganization } from '@/lib/organizations-server';
 import { getOrganizationStatsSafe, getCaseStudiesStatsSafe } from '@/lib/safeData';
+import { supabaseServer } from '@/lib/supabase-server';
 import PublishToggle from './components/PublishToggle';
 import TabbedDashboard from './components/TabbedDashboard';
 import PerformanceMetrics from './components/PerformanceMetrics';
@@ -18,32 +19,19 @@ export default async function DashboardPage() {
     console.log('[Dashboard] Rendering started');
     console.log('[VERIFY][MOBILE_UI] Dashboard with mobile optimizations loading');
     
-    // 🚫 非キャッシュの組織取得に差し替え
-    const [org, statsResult] = await Promise.all([
-      getCurrentUserOrganization(),
-      getOrganizationStatsSafe()
-    ]);
-
-    console.log('[VERIFY] Dashboard fetched organization', {
-      hasOrg: !!org,
-      slug: org?.slug,
-      status: org?.status,
+    // 1. まず認証状態をチェック
+    const supabase = await supabaseServer();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    console.log('[Dashboard] Auth check:', { 
+      hasUser: !!user, 
+      userId: user?.id, 
+      authError: authError?.message 
     });
 
-    const stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
-
-    // 導入事例統計を取得（組織がある場合のみ）
-    const caseStudiesResult = org?.id 
-      ? await getCaseStudiesStatsSafe(org.id)
-      : { data: { total: 0, published: 0 } };
-    
-    const caseStudiesStats = caseStudiesResult.data || { total: 0, published: 0 };
-
-    // 3段構えのレンダリング分岐
-
-    // 1. 認証状態不明 or エラー時 → サインイン導線  
-    if (org === null) {
-      console.log('[Dashboard] No authentication or access denied');
+    // 認証状態のエラーまたは未ログインの場合
+    if (authError || !user) {
+      console.log('[Dashboard] No authentication - redirecting to login');
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
@@ -60,9 +48,31 @@ export default async function DashboardPage() {
       );
     }
 
-    // 2. 認証OK & 組織なし → 企業作成導線
-    if (!org?.id) {
-      console.log('[Dashboard] No organization found');
+    // 2. 認証済みユーザーの組織を取得
+    const [org, statsResult] = await Promise.all([
+      getCurrentUserOrganization(),
+      getOrganizationStatsSafe()
+    ]);
+
+    console.log('[VERIFY] Dashboard fetched organization', {
+      hasUser: !!user,
+      hasOrg: !!org,
+      slug: org?.slug,
+      status: org?.status,
+    });
+
+    const stats = statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 };
+
+    // 導入事例統計を取得（組織がある場合のみ）
+    const caseStudiesResult = org?.id 
+      ? await getCaseStudiesStatsSafe(org.id)
+      : { data: { total: 0, published: 0 } };
+    
+    const caseStudiesStats = caseStudiesResult.data || { total: 0, published: 0 };
+
+    // 3. 認証済みでも組織がない場合 → 企業作成導線
+    if (!org || !org.id) {
+      console.log('[Dashboard] Authenticated user but no organization found');
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
@@ -79,8 +89,8 @@ export default async function DashboardPage() {
       );
     }
 
-    // 3. 組織あり → ダッシュボードUI
-    console.log('[Dashboard] Rendering dashboard UI');
+    // 4. 組織あり → ダッシュボードUI
+    console.log('[Dashboard] Rendering dashboard UI for user:', user.id, 'org:', org.id);
 
 
   return (
