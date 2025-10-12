@@ -23,7 +23,7 @@ export async function getUserWithAdmin(): Promise<UserWithAdmin> {
   }
 
   // 管理者判定
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(email => email.trim()) || [];
+  const adminEmails = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL)?.split(',').map(email => email.trim()) || [];
   const isAdmin = user.app_metadata?.role === 'admin' || adminEmails.includes(user.email || '');
 
   return { user, isAdmin };
