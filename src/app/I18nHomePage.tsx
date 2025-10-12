@@ -566,14 +566,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <div className="section-buffer"></div>
 
         {/* CTA */}
-        <section className="section-gap-hero bg-gray-800">
+        <section className="section-gap-hero bg-gray-50">
           
           <div className="container-article section-content text-center">
             <div className="max-w-3xl mx-auto">
-              <h2 className="headline text-3xl md:text-4xl font-bold text-white mb-6 jp-phrase break-keep">
+              <h2 className="headline text-3xl md:text-4xl font-bold text-gray-900 mb-6 jp-phrase break-keep">
                 {t('pages.home.cta.title')}
               </h2>
-              <p className="copy measure-lead text-lg md:text-xl text-gray-300 mb-8 jp-phrase break-keep">
+              <p className="copy measure-lead text-lg md:text-xl text-gray-600 mb-8 jp-phrase break-keep">
                 {t('pages.home.cta.subtitle').split('\n').map((line, index) => (
                   <span key={index} className="block">{line}</span>
                 ))}
@@ -605,7 +605,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   </span>
                 </Link>
                 
-                <div className="flex items-center text-gray-300 text-sm gap-6 sm:gap-8">
+                <div className="flex items-center text-gray-600 text-sm gap-6 sm:gap-8">
                   <div className="flex items-center jp-body break-keep">
                     <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -617,19 +617,19 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               
               {/* 信頼性バッジ */}
               <div className="mt-12 flex flex-wrap justify-center items-center gap-8 opacity-60">
-                <div className="flex items-center text-gray-300 text-sm">
+                <div className="flex items-center text-gray-600 text-sm">
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   セキュリティ保証
                 </div>
-                <div className="flex items-center text-gray-300 text-sm">
+                <div className="flex items-center text-gray-600 text-sm">
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   高い安定性保証
                 </div>
-                <div className="flex items-center text-gray-300 text-sm">
+                <div className="flex items-center text-gray-600 text-sm">
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>

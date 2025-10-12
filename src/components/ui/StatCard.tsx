@@ -19,7 +19,7 @@ export default function StatCard({
       'transition-all duration-200 hover:shadow-md hover:scale-[1.02]',
       className
     )}>
-      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-7 sm:leading-8 tracking-normal whitespace-nowrap">{value}</div>
+      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-7 sm:leading-8 tracking-normal break-keep [text-wrap:balance]">{value}</div>
       <div className="mt-1 text-[15px] sm:text-base lg:text-lg font-semibold text-gray-800 leading-7 sm:leading-8 break-keep [text-wrap:balance]">{title}</div>
       {subtitle && (
         <div className="mt-1 text-[13px] sm:text-sm text-gray-500 leading-6 break-keep [text-wrap:pretty]">{subtitle}</div>

@@ -52,16 +52,16 @@ const pricingPlans = [
 const getColorClasses = (color: string, popular: boolean = false) => {
   const colors = {
     blue: {
-      bg: popular ? 'bg-blue-600' : 'bg-white',
-      border: 'border-blue-200',
-      text: popular ? 'text-white' : 'text-gray-900',
+      bg: 'bg-white',
+      border: popular ? 'border-blue-500' : 'border-blue-200',
+      text: 'text-gray-900',
       accent: 'text-blue-600',
       button: 'bg-blue-600 hover:bg-blue-700 text-white'
     },
     purple: {
-      bg: popular ? 'bg-purple-600' : 'bg-white',
-      border: 'border-purple-200',
-      text: popular ? 'text-white' : 'text-gray-900',
+      bg: 'bg-white',
+      border: popular ? 'border-purple-500' : 'border-purple-200',
+      text: 'text-gray-900',
       accent: 'text-purple-600',
       button: 'bg-purple-600 hover:bg-purple-700 text-white'
     }
@@ -85,18 +85,18 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
         </div>
       )}
       
-      <div className={`relative ${colors.bg} ui-card p-6 lg:p-8 transition-all duration-300 h-full card-min-height-lg ${plan.popular ? '' : 'border-2 ' + colors.border}`}>
+      <div className={`relative ${colors.bg} ui-card p-6 lg:p-8 transition-all duration-300 h-full card-min-height-lg border-2 ${colors.border}`}>
         {/* プランヘッダー */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className={`media-frame w-12 h-12 sm:w-16 sm:h-16 ${plan.popular ? 'bg-white/20' : 'bg-gray-100'} rounded-xl flex items-center justify-center mx-auto mb-4`} style={{'--media-ar': '1/1'} as React.CSSProperties}>
-            <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${plan.popular ? 'text-white' : colors.accent} media-contain`} />
+          <div className="media-frame w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4" style={{'--media-ar': '1/1'} as React.CSSProperties}>
+            <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${colors.accent} media-contain`} />
           </div>
           <h3 className={`text-heading-3 ${colors.text} mb-2 jp-phrase measure-heading mx-auto text-balance`}>{plan.name}</h3>
-          <p className={`copy measure-body text-[15px] sm:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 text-center jp-phrase text-pretty mx-auto`}>{plan.description}</p>
+          <p className="copy measure-body text-[15px] sm:text-base text-gray-600 mb-4 text-center jp-phrase text-pretty mx-auto">{plan.description}</p>
           
           <div className="flex items-baseline justify-center gap-1 price-nowrap">
             <span className={`text-heading-1 ${colors.text} tabular-nums`}>¥{plan.price}</span>
-            <span className={`text-sm sm:text-base ${plan.popular ? 'text-white/80' : 'text-gray-600'} jp-phrase`}>/ {plan.period}</span>
+            <span className="text-sm sm:text-base text-gray-600 jp-phrase">/ {plan.period}</span>
           </div>
         </div>
 
@@ -104,15 +104,15 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
         <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
           {plan.features.map((feature, index) => (
             <div key={index} className="flex items-start gap-3">
-              <Check className={`w-4 h-4 sm:w-5 sm:h-5 ${plan.popular ? 'text-white' : 'text-green-500'} mt-0.5 flex-shrink-0`} />
-              <span className={`copy text-[13px] sm:text-sm ${plan.popular ? 'text-white/90' : 'text-gray-700'} jp-phrase`}>{feature}</span>
+              <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mt-0.5 flex-shrink-0" />
+              <span className="copy text-[13px] sm:text-sm text-gray-700 jp-phrase">{feature}</span>
             </div>
           ))}
           
           {plan.limitations.map((limitation, index) => (
             <div key={index} className="flex items-start gap-3 opacity-70">
-              <div className={`w-4 h-4 sm:w-5 sm:h-5 ${plan.popular ? 'text-white' : 'text-gray-400'} mt-0.5 flex-shrink-0 text-center text-sm`}>×</div>
-              <span className={`copy text-[13px] sm:text-sm ${plan.popular ? 'text-white/70' : 'text-gray-500'} jp-phrase`}>{limitation}</span>
+              <div className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mt-0.5 flex-shrink-0 text-center text-sm">×</div>
+              <span className="copy text-[13px] sm:text-sm text-gray-500 jp-phrase">{limitation}</span>
             </div>
           ))}
         </div>
