@@ -21,8 +21,27 @@ export default function CallbackPage() {
           return;
         }
 
-        // 直接ダッシュボードへ遷移（DBトリガーでプロフィールは自動作成）
-        router.push('/dashboard');
+        // セッション情報を取得してユーザーに組織があるかチェック
+        const { data: { user } } = await supabaseBrowser.auth.getUser();
+        
+        if (user) {
+          // 組織の有無をチェック（簡易チェック）
+          const { data: orgs } = await supabaseBrowser
+            .from('organizations')
+            .select('id')
+            .eq('created_by', user.id)
+            .limit(1);
+          
+          if (orgs && orgs.length > 0) {
+            // 組織があればダッシュボードへ
+            router.push('/dashboard');
+          } else {
+            // 組織がなければ組織作成ページへ
+            router.push('/organizations/new');
+          }
+        } else {
+          router.push('/dashboard');
+        }
         
       } catch (err) {
         console.error('Callback error:', err);

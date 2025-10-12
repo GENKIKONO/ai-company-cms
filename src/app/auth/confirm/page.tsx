@@ -42,10 +42,10 @@ function ConfirmPageContent() {
 
         setConfirmed(true);
 
-        // DBトリガーでプロフィール自動作成されるため、直接リダイレクト
-        // 3秒後にダッシュボードにリダイレクト
+        // DBトリガーでプロフィール自動作成されるため、組織作成ページにリダイレクト
+        // 3秒後に組織作成ページにリダイレクト
         setTimeout(() => {
-          router.push('/dashboard');
+          router.push('/organizations/new');
         }, 3000);
         
       } catch (err) {
@@ -210,11 +210,11 @@ function ConfirmPageContent() {
               メール確認が完了しました！
             </div>
             <p className="mt-4 text-gray-600">
-              3秒後にダッシュボードにリダイレクトします...
+              3秒後に企業情報登録ページにリダイレクトします...
             </p>
             <div className="mt-6">
-              <Link href="/dashboard" className="font-medium text-blue-600 hover:text-blue-500">
-                今すぐダッシュボードに移動
+              <Link href="/organizations/new" className="font-medium text-blue-600 hover:text-blue-500">
+                今すぐ企業情報を登録
               </Link>
             </div>
           </div>
