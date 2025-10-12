@@ -63,18 +63,18 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
   const features = [
     {
       icon: Building2,
-      title: "企業情報の統合管理",
-      description: "複数の企業データを一元管理し、効率的な情報運用を実現"
+      title: "AI引用最適化",
+      description: "企業情報を構造化データとして整備し、AIが理解・引用しやすい形に自動変換"
     },
     {
       icon: Zap,
-      title: "AI自動最適化",
-      description: "機械学習によりコンテンツの品質と配信効率を継続的に改善"
+      title: "ドメインパワー共有",
+      description: "信頼性の高いプラットフォームに情報を集約することで、検索・AI回答での露出を向上"
     },
     {
       icon: Users,
-      title: "チーム協働機能",
-      description: "複数のメンバーが安全に情報を共有・編集できる環境"
+      title: "アクセス流入促進",
+      description: "構造化された企業情報から自社サイトやSNSへの質の高い流入を創出"
     }
   ];
 
@@ -97,7 +97,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <span className="text-primary block">AIO Hub</span>
                 </h1>
                 <p className="text-body-large text-neutral-600 mb-8 jp-text">
-                  AI技術を活用した企業情報の統合管理プラットフォーム。シンプルで効率的な企業データ管理を実現します。
+                  <strong>ゼロクリック時代</strong>にAIが理解・引用しやすい企業情報を構築。検索結果からAI回答まで、企業が"選ばれる"プラットフォームです。
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 mb-12">
@@ -133,23 +133,23 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <div className="space-y-6">
                     <div className="badge badge-primary">
                       <Zap className="icon icon-sm" />
-                      AI搭載プラットフォーム
+                      ゼロクリック対応
                     </div>
                     <h3 className="text-h3 text-neutral-900 jp-text">
-                      効率的な企業情報管理を実現
+                      AIに選ばれる企業情報を構築
                     </h3>
                     <ul className="feature-list">
                       <li className="feature-item">
                         <CheckCircle className="feature-icon" />
-                        <span className="text-body jp-text">簡単な情報入力・更新</span>
+                        <span className="text-body jp-text">構造化データ自動生成</span>
                       </li>
                       <li className="feature-item">
                         <CheckCircle className="feature-icon" />
-                        <span className="text-body jp-text">自動データ最適化</span>
+                        <span className="text-body jp-text">AI引用最適化</span>
                       </li>
                       <li className="feature-item">
                         <CheckCircle className="feature-icon" />
-                        <span className="text-body jp-text">セキュアな情報共有</span>
+                        <span className="text-body jp-text">流入促進とSEO強化</span>
                       </li>
                     </ul>
                   </div>
@@ -164,10 +164,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="container">
             <div className="text-center mb-12">
               <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
-                主な機能
+                ゼロクリック時代の企業戦略
               </h2>
               <p className="text-body-large text-neutral-600 jp-text">
-                企業の情報管理を効率化する、実用的な機能を提供します
+                AIが情報を直接回答する時代に、企業が"選ばれる"ための仕組みを提供
               </p>
             </div>
 
@@ -191,10 +191,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <section className="section">
           <div className="container-narrow text-center">
             <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
-              今すぐ始めませんか？
+              ゼロクリック時代に取り残されませんか？
             </h2>
             <p className="text-body-large text-neutral-600 mb-8 jp-text">
-              AIO Hubで企業情報管理を効率化し、ビジネスの成長を加速させましょう。
+              AIが企業を"選ぶ"時代。構造化された情報で検索・AI回答での露出を確保し、新たな流入機会を創出しましょう。
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
