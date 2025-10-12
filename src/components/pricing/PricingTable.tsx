@@ -111,9 +111,6 @@ const PLANS: PricingPlan[] = [
 ];
 
 export default function PricingTable() {
-  // Focus on the main 2 plans for the standardized layout
-  const mainPlans = PLANS.filter(plan => plan.id === 'free' || plan.id === 'starter');
-  
   return (
     <section className="section bg-subtle">
       <div className="container">
@@ -126,9 +123,9 @@ export default function PricingTable() {
           </p>
         </div>
 
-        {/* 2-column pricing layout for PC */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 justify-center items-stretch max-w-4xl mx-auto mb-12">
-          {mainPlans.map((plan) => (
+        {/* All plans in responsive grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 justify-center items-stretch max-w-7xl mx-auto mb-12">
+          {PLANS.map((plan) => (
             <div
               key={plan.id}
               className={`card flex flex-col relative p-6 ${
@@ -232,14 +229,11 @@ export default function PricingTable() {
           ))}
         </div>
         
-        {/* Additional plans link */}
+        {/* Enterprise consultation note */}
         <div className="text-center mb-8">
-          <p className="text-body text-neutral-600 mb-4 jp-text">
-            その他のプラン（Business・Enterprise）はお問い合わせください
+          <p className="text-body text-neutral-600 jp-text">
+            Enterpriseプランの詳細な機能や導入サポートについては、お気軽にお問い合わせください
           </p>
-          <Link href="/contact" className="btn btn-outline">
-            詳細プランを見る
-          </Link>
         </div>
 
         <div className="mt-12 text-center">
