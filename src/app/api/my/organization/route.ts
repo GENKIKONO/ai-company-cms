@@ -166,9 +166,74 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     console.log('[my/organization] user =', user?.id || null, 'error =', authError?.message || null);
+    console.log('[my/organization] user details =', {
+      id: user?.id,
+      email: user?.email,
+      created_at: user?.created_at
+    });
+
+    // ユーザーIDをログに出力して確認
+    console.log('[my/organization] Current user ID:', user.id);
 
     if (authError || !user) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+    }
+
+    // ✅ 外部キー制約の詳細チェック: public.users にユーザーが存在するか確認し、必要に応じて作成
+    try {
+      // まず public.users テーブルでユーザーを確認
+      const { data: publicUser, error: publicUserError } = await supabase
+        .from('users')
+        .select('id, email')
+        .eq('id', user.id)
+        .single();
+
+      console.log('[my/organization] Public user existence check:', {
+        userId: user.id,
+        exists: !!publicUser,
+        error: publicUserError?.message,
+        errorCode: publicUserError?.code
+      });
+
+      // public.users にユーザーが存在しない場合は作成
+      if (publicUserError && publicUserError.code === 'PGRST116') { // No rows found
+        console.log('[my/organization] Creating user in public.users table...');
+        
+        // Service Role 権限で users テーブルを操作
+        const { createClient } = await import('@supabase/supabase-js');
+        const serviceSupabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false
+            }
+          }
+        );
+
+        const { data: newUser, error: createUserError } = await serviceSupabase
+          .from('users')
+          .insert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || null,
+            avatar_url: user.user_metadata?.avatar_url || null,
+            role: 'editor', // Default role
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (createUserError) {
+          console.error('[my/organization] Failed to create user:', createUserError);
+        } else {
+          console.log('[my/organization] User created successfully:', newUser.id);
+        }
+      }
+    } catch (checkError) {
+      console.warn('[my/organization] User existence check failed:', checkError);
     }
 
     // ✅ 外部キー制約違反の診断: auth.users に該当ユーザーが存在するかチェック
@@ -298,10 +363,11 @@ export async function POST(request: NextRequest) {
     }
 
     // ✅ API層での保険: 実際のDBスキーマに完全一致
+    // created_by を明示的に設定（auth.uid()はRLSコンテキストでのみ動作するため）
     const baseData = {
       name: body.name,
       slug: finalSlug, // 処理済みのslugを使用
-      // created_by は RLS で自動設定されるため除外
+      created_by: user.id, // 認証済みユーザーIDを明示的に設定
       // 注意: user_id, contact_email, is_published は実際のDBに存在しないため除外
     };
     
@@ -317,6 +383,8 @@ export async function POST(request: NextRequest) {
       'address_country', 'address_region', 'address_locality', 'address_postal_code', 'address_street',
       'telephone', 'email', 'email_public', 'url', 'logo_url', 'industries', 'same_as', 'status',
       'meta_title', 'meta_description', 'meta_keywords', 'corporate_number',
+      // 必須システムフィールド
+      'created_by',
       // foundedフィールドはUIに存在しないため完全除外
       // 拡張フィールドは本番DBに未適用のため一時的に除外
       // 'favicon_url', 'brand_color_primary', 'brand_color_secondary', 'social_media', 'business_hours',
@@ -419,97 +487,21 @@ export async function POST(request: NextRequest) {
     const insertPayload = buildOrgInsert(organizationData);
     console.log('API/my/organization INSERT payload (final):', insertPayload);
 
-    // ✅ 外部キー制約エラー回避: 安全な組織作成関数を使用
-    console.log('[ORG/CREATE] Using safe organization creation...');
+    // ✅ 単純な組織作成（trigger が created_by を自動設定）
+    console.log('[ORG/CREATE] Creating organization with trigger support...');
     
-    let data, error;
-    try {
-      // まず通常のINSERTを試行
-      const insertResult = await supabase
-        .from('organizations')
-        .insert([insertPayload])
-        .select()
-        .single();
-      
-      data = insertResult.data;
-      error = insertResult.error;
-      
-      console.log('[ORG/CREATE] Direct insert result:', { 
-        success: !error, 
-        error: error?.message,
-        errorCode: error?.code 
-      });
-      
-    } catch (insertError) {
-      console.error('[ORG/CREATE] Direct insert failed:', insertError);
-      error = insertError;
-    }
-
-    // 外部キー制約エラーの場合、代替手段を試行
-    if (error && (error.code === '23503' || error.message?.includes('foreign key') || error.message?.includes('violates'))) {
-      console.warn('[ORG/CREATE] Database constraint detected, trying minimal data approach...');
-      
-      // 最小限のデータで直接作成（外部キー問題回避）
-      console.warn('[ORG/CREATE] Attempting minimal data creation...');
-      
-      const minimalPayload = {
-        name: body.name,
-        slug: finalSlug,
-        // created_by を一時的に除外してテスト
-        status: 'draft',
-        is_published: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
-      console.log('[ORG/CREATE] Minimal payload (no created_by):', minimalPayload);
-      
-      try {
-        const minimalResult = await supabase
-          .from('organizations')
-          .insert([minimalPayload])
-          .select()
-          .single();
-          
-        data = minimalResult.data;
-        error = minimalResult.error;
-        
-        console.log('[ORG/CREATE] Minimal creation result:', { 
-          success: !error, 
-          error: error?.message,
-          errorCode: error?.code
-        });
-        
-        // まだ失敗する場合、さらに最小限に
-        if (error) {
-          console.warn('[ORG/CREATE] Still failing, trying ultra-minimal...');
-          
-          const ultraMinimalPayload = {
-            name: body.name,
-            slug: finalSlug
-          };
-          
-          const ultraResult = await supabase
-            .from('organizations')
-            .insert([ultraMinimalPayload])
-            .select()
-            .single();
-            
-          data = ultraResult.data;
-          error = ultraResult.error;
-          
-          console.log('[ORG/CREATE] Ultra-minimal result:', { 
-            success: !error, 
-            error: error?.message,
-            data: data
-          });
-        }
-        
-      } catch (minimalError) {
-        console.error('[ORG/CREATE] Minimal creation failed:', minimalError);
-        error = minimalError;
-      }
-    }
+    const { data, error } = await supabase
+      .from('organizations')
+      .insert([insertPayload])
+      .select()
+      .single();
+    
+    console.log('[ORG/CREATE] Insert result:', { 
+      success: !error, 
+      error: error?.message,
+      errorCode: error?.code,
+      data: data ? { id: data.id, name: data.name, created_by: data.created_by } : null
+    });
 
     if (error) {
       console.error('[ORG/CREATE] Database error details:', {

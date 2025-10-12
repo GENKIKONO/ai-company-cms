@@ -366,10 +366,35 @@ export default function NewOrganizationPage() {
       }
       
       const result = await response.json();
-      if (result.data?.id) {
+      
+      // デバッグ用：レスポンス構造をログ出力
+      console.log('Frontend: API Response Status:', response.status);
+      console.log('Frontend: API Response Data:', result);
+      console.log('Frontend: Response Structure Check:', {
+        hasData: !!result.data,
+        hasDataId: !!result.data?.id,
+        hasId: !!result.id,
+        hasMessage: !!result.message,
+        responseKeys: Object.keys(result),
+        dataKeys: result.data ? Object.keys(result.data) : 'no data'
+      });
+      
+      // 成功条件：APIの実際のレスポンス構造に基づいて判定
+      const isSuccessful = (
+        // 新規作成成功: { data: { id: ... }, created: true } with status 201
+        (response.status === 201 && result.data?.id && result.created === true) ||
+        // 既存組織発見: { data: { id: ... }, created: false } with status 200  
+        (response.status === 200 && result.data?.id && result.created === false) ||
+        // その他の成功パターン: dataにidがあれば成功とみなす
+        (result.data?.id)
+      );
+      
+      if (isSuccessful) {
+        console.log('Frontend: Organization creation/retrieval successful, redirecting to dashboard...');
         // Single-Org モードでは企業作成後はダッシュボードにリダイレクト
         router.push('/dashboard');
       } else {
+        console.error('Frontend: Organization creation failed - unexpected response structure');
         setErrors({ submit: '企業の作成に失敗しました' });
       }
     } catch (error) {

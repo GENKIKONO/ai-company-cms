@@ -6,6 +6,8 @@ export const ORG_COLUMNS: ReadonlyArray<string> = [
   'address_postal_code','address_street',
   'telephone','email','email_public',
   'url','logo_url','industries','same_as','status','partner_id',
+  // 必須システムフィールド
+  'created_by',
   // 正式な日付フィールドは established_at のみ採用（founded は排除）
   'established_at',
   // 任意のメタ系（存在すれば）
