@@ -36,6 +36,15 @@ interface HearingRequest {
   users: {
     email: string;
   };
+  requester_id?: string;
+  organization_id?: string;
+}
+
+interface ContentCreationRequest {
+  services: boolean;
+  faqs: boolean;
+  case_studies: boolean;
+  posts: boolean;
 }
 
 interface HearingCategory {
@@ -58,6 +67,15 @@ export default function AdminHearingsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<HearingRequest | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [interviewSummary, setInterviewSummary] = useState<string>('');
+  const [adminNotes, setAdminNotes] = useState<string>('');
+  const [contentCreationRequest, setContentCreationRequest] = useState<ContentCreationRequest>({
+    services: false,
+    faqs: false,
+    case_studies: false,
+    posts: false
+  });
+  const [isCreatingContent, setIsCreatingContent] = useState(false);
 
   useEffect(() => {
     fetchHearingRequests();
@@ -137,6 +155,158 @@ export default function AdminHearingsPage() {
 
   const getSelectedCategories = (request: HearingRequest) => {
     return hearingCategories.filter(cat => request[cat.key as keyof HearingRequest] as boolean);
+  };
+
+  // 統合されたコンテンツ作成処理
+  const handleCreateContent = async () => {
+    if (!selectedRequest) return;
+    
+    setIsCreatingContent(true);
+    try {
+      // 選択されたコンテンツタイプを取得
+      const selectedTypes = Object.entries(contentCreationRequest)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([type, _]) => type);
+
+      if (selectedTypes.length === 0) {
+        alert('作成するコンテンツタイプを少なくとも1つ選択してください');
+        return;
+      }
+
+      // 1. 委任設定作成
+      const delegationResponse = await fetch('/api/admin/delegation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_user_id: selectedRequest.requester_id || selectedRequest.users.email,
+          organization_id: selectedRequest.organization_id || selectedRequest.organizations.id,
+          scope: selectedTypes,
+          hearing_context: interviewSummary,
+          notes: `ヒアリング依頼ID: ${selectedRequest.id} から自動作成`
+        })
+      });
+
+      if (!delegationResponse.ok) {
+        throw new Error('委任設定の作成に失敗しました');
+      }
+
+      const delegation = await delegationResponse.json();
+
+      // 2. 各コンテンツタイプの下書き作成
+      const draftPromises = selectedTypes.map(async (contentType) => {
+        const title = generateTitleFromHearing(selectedRequest, contentType);
+        const content = generateContentFromHearing(selectedRequest, contentType, interviewSummary);
+
+        return fetch('/api/admin/hearing/drafts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            delegation_id: delegation.delegation.id,
+            content_type: contentType,
+            title,
+            content,
+            hearing_summary: interviewSummary
+          })
+        });
+      });
+
+      const draftResponses = await Promise.all(draftPromises);
+      const drafts = await Promise.all(
+        draftResponses.map(response => response.json())
+      );
+
+      // 3. ヒアリング完了ステータス更新
+      await fetch('/api/admin/hearing-requests', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedRequest.id,
+          status: 'completed',
+          interview_summary: interviewSummary,
+          admin_notes: adminNotes,
+          completed_at: new Date().toISOString()
+        })
+      });
+
+      alert(`✅ ${drafts.length}件の代行コンテンツ下書きを作成し、承認依頼を送信しました！`);
+      
+      // モーダルを閉じて画面をリフレッシュ
+      setShowModal(false);
+      fetchHearingRequests();
+
+    } catch (error) {
+      console.error('Content creation error:', error);
+      alert('❌ 代行コンテンツ作成に失敗しました');
+    } finally {
+      setIsCreatingContent(false);
+    }
+  };
+
+  // ヒアリング結果からタイトル生成
+  const generateTitleFromHearing = (request: HearingRequest, contentType: string): string => {
+    const orgName = request.organizations.name;
+    
+    switch (contentType) {
+      case 'services':
+        return `${orgName}のサービス紹介`;
+      case 'faqs':
+        return `${orgName}に関するよくある質問`;
+      case 'case_studies':
+        return `${orgName}の導入事例`;
+      case 'posts':
+        return `${orgName}について - ブログ記事`;
+      default:
+        return `${orgName}のコンテンツ`;
+    }
+  };
+
+  // ヒアリング結果からコンテンツ生成
+  const generateContentFromHearing = (request: HearingRequest, contentType: string, summary: string): string => {
+    const orgName = request.organizations.name;
+    const purpose = request.purpose;
+    
+    let content = `# ${generateTitleFromHearing(request, contentType)}\n\n`;
+    
+    content += `## 概要\n${purpose}\n\n`;
+    
+    if (summary) {
+      content += `## ヒアリング結果\n${summary}\n\n`;
+    }
+
+    // ヒアリング項目に基づいたコンテンツ追加
+    if (request.business_overview) {
+      content += `## 事業概要\n（ヒアリング結果に基づいて詳細を記載）\n\n`;
+    }
+    
+    if (request.service_details) {
+      content += `## サービス詳細\n（ヒアリング結果に基づいて詳細を記載）\n\n`;
+    }
+    
+    if (request.competitive_advantage) {
+      content += `## 競合優位性\n（ヒアリング結果に基づいて詳細を記載）\n\n`;
+    }
+    
+    if (request.target_market) {
+      content += `## ターゲット市場\n（ヒアリング結果に基づいて詳細を記載）\n\n`;
+    }
+
+    content += `\n---\n*このコンテンツは${orgName}のヒアリング結果に基づいて作成されました。*`;
+    
+    return content;
+  };
+
+  // モーダル開く時の初期化
+  const handleOpenModal = (request: HearingRequest) => {
+    setSelectedRequest(request);
+    setInterviewSummary(request.interview_summary || '');
+    setAdminNotes(request.admin_notes || '');
+    setContentCreationRequest({
+      services: request.service_details,
+      faqs: true, // デフォルトでFAQは選択
+      case_studies: request.case_studies,
+      posts: false
+    });
+    setShowModal(true);
   };
 
   const statusCounts = {
@@ -338,10 +508,7 @@ export default function AdminHearingsPage() {
 
                   <div className="ml-4">
                     <button
-                      onClick={() => {
-                        setSelectedRequest(request);
-                        setShowModal(true);
-                      }}
+                      onClick={() => handleOpenModal(request)}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                     >
                       詳細・編集
@@ -353,55 +520,206 @@ export default function AdminHearingsPage() {
           )}
         </div>
 
-        {/* 詳細モーダル（簡易版） */}
+        {/* 詳細モーダル（統合版） */}
         {showModal && selectedRequest && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    ヒアリング依頼詳細
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    ヒアリング依頼詳細・代行コンテンツ作成
                   </h3>
                   <button
                     onClick={() => setShowModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 text-xl"
                   >
                     ✕
                   </button>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">組織名</label>
-                    <p className="text-sm text-gray-900">{selectedRequest.organizations.name}</p>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">依頼目的</label>
-                    <p className="text-sm text-gray-900">{selectedRequest.purpose}</p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* 左側：基本情報・ヒアリング結果 */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-gray-900 border-b pb-2">📋 ヒアリング情報</h4>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">組織名</label>
+                      <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{selectedRequest.organizations.name}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">依頼目的</label>
+                      <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{selectedRequest.purpose}</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">ヒアリング項目</label>
+                      <div className="flex flex-wrap gap-1">
+                        {getSelectedCategories(selectedRequest).map((category) => (
+                          <span
+                            key={category.key}
+                            className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                          >
+                            {category.label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        ヒアリング結果 <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        rows={6}
+                        placeholder="ヒアリング実施後の結果を詳細に記載してください..."
+                        value={interviewSummary}
+                        onChange={(e) => setInterviewSummary(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">管理者メモ</label>
+                      <textarea
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        rows={3}
+                        placeholder="管理者用のメモを入力..."
+                        value={adminNotes}
+                        onChange={(e) => setAdminNotes(e.target.value)}
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">管理者メモ</label>
-                    <textarea
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                      rows={3}
-                      placeholder="管理者用のメモを入力..."
-                      defaultValue={selectedRequest.admin_notes || ''}
-                    />
-                  </div>
+                  {/* 右側：代行コンテンツ作成 */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-gray-900 border-b pb-2">🚀 代行コンテンツ作成</h4>
+                    
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium text-blue-800">自動コンテンツ生成</span>
+                      </div>
+                      <p className="text-sm text-blue-700 mb-4">
+                        ヒアリング結果を基に、選択したコンテンツタイプの下書きを自動生成します。
+                        生成後、クライアントに承認依頼が送信されます。
+                      </p>
+                      
+                      <div className="space-y-3">
+                        <label className="block text-sm font-medium text-gray-700">作成するコンテンツ</label>
+                        
+                        <div className="space-y-2">
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={contentCreationRequest.services}
+                              onChange={(e) => setContentCreationRequest(prev => ({
+                                ...prev,
+                                services: e.target.checked
+                              }))}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">📄 サービス紹介記事</span>
+                          </label>
+                          
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={contentCreationRequest.faqs}
+                              onChange={(e) => setContentCreationRequest(prev => ({
+                                ...prev,
+                                faqs: e.target.checked
+                              }))}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">❓ FAQ</span>
+                          </label>
+                          
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={contentCreationRequest.case_studies}
+                              onChange={(e) => setContentCreationRequest(prev => ({
+                                ...prev,
+                                case_studies: e.target.checked
+                              }))}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">📈 導入事例</span>
+                          </label>
+                          
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={contentCreationRequest.posts}
+                              onChange={(e) => setContentCreationRequest(prev => ({
+                                ...prev,
+                                posts: e.target.checked
+                              }))}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">📝 ブログ記事</span>
+                          </label>
+                        </div>
+                      </div>
 
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setShowModal(false)}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-                    >
-                      閉じる
-                    </button>
-                    <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                      保存
-                    </button>
+                      <div className="mt-4 pt-4 border-t border-blue-200">
+                        <button
+                          onClick={handleCreateContent}
+                          disabled={isCreatingContent || !interviewSummary.trim()}
+                          className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+                        >
+                          {isCreatingContent ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              代行コンテンツ作成中...
+                            </div>
+                          ) : (
+                            '🚀 代行コンテンツ作成開始'
+                          )}
+                        </button>
+                        
+                        {!interviewSummary.trim() && (
+                          <p className="text-xs text-red-500 mt-1">
+                            ヒアリング結果の入力が必要です
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
+                </div>
+
+                <div className="flex gap-3 mt-6 pt-6 border-t">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                  >
+                    閉じる
+                  </button>
+                  <button
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                    onClick={() => {
+                      // 基本的な保存処理（ヒアリング結果とメモのみ）
+                      fetch('/api/admin/hearing-requests', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          id: selectedRequest.id,
+                          interview_summary: interviewSummary,
+                          admin_notes: adminNotes
+                        })
+                      }).then(() => {
+                        alert('保存しました');
+                        fetchHearingRequests();
+                      }).catch(() => {
+                        alert('保存に失敗しました');
+                      });
+                    }}
+                  >
+                    💾 保存
+                  </button>
                 </div>
               </div>
             </div>
@@ -409,18 +727,22 @@ export default function AdminHearingsPage() {
         )}
 
         {/* 実装注記 */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="mt-8 bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex">
-            <svg className="w-5 h-5 text-blue-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg className="w-5 h-5 text-green-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <h4 className="text-sm font-medium text-blue-800">ヒアリング管理機能</h4>
-              <p className="text-sm text-blue-700 mt-1">
-                Phase E実装完了：ヒアリング依頼の管理画面が実装されました。
-                管理者は全ての依頼を確認し、ステータス更新やメモ管理が可能です。
-                データベースマイグレーション適用後に完全に動作します。
+              <h4 className="text-sm font-medium text-green-800">🚀 統合ヒアリング→代行コンテンツ作成機能</h4>
+              <p className="text-sm text-green-700 mt-1">
+                <strong>新機能実装完了！</strong> ヒアリング管理画面から直接代行コンテンツ作成が可能になりました。
               </p>
+              <ul className="text-sm text-green-700 mt-2 space-y-1">
+                <li>• ヒアリング結果を基にした自動コンテンツ生成</li>
+                <li>• 委任設定から下書き作成まで一括処理</li>
+                <li>• クライアント承認依頼の自動送信</li>
+                <li>• 複数コンテンツタイプの同時作成対応</li>
+              </ul>
             </div>
           </div>
         </div>
