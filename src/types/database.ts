@@ -357,6 +357,91 @@ export interface FAQFormData {
   sort_order?: number;
 }
 
+// Q&A Knowledge System Types
+export type QAVisibility = 'global' | 'org';
+export type QAEntryVisibility = 'public' | 'private';
+export type QAEntryStatus = 'draft' | 'published' | 'archived';
+export type QALogAction = 'create' | 'update' | 'publish' | 'unpublish' | 'archive' | 'delete' | 'category_create' | 'category_update' | 'category_delete';
+
+export interface QACategory {
+  id: string;
+  organization_id?: string;
+  name: string;
+  slug: string;
+  description?: string;
+  visibility: QAVisibility;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  created_by?: string;
+  updated_by?: string;
+}
+
+export interface QAEntry {
+  id: string;
+  organization_id: string;
+  category_id?: string;
+  question: string;
+  answer: string;
+  tags: string[];
+  visibility: QAEntryVisibility;
+  status: QAEntryStatus;
+  published_at?: string;
+  last_edited_by: string;
+  last_edited_at: string;
+  created_at: string;
+  updated_at: string;
+  content_hash?: string;
+  refresh_suggested_at?: string;
+  jsonld_cache?: any;
+  search_vector?: string;
+}
+
+export interface QAContentLog {
+  id: string;
+  organization_id: string;
+  qa_entry_id?: string;
+  category_id?: string;
+  action: QALogAction;
+  actor_user_id: string;
+  changes?: any;
+  note?: string;
+  metadata?: any;
+  created_at: string;
+}
+
+export interface QAQuestionTemplate {
+  id: string;
+  category_id?: string;
+  template_text: string;
+  description?: string;
+  tags: string[];
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Q&A Form Data Types
+export interface QACategoryFormData {
+  name: string;
+  slug: string;
+  description?: string;
+  visibility: QAVisibility;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface QAEntryFormData {
+  category_id?: string;
+  question: string;
+  answer: string;
+  tags?: string[];
+  visibility?: QAEntryVisibility;
+  status?: QAEntryStatus;
+}
+
 // Subscription types
 export interface Subscription {
   id: string;

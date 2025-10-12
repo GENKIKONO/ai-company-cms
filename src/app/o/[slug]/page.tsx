@@ -7,8 +7,10 @@ import { LogoImage } from '@/components/ui/optimized-image';
 import ReportButton from '@/components/common/ReportButton';
 import AddressDisplay from '@/components/address/AddressDisplay';
 import OrganizationJsonLd from '@/components/seo/OrganizationJsonLd';
+import FAQJsonLd from '@/components/seo/FAQJsonLd';
+import QAPublicDisplay from '@/components/qa/QAPublicDisplay';
 import { createFullAddress } from '@/lib/structured-data/organization';
-import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/database';
+import type { Organization, Post, Service, CaseStudy, FAQ, QAEntry } from '@/types/database';
 
 interface OrganizationPageData {
   organization: Organization;
@@ -16,6 +18,7 @@ interface OrganizationPageData {
   services: Service[];
   case_studies: CaseStudy[];
   faqs: FAQ[];
+  qa_entries: QAEntry[];
 }
 
 // ✅ キャッシュ対応: 公開組織データ取得
@@ -104,7 +107,7 @@ const getOrganizationDataCached = (slug: string) =>
       console.log(`[VERIFY] Public organization loaded successfully: ${organization.name} (${slug})`);
 
       // 公開されたコンテンツを並行取得
-      const [postsResult, servicesResult, caseStudiesResult, faqsResult] = await Promise.all([
+      const [postsResult, servicesResult, caseStudiesResult, faqsResult, qaEntriesResult] = await Promise.all([
         supabase
           .from('posts')
           .select('*')
@@ -132,7 +135,19 @@ const getOrganizationDataCached = (slug: string) =>
           .select('*')
           .eq('organization_id', organization.id)
           .eq('is_published', true)
-          .order('created_at', { ascending: false })
+          .order('created_at', { ascending: false }),
+        
+        supabase
+          .from('qa_entries')
+          .select(`
+            *,
+            qa_categories!left(id, name, slug)
+          `)
+          .eq('organization_id', organization.id)
+          .eq('status', 'published')
+          .eq('visibility', 'public')
+          .order('published_at', { ascending: false })
+          .limit(20)
       ]);
 
       return {
@@ -140,7 +155,8 @@ const getOrganizationDataCached = (slug: string) =>
         posts: postsResult.data || [],
         services: servicesResult.data || [],
         case_studies: caseStudiesResult.data || [],
-        faqs: faqsResult.data || []
+        faqs: faqsResult.data || [],
+        qa_entries: qaEntriesResult.data || []
       };
     },
     [`org-public-${slug}`],
@@ -224,7 +240,7 @@ export default async function OrganizationDetailPage({
     notFound();
   }
 
-  const { organization, posts, services, case_studies, faqs } = data;
+  const { organization, posts, services, case_studies, faqs, qa_entries } = data;
   const jsonLdArray = generateOrganizationPageJsonLd(organization, posts, services, case_studies, faqs);
 
   return (
@@ -234,6 +250,12 @@ export default async function OrganizationDetailPage({
         organization={organization} 
         includeGeo={!!(organization.lat && organization.lng)}
         includeContactInfo={true}
+      />
+      {/* FAQ JSON-LD for Q&A entries */}
+      <FAQJsonLd 
+        qaEntries={qa_entries}
+        organization={organization}
+        maxItems={50}
       />
       {/* Legacy JSON-LD for backward compatibility */}
       {jsonLdArray.slice(1).map((jsonLd, index) => (
@@ -614,11 +636,23 @@ export default async function OrganizationDetailPage({
               </div>
             )}
 
-            {/* FAQ */}
+            {/* Q&A Knowledge Base */}
+            {qa_entries && qa_entries.length > 0 && (
+              <div className="border-t border-gray-200">
+                <div className="p-6 sm:p-8">
+                  <QAPublicDisplay 
+                    organizationSlug={organization.slug}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Legacy FAQ */}
             {faqs && faqs.length > 0 && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">よくある質問</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">よくある質問 (旧形式)</h2>
                   <div className="space-y-4">
                     {faqs.map((faq) => (
                         <div key={faq.id} className="border border-gray-200 rounded-lg">

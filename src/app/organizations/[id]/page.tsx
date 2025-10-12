@@ -17,6 +17,7 @@ import FAQsTab from '@/components/FAQsTab';
 import PostsTab from '@/components/PostsTab';
 import OrgLogoUploader from '@/components/OrgLogoUploader';
 import AddressDisplay from '@/components/address/AddressDisplay';
+import QAManager from '@/components/qa/QAManager';
 
 // プラン別タグ数制限
 const TAG_LIMIT: Record<string, number | 'unlimited'> = {
@@ -66,7 +67,7 @@ export default function EditOrganizationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   // [VERIFY][DELETE_GUARD] Delete confirmation state removed for safety
-  const [activeTab, setActiveTab] = useState<'basic' | 'services' | 'casestudies' | 'faqs' | 'posts'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'services' | 'casestudies' | 'faqs' | 'posts' | 'qa'>('basic');
   
   // 座標管理
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
@@ -516,6 +517,16 @@ export default function EditOrganizationPage() {
                 }`}
               >
                 記事
+              </button>
+              <button
+                onClick={() => setActiveTab('qa')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'qa'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Q&A
               </button>
             </nav>
           </div>
@@ -1055,6 +1066,11 @@ export default function EditOrganizationPage() {
         {/* 記事タブ */}
         {activeTab === 'posts' && (
           <PostsTab organizationId={organizationId} organizationSlug={organization?.slug} />
+        )}
+
+        {/* Q&Aタブ */}
+        {activeTab === 'qa' && (
+          <QAManager />
         )}
       </main>
 
