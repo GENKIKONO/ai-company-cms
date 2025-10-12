@@ -177,9 +177,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             {/* Evolution Timeline */}
             <div className="mb-12">
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-3 gap-6">
                 {/* Traditional Search */}
-                <div className="text-center">
+                <div className="card p-6 text-center bg-white">
                   <div className="w-16 h-16 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -191,7 +191,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </div>
 
                 {/* Transition */}
-                <div className="text-center">
+                <div className="card p-6 text-center bg-white">
                   <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -203,7 +203,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </div>
 
                 {/* Future */}
-                <div className="text-center">
+                <div className="card p-6 text-center bg-white">
                   <div className="w-16 h-16 bg-success-50 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-success-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -216,43 +216,60 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
             </div>
 
-            {/* Comparison Table */}
-            <div className="card p-6 mb-8">
+            {/* Comparison Table - Split into two sections */}
+            <div className="mb-8">
               <h3 className="text-h2 text-neutral-900 mb-6 jp-text text-center">検索体験の変化</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-neutral-200">
-                      <th className="text-left py-3 px-4 text-body font-medium text-neutral-900 jp-text">項目</th>
-                      <th className="text-left py-3 px-4 text-body font-medium text-neutral-900 jp-text">従来の検索</th>
-                      <th className="text-left py-3 px-4 text-body font-medium text-neutral-900 jp-text">AI時代の検索</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-neutral-100">
-                      <td className="py-3 px-4 text-body-small text-neutral-900 font-medium jp-text">情報取得方法</td>
-                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">検索結果をクリックしてサイト訪問</td>
-                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">AIが情報を直接引用・要約して回答</td>
-                    </tr>
-                    <tr className="border-b border-neutral-100">
-                      <td className="py-3 px-4 text-body-small text-neutral-900 font-medium jp-text">企業への影響</td>
-                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">SEO順位とクリック率が重要</td>
-                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">AIに引用されるかが重要</td>
-                    </tr>
-                    <tr className="border-b border-neutral-100">
-                      <td className="py-3 px-4 text-body-small text-neutral-900 font-medium jp-text">必要な対策</td>
-                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">キーワード最適化、コンテンツSEO</td>
-                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">構造化データ、AI理解最適化</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Traditional Search */}
+                <div className="card p-6">
+                  <div className="mb-4">
+                    <div className="badge badge-neutral mb-2">従来の検索</div>
+                    <h4 className="text-h3 text-neutral-900 jp-text">クリック型の情報取得</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <h5 className="text-body font-medium text-neutral-900 mb-2 jp-text">情報取得方法</h5>
+                      <p className="text-body-small text-neutral-600 jp-text">検索結果をクリックしてサイト訪問</p>
+                    </div>
+                    <div>
+                      <h5 className="text-body font-medium text-neutral-900 mb-2 jp-text">企業への影響</h5>
+                      <p className="text-body-small text-neutral-600 jp-text">SEO順位とクリック率が重要</p>
+                    </div>
+                    <div>
+                      <h5 className="text-body font-medium text-neutral-900 mb-2 jp-text">必要な対策</h5>
+                      <p className="text-body-small text-neutral-600 jp-text">キーワード最適化、コンテンツSEO</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* AI Era Search */}
+                <div className="card p-6 bg-primary-50">
+                  <div className="mb-4">
+                    <div className="badge badge-primary mb-2">AI時代の検索</div>
+                    <h4 className="text-h3 text-primary-700 jp-text">ゼロクリック情報提供</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <h5 className="text-body font-medium text-primary-700 mb-2 jp-text">情報取得方法</h5>
+                      <p className="text-body-small text-primary-600 jp-text">AIが情報を直接引用・要約して回答</p>
+                    </div>
+                    <div>
+                      <h5 className="text-body font-medium text-primary-700 mb-2 jp-text">企業への影響</h5>
+                      <p className="text-body-small text-primary-600 jp-text">AIに引用されるかが重要</p>
+                    </div>
+                    <div>
+                      <h5 className="text-body font-medium text-primary-700 mb-2 jp-text">必要な対策</h5>
+                      <p className="text-body-small text-primary-600 jp-text">構造化データ、AI理解最適化</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Challenge and Solution */}
             <div className="grid md:grid-cols-2 gap-8">
               {/* Challenge */}
-              <div className="card p-6 border-l-4 border-red-400">
+              <div className="card p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
                     <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -278,7 +295,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
 
               {/* Solution */}
-              <div className="card p-6 border-l-4 border-blue-400">
+              <div className="card p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                     <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
