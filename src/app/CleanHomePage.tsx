@@ -18,7 +18,7 @@ interface CleanHomePageProps {
   siteSettings: SiteSettings;
 }
 
-export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
+export default function CleanHomePage({ siteSettings }: CleanHomePageProps) {
   const { t, formatNumber } = useI18n();
   const [dynamicStats, setDynamicStats] = useState({
     organizations: 1000,

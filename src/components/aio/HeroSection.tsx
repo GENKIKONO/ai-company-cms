@@ -34,23 +34,23 @@ export default async function HeroSection({
     ? heroImageUrl 
     : '/hero/zero-click-shift.png';
   return (
-    <section className="hero-gap bg-gray-50">
-      <div className="container-hero">
+    <section className="section bg-subtle">
+      <div className="container">
         <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
           {/* Left Column - Content */}
           <div>
             {/* バッジ */}
-            <div className="inline-flex items-center gap-2 text-indigo-700/80 bg-indigo-50 px-3 py-1 rounded-full text-sm font-medium mb-4">
-              <Zap className="w-4 h-4" />
-              <span className="jp-phrase">{subtitle}</span>
+            <div className="badge badge-primary mb-6">
+              <Zap className="icon icon-sm" />
+              <span className="jp-text">{subtitle}</span>
             </div>
             
             {/* メインタイトル */}
-            <h1 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 measure-hero jp-phrase">
+            <h1 className="text-display text-neutral-900 mb-6 text-balance jp-text">
               {title.split('\n').map((line, index) => (
-                <span key={index} className="block jp-phrase">
+                <span key={index} className="block jp-text">
                   {index === 1 ? (
-                    <span className="text-indigo-600">
+                    <span className="text-primary">
                       {line}
                     </span>
                   ) : (
@@ -61,7 +61,7 @@ export default async function HeroSection({
             </h1>
             
             {/* 説明文 */}
-            <p className="copy measure-lead text-gray-600 mb-8 jp-phrase">
+            <p className="text-body-large text-neutral-600 mb-8 jp-text">
               AIO Hubは、AIが理解・引用しやすい形に企業情報を最適化するCMS。
               フォーム入力だけで<strong>JSON‑LD自動生成</strong>と
               <strong>構造化公開</strong>を実現し、検索からAI回答までの導線で
@@ -69,10 +69,10 @@ export default async function HeroSection({
             </p>
 
             {/* 特徴ポイント */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 text-gray-700">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 text-neutral-700">
               {features.map((feature, index) => {
                 const IconComponent = iconComponents[feature.icon as keyof typeof iconComponents];
-                const colors = ['text-blue-500', 'text-purple-500', 'text-indigo-500'];
+                const colors = ['text-primary', 'text-primary', 'text-primary'];
                 
                 return (
                   <div key={index} className="flex items-center gap-2">
@@ -87,14 +87,14 @@ export default async function HeroSection({
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link 
                 href={primaryCta.href} 
-                className="cta-nowrap inline-flex justify-center items-center rounded-lg bg-indigo-600 px-6 py-3 min-h-[44px] text-white font-medium hover:bg-indigo-700 transition-colors duration-200"
+                className="btn btn-primary btn-large"
               >
                 {primaryCta.text}
               </Link>
               {secondaryCta && (
                 <Link 
                   href={secondaryCta.href} 
-                  className="cta-nowrap inline-flex justify-center items-center rounded-lg border border-gray-300 px-6 py-3 min-h-[44px] text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200"
+                  className="btn btn-secondary btn-large"
                 >
                   {secondaryCta.text}
                 </Link>
@@ -114,18 +114,18 @@ export default async function HeroSection({
                 priority
               />
             </div>
-            <p className="mt-3 text-center text-sm text-gray-500">
+            <p className="mt-3 text-center text-body-small text-neutral-500 jp-text">
               検索結果からAI直接回答へ。構造化された情報が引用されやすい。
             </p>
           </div>
         </div>
 
         {/* 価値訴求カード */}
-        <section className="section-gap">
-          <h2 className="headline text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-8 jp-phrase">
+        <section className="section">
+          <h2 className="text-h1 text-neutral-900 text-center mb-12 jp-text">
             AIO Hubで実現する価値
           </h2>
-          <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-4">
             {benefits.map((benefit, index) => (
               <StatCard
                 key={index}

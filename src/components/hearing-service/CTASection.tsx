@@ -6,17 +6,17 @@ import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 export default function CTASection() {
   return (
-    <section className="py-16 sm:py-20 bg-blue-900 relative overflow-hidden ui-bottom-content">
+    <section className="section bg-blue-900 relative overflow-hidden">
       {/* 背景装飾 */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
       </div>
       
-      <div className="relative wide-container">
+      <div className="relative container">
         <div className="text-center">
           {/* メインメッセージ */}
-          <h2 className="text-heading-2 text-white mb-6 leading-tight tracking-tight measure-heading mx-auto text-balance">
+          <h2 className="text-h2 text-white mb-6 leading-tight tracking-tight text-balance">
             今すぐAI時代に対応した
             <br className="hidden md:block" />
             <span className="text-blue-400">
@@ -24,7 +24,7 @@ export default function CTASection() {
             </span>
           </h2>
           
-          <p className="text-body-lead text-blue-100 mb-8 sm:mb-12 max-w-3xl mx-auto leading-7 sm:leading-8">
+          <p className="text-body-large text-blue-100 mb-8 sm:mb-12 max-w-3xl mx-auto leading-7 sm:leading-8">
             複雑な作業は一切不要。専門スタッフがあなたの企業の魅力を
             <br className="hidden md:block" />
             AIが理解しやすい形で構造化し、競合他社との差別化を実現します。
@@ -60,7 +60,7 @@ export default function CTASection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12">
             <Link
               href="/dashboard"
-              className="cta-unified cta-unified--primary gap-3"
+              className="btn btn-primary btn-large gap-3"
               aria-label="今すぐヒアリングを申し込む"
             >
               <span className="whitespace-nowrap">
@@ -72,7 +72,7 @@ export default function CTASection() {
             
             <Link
               href="#pricing"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-white/10 backdrop-blur-sm text-white rounded-lg font-medium border border-white/30 hover:bg-white/20 transition-colors duration-200 whitespace-nowrap"
+              className="btn btn-secondary btn-large bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20"
               aria-label="料金プランを確認"
             >
               料金プランを確認
@@ -81,7 +81,7 @@ export default function CTASection() {
 
           {/* 申込みステップ */}
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/10 max-w-4xl mx-auto">
-            <h3 className="text-heading-3 text-white mb-6">申し込みは3ステップで完了</h3>
+            <h3 className="text-h3 text-white mb-6">申し込みは3ステップで完了</h3>
             
             <HorizontalScroller ariaLabel="申し込みステップ" className="lg:grid-cols-3">
               <div className="snap-start min-w-[240px] sm:min-w-0 text-center">
@@ -112,10 +112,10 @@ export default function CTASection() {
 
           {/* 追加情報 */}
           <div className="mt-8 sm:mt-12 text-center">
-            <p className="jp-body text-blue-200 text-[13px] sm:text-sm mb-4 leading-5 break-keep">
+            <p className="text-body-small text-blue-200 mb-4 leading-5 break-keep">
               ✓ 初回相談無料　✓ 契約前のお見積もり無料　✓ オンライン対応可能
             </p>
-            <p className="jp-body text-blue-300 text-xs leading-4 break-keep">
+            <p className="text-body-small text-blue-300 leading-4 break-keep">
               ※ お申し込み後、担当者より24時間以内にご連絡いたします
             </p>
           </div>

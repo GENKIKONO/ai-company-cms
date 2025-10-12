@@ -98,7 +98,7 @@ export default function HearingServicePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
       />
       
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-clean">
         {/* ヒーローセクション */}
         <HeroSection />
         

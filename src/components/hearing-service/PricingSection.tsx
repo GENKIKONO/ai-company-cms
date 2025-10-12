@@ -72,25 +72,25 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
       {/* 人気バッジ */}
       {plan.popular && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-          <span className="inline-flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-full text-sm font-medium ui-flat">
+          <span className="badge badge-primary">
             <Zap className="w-4 h-4" />
-            <span className="jp-phrase">おすすめ</span>
+            <span className="jp-text">おすすめ</span>
           </span>
         </div>
       )}
       
-      <div className={`card group p-6 sm:p-7 h-full ${plan.popular ? 'ring-2 ring-purple-500 ring-offset-2' : ''}`}>
+      <div className={`card h-full ${plan.popular ? 'ring-2 ring-purple-500 ring-offset-2' : ''}`}>
         {/* プランヘッダー */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="media-frame w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4" style={{'--media-ar': '1/1'} as React.CSSProperties}>
-            <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${colors.accent} media-contain`} />
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${colors.accent}`} />
           </div>
-          <h3 className="headline text-xl font-bold text-gray-900 mb-2 jp-phrase">{plan.name}</h3>
-          <p className="copy measure-body text-gray-600 mb-4 jp-phrase">{plan.description}</p>
+          <h3 className="text-h3 text-neutral-900 mb-2 jp-text">{plan.name}</h3>
+          <p className="text-body text-neutral-600 mb-4 jp-text">{plan.description}</p>
           
           <div className="flex items-baseline justify-center gap-1">
-            <span className="headline text-3xl font-bold text-gray-900 tabular-nums">¥{plan.price}</span>
-            <span className="copy text-gray-600 jp-phrase">/ {plan.period}</span>
+            <span className="text-h1 text-neutral-900 tabular-nums">¥{plan.price}</span>
+            <span className="text-body text-neutral-600 jp-text">/ {plan.period}</span>
           </div>
         </div>
 
@@ -99,14 +99,14 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
           {plan.features.map((feature, index) => (
             <div key={index} className="flex items-start gap-3">
               <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mt-0.5 flex-shrink-0" />
-              <span className="copy measure-body text-gray-700 jp-phrase">{feature}</span>
+              <span className="text-body text-neutral-700 jp-text">{feature}</span>
             </div>
           ))}
           
           {plan.limitations.map((limitation, index) => (
             <div key={index} className="flex items-start gap-3 opacity-70">
               <div className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mt-0.5 flex-shrink-0 text-center text-sm">×</div>
-              <span className="copy measure-body text-gray-500 jp-phrase">{limitation}</span>
+              <span className="text-body text-neutral-500 jp-text">{limitation}</span>
             </div>
           ))}
         </div>
@@ -114,9 +114,9 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
         {/* CTAボタン */}
         <Link
           href="/dashboard"
-          className={`cta-nowrap block w-full text-center px-6 py-3 min-h-[44px] ${colors.button} rounded-lg font-medium transition-colors duration-200`}
+          className={`btn btn-primary btn-large w-full text-center`}
         >
-          <span className="jp-phrase">{plan.buttonText}</span>
+          <span className="jp-text">{plan.buttonText}</span>
         </Link>
       </div>
     </>
@@ -125,21 +125,21 @@ const PricingCard = ({ plan }: { plan: typeof pricingPlans[0] }) => {
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="section-gap bg-gray-50">
-      <div className="container-wide">
+    <section id="pricing" className="section bg-subtle">
+      <div className="container">
         {/* セクションヘッダー */}
-        <div className="heading-guard-top heading-guard-btm">
-          <h2 className="text-heading-2 text-gray-900 mb-6 text-center measure-heading mx-auto text-balance">
-            <span className="block jp-phrase">シンプルで明確な料金体系</span>
+        <div className="mb-12">
+          <h2 className="text-h2 text-neutral-900 mb-6 text-center text-balance">
+            <span className="block jp-text">シンプルで明確な料金体系</span>
           </h2>
-          <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase text-pretty">
+          <p className="text-body-large text-center text-neutral-600 mx-auto jp-text text-pretty">
             単発のヒアリングから継続的な支援まで、お客様のニーズに合わせて選択いただけます。
           </p>
         </div>
 
         {/* 料金プラン */}
-        <div className="section-gap">
-          <div className="grid gap-8 grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto">
+        <div className="mb-12">
+          <div className="grid grid-2 max-w-5xl mx-auto">
             {pricingPlans.map((plan) => (
               <div key={plan.name} className="relative">
                 <PricingCard plan={plan} />
@@ -149,26 +149,26 @@ export default function PricingSection() {
         </div>
 
         {/* 追加情報 */}
-        <div className="section-gap text-center">
-          <div className="ui-card p-6 lg:p-8 max-w-4xl mx-auto">
-            <h3 className="text-heading-3 text-gray-900 mb-6 jp-phrase measure-heading mx-auto text-balance">料金に関する補足</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
+        <div className="mt-12 text-center">
+          <div className="card p-6 lg:p-8 max-w-4xl mx-auto">
+            <h3 className="text-h3 text-neutral-900 mb-6 jp-text text-balance">料金に関する補足</h3>
+            <div className="grid grid-2 text-sm text-neutral-700">
               <div className="space-y-2 text-left">
-                <h4 className="headline font-semibold text-gray-900 jp-phrase">含まれるもの</h4>
+                <h4 className="text-h3 text-neutral-900 jp-text">含まれるもの</h4>
                 <ul className="space-y-1">
-                  <li className="copy jp-phrase">• 消費税込みの価格表示</li>
-                  <li className="copy jp-phrase">• 事前お見積もり無料</li>
-                  <li className="copy jp-phrase">• オンライン・対面対応</li>
-                  <li className="copy jp-phrase">• 成果物の著作権譲渡</li>
+                  <li className="text-body jp-text">• 消費税込みの価格表示</li>
+                  <li className="text-body jp-text">• 事前お見積もり無料</li>
+                  <li className="text-body jp-text">• オンライン・対面対応</li>
+                  <li className="text-body jp-text">• 成果物の著作権譲渡</li>
                 </ul>
               </div>
               <div className="space-y-2 text-left">
-                <h4 className="headline font-semibold text-gray-900 jp-phrase">お支払い・契約</h4>
+                <h4 className="text-h3 text-neutral-900 jp-text">お支払い・契約</h4>
                 <ul className="space-y-1">
-                  <li className="copy jp-phrase">• 銀行振込・クレジットカード対応</li>
-                  <li className="copy jp-phrase">• 継続プランはいつでも解約可能</li>
-                  <li className="copy jp-phrase">• 初回契約は最低3ヶ月から</li>
-                  <li className="copy jp-phrase">• 追加作業は事前お見積もり</li>
+                  <li className="text-body jp-text">• 銀行振込・クレジットカード対応</li>
+                  <li className="text-body jp-text">• 継続プランはいつでも解約可能</li>
+                  <li className="text-body jp-text">• 初回契約は最低3ヶ月から</li>
+                  <li className="text-body jp-text">• 追加作業は事前お見積もり</li>
                 </ul>
               </div>
             </div>

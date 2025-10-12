@@ -70,27 +70,27 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="section-layer section-safe-top section-safe-btm surface-fade-top bg-white section-gap">
-      <div className="container-article section-content">
+    <section className="section bg-clean">
+      <div className="container">
         {/* セクションヘッダー */}
-        <div className="section-gap">
-          <h2 className="text-heading-2 text-gray-900 mb-4 text-center measure-heading text-balance">
-            <span className="block jp-phrase">シンプルな3ステップ</span>
+        <div className="mb-12">
+          <h2 className="text-h2 text-neutral-900 mb-4 text-center text-balance">
+            <span className="block jp-text">シンプルな3ステップ</span>
           </h2>
-          <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
+          <p className="text-body-large text-center text-neutral-600 mx-auto jp-text">
             複雑な作業は一切不要。専門スタッフがすべて代行し、あなたの企業情報をAI時代に最適な形でお届けします。
           </p>
         </div>
 
         {/* フローステップ */}
-        <div className="section-gap">
-          <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mb-12">
+          <div className="grid grid-3">
             {flowSteps.map((step, index) => {
               const colors = getColorClasses(step.color);
               const IconComponent = step.icon;
               
               return (
-                <div key={step.step} className="card relative overflow-visible group p-6 sm:p-7 bg-white border border-gray-100 ui-card transition-all duration-300">
+                <div key={step.step} className="card relative overflow-visible">
                   {/* Step Badge - positioned outside to prevent clipping */}
                   <div className="absolute -top-4 -left-4 z-10 pointer-events-none">
                     <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white ui-flat`}>
@@ -99,20 +99,20 @@ export default function FlowSection() {
                   </div>
                   
                   {/* アイコン */}
-                  <div className={`media-frame w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6 `} style={{'--media-ar': '1/1'} as React.CSSProperties}>
-                    <IconComponent className={`w-8 h-8 ${colors.icon} media-contain`} />
+                  <div className={`w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6`}>
+                    <IconComponent className={`w-8 h-8 ${colors.icon}`} />
                   </div>
                   
                   {/* タイトル・説明 */}
-                  <h3 className="headline text-xl font-bold text-gray-900 mb-3 text-left jp-phrase">{step.title}</h3>
-                  <p className="copy measure-body text-left text-gray-600 mb-6 jp-phrase">{step.description}</p>
+                  <h3 className="text-h3 text-neutral-900 mb-3 jp-text">{step.title}</h3>
+                  <p className="text-body text-neutral-600 mb-6 jp-text">{step.description}</p>
                   
                   {/* 詳細リスト */}
                   <ul className="space-y-2.5">
                     {step.details.map((detail, detailIndex) => (
                       <li key={detailIndex} className="flex items-start gap-2">
                         <CheckCircle className={`w-4 h-4 ${colors.accent} mt-0.5 flex-shrink-0`} />
-                        <span className="copy text-sm text-gray-700 jp-phrase">{detail}</span>
+                        <span className="text-body-small text-neutral-700 jp-text">{detail}</span>
                       </li>
                     ))}
                   </ul>
@@ -123,12 +123,12 @@ export default function FlowSection() {
         </div>
 
         {/* Before/After セクション */}
-        <div className="section-gap bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-6 sm:p-8 lg:p-12">
+        <div className="mt-12 bg-gradient-to-r from-bg-subtle to-blue-50 rounded-2xl p-6 sm:p-8 lg:p-12">
           <div className="text-center mb-12">
-            <h3 className="headline text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              <span className="block jp-phrase">構造化前後の違い</span>
+            <h3 className="text-h2 text-neutral-900 mb-4">
+              <span className="block jp-text">構造化前後の違い</span>
             </h3>
-            <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
+            <p className="text-body-large text-center text-neutral-600 mx-auto jp-text">
               ヒアリングによってあなたの企業情報がどのように変わるかをご覧ください
             </p>
           </div>
@@ -141,14 +141,14 @@ export default function FlowSection() {
                   構造化前
                 </span>
               </div>
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="bg-gray-100 rounded p-3 copy jp-phrase">
+              <div className="space-y-3 text-sm text-neutral-600">
+                <div className="bg-neutral-100 rounded p-3 text-body-small jp-text">
                   "弊社は総合的なITソリューションを提供しています..."
                 </div>
-                <div className="bg-gray-100 rounded p-3 copy jp-phrase">
+                <div className="bg-neutral-100 rounded p-3 text-body-small jp-text">
                   "様々な業界のお客様にご利用いただいております..."
                 </div>
-                <div className="bg-gray-100 rounded p-3 copy jp-phrase">
+                <div className="bg-neutral-100 rounded p-3 text-body-small jp-text">
                   "高品質なサービスで満足度向上を実現..."
                 </div>
               </div>
@@ -158,7 +158,7 @@ export default function FlowSection() {
                   <path d="m15 9-6 6"></path>
                   <path d="m9 9 6 6"></path>
                 </svg>
-                <span className="copy jp-phrase">抽象的で検索されにくい</span>
+                <span className="text-body-small jp-text">抽象的で検索されにくい</span>
               </div>
             </div>
 
@@ -169,16 +169,16 @@ export default function FlowSection() {
                   構造化後
                 </span>
               </div>
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="bg-blue-50 rounded p-3 border-l-4 border-blue-400 copy jp-phrase space-y-1">
+              <div className="space-y-3 text-sm text-neutral-600">
+                <div className="bg-primary-50 rounded p-3 border-l-4 border-blue-400 text-body-small jp-text space-y-1">
                   <div><strong>対象業界:</strong> 製造業・小売業・サービス業</div>
                   <div><strong>主力サービス:</strong> ECサイト構築・在庫管理システム</div>
                 </div>
-                <div className="bg-purple-50 rounded p-3 border-l-4 border-purple-400 copy jp-phrase space-y-1">
+                <div className="bg-purple-50 rounded p-3 border-l-4 border-purple-400 text-body-small jp-text space-y-1">
                   <div><strong>導入実績:</strong> 中小企業への豊富な導入経験</div>
                   <div><strong>特徴:</strong> 短期間での効果実現を重視</div>
                 </div>
-                <div className="bg-indigo-50 rounded p-3 border-l-4 border-indigo-400 copy jp-phrase space-y-1">
+                <div className="bg-indigo-50 rounded p-3 border-l-4 border-indigo-400 text-body-small jp-text space-y-1">
                   <div><strong>差別化:</strong> ノーコード対応・24時間サポート</div>
                   <div><strong>価格:</strong> 月額5万円〜・初期費用無料</div>
                 </div>
@@ -188,7 +188,7 @@ export default function FlowSection() {
                   <circle cx="12" cy="12" r="10"></circle>
                   <path d="m9 12 2 2 4-4"></path>
                 </svg>
-                <span className="copy jp-phrase">具体的でAIが理解しやすい</span>
+                <span className="text-body-small jp-text">具体的でAIが理解しやすい</span>
               </div>
             </div>
           </div>

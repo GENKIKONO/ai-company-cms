@@ -70,18 +70,18 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="faq" className="section-gap bg-white">
-      <div className="container-article">
+    <section id="faq" className="section bg-clean">
+      <div className="container">
         {/* セクションヘッダー */}
-        <div className="section-gap">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium mb-4 mx-auto">
+        <div className="mb-12">
+          <div className="badge badge-primary mb-4 mx-auto">
             <HelpCircle className="w-4 h-4" />
-            <span className="jp-phrase">よくある質問</span>
+            <span className="jp-text">よくある質問</span>
           </div>
-          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
-            <span className="block jp-phrase">お客様からよくいただくご質問</span>
+          <h2 className="text-display text-neutral-900 mb-4 text-center">
+            <span className="block jp-text">お客様からよくいただくご質問</span>
           </h2>
-          <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
+          <p className="text-body-large text-center text-neutral-600 mx-auto jp-text">
             ご不明な点がございましたら、お気軽にお問い合わせください。
           </p>
         </div>
@@ -95,8 +95,8 @@ export default function FAQSection() {
                 onClick={() => setActiveCategory(category.id)}
                 className={`snap-start min-w-max px-4 py-2 min-h-[44px] rounded-full text-sm font-medium transition-colors duration-200 ${
                   activeCategory === category.id
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'btn btn-primary'
+                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                 }`}
               >
                 {category.label}
@@ -110,27 +110,27 @@ export default function FAQSection() {
           {filteredFAQs.map((faq, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden ui-card transition-all duration-300"
+              className="card border border-neutral-200 rounded-xl overflow-hidden"
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full px-4 sm:px-6 py-4 sm:py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 min-h-[44px]"
+                className="w-full px-4 sm:px-6 py-4 sm:py-5 text-left flex items-center justify-between hover:bg-neutral-50 transition-colors duration-200 min-h-[44px]"
               >
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 pr-4 leading-6 sm:leading-7">
+                <h3 className="text-body-large font-semibold text-neutral-900 pr-4 leading-6 sm:leading-7">
                   {faq.question}
                 </h3>
                 <div className="flex-shrink-0">
                   {openIndex === index ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500" />
+                    <ChevronUp className="w-5 h-5 text-neutral-500" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                    <ChevronDown className="w-5 h-5 text-neutral-500" />
                   )}
                 </div>
               </button>
               
               {openIndex === index && (
-                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-gray-100">
-                  <div className="pt-4 text-[15px] sm:text-base text-gray-700 leading-7 sm:leading-8 whitespace-pre-line">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-neutral-100">
+                  <div className="pt-4 text-body text-neutral-700 leading-7 sm:leading-8 whitespace-pre-line">
                     {faq.answer}
                   </div>
                 </div>
@@ -141,23 +141,23 @@ export default function FAQSection() {
 
         {/* 追加サポート */}
         <div className="mt-12 sm:mt-16 text-center">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 lg:p-8 border border-blue-200">
-            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">
+          <div className="bg-gradient-to-r from-primary-50 to-indigo-50 rounded-2xl p-4 sm:p-6 lg:p-8 border border-blue-200">
+            <h3 className="text-h3 text-neutral-900 mb-4">
               他にもご質問がございますか？
             </h3>
-            <p className="text-[15px] sm:text-base text-gray-600 mb-6 leading-6 sm:leading-7">
+            <p className="text-body text-neutral-600 mb-6 leading-6 sm:leading-7">
               お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <a
                 href="mailto:support@luxucare.jp"
-                className="inline-flex items-center justify-center px-6 py-3 min-h-[44px] bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="btn btn-primary btn-large"
               >
                 メールで問い合わせ
               </a>
               <a
                 href="tel:03-1234-5678"
-                className="inline-flex items-center justify-center px-6 py-3 min-h-[44px] bg-white text-blue-600 border border-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
+                className="btn btn-secondary btn-large"
               >
                 電話で問い合わせ
               </a>

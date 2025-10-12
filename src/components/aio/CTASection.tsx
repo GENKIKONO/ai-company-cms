@@ -23,14 +23,14 @@ export default function CTASection({
   features
 }: CTASectionProps) {
   return (
-    <section className="deco-wrap cta-safe-minh bg-gray-50 ui-bottom-content">
-      <div className="container-article text-center content-above-deco">
+    <section className="section bg-subtle">
+      <div className="container text-center">
         {/* メインタイトル */}
-        <h2 className="text-heading-2 text-gray-900 mb-6 text-center measure-heading text-balance">
+        <h2 className="text-h1 text-neutral-900 mb-6 text-balance jp-text">
           {title.split('\n').map((line, index) => (
-            <span key={index} className="block jp-phrase">
+            <span key={index} className="block jp-text">
               {index === 1 ? (
-                <span className="text-blue-600">
+                <span className="text-primary">
                   {line}
                 </span>
               ) : (
@@ -41,16 +41,16 @@ export default function CTASection({
         </h2>
         
         {/* 説明文 */}
-        <p className="copy measure-lead text-center text-gray-600 mb-8 mx-auto jp-phrase">
+        <p className="text-body-large text-neutral-600 mb-8 mx-auto jp-text">
           {description}
         </p>
         
         {/* 特徴リスト */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-12">
           {features.map((feature, index) => (
-            <div key={index} className="flex items-center gap-2 text-gray-700">
-              <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-              <span className="copy text-sm font-medium jp-phrase">{feature}</span>
+            <div key={index} className="flex items-center gap-2 text-neutral-700">
+              <Check className="icon icon-sm text-success-600 flex-shrink-0" />
+              <span className="text-body-small font-medium jp-text">{feature}</span>
             </div>
           ))}
         </div>
@@ -59,34 +59,34 @@ export default function CTASection({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
           <Link
             href={primaryHref}
-            className="cta-unified cta-unified--primary gap-2"
+            className="btn btn-primary btn-large"
           >
-            <span className="cta-nowrap">{primaryText}</span>
-            <ArrowRight className="w-5 h-5" />
+            {primaryText}
+            <ArrowRight className="icon icon-sm" />
           </Link>
           
           <Link
             href={secondaryHref}
-            className="cta-unified cta-unified--secondary gap-2"
+            className="btn btn-secondary btn-large">
           >
-            <span className="cta-nowrap">{secondaryText}</span>
+            {secondaryText}
           </Link>
         </div>
         
         {/* 信頼性の証明 */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/50 max-w-2xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-sm text-gray-600">
+        <div className="card max-w-2xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-body-small text-neutral-600">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="copy jp-phrase">Schema.org準拠保証</span>
+              <span className="jp-text">Schema.org準拠保証</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="copy jp-phrase">SSL暗号化通信</span>
+              <span className="jp-text">SSL暗号化通信</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span className="copy jp-phrase">GDPR準拠</span>
+              <span className="jp-text">GDPR準拠</span>
             </div>
           </div>
         </div>
