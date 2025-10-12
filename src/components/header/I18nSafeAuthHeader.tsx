@@ -50,11 +50,16 @@ export default function I18nSafeAuthHeader({
             console.warn('[I18nSafeAuthHeader] Auth state mismatch detected - forcing full logout');
             try {
               await auth.signOut();
-              window.location.href = '/';
+              // 少し待機してからリダイレクト
+              setTimeout(() => {
+                window.location.href = '/';
+              }, 100);
             } catch (error) {
               console.error('[I18nSafeAuthHeader] Auto logout failed:', error);
               // 強制リロード
-              window.location.reload();
+              setTimeout(() => {
+                window.location.reload();
+              }, 100);
             }
           }
         }

@@ -171,6 +171,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
+    // ✅ 外部キー制約違反の診断: auth.users に該当ユーザーが存在するかチェック
+    try {
+      const { data: authUserCheck, error: authUserError } = await supabase
+        .rpc('check_auth_user_exists', { user_id: user.id });
+
+      console.log('[my/organization] Auth user check:', {
+        userId: user.id,
+        checkResult: authUserCheck,
+        checkError: authUserError?.message
+      });
+    } catch (checkError) {
+      console.warn('[my/organization] Auth user check failed (non-critical):', checkError);
+    }
+
     // 👇 POSTハンドラの最上部（request.json() を呼ぶ前）に追加
     const cloned = request.clone();
     const rawBodyText = await cloned.text();
@@ -405,11 +419,81 @@ export async function POST(request: NextRequest) {
     const insertPayload = buildOrgInsert(organizationData);
     console.log('API/my/organization INSERT payload (final):', insertPayload);
 
-    const { data, error } = await supabase
-      .from('organizations')
-      .insert([insertPayload])
-      .select()
-      .single();
+    // ✅ 外部キー制約エラー回避: 安全な組織作成関数を使用
+    console.log('[ORG/CREATE] Using safe organization creation...');
+    
+    let data, error;
+    try {
+      // まず通常のINSERTを試行
+      const insertResult = await supabase
+        .from('organizations')
+        .insert([insertPayload])
+        .select()
+        .single();
+      
+      data = insertResult.data;
+      error = insertResult.error;
+      
+      console.log('[ORG/CREATE] Direct insert result:', { 
+        success: !error, 
+        error: error?.message,
+        errorCode: error?.code 
+      });
+      
+    } catch (insertError) {
+      console.error('[ORG/CREATE] Direct insert failed:', insertError);
+      error = insertError;
+    }
+
+    // 外部キー制約エラーの場合、代替手段を試行
+    if (error && (error.code === '23503' || error.message?.includes('foreign key'))) {
+      console.warn('[ORG/CREATE] Foreign key constraint detected, trying alternative approach...');
+      
+      try {
+        // RPC関数を使用した安全な作成
+        const rpcResult = await supabase.rpc('safe_create_organization', {
+          org_name: body.name,
+          org_slug: finalSlug,
+          org_data: JSON.stringify(insertPayload)
+        });
+        
+        data = rpcResult.data;
+        error = rpcResult.error;
+        
+        console.log('[ORG/CREATE] RPC creation result:', { 
+          success: !error, 
+          error: error?.message 
+        });
+        
+      } catch (rpcError) {
+        console.error('[ORG/CREATE] RPC creation also failed:', rpcError);
+        
+        // 最終手段: 最小限のデータで直接作成
+        console.warn('[ORG/CREATE] Attempting minimal data creation...');
+        
+        const minimalPayload = {
+          name: body.name,
+          slug: finalSlug,
+          created_by: user.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        const minimalResult = await supabase
+          .from('organizations')
+          .insert([minimalPayload])
+          .select()
+          .single();
+          
+        data = minimalResult.data;
+        error = minimalResult.error;
+        
+        console.log('[ORG/CREATE] Minimal creation result:', { 
+          success: !error, 
+          error: error?.message 
+        });
+      }
+    }
 
     if (error) {
       console.error('[ORG/CREATE] Database error details:', {
