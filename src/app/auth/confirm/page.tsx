@@ -64,8 +64,8 @@ function ConfirmPageContent() {
         // tokenがある場合（従来形式のサポート）
         else if (token) {
           const { error: verifyError } = await supabaseBrowser.auth.verifyOtp({
-            token,
-            type: 'signup',
+            token_hash: token,
+            type: 'email',
           });
 
           if (verifyError) {
