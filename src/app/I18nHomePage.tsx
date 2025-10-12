@@ -163,88 +163,144 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </section>
 
-        {/* Zero-Click Era Story Section */}
-        <section className="section">
+        {/* Zero-Click Era Evolution Section */}
+        <section className="section bg-subtle">
           <div className="container">
             <div className="text-center mb-12">
               <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
-                ゼロクリック時代の変化
+                検索体験の変化とAI時代への対応
               </h2>
               <p className="text-body-large text-neutral-600 jp-text">
-                検索の仕組みが根本的に変わりました。企業が「見つからない」時代が始まっています。
+                SEOは残り続けますが、AIが情報を直接引用・回答する機会が急増。企業の発見機会を確保する新たなアプローチが必要です。
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
-              {/* Before */}
-              <div className="card p-6 border-l-4 border-red-400">
-                <div className="badge badge-accent mb-4">従来の検索</div>
-                <h3 className="text-h3 text-neutral-900 mb-4 jp-text">検索→クリック→サイト訪問</h3>
-                <ul className="space-y-2 text-body text-neutral-600 jp-text">
-                  <li>• 検索結果をクリックして詳細確認</li>
-                  <li>• 企業サイトで情報収集</li>
-                  <li>• SEO対策で上位表示を狙う</li>
-                </ul>
-              </div>
-
-              {/* Transition */}
-              <div className="card p-6 border-l-4 border-yellow-400">
-                <div className="badge badge-warning mb-4">変化の兆し</div>
-                <h3 className="text-h3 text-neutral-900 mb-4 jp-text">AIが直接回答する時代</h3>
-                <ul className="space-y-2 text-body text-neutral-600 jp-text">
-                  <li>• ChatGPT、Google SGEの普及</li>
-                  <li>• 検索結果をクリックしない行動</li>
-                  <li>• AIが「選んだ」情報のみ表示</li>
-                </ul>
-              </div>
-
-              {/* After */}
-              <div className="card p-6 border-l-4 border-green-400">
-                <div className="badge badge-success mb-4">ゼロクリック時代</div>
-                <h3 className="text-h3 text-neutral-900 mb-4 jp-text">検索→AI回答→完結</h3>
-                <ul className="space-y-2 text-body text-neutral-600 jp-text">
-                  <li>• AIが直接企業情報を引用・紹介</li>
-                  <li>• 「信頼できる」企業のみ選択される</li>
-                  <li>• 構造化データが引用の鍵</li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Risk Alert */}
-            <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                  <span className="text-red-600 text-lg">⚠</span>
-                </div>
-                <div>
-                  <h3 className="text-h3 text-red-900 mb-2 jp-text">このままでは企業が「見つからない」リスク</h3>
-                  <div className="grid sm:grid-cols-2 gap-4 text-body text-red-800 jp-text">
-                    <div>
-                      <strong>• 機会損失の拡大</strong><br/>
-                      AIに選ばれない企業は、潜在顧客からの発見機会を失い続ける
-                    </div>
-                    <div>
-                      <strong>• 競合他社との格差</strong><br/>
-                      早期対応した企業とそうでない企業で、大きな差が生まれる
-                    </div>
+            {/* Evolution Timeline */}
+            <div className="mb-12">
+              <div className="grid md:grid-cols-3 gap-8">
+                {/* Traditional Search */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                   </div>
+                  <div className="badge badge-neutral mb-4">従来</div>
+                  <h3 className="text-h3 text-neutral-900 mb-3 jp-text">検索→クリック→サイト訪問</h3>
+                  <p className="text-body-small text-neutral-600 jp-text">SEO対策による上位表示とクリック率向上が中心</p>
+                </div>
+
+                {/* Transition */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  </div>
+                  <div className="badge badge-warning mb-4">現在</div>
+                  <h3 className="text-h3 text-neutral-900 mb-3 jp-text">AI回答の併存</h3>
+                  <p className="text-body-small text-neutral-600 jp-text">検索結果とAI回答（ChatGPT、Google SGE等）が並存</p>
+                </div>
+
+                {/* Future */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-success-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-success-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div className="badge badge-success mb-4">将来</div>
+                  <h3 className="text-h3 text-neutral-900 mb-3 jp-text">AI優先の情報発見</h3>
+                  <p className="text-body-small text-neutral-600 jp-text">AIが直接回答し、クリックを経ずに情報が伝達される機会が増加</p>
                 </div>
               </div>
             </div>
 
-            {/* Solution Preview */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 text-lg">💡</span>
+            {/* Comparison Table */}
+            <div className="card p-6 mb-8">
+              <h3 className="text-h2 text-neutral-900 mb-6 jp-text text-center">検索体験の変化</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-neutral-200">
+                      <th className="text-left py-3 px-4 text-body font-medium text-neutral-900 jp-text">項目</th>
+                      <th className="text-left py-3 px-4 text-body font-medium text-neutral-900 jp-text">従来の検索</th>
+                      <th className="text-left py-3 px-4 text-body font-medium text-neutral-900 jp-text">AI時代の検索</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-3 px-4 text-body-small text-neutral-900 font-medium jp-text">情報取得方法</td>
+                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">検索結果をクリックしてサイト訪問</td>
+                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">AIが情報を直接引用・要約して回答</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-3 px-4 text-body-small text-neutral-900 font-medium jp-text">企業への影響</td>
+                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">SEO順位とクリック率が重要</td>
+                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">AIに引用されるかが重要</td>
+                    </tr>
+                    <tr className="border-b border-neutral-100">
+                      <td className="py-3 px-4 text-body-small text-neutral-900 font-medium jp-text">必要な対策</td>
+                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">キーワード最適化、コンテンツSEO</td>
+                      <td className="py-3 px-4 text-body-small text-neutral-600 jp-text">構造化データ、AI理解最適化</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Challenge and Solution */}
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Challenge */}
+              <div className="card p-6 border-l-4 border-red-400">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-h3 text-red-900 jp-text">課題：発見機会の減少リスク</h3>
                 </div>
-                <div>
-                  <h3 className="text-h3 text-blue-900 mb-2 jp-text">AIO Hubでゼロクリック時代に対応</h3>
-                  <p className="text-body text-blue-800 jp-text">
-                    企業情報を<strong>AI が理解しやすい構造化データ</strong>に変換し、検索・AI回答で優先的に引用される仕組みを構築。
-                    さらに信頼性の高いプラットフォームに集約することで、<strong>ドメインパワーを活用した露出向上</strong>を実現します。
-                  </p>
+                <ul className="space-y-3 text-body-small text-red-800 jp-text">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-400 mt-1">●</span>
+                    <span>AIに選ばれない企業は潜在顧客からの発見機会が減少</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-400 mt-1">●</span>
+                    <span>従来のSEO対策だけでは不十分な場面が増加</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-400 mt-1">●</span>
+                    <span>早期対応企業と後発企業の格差拡大</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Solution */}
+              <div className="card p-6 border-l-4 border-blue-400">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-h3 text-blue-900 jp-text">解決策：AIO対応で発見機会を確保</h3>
                 </div>
+                <ul className="space-y-3 text-body-small text-blue-800 jp-text">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">●</span>
+                    <span>構造化データでAIが理解しやすい情報形式に変換</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">●</span>
+                    <span>信頼性の高いプラットフォームでドメインパワーを活用</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">●</span>
+                    <span>AI引用から自社サイトへの流入促進</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>

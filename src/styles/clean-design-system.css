@@ -30,6 +30,7 @@
   --neutral-900: #111827;
   
   /* Success & Status */
+  --success-50: #ecfdf5;
   --success-600: #059669;
   --warning-600: #d97706;
   --error-600: #dc2626;
@@ -385,4 +386,12 @@
 .stable {
   transform: none !important;
   transition: none !important;
+}
+/* Additional Success Colors */
+.bg-success-50 {
+  background-color: var(--success-50);
+}
+
+.text-success-600 {
+  color: var(--success-600);
 }
