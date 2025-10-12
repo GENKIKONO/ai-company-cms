@@ -68,11 +68,11 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection({ title, description, steps, beforeAfter }: FlowSectionProps) {
   return (
-    <section className="section-layer section-safe-top section-safe-btm surface-fade-btm section-gap bg-white">
-      <div className="container-article section-content">
+    <section className="section-gap bg-white">
+      <div className="container-article">
         {/* セクションヘッダー */}
         <div className="section-gap">
-          <h2 className="text-heading-2 text-gray-900 mb-4 text-left measure-heading text-balance">
+          <h2 className="headline text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 jp-phrase">
             {title.split('\n').map((line, index) => (
               <span key={index} className="block jp-phrase">{line}</span>
             ))}
@@ -95,7 +95,7 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
                 <div key={step.step} className="card relative overflow-visible group p-6 sm:p-7">
                   {/* Step Badge - positioned outside to prevent clipping */}
                   <div className="absolute -top-4 -left-4 z-10 pointer-events-none">
-                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white ui-flat`}>
+                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white`}>
                       {step.step}
                     </span>
                   </div>
@@ -106,8 +106,8 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
                   </div>
                   
                   {/* タイトル・説明 */}
-                  <h3 className="text-heading-3 text-gray-900 mb-3 text-left jp-phrase">{step.title}</h3>
-                  <p className="copy measure-body text-left text-gray-600 mb-6 jp-phrase">{step.description}</p>
+                  <h3 className="headline text-xl font-bold text-gray-900 mb-3 jp-phrase">{step.title}</h3>
+                  <p className="copy measure-body text-gray-600 mb-6 jp-phrase">{step.description}</p>
                   
                   {/* 詳細リスト */}
                   <ul className="space-y-2.5">

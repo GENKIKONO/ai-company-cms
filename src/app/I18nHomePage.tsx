@@ -583,7 +583,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <Link 
                   href="/auth/signup" 
                   onClick={handleCtaClick}
-                  className="group cta-btn cta-btn--primary text-lg"
+                  className="cta-nowrap bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium text-lg"
                 >
                   <span className="flex items-center gap-3">
                     {t('pages.home.cta.button')}
@@ -595,7 +595,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 
                 <Link 
                   href="/hearing-service"
-                  className="group cta-btn cta-btn--outline text-lg"
+                  className="cta-nowrap border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg font-medium text-lg"
                 >
                   <span className="flex items-center gap-2">
                     <span>ヒアリング代行サービス</span>

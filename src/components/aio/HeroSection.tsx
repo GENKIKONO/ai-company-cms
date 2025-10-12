@@ -34,8 +34,8 @@ export default async function HeroSection({
     ? heroImageUrl 
     : '/hero/zero-click-shift.png';
   return (
-    <section className="section-layer section-hero-pad surface-fade-btm deco-wrap hero-gap bg-gray-50">
-      <div className="container-hero section-content content-above-deco">
+    <section className="hero-gap bg-gray-50">
+      <div className="container-hero">
         <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 items-center">
           {/* Left Column - Content */}
           <div>
@@ -46,7 +46,7 @@ export default async function HeroSection({
             </div>
             
             {/* メインタイトル */}
-            <h1 className="text-heading-1 text-gray-900 mb-6 text-left measure-heading text-balance">
+            <h1 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 measure-hero jp-phrase">
               {title.split('\n').map((line, index) => (
                 <span key={index} className="block jp-phrase">
                   {index === 1 ? (
@@ -61,7 +61,7 @@ export default async function HeroSection({
             </h1>
             
             {/* 説明文 */}
-            <p className="copy measure-lead text-left text-[15px] sm:text-base text-gray-600 mb-8 jp-phrase">
+            <p className="copy measure-lead text-gray-600 mb-8 jp-phrase">
               AIO Hubは、AIが理解・引用しやすい形に企業情報を最適化するCMS。
               フォーム入力だけで<strong>JSON‑LD自動生成</strong>と
               <strong>構造化公開</strong>を実現し、検索からAI回答までの導線で
@@ -104,12 +104,12 @@ export default async function HeroSection({
 
           {/* Right Column - Image */}
           <div className="mt-10 md:mt-0">
-            <div className="media-frame relative w-full rounded-xl bg-white ui-flat" style={{'--media-ar': '16/9'} as React.CSSProperties}>
+            <div className="card relative w-full" style={{'aspectRatio': '16/9'} as React.CSSProperties}>
               <Image
                 src={imageSrc}
                 alt="検索からAI直接回答へのシフト図（ゼロクリック時代の可視化）"
                 fill
-                className="media-contain"
+                className="object-cover rounded-lg"
                 sizes="(max-width: 768px) 100vw, 640px"
                 priority
               />
@@ -122,7 +122,7 @@ export default async function HeroSection({
 
         {/* 価値訴求カード */}
         <section className="section-gap">
-          <h2 className="text-heading-2 text-gray-900 text-left mb-8 measure-heading text-balance">
+          <h2 className="headline text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-8 jp-phrase">
             AIO Hubで実現する価値
           </h2>
           <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
