@@ -51,5 +51,9 @@ export default async function HomePage() {
     // エラー時はデフォルト設定を使用
   }
 
-  return <I18nHomePage siteSettings={siteSettings} />;
+  return <I18nHomePage siteSettings={{
+    title: siteSettings.hero_title,
+    tagline: siteSettings.hero_subtitle,
+    representative_message: siteSettings.representative_message
+  }} />;
 }
