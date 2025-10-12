@@ -7,6 +7,10 @@ import { useI18n } from '@/hooks/useI18n';
 import { useABTest } from '@/hooks/useABTest';
 import { useSEO } from '@/hooks/useSEO';
 import { applyJapaneseSoftBreaks } from '@/lib/utils/textUtils';
+import FlowSection from '@/components/aio/FlowSection';
+import PricingTable from '@/components/pricing/PricingTable';
+import FAQSection from '@/components/aio/FAQSection';
+import { aioCopy } from '@/app/aio/copy';
 
 interface SiteSettings {
   title: string;
@@ -215,6 +219,56 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             <div className="mt-8 text-body-small text-neutral-500 jp-text">
               無料トライアル • クレジットカード不要
+            </div>
+          </div>
+        </section>
+
+        {/* Flow Section - ゼロクリック時代の課題と解決策 */}
+        <FlowSection
+          title={aioCopy.flow.title}
+          description={aioCopy.flow.description}
+          steps={aioCopy.flow.steps}
+          beforeAfter={aioCopy.flow.beforeAfter}
+        />
+
+        {/* Pricing Section - 料金プラン */}
+        <PricingTable />
+
+        {/* FAQ Section - よくある質問 */}
+        <FAQSection
+          title={aioCopy.faq.title}
+          description={aioCopy.faq.description}
+          categories={aioCopy.faq.categories}
+        />
+
+        {/* Final CTA Section */}
+        <section className="section bg-subtle">
+          <div className="container-narrow text-center">
+            <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
+              今すぐゼロクリック時代に備えましょう
+            </h2>
+            <p className="text-body-large text-neutral-600 mb-8 jp-text">
+              無料プランでAIO Hubの価値を体験し、AI時代の企業情報戦略を始めてください。
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link 
+                href="/auth/signup" 
+                className="btn btn-primary btn-large"
+              >
+                無料で始める
+                <ArrowRight className="icon icon-sm" />
+              </Link>
+              <Link 
+                href="/hearing-service"
+                className="btn btn-secondary btn-large"
+              >
+                ヒアリング代行サービス
+              </Link>
+            </div>
+
+            <div className="mt-8 text-body-small text-neutral-500 jp-text">
+              永続無料プラン • クレジットカード不要 • 今すぐ開始
             </div>
           </div>
         </section>
