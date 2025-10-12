@@ -14,7 +14,7 @@ interface SiteSettings {
   representative_message: string;
 }
 
-interface CleanHomePageProps {
+interface I18nHomePageProps {
   siteSettings: SiteSettings;
 }
 
