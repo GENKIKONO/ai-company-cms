@@ -3,13 +3,12 @@
 import { useState } from 'react';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Phone, Mail, Users, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Calendar, Mail, Users, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
 interface HearingRequestFormData {
   purpose: string;
   preferred_date: string;
-  contact_phone: string;
   contact_email: string;
   business_overview: boolean;
   service_details: boolean;
@@ -26,7 +25,6 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
   const [formData, setFormData] = useState<HearingRequestFormData>({
     purpose: '',
     preferred_date: '',
-    contact_phone: '',
     contact_email: '',
     business_overview: false,
     service_details: false,
@@ -177,33 +175,18 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* 連絡先情報 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Phone className="inline w-4 h-4 mr-1" />
-                  連絡先電話番号
-                </label>
-                <input
-                  type="tel"
-                  value={formData.contact_phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, contact_phone: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="03-1234-5678"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Mail className="inline w-4 h-4 mr-1" />
-                  連絡先メールアドレス
-                </label>
-                <input
-                  type="email"
-                  value={formData.contact_email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, contact_email: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="contact@example.com"
-                />
-              </div>
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Mail className="inline w-4 h-4 mr-1" />
+                連絡先メールアドレス
+              </label>
+              <input
+                type="email"
+                value={formData.contact_email}
+                onChange={(e) => setFormData(prev => ({ ...prev, contact_email: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="contact@example.com"
+              />
             </div>
 
             {/* ヒアリング項目 */}

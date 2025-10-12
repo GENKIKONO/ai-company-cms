@@ -10,9 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { env } from '@/lib/env';
+import { supabaseServer } from '@/lib/supabase-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,7 +22,6 @@ const hearingRequestSchema = z.object({
     .min(10, '依頼目的は10文字以上で入力してください')
     .max(1000, '依頼目的は1000文字以内で入力してください'),
   preferred_date: z.string().optional(),
-  contact_phone: z.string().optional(),
   contact_email: z.string().email('有効なメールアドレスを入力してください').optional().or(z.literal('')),
   
   // ヒアリング項目（少なくとも1つは必須）
@@ -42,27 +39,7 @@ const hearingRequestSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Supabaseクライアント初期化
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      env.SUPABASE_URL,
-      env.SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch (error) {
-              // Server Component での cookie 設定エラーをハンドル
-            }
-          },
-        },
-      }
-    );
+    const supabase = await supabaseServer();
 
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -128,7 +105,6 @@ export async function POST(request: NextRequest) {
       requester_id: user.id,
       purpose: validatedData.purpose,
       preferred_date: validatedData.preferred_date || null,
-      contact_phone: validatedData.contact_phone || null,
       contact_email: validatedData.contact_email || null,
       business_overview: validatedData.business_overview,
       service_details: validatedData.service_details,
@@ -181,27 +157,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Supabaseクライアント初期化
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      env.SUPABASE_URL,
-      env.SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch (error) {
-              // Server Component での cookie 設定エラーをハンドル
-            }
-          },
-        },
-      }
-    );
+    const supabase = await supabaseServer();
 
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();

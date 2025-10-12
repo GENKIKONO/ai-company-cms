@@ -1065,7 +1065,7 @@ export default function EditOrganizationPage() {
 
         {/* 記事タブ */}
         {activeTab === 'posts' && (
-          <PostsTab organizationId={organizationId} organizationSlug={organization?.slug} />
+          <PostsTab organizationId={organizationId} organizationSlug={organization?.slug || ''} />
         )}
 
         {/* Q&Aタブ */}
