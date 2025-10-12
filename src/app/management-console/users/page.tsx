@@ -682,10 +682,85 @@ export default function UsersManagementPage() {
                     </div>
                   </div>
 
+                  {/* プラン管理 */}
+                  <div>
+                    <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      プラン・機能設定
+                    </h4>
+                    <div className="border rounded-lg p-4 bg-gradient-to-r from-blue-50 to-purple-50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-900">
+                            現在のプラン: 
+                            <span className="ml-2 px-3 py-1 bg-white border rounded-md font-semibold">
+                              {userDetails.organizations[0]?.plan || 'free'}
+                            </span>
+                            {userDetails.organizations[0]?.admin_plan_override && (
+                              <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
+                                <Star className="h-3 w-3 inline mr-1" />
+                                管理者設定
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setShowPlanModal(true)}
+                          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 flex items-center"
+                        >
+                          <Edit className="h-3 w-3 mr-1" />
+                          プラン変更
+                        </button>
+                      </div>
+                      
+                      {userDetails.organizations[0]?.admin_plan_override && userDetails.organizations[0]?.admin_plan_notes && (
+                        <div className="mb-3 p-2 bg-white rounded border-l-4 border-orange-500">
+                          <div className="text-xs text-gray-600">
+                            <strong>管理者メモ:</strong> {userDetails.organizations[0].admin_plan_notes}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {userDetails.organizations[0]?.trial_expires_at && (
+                        <div className="mb-3 p-2 bg-white rounded border-l-4 border-yellow-500">
+                          <div className="text-xs text-orange-600">
+                            <strong>体験期限:</strong> {new Date(userDetails.organizations[0].trial_expires_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-2 gap-4 text-xs">
+                        <div className="bg-white p-2 rounded">
+                          <div className="font-medium text-gray-700">利用可能機能</div>
+                          <div className="mt-1 text-gray-600">
+                            {(() => {
+                              const plan = userDetails.organizations[0]?.plan || 'free';
+                              switch(plan) {
+                                case 'free': return 'サービス3件、投稿5件まで';
+                                case 'basic': return 'サービス50件、投稿200件まで';
+                                case 'pro': return 'サービス200件、投稿1000件まで';
+                                case 'standard': return 'スタンダード機能一式';
+                                case 'enterprise': return '無制限・全機能';
+                                default: return '基本機能のみ';
+                              }
+                            })()}
+                          </div>
+                        </div>
+                        <div className="bg-white p-2 rounded">
+                          <div className="font-medium text-gray-700">使用状況</div>
+                          <div className="mt-1 text-gray-600">
+                            コンテンツ: {userDetails.stats.totalContent}件
+                            <br />公開中: {userDetails.stats.publishedContent}件
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* 組織情報 */}
                   {userDetails.organizations.length > 0 && (
                     <div>
-                      <h4 className="text-md font-semibold text-gray-900 mb-3">組織</h4>
+                      <h4 className="text-md font-semibold text-gray-900 mb-3">組織詳細</h4>
                       {userDetails.organizations.map((org) => (
                         <div key={org.id} className="border rounded-lg p-4 mb-3">
                           <div className="flex justify-between items-start">
@@ -697,40 +772,6 @@ export default function UsersManagementPage() {
                                 <span className={`px-2 py-1 rounded ${org.is_published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                   {org.is_published ? '公開中' : '非公開'}
                                 </span>
-                              </div>
-                              {/* プラン情報 */}
-                              <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <CreditCard className="h-4 w-4 text-blue-600" />
-                                    <span className="text-sm font-medium text-blue-900">
-                                      プラン: {org.plan || 'free'}
-                                      {org.admin_plan_override && (
-                                        <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
-                                          <Star className="h-3 w-3 inline mr-1" />
-                                          管理者設定
-                                        </span>
-                                      )}
-                                    </span>
-                                  </div>
-                                  <button
-                                    onClick={() => setShowPlanModal(true)}
-                                    className="text-blue-600 hover:text-blue-700 text-xs flex items-center"
-                                  >
-                                    <Edit className="h-3 w-3 mr-1" />
-                                    変更
-                                  </button>
-                                </div>
-                                {org.admin_plan_override && org.admin_plan_notes && (
-                                  <div className="mt-2 text-xs text-gray-600">
-                                    <strong>管理者メモ:</strong> {org.admin_plan_notes}
-                                  </div>
-                                )}
-                                {org.trial_expires_at && (
-                                  <div className="mt-2 text-xs text-orange-600">
-                                    <strong>体験終了:</strong> {new Date(org.trial_expires_at).toLocaleDateString()}
-                                  </div>
-                                )}
                               </div>
                             </div>
                             <div className="flex items-center gap-2 ml-4">
