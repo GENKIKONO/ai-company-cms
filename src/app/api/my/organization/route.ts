@@ -280,7 +280,7 @@ export async function POST(request: NextRequest) {
       'description', 'legal_form', 'representative_name', 'capital', 'employees',
       'address_country', 'address_region', 'address_locality', 'address_postal_code', 'address_street',
       'telephone', 'email', 'email_public', 'url', 'logo_url', 'industries', 'same_as', 'status',
-      'meta_title', 'meta_description', 'meta_keywords',
+      'meta_title', 'meta_description', 'meta_keywords', 'corporate_number',
       // foundedフィールドはUIに存在しないため完全除外
       // 拡張フィールドは本番DBに未適用のため一時的に除外
       // 'favicon_url', 'brand_color_primary', 'brand_color_secondary', 'social_media', 'business_hours',

@@ -41,10 +41,27 @@ export const organizationCreateSchema = z.object({
   description: optionalString(),
   legal_form: optionalString(),
   representative_name: optionalString(),
-  corporate_number: z.string().regex(/^\d{13}$/, '法人番号は13桁の数字で入力してください').optional(),
+  corporate_number: z.string().optional().transform(val => {
+    if (!val || val.trim() === '') return undefined;
+    const trimmed = val.trim();
+    if (!/^\d{13}$/.test(trimmed)) {
+      throw new Error('法人番号は13桁の数字で入力してください');
+    }
+    return trimmed;
+  }),
   // founded フィールドはUIに存在しないため完全除去
-  capital: z.number().optional(),
-  employees: z.number().optional(),
+  capital: z.union([z.number(), z.string()]).optional().transform(val => {
+    if (val === null || val === undefined || val === '') return undefined;
+    if (typeof val === 'number') return val;
+    const num = parseInt(val.toString().trim(), 10);
+    return isNaN(num) ? undefined : num;
+  }),
+  employees: z.union([z.number(), z.string()]).optional().transform(val => {
+    if (val === null || val === undefined || val === '') return undefined;
+    if (typeof val === 'number') return val;
+    const num = parseInt(val.toString().trim(), 10);
+    return isNaN(num) ? undefined : num;
+  }),
   // 住所情報
   address_country: optionalString(),
   address_region: optionalString(),
@@ -58,13 +75,22 @@ export const organizationCreateSchema = z.object({
   url: urlField().optional(),
   logo_url: urlField().optional(),
   // ビジネス情報
-  industries: z.array(z.string()).optional(),
-  same_as: z.array(z.string()).optional(),
+  industries: z.array(z.string()).optional().transform(val => {
+    if (!val || !Array.isArray(val) || val.length === 0) return undefined;
+    return val.filter(item => item && item.trim() !== '');
+  }),
+  same_as: z.array(z.string()).optional().transform(val => {
+    if (!val || !Array.isArray(val) || val.length === 0) return undefined;
+    return val.filter(item => item && item.trim() !== '');
+  }),
   status: organizationStatusSchema.optional(),
   // SEO情報
   meta_title: optionalString(),
   meta_description: optionalString(),
-  meta_keywords: z.array(z.string()).optional(),
+  meta_keywords: z.array(z.string()).optional().transform(val => {
+    if (!val || !Array.isArray(val) || val.length === 0) return undefined;
+    return val.filter(item => item && item.trim() !== '');
+  }),
   // 拡張フィールドは本番DBに未適用のため一時的に除外
   // favicon_url: urlField().optional(),
   // brand_color_primary: colorField().optional(),
