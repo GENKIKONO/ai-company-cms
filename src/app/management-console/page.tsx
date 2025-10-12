@@ -133,6 +133,27 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* ユーザー管理カード */}
+          <Link href="/management-console/users" className="block">
+            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <div className="flex items-center mb-4">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                </div>
+                <h3 className="ml-3 text-lg font-semibold text-gray-900">ユーザー管理</h3>
+              </div>
+              <p className="text-gray-600 mb-4">ユーザーアカウント・権限の管理</p>
+              <div className="text-sm text-yellow-600 font-medium flex items-center">
+                ユーザーを管理
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </Link>
+
           {/* クイックアクションカード */}
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center mb-4">
@@ -153,6 +174,9 @@ export default function AdminDashboard() {
               </Link>
               <Link href="/management-console/hearings" className="block text-sm text-orange-600 hover:text-orange-700 font-medium">
                 • ヒアリング依頼を確認
+              </Link>
+              <Link href="/management-console/users" className="block text-sm text-orange-600 hover:text-orange-700 font-medium">
+                • ユーザー権限を管理
               </Link>
             </div>
           </div>

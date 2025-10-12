@@ -67,11 +67,19 @@ export default function AdminHearingsPage() {
     try {
       const response = await fetch('/api/admin/hearing-requests');
       if (!response.ok) {
-        throw new Error('Failed to fetch hearing requests');
+        if (response.status === 404 || response.status === 500) {
+          // No data found or server error - set empty array
+          setHearingRequests([]);
+          setLoading(false);
+          return;
+        }
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch hearing requests');
       }
       const data = await response.json();
       setHearingRequests(data.hearing_requests || []);
     } catch (err) {
+      console.error('Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
