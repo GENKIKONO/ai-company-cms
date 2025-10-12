@@ -438,7 +438,7 @@ export default async function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <p className="text-sm text-gray-500">アクティビティ追跡機能は今後実装予定です</p>
+              <p className="text-sm text-gray-500">アクティビティ追跡機能を計画中です</p>
             </div>
             
             <DashboardActions organization={org} context="activity" />

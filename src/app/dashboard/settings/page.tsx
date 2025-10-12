@@ -38,7 +38,7 @@ export default function SettingsPage() {
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-blue-800">設定ページ実装中</h3>
                     <div className="mt-2 text-sm text-blue-700">
-                      <p>このページは現在開発中です。以下の機能を順次実装予定：</p>
+                      <p>このページは現在開発中です。以下の機能を計画しています：</p>
                       <ul className="mt-2 list-disc list-inside space-y-1">
                         <li>プロフィール設定</li>
                         <li>企業情報設定</li>

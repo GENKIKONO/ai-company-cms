@@ -50,7 +50,7 @@ export default function ActivityPage() {
                         </svg>
                       </div>
                       <div className="ml-3">
-                        <h3 className="text-sm font-medium text-blue-800">実装予定の機能</h3>
+                        <h3 className="text-sm font-medium text-blue-800">計画中の機能</h3>
                         <div className="mt-2 text-sm text-blue-700">
                           <ul className="list-disc list-inside space-y-1">
                             <li>コンテンツの作成・編集履歴</li>

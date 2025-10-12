@@ -65,7 +65,7 @@ const PLANS: PricingPlan[] = [
       { text: 'ディレクトリ掲載（通常順位・タグ複数）', included: true },
       { text: 'サービス上限：10件', included: true },
       { text: 'FAQ・外部リンクの追加', included: true },
-      { text: 'SNSシェア最適化（OGP対応／順次拡張予定）', included: true }
+      { text: 'JSON-LD構造化データ対応', included: true }
     ],
     ctaText: 'このプランで始める',
     ctaHref: '/organizations',
@@ -83,12 +83,12 @@ const PLANS: PricingPlan[] = [
       { text: '上位掲載（おすすめ・特集枠）', included: true },
       { text: 'ブログCMS（AIO Hub配下で配信）', included: true, subtext: '構造化済みの記事を自動生成・公開でき、AIに"読まれやすい"情報資産を継続的に蓄積' },
       { text: 'タグ複数露出（関連カテゴリでの表示強化）', included: true },
-      { text: 'カスタムOGP設定（順次拡張予定）', included: true }
+      { text: 'カスタムメタデータ設定', included: true }
     ],
     ctaText: 'このプランで始める',
     ctaHref: '/organizations',
     color: 'indigo',
-    comingSoon: ['※上位掲載・分析は順次拡張予定']
+    comingSoon: ['※上位掲載・詳細分析機能を含みます']
   },
   {
     id: 'enterprise',
@@ -238,7 +238,7 @@ export default function PricingTable() {
 
         <div className="mt-12 text-center">
           <p className="text-body-small text-neutral-500 jp-text">
-            ※価格は税込。機能の一部は順次拡張予定です。<br/>
+            ※価格は税込。詳細機能についてはお問い合わせください。<br/>
             お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
           </p>
         </div>
