@@ -566,14 +566,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <div className="section-buffer"></div>
 
         {/* CTA */}
-        <section className="section-gap-hero bg-gray-50">
+        <section className="section-gap">
           
-          <div className="container-article section-content text-center">
+          <div className="container-hero text-center">
             <div className="max-w-3xl mx-auto">
-              <h2 className="headline text-3xl md:text-4xl font-bold text-gray-900 mb-6 jp-phrase break-keep">
+              <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 jp-phrase">
                 {t('pages.home.cta.title')}
               </h2>
-              <p className="copy measure-lead text-lg md:text-xl text-gray-600 mb-8 jp-phrase break-keep">
+              <p className="copy measure-lead text-gray-600 mb-8 jp-phrase">
                 {t('pages.home.cta.subtitle').split('\n').map((line, index) => (
                   <span key={index} className="block">{line}</span>
                 ))}
