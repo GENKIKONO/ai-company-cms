@@ -48,8 +48,9 @@ const updateUserSchema = z.object({
 // PATCH: ユーザー情報更新
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
   try {
     // Supabaseクライアント初期化
     const cookieStore = await cookies();
@@ -184,8 +185,9 @@ export async function PATCH(
 // DELETE: ユーザー削除
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
   try {
     // Supabaseクライアント初期化
     const cookieStore = await cookies();
