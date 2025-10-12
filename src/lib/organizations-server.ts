@@ -34,8 +34,34 @@ export type OrgFull = OrgLite & {
 export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
   // 🚫 ここでは unstable_cache・headers・cookies を使わない
   const supabase = await supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  console.log('[getCurrentUserOrganization] Auth check:', {
+    hasUser: !!user,
+    userId: user?.id,
+    authError: authError?.message
+  });
+  
+  if (authError || !user) {
+    console.log('[getCurrentUserOrganization] No user authenticated');
+    return null;
+  }
+
+  // 全ての組織を取得してデバッグ
+  const { data: allOrgs, error: allOrgsError } = await supabase
+    .from('organizations')
+    .select('id,name,slug,status,is_published,logo_url,created_by')
+    .order('created_at', { ascending: false });
+
+  console.log('[getCurrentUserOrganization] All organizations:', {
+    count: allOrgs?.length || 0,
+    organizations: allOrgs?.map(org => ({
+      id: org.id,
+      name: org.name,
+      created_by: org.created_by,
+      matches_user: org.created_by === user.id
+    }))
+  });
 
   const { data, error } = await supabase
     .from('organizations')
@@ -44,6 +70,14 @@ export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
     .order('created_at', { ascending: false })
     .limit(1)
     .single();
+
+  console.log('[getCurrentUserOrganization] Query result:', {
+    userId: user.id,
+    hasData: !!data,
+    data: data,
+    error: error?.message,
+    errorCode: error?.code
+  });
 
   if (error) {
     console.error('[getCurrentUserOrganization] select error', error);
