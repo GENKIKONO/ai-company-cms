@@ -13,7 +13,6 @@ const PUBLIC_PATHS = new Set([
   '/auth/forgot-password',
   '/auth/reset-password-confirm',
   '/search',
-  '/admin-login',
 ]);
 
 // 要ログインのプレフィックス  

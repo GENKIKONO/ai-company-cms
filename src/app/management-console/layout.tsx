@@ -4,7 +4,7 @@
  */
 
 import { redirect } from 'next/navigation';
-import { getUserWithAdmin } from '@/lib/auth/server';
+import { getServerUser, isAdmin } from '@/lib/auth/server';
 
 export default async function AdminLayout({
   children,
@@ -12,10 +12,14 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   // 認証と管理者権限の統合チェック
-  const { user, isAdmin } = await getUserWithAdmin();
+  const user = await getServerUser();
   
-  if (!user || !isAdmin) {
-    redirect('/admin-login');
+  if (!user) {
+    redirect('/auth/login?redirect=/management-console');
+  }
+  
+  if (!isAdmin(user)) {
+    redirect('/dashboard');
   }
 
   return (
