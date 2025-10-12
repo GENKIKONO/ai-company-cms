@@ -6,7 +6,7 @@ import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 export default function CTASection() {
   return (
-    <section className="py-16 sm:py-20 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden ui-bottom-content">
+    <section className="py-16 sm:py-20 bg-blue-900 relative overflow-hidden ui-bottom-content">
       {/* 背景装飾 */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
@@ -16,15 +16,15 @@ export default function CTASection() {
       <div className="relative wide-container">
         <div className="text-center">
           {/* メインメッセージ */}
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 leading-tight tracking-tight">
+          <h2 className="text-heading-2 text-white mb-6 leading-tight tracking-tight measure-heading mx-auto text-balance">
             今すぐAI時代に対応した
             <br className="hidden md:block" />
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="text-blue-400">
               企業情報を手に入れよう
             </span>
           </h2>
           
-          <p className="text-[15px] sm:text-base md:text-xl text-blue-100 mb-8 sm:mb-12 max-w-3xl mx-auto leading-7 sm:leading-8">
+          <p className="text-body-lead text-blue-100 mb-8 sm:mb-12 max-w-3xl mx-auto leading-7 sm:leading-8">
             複雑な作業は一切不要。専門スタッフがあなたの企業の魅力を
             <br className="hidden md:block" />
             AIが理解しやすい形で構造化し、競合他社との差別化を実現します。
@@ -60,14 +60,14 @@ export default function CTASection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12">
             <Link
               href="/dashboard"
-              className="group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] bg-gradient-to-r from-white to-blue-50 text-gray-900 rounded-lg font-bold hover:from-blue-50 hover:to-white transition-colors duration-200"
+              className="cta-unified cta-unified--primary gap-3"
               aria-label="今すぐヒアリングを申し込む"
             >
               <span className="whitespace-nowrap">
                 <span className="hidden sm:inline">今すぐヒアリング<wbr/>を申し込む</span>
                 <span className="sm:hidden">ヒアリング申し込み</span>
               </span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-5 h-5" />
             </Link>
             
             <Link
@@ -81,11 +81,11 @@ export default function CTASection() {
 
           {/* 申込みステップ */}
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/10 max-w-4xl mx-auto">
-            <h3 className="text-lg sm:text-xl font-bold text-white mb-6">申し込みは3ステップで完了</h3>
+            <h3 className="text-heading-3 text-white mb-6">申し込みは3ステップで完了</h3>
             
             <HorizontalScroller ariaLabel="申し込みステップ" className="lg:grid-cols-3">
               <div className="snap-start min-w-[240px] sm:min-w-0 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <span className="text-white font-bold">1</span>
                 </div>
                 <h4 className="text-white font-semibold mb-2">プラン選択</h4>
@@ -93,7 +93,7 @@ export default function CTASection() {
               </div>
               
               <div className="snap-start min-w-[240px] sm:min-w-0 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <span className="text-white font-bold">2</span>
                 </div>
                 <h4 className="text-white font-semibold mb-2">基本情報入力</h4>
@@ -101,7 +101,7 @@ export default function CTASection() {
               </div>
               
               <div className="snap-start min-w-[240px] sm:min-w-0 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <span className="text-white font-bold">3</span>
                 </div>
                 <h4 className="text-white font-semibold mb-2">日程確定</h4>

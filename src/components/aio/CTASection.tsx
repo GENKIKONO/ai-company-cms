@@ -23,14 +23,14 @@ export default function CTASection({
   features
 }: CTASectionProps) {
   return (
-    <section className="deco-wrap cta-safe-minh bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 ui-bottom-content">
+    <section className="deco-wrap cta-safe-minh bg-gray-50 ui-bottom-content">
       <div className="container-article text-center content-above-deco">
         {/* メインタイトル */}
-        <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center heading-guard-top heading-guard-btm">
+        <h2 className="text-heading-2 text-gray-900 mb-6 text-center measure-heading text-balance">
           {title.split('\n').map((line, index) => (
             <span key={index} className="block jp-phrase">
               {index === 1 ? (
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="text-blue-600">
                   {line}
                 </span>
               ) : (
@@ -59,15 +59,15 @@ export default function CTASection({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
           <Link
             href={primaryHref}
-            className="group inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 ui-flat"
+            className="cta-unified cta-unified--primary gap-2"
           >
             <span className="cta-nowrap">{primaryText}</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-5 h-5" />
           </Link>
           
           <Link
             href={secondaryHref}
-            className="inline-flex items-center gap-2 px-10 py-5 bg-white/80 backdrop-blur-sm text-gray-700 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:bg-white hover:border-gray-300 transition-all duration-300"
+            className="cta-unified cta-unified--secondary gap-2"
           >
             <span className="cta-nowrap">{secondaryText}</span>
           </Link>

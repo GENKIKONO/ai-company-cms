@@ -41,11 +41,11 @@ const getColorClasses = (color: string, popular: boolean = false) => {
       button: 'bg-blue-600 hover:bg-blue-700 text-white'
     },
     purple: {
-      bg: popular ? 'bg-gradient-to-br from-purple-600 to-indigo-600' : 'bg-white',
+      bg: popular ? 'bg-purple-600' : 'bg-white',
       border: 'border-purple-200',
       text: popular ? 'text-white' : 'text-gray-900',
       accent: 'text-purple-600',
-      button: 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
+      button: 'bg-purple-600 hover:bg-purple-700 text-white'
     }
   };
   return colors[color as keyof typeof colors];
@@ -57,17 +57,17 @@ export default function PricingSection({ title, description, plans, notes }: Pri
       <div className="container-wide">
         {/* セクションヘッダー */}
         <div className="text-center heading-guard-top heading-guard-btm">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 measure-heading mx-auto text-balance">
+          <h2 className="text-heading-2 text-gray-900 mb-6 measure-heading mx-auto text-balance">
             {title}
           </h2>
-          <p className="text-xl text-gray-600 measure-lead mx-auto text-pretty">
+          <p className="text-body-lead text-gray-600 measure-lead mx-auto text-pretty">
             {description}
           </p>
         </div>
 
         {/* 料金プラン */}
         <div className="section-gap">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-24 max-w-5xl mx-auto">
           {plans.map((plan) => {
             const colors = getColorClasses(plan.color, plan.popular);
             const IconComponent = iconComponents[plan.icon as keyof typeof iconComponents];
@@ -76,8 +76,8 @@ export default function PricingSection({ title, description, plans, notes }: Pri
               <div key={plan.name} className="relative">
                 {/* 人気バッジ */}
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-medium ui-flat">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                    <span className="inline-flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-full text-sm font-medium ui-flat">
                       <Zap className="w-4 h-4" />
                       おすすめ
                     </span>
@@ -90,13 +90,13 @@ export default function PricingSection({ title, description, plans, notes }: Pri
                     <div className={`w-16 h-16 ${plan.popular ? 'bg-white/20' : 'bg-gray-100'} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
                       <IconComponent className={`w-8 h-8 ${plan.popular ? 'text-white' : colors.accent}`} />
                     </div>
-                    <h3 className={`text-2xl font-bold ${colors.text} mb-2 measure-heading mx-auto text-balance`}>{plan.name}</h3>
+                    <h3 className={`text-heading-3 ${colors.text} mb-2 measure-heading mx-auto text-balance`}>{plan.name}</h3>
                     <p className={`${plan.popular ? 'text-white/80' : 'text-gray-600'} mb-4 measure-body mx-auto text-pretty`}>
                       {plan.description}
                     </p>
                     
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className={`text-4xl font-bold ${colors.text} tabular-nums`}>
+                      <span className={`text-heading-1 ${colors.text} tabular-nums`}>
                         {plan.price === '0' ? '無料' : `¥${plan.price}`}
                       </span>
                       <span className={`${plan.popular ? 'text-white/80' : 'text-gray-600'}`}>
@@ -143,7 +143,7 @@ export default function PricingSection({ title, description, plans, notes }: Pri
         {/* 追加情報 */}
         <div className="section-gap text-center">
           <div className="ui-card p-8 max-w-4xl mx-auto">
-            <h3 className="text-xl font-bold text-gray-900 mb-6 measure-heading mx-auto text-balance">料金に関する補足</h3>
+            <h3 className="text-heading-3 text-gray-900 mb-6 measure-heading mx-auto text-balance">料金に関する補足</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-900">含まれるもの</h4>

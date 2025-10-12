@@ -210,7 +210,7 @@ html {
   }
   
   .cta-btn--primary {
-    @apply bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50;
+    @apply bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50;
   }
   
   .cta-btn--outline {
@@ -331,10 +331,10 @@ html {
     transform: none;
   }
   
-  /* Mobile-optimized focus states without blue rings */
+  /* Focus-visible only styling - hide outlines except for keyboard navigation */
   .focus-clean:focus {
-    outline: 2px solid transparent;
-    box-shadow: 0 0 0 2px rgb(99 102 241 / 0.5);
+    outline: none;
+    box-shadow: none;
   }
   
   .focus-clean:focus-visible {

@@ -68,15 +68,15 @@ export default function HeroSection() {
             <div className="flex flex-col sm:flex-row items-start justify-start gap-3 sm:gap-4">
             <Link
               href="#pricing"
-              className="cta-nowrap group inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors duration-200"
+              className="cta-unified cta-unified--primary gap-2"
             >
               <span className="jp-phrase">サービス詳細を見る</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-5 h-5" />
             </Link>
             
             <Link
               href="#faq"
-              className="cta-nowrap inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-white/80 backdrop-blur-sm text-gray-700 rounded-lg font-medium border border-gray-200 hover:bg-white hover:border-gray-300 transition-colors duration-200"
+              className="cta-unified cta-unified--secondary gap-2"
             >
               <span className="jp-phrase">よくある質問</span>
             </Link>

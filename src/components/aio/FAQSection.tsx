@@ -40,7 +40,7 @@ export default function FAQSection({ title, description, categories }: FAQSectio
       <div className="container-article">
         {/* セクションヘッダー */}
         <div className="section-gap">
-          <h2 className="headline text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center heading-guard-top heading-guard-btm">
+          <h2 className="text-heading-2 text-gray-900 mb-4 text-center measure-heading text-balance">
             <span className="block jp-phrase">{title}</span>
           </h2>
           <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
@@ -53,7 +53,7 @@ export default function FAQSection({ title, description, categories }: FAQSectio
           {categories.map((category, categoryIndex) => (
             <div key={categoryIndex}>
               {/* カテゴリータイトル */}
-              <h3 className="headline text-xl sm:text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-blue-100 jp-phrase">
+              <h3 className="text-heading-3 text-gray-900 mb-6 pb-2 border-b-2 border-blue-100 jp-phrase">
                 {category.title}
               </h3>
               
@@ -73,7 +73,7 @@ export default function FAQSection({ title, description, categories }: FAQSectio
                         onClick={() => toggleItem(categoryIndex, itemIndex)}
                         className="w-full px-6 py-4 text-left flex items-center justify-between group"
                       >
-                        <span className="headline text-base sm:text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 jp-phrase">
+                        <span className="text-body-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 jp-phrase">
                           {item.question}
                         </span>
                         <div className="flex-shrink-0 ml-4">
@@ -105,8 +105,8 @@ export default function FAQSection({ title, description, categories }: FAQSectio
         
         {/* 追加サポート */}
         <div className="section-gap text-center">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 sm:p-8 border border-blue-100">
-            <h3 className="headline text-lg sm:text-xl font-bold text-gray-900 mb-2 jp-phrase">
+          <div className="bg-blue-50 rounded-2xl p-6 sm:p-8 border border-blue-100">
+            <h3 className="text-heading-3 text-gray-900 mb-2 jp-phrase">
               その他のご質問がございましたら
             </h3>
             <p className="copy measure-lead text-gray-600 mb-4 mx-auto jp-phrase">

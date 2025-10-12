@@ -199,10 +199,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       </svg>
                     </div>
                     
-                    <h1 className="headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 lg:mb-5 leading-tight measure-heading text-balance">
+                    <h1 className="text-heading-1 text-gray-900 mb-4 lg:mb-5 measure-heading text-balance">
                       AIO Hub AI企業CMS
                     </h1>
-                    <p className="copy text-lg sm:text-xl md:text-2xl text-gray-500 mb-6 lg:mb-8 leading-relaxed measure-lead text-pretty">
+                    <p className="text-body-lead text-gray-500 mb-6 lg:mb-8 measure-lead text-pretty">
                       AI技術を活用した企業情報の統合管理プラットフォーム
                     </p>
                   </div>
@@ -212,21 +212,21 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       <Link 
                         href="/auth/signup" 
                         onClick={handleCtaClick}
-                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[52px] bg-gray-800 text-white text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-900 transition-all duration-300 focus:outline-none ui-flat--no-border"
+                        className="cta-unified cta-unified--primary gap-3 focus:outline-none"
                         aria-label="無料で始める"
                       >
                         <span>無料で始める</span>
-                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                       </Link>
                       <Link 
                         href="/organizations" 
-                        className="cta-nowrap group inline-flex items-center justify-center gap-3 px-6 py-3 min-h-[52px] border-2 border-gray-300 text-gray-700 text-base lg:text-lg font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 focus:outline-none ui-flat"
+                        className="cta-unified cta-unified--secondary gap-3 focus:outline-none"
                         aria-label="企業ディレクトリを見る"
                       >
                         <span>企業ディレクトリを見る</span>
-                        <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
@@ -238,7 +238,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
               {/* Right Column - Visualization */}
               <div className="mt-10 md:mt-0">
-                <div className="relative w-full aspect-video rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 ui-flat overflow-hidden">
+                <div className="relative w-full aspect-video rounded-xl bg-gray-50 ui-flat overflow-hidden">
                   {/* AI Information Flow Visualization */}
                   <div className="absolute inset-4 flex flex-col justify-center items-center">
                     <div className="text-center space-y-6">
@@ -305,7 +305,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="card-grid-4">
               {/* 企業管理 */}
               <div className="card group p-6 sm:p-7 card-min-height-md">
-                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 " style={{'--media-ar': '1/1'} as React.CSSProperties}>
                   <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
@@ -320,7 +320,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
               {/* サービス管理 */}
               <div className="card group p-6 sm:p-7 card-min-height-md">
-                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 " style={{'--media-ar': '1/1'} as React.CSSProperties}>
                   <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -335,7 +335,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
               {/* 導入事例管理 */}
               <div className="card group p-6 sm:p-7 card-min-height-md">
-                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 " style={{'--media-ar': '1/1'} as React.CSSProperties}>
                   <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -350,7 +350,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
               {/* AI最適化 */}
               <div className="card group p-6 sm:p-7 card-min-height-md">
-                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{'--media-ar': '1/1'} as React.CSSProperties}>
+                <div className="media-frame w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 " style={{'--media-ar': '1/1'} as React.CSSProperties}>
                   <svg className="w-8 h-8 text-gray-600 media-contain" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
@@ -381,12 +381,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             <div className="relative">
               {/* 接続線 - グレー基調に */}
-              <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 transform -translate-y-1/2 z-0"></div>
+              <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2 z-0"></div>
               
               <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* ステップ1: アカウント作成 */}
                 <div className="group">
-                  <div className="relative mx-auto w-24 h-24 lg:w-32 lg:h-32 bg-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                  <div className="relative mx-auto w-24 h-24 lg:w-32 lg:h-32 bg-gray-700 rounded-full flex items-center justify-center mb-8 ">
                     <span className="text-3xl lg:text-4xl font-bold text-white">1</span>
                   </div>
                   <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
@@ -399,7 +399,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
                 {/* ステップ2: 企業情報登録 */}
                 <div className="group">
-                  <div className="relative mx-auto w-24 h-24 lg:w-32 lg:h-32 bg-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                  <div className="relative mx-auto w-24 h-24 lg:w-32 lg:h-32 bg-gray-700 rounded-full flex items-center justify-center mb-8 ">
                     <span className="text-3xl lg:text-4xl font-bold text-white">2</span>
                   </div>
                   <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
@@ -412,7 +412,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
                 {/* ステップ3: コンテンツ管理開始 */}
                 <div className="group">
-                  <div className="relative mx-auto w-24 h-24 lg:w-32 lg:h-32 bg-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                  <div className="relative mx-auto w-24 h-24 lg:w-32 lg:h-32 bg-gray-700 rounded-full flex items-center justify-center mb-8 ">
                     <span className="text-3xl lg:text-4xl font-bold text-white">3</span>
                   </div>
                   <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
@@ -587,7 +587,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 >
                   <span className="flex items-center gap-3">
                     {t('pages.home.cta.button')}
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-5 h-5 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
@@ -599,7 +599,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 >
                   <span className="flex items-center gap-2">
                     <span>ヒアリング代行サービス</span>
-                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h2" />
                     </svg>
                   </span>
