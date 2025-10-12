@@ -67,7 +67,7 @@ export default function CTASection({
           
           <Link
             href={secondaryHref}
-            className="btn btn-secondary btn-large">
+            className="btn btn-secondary btn-large"
           >
             {secondaryText}
           </Link>
