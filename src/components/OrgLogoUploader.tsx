@@ -65,69 +65,55 @@ export default function OrgLogoUploader({
     setUploading(true);
 
     try {
-      const fileExtension = getFileExtension(file);
-      const fileName = `${organizationId}/logo${fileExtension}`;
+      // FormDataを作成
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('organizationId', organizationId);
 
-      // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('org-logos')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: true, // Replace existing file
-        });
+      // API経由でアップロード
+      const response = await fetch('/api/upload/logo', {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (uploadError) {
-        console.error('[UPLOAD]', { 
-          message: uploadError.message, 
-          bucket: 'org-logos', 
-          path: fileName 
-        });
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        console.error('[UPLOAD] API error:', result);
         
-        // バケット未作成エラーの場合の分岐
-        if (uploadError.message.includes('Bucket not found') || 
-            uploadError.message.includes('bucket does not exist')) {
+        // エラータイプに応じたメッセージ
+        if (response.status === 401) {
           addToast({
             type: 'error',
-            title: 'ストレージ設定エラー',
-            message: 'バケット未作成のため失敗しました。管理者へご連絡ください。',
+            title: 'ログインが必要です',
+            message: '再度ログインしてからお試しください。',
+          });
+        } else if (response.status === 403) {
+          addToast({
+            type: 'error',
+            title: 'アクセス権限がありません',
+            message: 'この組織のロゴを変更する権限がありません。',
+          });
+        } else if (response.status === 400) {
+          addToast({
+            type: 'error',
+            title: 'ファイルエラー',
+            message: result.error || 'ファイル形式またはサイズに問題があります。',
           });
         } else {
-          // その他のエラーの場合
           addToast({
             type: 'error',
             title: 'アップロード失敗',
-            message: '一時的にアップロードに失敗しました。少し時間をおいて再度お試しください。',
+            message: result.error || 'ロゴのアップロードに失敗しました。',
           });
         }
         return;
       }
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('org-logos')
-        .getPublicUrl(fileName);
-
-      const publicUrl = urlData.publicUrl;
-
-      // Update organization logo_url in database
-      const { error: updateError } = await supabase
-        .from('organizations')
-        .update({ logo_url: publicUrl })
-        .eq('id', organizationId);
-
-      if (updateError) {
-        console.error('[UPLOAD] Database update error:', updateError);
-        addToast({
-          type: 'error',
-          title: 'アップロード失敗',
-          message: '画像のアップロードは成功しましたが、データベースの更新に失敗しました。',
-        });
-        return;
-      }
-
-      setLogoUrl(publicUrl);
+      // 成功時の処理
+      setLogoUrl(result.logoUrl);
       setImageError(false);
-      onUploadComplete?.(publicUrl);
+      onUploadComplete?.(result.logoUrl);
 
       addToast({
         type: 'success',

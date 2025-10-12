@@ -49,14 +49,29 @@ export default function I18nSafeAuthHeader({
           if (isAuthenticated && !actuallyAuthenticated) {
             console.warn('[I18nSafeAuthHeader] Auth state mismatch detected - forcing full logout');
             try {
+              // 認証Cookieも明示的にクリア
+              document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+              });
+              
               await auth.signOut();
+              
+              // ローカルストレージもクリア
+              localStorage.clear();
+              sessionStorage.clear();
+              
               // 少し待機してからリダイレクト
               setTimeout(() => {
                 window.location.href = '/';
               }, 100);
             } catch (error) {
               console.error('[I18nSafeAuthHeader] Auto logout failed:', error);
-              // 強制リロード
+              
+              // 強制的にCookieクリア + リロード
+              document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+              });
+              
               setTimeout(() => {
                 window.location.reload();
               }, 100);

@@ -27,19 +27,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 303リダイレクト（POST → GET への標準的なリダイレクト）
-    // ホームページへリダイレクト
-    return NextResponse.redirect(
+    // レスポンスを作成してCookieクリア
+    const response = NextResponse.redirect(
       new URL('/', request.url),
       { status: 303 }
     );
+
+    // 認証関連のCookieを明示的にクリア
+    const cookiesToClear = [
+      'sb-chyicolujwhkycpkxbej-auth-token',
+      'sb-chyicolujwhkycpkxbej-auth-token.0',
+      'sb-chyicolujwhkycpkxbej-auth-token.1',
+    ];
+
+    cookiesToClear.forEach(cookieName => {
+      response.cookies.set(cookieName, '', {
+        expires: new Date(0),
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      });
+    });
+
+    return response;
     
   } catch (error) {
     console.error('Unexpected signout error:', error);
-    return NextResponse.json(
+    
+    // エラーの場合でもCookieクリアを実行してからJSONレスポンス
+    const response = NextResponse.json(
       { error: 'Internal server error', message: 'Signout failed' },
       { status: 500 }
     );
+
+    const cookiesToClear = [
+      'sb-chyicolujwhkycpkxbej-auth-token',
+      'sb-chyicolujwhkycpkxbej-auth-token.0',
+      'sb-chyicolujwhkycpkxbej-auth-token.1',
+    ];
+
+    cookiesToClear.forEach(cookieName => {
+      response.cookies.set(cookieName, '', {
+        expires: new Date(0),
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      });
+    });
+
+    return response;
   }
 }
 
@@ -51,26 +89,61 @@ export async function GET(request: NextRequest) {
     // Supabaseセッション終了
     const { error } = await supabase.auth.signOut();
     
-    if (error) {
-      console.error('Signout error:', error);
-      return NextResponse.redirect(
-        new URL('/?error=signout_failed', request.url),
-        { status: 303 }
-      );
-    }
-
-    // ホームページへリダイレクト
-    return NextResponse.redirect(
-      new URL('/', request.url),
+    // レスポンスを作成（エラーの場合も含む）
+    const response = NextResponse.redirect(
+      new URL(error ? '/?error=signout_failed' : '/', request.url),
       { status: 303 }
     );
+
+    // 認証関連のCookieを明示的にクリア（エラーの場合でも実行）
+    const cookiesToClear = [
+      'sb-chyicolujwhkycpkxbej-auth-token',
+      'sb-chyicolujwhkycpkxbej-auth-token.0',
+      'sb-chyicolujwhkycpkxbej-auth-token.1',
+    ];
+
+    cookiesToClear.forEach(cookieName => {
+      response.cookies.set(cookieName, '', {
+        expires: new Date(0),
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      });
+    });
+
+    if (error) {
+      console.error('Signout error:', error);
+    }
+
+    return response;
     
   } catch (error) {
     console.error('Unexpected signout error:', error);
-    return NextResponse.redirect(
+    
+    // エラーの場合でもCookieクリアを実行
+    const response = NextResponse.redirect(
       new URL('/?error=signout_error', request.url),
       { status: 303 }
     );
+
+    const cookiesToClear = [
+      'sb-chyicolujwhkycpkxbej-auth-token',
+      'sb-chyicolujwhkycpkxbej-auth-token.0',
+      'sb-chyicolujwhkycpkxbej-auth-token.1',
+    ];
+
+    cookiesToClear.forEach(cookieName => {
+      response.cookies.set(cookieName, '', {
+        expires: new Date(0),
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      });
+    });
+
+    return response;
   }
 }
 

@@ -1,4 +1,4 @@
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { createClient } from '@supabase/supabase-js';
 import { vLog, vErr } from '@/lib/utils/logger';
 
 export type FeatureKey = 'monitoring' | 'business_matching_beta' | 'advanced_embed' | 'service_gallery' | 'service_video';
@@ -28,8 +28,20 @@ export async function hasEntitlement(orgId: string, key: FeatureKey): Promise<bo
       return true;
     }
 
+    // Create server-side Supabase client with Service Role
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+
     // Fetch organization entitlements
-    const { data: org, error } = await supabaseBrowser
+    const { data: org, error } = await supabase
       .from('organizations')
       .select('id, plan, entitlements')
       .eq('id', orgId)

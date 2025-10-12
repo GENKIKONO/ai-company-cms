@@ -822,13 +822,33 @@ export default function NewOrganizationPage() {
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">ブランド設定</h2>
             
-            <OrgLogoUploader
-              organizationId="temp-new"
-              organizationName={formData.name || '新規企業'}
-              currentLogoUrl={formData.logo_url}
-              onUploadComplete={(logoUrl) => handleInputChange('logo_url', logoUrl)}
-              disabled={submitting}
-            />
+            {/* 企業作成前はロゴアップロード機能を無効化 */}
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                企業ロゴ
+              </label>
+              
+              <div className="flex items-center space-x-4">
+                {/* Logo Display */}
+                <div className="flex-shrink-0 w-30 h-30">
+                  <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Upload Message */}
+                <div className="flex-1">
+                  <p className="text-sm text-gray-500">
+                    企業作成後にロゴをアップロードできます
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    PNG、JPG、WebP形式、最大1MB
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* SEO・メタ情報 */}
