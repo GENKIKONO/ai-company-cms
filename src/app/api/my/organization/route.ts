@@ -199,8 +199,10 @@ export async function POST(request: NextRequest) {
     // 統一バリデーション（正規化済みデータ使用）
     let validatedData: OrganizationCreate;
     try {
+      console.log('[ORG/CREATE] About to validate with schema:', normalizedRawBody);
       validatedData = organizationCreateSchema.parse(normalizedRawBody);
       body = validatedData as any; // 既存の型との互換性のため
+      console.log('[ORG/CREATE] Validation successful:', validatedData);
       
       // サニタイズ後ログ
       const bodyAny = body as any;
@@ -211,9 +213,12 @@ export async function POST(request: NextRequest) {
         // 実際に存在する日付系フィールドのみチェック（foundedフィールドはUIに存在しないため除外）
       });
     } catch (error) {
+      console.error('[ORG/CREATE] Validation error:', error);
       if (error instanceof z.ZodError) {
+        console.error('[ORG/CREATE] Zod validation issues:', error.issues);
         return handleZodError(error);
       }
+      console.error('[ORG/CREATE] Non-zod validation error:', error);
       throw error;
     }
 
@@ -390,12 +395,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Database error details:', {
+      console.error('[ORG/CREATE] Database error details:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
         code: error.code,
-        data: organizationData
+        insertPayload: insertPayload,
+        originalData: organizationData
       });
       
       // 23505: unique constraint violation - idempotent処理

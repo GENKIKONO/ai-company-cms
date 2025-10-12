@@ -285,6 +285,8 @@ export default function NewOrganizationPage() {
       }
       
       console.log('Frontend: FINAL payload before fetch:', payload);
+      console.log('Frontend: Payload keys:', Object.keys(payload));
+      console.log('Frontend: Payload types:', Object.entries(payload).map(([k, v]) => [k, typeof v, v]));
 
       const response = await fetch('/api/my/organization', {
         method: 'POST',
