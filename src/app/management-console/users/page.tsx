@@ -45,19 +45,30 @@ export default function UsersManagementPage() {
 
   const fetchUsers = async () => {
     try {
-      console.log('[DEBUG] Fetching users from /api/admin/users');
-      const response = await fetch('/api/admin/users');
+      const response = await fetch('/api/admin/users', { cache: 'no-store' });
       
-      console.log('[DEBUG] Response status:', response.status);
-      console.log('[DEBUG] Response headers:', Object.fromEntries(response.headers.entries()));
+      // 原因別UI分岐（既存の文言・クラスを流用）
+      if (response.status === 401) {
+        setError('ログインが必要です。再ログインしてください。');
+        setLoading(false);
+        return;
+      }
+      
+      if (response.status === 403) {
+        setError('管理者権限が必要です');
+        setLoading(false);
+        return;
+      }
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.log('[DEBUG] Error response data:', errorData);
-        throw new Error(errorData.message || 'ユーザーデータの取得に失敗しました');
+        const errorMessage = errorData.error === 'ENV_MISSING' 
+          ? 'システム設定エラー（環境変数不足）'
+          : errorData.message || 'ユーザーデータの取得に失敗しました';
+        throw new Error(errorMessage);
       }
+      
       const data = await response.json();
-      console.log('[DEBUG] Success response data:', data);
       setUsers(data.users || []);
     } catch (err) {
       console.error('Fetch users error:', err);
