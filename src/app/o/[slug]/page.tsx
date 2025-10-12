@@ -5,7 +5,9 @@ import Image from 'next/image';
 import { generateOrganizationPageJsonLd } from '@/lib/utils/jsonld';
 import { LogoImage } from '@/components/ui/optimized-image';
 import ReportButton from '@/components/common/ReportButton';
-import OrgMap from '@/components/org/OrgMap';
+import AddressDisplay from '@/components/address/AddressDisplay';
+import OrganizationJsonLd from '@/components/seo/OrganizationJsonLd';
+import { createFullAddress } from '@/lib/structured-data/organization';
 import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/database';
 
 interface OrganizationPageData {
@@ -227,10 +229,16 @@ export default async function OrganizationDetailPage({
 
   return (
     <>
-      {/* JSON-LD structured data */}
-      {jsonLdArray.map((jsonLd, index) => (
+      {/* Enhanced JSON-LD structured data with address and geo */}
+      <OrganizationJsonLd 
+        organization={organization} 
+        includeGeo={!!(organization.lat && organization.lng)}
+        includeContactInfo={true}
+      />
+      {/* Legacy JSON-LD for backward compatibility */}
+      {jsonLdArray.slice(1).map((jsonLd, index) => (
         <script
-          key={index}
+          key={index + 1}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
@@ -440,12 +448,20 @@ export default async function OrganizationDetailPage({
               </div>
             </div>
 
-            {/* 地図表示 */}
-            <div className="border-t border-gray-200">
-              <div className="p-6 sm:p-8">
-                <OrgMap organization={organization} />
+            {/* 所在地表示 */}
+            {createFullAddress(organization) && (
+              <div className="border-t border-gray-200">
+                <div className="p-6 sm:p-8">
+                  <AddressDisplay
+                    postalCode={organization.address_postal_code}
+                    fullAddress={createFullAddress(organization)}
+                    organizationName={organization.name}
+                    showGoogleMapsLink={true}
+                    showDirectionsLink={true}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* 記事一覧 */}
             {posts && posts.length > 0 && (

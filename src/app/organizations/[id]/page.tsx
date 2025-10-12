@@ -16,7 +16,7 @@ import CaseStudiesTab from '@/components/CaseStudiesTab';
 import FAQsTab from '@/components/FAQsTab';
 import PostsTab from '@/components/PostsTab';
 import OrgLogoUploader from '@/components/OrgLogoUploader';
-import InteractiveOrgMap from '@/components/org/InteractiveOrgMap';
+import AddressDisplay from '@/components/address/AddressDisplay';
 
 // プラン別タグ数制限
 const TAG_LIMIT: Record<string, number | 'unlimited'> = {
@@ -72,6 +72,7 @@ export default function EditOrganizationPage() {
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   const [geocoding, setGeocoding] = useState(false);
   const [showManualCoords, setShowManualCoords] = useState(false);
+  const [publishCoordinates, setPublishCoordinates] = useState(false);
 
   // 初期化は空の状態から開始
   const [formData, setFormData] = useState<OrganizationFormData>(() => fromOrg(null));
@@ -852,7 +853,7 @@ export default function EditOrganizationPage() {
               
               {/* 成功メッセージ */}
               <div id="geocode-success" className="mt-2 text-sm text-green-600" style={{ display: 'none' }}>
-                位置を特定しました！地図が更新されました。
+                位置を特定しました！住所プレビューが更新されました。
               </div>
             </div>
 
@@ -926,26 +927,38 @@ export default function EditOrganizationPage() {
                   <p className="mt-2 text-xs text-gray-500">
                     手動で入力した座標は住所検出より優先されます。日本国内の座標を入力してください。
                   </p>
+                  
+                  {/* 座標公開設定 */}
+                  <div className="mt-4 flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="publish_coordinates"
+                      checked={publishCoordinates}
+                      onChange={(e) => setPublishCoordinates(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <label htmlFor="publish_coordinates" className="text-sm text-gray-700">
+                      座標情報を公開する（検索エンジン向けJSON-LDに含める）
+                    </label>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">
+                    オフの場合、座標は保存されますが公開ページには表示されません。
+                  </p>
                 </div>
               )}
             </div>
 
-            {/* インタラクティブ地図 */}
-            {coordinates && (
-              <div className="mt-6">
-                <InteractiveOrgMap
-                  initialLat={coordinates.lat}
-                  initialLng={coordinates.lng}
-                  address={getFullAddress()}
-                  organizationName={formData.name}
-                  onLocationChange={(lat, lng) => {
-                    setCoordinates({ lat, lng });
-                    handleManualCoordinates(lat, lng);
-                  }}
-                  className="w-full"
-                />
-              </div>
-            )}
+            {/* 住所プレビュー */}
+            <div className="mt-6">
+              <AddressDisplay
+                postalCode={formData.address_postal_code}
+                fullAddress={getFullAddress()}
+                organizationName={formData.name}
+                showGoogleMapsLink={true}
+                showDirectionsLink={true}
+                className="w-full"
+              />
+            </div>
           </div>
 
           {/* ブランド設定 */}
