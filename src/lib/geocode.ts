@@ -71,7 +71,7 @@ function createAddressVariations(normalized: string): string[] {
 }
 
 /**
- * Queries Nominatim API with retry logic
+ * Queries Nominatim API with retry logic and improved Japan-specific search
  * @param address Address to geocode
  * @returns Promise<GeocodeResult | null>
  */
@@ -81,36 +81,50 @@ async function queryNominatim(address: string): Promise<GeocodeResult | null> {
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&addressdetails=1&limit=1&countrycodes=jp`;
+      // Enhanced query with Japan-specific parameters
+      const queries = [
+        // Primary: Structured search with Japan country code
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address + ', Japan')}&format=json&addressdetails=1&limit=3&countrycodes=jp&accept-language=ja,en`,
+        // Fallback: Basic search
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&addressdetails=1&limit=1&countrycodes=jp`
+      ];
       
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': 'AIO Hub Geocoding Service (https://aiohub.jp)'
+      for (const url of queries) {
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'AIO Hub Geocoding Service (https://aiohub.jp)'
+          }
+        });
+        
+        if (response.status === 429) {
+          // Rate limited, wait and retry
+          if (attempt < maxRetries - 1) {
+            await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
+            continue;
+          }
+          throw new Error('Rate limit exceeded');
         }
-      });
-      
-      if (response.status === 429) {
-        // Rate limited, wait and retry
-        if (attempt < maxRetries - 1) {
-          await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
-          continue;
+        
+        if (!response.ok) {
+          continue; // Try next query
         }
-        throw new Error('Rate limit exceeded');
-      }
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.length > 0) {
-        const result = data[0];
-        return {
-          lat: parseFloat(result.lat),
-          lng: parseFloat(result.lon),
-          normalized: address
-        };
+        
+        const data = await response.json();
+        
+        if (data.length > 0) {
+          // Find the most specific result (highest importance or smallest bbox)
+          const bestResult = data.reduce((best: any, current: any) => {
+            const currentSpecificity = calculateSpecificity(current);
+            const bestSpecificity = calculateSpecificity(best);
+            return currentSpecificity > bestSpecificity ? current : best;
+          });
+          
+          return {
+            lat: parseFloat(bestResult.lat),
+            lng: parseFloat(bestResult.lon),
+            normalized: address
+          };
+        }
       }
       
       return null;
@@ -126,6 +140,50 @@ async function queryNominatim(address: string): Promise<GeocodeResult | null> {
   }
   
   return null;
+}
+
+/**
+ * Calculate specificity score for a Nominatim result
+ * Higher score = more specific location
+ */
+function calculateSpecificity(result: any): number {
+  let score = 0;
+  
+  // Importance score (0-1, higher is better for major places)
+  score += (result.importance || 0) * 50;
+  
+  // Place type specificity
+  const placeTypeScores: Record<string, number> = {
+    'house': 100,
+    'building': 90,
+    'amenity': 80,
+    'shop': 75,
+    'office': 75,
+    'industrial': 70,
+    'residential': 65,
+    'commercial': 60,
+    'suburb': 50,
+    'neighbourhood': 45,
+    'quarter': 40,
+    'city_district': 35,
+    'town': 30,
+    'city': 25,
+    'county': 15,
+    'state': 10,
+    'country': 5
+  };
+  
+  const placeType = result.class || result.type || '';
+  score += placeTypeScores[placeType] || 20;
+  
+  // Address completeness
+  const address = result.address || {};
+  if (address.house_number) score += 20;
+  if (address.road) score += 15;
+  if (address.neighbourhood || address.suburb) score += 10;
+  if (address.city || address.town) score += 5;
+  
+  return score;
 }
 
 /**

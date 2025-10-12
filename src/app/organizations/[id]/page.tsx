@@ -16,6 +16,7 @@ import CaseStudiesTab from '@/components/CaseStudiesTab';
 import FAQsTab from '@/components/FAQsTab';
 import PostsTab from '@/components/PostsTab';
 import OrgLogoUploader from '@/components/OrgLogoUploader';
+import InteractiveOrgMap from '@/components/org/InteractiveOrgMap';
 
 // プラン別タグ数制限
 const TAG_LIMIT: Record<string, number | 'unlimited'> = {
@@ -812,7 +813,10 @@ export default function EditOrganizationPage() {
                     </>
                   ) : (
                     <>
-                      🔎 位置を検出
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      位置を検出
                     </>
                   )}
                 </button>
@@ -830,7 +834,7 @@ export default function EditOrganizationPage() {
               
               {/* 成功メッセージ */}
               <div id="geocode-success" className="mt-2 text-sm text-green-600" style={{ display: 'none' }}>
-                ✅ 位置を特定しました！地図が更新されました。
+                位置を特定しました！地図が更新されました。
               </div>
             </div>
 
@@ -907,6 +911,23 @@ export default function EditOrganizationPage() {
                 </div>
               )}
             </div>
+
+            {/* インタラクティブ地図 */}
+            {coordinates && (
+              <div className="mt-6">
+                <InteractiveOrgMap
+                  initialLat={coordinates.lat}
+                  initialLng={coordinates.lng}
+                  address={getFullAddress()}
+                  organizationName={formData.name}
+                  onLocationChange={(lat, lng) => {
+                    setCoordinates({ lat, lng });
+                    handleManualCoordinates(lat, lng);
+                  }}
+                  className="w-full"
+                />
+              </div>
+            )}
           </div>
 
           {/* ブランド設定 */}
