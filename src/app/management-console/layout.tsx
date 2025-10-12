@@ -14,12 +14,8 @@ export default async function AdminLayout({
   // 認証と管理者権限の統合チェック
   const { user, isAdmin } = await getUserWithAdmin();
   
-  if (!user) {
-    redirect('/auth/login?redirect=/management-console');
-  }
-
-  if (!isAdmin) {
-    redirect('/dashboard');
+  if (!user || !isAdmin) {
+    redirect('/management-console/login');
   }
 
   return (
