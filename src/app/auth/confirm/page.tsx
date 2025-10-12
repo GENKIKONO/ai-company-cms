@@ -23,21 +23,56 @@ function ConfirmPageContent() {
       try {
         const token_hash = searchParams.get('token_hash');
         const type = searchParams.get('type');
+        const token = searchParams.get('token');
+        
+        console.log('Confirmation params:', { token_hash, type, token });
 
-        if (!token_hash || type !== 'email') {
-          setError('無効な確認リンクです');
+        // URLパラメーターの複数パターンに対応
+        if (!token_hash && !token) {
+          setError('無効な確認リンクです。URLパラメーターが不足しています。');
           return;
         }
 
-        const { error: verifyError } = await supabaseBrowser.auth.verifyOtp({
-          token_hash,
-          type: 'email',
-        });
-
-        if (verifyError) {
-          console.error('Email verification error:', verifyError);
-          setError('メール確認に失敗しました');
+        if (type && type !== 'email' && type !== 'signup') {
+          setError(`サポートされていない確認タイプです: ${type}`);
           return;
+        }
+
+        // token_hashがある場合はverifyOtpを使用
+        if (token_hash) {
+          const { error: verifyError } = await supabaseBrowser.auth.verifyOtp({
+            token_hash,
+            type: 'email',
+          });
+
+          if (verifyError) {
+            console.error('Email verification error:', verifyError);
+            let errorMessage = 'メール確認に失敗しました';
+            
+            if (verifyError.message.includes('expired')) {
+              errorMessage = '確認リンクの有効期限が切れています';
+            } else if (verifyError.message.includes('invalid')) {
+              errorMessage = '無効な確認リンクです';
+            } else if (verifyError.message.includes('already confirmed')) {
+              errorMessage = 'このアカウントは既に確認済みです';
+            }
+            
+            setError(errorMessage);
+            return;
+          }
+        } 
+        // tokenがある場合（従来形式のサポート）
+        else if (token) {
+          const { error: verifyError } = await supabaseBrowser.auth.verifyOtp({
+            token,
+            type: 'signup',
+          });
+
+          if (verifyError) {
+            console.error('Token verification error:', verifyError);
+            setError('メール確認に失敗しました（従来形式）');
+            return;
+          }
         }
 
         setConfirmed(true);
