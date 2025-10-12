@@ -83,11 +83,25 @@ export default function NewOrganizationPage() {
 
   // スラッグの自動生成
   const generateSlug = (name: string): string => {
-    return name
+    const baseSlug = name
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
       .replace(/[\s_-]+/g, '-')
       .replace(/^-+|-+$/g, '');
+    
+    // 予約語チェック
+    const reservedSlugs = [
+      'o', 's', 'admin', 'api', 'assets', 'static', 
+      'sitemap', 'robots', 'login', 'signup', 'auth',
+      'dashboard', 'ops', 'help', 'contact', 'terms', 'privacy',
+      'organizations', 'new', 'edit', 'delete', 'create'
+    ];
+    
+    if (reservedSlugs.includes(baseSlug)) {
+      return `${baseSlug}-company`;
+    }
+    
+    return baseSlug;
   };
 
   const handleInputChange = (field: keyof OrganizationFormData, value: any) => {

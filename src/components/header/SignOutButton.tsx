@@ -5,7 +5,13 @@ import { auth } from '@/lib/auth';
 export default function SignOutButton() {
   const handleSignOut = async () => {
     try {
+      console.log('[SignOutButton] ログアウト開始');
       await auth.signOut();
+      
+      // Cookieがクリアされるまで少し待機
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      console.log('[SignOutButton] ホームページにリダイレクト');
       window.location.href = '/';
     } catch (error) {
       console.error('Sign out failed:', error);

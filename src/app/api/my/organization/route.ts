@@ -258,18 +258,35 @@ export async function POST(request: NextRequest) {
     // 最小限のデータのみでシンプルに作成
     const timestamp = Date.now();
     const randomId = Math.random().toString(36).substring(2, 8);
-    const baseSlug = body.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '') || 'organization';
     
-    const uniqueSlug = `${baseSlug}-${timestamp}-${randomId}`;
+    // slugが提供されている場合はそれを使用、そうでなければ自動生成
+    let finalSlug = body.slug;
+    if (!finalSlug || finalSlug.trim() === '') {
+      const baseSlug = body.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '') || 'organization';
+      
+      finalSlug = `${baseSlug}-${timestamp}-${randomId}`;
+    } else {
+      // 提供されたslugが予約語の場合は安全に変更
+      const reservedSlugs = [
+        'o', 's', 'admin', 'api', 'assets', 'static', 
+        'sitemap', 'robots', 'login', 'signup', 'auth',
+        'dashboard', 'ops', 'help', 'contact', 'terms', 'privacy',
+        'organizations', 'new', 'edit', 'delete', 'create'
+      ];
+      
+      if (reservedSlugs.includes(finalSlug)) {
+        finalSlug = `${finalSlug}-${randomId}`;
+      }
+    }
 
     // ✅ API層での保険: 実際のDBスキーマに完全一致
     const baseData = {
       name: body.name,
-      slug: uniqueSlug, // 常にユニークなslugを使用
+      slug: finalSlug, // 処理済みのslugを使用
       created_by: user.id,
       // 注意: user_id, contact_email, is_published は実際のDBに存在しないため除外
     };

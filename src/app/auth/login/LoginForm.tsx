@@ -49,17 +49,25 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
 
       // ログイン成功 - セッション確認を行う
       if (data.session) {
+        // Cookieが設定されるまで少し待機
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         // Cookieを確認してセッションが設定されているかチェック
         const cookieString = document.cookie;
         const hasSupabaseAuthToken = /sb-[^=;]+-auth-token=/.test(cookieString);
         
         if (!hasSupabaseAuthToken) {
-          console.warn('[LoginForm] セッションCookieが設定されていません');
+          console.warn('[LoginForm] セッションCookieが設定されていません、もう少し待機します');
+          // さらに1秒待機
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
         // ダッシュボードへ遷移
         const targetUrl = redirectUrl || '/dashboard';
-        router.replace(targetUrl);
+        console.log('[LoginForm] リダイレクト開始:', targetUrl);
+        
+        // 強制的にページをリロードして認証状態を確実に反映
+        window.location.href = targetUrl;
       } else {
         setError('ログインに失敗しました。セッションが作成されませんでした。');
       }

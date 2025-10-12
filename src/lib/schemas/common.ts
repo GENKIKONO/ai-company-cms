@@ -118,7 +118,8 @@ export const phoneField = () =>
 const RESERVED_SLUGS = [
   'o', 's', 'admin', 'api', 'assets', 'static', 
   'sitemap', 'robots', 'login', 'signup', 'auth',
-  'dashboard', 'ops', 'help', 'contact', 'terms', 'privacy'
+  'dashboard', 'ops', 'help', 'contact', 'terms', 'privacy',
+  'organizations', 'new', 'edit', 'delete', 'create'
 ];
 
 export const slugField = () =>
