@@ -43,17 +43,35 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GETアクセス時は405を返す
+// GETアクセス時もサインアウト処理を実行（ユーザビリティ向上）
 export async function GET(request: NextRequest) {
-  return NextResponse.json(
-    { error: 'Method Not Allowed', message: 'Use POST method for signout' },
-    { 
-      status: 405,
-      headers: {
-        'Allow': 'POST, OPTIONS'
-      }
+  try {
+    const supabase = await supabaseServer();
+    
+    // Supabaseセッション終了
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      console.error('Signout error:', error);
+      return NextResponse.redirect(
+        new URL('/?error=signout_failed', request.url),
+        { status: 303 }
+      );
     }
-  );
+
+    // ホームページへリダイレクト
+    return NextResponse.redirect(
+      new URL('/', request.url),
+      { status: 303 }
+    );
+    
+  } catch (error) {
+    console.error('Unexpected signout error:', error);
+    return NextResponse.redirect(
+      new URL('/?error=signout_error', request.url),
+      { status: 303 }
+    );
+  }
 }
 
 // OPTIONSメソッド（CORSプリフライト対応）
