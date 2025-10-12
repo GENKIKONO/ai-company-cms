@@ -24,18 +24,15 @@ async function checkAdminPermission(supabase: any) {
     return { error: 'UNAUTHORIZED', message: 'ログインが必要です', status: 401 };
   }
 
-  // 管理者権限チェック
-  const { data: userData, error: userError } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+  // 管理者判定 - 環境変数またはapp_metadataをチェック
+  const adminEmails = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL)?.split(',').map(email => email.trim()) || [];
+  const isAdmin = user.app_metadata?.role === 'admin' || adminEmails.includes(user.email || '');
 
-  if (userError || !userData || userData.role !== 'admin') {
+  if (!isAdmin) {
     return { error: 'FORBIDDEN', message: '管理者権限が必要です', status: 403 };
   }
 
-  return { user, userData };
+  return { user, isAdmin: true };
 }
 
 // GET: 全ユーザー一覧取得
