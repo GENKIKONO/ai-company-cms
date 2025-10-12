@@ -423,6 +423,15 @@ export interface QAQuestionTemplate {
   updated_at: string;
 }
 
+// Q&A Extended Types (with joined data)
+export interface QAEntryWithCategory extends QAEntry {
+  qa_categories?: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+}
+
 // Q&A Form Data Types
 export interface QACategoryFormData {
   name: string;

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { QACategoryFormData } from '@/types/database';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient();
+  const supabase = await supabaseServer();
   const { id } = await params;
   
   try {
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient();
+  const supabase = await supabaseServer();
   const { id } = await params;
   
   try {
@@ -120,7 +120,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           before: existingCategory, 
           after: updateData 
         },
-        metadata: { ip: req.ip, user_agent: req.headers.get('user-agent') }
+        metadata: { ip: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown", user_agent: req.headers.get('user-agent') }
       });
 
     return NextResponse.json({ data: category });
@@ -132,7 +132,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient();
+  const supabase = await supabaseServer();
   const { id } = await params;
   
   try {
@@ -201,7 +201,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         action: 'category_delete',
         actor_user_id: user.id,
         changes: { deleted: existingCategory },
-        metadata: { ip: req.ip, user_agent: req.headers.get('user-agent') }
+        metadata: { ip: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown", user_agent: req.headers.get('user-agent') }
       });
 
     return NextResponse.json({ message: 'Category deleted successfully' });

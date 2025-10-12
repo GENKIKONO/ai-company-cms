@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit2, Trash2, Save, X, Search, Eye, FileText } from 'lucide-react';
-import type { QAEntry, QACategory, QAEntryFormData } from '@/types/database';
+import type { QAEntry, QAEntryWithCategory, QACategory, QAEntryFormData } from '@/types/database';
 
 interface QAEntryManagerProps {
   categories: QACategory[];
@@ -18,7 +18,7 @@ interface QAEntryManagerProps {
 }
 
 export default function QAEntryManager({ categories, onRefreshCategories }: QAEntryManagerProps) {
-  const [entries, setEntries] = useState<QAEntry[]>([]);
+  const [entries, setEntries] = useState<QAEntryWithCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);

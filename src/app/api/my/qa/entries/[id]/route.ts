@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { QAEntryFormData } from '@/types/database';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient();
+  const supabase = await supabaseServer();
   const { id } = await params;
   
   try {
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient();
+  const supabase = await supabaseServer();
   const { id } = await params;
   
   try {
@@ -100,7 +100,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       }
     }
 
-    const updateData = {
+    const updateData: any = {
       category_id: body.category_id || null,
       question: body.question.trim(),
       answer: body.answer.trim(),
@@ -165,7 +165,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           before: existingEntry, 
           after: finalUpdateData 
         },
-        metadata: { ip: req.ip, user_agent: req.headers.get('user-agent') }
+        metadata: { ip: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown", user_agent: req.headers.get('user-agent') }
       });
 
     return NextResponse.json({ data: entry });
@@ -177,7 +177,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient();
+  const supabase = await supabaseServer();
   const { id } = await params;
   
   try {
@@ -228,7 +228,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         action: 'delete',
         actor_user_id: user.id,
         changes: { deleted: existingEntry },
-        metadata: { ip: req.ip, user_agent: req.headers.get('user-agent') }
+        metadata: { ip: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown", user_agent: req.headers.get('user-agent') }
       });
 
     return NextResponse.json({ message: 'Entry deleted successfully' });

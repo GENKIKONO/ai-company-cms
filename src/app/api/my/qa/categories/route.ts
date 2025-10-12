@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { QACategoryFormData } from '@/types/database';
 
 export async function GET(req: NextRequest) {
-  const supabase = await createClient();
+  const supabase = await supabaseServer();
   
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
+  const supabase = await supabaseServer();
   
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
         action: 'category_create',
         actor_user_id: user.id,
         changes: { created: categoryData },
-        metadata: { ip: req.ip, user_agent: req.headers.get('user-agent') }
+        metadata: { ip: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown", user_agent: req.headers.get('user-agent') }
       });
 
     return NextResponse.json({ data: category }, { status: 201 });

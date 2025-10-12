@@ -1,4 +1,4 @@
-import { type QAEntry, type Organization } from '@/types/database';
+import { type QAEntry, type QAEntryWithCategory, type Organization } from '@/types/database';
 
 export interface FAQStructuredData {
   '@context': string;
@@ -27,7 +27,7 @@ interface GenerateFAQJsonLdOptions {
  * @returns FAQ structured data object
  */
 export function generateFAQJsonLd(
-  qaEntries: QAEntry[],
+  qaEntries: QAEntryWithCategory[],
   organization?: Organization,
   options: GenerateFAQJsonLdOptions = {}
 ): FAQStructuredData | null {
@@ -75,7 +75,7 @@ export function generateFAQJsonLd(
  * @returns JSON-LD as string for script tag
  */
 export function generateFAQJsonLdScript(
-  qaEntries: QAEntry[],
+  qaEntries: QAEntryWithCategory[],
   organization?: Organization,
   options: GenerateFAQJsonLdOptions = {}
 ): string | null {
@@ -93,7 +93,7 @@ export function generateFAQJsonLdScript(
  * @param qaEntries Array of Q&A entries
  * @returns Boolean indicating if valid
  */
-export function isValidForFAQJsonLd(qaEntries: QAEntry[]): boolean {
+export function isValidForFAQJsonLd(qaEntries: QAEntryWithCategory[]): boolean {
   const validEntries = qaEntries.filter(entry => 
     entry.status === 'published' && 
     entry.visibility === 'public' &&
@@ -121,7 +121,7 @@ export function cleanContentForJsonLd(content: string): string {
  * @param qaEntries Array of Q&A entries with category data
  * @returns Object grouped by category
  */
-export function groupQAByCategory(qaEntries: QAEntry[]): Record<string, QAEntry[]> {
+export function groupQAByCategory(qaEntries: QAEntryWithCategory[]): Record<string, QAEntryWithCategory[]> {
   return qaEntries.reduce((groups, entry) => {
     const categoryName = entry.qa_categories?.name || 'その他';
     if (!groups[categoryName]) {
@@ -129,7 +129,7 @@ export function groupQAByCategory(qaEntries: QAEntry[]): Record<string, QAEntry[
     }
     groups[categoryName].push(entry);
     return groups;
-  }, {} as Record<string, QAEntry[]>);
+  }, {} as Record<string, QAEntryWithCategory[]>);
 }
 
 /**
