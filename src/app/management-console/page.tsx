@@ -154,6 +154,28 @@ export default function AdminDashboard() {
             </div>
           </Link>
 
+          {/* お問合せ管理カード */}
+          <Link href="/management-console/contacts" className="block">
+            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <div className="flex items-center mb-4">
+                <div className="p-2 bg-teal-100 rounded-lg">
+                  <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="ml-3 text-lg font-semibold text-gray-900">お問合せ管理</h3>
+                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span>
+              </div>
+              <p className="text-gray-600 mb-4">お問合せ・サポート依頼の管理</p>
+              <div className="text-sm text-teal-600 font-medium flex items-center">
+                お問合せを確認
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </Link>
+
           {/* クイックアクションカード */}
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center mb-4">

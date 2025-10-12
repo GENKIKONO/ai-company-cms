@@ -42,7 +42,7 @@ const PLANS: PricingPlan[] = [
     popular: false,
     features: [
       { text: 'ロゴ・企業情報を構造化公開（JSON‑LD）', included: true },
-      { text: 'ディレクトリ掲載（最下層・タグ1件）', included: true },
+      { text: 'ディレクトリ掲載（通常掲載・タグ1件）', included: true },
       { text: 'サービス1件登録', included: true },
       { text: '公開 / 非公開の切替', included: true },
       { text: '上位掲載・特集枠は対象外', included: false }
