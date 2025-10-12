@@ -45,12 +45,19 @@ export default function UsersManagementPage() {
 
   const fetchUsers = async () => {
     try {
+      console.log('[DEBUG] Fetching users from /api/admin/users');
       const response = await fetch('/api/admin/users');
+      
+      console.log('[DEBUG] Response status:', response.status);
+      console.log('[DEBUG] Response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('[DEBUG] Error response data:', errorData);
         throw new Error(errorData.message || 'ユーザーデータの取得に失敗しました');
       }
       const data = await response.json();
+      console.log('[DEBUG] Success response data:', data);
       setUsers(data.users || []);
     } catch (err) {
       console.error('Fetch users error:', err);

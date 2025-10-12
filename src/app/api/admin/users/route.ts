@@ -18,20 +18,41 @@ export const dynamic = 'force-dynamic';
 
 // 管理者権限チェック関数
 async function checkAdminPermission(supabase: any) {
+  console.log('[DEBUG] Admin permission check started');
+  
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   
+  console.log('[DEBUG] Auth result:', {
+    user: user ? { id: user.id, email: user.email, app_metadata: user.app_metadata } : null,
+    authError: authError ? authError.message : null
+  });
+  
   if (authError || !user) {
+    console.log('[DEBUG] Auth failed - no user or auth error');
     return { error: 'UNAUTHORIZED', message: 'ログインが必要です', status: 401 };
   }
 
   // 管理者判定 - 環境変数またはapp_metadataをチェック
   const adminEmails = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL)?.split(',').map(email => email.trim()) || [];
-  const isAdmin = user.app_metadata?.role === 'admin' || adminEmails.includes(user.email || '');
+  const hasAppMetadataRole = user.app_metadata?.role === 'admin';
+  const isInAdminEmails = adminEmails.includes(user.email || '');
+  const isAdmin = hasAppMetadataRole || isInAdminEmails;
+
+  console.log('[DEBUG] Admin check details:', {
+    userEmail: user.email,
+    appMetadataRole: user.app_metadata?.role,
+    adminEmails: adminEmails,
+    hasAppMetadataRole,
+    isInAdminEmails,
+    isAdmin
+  });
 
   if (!isAdmin) {
+    console.log('[DEBUG] Admin check failed - user not admin');
     return { error: 'FORBIDDEN', message: '管理者権限が必要です', status: 403 };
   }
 
+  console.log('[DEBUG] Admin check passed');
   return { user, isAdmin: true };
 }
 
