@@ -1,7 +1,6 @@
 'use client';
 
 import { FileText, Cog, Rocket, ArrowRight, CheckCircle } from 'lucide-react';
-import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 interface FlowStep {
   readonly step: number;
@@ -77,9 +76,9 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
               <span key={index} className="block jp-text">{line}</span>
             ))}
           </h2>
-          <p className="copy measure-lead text-left text-gray-600">
+          <p className="text-body-large text-neutral-600 text-center jp-text">
             {description.split('\n').map((line, index) => (
-              <span key={index} className="block jp-phrase">{line}</span>
+              <span key={index} className="block jp-text">{line}</span>
             ))}
           </p>
         </div>
@@ -106,15 +105,15 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
                   </div>
                   
                   {/* タイトル・説明 */}
-                  <h3 className="headline text-xl font-bold text-gray-900 mb-3 jp-phrase">{step.title}</h3>
-                  <p className="copy measure-body text-gray-600 mb-6 jp-phrase">{step.description}</p>
+                  <h3 className="text-h3 text-neutral-900 mb-3 jp-text">{step.title}</h3>
+                  <p className="text-body text-neutral-600 mb-6 jp-text">{step.description}</p>
                   
                   {/* 詳細リスト */}
                   <ul className="space-y-2.5">
                     {step.details.map((detail, detailIndex) => (
                       <li key={detailIndex} className="flex items-start gap-2">
                         <CheckCircle className={`w-4 h-4 ${colors.accent} mt-0.5 flex-shrink-0`} />
-                        <span className="copy text-sm text-gray-700 jp-phrase">{detail}</span>
+                        <span className="text-body-small text-neutral-700 jp-text">{detail}</span>
                       </li>
                     ))}
                   </ul>
@@ -127,10 +126,10 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
         {/* Before/After セクション */}
         <div className="bg-gray-50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 lg:p-12">
           <div className="text-center mb-8 sm:mb-12">
-            <h3 className="text-heading-2 text-gray-900 mb-4 measure-heading text-balance">
+            <h3 className="text-h2 text-neutral-900 mb-4 jp-text">
               {beforeAfter.title}
             </h3>
-            <p className="text-[15px] sm:text-base leading-7 sm:leading-8 text-gray-600 max-w-2xl mx-auto">
+            <p className="text-body-large text-neutral-600 max-w-2xl mx-auto jp-text">
               {beforeAfter.description}
             </p>
           </div>

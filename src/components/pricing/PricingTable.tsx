@@ -115,31 +115,31 @@ export default function PricingTable() {
   const mainPlans = PLANS.filter(plan => plan.id === 'free' || plan.id === 'starter');
   
   return (
-    <section className="section-gap bg-gray-50">
-      <div className="container-wide">
-        <div className="text-center mb-10 sm:mb-12">
-          <h2 className="heading-guard-top heading-guard-btm text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 measure-hero mx-auto jp-phrase">
+    <section className="section bg-subtle">
+      <div className="container">
+        <div className="text-center mb-12">
+          <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
             シンプルで明確な料金体系
           </h2>
-          <p className="measure-lead mx-auto text-lg text-gray-600 jp-phrase">
+          <p className="text-body-large text-neutral-600 jp-text">
             無料から始めて、必要になったら拡張。最小の入力で、AIに"引用されやすい"企業情報を実現します。
           </p>
         </div>
 
         {/* 2-column pricing layout for PC */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 justify-center items-stretch max-w-4xl mx-auto mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 justify-center items-stretch max-w-4xl mx-auto mb-12">
           {mainPlans.map((plan) => (
             <div
               key={plan.id}
-              className={`ui-card flex flex-col relative rounded-2xl p-6 transition-all duration-300 ${
+              className={`card flex flex-col relative p-6 ${
                 plan.popular
-                  ? 'border-purple-500'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-primary border-2'
+                  : 'hover:border-neutral-300'
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="rounded-full bg-purple-500 px-4 py-1 text-sm font-medium text-white">
+                  <span className="badge badge-primary">
                     人気
                   </span>
                 </div>
@@ -147,7 +147,7 @@ export default function PricingTable() {
 
               {plan.badge && (
                 <div className="absolute -top-3 -right-3">
-                  <span className="rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white">
+                  <span className="badge badge-accent">
                     {plan.badge}
                   </span>
                 </div>
@@ -157,20 +157,20 @@ export default function PricingTable() {
                 <div className="mb-4">
                   <plan.icon className={`h-8 w-8 text-${plan.color}-600`} />
                 </div>
-                <h3 className="jp-heading text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-7 sm:leading-8 tracking-normal break-keep">{plan.name}</h3>
-                <p className="measure-body text-sm text-gray-600 mb-4 jp-phrase">{plan.description}</p>
+                <h3 className="text-h3 text-neutral-900 mb-2 jp-text">{plan.name}</h3>
+                <p className="text-body text-neutral-600 mb-4 jp-text">{plan.description}</p>
                 
                 <div className="mb-4">
                   {plan.originalPrice && (
-                    <span className="text-base sm:text-lg text-gray-400 line-through mr-2 whitespace-nowrap tabular-nums">
+                    <span className="text-body text-neutral-400 line-through mr-2">
                       {plan.originalPrice}
                     </span>
                   )}
-                  <span className="text-2xl sm:text-3xl font-bold text-gray-900 whitespace-nowrap tabular-nums">
+                  <span className="text-h1 text-neutral-900">
                     {plan.price}
                   </span>
                   {plan.id !== 'free' && (
-                    <span className="text-gray-600 ml-1 whitespace-nowrap">/月</span>
+                    <span className="text-neutral-600 ml-1">/月</span>
                   )}
                 </div>
               </div>
@@ -178,7 +178,7 @@ export default function PricingTable() {
               <ul className="mb-8 space-y-2 sm:space-y-2.5 flex-1">
                 {plan.inheritedFeatures && (
                   <li className="mb-4 pb-3 border-b border-gray-100">
-                    <span className="text-sm font-medium text-purple-600">
+                    <span className="text-body-small text-primary font-medium">
                       {plan.inheritedFeatures}
                     </span>
                   </li>
@@ -186,20 +186,20 @@ export default function PricingTable() {
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
                     <Check
-                      className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 mr-2 sm:mr-3 ${
-                        feature.included ? 'text-green-500' : 'text-gray-300'
+                      className={`icon icon-sm shrink-0 mt-0.5 mr-3 ${
+                        feature.included ? 'text-success' : 'text-neutral-300'
                       }`}
                     />
                     <div className="flex-1">
                       <span
-                        className={`text-[13px] sm:text-[15px] leading-6 sm:leading-7 break-keep [text-wrap:pretty] ${
-                          feature.included ? 'text-gray-700' : 'text-gray-400'
+                        className={`text-body-small jp-text ${
+                          feature.included ? 'text-neutral-700' : 'text-neutral-400'
                         }`}
                       >
                         {feature.text}
                       </span>
                       {feature.subtext && (
-                        <div className="mt-1 text-xs sm:text-sm text-gray-500 pl-2 border-l-2 border-gray-200 leading-5 break-keep [text-wrap:pretty]">
+                        <div className="mt-1 text-body-small text-neutral-500 pl-2 border-l-2 border-neutral-200 jp-text">
                           {feature.subtext}
                         </div>
                       )}
@@ -211,10 +211,10 @@ export default function PricingTable() {
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className={`ui-flat block w-full rounded-lg px-4 py-3 min-h-[52px] text-center text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`btn w-full ${
                     plan.popular
-                      ? 'bg-purple-600 text-white hover:bg-purple-700'
-                      : 'bg-gray-900 text-white hover:bg-gray-800'
+                      ? 'btn-primary'
+                      : 'btn-secondary'
                   }`}
                 >
                   {plan.ctaText}
@@ -222,7 +222,7 @@ export default function PricingTable() {
               </div>
 
               {plan.comingSoon && (
-                <div className="mt-4 text-xs text-gray-500">
+                <div className="mt-4 text-body-small text-neutral-500">
                   {plan.comingSoon.map((note, index) => (
                     <p key={index}>{note}</p>
                   ))}
@@ -234,16 +234,16 @@ export default function PricingTable() {
         
         {/* Additional plans link */}
         <div className="text-center mb-8">
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-body text-neutral-600 mb-4 jp-text">
             その他のプラン（Business・Enterprise）はお問い合わせください
           </p>
-          <Link href="/contact" className="ui-flat inline-flex items-center px-6 py-3 min-h-[52px] border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          <Link href="/contact" className="btn btn-outline">
             詳細プランを見る
           </Link>
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-sm text-gray-500 leading-relaxed">
+          <p className="text-body-small text-neutral-500 jp-text">
             ※価格は税込。機能の一部は順次拡張予定です。<br/>
             お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
           </p>

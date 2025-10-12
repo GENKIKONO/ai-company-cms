@@ -36,14 +36,14 @@ export default function FAQSection({ title, description, categories }: FAQSectio
   };
 
   return (
-    <section id="faq" className="section-gap bg-white">
-      <div className="container-article">
+    <section id="faq" className="section">
+      <div className="container">
         {/* セクションヘッダー */}
-        <div className="section-gap">
-          <h2 className="text-heading-2 text-gray-900 mb-4 text-center measure-heading text-balance">
-            <span className="block jp-phrase">{title}</span>
+        <div className="text-center mb-12">
+          <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
+            {title}
           </h2>
-          <p className="copy measure-lead text-center text-gray-600 mx-auto jp-phrase">
+          <p className="text-body-large text-neutral-600 jp-text">
             {description}
           </p>
         </div>
@@ -53,7 +53,7 @@ export default function FAQSection({ title, description, categories }: FAQSectio
           {categories.map((category, categoryIndex) => (
             <div key={categoryIndex}>
               {/* カテゴリータイトル */}
-              <h3 className="text-heading-3 text-gray-900 mb-6 pb-2 border-b-2 border-blue-100 jp-phrase">
+              <h3 className="text-h2 text-neutral-900 mb-6 pb-2 border-b-2 border-primary/20 jp-text">
                 {category.title}
               </h3>
               
@@ -66,21 +66,21 @@ export default function FAQSection({ title, description, categories }: FAQSectio
                   return (
                     <div
                       key={itemIndex}
-                      className="bg-gray-50 rounded-xl border border-gray-200 hover:border-blue-200 transition-colors duration-200"
+                      className="card hover:border-primary/30 transition-colors duration-200"
                     >
                       {/* 質問部分 */}
                       <button
                         onClick={() => toggleItem(categoryIndex, itemIndex)}
                         className="w-full px-6 py-4 text-left flex items-center justify-between group"
                       >
-                        <span className="text-body-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 jp-phrase">
+                        <span className="text-body font-semibold text-neutral-900 group-hover:text-primary transition-colors duration-200 jp-text">
                           {item.question}
                         </span>
                         <div className="flex-shrink-0 ml-4">
                           {isOpen ? (
-                            <ChevronUp className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors duration-200" />
+                            <ChevronUp className="icon icon-sm text-neutral-400 group-hover:text-primary transition-colors duration-200" />
                           ) : (
-                            <ChevronDown className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors duration-200" />
+                            <ChevronDown className="icon icon-sm text-neutral-400 group-hover:text-primary transition-colors duration-200" />
                           )}
                         </div>
                       </button>
@@ -88,8 +88,8 @@ export default function FAQSection({ title, description, categories }: FAQSectio
                       {/* 回答部分 */}
                       {isOpen && (
                         <div className="px-6 pb-4">
-                          <div className="pt-2 border-t border-gray-200">
-                            <p className="copy measure-body text-gray-700 jp-phrase">
+                          <div className="pt-2 border-t border-neutral-200">
+                            <p className="text-body text-neutral-700 jp-text">
                               {item.answer}
                             </p>
                           </div>
@@ -104,17 +104,17 @@ export default function FAQSection({ title, description, categories }: FAQSectio
         </div>
         
         {/* 追加サポート */}
-        <div className="section-gap text-center">
-          <div className="bg-blue-50 rounded-2xl p-6 sm:p-8 border border-blue-100">
-            <h3 className="text-heading-3 text-gray-900 mb-2 jp-phrase">
+        <div className="mt-12 text-center">
+          <div className="card bg-subtle p-8">
+            <h3 className="text-h3 text-neutral-900 mb-2 jp-text">
               その他のご質問がございましたら
             </h3>
-            <p className="copy measure-lead text-gray-600 mb-4 mx-auto jp-phrase">
+            <p className="text-body-large text-neutral-600 mb-6 jp-text">
               AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
             </p>
             <a
               href="/contact"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors duration-300"
+              className="btn btn-primary"
             >
               お問い合わせフォーム
             </a>
