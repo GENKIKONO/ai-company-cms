@@ -1,6 +1,7 @@
 'use client';
 
 import { useMenu } from './MenuProvider';
+import { usePathname } from 'next/navigation';
 
 // Icon components for the toggle
 function MenuIcon() {
@@ -33,6 +34,12 @@ function CloseIcon() {
 
 export default function FAB() {
   const { open, toggle } = useMenu();
+  const pathname = usePathname();
+  
+  // Hide FAB on admin pages
+  if (pathname?.startsWith('/management-console')) {
+    return null;
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {

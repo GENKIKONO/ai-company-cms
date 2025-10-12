@@ -346,8 +346,32 @@ export default function AdminHearingsPage() {
       <div className="max-w-7xl mx-auto">
         {/* ヘッダー */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">ヒアリング依頼管理</h1>
-          <p className="text-gray-600 mt-2">企業ヒアリング代行依頼の管理・進捗確認</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">ヒアリング依頼管理</h1>
+              <p className="text-gray-600 mt-2">企業ヒアリング代行依頼の管理・進捗確認</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  // 新規ヒアリング作成機能（管理者用）
+                  alert('🚧 管理者用ヒアリング作成機能を実装予定です');
+                }}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+              >
+                ➕ 新規ヒアリング作成
+              </button>
+              <button
+                onClick={() => {
+                  // ヒアリング一覧をリフレッシュ
+                  fetchHearingRequests();
+                }}
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+              >
+                🔄 更新
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* 統計カード */}
