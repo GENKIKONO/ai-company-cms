@@ -3,6 +3,9 @@
 import { useI18n } from '@/components/layout/I18nProvider';
 import Link from 'next/link';
 import { User } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
+import { supabaseBrowser } from '@/lib/supabase-client';
+import { auth } from '@/lib/auth';
 
 interface I18nSafeAuthHeaderProps {
   user?: User | null;
@@ -16,14 +19,86 @@ export default function I18nSafeAuthHeader({
   isAuthenticated 
 }: I18nSafeAuthHeaderProps) {
   const { t } = useI18n();
+  const [actualAuthState, setActualAuthState] = useState<boolean>(isAuthenticated);
+  const [authStateChecked, setAuthStateChecked] = useState(false);
+
+  // 認証状態の整合性チェック
+  useEffect(() => {
+    let mounted = true;
+    
+    const checkAuthState = async () => {
+      try {
+        console.log('[I18nSafeAuthHeader] Checking auth state...');
+        
+        // クライアント側の実際の認証状態を確認
+        const { data: { user: currentUser } } = await supabaseBrowser.auth.getUser();
+        const actuallyAuthenticated = !!currentUser;
+        
+        console.log('[I18nSafeAuthHeader] Auth state check:', {
+          propsIsAuthenticated: isAuthenticated,
+          actuallyAuthenticated,
+          hasUser: !!currentUser,
+          propsUser: !!user
+        });
+        
+        if (mounted) {
+          setActualAuthState(actuallyAuthenticated);
+          setAuthStateChecked(true);
+          
+          // 不整合検出時の自動修正
+          if (isAuthenticated && !actuallyAuthenticated) {
+            console.warn('[I18nSafeAuthHeader] Auth state mismatch detected - forcing full logout');
+            try {
+              await auth.signOut();
+              window.location.href = '/';
+            } catch (error) {
+              console.error('[I18nSafeAuthHeader] Auto logout failed:', error);
+              // 強制リロード
+              window.location.reload();
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[I18nSafeAuthHeader] Auth state check failed:', error);
+        if (mounted) {
+          setActualAuthState(false);
+          setAuthStateChecked(true);
+        }
+      }
+    };
+    
+    // 初回チェック
+    checkAuthState();
+    
+    // 認証状態変更のリスナー
+    const { data: { subscription } } = supabaseBrowser.auth.onAuthStateChange((event, session) => {
+      console.log('[I18nSafeAuthHeader] Auth state changed:', event, !!session);
+      if (mounted) {
+        setActualAuthState(!!session);
+      }
+    });
+    
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [isAuthenticated, user]);
+
+  // 認証状態チェック前は何も表示しない（フラッシュ防止）
+  if (!authStateChecked) {
+    return null;
+  }
+
+  // 実際の認証状態を使用
+  const effectiveAuthState = actualAuthState;
 
   const getCtaHref = () => {
-    if (!isAuthenticated) return '/auth/login';
+    if (!effectiveAuthState) return '/auth/login';
     return hasOrganization ? '/dashboard' : '/organizations/new';
   };
 
   const getCtaText = () => {
-    if (!isAuthenticated) return t('ui.header.getStarted');
+    if (!effectiveAuthState) return t('ui.header.getStarted');
     return hasOrganization ? t('ui.header.dashboard') : t('ui.header.createOrganization');
   };
 
@@ -39,14 +114,14 @@ export default function I18nSafeAuthHeader({
               {t('ui.header.title')}
             </Link>
             
-            {isAuthenticated && (
+            {effectiveAuthState && (
               <nav className="ml-10 hidden md:flex space-x-8">
-                <Link 
-                  href="/dashboard" 
+                <button
+                  onClick={() => window.location.href = '/dashboard'}
                   className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                 >
                   {t('ui.header.dashboard')}
-                </Link>
+                </button>
                 <Link 
                   href="/dashboard/billing" 
                   className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
@@ -58,7 +133,7 @@ export default function I18nSafeAuthHeader({
           </div>
           
           <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
+            {effectiveAuthState ? (
               <>
                 <div className="hidden sm:block text-sm text-gray-700 dark:text-gray-300 max-w-[200px] truncate">
                   {t('ui.header.greeting', { 

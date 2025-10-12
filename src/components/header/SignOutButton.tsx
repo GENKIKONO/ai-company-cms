@@ -5,16 +5,20 @@ import { auth } from '@/lib/auth';
 export default function SignOutButton() {
   const handleSignOut = async () => {
     try {
-      console.log('[SignOutButton] ログアウト開始');
+      console.log('[SignOutButton] Complete logout starting...');
+      
+      // 完全なログアウト処理
       await auth.signOut();
       
-      // Cookieがクリアされるまで少し待機
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log('[SignOutButton] Logout completed, redirecting to home...');
       
-      console.log('[SignOutButton] ホームページにリダイレクト');
+      // 強制的にホームページにリダイレクト
       window.location.href = '/';
     } catch (error) {
-      console.error('Sign out failed:', error);
+      console.error('[SignOutButton] Logout failed:', error);
+      
+      // エラーが発生した場合でも強制的にリロード
+      window.location.reload();
     }
   };
 

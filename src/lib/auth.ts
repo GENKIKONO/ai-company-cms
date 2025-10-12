@@ -101,10 +101,51 @@ export const auth = {
     return data;
   },
 
-  // サインアウト
+  // サインアウト - 完全なセッション クリア
   signOut: async () => {
-    const { error } = await supabaseBrowser.auth.signOut();
-    if (error) throw error;
+    try {
+      console.log('[auth.signOut] Starting complete sign out process');
+      
+      // 1. Supabase クライアント サインアウト
+      const { error: signOutError } = await supabaseBrowser.auth.signOut();
+      if (signOutError) {
+        console.error('[auth.signOut] Supabase signOut error:', signOutError);
+      }
+      
+      // 2. 全ての認証関連 Cookie を手動削除
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        const eqPos = cookie.indexOf('=');
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        if (name.startsWith('sb-') || name.includes('auth')) {
+          // 複数のドメイン・パスで削除を試行
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.aiohub.jp`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=aiohub.jp`;
+        }
+      }
+      
+      // 3. localStorage と sessionStorage をクリア
+      if (typeof window !== 'undefined') {
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        });
+        Object.keys(sessionStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            sessionStorage.removeItem(key);
+          }
+        });
+      }
+      
+      console.log('[auth.signOut] Complete sign out finished');
+      
+      if (signOutError) throw signOutError;
+    } catch (error) {
+      console.error('[auth.signOut] Sign out process failed:', error);
+      throw error;
+    }
   },
 
   // パスワードリセット
