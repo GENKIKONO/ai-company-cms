@@ -74,7 +74,13 @@ export async function GET(
         telephone,
         address_country,
         address_region,
-        address_locality
+        address_locality,
+        plan,
+        admin_plan_override,
+        admin_plan_notes,
+        admin_plan_changed_by,
+        admin_plan_changed_at,
+        trial_expires_at
       `)
       .eq('created_by', userId);
 

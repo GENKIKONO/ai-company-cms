@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   User, Building, Mail, Calendar, Shield, Edit, Trash2, Eye, Search, 
   FileText, Briefcase, HelpCircle, BookOpen, ExternalLink, 
-  MoreVertical, Play, Pause, Archive, AlertTriangle
+  MoreVertical, Play, Pause, Archive, AlertTriangle, Plus, X, CreditCard, Star
 } from 'lucide-react';
 
 interface UserData {
@@ -48,6 +48,12 @@ interface UserDetails {
     address_country?: string;
     address_region?: string;
     address_locality?: string;
+    plan?: string;
+    admin_plan_override?: boolean;
+    admin_plan_notes?: string;
+    admin_plan_changed_by?: string;
+    admin_plan_changed_at?: string;
+    trial_expires_at?: string;
   }>;
   content: {
     services: Array<{
@@ -131,6 +137,11 @@ export default function UsersManagementPage() {
   const [updating, setUpdating] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createType, setCreateType] = useState<'service' | 'post' | 'faq' | 'case_study' | null>(null);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [planLoading, setPlanLoading] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -292,6 +303,73 @@ export default function UsersManagementPage() {
       alert(err instanceof Error ? err.message : 'コンテンツ操作中にエラーが発生しました');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const createProxyContent = async (formData: any) => {
+    if (!selectedUser || !createType) return;
+
+    setCreateLoading(true);
+    try {
+      const endpoint = createType === 'case_study' ? 'case-studies' : `${createType}s`;
+      const response = await fetch(`/api/admin/proxy/${selectedUser.id}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '作成に失敗しました');
+      }
+
+      // 詳細情報を再取得
+      await fetchUserDetails(selectedUser.id);
+      setShowCreateModal(false);
+      setCreateType(null);
+      alert('コンテンツが正常に作成されました');
+    } catch (err) {
+      console.error('Proxy content creation error:', err);
+      alert(err instanceof Error ? err.message : 'コンテンツ作成中にエラーが発生しました');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  const openCreateModal = (type: 'service' | 'post' | 'faq' | 'case_study') => {
+    setCreateType(type);
+    setShowCreateModal(true);
+  };
+
+  const changePlan = async (planData: any) => {
+    if (!selectedUser) return;
+
+    setPlanLoading(true);
+    try {
+      const response = await fetch(`/api/admin/users/${selectedUser.id}/plan`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(planData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'プラン変更に失敗しました');
+      }
+
+      // 詳細情報を再取得
+      await fetchUserDetails(selectedUser.id);
+      setShowPlanModal(false);
+      alert('プランが正常に変更されました');
+    } catch (err) {
+      console.error('Plan change error:', err);
+      alert(err instanceof Error ? err.message : 'プラン変更中にエラーが発生しました');
+    } finally {
+      setPlanLoading(false);
     }
   };
 
@@ -620,6 +698,40 @@ export default function UsersManagementPage() {
                                   {org.is_published ? '公開中' : '非公開'}
                                 </span>
                               </div>
+                              {/* プラン情報 */}
+                              <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <CreditCard className="h-4 w-4 text-blue-600" />
+                                    <span className="text-sm font-medium text-blue-900">
+                                      プラン: {org.plan || 'free'}
+                                      {org.admin_plan_override && (
+                                        <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
+                                          <Star className="h-3 w-3 inline mr-1" />
+                                          管理者設定
+                                        </span>
+                                      )}
+                                    </span>
+                                  </div>
+                                  <button
+                                    onClick={() => setShowPlanModal(true)}
+                                    className="text-blue-600 hover:text-blue-700 text-xs flex items-center"
+                                  >
+                                    <Edit className="h-3 w-3 mr-1" />
+                                    変更
+                                  </button>
+                                </div>
+                                {org.admin_plan_override && org.admin_plan_notes && (
+                                  <div className="mt-2 text-xs text-gray-600">
+                                    <strong>管理者メモ:</strong> {org.admin_plan_notes}
+                                  </div>
+                                )}
+                                {org.trial_expires_at && (
+                                  <div className="mt-2 text-xs text-orange-600">
+                                    <strong>体験終了:</strong> {new Date(org.trial_expires_at).toLocaleDateString()}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                             <div className="flex items-center gap-2 ml-4">
                               {org.url && (
@@ -667,10 +779,19 @@ export default function UsersManagementPage() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* サービス */}
                     <div>
-                      <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                        <Briefcase className="h-4 w-4 mr-2" />
-                        サービス ({userDetails.content.services.length})
-                      </h4>
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="text-md font-semibold text-gray-900 flex items-center">
+                          <Briefcase className="h-4 w-4 mr-2" />
+                          サービス ({userDetails.content.services.length})
+                        </h4>
+                        <button
+                          onClick={() => openCreateModal('service')}
+                          className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          新規作成
+                        </button>
+                      </div>
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {userDetails.content.services.map((service) => (
                           <ContentItem
@@ -689,10 +810,19 @@ export default function UsersManagementPage() {
 
                     {/* 投稿 */}
                     <div>
-                      <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                        <FileText className="h-4 w-4 mr-2" />
-                        投稿 ({userDetails.content.posts.length})
-                      </h4>
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="text-md font-semibold text-gray-900 flex items-center">
+                          <FileText className="h-4 w-4 mr-2" />
+                          投稿 ({userDetails.content.posts.length})
+                        </h4>
+                        <button
+                          onClick={() => openCreateModal('post')}
+                          className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          新規作成
+                        </button>
+                      </div>
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {userDetails.content.posts.map((post) => (
                           <ContentItem
@@ -711,10 +841,19 @@ export default function UsersManagementPage() {
 
                     {/* ケーススタディ */}
                     <div>
-                      <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        ケーススタディ ({userDetails.content.caseStudies.length})
-                      </h4>
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="text-md font-semibold text-gray-900 flex items-center">
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          ケーススタディ ({userDetails.content.caseStudies.length})
+                        </h4>
+                        <button
+                          onClick={() => openCreateModal('case_study')}
+                          className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          新規作成
+                        </button>
+                      </div>
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {userDetails.content.caseStudies.map((caseStudy) => (
                           <ContentItem
@@ -733,10 +872,19 @@ export default function UsersManagementPage() {
 
                     {/* FAQ */}
                     <div>
-                      <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                        <HelpCircle className="h-4 w-4 mr-2" />
-                        FAQ ({userDetails.content.faqs.length})
-                      </h4>
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="text-md font-semibold text-gray-900 flex items-center">
+                          <HelpCircle className="h-4 w-4 mr-2" />
+                          FAQ ({userDetails.content.faqs.length})
+                        </h4>
+                        <button
+                          onClick={() => openCreateModal('faq')}
+                          className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          新規作成
+                        </button>
+                      </div>
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {userDetails.content.faqs.map((faq) => (
                           <ContentItem
@@ -810,7 +958,474 @@ export default function UsersManagementPage() {
           </div>
         </div>
       )}
+
+      {/* 代理作成モーダル */}
+      {showCreateModal && selectedUser && createType && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {createType === 'service' && 'サービス作成'}
+                  {createType === 'post' && '投稿作成'}
+                  {createType === 'faq' && 'FAQ作成'}
+                  {createType === 'case_study' && 'ケーススタディ作成'}
+                  - {selectedUser.email} の代理
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setCreateType(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <ProxyCreateForm
+                type={createType}
+                onSubmit={createProxyContent}
+                onCancel={() => {
+                  setShowCreateModal(false);
+                  setCreateType(null);
+                }}
+                loading={createLoading}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* プラン変更モーダル */}
+      {showPlanModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-lg w-full">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  プラン変更 - {selectedUser.email}
+                </h3>
+                <button
+                  onClick={() => setShowPlanModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <PlanChangeForm
+                onSubmit={changePlan}
+                onCancel={() => setShowPlanModal(false)}
+                loading={planLoading}
+                currentPlan={userDetails?.organizations[0]?.plan || 'free'}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+// プラン変更フォームコンポーネント
+function PlanChangeForm({ onSubmit, onCancel, loading, currentPlan }: {
+  onSubmit: (data: any) => void;
+  onCancel: () => void;
+  loading: boolean;
+  currentPlan: string;
+}) {
+  const [formData, setFormData] = useState({
+    plan: currentPlan,
+    override_reason: '',
+    admin_notes: '',
+    trial_expires_at: ''
+  });
+
+  const planOptions = [
+    { value: 'free', label: '無料プラン', description: 'サービス3件、投稿5件まで' },
+    { value: 'basic', label: 'ベーシック', description: 'サービス50件、投稿200件まで' },
+    { value: 'pro', label: 'プロ', description: 'サービス200件、投稿1000件まで' },
+    { value: 'standard', label: 'スタンダード', description: '企業向け標準プラン' },
+    { value: 'enterprise', label: 'エンタープライズ', description: '無制限・カスタム機能' }
+  ];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.override_reason.trim()) {
+      alert('変更理由は必須です');
+      return;
+    }
+    onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="space-y-4">
+        {/* 現在のプラン表示 */}
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <span className="text-sm text-gray-700">現在のプラン: </span>
+          <span className="font-medium text-gray-900">{currentPlan}</span>
+        </div>
+
+        {/* 新しいプラン選択 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            新しいプラン <span className="text-red-500">*</span>
+          </label>
+          <div className="space-y-2">
+            {planOptions.map((option) => (
+              <label key={option.value} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                <input
+                  type="radio"
+                  name="plan"
+                  value={option.value}
+                  checked={formData.plan === option.value}
+                  onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
+                  className="mt-1 text-blue-600 focus:ring-blue-500"
+                />
+                <div>
+                  <div className="font-medium text-gray-900">{option.label}</div>
+                  <div className="text-sm text-gray-500">{option.description}</div>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* 変更理由 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            変更理由 <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            rows={3}
+            required
+            value={formData.override_reason}
+            onChange={(e) => setFormData({ ...formData, override_reason: e.target.value })}
+            placeholder="プラン変更の理由を記録してください..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        {/* 管理者メモ */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">管理者メモ</label>
+          <textarea
+            rows={2}
+            value={formData.admin_notes}
+            onChange={(e) => setFormData({ ...formData, admin_notes: e.target.value })}
+            placeholder="追加のメモや注意事項..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        {/* 体験期限 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">体験期限（任意）</label>
+          <input
+            type="date"
+            value={formData.trial_expires_at}
+            onChange={(e) => setFormData({ ...formData, trial_expires_at: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            設定すると体験版として扱われ、期限後に元のプランに戻ります
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-3 mt-6">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+          disabled={loading}
+        >
+          キャンセル
+        </button>
+        <button
+          type="submit"
+          disabled={loading || !formData.override_reason.trim()}
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center"
+        >
+          {loading ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              変更中...
+            </>
+          ) : (
+            '変更'
+          )}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// 代理作成フォームコンポーネント
+function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
+  type: 'service' | 'post' | 'faq' | 'case_study';
+  onSubmit: (data: any) => void;
+  onCancel: () => void;
+  loading: boolean;
+}) {
+  const [formData, setFormData] = useState<any>({});
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({ ...formData, admin_notes: formData.admin_notes || '管理者による代理作成' });
+  };
+
+  const renderFormFields = () => {
+    switch (type) {
+      case 'service':
+        return (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                サービス名 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.name || ''}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">説明</label>
+              <textarea
+                rows={3}
+                value={formData.description || ''}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">価格</label>
+                <input
+                  type="number"
+                  value={formData.price || ''}
+                  onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || undefined })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">所要時間（分）</label>
+                <input
+                  type="number"
+                  value={formData.duration || ''}
+                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || undefined })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </>
+        );
+
+      case 'post':
+        return (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                タイトル <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.title || ''}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                スラッグ <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.slug || ''}
+                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="url-friendly-name"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">本文</label>
+              <textarea
+                rows={6}
+                value={formData.content || ''}
+                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">抜粋</label>
+              <textarea
+                rows={2}
+                value={formData.excerpt || ''}
+                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </>
+        );
+
+      case 'faq':
+        return (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                質問 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.question || ''}
+                onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                回答 <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                rows={4}
+                required
+                value={formData.answer || ''}
+                onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">カテゴリ</label>
+              <input
+                type="text"
+                value={formData.category || ''}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </>
+        );
+
+      case 'case_study':
+        return (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                タイトル <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.title || ''}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">クライアント名</label>
+              <input
+                type="text"
+                value={formData.client_name || ''}
+                onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">課題</label>
+              <textarea
+                rows={3}
+                value={formData.challenge || ''}
+                onChange={(e) => setFormData({ ...formData, challenge: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">解決策</label>
+              <textarea
+                rows={3}
+                value={formData.solution || ''}
+                onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">結果</label>
+              <textarea
+                rows={3}
+                value={formData.results || ''}
+                onChange={(e) => setFormData({ ...formData, results: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {renderFormFields()}
+      
+      {/* 共通フィールド */}
+      <div className="mb-4">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={formData.is_published || false}
+            onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
+            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="ml-2 text-sm text-gray-700">すぐに公開する</span>
+        </label>
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">管理者メモ</label>
+        <textarea
+          rows={2}
+          value={formData.admin_notes || ''}
+          onChange={(e) => setFormData({ ...formData, admin_notes: e.target.value })}
+          placeholder="作成理由や注意事項などを記録..."
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+          disabled={loading}
+        >
+          キャンセル
+        </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center"
+        >
+          {loading ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              作成中...
+            </>
+          ) : (
+            '作成'
+          )}
+        </button>
+      </div>
+    </form>
   );
 }
 
