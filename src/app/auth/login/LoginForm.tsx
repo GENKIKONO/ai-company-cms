@@ -13,6 +13,9 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showResendConfirmation, setShowResendConfirmation] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -31,8 +34,11 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
         
         if (signInError.message.includes('Invalid login credentials')) {
           errorMessage = 'メールアドレスまたはパスワードが正しくありません。';
-        } else if (signInError.message.includes('Email not confirmed')) {
-          errorMessage = 'メールアドレスが確認されていません。確認メールをご確認ください。';
+        } else if (signInError.message.includes('Email not confirmed') || 
+                   signInError.message.includes('email_not_confirmed') ||
+                   signInError.message.includes('signup_disabled')) {
+          errorMessage = 'メールアドレスが確認されていません。';
+          setShowResendConfirmation(true);
         } else if (signInError.message.includes('Too many requests')) {
           errorMessage = '試行回数が上限に達しました。しばらく時間をおいてからお試しください。';
         }
@@ -66,11 +72,69 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
     }
   };
 
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      setResendMessage('メールアドレスを入力してください。');
+      return;
+    }
+
+    setResendLoading(true);
+    setResendMessage('');
+
+    try {
+      const response = await fetch('/api/auth/resend-confirmation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          type: 'signup'
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setResendMessage('確認メールを再送信しました。メールをご確認ください。');
+        setShowResendConfirmation(false);
+      } else {
+        setResendMessage(result.error || '再送信に失敗しました。');
+      }
+    } catch (err) {
+      setResendMessage('ネットワークエラーが発生しました。');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
     <form className="mt-8 space-y-6" onSubmit={handleLogin}>
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
           {error}
+          {showResendConfirmation && (
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={handleResendConfirmation}
+                disabled={resendLoading}
+                className="text-sm text-blue-600 hover:text-blue-500 underline disabled:opacity-50"
+              >
+                {resendLoading ? '再送信中...' : '確認メールを再送信'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {resendMessage && (
+        <div className={`px-4 py-3 rounded ${
+          resendMessage.includes('再送信しました') 
+            ? 'bg-green-50 border border-green-200 text-green-600'
+            : 'bg-yellow-50 border border-yellow-200 text-yellow-600'
+        }`}>
+          {resendMessage}
         </div>
       )}
       
