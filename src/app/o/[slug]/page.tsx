@@ -112,7 +112,6 @@ const getOrganizationDataCached = (slug: string) =>
           .from('posts')
           .select('*')
           .eq('organization_id', organization.id)
-          .eq('is_published', true)
           .order('created_at', { ascending: false })
           .limit(10),
         
@@ -120,14 +119,12 @@ const getOrganizationDataCached = (slug: string) =>
           .from('services')
           .select('*')
           .eq('organization_id', organization.id)
-          .eq('is_published', true)
           .order('created_at', { ascending: false }),
         
         supabase
           .from('case_studies')
           .select('*')
           .eq('organization_id', organization.id)
-          .eq('is_published', true)
           .order('created_at', { ascending: false }),
         
         supabase
