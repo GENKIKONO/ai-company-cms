@@ -97,7 +97,7 @@ export default function QAPublicDisplay({ organizationSlug, className = '' }: QA
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="w-5 h-5" />
-            よくある質問
+            ナレッジベース
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
