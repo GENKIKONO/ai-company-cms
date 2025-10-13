@@ -35,7 +35,7 @@ export default function NewServicePage() {
     };
 
     try {
-      const response = await fetch('/api/services', {
+      const response = await fetch('/api/my/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -43,10 +43,10 @@ export default function NewServicePage() {
 
       const result = await response.json();
 
-      if (result.ok) {
-        router.push('/dashboard');
+      if (response.ok && result.data) {
+        router.push('/dashboard/services');
       } else {
-        setError(result.error || '作成に失敗しました');
+        setError(result.message || result.error || '作成に失敗しました');
       }
     } catch (err) {
       setError('ネットワークエラーが発生しました');
