@@ -13,6 +13,8 @@ interface Organization {
   logo_url?: string;
   description?: string;
   url?: string;
+  address_country: string;
+  email_public: boolean;
 }
 
 interface Service {
