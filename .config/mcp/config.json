@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "supabase": {
+      "command": "node",
+      "args": [
+        "/Users/kounogenki/Documents/LuxuCare株式会社/開発/mcp-supabase-server.js"
+      ],
+      "env": {
+        "SUPABASE_URL": "https://chyicolujwhkycpkxbej.supabase.co",
+        "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoeWljb2x1andoa3ljcGt4YmVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODQ0Mjg4NiwiZXhwIjoyMDc0MDE4ODg2fQ.rHrHkFfO8VYvF0mlpHbDQZ47SO37IQXWAXEhNAY2dGA"
+      }
+    }
+  }
+}
