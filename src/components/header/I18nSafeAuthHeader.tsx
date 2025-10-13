@@ -155,7 +155,10 @@ export default function I18nSafeAuthHeader({
           <div className="flex items-center space-x-4">
             {effectiveAuthState ? (
               <>
-                <div className="hidden sm:block text-sm text-gray-700 dark:text-gray-300 max-w-[200px] truncate">
+                <div 
+                  className="hidden sm:block text-sm text-gray-700 dark:text-gray-300 max-w-[200px] truncate"
+                  data-testid="user-menu"
+                >
                   {t('ui.header.greeting', { 
                     name: user?.user_metadata?.full_name || user?.email || t('ui.common.user')
                   })}
@@ -164,6 +167,7 @@ export default function I18nSafeAuthHeader({
                 <Link
                   href="/auth/signout"
                   className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  data-testid="logout-button"
                 >
                   {t('ui.header.signOut')}
                 </Link>

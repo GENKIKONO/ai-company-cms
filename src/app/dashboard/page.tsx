@@ -81,6 +81,7 @@ export default async function DashboardPage() {
             <Link
               href="/organizations/new"
               className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-md text-center block"
+              data-testid="create-organization"
             >
               企業を作成
             </Link>
@@ -110,7 +111,7 @@ export default async function DashboardPage() {
               ダッシュボード
             </h1>
             <p className="text-sm sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-prose mx-auto leading-relaxed">
-              {org.name} の企業情報管理と公開状況を確認できます
+              <span data-testid="organization-name">{org.name}</span> の企業情報管理と公開状況を確認できます
             </p>
             
             {/* ステータス表示 */}
