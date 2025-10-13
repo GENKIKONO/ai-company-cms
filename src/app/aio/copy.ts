@@ -3,22 +3,22 @@
 export const aioCopy = {
   // Hero Section
   hero: {
-    title: 'ゼロクリック時代でも\n見つかり続ける\n企業情報へ',
+    title: 'AIと検索エンジンが解釈しやすい形で\n企業情報を構造化・整備します',
     subtitle: 'AIO（AI Information Optimization）',
-    description: 'AIが理解・引用しやすい形に情報を最適化。JSON-LD自動生成とCMS管理で、検索からAI回答まで一貫して見つかる企業情報を実現します。',
+    description: 'Schema.orgに準拠したJSON-LD を生成し、情報の解釈を支援します。CMS管理で企業情報の構造化・整備を行います。',
     features: [
       { icon: 'Database', text: 'JSON-LD自動生成' },
-      { icon: 'Search', text: 'AI検索最適化' },
-      { icon: 'Zap', text: 'ゼロクリック対応' }
+      { icon: 'Search', text: 'AI理解支援' },
+      { icon: 'Zap', text: '構造化データ出力' }
     ],
     benefits: [
       { 
         title: 'JSON-LD自動生成', 
-        description: '入力だけで構造化データを自動生成し、AIに引用されやすい形へ。' 
+        description: '入力データからSchema.org準拠の構造化データを自動生成します。' 
       },
       { 
-        title: 'AI検索最適化', 
-        description: 'ゼロクリック時代でも外されないための情報設計を提供。' 
+        title: 'AI理解支援', 
+        description: '検索エンジンやAIが解釈しやすい情報構造の準備を支援します。' 
       },
       { 
         title: 'CMS一元管理', 
@@ -61,7 +61,7 @@ export const aioCopy = {
       {
         step: 3,
         title: '公開・運用開始',
-        description: 'SEO・AI検索・JSON-LD構造化データ・サイトマップまで自動対応で即座に効果発揮。',
+        description: 'Schema.org準拠の構造化データ出力などの技術対応を実施します。',
         details: [
           '検索エンジン・AI向けサイトマップ',
           'JSON-LD構造化データ自動生成',
@@ -89,7 +89,7 @@ export const aioCopy = {
           '{ "targetIndustry": ["製造業", "小売業"], "customerSize": "中小企業" }',
           '{ "serviceOutput": { "metric": "売上向上", "value": "実績あり" } }'
         ],
-        benefit: 'AI・検索エンジンが正確に理解'
+        benefit: 'AI・検索エンジンが解釈しやすい構造'
       }
     }
   },
@@ -157,7 +157,6 @@ export const aioCopy = {
           'Verified法人バッジ',
           '承認フロー機能',
           '認証バッジ機能',
-          'Search Console連携',
           'AI解析レポート（基本版）',
           'システム監視機能',
           '優先サポート・個別相談'
@@ -192,7 +191,7 @@ export const aioCopy = {
       included: [
         '消費税込みの価格表示',
         '初期費用・セットアップ費用無料',
-        'JSON-LD・Schema.org準拠保証',
+        'JSON-LD・Schema.org準拠対応',
         'デザイン・レスポンシブ対応'
       ],
       payment: [
@@ -253,8 +252,8 @@ export const aioCopy = {
 
   // CTA Section
   cta: {
-    title: 'AIOで、今すぐ始める\n企業情報の最適化',
-    description: 'フリープランなら永続無料。5分の入力で、あなたの企業情報がAI時代に対応します。',
+    title: 'AIOで、今すぐ始める\n企業情報の構造化',
+    description: 'フリープランなら永続無料。5分の入力で、あなたの企業情報の構造化を開始できます。',
     primaryText: '無料でAIOを始める',
     primaryHref: '/organizations',
     secondaryText: 'ヒアリング代行を利用する',
@@ -262,13 +261,14 @@ export const aioCopy = {
     features: [
       'クレジットカード登録不要',
       'いつでもプラン変更可能',
-      'JSON-LD・Schema.org準拠保証'
-    ]
+      'JSON-LD・Schema.org準拠対応'
+    ],
+    disclaimer: '本サービスは、構造化データの出力など技術的支援を提供するものであり、検索順位や掲載・引用の結果を保証するものではありません。'
   },
 
   // メタデータ
   metadata: {
-    title: 'AIOとは - AI情報最適化でゼロクリック時代に対応 | AIO Hub',
-    description: 'AIO（AI Information Optimization）でゼロクリック時代に対応。JSON-LD自動生成とCMS管理で、AI検索・生成AIから見つかり続ける企業情報を実現。フリープラン永続無料。',
+    title: 'AIOとは - AI情報構造化で検索エンジン理解を支援 | AIO Hub',
+    description: 'AIO（AI Information Optimization）で企業情報を構造化。JSON-LD自動生成とCMS管理で、検索エンジンやAIが解釈しやすい形での情報整備を支援。フリープラン永続無料。',
   },
 } as const;

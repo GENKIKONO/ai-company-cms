@@ -50,7 +50,7 @@ export const PLAN_LIMITS = {
     faqs: Number.POSITIVE_INFINITY,  // FAQ無制限
     approval_flow: true,  // 承認フロー機能
     auth_badges: true,  // 認証バッジ機能
-    search_console: true  // Search Console連携
+    search_console: false  // Search Console連携（未実装）
   },
   enterprise: { 
     services: Number.POSITIVE_INFINITY, 
@@ -126,7 +126,6 @@ export const PLAN_FEATURES = {
     'Verified法人バッジ',
     '承認フロー機能',
     '認証バッジ機能',
-    'Search Console連携',
     'AI解析レポート（基本版）',
     'システム監視機能',
     '優先サポート'

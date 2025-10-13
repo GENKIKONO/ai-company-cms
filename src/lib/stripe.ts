@@ -74,7 +74,6 @@ export const SUBSCRIPTION_PLANS = {
       'Verified法人バッジ',
       '承認フロー機能',
       '認証バッジ機能',
-      'Search Console連携',
       'AI解析レポート（基本版）',
       'システム監視機能',
       '優先サポート・個別相談',

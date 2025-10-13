@@ -19,10 +19,10 @@ export const HEARING_SERVICE_PLANS = {
     color: 'blue',
     features: [
       '企業/サービスの基礎ヒアリング（60分）',
-      'AIO Hubページの「企業概要・サービス概要・代表挨拶」を代理入力',
+      '登録中の項目（サービス情報・Q&A等）の代行入力（同意に基づく）',
       'JSON-LD構造化適用（Hub側反映）',
-      '簡易「AI引用最適化レポート」1点納品',
-      'AIに"読まれる"最低限の土台ページが1枚完成'
+      '構造化データ出力と整合性チェック（技術的）',
+      'Schema.org準拠のプロフィール構造（JSON-LD）を出力'
     ],
     limitations: [
       'Q&A拡充は含まれません',
@@ -47,11 +47,10 @@ export const HEARING_SERVICE_PLANS = {
       '採用/PR/B2B向けQ&A拡充（テンプレ活用）',
       '文章校正とAIO/SEO視点の整理',
       '公開後の簡易ブラッシュアップ1回まで',
-      '採用・顧客獲得に効く"深度ある"情報構造が完成'
+      '採用・B2B向けの情報整理と構造化を実施'
     ],
     limitations: [
       '競合比較分析は含まれません',
-      'Search Console設定は別途相談'
     ],
     ctaText: 'アドバンスプランで依頼する',
     contactParam: 'hearing-advance'
@@ -70,10 +69,9 @@ export const HEARING_SERVICE_PLANS = {
     features: [
       'アドバンスヒアリングの全範囲を含む',
       '各カテゴリ（採用/B2B/CSR/ブランド）深掘りQ&A',
-      '競合比較分析とAI引用想定設計',
-      'Business/Enterprise利用時はSearch Console初期セット/最適化サポート',
+      '競合比較分析と情報構造の設計',
       '公開前レビュー＋再編集2回まで',
-      'AI引用を前提とした"完全構造化プロフィール"が完成'
+      'Schema.org準拠のプロフィール構造（JSON-LD）を出力'
     ],
     limitations: [],
     ctaText: 'フルプランで依頼する',
@@ -94,9 +92,9 @@ export const HEARING_SERVICE_PLANS = {
     features: [
       '月30〜60分の定例ヒアリング',
       '情報更新代行（企業情報・サービス情報・Q&A等）',
-      'Search Console＋AI引用傾向ミニレポート',
+      '構造化データの更新と技術レポート',
       '価格はカバレッジ/頻度で見積もり',
-      '継続的な情報鮮度維持とAI最適化'
+      '継続的な情報鮮度維持と構造化データの更新'
     ],
     limitations: [
       '詳細な価格は個別見積もり',

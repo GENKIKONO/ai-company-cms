@@ -86,7 +86,6 @@ const PLANS: PricingPlan[] = [
       { text: 'Verified法人バッジ', included: true },
       { text: '承認フロー機能', included: true },
       { text: '認証バッジ機能', included: true },
-      { text: 'Search Console連携', included: true },
       { text: 'AI解析レポート（基本版）', included: true },
       { text: 'システム監視機能', included: true },
       { text: '優先サポート・個別相談', included: true }
@@ -128,7 +127,7 @@ export default function PricingTable() {
             シンプルで明確な料金体系
           </h2>
           <p className="text-body-large text-neutral-600 jp-text">
-            無料から始めて、必要になったら拡張。最小の入力で、AIに"引用されやすい"企業情報を実現します。
+            無料から始めて、必要になったら拡張。最小の入力で、Schema.org準拠の企業情報構造化を実現します。
           </p>
         </div>
 
