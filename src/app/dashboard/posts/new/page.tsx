@@ -22,18 +22,22 @@ export default function NewPostPage() {
     };
 
     try {
-      const response = await fetch('/api/posts', {
+      const response = await fetch('/api/my/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          ...data,
+          content_markdown: data.content,
+          is_published: data.status === 'published'
+        })
       });
 
       const result = await response.json();
 
-      if (result.ok) {
-        router.push('/dashboard');
+      if (response.ok && result.data) {
+        router.push('/dashboard/posts');
       } else {
-        setError(result.error || '作成に失敗しました');
+        setError(result.message || result.error || '作成に失敗しました');
       }
     } catch (err) {
       setError('ネットワークエラーが発生しました');
@@ -45,8 +49,18 @@ export default function NewPostPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">新しい記事</h1>
-        <p className="text-gray-600 mt-2">記事の情報を入力してください</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">新しい記事</h1>
+            <p className="text-gray-600 mt-2">記事の情報を入力してください</p>
+          </div>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+          >
+            ダッシュボードに戻る
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

@@ -17,6 +17,7 @@ interface Service {
   features?: string[];
   cta_text?: string;
   cta_url?: string;
+  is_published?: boolean;
 }
 
 export default function EditServicePage() {
@@ -40,7 +41,8 @@ export default function EditServicePage() {
     video_url: '',
     features: [''] as string[],
     cta_text: '',
-    cta_url: ''
+    cta_url: '',
+    is_published: false
   });
 
   useEffect(() => {
@@ -67,7 +69,8 @@ export default function EditServicePage() {
         video_url: serviceData.video_url || '',
         features: serviceData.features?.length > 0 ? serviceData.features : [''],
         cta_text: serviceData.cta_text || '',
-        cta_url: serviceData.cta_url || ''
+        cta_url: serviceData.cta_url || '',
+        is_published: serviceData.is_published || false
       });
     } catch (err) {
       setError('サービスの読み込みに失敗しました');
@@ -93,7 +96,8 @@ export default function EditServicePage() {
       video_url: formData.video_url || undefined,
       features: formData.features.filter(f => f.trim() !== ''),
       cta_text: formData.cta_text || undefined,
-      cta_url: formData.cta_url || undefined
+      cta_url: formData.cta_url || undefined,
+      is_published: formData.is_published
     };
 
     try {
@@ -160,8 +164,18 @@ export default function EditServicePage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">サービス編集</h1>
-        <p className="text-gray-600 mt-2">サービス情報を更新してください</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">サービス編集</h1>
+            <p className="text-gray-600 mt-2">サービス情報を更新してください</p>
+          </div>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+          >
+            ダッシュボードに戻る
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -335,6 +349,23 @@ export default function EditServicePage() {
               placeholder="https://example.com/service"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            公開ステータス
+          </label>
+          <select
+            value={formData.is_published ? 'published' : 'draft'}
+            onChange={(e) => setFormData({ ...formData, is_published: e.target.value === 'published' })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="draft">下書き</option>
+            <option value="published">公開</option>
+          </select>
+          <p className="mt-1 text-xs text-gray-500">
+            公開にすると企業ページに表示され、検索エンジンからも見つけられるようになります
+          </p>
         </div>
 
         {error && (

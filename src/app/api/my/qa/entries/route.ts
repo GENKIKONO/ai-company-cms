@@ -11,13 +11,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('organization_id')
-      .eq('id', user.id)
+    // Get user's organization (Single-Org Mode: user owns organization)
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', user.id)
       .single();
 
-    if (userError || !userData?.organization_id) {
+    if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
     }
 
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
         *,
         qa_categories!left(id, name, slug)
       `, { count: 'exact' })
-      .eq('organization_id', userData.organization_id);
+      .eq('organization_id', organization.id);
 
     if (status && ['draft', 'published', 'archived'].includes(status)) {
       query = query.eq('status', status);
@@ -85,16 +86,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('organization_id')
-      .eq('id', user.id)
+    // Get user's organization (Single-Org Mode: user owns organization)
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', user.id)
       .single();
 
-    if (userError || !userData?.organization_id) {
+    if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
     }
-
+    
     const body: QAEntryFormData = await req.json();
     
     if (!body.question?.trim() || !body.answer?.trim()) {
@@ -107,7 +109,7 @@ export async function POST(req: NextRequest) {
         .from('qa_categories')
         .select('id')
         .eq('id', body.category_id)
-        .or(`organization_id.eq.${userData.organization_id},visibility.eq.global`)
+        .or(`organization_id.eq.${organization.id},visibility.eq.global`)
         .single();
 
       if (categoryError || !category) {
@@ -116,7 +118,7 @@ export async function POST(req: NextRequest) {
     }
 
     const entryData = {
-      organization_id: userData.organization_id,
+      organization_id: organization.id,
       category_id: body.category_id || null,
       question: body.question.trim(),
       answer: body.answer.trim(),
@@ -159,7 +161,7 @@ export async function POST(req: NextRequest) {
     await supabase
       .from('qa_content_logs')
       .insert({
-        organization_id: userData.organization_id,
+        organization_id: organization.id,
         qa_entry_id: entry.id,
         category_id: entry.category_id,
         action: 'create',

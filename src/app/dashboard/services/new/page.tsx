@@ -12,6 +12,7 @@ export default function NewServicePage() {
   const [features, setFeatures] = useState<string[]>(['']);
   const [ctaText, setCtaText] = useState<string>('');
   const [ctaUrl, setCtaUrl] = useState<string>('');
+  const [publishStatus, setPublishStatus] = useState<'draft' | 'published' | 'private'>('draft');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -31,7 +32,8 @@ export default function NewServicePage() {
       video_url: videoUrl || undefined,
       features: features.filter(f => f.trim() !== ''),
       cta_text: ctaText || undefined,
-      cta_url: ctaUrl || undefined
+      cta_url: ctaUrl || undefined,
+      is_published: publishStatus === 'published'
     };
 
     try {
@@ -236,6 +238,24 @@ export default function NewServicePage() {
               placeholder="https://example.com/service"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            公開ステータス
+          </label>
+          <select
+            value={publishStatus}
+            onChange={(e) => setPublishStatus(e.target.value as 'draft' | 'published' | 'private')}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="draft">下書き</option>
+            <option value="published">公開</option>
+            <option value="private">非公開</option>
+          </select>
+          <p className="mt-1 text-xs text-gray-500">
+            公開にすると企業ページに表示され、検索エンジンからも見つけられるようになります
+          </p>
         </div>
 
         {error && (
