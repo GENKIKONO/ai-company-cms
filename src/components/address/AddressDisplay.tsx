@@ -26,10 +26,12 @@ export default function AddressDisplay({
     return null;
   }
 
-  // Create Google Maps URLs
-  const searchQuery = encodeURIComponent(`${organizationName} ${fullAddress}`.trim());
-  const googleMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
-  const googleMapsDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${searchQuery}`;
+  // Create Google Maps URLs with more accurate search
+  // Use just the address for more accurate location, add organization name as secondary context
+  const addressQuery = encodeURIComponent(fullAddress);
+  const searchWithOrg = organizationName ? encodeURIComponent(`${fullAddress} ${organizationName}`) : addressQuery;
+  const googleMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${addressQuery}`;
+  const googleMapsDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${addressQuery}`;
 
   return (
     <div className={`bg-white border border-gray-200 rounded-lg overflow-hidden ${className}`}>

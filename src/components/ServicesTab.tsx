@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import ServiceImageUploader from '@/components/ServiceImageUploader';
 
 interface Service {
   id: string;
@@ -20,6 +21,7 @@ interface ServiceFormData {
   price: number | null;
   duration: string;
   category: string;
+  image_url?: string;
 }
 
 interface ServicesTabProps {
@@ -39,7 +41,8 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
     description: '',
     price: null,
     duration: '',
-    category: ''
+    category: '',
+    image_url: ''
   });
 
   useEffect(() => {
@@ -68,7 +71,8 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
       description: '',
       price: null,
       duration: '',
-      category: ''
+      category: '',
+      image_url: ''
     });
     setEditingService(null);
     setShowForm(false);
@@ -81,7 +85,8 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
       description: service.description || '',
       price: service.price,
       duration: service.duration || '',
-      category: service.category || ''
+      category: service.category || '',
+      image_url: (service as any).image_url || ''
     });
     setEditingService(service);
     setShowForm(true);
@@ -315,6 +320,15 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
                     onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
                     placeholder="例: 1時間、3ヶ月など"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <ServiceImageUploader
+                    serviceId={editingService?.id}
+                    currentImageUrl={formData.image_url}
+                    onImageChange={(imageUrl) => setFormData(prev => ({ ...prev, image_url: imageUrl || '' }))}
+                    disabled={submitting}
                   />
                 </div>
 
