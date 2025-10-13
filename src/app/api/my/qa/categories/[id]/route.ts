@@ -12,13 +12,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('organization_id')
-      .eq('id', user.id)
+    // ユーザーの企業IDを取得（単一組織モード）
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', user.id)
       .single();
 
-    if (userError || !userData?.organization_id) {
+    if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
     }
 
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       .from('qa_categories')
       .select('*')
       .eq('id', id)
-      .or(`organization_id.eq.${userData.organization_id},visibility.eq.global`)
+      .or(`organization_id.eq.${organization.id},visibility.eq.global`)
       .single();
 
     if (error) {
@@ -55,13 +56,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('organization_id')
-      .eq('id', user.id)
+    // ユーザーの企業IDを取得（単一組織モード）
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', user.id)
       .single();
 
-    if (userError || !userData?.organization_id) {
+    if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
     }
 
@@ -70,7 +72,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       .from('qa_categories')
       .select('*')
       .eq('id', id)
-      .eq('organization_id', userData.organization_id)
+      .eq('organization_id', organization.id)
       .eq('visibility', 'org')
       .single();
 
@@ -112,7 +114,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await supabase
       .from('qa_content_logs')
       .insert({
-        organization_id: userData.organization_id,
+        organization_id: organization.id,
         category_id: id,
         action: 'category_update',
         actor_user_id: user.id,
@@ -141,13 +143,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('organization_id')
-      .eq('id', user.id)
+    // ユーザーの企業IDを取得（単一組織モード）
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', user.id)
       .single();
 
-    if (userError || !userData?.organization_id) {
+    if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
     }
 
@@ -156,7 +159,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       .from('qa_categories')
       .select('*')
       .eq('id', id)
-      .eq('organization_id', userData.organization_id)
+      .eq('organization_id', organization.id)
       .eq('visibility', 'org')
       .single();
 
@@ -196,7 +199,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await supabase
       .from('qa_content_logs')
       .insert({
-        organization_id: userData.organization_id,
+        organization_id: organization.id,
         category_id: id,
         action: 'category_delete',
         actor_user_id: user.id,

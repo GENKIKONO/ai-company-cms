@@ -11,20 +11,21 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('organization_id')
-      .eq('id', user.id)
+    // ユーザーの企業IDを取得（単一組織モード）
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', user.id)
       .single();
 
-    if (userError || !userData?.organization_id) {
+    if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
     }
 
     const { data: categories, error } = await supabase
       .from('qa_categories')
       .select('*')
-      .or(`organization_id.eq.${userData.organization_id},visibility.eq.global`)
+      .or(`organization_id.eq.${organization.id},visibility.eq.global`)
       .eq('is_active', true)
       .order('sort_order', { ascending: true });
 
@@ -50,13 +51,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('organization_id')
-      .eq('id', user.id)
+    // ユーザーの企業IDを取得（単一組織モード）
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', user.id)
       .single();
 
-    if (userError || !userData?.organization_id) {
+    if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
     }
 
@@ -67,7 +69,7 @@ export async function POST(req: NextRequest) {
     }
 
     const categoryData = {
-      organization_id: userData.organization_id,
+      organization_id: organization.id,
       name: body.name.trim(),
       slug: body.slug.trim(),
       description: body.description?.trim() || null,
@@ -96,7 +98,7 @@ export async function POST(req: NextRequest) {
     await supabase
       .from('qa_content_logs')
       .insert({
-        organization_id: userData.organization_id,
+        organization_id: organization.id,
         category_id: category.id,
         action: 'category_create',
         actor_user_id: user.id,

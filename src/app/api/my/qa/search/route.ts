@@ -10,13 +10,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('organization_id')
-      .eq('id', user.id)
+    // ユーザーの企業IDを取得（単一組織モード）
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', user.id)
       .single();
 
-    if (userError || !userData?.organization_id) {
+    if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
     }
 
@@ -44,7 +45,7 @@ export async function GET(req: NextRequest) {
         published_at,
         qa_categories!left(id, name, slug)
       `)
-      .eq('organization_id', userData.organization_id)
+      .eq('organization_id', organization.id)
       .eq('status', status)
       .textSearch('search_vector', query.trim());
 
