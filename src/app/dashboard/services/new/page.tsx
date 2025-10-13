@@ -25,13 +25,7 @@ export default function NewServicePage() {
       name: formData.get('name')?.toString() || '',
       description: formData.get('description')?.toString() || '',
       price: formData.get('price')?.toString() || '',
-      duration_months: formData.get('duration_months')?.toString() || '',
       category: formData.get('category')?.toString() || '',
-      image_url: imageUrl,
-      video_url: videoUrl || undefined,
-      features: features.filter(f => f.trim() !== ''),
-      cta_text: ctaText || undefined,
-      cta_url: ctaUrl || undefined,
       is_published: publishStatus === 'published'
     };
 

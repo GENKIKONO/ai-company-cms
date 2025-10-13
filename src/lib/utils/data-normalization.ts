@@ -93,13 +93,12 @@ export function normalizePostPayload(data: any) {
  * Service データの正規化
  */
 export function normalizeServicePayload(data: any) {
-  // データベース スキーマに存在するフィールドのみ抽出
+  // 実際のデータベース スキーマに存在するフィールドのみ抽出
   const allowedFields = [
     'name',
     'description', 
     'category',
     'price',
-    'duration_months',
     'is_published',
     'organization_id'
   ];
@@ -118,8 +117,7 @@ export function normalizeServicePayload(data: any) {
   ]);
   
   normalized = normalizeNumericFields(normalized, [
-    'price',
-    'duration_months'
+    'price'
   ]);
   
   // features配列の正規化
