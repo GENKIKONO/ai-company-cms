@@ -49,7 +49,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
           {/* 価格 */}
           <div className="flex items-baseline justify-center gap-1 mb-2">
             <span className="text-h1 text-neutral-900 tabular-nums">{formatHearingPrice(plan)}</span>
-            <span className="text-body text-neutral-600 jp-text">（税込）</span>
+            <span className="text-body text-neutral-600 jp-text">（税別）</span>
           </div>
           <div className="text-sm text-neutral-600 jp-text">
             {plan.duration} / {plan.period}
@@ -122,7 +122,7 @@ export default function PricingSection() {
               <div className="space-y-4 text-left">
                 <h4 className="text-lg font-semibold text-neutral-900 jp-text">含まれるもの</h4>
                 <ul className="space-y-2">
-                  <li className="text-body jp-text">• 消費税込みの価格表示</li>
+                  <li className="text-body jp-text">• 消費税別の価格表示</li>
                   <li className="text-body jp-text">• 事前お見積もり無料</li>
                   <li className="text-body jp-text">• オンライン・対面対応</li>
                   <li className="text-body jp-text">• 成果物の著作権譲渡</li>
