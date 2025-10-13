@@ -1,65 +1,167 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
 
-export default function NewServicePage() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string>('');
-  const [features, setFeatures] = useState<string[]>(['']);
-  const [ctaText, setCtaText] = useState<string>('');
-  const [ctaUrl, setCtaUrl] = useState<string>('');
+interface Service {
+  id: string;
+  name: string;
+  summary?: string;
+  description?: string;
+  price?: number;
+  duration_months?: number;
+  category?: string;
+  image_url?: string;
+  video_url?: string;
+  features?: string[];
+  cta_text?: string;
+  cta_url?: string;
+}
+
+export default function EditServicePage() {
   const router = useRouter();
+  const params = useParams();
+  const serviceId = params.id as string;
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  const [service, setService] = useState<Service | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get('name')?.toString() || '',
-      summary: formData.get('summary')?.toString() || '',
-      description: formData.get('description')?.toString() || '',
-      price: formData.get('price')?.toString() || '',
-      duration_months: formData.get('duration_months')?.toString() || '',
-      category: formData.get('category')?.toString() || '',
-      image_url: imageUrl,
-      video_url: videoUrl || undefined,
-      features: features.filter(f => f.trim() !== ''),
-      cta_text: ctaText || undefined,
-      cta_url: ctaUrl || undefined
-    };
+  const [formData, setFormData] = useState({
+    name: '',
+    summary: '',
+    description: '',
+    price: '',
+    duration_months: '',
+    category: '',
+    image_url: null as string | null,
+    video_url: '',
+    features: [''] as string[],
+    cta_text: '',
+    cta_url: ''
+  });
 
+  useEffect(() => {
+    fetchService();
+  }, [serviceId]);
+
+  const fetchService = async () => {
     try {
-      const response = await fetch('/api/services', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
+      const response = await fetch(`/api/my/services/${serviceId}`);
+      if (!response.ok) throw new Error('Failed to fetch service');
+      
       const result = await response.json();
-
-      if (result.ok) {
-        router.push('/dashboard');
-      } else {
-        setError(result.error || '作成に失敗しました');
-      }
+      const serviceData = result.data;
+      
+      setService(serviceData);
+      setFormData({
+        name: serviceData.name || '',
+        summary: serviceData.summary || '',
+        description: serviceData.description || '',
+        price: serviceData.price?.toString() || '',
+        duration_months: serviceData.duration_months?.toString() || '',
+        category: serviceData.category || '',
+        image_url: serviceData.image_url || null,
+        video_url: serviceData.video_url || '',
+        features: serviceData.features?.length > 0 ? serviceData.features : [''],
+        cta_text: serviceData.cta_text || '',
+        cta_url: serviceData.cta_url || ''
+      });
     } catch (err) {
-      setError('ネットワークエラーが発生しました');
+      setError('サービスの読み込みに失敗しました');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+
+    const submitData = {
+      name: formData.name,
+      summary: formData.summary || undefined,
+      description: formData.description || undefined,
+      price: formData.price ? Number(formData.price) : undefined,
+      duration_months: formData.duration_months ? Number(formData.duration_months) : undefined,
+      category: formData.category || undefined,
+      image_url: formData.image_url,
+      video_url: formData.video_url || undefined,
+      features: formData.features.filter(f => f.trim() !== ''),
+      cta_text: formData.cta_text || undefined,
+      cta_url: formData.cta_url || undefined
+    };
+
+    try {
+      const response = await fetch(`/api/my/services/${serviceId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submitData)
+      });
+
+      const result = await response.json();
+
+      if (result.ok) {
+        router.push('/dashboard/services');
+      } else {
+        setError(result.error || '更新に失敗しました');
+      }
+    } catch (err) {
+      setError('ネットワークエラーが発生しました');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateFeature = (index: number, value: string) => {
+    const newFeatures = [...formData.features];
+    newFeatures[index] = value;
+    setFormData({ ...formData, features: newFeatures });
+  };
+
+  const removeFeature = (index: number) => {
+    const newFeatures = formData.features.filter((_, i) => i !== index);
+    setFormData({ ...formData, features: newFeatures.length > 0 ? newFeatures : [''] });
+  };
+
+  const addFeature = () => {
+    setFormData({ ...formData, features: [...formData.features, ''] });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-3 text-gray-600">読み込み中...</span>
+      </div>
+    );
+  }
+
+  if (!service) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900">サービスが見つかりません</h2>
+          <button
+            onClick={() => router.push('/dashboard/services')}
+            className="mt-4 text-blue-600 hover:text-blue-700"
+          >
+            サービス一覧に戻る
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">新しいサービス</h1>
-        <p className="text-gray-600 mt-2">サービス情報を入力してください</p>
+        <h1 className="text-2xl font-bold text-gray-900">サービス編集</h1>
+        <p className="text-gray-600 mt-2">サービス情報を更新してください</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -70,7 +172,8 @@ export default function NewServicePage() {
           <input
             type="text"
             id="name"
-            name="name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="サービス名を入力"
@@ -83,7 +186,8 @@ export default function NewServicePage() {
           </label>
           <textarea
             id="summary"
-            name="summary"
+            value={formData.summary}
+            onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="サービスの概要を入力"
@@ -96,7 +200,8 @@ export default function NewServicePage() {
           </label>
           <textarea
             id="description"
-            name="description"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="サービスの詳細説明を入力"
@@ -111,7 +216,8 @@ export default function NewServicePage() {
             <input
               type="number"
               id="price"
-              name="price"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
               min="0"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="10000"
@@ -125,7 +231,8 @@ export default function NewServicePage() {
             <input
               type="number"
               id="duration_months"
-              name="duration_months"
+              value={formData.duration_months}
+              onChange={(e) => setFormData({ ...formData, duration_months: e.target.value })}
               min="1"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="12"
@@ -139,7 +246,8 @@ export default function NewServicePage() {
             <input
               type="text"
               id="category"
-              name="category"
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="コンサルティング"
             />
@@ -147,9 +255,10 @@ export default function NewServicePage() {
         </div>
 
         <ServiceImageUploader
-          currentImageUrl={imageUrl}
-          onImageChange={setImageUrl}
-          disabled={loading}
+          serviceId={serviceId}
+          currentImageUrl={formData.image_url}
+          onImageChange={(imageUrl) => setFormData({ ...formData, image_url: imageUrl })}
+          disabled={saving}
         />
 
         <div>
@@ -159,14 +268,11 @@ export default function NewServicePage() {
           <input
             type="url"
             id="video_url"
-            value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
+            value={formData.video_url}
+            onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="https://www.youtube.com/watch?v=..."
           />
-          <p className="mt-1 text-xs text-gray-500">
-            YouTube、Vimeo等の動画URLを入力してください
-          </p>
         </div>
 
         <div>
@@ -174,25 +280,18 @@ export default function NewServicePage() {
             サービス機能・特徴
           </label>
           <div className="space-y-2">
-            {features.map((feature, index) => (
+            {formData.features.map((feature, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <input
                   type="text"
                   value={feature}
-                  onChange={(e) => {
-                    const newFeatures = [...features];
-                    newFeatures[index] = e.target.value;
-                    setFeatures(newFeatures);
-                  }}
+                  onChange={(e) => updateFeature(index, e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="例: 高度な分析機能"
                 />
                 <button
                   type="button"
-                  onClick={() => {
-                    const newFeatures = features.filter((_, i) => i !== index);
-                    setFeatures(newFeatures.length > 0 ? newFeatures : ['']);
-                  }}
+                  onClick={() => removeFeature(index)}
                   className="px-3 py-2 text-red-600 hover:text-red-700"
                 >
                   削除
@@ -201,7 +300,7 @@ export default function NewServicePage() {
             ))}
             <button
               type="button"
-              onClick={() => setFeatures([...features, ''])}
+              onClick={addFeature}
               className="px-4 py-2 text-blue-600 hover:text-blue-700 border border-blue-600 rounded-md hover:bg-blue-50"
             >
               + 機能を追加
@@ -217,8 +316,8 @@ export default function NewServicePage() {
             <input
               type="text"
               id="cta_text"
-              value={ctaText}
-              onChange={(e) => setCtaText(e.target.value)}
+              value={formData.cta_text}
+              onChange={(e) => setFormData({ ...formData, cta_text: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="例: 詳細を見る"
             />
@@ -230,8 +329,8 @@ export default function NewServicePage() {
             <input
               type="url"
               id="cta_url"
-              value={ctaUrl}
-              onChange={(e) => setCtaUrl(e.target.value)}
+              value={formData.cta_url}
+              onChange={(e) => setFormData({ ...formData, cta_url: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="https://example.com/service"
             />
@@ -247,14 +346,14 @@ export default function NewServicePage() {
         <div className="flex space-x-4">
           <button
             type="submit"
-            disabled={loading}
+            disabled={saving}
             className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? '作成中...' : '作成'}
+            {saving ? '更新中...' : '更新'}
           </button>
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.push('/dashboard/services')}
             className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400"
           >
             キャンセル

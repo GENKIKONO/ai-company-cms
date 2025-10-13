@@ -345,6 +345,21 @@ export default async function DashboardPage() {
             )}
 
             <Link 
+              href="/dashboard/embed"
+              className="group flex flex-col items-center p-4 sm:p-6 border-2 border-gray-200 rounded-xl hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 min-h-0 h-20 sm:h-auto"
+            >
+              <div className="p-2 sm:p-3 bg-purple-100 rounded-xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </div>
+              <div className="text-center">
+                <p className="font-semibold text-gray-900 mb-1 text-xs sm:text-base">Widget埋め込み</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">サイトに企業情報を表示</p>
+              </div>
+            </Link>
+
+            <Link 
               href={`/organizations/${org.id}/hearing-request`}
               className="group flex flex-col items-center p-4 sm:p-6 border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 min-h-0 h-20 sm:h-auto"
             >
