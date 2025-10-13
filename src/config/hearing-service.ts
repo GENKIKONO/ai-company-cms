@@ -1,0 +1,157 @@
+/**
+ * ヒアリング代行サービス プラン設定
+ * 新4階層プラン体系の定義
+ */
+
+import { Star, Zap, Crown, RotateCcw } from 'lucide-react';
+
+export const HEARING_SERVICE_PLANS = {
+  light: {
+    id: 'light',
+    name: 'ライトヒアリング',
+    badge: '基本構造化',
+    description: '企業の基本情報を短時間でAI最適化',
+    price: 30000,
+    period: '一回限り',
+    duration: '60分×1回',
+    icon: Star,
+    popular: false,
+    color: 'blue',
+    features: [
+      '企業/サービスの基礎ヒアリング（60分）',
+      'AIO Hubページの「企業概要・サービス概要・代表挨拶」を代理入力',
+      'JSON-LD構造化適用（Hub側反映）',
+      '簡易「AI引用最適化レポート」1点納品',
+      'AIに"読まれる"最低限の土台ページが1枚完成'
+    ],
+    limitations: [
+      'Q&A拡充は含まれません',
+      '公開後のブラッシュアップは別途相談'
+    ],
+    ctaText: 'ライトプランで依頼する',
+    contactParam: 'hearing-light'
+  },
+  advance: {
+    id: 'advance',
+    name: 'アドバンスヒアリング',
+    badge: '戦略構造化',
+    description: '採用・PR・B2B向けQ&A拡充で深度ある情報構造',
+    price: 70000,
+    period: '一回限り',
+    duration: '2.5〜3時間（分割可）',
+    icon: Zap,
+    popular: true,
+    color: 'purple',
+    features: [
+      'ライトヒアリングの全範囲を含む',
+      '採用/PR/B2B向けQ&A拡充（テンプレ活用）',
+      '文章校正とAIO/SEO視点の整理',
+      '公開後の簡易ブラッシュアップ1回まで',
+      '採用・顧客獲得に効く"深度ある"情報構造が完成'
+    ],
+    limitations: [
+      '競合比較分析は含まれません',
+      'Search Console設定は別途相談'
+    ],
+    ctaText: 'アドバンスプランで依頼する',
+    contactParam: 'hearing-advance'
+  },
+  full: {
+    id: 'full',
+    name: 'フルヒアリング',
+    badge: '包括構造化',
+    description: 'AI引用を前提とした完全構造化プロフィール',
+    price: 120000,
+    period: '一回限り',
+    duration: '5〜6時間（複数回）',
+    icon: Crown,
+    popular: false,
+    color: 'gold',
+    features: [
+      'アドバンスヒアリングの全範囲を含む',
+      '各カテゴリ（採用/B2B/CSR/ブランド）深掘りQ&A',
+      '競合比較分析とAI引用想定設計',
+      'Business/Enterprise利用時はSearch Console初期セット/最適化サポート',
+      '公開前レビュー＋再編集2回まで',
+      'AI引用を前提とした"完全構造化プロフィール"が完成'
+    ],
+    limitations: [],
+    ctaText: 'フルプランで依頼する',
+    contactParam: 'hearing-full'
+  },
+  continuous: {
+    id: 'continuous',
+    name: '継続フォロー',
+    badge: '運用サポート',
+    description: '月次ヒアリング＋更新代行で継続的な最適化',
+    price: 30000,
+    priceRange: '30,000〜50,000',
+    period: '月額',
+    duration: '月30〜60分',
+    icon: RotateCcw,
+    popular: false,
+    color: 'green',
+    features: [
+      '月30〜60分の定例ヒアリング',
+      '情報更新代行（企業情報・サービス情報・Q&A等）',
+      'Search Console＋AI引用傾向ミニレポート',
+      '価格はカバレッジ/頻度で見積もり',
+      '継続的な情報鮮度維持とAI最適化'
+    ],
+    limitations: [
+      '詳細な価格は個別見積もり',
+      '最低契約期間3ヶ月から'
+    ],
+    ctaText: '継続プランの見積依頼',
+    contactParam: 'hearing-continuous'
+  }
+} as const;
+
+export type HearingServicePlanId = keyof typeof HEARING_SERVICE_PLANS;
+
+/**
+ * プランカラー設定
+ */
+export const getHearingPlanColorClasses = (color: string) => {
+  const colors = {
+    blue: {
+      accent: 'text-blue-600',
+      button: 'bg-blue-600 hover:bg-blue-700 text-white',
+      ring: 'ring-blue-500'
+    },
+    purple: {
+      accent: 'text-purple-600',
+      button: 'bg-purple-600 hover:bg-purple-700 text-white',
+      ring: 'ring-purple-500'
+    },
+    gold: {
+      accent: 'text-amber-600',
+      button: 'bg-amber-600 hover:bg-amber-700 text-white',
+      ring: 'ring-amber-500'
+    },
+    green: {
+      accent: 'text-green-600',
+      button: 'bg-green-600 hover:bg-green-700 text-white',
+      ring: 'ring-green-500'
+    }
+  };
+  return colors[color as keyof typeof colors] || colors.blue;
+};
+
+/**
+ * 価格フォーマッター
+ */
+export function formatHearingPrice(plan: typeof HEARING_SERVICE_PLANS[HearingServicePlanId]): string {
+  if ('priceRange' in plan && plan.priceRange) {
+    return `¥${plan.priceRange}`;
+  }
+  return `¥${plan.price.toLocaleString()}`;
+}
+
+/**
+ * お問い合わせURL生成
+ */
+export function generateContactUrl(planId: HearingServicePlanId): string {
+  const plan = HEARING_SERVICE_PLANS[planId];
+  return `/contact?plan=${plan.contactParam}`;
+}

@@ -44,17 +44,33 @@ const serviceJsonLd = {
   "offers": [
     {
       "@type": "Offer",
-      "name": "シングルヒアリング",
-      "description": "1社向け1回限りのヒアリング代行サービス",
+      "name": "ライトヒアリング（基本構造化）",
+      "description": "企業の基本情報を短時間でAI最適化",
       "price": "30000",
       "priceCurrency": "JPY",
       "priceValidUntil": "2025-12-31"
     },
     {
       "@type": "Offer",
-      "name": "継続支援プラン",
-      "description": "継続的な情報更新・最適化支援",
-      "price": "50000",
+      "name": "アドバンスヒアリング（戦略構造化）",
+      "description": "採用・PR・B2B向けQ&A拡充で深度ある情報構造",
+      "price": "70000",
+      "priceCurrency": "JPY",
+      "priceValidUntil": "2025-12-31"
+    },
+    {
+      "@type": "Offer",
+      "name": "フルヒアリング（包括構造化＋運用設計）",
+      "description": "AI引用を前提とした完全構造化プロフィール",
+      "price": "120000",
+      "priceCurrency": "JPY",
+      "priceValidUntil": "2025-12-31"
+    },
+    {
+      "@type": "Offer",
+      "name": "継続フォロー（運用＋月次ヒアリング）",
+      "description": "月次ヒアリング＋更新代行で継続的な最適化",
+      "price": "30000",
       "priceCurrency": "JPY",
       "billingIncrement": "P1M",
       "priceValidUntil": "2025-12-31"
@@ -69,7 +85,7 @@ const serviceJsonLd = {
         "itemOffered": {
           "@type": "Service",
           "name": "企業情報ヒアリング",
-          "description": "60分の専門ヒアリングによる企業情報の構造化"
+          "description": "専門ヒアリングによる企業情報の構造化"
         }
       },
       {
@@ -78,6 +94,14 @@ const serviceJsonLd = {
           "@type": "Service",
           "name": "AI最適化構造化",
           "description": "ヒアリング内容のAI理解に最適な形での構造化・登録"
+        }
+      },
+      {
+        "@type": "Offer", 
+        "itemOffered": {
+          "@type": "Service",
+          "name": "継続運用サポート",
+          "description": "月次ヒアリングと情報更新による継続的な最適化"
         }
       }
     ]
