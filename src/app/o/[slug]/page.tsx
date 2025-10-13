@@ -502,7 +502,7 @@ export default async function OrganizationDetailPage({
             )}
 
             {/* 記事一覧 */}
-            {posts && posts.length > 0 && organization.show_posts !== false && (
+            {organization.show_posts !== false && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <div className="flex items-center justify-between mb-6">
@@ -514,8 +514,9 @@ export default async function OrganizationDetailPage({
                       記事一覧を見る →
                     </Link>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {posts.slice(0, 6).map((post) => (
+                  {posts && posts.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {posts.slice(0, 6).map((post) => (
                       <Link
                         key={post.id}
                         href={`/o/${organization.slug}/posts/${post.id}`}
@@ -536,19 +537,25 @@ export default async function OrganizationDetailPage({
                           </span>
                         </div>
                       </Link>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">まだ記事が投稿されていません</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {/* サービス一覧 */}
-            {services && services.length > 0 && organization.show_services !== false && (
+            {organization.show_services !== false && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">提供サービス</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {services.map((service) => (
+                  {services && services.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {services.map((service) => (
                       <Link 
                         key={service.id} 
                         href={`/o/${organization.slug}/services/${service.id}`}
@@ -592,19 +599,25 @@ export default async function OrganizationDetailPage({
                           </div>
                         </div>
                       </Link>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">まだサービスが登録されていません</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {/* 事例一覧 */}
-            {case_studies && case_studies.length > 0 && organization.show_case_studies !== false && (
+            {organization.show_case_studies !== false && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">導入事例</h2>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {case_studies.map((caseStudy) => (
+                  {case_studies && case_studies.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {case_studies.map((caseStudy) => (
                       <div key={caseStudy.id} className="border border-gray-200 rounded-lg p-6">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -646,8 +659,13 @@ export default async function OrganizationDetailPage({
                           </div>
                         )}
                       </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">まだ導入事例が登録されていません</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -665,12 +683,13 @@ export default async function OrganizationDetailPage({
             )}
 
             {/* Legacy FAQ */}
-            {faqs && faqs.length > 0 && organization.show_faqs !== false && (
+            {organization.show_faqs !== false && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">よくある質問 (旧形式)</h2>
-                  <div className="space-y-4">
-                    {faqs.map((faq) => (
+                  {faqs && faqs.length > 0 ? (
+                    <div className="space-y-4">
+                      {faqs.map((faq) => (
                         <div key={faq.id} className="border border-gray-200 rounded-lg">
                           <details className="group">
                             <summary className="flex items-center justify-between p-4 cursor-pointer">
@@ -690,7 +709,12 @@ export default async function OrganizationDetailPage({
                           </details>
                         </div>
                       ))}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">まだFAQが登録されていません</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
