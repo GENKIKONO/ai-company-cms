@@ -193,14 +193,14 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
   };
 
   if (loading) {
-    return <div>Q&Aエントリを読み込み中...</div>;
+    return <div>ナレッジベースを読み込み中...</div>;
   }
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Q&Aエントリ管理</CardTitle>
+          <CardTitle>ナレッジベース管理</CardTitle>
           <Button
             onClick={() => setIsCreating(true)}
             disabled={isCreating || isEditing !== null}
@@ -510,7 +510,7 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
                             <AlertDialogHeader>
                               <AlertDialogTitle>エントリを削除しますか？</AlertDialogTitle>
                               <AlertDialogDescription>
-                                このQ&Aエントリを削除します。この操作は取り消せません。
+                                このナレッジベースエントリを削除します。この操作は取り消せません。
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -534,7 +534,7 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
           <div className="text-center py-8 text-muted-foreground">
             {searchTerm || statusFilter !== 'all' || categoryFilter !== 'all' 
               ? 'フィルター条件に一致するエントリがありません。'
-              : 'Q&Aエントリがありません。最初のエントリを作成してください。'
+              : 'ナレッジベースエントリがありません。最初のエントリを作成してください。'
             }
           </div>
         )}

@@ -169,7 +169,7 @@ export default function QACategoryManager({ onCategoryChange }: QACategoryManage
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Q&Aカテゴリ管理</CardTitle>
+          <CardTitle>ナレッジベースカテゴリ管理</CardTitle>
           <Button
             onClick={() => setIsCreating(true)}
             disabled={isCreating || isEditing !== null}
@@ -383,7 +383,7 @@ export default function QACategoryManager({ onCategoryChange }: QACategoryManage
                               <AlertDialogTitle>カテゴリを削除しますか？</AlertDialogTitle>
                               <AlertDialogDescription>
                                 カテゴリ「{category.name}」を削除します。この操作は取り消せません。
-                                関連するQ&Aエントリがある場合は削除できません。
+                                関連するナレッジベースエントリがある場合は削除できません。
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>

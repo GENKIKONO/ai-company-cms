@@ -526,7 +526,7 @@ export default function EditOrganizationPage() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Q&A
+                ナレッジベース
               </button>
             </nav>
           </div>
@@ -1070,7 +1070,7 @@ export default function EditOrganizationPage() {
                   onChange={(e) => handleInputChange('show_qa', e.target.checked)}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Q&Aを表示</span>
+                <span className="text-sm text-gray-700">ナレッジベースを表示</span>
               </label>
 
               <label className="flex items-center space-x-3">
@@ -1156,7 +1156,7 @@ export default function EditOrganizationPage() {
           <PostsTab organizationId={organizationId} organizationSlug={organization?.slug || ''} />
         )}
 
-        {/* Q&Aタブ */}
+        {/* ナレッジベースタブ */}
         {activeTab === 'qa' && (
           <QAManager />
         )}

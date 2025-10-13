@@ -686,7 +686,7 @@ export default async function OrganizationDetailPage({
             {organization.show_faqs !== false && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">よくある質問 (旧形式)</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">よくある質問</h2>
                   {faqs && faqs.length > 0 ? (
                     <div className="space-y-4">
                       {faqs.map((faq) => (

@@ -80,7 +80,7 @@ export default function FAQsManagementPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">FAQ管理</h1>
-              <p className="text-lg text-gray-600 mt-2">よくある質問を管理します</p>
+              <p className="text-lg text-gray-600 mt-2">お客様からよくある簡単な質問と回答を管理します。詳しい解説が必要な場合はナレッジベース機能をご利用ください。</p>
             </div>
             <div className="flex items-center space-x-3">
               <PublicPageLinks contentType="faq" />
@@ -136,7 +136,7 @@ export default function FAQsManagementPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <h3 className="mt-4 text-sm font-medium text-gray-900">FAQがありません</h3>
-              <p className="mt-2 text-sm text-gray-500">最初のFAQを作成してみましょう。</p>
+              <p className="mt-2 text-sm text-gray-500">お客様からよくある簡単な質問と回答を登録しましょう。</p>
               <div className="mt-6">
                 <Link
                   href="/dashboard/faqs/new"

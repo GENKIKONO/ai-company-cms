@@ -20,7 +20,7 @@ export default function QAManager() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Q&A管理システム</CardTitle>
+          <CardTitle>ナレッジベース管理システム</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
@@ -37,10 +37,10 @@ export default function QAManager() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="w-5 h-5" />
-            Q&A管理システム
+            ナレッジベース管理システム
           </CardTitle>
           <CardDescription>
-            組織の知識ベースを構築・管理し、AIと検索エンジン最適化を通じて情報発見を向上させます。
+            詳しい解説や専門知識を整理・管理するシステムです。簡単なQ&AはFAQ機能をご利用ください。
           </CardDescription>
         </CardHeader>
       </Card>
@@ -49,7 +49,7 @@ export default function QAManager() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="entries" className="flex items-center gap-2">
             <FileText className="w-4 h-4" />
-            Q&Aエントリ
+            ナレッジベースエントリ
           </TabsTrigger>
           <TabsTrigger value="categories" className="flex items-center gap-2">
             <Folder className="w-4 h-4" />
@@ -76,8 +76,8 @@ export default function QAManager() {
             <div className="flex items-center gap-2">
               <FileText className="w-4 h-4 text-blue-500" />
               <div>
-                <p className="text-sm font-medium">総Q&Aエントリ</p>
-                <p className="text-xs text-muted-foreground">管理中のQ&A数</p>
+                <p className="text-sm font-medium">総ナレッジベースエントリ</p>
+                <p className="text-xs text-muted-foreground">管理中のナレッジベース数</p>
               </div>
             </div>
           </CardContent>
