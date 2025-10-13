@@ -4,25 +4,8 @@ import { useState, useEffect } from 'react';
 import { WidgetPreview } from '@/components/embed/WidgetPreview';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
+import { Organization, Service } from '@/types/database';
 import Link from 'next/link';
-
-interface Organization {
-  id: string;
-  name: string;
-  slug?: string;
-  logo_url?: string;
-  description?: string;
-  url?: string;
-  address_country: string;
-  email_public: boolean;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  description?: string;
-  image_url?: string;
-}
 
 export default function EmbedPage() {
   const [loading, setLoading] = useState(true);

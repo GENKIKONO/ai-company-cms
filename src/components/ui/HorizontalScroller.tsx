@@ -12,6 +12,7 @@ export default function HorizontalScroller({
   showArrowsOnMobile = true,
   scrollPaddingInlineStart = '24px',
   scrollPaddingInlineEnd = '24px',
+  showHintOnce = false,
 }: PropsWithChildren<{
   className?: string; 
   ariaLabel?: string;
@@ -19,6 +20,7 @@ export default function HorizontalScroller({
   showArrowsOnMobile?: boolean;
   scrollPaddingInlineStart?: string;
   scrollPaddingInlineEnd?: string;
+  showHintOnce?: boolean;
 }>) {
   const ref = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
