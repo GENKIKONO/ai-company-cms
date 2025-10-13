@@ -23,7 +23,6 @@ export default function NewServicePage() {
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get('name')?.toString() || '',
-      summary: formData.get('summary')?.toString() || '',
       description: formData.get('description')?.toString() || '',
       price: formData.get('price')?.toString() || '',
       duration_months: formData.get('duration_months')?.toString() || '',

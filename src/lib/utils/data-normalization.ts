@@ -93,13 +93,28 @@ export function normalizePostPayload(data: any) {
  * Service データの正規化
  */
 export function normalizeServicePayload(data: any) {
-  let normalized = normalizeEmptyStrings(data, [
-    'description',
+  // データベース スキーマに存在するフィールドのみ抽出
+  const allowedFields = [
+    'name',
+    'description', 
     'category',
-    'image_url',
-    'video_url',
-    'cta_text',
-    'cta_url'
+    'price',
+    'duration_months',
+    'is_published',
+    'organization_id'
+  ];
+
+  // 許可されたフィールドのみを保持
+  let normalized: any = {};
+  allowedFields.forEach(field => {
+    if (data.hasOwnProperty(field)) {
+      normalized[field] = data[field];
+    }
+  });
+
+  normalized = normalizeEmptyStrings(normalized, [
+    'description',
+    'category'
   ]);
   
   normalized = normalizeNumericFields(normalized, [
