@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ServiceImageUploader from '@/components/ServiceImageUploader';
 
 export default function NewServicePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -20,7 +22,8 @@ export default function NewServicePage() {
       description: formData.get('description')?.toString() || '',
       price: formData.get('price')?.toString() || '',
       duration_months: formData.get('duration_months')?.toString() || '',
-      category: formData.get('category')?.toString() || ''
+      category: formData.get('category')?.toString() || '',
+      image_url: imageUrl
     };
 
     try {
@@ -134,6 +137,12 @@ export default function NewServicePage() {
             />
           </div>
         </div>
+
+        <ServiceImageUploader
+          currentImageUrl={imageUrl}
+          onImageChange={setImageUrl}
+          disabled={loading}
+        />
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-md p-4">
