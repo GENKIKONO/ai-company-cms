@@ -97,6 +97,15 @@ export interface Organization {
   plan?: 'free' | 'basic' | 'business' | 'enterprise';
   subscription_status?: 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'paused';
   current_period_end?: string;
+  // Section visibility controls
+  show_services?: boolean;
+  show_posts?: boolean;
+  show_case_studies?: boolean;
+  show_faqs?: boolean;
+  show_qa?: boolean;
+  show_news?: boolean;
+  show_partnership?: boolean;
+  show_contact?: boolean;
 }
 
 export interface Service {
