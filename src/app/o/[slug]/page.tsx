@@ -488,7 +488,7 @@ export default async function OrganizationDetailPage({
             )}
 
             {/* 記事一覧 */}
-            {posts && posts.length > 0 && organization.show_posts !== false && (
+            {posts && posts.length > 0 && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <div className="flex items-center justify-between mb-6">
@@ -529,7 +529,7 @@ export default async function OrganizationDetailPage({
             )}
 
             {/* サービス一覧 */}
-            {services && services.length > 0 && organization.show_services !== false && (
+            {services && services.length > 0 && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">提供サービス</h2>
@@ -585,7 +585,7 @@ export default async function OrganizationDetailPage({
             )}
 
             {/* 事例一覧 */}
-            {case_studies && case_studies.length > 0 && organization.show_case_studies !== false && (
+            {case_studies && case_studies.length > 0 && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">導入事例</h2>
@@ -651,7 +651,7 @@ export default async function OrganizationDetailPage({
             )}
 
             {/* Legacy FAQ */}
-            {faqs && faqs.length > 0 && organization.show_faqs !== false && (
+            {faqs && faqs.length > 0 && (
               <div className="border-t border-gray-200">
                 <div className="p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">よくある質問 (旧形式)</h2>
