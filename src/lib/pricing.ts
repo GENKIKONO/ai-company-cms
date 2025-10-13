@@ -1,12 +1,11 @@
 /**
- * 価格フォーマッタとキャンペーン管理
+ * 価格フォーマッタと新価格体系管理
  */
 
-// 環境変数から価格を取得（デフォルトあり）
-const CAMPAIGN_STARTER_PRICE = Number(process.env.CAMPAIGN_STARTER_PRICE) || 9800;
-const STARTER_LIST_PRICE = Number(process.env.STARTER_LIST_PRICE) || 14800;
-const BUSINESS_PRICE = Number(process.env.BUSINESS_PRICE) || 34800;
-const ENTERPRISE_PRICE_FROM = Number(process.env.ENTERPRISE_PRICE_FROM) || 50000;
+// 新価格体系（環境変数から価格を取得、デフォルトあり）
+const BASIC_PRICE = Number(process.env.BASIC_PRICE) || 5000;
+const BUSINESS_PRICE = Number(process.env.BUSINESS_PRICE) || 15000;
+const ENTERPRISE_PRICE_FROM = Number(process.env.ENTERPRISE_PRICE_FROM) || 30000;
 const CURRENCY = process.env.CURRENCY || 'JPY';
 
 /**
@@ -17,18 +16,18 @@ export function formatJPY(n: number): string {
 }
 
 /**
- * Starterプランのキャンペーン情報を取得
+ * プラン価格情報を取得
  */
-export function getCampaignStarter(): {
-  campaign: number;
-  list: number;
-  isCampaign: boolean;
-} {
-  return {
-    campaign: CAMPAIGN_STARTER_PRICE,
-    list: STARTER_LIST_PRICE,
-    isCampaign: CAMPAIGN_STARTER_PRICE < STARTER_LIST_PRICE
-  };
+export function getBasicPrice(): number {
+  return BASIC_PRICE;
+}
+
+export function getBusinessPrice(): number {
+  return BUSINESS_PRICE;
+}
+
+export function getEnterprisePrice(): number {
+  return ENTERPRISE_PRICE_FROM;
 }
 
 /**
@@ -40,7 +39,11 @@ export const PRICING_CONFIG = {
     name: 'Free',
     displayPrice: '¥0'
   },
-  starter: getCampaignStarter(),
+  basic: {
+    price: BASIC_PRICE,
+    name: 'Basic',
+    displayPrice: formatJPY(BASIC_PRICE)
+  },
   business: {
     price: BUSINESS_PRICE,
     name: 'Business',

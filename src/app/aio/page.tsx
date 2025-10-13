@@ -61,16 +61,32 @@ const aioJsonLd = {
     "offers": [
       {
         "@type": "Offer",
-        "name": "フリープラン",
+        "name": "Free",
         "description": "AIOの基本機能を永続無料で体験",
         "price": "0",
         "priceCurrency": "JPY"
       },
       {
         "@type": "Offer", 
-        "name": "スタンダードプラン",
+        "name": "Basic",
+        "description": "基本的なAI最適化運用",
+        "price": "5000",
+        "priceCurrency": "JPY",
+        "billingIncrement": "P1M"
+      },
+      {
+        "@type": "Offer", 
+        "name": "Business",
         "description": "本格的なAI最適化運用",
-        "price": "9800",
+        "price": "15000",
+        "priceCurrency": "JPY",
+        "billingIncrement": "P1M"
+      },
+      {
+        "@type": "Offer", 
+        "name": "Enterprise",
+        "description": "エンタープライズ向け完全運用",
+        "price": "30000",
         "priceCurrency": "JPY",
         "billingIncrement": "P1M"
       }

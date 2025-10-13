@@ -152,22 +152,22 @@ export default function PricingSection() {
         <div className="mt-12 text-center">
           <div className="card p-6 lg:p-8 max-w-4xl mx-auto">
             <h3 className="text-h3 text-neutral-900 mb-6 jp-text text-balance">料金に関する補足</h3>
-            <div className="grid grid-2 text-sm text-neutral-700">
-              <div className="space-y-2 text-left">
-                <h4 className="text-h3 text-neutral-900 jp-text">含まれるもの</h4>
-                <ul className="space-y-1">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-neutral-700">
+              <div className="space-y-4 text-left">
+                <h4 className="text-lg font-semibold text-neutral-900 jp-text">含まれるもの</h4>
+                <ul className="space-y-2">
                   <li className="text-body jp-text">• 消費税込みの価格表示</li>
                   <li className="text-body jp-text">• 事前お見積もり無料</li>
                   <li className="text-body jp-text">• オンライン・対面対応</li>
                   <li className="text-body jp-text">• 成果物の著作権譲渡</li>
                 </ul>
               </div>
-              <div className="space-y-2 text-left">
-                <h4 className="text-h3 text-neutral-900 jp-text">お支払い・契約</h4>
-                <ul className="space-y-1">
+              <div className="space-y-4 text-left">
+                <h4 className="text-lg font-semibold text-neutral-900 jp-text">お支払い・契約</h4>
+                <ul className="space-y-2">
                   <li className="text-body jp-text">• 銀行振込・クレジットカード対応</li>
                   <li className="text-body jp-text">• 継続プランはいつでも解約可能</li>
-                  <li className="text-body jp-text">• 初回契約は最低3ヶ月から</li>
+                  <li className="text-body jp-text">• 初回契約は目安3ヶ月から</li>
                   <li className="text-body jp-text">• 追加作業は事前お見積もり</li>
                 </ul>
               </div>

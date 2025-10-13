@@ -82,11 +82,6 @@ const serviceJsonLd = {
       }
     ]
   },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "reviewCount": "127"
-  }
 };
 
 export default function HearingServicePage() {

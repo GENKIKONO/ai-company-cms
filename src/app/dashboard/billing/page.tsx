@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
-import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { PLAN_LIMITS } from '@/config/plans';
 import type { Organization } from '@/types/database';
 
 interface BillingData {
@@ -213,10 +213,10 @@ export default function BillingPage() {
           <div>
             <div className="text-sm text-gray-500 mb-1">プラン</div>
             <div className="text-lg font-medium text-gray-900 capitalize">
-              {currentPlan === 'free' ? 'フリープラン' : 
-               currentPlan === 'starter' ? 'スタータープラン (¥9,800/月)' : 
-               currentPlan === 'business' ? 'ビジネスプラン' : 
-               currentPlan === 'enterprise' ? 'エンタープライズプラン' : currentPlan}
+              {currentPlan === 'free' ? 'Free (¥0)' : 
+               currentPlan === 'basic' ? 'Basic (¥5,000/月)' : 
+               currentPlan === 'business' ? 'Business (¥15,000/月)' : 
+               currentPlan === 'enterprise' ? 'Enterprise (¥30,000〜/月)' : currentPlan}
             </div>
           </div>
           
@@ -236,8 +236,9 @@ export default function BillingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Object.entries(currentCounts).map(([key, count]) => {
               const limit = limits[key as keyof typeof limits];
-              const isNearLimit = limit > 0 && count >= limit * 0.8;
-              const isOverLimit = limit > 0 && count >= limit;
+              const numericLimit = typeof limit === 'number' ? limit : 0;
+              const isNearLimit = numericLimit > 0 && count >= numericLimit * 0.8;
+              const isOverLimit = numericLimit > 0 && count >= numericLimit;
               
               return (
                 <div key={key} className="text-center">
@@ -248,7 +249,7 @@ export default function BillingPage() {
                      key === 'faqs' ? 'FAQ' : key}
                   </div>
                   <div className={`text-lg font-medium ${isOverLimit ? 'text-red-600' : isNearLimit ? 'text-yellow-600' : 'text-gray-900'}`}>
-                    {count} / {limit > 0 ? limit : '無制限'}
+                    {count} / {numericLimit > 0 ? numericLimit : '無制限'}
                   </div>
                 </div>
               );
@@ -264,7 +265,7 @@ export default function BillingPage() {
               disabled={actionLoading}
               className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
-              {actionLoading ? '処理中...' : '¥5,000で購読'}
+              {actionLoading ? '処理中...' : 'Basicプランで購読 (¥5,000/月)'}
             </button>
           ) : (
             <button
@@ -293,17 +294,17 @@ export default function BillingPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">機能</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">フリー</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ベーシック</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">プロ</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Free</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Basic</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Business</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enterprise</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">サービス</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.services}</td></tr>
-              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">記事</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.posts}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.posts}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.posts}</td></tr>
-              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">導入事例</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.case_studies}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.case_studies}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.case_studies}</td></tr>
-              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">FAQ</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.faqs}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.faqs}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.faqs}</td></tr>
-              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">料金</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無料</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥5,000/月</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">近日公開</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">サービス</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.business.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Q&A項目</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.qa_items}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.qa_items}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">営業資料</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.materials}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.materials}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.business.materials}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">料金</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥0</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥5,000/月</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥15,000/月</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥30,000〜/月</td></tr>
             </tbody>
           </table>
         </div>

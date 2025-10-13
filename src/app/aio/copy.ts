@@ -97,10 +97,10 @@ export const aioCopy = {
   // Pricing Section
   pricing: {
     title: 'シンプルで明確な料金体系',
-    description: 'まずは無料でAIOの効果を実感。本格運用は月額9,800円で始められます。',
+    description: 'まずは無料でAIOの効果を実感。本格運用は月額5,000円から始められます。',
     plans: [
       {
-        name: 'フリープラン',
+        name: 'Free',
         description: 'AIOの基本機能を体験',
         price: '0',
         period: '永続無料',
@@ -109,10 +109,10 @@ export const aioCopy = {
         features: [
           '企業ロゴ・基本情報の登録',
           '主力サービス1件の詳細登録',
+          'Q&A項目：5件まで',
           'JSON-LD自動生成・公開',
           '基本的なSEO最適化',
-          'JSON-LD構造化データ自動生成',
-          'コミュニティサポート'
+          'Hub内構造化のみ（自社サイト埋め込み不可）'
         ],
         limitations: [
           '登録サービス数は1件まで',
@@ -122,25 +122,70 @@ export const aioCopy = {
         buttonText: '無料で始める'
       },
       {
-        name: 'スタンダードプラン',
+        name: 'Basic',
+        description: '基本的なAI最適化運用',
+        price: '5,000',
+        period: '月額',
+        icon: 'Zap',
+        popular: false,
+        features: [
+          'Freeプランの全機能',
+          'サービス登録：10件まで',
+          'Q&A項目：20件まで',
+          'Hub＋自社サイト埋め込み対応',
+          '営業資料添付（最大5個）',
+          '外部リンク表示機能',
+          'カテゴリタグ検索対応',
+          'メールサポート'
+        ],
+        limitations: [],
+        color: 'green',
+        buttonText: 'Basicプランを選択'
+      },
+      {
+        name: 'Business',
         description: '本格的なAI最適化運用',
-        price: '9,800',
+        price: '15,000',
         period: '月額',
         icon: 'Crown',
         popular: true,
         features: [
-          'フリープランの全機能',
-          'サービス登録数無制限',
-          '外部サイト・CTAリンク連携',
-          '問い合わせフォーム・予約システム連携',
-          'カスタムメタデータ設定',
-          'アクセス解析・改善レポート',
-          'マルチ言語対応（英語・中国語）',
+          'Basicプランの全機能',
+          'サービス登録：50件まで',
+          'Q&A項目：無制限',
+          '営業資料添付（最大20個）',
+          'Verified法人バッジ',
+          '承認フロー機能',
+          '認証バッジ機能',
+          'Search Console連携',
+          'AI解析レポート（基本版）',
+          'システム監視機能',
           '優先サポート・個別相談'
         ],
         limitations: [],
         color: 'purple',
-        buttonText: 'スタンダードプランを選択'
+        buttonText: 'Businessプランを選択'
+      },
+      {
+        name: 'Enterprise',
+        description: 'エンタープライズ向け完全運用',
+        price: '30,000',
+        period: '月額〜',
+        icon: 'Building',
+        popular: false,
+        features: [
+          'Businessプランの全機能',
+          'すべての機能無制限',
+          'SVG対応大サイズロゴ',
+          'AI解析レポート（拡張版）',
+          'カスタム機能開発',
+          '専任サポート',
+          'SLA保証',
+          'ホワイトラベル対応'
+        ],
+        limitations: [],
+        color: 'indigo',
+        buttonText: 'お問い合わせ'
       }
     ],
     notes: {

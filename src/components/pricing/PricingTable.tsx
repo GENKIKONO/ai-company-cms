@@ -5,7 +5,7 @@
 
 import Link from 'next/link';
 import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
-import { formatJPY, getCampaignStarter, PRICING_CONFIG } from '@/lib/pricing';
+import { formatJPY, PRICING_CONFIG } from '@/lib/pricing';
 
 interface PlanFeature {
   text: string;
@@ -30,8 +30,6 @@ interface PricingPlan {
   comingSoon?: string[];
 }
 
-const campaignStarter = getCampaignStarter();
-
 const PLANS: PricingPlan[] = [
   {
     id: 'free',
@@ -42,71 +40,82 @@ const PLANS: PricingPlan[] = [
     popular: false,
     features: [
       { text: 'ロゴ・企業情報を構造化公開（JSON‑LD）', included: true },
-      { text: 'ディレクトリ掲載（通常掲載・タグ1件）', included: true },
       { text: 'サービス1件登録', included: true },
-      { text: '公開 / 非公開の切替', included: true },
-      { text: '上位掲載・特集枠は対象外', included: false }
+      { text: 'Q&A項目：5件まで', included: true },
+      { text: 'Hub内構造化のみ（自社サイト埋め込み不可）', included: true },
+      { text: 'SEO最適化・構造化データ自動生成', included: true },
+      { text: '外部CTA・問い合わせフォーム連携', included: false }
     ],
     ctaText: '無料で始める',
     ctaHref: '/organizations',
     color: 'blue'
   },
   {
-    id: 'starter',
-    name: 'Starter',
-    description: '本格的なAI最適化運用',
-    price: formatJPY(campaignStarter.campaign),
-    originalPrice: campaignStarter.isCampaign ? formatJPY(campaignStarter.list) : undefined,
-    badge: campaignStarter.isCampaign ? '今だけ' : undefined,
-    icon: Crown,
-    popular: true,
+    id: 'basic',
+    name: 'Basic',
+    description: '基本的なAI最適化運用',
+    price: PRICING_CONFIG.basic.displayPrice,
+    icon: Zap,
+    popular: false,
     inheritedFeatures: 'Freeプランのすべての機能に加えて',
     features: [
-      { text: 'ディレクトリ掲載（通常順位・タグ複数）', included: true },
-      { text: 'サービス上限：10件', included: true },
-      { text: 'FAQ・外部リンクの追加', included: true },
-      { text: 'JSON-LD構造化データ対応', included: true }
+      { text: 'サービス登録：10件まで', included: true },
+      { text: 'Q&A項目：20件まで', included: true },
+      { text: 'Hub＋自社サイト埋め込み対応', included: true },
+      { text: '営業資料添付（最大5個）', included: true },
+      { text: '外部リンク表示機能', included: true },
+      { text: 'カテゴリタグ検索対応', included: true },
+      { text: 'メールサポート', included: true }
+    ],
+    ctaText: 'このプランで始める',
+    ctaHref: '/organizations',
+    color: 'green'
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    description: '本格的なAI最適化運用',
+    price: PRICING_CONFIG.business.displayPrice,
+    icon: Crown,
+    popular: true,
+    inheritedFeatures: 'Basicプランのすべての機能に加えて',
+    features: [
+      { text: 'サービス登録：50件まで', included: true },
+      { text: 'Q&A項目：無制限', included: true },
+      { text: '営業資料添付（最大20個）', included: true },
+      { text: 'Verified法人バッジ', included: true },
+      { text: '承認フロー機能', included: true },
+      { text: '認証バッジ機能', included: true },
+      { text: 'Search Console連携', included: true },
+      { text: 'AI解析レポート（基本版）', included: true },
+      { text: 'システム監視機能', included: true },
+      { text: '優先サポート・個別相談', included: true }
     ],
     ctaText: 'このプランで始める',
     ctaHref: '/organizations',
     color: 'purple'
   },
   {
-    id: 'business',
-    name: 'Business',
-    description: '露出機会の最大化',
-    price: PRICING_CONFIG.business.displayPrice,
-    icon: Building2,
-    popular: false,
-    inheritedFeatures: 'Starterのすべての機能に加えて',
-    features: [
-      { text: '上位掲載（おすすめ・特集枠）', included: true },
-      { text: 'ブログCMS（AIO Hub配下で配信）', included: true, subtext: '構造化済みの記事を自動生成・公開でき、AIに"読まれやすい"情報資産を継続的に蓄積' },
-      { text: 'タグ複数露出（関連カテゴリでの表示強化）', included: true },
-      { text: 'カスタムメタデータ設定', included: true }
-    ],
-    ctaText: 'このプランで始める',
-    ctaHref: '/organizations',
-    color: 'indigo',
-    comingSoon: ['※上位掲載・詳細分析機能を含みます']
-  },
-  {
     id: 'enterprise',
     name: 'Enterprise',
-    description: '大規模運用・API連携',
+    description: 'エンタープライズ向け完全運用',
     price: PRICING_CONFIG.enterprise.displayPrice,
-    icon: Zap,
+    icon: Building2,
     popular: false,
-    inheritedFeatures: 'Businessのすべての機能に加えて',
+    inheritedFeatures: 'Businessプランのすべての機能に加えて',
     features: [
-      { text: '複数ブランド管理・承認フロー', included: true },
-      { text: 'API / SSO 連携支援・優先サポート / SLA', included: true },
-      { text: '専属コンサルティング（情報設計・AIO運用設計）', included: true },
-      { text: '個別要件・外部データ連携などの拡張相談に対応', included: true }
+      { text: 'すべての機能無制限', included: true },
+      { text: 'SVG対応大サイズロゴ', included: true },
+      { text: 'AI解析レポート（拡張版）', included: true },
+      { text: 'カスタム機能開発', included: true },
+      { text: '専任サポート', included: true },
+      { text: 'SLA保証', included: true },
+      { text: 'ホワイトラベル対応', included: true },
+      { text: 'API優先アクセス', included: true }
     ],
     ctaText: 'お問い合わせ',
     ctaHref: '/contact',
-    color: 'emerald'
+    color: 'indigo'
   }
 ];
 

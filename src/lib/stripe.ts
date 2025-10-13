@@ -20,59 +20,98 @@ export { stripePromise };
 export const SUBSCRIPTION_PLANS = {
   FREE: {
     id: 'free',
-    name: 'フリープラン',
+    name: 'Free',
     price: 0,
     priceId: '', // Will be set when Stripe products are created
     features: [
-      '企業登録 最大5社',
-      'サービス登録 最大10個',
-      '導入事例 最大5件',
-      '基本検索機能',
+      'サービス登録：1件まで',
+      'Q&A項目：5件まで',
+      'Hub上での公開のみ',
+      'SEO最適化・構造化データ自動生成',
     ],
     limits: {
-      maxOrganizations: 5,
-      maxServices: 10,
-      maxCaseStudies: 5,
+      maxServices: 1,
+      maxQAItems: 5,
+      maxMaterials: 0,
+      maxOrganizations: 1,
+      maxCaseStudies: 2,
+      maxPosts: 5,
+      maxFaqs: 5,
     },
   },
   BASIC: {
     id: 'basic',
-    name: 'ベーシックプラン',
-    price: 2980,
+    name: 'Basic',
+    price: 5000,
     priceId: '', // Will be set when Stripe products are created
     features: [
-      '企業登録 最大50社',
-      'サービス登録 最大100個',
-      '導入事例 最大50件',
-      '高度な検索・フィルター機能',
-      'データエクスポート機能',
+      'サービス登録：10件まで',
+      'Q&A項目：20件まで',
+      '営業資料添付（最大5個）',
+      '外部リンク表示機能',
+      'カテゴリタグ検索対応',
       'メールサポート',
     ],
     limits: {
-      maxOrganizations: 50,
-      maxServices: 100,
-      maxCaseStudies: 50,
+      maxServices: 10,
+      maxQAItems: 20,
+      maxMaterials: 5,
+      maxOrganizations: 1,
+      maxCaseStudies: 10,
+      maxPosts: 50,
+      maxFaqs: 20,
     },
   },
-  PREMIUM: {
-    id: 'premium',
-    name: 'プレミアムプラン',
-    price: 9800,
+  BUSINESS: {
+    id: 'business',
+    name: 'Business',
+    price: 15000,
     priceId: '', // Will be set when Stripe products are created
     features: [
-      '企業登録 無制限',
-      'サービス登録 無制限',
-      '導入事例 無制限',
-      'AI検索・推薦機能',
-      'カスタムレポート',
-      'API アクセス',
-      '優先サポート',
-      'カスタムブランディング',
+      'サービス登録：50件まで',
+      'Q&A項目：無制限',
+      '営業資料添付（最大20個）',
+      'Verified法人バッジ',
+      '承認フロー機能',
+      '認証バッジ機能',
+      'Search Console連携',
+      'AI解析レポート（基本版）',
+      'システム監視機能',
+      '優先サポート・個別相談',
     ],
     limits: {
-      maxOrganizations: -1, // Unlimited
-      maxServices: -1, // Unlimited
-      maxCaseStudies: -1, // Unlimited
+      maxServices: 50,
+      maxQAItems: -1,
+      maxMaterials: 20,
+      maxOrganizations: 1,
+      maxCaseStudies: -1,
+      maxPosts: -1,
+      maxFaqs: -1,
+    },
+  },
+  ENTERPRISE: {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 30000,
+    priceId: '', // Will be set when Stripe products are created
+    features: [
+      'すべての機能無制限',
+      'SVG対応大サイズロゴ',
+      'AI解析レポート（拡張版）',
+      'カスタム機能開発',
+      '専任サポート',
+      'SLA保証',
+      'ホワイトラベル対応',
+      'API優先アクセス',
+    ],
+    limits: {
+      maxServices: -1,
+      maxQAItems: -1,
+      maxMaterials: -1,
+      maxOrganizations: 1,
+      maxCaseStudies: -1,
+      maxPosts: -1,
+      maxFaqs: -1,
     },
   },
 } as const;
@@ -321,7 +360,7 @@ export async function updateSubscriptionInDB(subscriptionId: string) {
     }
 
     // Determine plan based on subscription status and items
-    let plan: 'free' | 'basic' | 'pro' = 'free';
+    let plan: 'free' | 'basic' | 'business' | 'enterprise' = 'free';
     if (subscription.status === 'active' || subscription.status === 'trialing') {
       // For now, all paid subscriptions are 'basic'
       // Later can check subscription.items.data[0].price.id to determine plan
@@ -348,4 +387,4 @@ export async function updateSubscriptionInDB(subscriptionId: string) {
 }
 
 // Re-export plan limits for convenience
-export { PLAN_LIMITS, type PlanType, type ResourceType } from '@/lib/plan-limits';
+export { PLAN_LIMITS, type PlanType } from '@/config/plans';

@@ -27,7 +27,7 @@ export default function OrganizationsPage() {
     size: '',
     hasServices: false,
     hasCaseStudies: false,
-    sortBy: 'plan' // デフォルトをプラン順に変更
+    sortBy: 'updated' // デフォルトを更新日順に変更
   });
 
   // 公開済み企業データの取得
@@ -63,7 +63,7 @@ export default function OrganizationsPage() {
     switch (plan) {
       case 'enterprise': return 4;
       case 'business': return 3;
-      case 'starter': return 2;
+      case 'basic': return 2;
       case 'free': return 1;
       default: return 1;
     }
@@ -81,10 +81,21 @@ export default function OrganizationsPage() {
         org.industries?.includes(filters.industry);
 
       const matchesRegion = !filters.region || 
-        org.address_region?.includes(filters.region) ||
         org.address_locality?.includes(filters.region);
 
-      const matchesSize = !filters.size || org.size === parseInt(filters.size);
+      const matchesSize = !filters.size || (() => {
+        if (!org.employees) return false;
+        const employees = typeof org.employees === 'string' ? parseInt(org.employees) : org.employees;
+        switch (filters.size) {
+          case '1-5': return employees >= 1 && employees <= 5;
+          case '6-20': return employees >= 6 && employees <= 20;
+          case '21-50': return employees >= 21 && employees <= 50;
+          case '51-100': return employees >= 51 && employees <= 100;
+          case '101-300': return employees >= 101 && employees <= 300;
+          case '301+': return employees >= 301;
+          default: return true;
+        }
+      })();
 
       const matchesServices = !filters.hasServices || 
         (org.services && Array.isArray(org.services) && org.services.length > 0);
@@ -99,13 +110,6 @@ export default function OrganizationsPage() {
     // ソート
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
-        case 'plan':
-          // プラン重み付けソート: enterprise > business > starter > free
-          const weightA = getOrganizationWeight(a);
-          const weightB = getOrganizationWeight(b);
-          if (weightA !== weightB) return weightB - weightA;
-          // 同じプランの場合は更新日順
-          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
         case 'name':
           return a.name.localeCompare(b.name);
         case 'established':
@@ -154,10 +158,10 @@ export default function OrganizationsPage() {
     }
   };
 
-  // 地域一覧の抽出
+  // 地域一覧の抽出（市町村レベルのみ）
   const regions = useMemo(() => {
     const allRegions = organizations
-      .flatMap(org => [org.address_region, org.address_locality])
+      .flatMap(org => [org.address_locality]) // address_regionを除外し、市町村レベルのみ
       .filter((region): region is string => Boolean(region))
       .filter((region, index, self) => self.indexOf(region) === index)
       .sort();
@@ -176,7 +180,7 @@ export default function OrganizationsPage() {
       size: '', 
       hasServices: false, 
       hasCaseStudies: false, 
-      sortBy: 'plan' 
+      sortBy: 'updated' 
     });
   };
 
@@ -262,10 +266,12 @@ export default function OrganizationsPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               >
                 <option value="">すべて</option>
-                <option value="startup">スタートアップ</option>
-                <option value="small">中小企業</option>
-                <option value="medium">中堅企業</option>
-                <option value="large">大企業</option>
+                <option value="1-5">1〜5名</option>
+                <option value="6-20">6〜20名</option>
+                <option value="21-50">21〜50名</option>
+                <option value="51-100">51〜100名</option>
+                <option value="101-300">101〜300名</option>
+                <option value="301+">301名以上</option>
               </select>
             </div>
 
@@ -280,9 +286,8 @@ export default function OrganizationsPage() {
                 onChange={(e) => handleFilterChange('sortBy', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               >
-                <option value="plan">プラン順（Enterprise → Free）</option>
-                <option value="name">名前順</option>
                 <option value="updated">更新日順</option>
+                <option value="name">名前順</option>
                 <option value="established">設立年順</option>
                 <option value="employees">従業員数順</option>
                 <option value="services">サービス数順</option>
@@ -442,9 +447,6 @@ export default function OrganizationsPage() {
                       <h3 className="jp-heading text-lg font-semibold text-gray-900 truncate group-hover:text-gray-700 transition-colors pr-2">
                         {org.name}
                       </h3>
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border shadow-sm ${getPlanBadgeStyle(org.plan)} flex-shrink-0`}>
-                        {getPlanDisplayName(org.plan)}
-                      </span>
                     </div>
                     {org.industries && org.industries.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
