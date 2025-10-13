@@ -309,6 +309,15 @@ export interface OrganizationFormData {
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string[];
+  // Section visibility controls
+  show_services?: boolean;
+  show_posts?: boolean;
+  show_case_studies?: boolean;
+  show_faqs?: boolean;
+  show_qa?: boolean;
+  show_news?: boolean;
+  show_partnership?: boolean;
+  show_contact?: boolean;
 }
 
 export interface PartnerFormData {

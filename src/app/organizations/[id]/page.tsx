@@ -1015,6 +1015,76 @@ export default function EditOrganizationPage() {
             </div>
           </div>
 
+          {/* セクション別公開設定 */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">セクション別公開設定</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              各セクションの公開/非公開を個別に設定できます。組織全体が公開されている場合のみ有効です。
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={formData.show_services !== false}
+                  onChange={(e) => handleInputChange('show_services', e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">サービス一覧を表示</span>
+              </label>
+
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={formData.show_posts !== false}
+                  onChange={(e) => handleInputChange('show_posts', e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">記事一覧を表示</span>
+              </label>
+
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={formData.show_case_studies !== false}
+                  onChange={(e) => handleInputChange('show_case_studies', e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">導入事例を表示</span>
+              </label>
+
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={formData.show_faqs !== false}
+                  onChange={(e) => handleInputChange('show_faqs', e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">FAQを表示</span>
+              </label>
+
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={formData.show_qa !== false}
+                  onChange={(e) => handleInputChange('show_qa', e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Q&Aを表示</span>
+              </label>
+
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={formData.show_contact !== false}
+                  onChange={(e) => handleInputChange('show_contact', e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">連絡先を表示</span>
+              </label>
+            </div>
+          </div>
+
           {/* アクションボタン */}
           <div className="p-6">
             {errors.submit && (
@@ -1029,20 +1099,38 @@ export default function EditOrganizationPage() {
               </div>
             )}
             
-            <div className="flex justify-end space-x-3">
-              <Link
-                href="/dashboard"
-                className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                戻る
-              </Link>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {submitting ? '保存中...' : '変更を保存'}
-              </button>
+            <div className="flex justify-between items-center">
+              {/* データエクスポート */}
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const { ExportService } = require('@/lib/export');
+                    const exportService = new ExportService();
+                    exportService.exportToJSONLD(organization);
+                  }}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                >
+                  構造化データダウンロード
+                </button>
+              </div>
+              
+              {/* アクションボタン */}
+              <div className="flex space-x-3">
+                <Link
+                  href="/dashboard"
+                  className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  戻る
+                </Link>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? '保存中...' : '変更を保存'}
+                </button>
+              </div>
             </div>
           </div>
         </form>

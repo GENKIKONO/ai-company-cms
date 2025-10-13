@@ -60,6 +60,65 @@ export class ExportService {
     );
   }
 
+  // JSON-LD構造化データエクスポート
+  exportToJSONLD(organization: Organization, options: Partial<ExportOptions> = {}): void {
+    const jsonLdData = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": organization.name,
+      "description": organization.description,
+      "url": organization.url,
+      "logo": organization.logo_url,
+      "address": {
+        "@type": "PostalAddress",
+        "addressRegion": organization.address_region,
+        "addressLocality": organization.address_locality,
+        "streetAddress": organization.address_street,
+        "postalCode": organization.address_postal_code,
+        "addressCountry": "JP"
+      },
+      "telephone": organization.telephone,
+      "email": organization.email,
+      "foundingDate": organization.established_at,
+      "legalName": organization.name,
+      "identifier": {
+        "@type": "PropertyValue",
+        "name": "AIO Hub ID",
+        "value": organization.id
+      }
+    };
+
+    // 空の値を除去
+    const cleanedData = this.removeEmptyValues(jsonLdData);
+    const jsonLdContent = JSON.stringify(cleanedData, null, 2);
+    
+    this.downloadFile(
+      jsonLdContent,
+      options.customFilename || `${organization.slug}-structured-data.json`,
+      'application/ld+json'
+    );
+  }
+
+  // 空の値を再帰的に除去
+  private removeEmptyValues(obj: any): any {
+    if (Array.isArray(obj)) {
+      return obj.filter(item => item !== null && item !== undefined && item !== '').map(item => this.removeEmptyValues(item));
+    } else if (obj !== null && typeof obj === 'object') {
+      const cleaned: any = {};
+      for (const [key, value] of Object.entries(obj)) {
+        if (value !== null && value !== undefined && value !== '') {
+          const cleanedValue = this.removeEmptyValues(value);
+          if (cleanedValue !== null && cleanedValue !== undefined && 
+              (typeof cleanedValue !== 'object' || Object.keys(cleanedValue).length > 0)) {
+            cleaned[key] = cleanedValue;
+          }
+        }
+      }
+      return cleaned;
+    }
+    return obj;
+  }
+
   // Excelファイル風のCSVエクスポート（詳細版）
   exportToExcel(organizations: Organization[], options: Partial<ExportOptions> = {}): void {
     const fields = options.fields || [
