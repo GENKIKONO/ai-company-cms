@@ -16,11 +16,16 @@ export default function NewCaseStudyPage() {
     const formData = new FormData(e.currentTarget);
     const data = {
       title: formData.get('title')?.toString() || '',
-      summary: formData.get('summary')?.toString() || ''
+      problem: formData.get('problem')?.toString() || '',
+      solution: formData.get('solution')?.toString() || '',
+      result: formData.get('result')?.toString() || '',
+      client_name: formData.get('client_name')?.toString() || '',
+      client_industry: formData.get('client_industry')?.toString() || '',
+      tags: []
     };
 
     try {
-      const response = await fetch('/api/cases', {
+      const response = await fetch('/api/my/case-studies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -28,7 +33,7 @@ export default function NewCaseStudyPage() {
 
       const result = await response.json();
 
-      if (result.ok) {
+      if (response.ok) {
         router.push('/dashboard');
       } else {
         setError(result.error || '作成に失敗しました');
