@@ -345,7 +345,6 @@ export default function PricingTable() {
             </div>
           ))}
         </div>
-        </div>
         
         {/* Enterprise consultation note */}
         <div className="text-center mb-8">
