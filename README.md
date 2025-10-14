@@ -1,5 +1,7 @@
 # ai-company-cms
 
+[![E2E Tests](https://github.com/GENKIKONO/ai-company-cms/actions/workflows/e2e.yml/badge.svg)](https://github.com/GENKIKONO/ai-company-cms/actions/workflows/e2e.yml)
+
 ## 本番とソースの乖離可視化
 
 ### ビルド情報バッジ

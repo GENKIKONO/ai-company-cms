@@ -1,0 +1,124 @@
+name: E2E Tests (Playwright)
+
+# Trigger on PR to any branch and push to main
+on:
+  pull_request:
+    branches: ['*']
+  push:
+    branches: [main]
+
+# Cancel redundant runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Minimal permissions for security
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Setup test environment
+        run: |
+          # Create test environment file (TEST-ONLY variables)
+          cat > .env.test.ci << EOF
+          # E2E Test Environment (CI) - NO PRODUCTION SECRETS
+          PLAYWRIGHT_BASE_URL=http://localhost:3000
+          NEXT_PUBLIC_SITE_URL=http://localhost:3000
+          
+          # Test Supabase (if available via secrets, otherwise use defaults)
+          NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL_TEST || 'https://chyicolujwhkycpkxbej.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_TEST || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoeWljb2x1andoa3ljcGt4YmVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NDI4ODYsImV4cCI6MjA3NDAxODg4Nn0.It9t8Cmz7pn7tvONkUETsVhoqGiQCQ8mIxCQAzDzV-E' }}
+          SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY_TEST || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoeWljb2x1andoa3ljcGt4YmVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODQ0Mjg4NiwiZXhwIjoyMDc0MDE4ODg2fQ.rHrHkFfO8VYvF0mlpHbDQZ47SO37IQXWAXEhNAY2dGA' }}
+          
+          # Test user credentials
+          E2E_ADMIN_EMAIL=admin+e2e+ci@example.com
+          E2E_ADMIN_PASSWORD=TestAdminCI123!
+          E2E_USER_EMAIL=user+e2e+ci@example.com
+          E2E_USER_PASSWORD=TestUserCI123!
+          
+          # Test configuration
+          E2E_TIMEOUT=30000
+          E2E_HEADLESS=true
+          E2E_SLOW_MO=0
+          
+          # JWT for auth (test-only)
+          JWT_SECRET=${{ secrets.JWT_SECRET_TEST || '5aNt/ab1Ip5Azgw9cQqReZ7tISCmUReDQ7GANQMWAsk=' }}
+          
+          # CI flag
+          CI=true
+          EOF
+          
+          # Copy to .env.local for the application
+          cp .env.test.ci .env.local
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Upload Playwright Report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload Test Results (Traces/Videos/Screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_id }}
+          path: test-results/
+          retention-days: 7
+
+      - name: Test Results Summary
+        if: always()
+        run: |
+          echo "## 🎭 E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          
+          # Count test results if available
+          if [ -f "test-results/results.json" ]; then
+            echo "### 📊 Test Summary" >> $GITHUB_STEP_SUMMARY
+            node -e "
+              try {
+                const results = require('./test-results/results.json');
+                const stats = results.stats || {};
+                console.log(\`- **Total Tests**: \${stats.expected || 0}\`);
+                console.log(\`- **Passed**: \${stats.expected - stats.unexpected - stats.flaky || 0}\`);
+                console.log(\`- **Failed**: \${stats.unexpected || 0}\`);
+                console.log(\`- **Flaky**: \${stats.flaky || 0}\`);
+                console.log(\`- **Duration**: \${Math.round((stats.duration || 0) / 1000)}s\`);
+              } catch (e) {
+                console.log('- Test results parsing failed');
+              }
+            " >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📁 Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- [📊 HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) (Download \`playwright-report-${{ github.run_id }}\`)" >> $GITHUB_STEP_SUMMARY
+          echo "- [🎬 Traces/Videos](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) (Download \`test-results-${{ github.run_id }}\`)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "💡 **Tip**: Download artifacts to investigate failures locally" >> $GITHUB_STEP_SUMMARY
