@@ -1,0 +1,161 @@
+name: Production Smoke Tests
+
+# Trigger on main branch push and allow manual dispatch
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # TODO: Add Vercel deployment webhook when available
+  # repository_dispatch:
+  #   types: [vercel-deployment-completed]
+
+# Cancel redundant runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Minimal permissions for security
+permissions:
+  contents: read
+
+jobs:
+  prod-smoke:
+    name: Production Smoke Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Setup production test environment
+        run: |
+          # Create production test environment file
+          cat > .env.prod.test << EOF
+          # Production Smoke Test Environment - READ ONLY
+          PLAYWRIGHT_BASE_URL=https://aiohub.jp
+          NEXT_PUBLIC_SITE_URL=https://aiohub.jp
+          
+          # Production Supabase (read-only operations)
+          NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL_PROD }}
+          SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_KEY_PROD }}
+          
+          # Test user credentials (temporary, auto-deleted)
+          PROD_SMOKE_TEST_EMAIL=smoke-test@aiohub.jp
+          PROD_SMOKE_TEST_PASSWORD=TempSmoke123!
+          
+          # Test configuration
+          PROD_SMOKE_TIMEOUT=30000
+          PROD_SMOKE_HEADLESS=true
+          
+          # CI flag
+          CI=true
+          EOF
+          
+          # Copy to .env.local for the test
+          cp .env.prod.test .env.local
+
+      - name: Create temporary test user
+        run: |
+          echo "Creating temporary test user for production smoke tests..."
+          npx ts-node scripts/create-prod-test-user.ts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL_PROD }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY_PROD }}
+
+      - name: Run Production Smoke Tests
+        run: |
+          echo "Running production smoke tests against https://aiohub.jp"
+          npx playwright test tests/e2e/prod-smoke.spec.ts --workers=2
+        env:
+          CI: true
+
+      - name: Cleanup test user
+        if: always()
+        run: |
+          echo "Cleaning up temporary test user..."
+          npx ts-node scripts/cleanup-prod-test-user.ts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL_PROD }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY_PROD }}
+
+      - name: Upload Playwright Report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod-smoke-report-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload Test Results (Traces/Videos/Screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod-smoke-results-${{ github.run_id }}
+          path: test-results/
+          retention-days: 7
+
+      - name: Production Smoke Test Summary
+        if: always()
+        run: |
+          echo "## 🏭 Production Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "**Target**: https://aiohub.jp" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Count test results if available
+          if [ -f "test-results/results.json" ]; then
+            echo "### 📊 Test Summary" >> $GITHUB_STEP_SUMMARY
+            node -e "
+              try {
+                const results = require('./test-results/results.json');
+                const stats = results.stats || {};
+                console.log(\`- **Total Tests**: \${stats.expected || 0}\`);
+                console.log(\`- **Passed**: \${stats.expected - stats.unexpected - stats.flaky || 0}\`);
+                console.log(\`- **Failed**: \${stats.unexpected || 0}\`);
+                console.log(\`- **Flaky**: \${stats.flaky || 0}\`);
+                console.log(\`- **Duration**: \${Math.round((stats.duration || 0) / 1000)}s\`);
+                
+                if (stats.unexpected > 0) {
+                  console.log('');
+                  console.log('### ⚠️ Failed Tests');
+                  console.log('Please check the artifacts for detailed failure information.');
+                }
+              } catch (e) {
+                console.log('- Test results parsing failed');
+              }
+            " >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📁 Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- [📊 HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) (Download \`prod-smoke-report-${{ github.run_id }}\`)" >> $GITHUB_STEP_SUMMARY
+          echo "- [🎬 Traces/Videos](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) (Download \`prod-smoke-results-${{ github.run_id }}\`)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Smoke Test Coverage" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Public pages (/, /aio, /pricing, /hearing-service, /o/luxucare)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ SEO meta tags (canonical, JSON-LD)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Static assets (CSS, fonts, images)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ robots.txt and sitemap.xml" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Authentication flow (login/logout)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Security redirects" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "💡 **Note**: This is a read-only smoke test. No production data was modified." >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "🚨 Production smoke tests failed!"
+          echo "Please check the artifacts and investigate the issue:"
+          echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
