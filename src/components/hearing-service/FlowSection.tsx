@@ -84,35 +84,35 @@ export default function FlowSection() {
 
         {/* フローステップ */}
         <div className="mb-12">
-          <div className="grid grid-3">
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-3">
             {flowSteps.map((step, index) => {
               const colors = getColorClasses(step.color);
               const IconComponent = step.icon;
               
               return (
-                <div key={step.step} className="card relative overflow-visible">
-                  {/* Step Badge - positioned outside to prevent clipping */}
-                  <div className="absolute -top-4 -left-4 z-10 pointer-events-none">
-                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${colors.step} text-white text-sm font-semibold ring-4 ring-white ui-flat`}>
-                      {step.step}
-                    </span>
+                <div key={step.step} className="flex-shrink-0 w-64 snap-center">
+                  {/* コンパクトなステップ表示 */}
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-10 h-10 ${colors.bg} rounded-xl flex items-center justify-center`}>
+                      <IconComponent className={`w-6 h-6 ${colors.icon}`} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${colors.step} text-white text-xs font-semibold`}>
+                        {step.step}
+                      </span>
+                      <h3 className="text-h4 text-neutral-900 font-semibold jp-text">{step.title}</h3>
+                    </div>
                   </div>
                   
-                  {/* アイコン */}
-                  <div className={`w-16 h-16 ${colors.bg} rounded-xl flex items-center justify-center mb-6`}>
-                    <IconComponent className={`w-8 h-8 ${colors.icon}`} />
-                  </div>
+                  {/* 説明 */}
+                  <p className="text-body-small text-neutral-600 mb-4 jp-text">{step.description}</p>
                   
-                  {/* タイトル・説明 */}
-                  <h3 className="text-h3 text-neutral-900 mb-3 jp-text">{step.title}</h3>
-                  <p className="text-body text-neutral-600 mb-6 jp-text">{step.description}</p>
-                  
-                  {/* 詳細リスト */}
-                  <ul className="space-y-2.5">
+                  {/* 詳細リスト（コンパクト表示） */}
+                  <ul className="space-y-1.5">
                     {step.details.map((detail, detailIndex) => (
                       <li key={detailIndex} className="flex items-start gap-2">
-                        <CheckCircle className={`w-4 h-4 ${colors.accent} mt-0.5 flex-shrink-0`} />
-                        <span className="text-body-small text-neutral-700 jp-text">{detail}</span>
+                        <CheckCircle className={`w-3 h-3 ${colors.accent} mt-0.5 flex-shrink-0`} />
+                        <span className="text-xs text-neutral-700 jp-text">{detail}</span>
                       </li>
                     ))}
                   </ul>
