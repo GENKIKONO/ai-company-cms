@@ -105,7 +105,19 @@ export default function PricingSection() {
 
         {/* 料金プラン */}
         <div className="mb-12 lg:mb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 max-w-7xl mx-auto">
+          {/* Mobile: Carousel */}
+          <div className="lg:hidden">
+            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory">
+              {planIds.map((planId) => (
+                <div key={planId} className="relative flex-shrink-0 w-80 snap-center">
+                  <PricingCard planId={planId} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop: Grid */}
+          <div className="hidden lg:grid lg:grid-cols-2 gap-8 lg:gap-16 max-w-7xl mx-auto">
             {planIds.map((planId) => (
               <div key={planId} className="relative">
                 <PricingCard planId={planId} />

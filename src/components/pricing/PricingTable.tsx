@@ -131,8 +131,117 @@ export default function PricingTable() {
           </p>
         </div>
 
-        {/* All plans in responsive grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 justify-center items-stretch max-w-7xl mx-auto mb-12">
+        {/* Mobile: Carousel, Desktop: Grid */}
+        <div className="lg:hidden">
+          {/* Mobile Carousel */}
+          <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory">
+            {PLANS.map((plan) => (
+              <div
+                key={plan.id}
+                className={`card flex flex-col relative p-6 flex-shrink-0 w-80 snap-center ${
+                  plan.popular
+                    ? 'border-primary border-2'
+                    : 'hover:border-neutral-300'
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="badge badge-primary">
+                      人気
+                    </span>
+                  </div>
+                )}
+
+                {plan.badge && (
+                  <div className="absolute -top-3 -right-3">
+                    <span className="badge badge-accent">
+                      {plan.badge}
+                    </span>
+                  </div>
+                )}
+
+                <div className="mb-6">
+                  <div className="mb-4">
+                    <plan.icon className={`h-8 w-8 text-${plan.color}-600`} />
+                  </div>
+                  <h3 className="text-h3 text-neutral-900 mb-2 jp-text">{plan.name}</h3>
+                  <p className="text-body text-neutral-600 mb-4 jp-text">{plan.description}</p>
+                  
+                  <div className="mb-4">
+                    {plan.originalPrice && (
+                      <span className="text-body text-neutral-400 line-through mr-2">
+                        {plan.originalPrice}
+                      </span>
+                    )}
+                    <span className="text-h1 text-neutral-900">
+                      {plan.price}
+                    </span>
+                    {plan.id !== 'free' && (
+                      <span className="text-neutral-600 ml-1">/月</span>
+                    )}
+                  </div>
+                </div>
+
+                <ul className="mb-8 space-y-2 sm:space-y-2.5 flex-1">
+                  {plan.inheritedFeatures && (
+                    <li className="mb-4 pb-3 border-b border-gray-100">
+                      <span className="text-body-small text-primary font-medium">
+                        {plan.inheritedFeatures}
+                      </span>
+                    </li>
+                  )}
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <Check
+                        className={`icon icon-sm shrink-0 mt-0.5 mr-3 ${
+                          feature.included ? 'text-success' : 'text-neutral-300'
+                        }`}
+                      />
+                      <div className="flex-1">
+                        <span
+                          className={`text-body-small jp-text ${
+                            feature.included ? 'text-neutral-700' : 'text-neutral-400'
+                          }`}
+                        >
+                          {feature.text}
+                        </span>
+                        {feature.subtext && (
+                          <div className="mt-1 text-body-small text-neutral-500 pl-2 border-l-2 border-neutral-200 jp-text">
+                            {feature.subtext}
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-auto">
+                  <Link
+                    href={plan.ctaHref}
+                    className={`btn w-full ${
+                      plan.popular
+                        ? 'btn-primary'
+                        : 'btn-secondary'
+                    }`}
+                  >
+                    {plan.ctaText}
+                  </Link>
+                </div>
+
+                {plan.comingSoon && (
+                  <div className="mt-4 text-body-small text-neutral-500">
+                    {plan.comingSoon.map((note, index) => (
+                      <p key={index}>{note}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop: Responsive Grid */}
+        <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-6 justify-center items-stretch max-w-7xl mx-auto mb-12">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
@@ -235,6 +344,7 @@ export default function PricingTable() {
               )}
             </div>
           ))}
+        </div>
         </div>
         
         {/* Enterprise consultation note */}
