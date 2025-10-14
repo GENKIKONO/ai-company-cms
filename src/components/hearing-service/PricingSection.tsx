@@ -117,7 +117,7 @@ export default function PricingSection() {
           </div>
 
           {/* Desktop: Grid */}
-          <div className="hidden lg:grid lg:grid-cols-2 gap-8 lg:gap-16 max-w-7xl mx-auto">
+          <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
             {planIds.map((planId) => (
               <div key={planId} className="relative">
                 <PricingCard planId={planId} />

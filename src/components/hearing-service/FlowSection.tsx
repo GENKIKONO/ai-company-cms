@@ -97,8 +97,8 @@ export default function FlowSection() {
                       <IconComponent className={`w-6 h-6 ${colors.icon}`} />
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${colors.step} text-white text-xs font-semibold`}>
-                        {step.step}
+                      <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${colors.step} text-white text-lg font-bold`}>
+                        {step.step === 1 ? '①' : step.step === 2 ? '②' : '③'}
                       </span>
                       <h3 className="text-h4 text-neutral-900 font-semibold jp-text">{step.title}</h3>
                     </div>
