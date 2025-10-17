@@ -44,6 +44,9 @@ export async function GET(request: NextRequest) {
 }
 
 function generateSummary(logs: any[]) {
+  const uniqueUrls = new Set<string>();
+  const uniqueUserAgents = new Set<string>();
+  
   const summary = {
     total: logs.length,
     p0Issues: 0,
@@ -51,8 +54,8 @@ function generateSummary(logs: any[]) {
     p2Issues: 0,
     okChecks: 0,
     avgResponseTime: 0,
-    uniqueUrls: new Set(),
-    uniqueUserAgents: new Set(),
+    uniqueUrls: 0,
+    uniqueUserAgents: 0,
     topIssues: [] as string[]
   };
   
@@ -60,8 +63,8 @@ function generateSummary(logs: any[]) {
   const allIssues: string[] = [];
   
   logs.forEach(log => {
-    summary.uniqueUrls.add(log.url);
-    summary.uniqueUserAgents.add(log.user_agent);
+    uniqueUrls.add(log.url);
+    uniqueUserAgents.add(log.user_agent);
     
     switch (log.severity_level) {
       case 'P0': summary.p0Issues++; break;
@@ -80,8 +83,8 @@ function generateSummary(logs: any[]) {
   });
   
   summary.avgResponseTime = logs.length > 0 ? Math.round(totalResponseTime / logs.length) : 0;
-  summary.uniqueUrls = summary.uniqueUrls.size;
-  summary.uniqueUserAgents = summary.uniqueUserAgents.size;
+  summary.uniqueUrls = uniqueUrls.size;
+  summary.uniqueUserAgents = uniqueUserAgents.size;
   
   // Count issue frequency
   const issueCounts = allIssues.reduce((acc, issue) => {

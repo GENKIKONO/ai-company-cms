@@ -10,7 +10,7 @@ import {
   CheckCircle, 
   Clock, 
   Globe,
-  Refresh,
+  RefreshCw as Refresh,
   Download,
   Settings
 } from 'lucide-react';

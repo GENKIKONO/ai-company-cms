@@ -193,7 +193,7 @@ function analyzeHTML(html: string, url: string) {
   };
   
   // Extract JSON-LD
-  const jsonLdMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis);
+  const jsonLdMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
   if (jsonLdMatches) {
     analysis.hasJsonLd = true;
     jsonLdMatches.forEach(match => {
@@ -235,8 +235,8 @@ function analyzeHTML(html: string, url: string) {
   
   // Calculate main text length (rough estimate)
   const textContent = html
-    .replace(/<script[^>]*>.*?<\/script>/gis, '')
-    .replace(/<style[^>]*>.*?<\/style>/gis, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -337,8 +337,8 @@ function generateIssues(statusCode: number, analysis: any, userAgent: string, ur
 function generateContentSignature(html: string): string {
   // Generate SHA256 hash of main content for tamper detection
   const content = html
-    .replace(/<script[^>]*>.*?<\/script>/gis, '')
-    .replace(/<!--.*?-->/gis, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<!--[\s\S]*?-->/gi, '')
     .replace(/\s+/g, ' ')
     .trim();
   
@@ -346,6 +346,9 @@ function generateContentSignature(html: string): string {
 }
 
 function generateSummary(results: any[]) {
+  const uniqueUrls = new Set<string>();
+  const uniqueUserAgents = new Set<string>();
+  
   const summary = {
     total: results.length,
     p0Issues: 0,
@@ -353,8 +356,8 @@ function generateSummary(results: any[]) {
     p2Issues: 0,
     okChecks: 0,
     avgResponseTime: 0,
-    uniqueUrls: new Set(),
-    uniqueUserAgents: new Set(),
+    uniqueUrls: 0,
+    uniqueUserAgents: 0,
     topIssues: [] as string[]
   };
   
@@ -362,8 +365,8 @@ function generateSummary(results: any[]) {
   const allIssues: string[] = [];
   
   results.forEach(result => {
-    summary.uniqueUrls.add(result.url);
-    summary.uniqueUserAgents.add(result.userAgent);
+    uniqueUrls.add(result.url);
+    uniqueUserAgents.add(result.userAgent);
     
     switch (result.severity) {
       case 'P0': summary.p0Issues++; break;
@@ -382,8 +385,8 @@ function generateSummary(results: any[]) {
   });
   
   summary.avgResponseTime = Math.round(totalResponseTime / results.length);
-  summary.uniqueUrls = summary.uniqueUrls.size;
-  summary.uniqueUserAgents = summary.uniqueUserAgents.size;
+  summary.uniqueUrls = uniqueUrls.size;
+  summary.uniqueUserAgents = uniqueUserAgents.size;
   
   // Count issue frequency
   const issueCounts = allIssues.reduce((acc, issue) => {
