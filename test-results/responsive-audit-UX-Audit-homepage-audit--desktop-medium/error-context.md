@@ -1,0 +1,495 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "メインコンテンツにスキップ" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "AIO Hub AI企業CMS" [ref=e7] [cursor=pointer]:
+          - /url: /
+        - navigation [ref=e8]:
+          - link "料金プラン" [ref=e9] [cursor=pointer]:
+            - /url: /pricing
+          - link "ヒアリング代行" [ref=e10] [cursor=pointer]:
+            - /url: /hearing-service
+      - link "ログイン" [ref=e13] [cursor=pointer]:
+        - /url: /auth/login
+  - main [ref=e14]:
+    - main [ref=e16]:
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - heading "AI企業CMS AIO Hub" [level=1] [ref=e21]:
+            - text: AI企業CMS
+            - generic [ref=e22]: AIO Hub
+          - paragraph [ref=e23]:
+            - strong [ref=e24]: ゼロクリック時代
+            - text: にAIが理解・引用しやすい企業情報を構築。検索結果からAI回答まで、企業が"選ばれる"プラットフォームです。
+          - generic [ref=e25]:
+            - link "無料で始める" [ref=e26] [cursor=pointer]:
+              - /url: /auth/signup
+              - text: 無料で始める
+              - img [ref=e27] [cursor=pointer]
+            - link "企業ディレクトリを見る" [ref=e29] [cursor=pointer]:
+              - /url: /organizations
+          - generic [ref=e30]:
+            - generic [ref=e31]:
+              - generic [ref=e32]: "1"
+              - generic [ref=e33]: 登録企業
+            - generic [ref=e34]:
+              - generic [ref=e35]: "0"
+              - generic [ref=e36]: 管理サービス
+            - generic [ref=e37]:
+              - generic [ref=e38]: "0"
+              - generic [ref=e39]: 導入事例
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - img [ref=e44]
+            - text: ゼロクリック対応
+          - heading "AIに選ばれる企業情報を構築" [level=3] [ref=e46]
+          - list [ref=e47]:
+            - listitem [ref=e48]:
+              - img [ref=e49]
+              - generic [ref=e52]: 構造化データ自動生成
+            - listitem [ref=e53]:
+              - img [ref=e54]
+              - generic [ref=e57]: AI引用最適化
+            - listitem [ref=e58]:
+              - img [ref=e59]
+              - generic [ref=e62]: 流入促進とSEO強化
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - heading "検索体験の変化とAI時代への対応" [level=2] [ref=e66]
+          - paragraph [ref=e67]: SEOは残り続けますが、AIが情報を直接引用・回答する機会が急増。企業の発見機会を確保する新たなアプローチが必要です。
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - img [ref=e72]
+            - generic [ref=e74]: 従来
+            - heading "検索→クリック→サイト訪問" [level=3] [ref=e75]
+            - paragraph [ref=e76]: SEO対策による上位表示とクリック率向上が中心
+          - generic [ref=e77]:
+            - img [ref=e79]
+            - generic [ref=e81]: 現在
+            - heading "AI回答の併存" [level=3] [ref=e82]
+            - paragraph [ref=e83]: 検索結果とAI回答（ChatGPT、Google SGE等）が並存
+          - generic [ref=e84]:
+            - img [ref=e86]
+            - generic [ref=e88]: 将来
+            - heading "AI優先の情報発見" [level=3] [ref=e89]
+            - paragraph [ref=e90]: AIが直接回答し、クリックを経ずに情報が伝達される機会が増加
+        - generic [ref=e91]:
+          - heading "検索体験の変化" [level=3] [ref=e92]
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - generic [ref=e95]:
+                - generic [ref=e96]: 従来の検索
+                - heading "クリック型の情報取得" [level=4] [ref=e97]:
+                  - img [ref=e98]
+                  - text: クリック型の情報取得
+              - generic [ref=e100]:
+                - generic [ref=e101]:
+                  - heading "情報取得方法" [level=5] [ref=e102]:
+                    - img [ref=e103]
+                    - text: 情報取得方法
+                  - paragraph [ref=e105]: 検索結果をクリックしてサイト訪問
+                - generic [ref=e106]:
+                  - heading "企業への影響" [level=5] [ref=e107]:
+                    - img [ref=e108]
+                    - text: 企業への影響
+                  - paragraph [ref=e110]: SEO順位とクリック率が重要
+                - generic [ref=e111]:
+                  - heading "必要な対策" [level=5] [ref=e112]:
+                    - img [ref=e113]
+                    - text: 必要な対策
+                  - paragraph [ref=e115]: キーワード最適化、コンテンツSEO
+            - generic [ref=e118]:
+              - generic [ref=e119]:
+                - generic [ref=e120]: AI時代の検索
+                - heading "ゼロクリック情報提供" [level=4] [ref=e121]:
+                  - img [ref=e122]
+                  - text: ゼロクリック情報提供
+              - generic [ref=e124]:
+                - generic [ref=e125]:
+                  - heading "情報取得方法" [level=5] [ref=e126]:
+                    - img [ref=e127]
+                    - text: 情報取得方法
+                  - paragraph [ref=e129]: AIが情報を直接引用・要約して回答
+                - generic [ref=e130]:
+                  - heading "企業への影響" [level=5] [ref=e131]:
+                    - img [ref=e132]
+                    - text: 企業への影響
+                  - paragraph [ref=e134]: AIに引用されるかが重要
+                - generic [ref=e135]:
+                  - heading "必要な対策" [level=5] [ref=e136]:
+                    - img [ref=e137]
+                    - text: 必要な対策
+                  - paragraph [ref=e139]: 構造化データ、AI理解最適化
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - generic [ref=e144]:
+              - img [ref=e146]
+              - heading "課題：発見機会の減少リスク" [level=3] [ref=e148]
+            - list [ref=e149]:
+              - listitem [ref=e150]:
+                - generic [ref=e151]: ●
+                - generic [ref=e152]: AIに選ばれない企業は潜在顧客からの発見機会が減少
+              - listitem [ref=e153]:
+                - generic [ref=e154]: ●
+                - generic [ref=e155]: 従来のSEO対策だけでは不十分な場面が増加
+              - listitem [ref=e156]:
+                - generic [ref=e157]: ●
+                - generic [ref=e158]: 早期対応企業と後発企業の格差拡大
+          - generic [ref=e159]:
+            - generic [ref=e162]:
+              - img [ref=e164]
+              - heading "解決策：AIO対応で発見機会を確保" [level=3] [ref=e166]
+            - list [ref=e167]:
+              - listitem [ref=e168]:
+                - generic [ref=e169]: ●
+                - generic [ref=e170]: 構造化データでAIが理解しやすい情報形式に変換
+              - listitem [ref=e171]:
+                - generic [ref=e172]: ●
+                - generic [ref=e173]: 信頼性の高いプラットフォームでドメインパワーを活用
+              - listitem [ref=e174]:
+                - generic [ref=e175]: ●
+                - generic [ref=e176]: AI引用から自社サイトへの流入促進
+      - generic [ref=e178]:
+        - generic [ref=e179]:
+          - heading "ゼロクリック時代の企業戦略" [level=2] [ref=e180]
+          - paragraph [ref=e181]: AIが情報を直接回答する時代に、企業が"選ばれる"ための仕組みを提供
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - img [ref=e184]
+            - heading "AI引用最適化" [level=3] [ref=e188]
+            - paragraph [ref=e189]: 企業情報を構造化データとして整備し、AIが理解・引用しやすい形に自動変換
+          - generic [ref=e190]:
+            - img [ref=e191]
+            - heading "ドメインパワー共有" [level=3] [ref=e193]
+            - paragraph [ref=e194]: 信頼性の高いプラットフォームに情報を集約することで、検索・AI回答での露出を向上
+          - generic [ref=e195]:
+            - img [ref=e196]
+            - heading "アクセス流入促進" [level=3] [ref=e201]
+            - paragraph [ref=e202]: 構造化された企業情報から自社サイトやSNSへの質の高い流入を創出
+      - generic [ref=e204]:
+        - heading "ゼロクリック時代に取り残されませんか？" [level=2] [ref=e205]
+        - paragraph [ref=e206]: AIが企業を"選ぶ"時代。構造化された情報で検索・AI回答での露出を確保し、新たな流入機会を創出しましょう。
+        - generic [ref=e207]:
+          - link "無料で始める" [ref=e208] [cursor=pointer]:
+            - /url: /auth/signup
+            - text: 無料で始める
+            - img [ref=e209] [cursor=pointer]
+          - link "ヒアリング代行サービス" [ref=e211] [cursor=pointer]:
+            - /url: /hearing-service
+        - generic [ref=e212]: 無料トライアル • クレジットカード不要
+      - generic [ref=e214]:
+        - generic [ref=e215]:
+          - heading "シンプルな3ステップで AI最適化を実現" [level=2] [ref=e216]:
+            - generic [ref=e217]: シンプルな3ステップで
+            - generic [ref=e218]: AI最適化を実現
+          - paragraph [ref=e219]:
+            - generic [ref=e220]: フォーム入力だけで、企業情報が自動的にJSON-LDとして構造化。
+            - generic [ref=e221]: 技術知識不要でAI時代の情報発信が始められます。
+        - generic [ref=e223]:
+          - generic [ref=e224]:
+            - generic:
+              - generic: "1"
+            - img [ref=e226]
+            - heading "企業情報入力" [level=3] [ref=e229]
+            - paragraph [ref=e230]: 直感的なフォームで基本情報・サービス・実績を入力するだけ。
+            - list [ref=e231]:
+              - listitem [ref=e232]:
+                - img [ref=e233]
+                - generic [ref=e236]: 会社概要・沿革・理念
+              - listitem [ref=e237]:
+                - img [ref=e238]
+                - generic [ref=e241]: サービス詳細・料金・特徴
+              - listitem [ref=e242]:
+                - img [ref=e243]
+                - generic [ref=e246]: 導入事例・実績・認定資格
+          - generic [ref=e247]:
+            - generic:
+              - generic: "2"
+            - img [ref=e249]
+            - heading "JSON-LD自動生成" [level=3] [ref=e260]
+            - paragraph [ref=e261]: Schema.orgに準拠した構造化データを自動生成・最適化。
+            - list [ref=e262]:
+              - listitem [ref=e263]:
+                - img [ref=e264]
+                - generic [ref=e267]: Organization・Service・Offer構造
+              - listitem [ref=e268]:
+                - img [ref=e269]
+                - generic [ref=e272]: セマンティックHTMLとの連携
+              - listitem [ref=e273]:
+                - img [ref=e274]
+                - generic [ref=e277]: AI理解に最適化された項目設計
+          - generic [ref=e278]:
+            - generic:
+              - generic: "3"
+            - img [ref=e280]
+            - heading "公開・運用開始" [level=3] [ref=e285]
+            - paragraph [ref=e286]: Schema.org準拠の構造化データ出力などの技術対応を実施します。
+            - list [ref=e287]:
+              - listitem [ref=e288]:
+                - img [ref=e289]
+                - generic [ref=e292]: 検索エンジン・AI向けサイトマップ
+              - listitem [ref=e293]:
+                - img [ref=e294]
+                - generic [ref=e297]: JSON-LD構造化データ自動生成
+              - listitem [ref=e298]:
+                - img [ref=e299]
+                - generic [ref=e302]: リアルタイム更新・バージョン管理
+        - generic [ref=e303]:
+          - generic [ref=e304]:
+            - 'heading "Before → After: 情報構造の変化" [level=3] [ref=e305]'
+            - paragraph [ref=e306]: バラバラな情報がAI理解に最適な構造に変わります
+          - generic [ref=e307]:
+            - generic [ref=e308]:
+              - generic [ref=e310]: 従来の情報発信
+              - generic [ref=e311]:
+                - generic [ref=e312]: "\"総合的なITソリューションを提供...\""
+                - generic [ref=e313]: "\"お客様のニーズに合わせたサービス...\""
+                - generic [ref=e314]: "\"高品質で安心・安全なシステム...\""
+              - generic [ref=e315]:
+                - img [ref=e316]
+                - text: 抽象的でAIが理解困難
+            - generic [ref=e320]:
+              - generic [ref=e322]: AIO対応後
+              - generic [ref=e323]:
+                - generic [ref=e324]: "{ \"@type\": \"Service\", \"name\": \"ECサイト構築\", \"priceRange\": \"月額5万円〜\" }"
+                - generic [ref=e325]: "{ \"targetIndustry\": [\"製造業\", \"小売業\"], \"customerSize\": \"中小企業\" }"
+                - generic [ref=e326]: "{ \"serviceOutput\": { \"metric\": \"売上向上\", \"value\": \"実績あり\" } }"
+              - generic [ref=e327]:
+                - img [ref=e328]
+                - text: AI・検索エンジンが解釈しやすい構造
+      - generic [ref=e332]:
+        - generic [ref=e333]:
+          - heading "シンプルで明確な料金体系" [level=2] [ref=e334]
+          - paragraph [ref=e335]: 無料から始めて、必要になったら拡張。最小の入力で、Schema.org準拠の企業情報構造化を実現します。
+        - generic [ref=e336]:
+          - generic [ref=e337]:
+            - generic [ref=e338]:
+              - img [ref=e340]
+              - heading "Free" [level=3] [ref=e342]
+              - paragraph [ref=e343]: 無料で始めるAI最適化
+              - generic [ref=e345]: ¥0
+            - list [ref=e346]:
+              - listitem [ref=e347]:
+                - img [ref=e348]
+                - generic [ref=e351]: ロゴ・企業情報を構造化公開（JSON‑LD）
+              - listitem [ref=e352]:
+                - img [ref=e353]
+                - generic [ref=e356]: サービス1件登録
+              - listitem [ref=e357]:
+                - img [ref=e358]
+                - generic [ref=e361]: Q&A項目：5件まで
+              - listitem [ref=e362]:
+                - img [ref=e363]
+                - generic [ref=e366]: Hub内構造化のみ（自社サイト埋め込み不可）
+              - listitem [ref=e367]:
+                - img [ref=e368]
+                - generic [ref=e371]: SEO最適化・構造化データ自動生成
+              - listitem [ref=e372]:
+                - img [ref=e373]
+                - generic [ref=e376]: 外部CTA・問い合わせフォーム連携
+            - link "無料で始める" [ref=e378] [cursor=pointer]:
+              - /url: /organizations
+          - generic [ref=e379]:
+            - generic [ref=e380]:
+              - img [ref=e382]
+              - heading "Basic" [level=3] [ref=e384]
+              - paragraph [ref=e385]: 基本的なAI最適化運用
+              - generic [ref=e386]:
+                - generic [ref=e387]: ¥5,000
+                - generic [ref=e388]: /月
+            - list [ref=e389]:
+              - listitem [ref=e390]:
+                - generic [ref=e391]: Freeプランのすべての機能に加えて
+              - listitem [ref=e392]:
+                - img [ref=e393]
+                - generic [ref=e396]: サービス登録：10件まで
+              - listitem [ref=e397]:
+                - img [ref=e398]
+                - generic [ref=e401]: Q&A項目：20件まで
+              - listitem [ref=e402]:
+                - img [ref=e403]
+                - generic [ref=e406]: Hub＋自社サイト埋め込み対応
+              - listitem [ref=e407]:
+                - img [ref=e408]
+                - generic [ref=e411]: 営業資料添付（最大5個）
+              - listitem [ref=e412]:
+                - img [ref=e413]
+                - generic [ref=e416]: 外部リンク表示機能
+              - listitem [ref=e417]:
+                - img [ref=e418]
+                - generic [ref=e421]: カテゴリタグ検索対応
+              - listitem [ref=e422]:
+                - img [ref=e423]
+                - generic [ref=e426]: メールサポート
+            - link "このプランで始める" [ref=e428] [cursor=pointer]:
+              - /url: /organizations
+          - generic [ref=e429]:
+            - generic [ref=e431]: 人気
+            - generic [ref=e432]:
+              - img [ref=e434]
+              - heading "Business" [level=3] [ref=e436]
+              - paragraph [ref=e437]: 本格的なAI最適化運用
+              - generic [ref=e438]:
+                - generic [ref=e439]: ¥15,000
+                - generic [ref=e440]: /月
+            - list [ref=e441]:
+              - listitem [ref=e442]:
+                - generic [ref=e443]: Basicプランのすべての機能に加えて
+              - listitem [ref=e444]:
+                - img [ref=e445]
+                - generic [ref=e448]: サービス登録：50件まで
+              - listitem [ref=e449]:
+                - img [ref=e450]
+                - generic [ref=e453]: Q&A項目：無制限
+              - listitem [ref=e454]:
+                - img [ref=e455]
+                - generic [ref=e458]: 営業資料添付（最大20個）
+              - listitem [ref=e459]:
+                - img [ref=e460]
+                - generic [ref=e463]: Verified法人バッジ
+              - listitem [ref=e464]:
+                - img [ref=e465]
+                - generic [ref=e468]: 承認フロー機能
+              - listitem [ref=e469]:
+                - img [ref=e470]
+                - generic [ref=e473]: 認証バッジ機能
+              - listitem [ref=e474]:
+                - img [ref=e475]
+                - generic [ref=e478]: AI解析レポート（基本版）
+              - listitem [ref=e479]:
+                - img [ref=e480]
+                - generic [ref=e483]: システム監視機能
+              - listitem [ref=e484]:
+                - img [ref=e485]
+                - generic [ref=e488]: 優先サポート・個別相談
+            - link "このプランで始める" [ref=e490] [cursor=pointer]:
+              - /url: /organizations
+          - generic [ref=e491]:
+            - generic [ref=e492]:
+              - img [ref=e494]
+              - heading "Enterprise" [level=3] [ref=e498]
+              - paragraph [ref=e499]: エンタープライズ向け完全運用
+              - generic [ref=e500]:
+                - generic [ref=e501]: ¥30,000〜
+                - generic [ref=e502]: /月
+            - list [ref=e503]:
+              - listitem [ref=e504]:
+                - generic [ref=e505]: Businessプランのすべての機能に加えて
+              - listitem [ref=e506]:
+                - img [ref=e507]
+                - generic [ref=e510]: すべての機能無制限
+              - listitem [ref=e511]:
+                - img [ref=e512]
+                - generic [ref=e515]: SVG対応大サイズロゴ
+              - listitem [ref=e516]:
+                - img [ref=e517]
+                - generic [ref=e520]: AI解析レポート（拡張版）
+              - listitem [ref=e521]:
+                - img [ref=e522]
+                - generic [ref=e525]: カスタム機能開発
+              - listitem [ref=e526]:
+                - img [ref=e527]
+                - generic [ref=e530]: 専任サポート
+              - listitem [ref=e531]:
+                - img [ref=e532]
+                - generic [ref=e535]: SLA保証
+              - listitem [ref=e536]:
+                - img [ref=e537]
+                - generic [ref=e540]: ホワイトラベル対応
+              - listitem [ref=e541]:
+                - img [ref=e542]
+                - generic [ref=e545]: API優先アクセス
+            - link "お問い合わせ" [ref=e547] [cursor=pointer]:
+              - /url: /contact
+        - paragraph [ref=e549]: Enterpriseプランの詳細な機能や導入サポートについては、お気軽にお問い合わせください
+        - paragraph [ref=e551]:
+          - text: ※価格は税込。詳細機能についてはお問い合わせください。
+          - text: お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
+      - generic [ref=e553]:
+        - generic [ref=e554]:
+          - heading "よくあるご質問" [level=2] [ref=e555]
+          - paragraph [ref=e556]: AIO・JSON-LD・構造化データに関する技術的な質問にお答えします。
+        - generic [ref=e557]:
+          - generic [ref=e558]:
+            - heading "AIO・基本概念" [level=3] [ref=e559]
+            - generic [ref=e560]:
+              - button "AIO（AI Information Optimization）とは何ですか？" [ref=e562] [cursor=pointer]:
+                - generic [ref=e563] [cursor=pointer]: AIO（AI Information Optimization）とは何ですか？
+                - img [ref=e565] [cursor=pointer]
+              - button "なぜ今AIOが必要なのですか？" [ref=e568] [cursor=pointer]:
+                - generic [ref=e569] [cursor=pointer]: なぜ今AIOが必要なのですか？
+                - img [ref=e571] [cursor=pointer]
+          - generic [ref=e573]:
+            - heading "JSON-LD・技術仕様" [level=3] [ref=e574]
+            - generic [ref=e575]:
+              - button "JSON-LDとは何ですか？" [ref=e577] [cursor=pointer]:
+                - generic [ref=e578] [cursor=pointer]: JSON-LDとは何ですか？
+                - img [ref=e580] [cursor=pointer]
+              - button "自社サイトにJSON-LDを設置する必要がありますか？" [ref=e583] [cursor=pointer]:
+                - generic [ref=e584] [cursor=pointer]: 自社サイトにJSON-LDを設置する必要がありますか？
+                - img [ref=e586] [cursor=pointer]
+          - generic [ref=e588]:
+            - heading "プラン・機能" [level=3] [ref=e589]
+            - generic [ref=e590]:
+              - button "フリープランでも効果はありますか？" [ref=e592] [cursor=pointer]:
+                - generic [ref=e593] [cursor=pointer]: フリープランでも効果はありますか？
+                - img [ref=e595] [cursor=pointer]
+              - button "データの更新頻度はどの程度ですか？" [ref=e598] [cursor=pointer]:
+                - generic [ref=e599] [cursor=pointer]: データの更新頻度はどの程度ですか？
+                - img [ref=e601] [cursor=pointer]
+        - generic [ref=e604]:
+          - heading "その他のご質問がございましたら" [level=3] [ref=e605]
+          - paragraph [ref=e606]: AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
+          - link "お問い合わせフォーム" [ref=e607] [cursor=pointer]:
+            - /url: /contact
+      - generic [ref=e609]:
+        - heading "今すぐゼロクリック時代に備えましょう" [level=2] [ref=e610]
+        - paragraph [ref=e611]: 無料プランでAIO Hubの価値を体験し、AI時代の企業情報戦略を始めてください。
+        - generic [ref=e612]:
+          - link "無料で始める" [ref=e613] [cursor=pointer]:
+            - /url: /auth/signup
+            - text: 無料で始める
+            - img [ref=e614] [cursor=pointer]
+          - link "ヒアリング代行サービス" [ref=e616] [cursor=pointer]:
+            - /url: /hearing-service
+        - generic [ref=e617]: 永続無料プラン • クレジットカード不要 • 今すぐ開始
+      - generic [ref=e619]:
+        - generic [ref=e620]:
+          - generic [ref=e621]:
+            - heading "AIO Hub" [level=3] [ref=e622]
+            - paragraph [ref=e623]: AI技術を活用した企業情報の統合管理プラットフォーム
+          - generic [ref=e624]:
+            - heading "リンク" [level=4] [ref=e625]
+            - list [ref=e626]:
+              - listitem [ref=e627]:
+                - link "企業ディレクトリ" [ref=e628] [cursor=pointer]:
+                  - /url: /organizations
+              - listitem [ref=e629]:
+                - link "検索" [ref=e630] [cursor=pointer]:
+                  - /url: /search
+              - listitem [ref=e631]:
+                - link "ダッシュボード" [ref=e632] [cursor=pointer]:
+                  - /url: /dashboard
+          - generic [ref=e633]:
+            - heading "サポート" [level=4] [ref=e634]
+            - list [ref=e635]:
+              - listitem [ref=e636]:
+                - link "ヘルプ" [ref=e637] [cursor=pointer]:
+                  - /url: /help
+              - listitem [ref=e638]:
+                - link "お問い合わせ" [ref=e639] [cursor=pointer]:
+                  - /url: /contact
+              - listitem [ref=e640]:
+                - link "利用規約" [ref=e641] [cursor=pointer]:
+                  - /url: /terms
+              - listitem [ref=e642]:
+                - link "プライバシー" [ref=e643] [cursor=pointer]:
+                  - /url: /privacy
+        - paragraph [ref=e645]: © 2024 AIO Hub. All rights reserved.
+  - alert [ref=e646]
+```

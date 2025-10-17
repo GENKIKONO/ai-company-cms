@@ -1,0 +1,16 @@
+{
+  "url": "/faq",
+  "viewports": [
+    "768x1024"
+  ],
+  "issues": [],
+  "a11y": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "violations": []
+  },
+  "perf_notes": [],
+  "timestamp": "2025-10-17T13:10:04.502Z"
+}

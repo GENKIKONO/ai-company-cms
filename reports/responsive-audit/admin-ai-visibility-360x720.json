@@ -1,0 +1,16 @@
+{
+  "url": "/admin/ai-visibility",
+  "viewports": [
+    "360x720"
+  ],
+  "issues": [],
+  "a11y": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "violations": []
+  },
+  "perf_notes": [],
+  "timestamp": "2025-10-17T13:09:33.770Z"
+}

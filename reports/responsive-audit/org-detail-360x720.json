@@ -1,0 +1,80 @@
+{
+  "url": "/o/luxucare",
+  "viewports": [
+    "360x720"
+  ],
+  "issues": [
+    {
+      "id": "CTA_TOO_LARGE",
+      "severity": "major",
+      "viewport": "360x720",
+      "selector": "button:nth-of-type(2)",
+      "evidence": "CTA height 189px (> 72px guideline)",
+      "screenshot": "screenshots/cta-issue-360x720-1.png",
+      "guideline": "CTAは48-72px、単一配置、ラベルは最短"
+    }
+  ],
+  "a11y": {
+    "critical": 0,
+    "serious": 1,
+    "moderate": 0,
+    "minor": 0,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright",
+        "nodes": [
+          {
+            "any": [
+              {
+                "id": "color-contrast",
+                "data": {
+                  "fgColor": "#16a34a",
+                  "bgColor": "#ffffff",
+                  "contrastRatio": 3.29,
+                  "fontSize": "9.2pt (12.25px)",
+                  "fontWeight": "normal",
+                  "messageKey": null,
+                  "expectedContrastRatio": "4.5:1"
+                },
+                "relatedNodes": [
+                  {
+                    "html": "<a href=\"https://www.google.com/maps/dir/?api=1&amp;destination=%E9%AB%98%E7%9F%A5%E7%9C%8C%E9%AB%98%E7%9F%A5%E5%B8%82%E4%B8%80%E5%AE%AE%E8%A5%BF%E7%94%BA%E5%9B%9B%E4%B8%81%E7%9B%AE19%E7%95%AA24%E5%8F%B7\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-green-600 bg-white border border-green-300 rounded-md hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors\" aria-label=\"LuxuCare株式会社へのルートを検索\">",
+                    "target": [
+                      ".text-green-600"
+                    ]
+                  }
+                ],
+                "impact": "serious",
+                "message": "Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 9.2pt (12.25px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ],
+            "all": [],
+            "none": [],
+            "impact": "serious",
+            "html": "<a href=\"https://www.google.com/maps/dir/?api=1&amp;destination=%E9%AB%98%E7%9F%A5%E7%9C%8C%E9%AB%98%E7%9F%A5%E5%B8%82%E4%B8%80%E5%AE%AE%E8%A5%BF%E7%94%BA%E5%9B%9B%E4%B8%81%E7%9B%AE19%E7%95%AA24%E5%8F%B7\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-green-600 bg-white border border-green-300 rounded-md hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors\" aria-label=\"LuxuCare株式会社へのルートを検索\">",
+            "target": [
+              ".text-green-600"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 9.2pt (12.25px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  "perf_notes": [],
+  "timestamp": "2025-10-17T13:09:25.534Z"
+}

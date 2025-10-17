@@ -1,0 +1,263 @@
+{
+  "url": "/",
+  "viewports": [
+    "360x720"
+  ],
+  "issues": [
+    {
+      "id": "HORIZONTAL_OVERFLOW",
+      "severity": "critical",
+      "viewport": "360x720",
+      "selector": "body",
+      "evidence": "Page width 387px causes horizontal scroll (viewport: 360px)",
+      "screenshot": "screenshots/homepage-360x720-overflow.png",
+      "guideline": "横スクロール禁止（カルーセル除く）"
+    },
+    {
+      "id": "TAP_TARGET_TOO_SMALL",
+      "severity": "critical",
+      "viewport": "360x720",
+      "selector": "button:nth-of-type(5)",
+      "evidence": "Tap target 77.56232452392578x17px (< 44x44px minimum)",
+      "screenshot": "screenshots/tap-target-issue-360x720-4.png",
+      "guideline": "タップターゲット最小44px角"
+    }
+  ],
+  "a11y": {
+    "critical": 0,
+    "serious": 2,
+    "moderate": 0,
+    "minor": 0,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT"
+        ],
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright",
+        "nodes": [
+          {
+            "any": [
+              {
+                "id": "color-contrast",
+                "data": {
+                  "fgColor": "#92400e",
+                  "bgColor": "#fbbf24",
+                  "contrastRatio": 4.24,
+                  "fontSize": "9.2pt (12.25px)",
+                  "fontWeight": "normal",
+                  "messageKey": null,
+                  "expectedContrastRatio": "4.5:1"
+                },
+                "relatedNodes": [
+                  {
+                    "html": "<div class=\"badge badge-warning mb-4\">現在</div>",
+                    "target": [
+                      ".badge-warning"
+                    ]
+                  }
+                ],
+                "impact": "serious",
+                "message": "Element has insufficient color contrast of 4.24 (foreground color: #92400e, background color: #fbbf24, font size: 9.2pt (12.25px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ],
+            "all": [],
+            "none": [],
+            "impact": "serious",
+            "html": "<div class=\"badge badge-warning mb-4\">現在</div>",
+            "target": [
+              ".badge-warning"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.24 (foreground color: #92400e, background color: #fbbf24, font size: 9.2pt (12.25px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "any": [
+              {
+                "id": "color-contrast",
+                "data": {
+                  "fgColor": "#ffffff",
+                  "bgColor": "#10b981",
+                  "contrastRatio": 2.53,
+                  "fontSize": "9.2pt (12.25px)",
+                  "fontWeight": "normal",
+                  "messageKey": null,
+                  "expectedContrastRatio": "4.5:1"
+                },
+                "relatedNodes": [
+                  {
+                    "html": "<div class=\"badge badge-success mb-4\">将来</div>",
+                    "target": [
+                      ".badge-success"
+                    ]
+                  }
+                ],
+                "impact": "serious",
+                "message": "Element has insufficient color contrast of 2.53 (foreground color: #ffffff, background color: #10b981, font size: 9.2pt (12.25px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ],
+            "all": [],
+            "none": [],
+            "impact": "serious",
+            "html": "<div class=\"badge badge-success mb-4\">将来</div>",
+            "target": [
+              ".badge-success"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.53 (foreground color: #ffffff, background color: #10b981, font size: 9.2pt (12.25px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "any": [
+              {
+                "id": "color-contrast",
+                "data": {
+                  "fgColor": "#16a34a",
+                  "bgColor": "#ffffff",
+                  "contrastRatio": 3.29,
+                  "fontSize": "7.9pt (10.5px)",
+                  "fontWeight": "normal",
+                  "messageKey": null,
+                  "expectedContrastRatio": "4.5:1"
+                },
+                "relatedNodes": [
+                  {
+                    "html": "<div class=\"bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-green-200\">",
+                    "target": [
+                      ".border-green-200"
+                    ]
+                  }
+                ],
+                "impact": "serious",
+                "message": "Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 7.9pt (10.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ],
+            "all": [],
+            "none": [],
+            "impact": "serious",
+            "html": "<div class=\"mt-4 text-xs sm:text-sm text-green-600 text-center leading-5 flex items-center justify-center gap-1\">",
+            "target": [
+              ".mt-4.gap-1.text-green-600"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 7.9pt (10.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "any": [
+              {
+                "id": "color-contrast",
+                "data": {
+                  "fgColor": "#a3a3a3",
+                  "bgColor": "#ffffff",
+                  "contrastRatio": 2.52,
+                  "fontSize": "9.2pt (12.25px)",
+                  "fontWeight": "normal",
+                  "messageKey": null,
+                  "expectedContrastRatio": "4.5:1"
+                },
+                "relatedNodes": [
+                  {
+                    "html": "<div class=\"card flex flex-col relative p-6 flex-shrink-0 w-80 snap-center hover:border-neutral-300\">",
+                    "target": [
+                      ".w-80.hover\\:border-neutral-300.flex-col:nth-child(1)"
+                    ]
+                  }
+                ],
+                "impact": "serious",
+                "message": "Element has insufficient color contrast of 2.52 (foreground color: #a3a3a3, background color: #ffffff, font size: 9.2pt (12.25px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ],
+            "all": [],
+            "none": [],
+            "impact": "serious",
+            "html": "<span class=\"text-body-small jp-text text-neutral-400\">外部CTA・問い合わせフォーム連携</span>",
+            "target": [
+              ".w-80.hover\\:border-neutral-300.flex-col:nth-child(1) > .sm\\:space-y-2\\.5.space-y-2.mb-8 > .items-start:nth-child(6) > .flex-1 > .text-neutral-400.text-body-small"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.52 (foreground color: #a3a3a3, background color: #ffffff, font size: 9.2pt (12.25px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "tags": [
+          "cat.keyboard",
+          "wcag2a",
+          "wcag211",
+          "wcag213",
+          "TTv5",
+          "TT4.a",
+          "EN-301-549",
+          "EN-9.2.1.1",
+          "EN-9.2.1.3"
+        ],
+        "description": "Ensure elements that have scrollable content are accessible by keyboard",
+        "help": "Scrollable region must have keyboard access",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/scrollable-region-focusable?application=playwright",
+        "nodes": [
+          {
+            "any": [
+              {
+                "id": "focusable-content",
+                "data": null,
+                "relatedNodes": [],
+                "impact": "serious",
+                "message": "Element should have focusable content"
+              },
+              {
+                "id": "focusable-element",
+                "data": null,
+                "relatedNodes": [],
+                "impact": "serious",
+                "message": "Element should be focusable"
+              }
+            ],
+            "all": [],
+            "none": [],
+            "impact": "serious",
+            "html": "<div class=\"flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-4\">",
+            "target": [
+              ".md\\:gap-4"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+          },
+          {
+            "any": [
+              {
+                "id": "focusable-content",
+                "data": null,
+                "relatedNodes": [],
+                "impact": "serious",
+                "message": "Element should have focusable content"
+              },
+              {
+                "id": "focusable-element",
+                "data": null,
+                "relatedNodes": [],
+                "impact": "serious",
+                "message": "Element should be focusable"
+              }
+            ],
+            "all": [],
+            "none": [],
+            "impact": "serious",
+            "html": "<div class=\"flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 md:gap-6\">",
+            "target": [
+              ".md\\:gap-6"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+          }
+        ]
+      }
+    ]
+  },
+  "perf_notes": [],
+  "timestamp": "2025-10-17T13:09:19.068Z"
+}
