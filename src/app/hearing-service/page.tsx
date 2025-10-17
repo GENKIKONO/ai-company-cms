@@ -6,9 +6,12 @@
 import { Metadata } from 'next';
 import HeroSection from '@/components/hearing-service/HeroSection';
 import FlowSection from '@/components/hearing-service/FlowSection';
-import PricingSection from '@/components/hearing-service/PricingSection';
+import PricingPlans from '@/components/pricing/PricingPlans';
 import FAQSection from '@/components/hearing-service/FAQSection';
 import CTASection from '@/components/hearing-service/CTASection';
+
+// ISR設定: 即時反映を優先（安定後は60などに調整可）
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'AI最適化ヒアリング代行サービス | LuxuCare CMS',
@@ -124,8 +127,8 @@ export default function HearingServicePage() {
         {/* サービス流れ説明 */}
         <FlowSection />
         
-        {/* 料金プラン */}
-        <PricingSection />
+        {/* 料金プラン - 新PricingPlansコンポーネント */}
+        <PricingPlans />
         
         {/* よくある質問 */}
         <FAQSection />
