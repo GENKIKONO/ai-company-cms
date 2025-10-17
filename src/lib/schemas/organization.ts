@@ -23,8 +23,9 @@ import {
  */
 export const organizationStatusSchema = z.enum([
   'draft',
-  'waiting_approval', 
-  'published',
+  'waiting_approval',
+  'public_unverified',
+  'published', 
   'paused',
   'archived'
 ]);

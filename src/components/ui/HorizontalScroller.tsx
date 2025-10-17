@@ -123,12 +123,12 @@ export default function HorizontalScroller({
   };
 
   return (
-    <div className="relative">
+    <div className="carousel-container relative">
       <div
         ref={ref}
         className={clsx(
           className,
-          'carousel-inline no-inline-overflow scroll-smooth snap-x snap-mandatory overflow-y-visible sm:overflow-visible [-webkit-overflow-scrolling:touch] px-6 -mx-6 sm:mx-0 sm:px-0 pb-4 sm:pb-0 pt-6 scrollbar-hide isolate'
+          'carousel-wrapper scroll-smooth snap-x snap-mandatory overflow-y-visible sm:overflow-visible [-webkit-overflow-scrolling:touch] px-6 -mx-6 sm:mx-0 sm:px-0 pb-4 sm:pb-0 pt-6 scrollbar-hide isolate'
         )}
         style={{
           scrollSnapStop: 'normal',
@@ -139,14 +139,14 @@ export default function HorizontalScroller({
         aria-label={ariaLabel}
         role="region"
       >
-      <div className="flex sm:grid gap-4 sm:gap-6 items-stretch min-h-fit sm:grid-cols-2 lg:grid-cols-3 justify-start sm:justify-normal auto-rows-fr">
+      <div className="carousel-content flex sm:grid gap-4 sm:gap-6 items-stretch min-h-fit sm:grid-cols-2 lg:grid-cols-3 justify-start sm:justify-normal auto-rows-fr">
         {Array.isArray(children) 
           ? children.map((child, index) => (
-              <div key={index} data-index={index} className="contents">
+              <div key={index} data-index={index} className="carousel-item snap-card">
                 {child}
               </div>
             ))
-          : <div data-index={0} className="contents">{children}</div>
+          : <div data-index={0} className="carousel-item snap-card">{children}</div>
         }
       </div>
 
@@ -160,8 +160,9 @@ export default function HorizontalScroller({
               disabled={currentIndex === 0}
               aria-label="前のページ"
               className={clsx(
+                'carousel-nav carousel-nav-prev hit-44',
                 'absolute left-2 top-1/2 -translate-y-1/2 z-10',
-                'w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200',
+                'w-11 h-11 rounded-full bg-white shadow-lg border border-gray-200',
                 'flex items-center justify-center',
                 'transition-all duration-300',
                 currentIndex === 0
@@ -177,8 +178,9 @@ export default function HorizontalScroller({
               disabled={currentIndex === childrenCount - 1}
               aria-label="次のページ"
               className={clsx(
+                'carousel-nav carousel-nav-next hit-44',
                 'absolute right-2 top-1/2 -translate-y-1/2 z-10',
-                'w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200',
+                'w-11 h-11 rounded-full bg-white shadow-lg border border-gray-200',
                 'flex items-center justify-center',
                 'transition-all duration-300',
                 currentIndex === childrenCount - 1
@@ -195,7 +197,7 @@ export default function HorizontalScroller({
       
       {/* Dots indicator - positioned at bottom center */}
       {showDots && childrenCount > 1 && (
-        <div className="sm:hidden flex justify-center mt-6 gap-2" role="tablist" aria-label="ページインジケーター">
+        <div className="carousel-dots sm:hidden flex justify-center mt-6 gap-2" role="tablist" aria-label="ページインジケーター">
           {Array.from({ length: childrenCount }).map((_, index) => (
             <button
               key={index}
@@ -204,7 +206,8 @@ export default function HorizontalScroller({
               aria-label={`${index + 1}ページ目`}
               onClick={() => scrollToIndex(index)}
               className={clsx(
-                'w-2.5 h-2.5 rounded-full transition-all duration-300',
+                'carousel-dot hit-44 rounded-full transition-all duration-300',
+                'w-2.5 h-2.5 flex items-center justify-center',
                 currentIndex === index
                   ? 'bg-blue-600 scale-125'
                   : 'bg-gray-300 hover:bg-gray-400'

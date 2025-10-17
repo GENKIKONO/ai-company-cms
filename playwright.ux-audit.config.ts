@@ -18,7 +18,7 @@ export default defineConfig({
   use: {
     baseURL: 'https://aiohub.jp',
     trace: 'retain-on-failure',
-    screenshot: 'always',
+    screenshot: 'only-on-failure',
     video: 'off', // 監査では不要
     actionTimeout: 30000,
     navigationTimeout: 60000,

@@ -30,6 +30,7 @@ export interface OrganizationStructuredData {
   foundingDate?: string;
   numberOfEmployees?: number;
   industry?: string[];
+  pendingVerification?: boolean; // P0: 審査中ステータス表示
 }
 
 interface GenerateJsonLdOptions {
@@ -173,6 +174,11 @@ export function generateOrganizationJsonLd(
   // Industries
   if (organization.industries && organization.industries.length > 0) {
     structuredData.industry = organization.industries;
+  }
+
+  // P0: Pending verification status
+  if (organization.status === 'public_unverified') {
+    structuredData.pendingVerification = true;
   }
 
   return structuredData;
