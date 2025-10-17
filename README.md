@@ -1,5 +1,68 @@
 # ai-company-cms
 
+## 🚀 本番デプロイメント
+
+### 必須環境変数（最小6項目）
+
+本番デプロイには以下の6つの環境変数が必須です：
+
+1. **SUPABASE_URL** - Supabase プロジェクト URL
+   - 取得場所: Supabase Dashboard > Settings > General > Project URL
+   - 例: `https://your-project.supabase.co`
+
+2. **SUPABASE_SERVICE_ROLE_KEY** - Supabase サービスロールキー
+   - 取得場所: Supabase Dashboard > Settings > API > service_role (secret)
+   - 用途: サーバーサイドでのRLSバイパス
+
+3. **SUPABASE_ANON_KEY** - Supabase 匿名キー
+   - 取得場所: Supabase Dashboard > Settings > API > anon (public)
+   - 用途: クライアントサイドでの認証
+
+4. **NEXT_PUBLIC_SUPABASE_URL** - パブリック Supabase URL
+   - 値: SUPABASE_URL と同じ値
+   - 用途: クライアントサイドでのSupabase接続
+
+5. **NEXT_PUBLIC_APP_URL** - アプリケーション URL
+   - 例: `https://aiohub.jp`
+   - 用途: API呼び出しとリダイレクト
+
+6. **NEXT_PUBLIC_SITE_URL** - サイト URL
+   - 値: NEXT_PUBLIC_APP_URL と同じ値
+   - 用途: 内部API呼び出し
+
+### Vercel 環境変数設定手順
+
+1. Vercel Dashboard にログイン
+2. プロジェクト選択
+3. Settings > Environment Variables
+4. **Production** 環境を選択
+5. 上記6項目を設定
+
+### デプロイメント運用ルール
+
+- **main ブランチへの push = Production デプロイ**
+  - GitHub Actions が自動的に本番環境にデプロイ
+  - CI/CD パイプラインで品質チェック実行
+  - デプロイ後に自動ヘルスチェック
+
+- **develop ブランチへの push = Staging デプロイ**
+  - プレビュー環境での検証
+
+- **手動デプロイ（緊急時のみ）**:
+  ```bash
+  npm run deploy:production
+  ```
+
+### 🔍 デプロイ前検証
+
+```bash
+# 環境変数チェック
+node scripts/verify-env.mjs
+
+# 本番検証（デプロイ後）
+npm run validate:production
+```
+
 ## 運用
 
 ### AI可視性監視

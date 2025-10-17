@@ -8,61 +8,50 @@
 import { writeFileSync } from 'fs';
 
 const REQUIRED_ENV_VARS = {
-  // Supabase Core
+  // Essential 6 Variables (REQUIRED for production)
   'SUPABASE_URL': {
-    description: 'Supabase project URL',
+    description: 'Supabase project URL (Dashboard > Settings > General > Project URL)',
     required: true,
     example: 'https://your-project.supabase.co'
   },
   'SUPABASE_SERVICE_ROLE_KEY': {
-    description: 'Supabase service role key (bypass RLS)',
+    description: 'Supabase service role key (Dashboard > Settings > API > service_role secret)',
+    required: true,
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    sensitive: true
+  },
+  'SUPABASE_ANON_KEY': {
+    description: 'Supabase anonymous key (Dashboard > Settings > API > anon public)',
     required: true,
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     sensitive: true
   },
   'NEXT_PUBLIC_SUPABASE_URL': {
-    description: 'Public Supabase URL for client-side',
+    description: 'Public Supabase URL for client-side (same as SUPABASE_URL)',
     required: true,
     example: 'https://your-project.supabase.co'
   },
-  'SUPABASE_ANON_KEY': {
-    description: 'Supabase anonymous key for client auth',
-    required: true,
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    sensitive: true
-  },
-  
-  // Application Core
   'NEXT_PUBLIC_APP_URL': {
-    description: 'Application base URL',
+    description: 'Application base URL (your production domain)',
     required: true,
     example: 'https://aiohub.jp'
   },
   'NEXT_PUBLIC_SITE_URL': {
-    description: 'Site URL for API calls',
+    description: 'Site URL for API calls (same as NEXT_PUBLIC_APP_URL)',
     required: true,
     example: 'https://aiohub.jp'
   },
   
-  // Security & Auth
-  'ADMIN_API_TOKEN': {
-    description: 'Internal API authentication token',
-    required: true,
-    example: 'your-secure-admin-token',
-    sensitive: true
-  },
-  'CRON_SECRET': {
-    description: 'Vercel Cron authentication secret',
+  // Optional Variables (checked if present)
+  'ADMIN_EMAIL': {
+    description: 'Admin email for system notifications',
     required: false,
-    example: 'your-cron-secret',
-    sensitive: true
+    example: 'admin@aiohub.jp'
   },
-  
-  // Notifications
-  'SLACK_WEBHOOK_URL': {
-    description: 'Slack webhook for notifications',
+  'ADMIN_OPS_PASSWORD': {
+    description: 'Admin operations password',
     required: false,
-    example: 'https://hooks.slack.com/services/...',
+    example: 'your-admin-password',
     sensitive: true
   }
 };
@@ -102,6 +91,8 @@ function checkEnvironmentVariables() {
   if (results.missing.length > 0) {
     console.log(`\\n🚨 CRITICAL: ${results.missing.length} required environment variables are missing!`);
     console.log('Production deployment will fail without these variables.\\n');
+    console.log('📋 これらの変数を Vercel の Production environment に設定してください:');
+    console.log('   Vercel Dashboard → Project → Settings → Environment Variables → Production\\n');
     
     console.log('Missing variables:');
     results.missing.forEach(({ name, config }) => {
@@ -135,10 +126,9 @@ function generateEnvTemplate() {
 `;
 
   const categories = {
-    'Supabase Configuration': ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_ANON_KEY'],
-    'Application URLs': ['NEXT_PUBLIC_APP_URL', 'NEXT_PUBLIC_SITE_URL'],
-    'Security & Authentication': ['ADMIN_API_TOKEN', 'CRON_SECRET'],
-    'External Integrations': ['SLACK_WEBHOOK_URL']
+    'Supabase Configuration (REQUIRED)': ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_ANON_KEY', 'NEXT_PUBLIC_SUPABASE_URL'],
+    'Application URLs (REQUIRED)': ['NEXT_PUBLIC_APP_URL', 'NEXT_PUBLIC_SITE_URL'],
+    'Admin Settings (OPTIONAL)': ['ADMIN_EMAIL', 'ADMIN_OPS_PASSWORD']
   };
   
   for (const [category, varNames] of Object.entries(categories)) {

@@ -2,12 +2,25 @@
 
 ## 🚀 本番デプロイ前の必須確認事項
 
-### 1. 環境設定 (.env.production)
-- [ ] `.env.production`ファイルが存在し、以下が設定されている
+### 1. 環境設定（最小6項目）
+- [ ] **Vercel Production 環境変数**が設定されている（`.env.production`ファイルは不要）
+  - [ ] `SUPABASE_URL` (Supabase プロジェクト URL)
+  - [ ] `SUPABASE_SERVICE_ROLE_KEY` (サービスロールキー)
+  - [ ] `SUPABASE_ANON_KEY` (匿名キー)
+  - [ ] `NEXT_PUBLIC_SUPABASE_URL` (同上 SUPABASE_URL)
+  - [ ] `NEXT_PUBLIC_APP_URL="https://aiohub.jp"`
   - [ ] `NEXT_PUBLIC_SITE_URL="https://aiohub.jp"`
-  - [ ] `NEXT_PUBLIC_SUPABASE_URL` (本番Supabase URL)
-  - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` (本番Supabase匿名キー)
-  - [ ] `SUPABASE_SERVICE_ROLE_KEY` (本番サービスロールキー)
+
+#### 環境変数検証コマンド
+```bash
+# デプロイ前検証（必須6項目チェック）
+node scripts/verify-env.mjs
+```
+
+#### Vercel 設定手順
+1. Vercel Dashboard > Project > Settings > Environment Variables
+2. **Production** 環境を選択
+3. 上記6項目を設定（Stripe/Sentry等は不要）
 
 ### 2. Supabase設定確認
 - [ ] **Auth設定 > URL Configuration**
