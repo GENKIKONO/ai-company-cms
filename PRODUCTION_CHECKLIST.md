@@ -12,7 +12,6 @@
 - [ ] **基本マイグレーション適用**
   - `001_initial_schema.sql` ✅ (完了済み)
   - `002_rls_policies.sql` ✅ (完了済み)
-  - `003_sample_data.sql` ✅ (完了済み)
 
 - [ ] **Stripe連携テーブル追加**
   - `missing_tables.sql` の実行

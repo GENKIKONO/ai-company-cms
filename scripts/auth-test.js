@@ -91,7 +91,7 @@ function printTestGuide() {
   testUsers.forEach(user => {
     console.log(`\n📧 ${user.role.toUpperCase()}:`);
     console.log(`   Email: ${user.email}`);
-    console.log(`   Password: ${user.password}`);
+    console.log(`   Password: [REDACTED]`);
     console.log(`   権限:`);
     user.permissions.forEach(permission => {
       console.log(`     - ${permission}`);
