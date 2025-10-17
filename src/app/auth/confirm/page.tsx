@@ -25,7 +25,14 @@ function ConfirmPageContent() {
         const type = searchParams.get('type');
         const token = searchParams.get('token');
         
-        console.log('Confirmation params:', { token_hash, type, token });
+        // Development only: mask sensitive tokens
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Confirmation params:', { 
+            token_hash: token_hash ? '[REDACTED]' : null, 
+            type, 
+            token: token ? '[REDACTED]' : null 
+          });
+        }
 
         // URLパラメーターの複数パターンに対応
         if (!token_hash && !token) {

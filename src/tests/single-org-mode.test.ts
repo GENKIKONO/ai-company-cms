@@ -89,7 +89,7 @@ afterAll(async () => {
 async function setupTestUsers() {
   // テストユーザー1を作成
   const user1Email = `test-user-1-${Date.now()}@example.com`
-  const user1Password = 'TestPassword123!'
+  const user1Password = process.env.TEST_PASSWORD || 'TestPassword123!'
 
   const { data: signUpData1, error: signUpError1 } = await supabase.auth.signUp({
     email: user1Email,
@@ -102,7 +102,7 @@ async function setupTestUsers() {
 
   // テストユーザー2を作成
   const user2Email = `test-user-2-${Date.now()}@example.com`
-  const user2Password = 'TestPassword123!'
+  const user2Password = process.env.TEST_PASSWORD || 'TestPassword123!'
 
   const { data: signUpData2, error: signUpError2 } = await supabase.auth.signUp({
     email: user2Email,

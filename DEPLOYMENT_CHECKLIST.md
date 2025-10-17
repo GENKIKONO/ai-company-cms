@@ -5,7 +5,7 @@
 ### 必須マイグレーション
 - [ ] `001_initial_schema.sql` - データベーススキーマ
 - [ ] `002_rls_policies.sql` - セキュリティポリシー
-- [ ] `003_sample_data.sql` - サンプルデータ
+- [x] ~~`003_sample_data.sql` - サンプルデータ~~ (削除済み)
 
 ### 確認方法
 ```sql

@@ -19,7 +19,7 @@
 - 0001_init.sql: 基本スキーマ
 - 001_initial_schema.sql: 初期テーブル定義
 - 002_rls_policies.sql: Row Level Security
-- 003_sample_data.sql: サンプルデータ
+- ~~003_sample_data.sql: サンプルデータ~~ (削除済み)
 - 20250922_add_setup_fee.sql: セットアップ費用対応
 - 20250923_create_app_users.sql: ユーザーテーブル
 - 20250927_*.sql: 監査・サブリソース・RLS修正
