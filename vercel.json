@@ -1,0 +1,27 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/ai-visibility",
+      "schedule": "0 18 * * *"
+    }
+  ],
+  "functions": {
+    "src/app/api/admin/ai-visibility/run/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/cron/ai-visibility/route.ts": {
+      "maxDuration": 60
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ]
+}

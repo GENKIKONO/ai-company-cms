@@ -1,4 +1,5 @@
 import { type Organization } from '@/types/database';
+import { signJsonLd, type SignedJsonLd } from '@/lib/ai-visibility/content-protection';
 
 export interface OrganizationStructuredData {
   '@context': string;
@@ -178,7 +179,7 @@ export function generateOrganizationJsonLd(
 }
 
 /**
- * Generate JSON-LD script tag content
+ * Generate JSON-LD script tag content with content protection
  * @param organization Organization data
  * @param options Generation options
  * @returns JSON-LD as string for script tag
@@ -188,7 +189,31 @@ export function generateOrganizationJsonLdScript(
   options: GenerateJsonLdOptions = {}
 ): string {
   const jsonLd = generateOrganizationJsonLd(organization, options);
+  
+  // Add content protection signature in production
+  const shouldSign = process.env.NODE_ENV === 'production' && 
+                    process.env.AI_VISIBILITY_SIGNING_ENABLED !== 'false';
+  
+  if (shouldSign) {
+    const signedJsonLd = signJsonLd(jsonLd);
+    return JSON.stringify(signedJsonLd, null, 2);
+  }
+  
   return JSON.stringify(jsonLd, null, 2);
+}
+
+/**
+ * Generate protected Organization JSON-LD with signature
+ * @param organization Organization data
+ * @param options Generation options
+ * @returns Signed JSON-LD for enhanced protection
+ */
+export function generateProtectedOrganizationJsonLd(
+  organization: Organization, 
+  options: GenerateJsonLdOptions = {}
+): SignedJsonLd {
+  const jsonLd = generateOrganizationJsonLd(organization, options);
+  return signJsonLd(jsonLd);
 }
 
 /**

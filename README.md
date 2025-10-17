@@ -1,5 +1,11 @@
 # ai-company-cms
 
+## 運用
+
+### AI可視性監視
+- **管理画面**: [/admin/ai-visibility](https://aiohub.jp/admin/ai-visibility)
+- **手動実行API**: `POST /api/admin/ai-visibility/run` (認証必要)
+
 ## 本番とソースの乖離可視化
 
 ### ビルド情報バッジ

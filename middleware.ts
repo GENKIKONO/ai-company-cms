@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 
 // 公開ルート（常に素通し）
 const PUBLIC_PATHS = new Set([
@@ -34,6 +35,8 @@ const AUTH_PAGES = new Set([
 ]);
 
 export async function middleware(req: NextRequest) {
+  const startTime = Date.now();
+  
   try {
     const { pathname } = req.nextUrl;
 
@@ -51,6 +54,12 @@ export async function middleware(req: NextRequest) {
     }
 
     console.log(`[Middleware] Processing: ${pathname}`);
+
+    // 🛡️ AI Visibility Guard - Rate limiting and bot protection
+    const guardResult = await aiVisibilityGuard(req, pathname, startTime);
+    if (guardResult.blocked) {
+      return guardResult.response;
+    }
 
   // 公開パスは認証チェック不要
   if (PUBLIC_PATHS.has(pathname)) {
@@ -140,12 +149,316 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(target, req.url));
   }
 
+    // Add security headers to response
+    res.headers.set('X-Frame-Options', 'DENY');
+    res.headers.set('X-Content-Type-Options', 'nosniff');
+    res.headers.set('X-Response-Time', `${Date.now() - startTime}ms`);
+    
     // それ以外はそのまま通過
     return res;
   } catch (error) {
     console.error('[Middleware] Exception caught:', error);
     // 例外時は素通り（フォールバック）
     return NextResponse.next();
+  }
+}
+
+// 🛡️ AI Visibility Guard Functions
+async function aiVisibilityGuard(
+  req: NextRequest, 
+  pathname: string, 
+  startTime: number
+): Promise<{ blocked: boolean; response?: NextResponse }> {
+  try {
+    const ip = getClientIP(req);
+    const userAgent = req.headers.get('user-agent') || '';
+    const method = req.method;
+    const referer = req.headers.get('referer') || '';
+    
+    // Initialize Supabase client for logging (service role for write access)
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    
+    // 1. Check if IP is blocked
+    if (await isIPBlocked(supabase, ip)) {
+      await logAccess(supabase, ip, userAgent, pathname, method, 403, startTime, 'IP_BLOCKED');
+      return {
+        blocked: true,
+        response: new NextResponse('Access Denied', { status: 403 })
+      };
+    }
+    
+    // 2. Check rate limits
+    const rateLimitResult = await checkRateLimit(supabase, ip, userAgent, pathname);
+    if (rateLimitResult.exceeded) {
+      if (rateLimitResult.shouldBlock) {
+        await autoBlockIP(supabase, ip, 'Rate limit exceeded multiple times');
+      }
+      
+      await logAccess(supabase, ip, userAgent, pathname, method, 429, startTime, 'RATE_LIMITED');
+      return {
+        blocked: true,
+        response: new NextResponse('Too Many Requests', { 
+          status: 429,
+          headers: {
+            'Retry-After': '60',
+            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': (Date.now() + 60000).toString()
+          }
+        })
+      };
+    }
+    
+    // 3. Check bot access permissions
+    const botCheck = analyzeBotAccess(userAgent, pathname);
+    if (!botCheck.allowed) {
+      await logAccess(supabase, ip, userAgent, pathname, method, 403, startTime, 'BOT_BLOCKED');
+      return {
+        blocked: true,
+        response: new NextResponse('Bot Access Denied', { 
+          status: 403,
+          headers: {
+            'X-Robots-Tag': 'noindex, nofollow'
+          }
+        })
+      };
+    }
+    
+    // 4. Block access to protected paths for bots
+    if (isProtectedPath(pathname) && detectBotType(userAgent) !== 'browser') {
+      await logAccess(supabase, ip, userAgent, pathname, method, 403, startTime, 'PROTECTED_PATH');
+      return {
+        blocked: true,
+        response: new NextResponse('Forbidden', { status: 403 })
+      };
+    }
+    
+    // 5. Log successful access
+    await logAccess(supabase, ip, userAgent, pathname, method, 200, startTime, 'ALLOWED');
+    
+    return { blocked: false };
+    
+  } catch (error) {
+    console.error('AI Visibility Guard error:', error);
+    // Don't block on error, just log
+    return { blocked: false };
+  }
+}
+
+function getClientIP(req: NextRequest): string {
+  // Try various headers for IP detection (Vercel/Cloudflare compatible)
+  const xForwardedFor = req.headers.get('x-forwarded-for');
+  const xRealIP = req.headers.get('x-real-ip');
+  const cfConnectingIP = req.headers.get('cf-connecting-ip');
+  const vercelForwardedFor = req.headers.get('x-vercel-forwarded-for');
+  
+  if (cfConnectingIP) return cfConnectingIP;
+  if (vercelForwardedFor) return vercelForwardedFor;
+  if (xRealIP) return xRealIP;
+  if (xForwardedFor) return xForwardedFor.split(',')[0].trim();
+  
+  return '127.0.0.1'; // fallback
+}
+
+async function isIPBlocked(supabase: any, ip: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from('blocked_ips')
+      .select('*')
+      .eq('ip_address', ip)
+      .eq('is_active', true)
+      .or('blocked_until.is.null,blocked_until.gt.now()')
+      .maybeSingle();
+    
+    if (error) {
+      console.error('Error checking blocked IP:', error);
+      return false;
+    }
+    return !!data;
+  } catch (error) {
+    console.error('Error checking blocked IP:', error);
+    return false;
+  }
+}
+
+async function checkRateLimit(
+  supabase: any, 
+  ip: string, 
+  userAgent: string, 
+  pathname: string
+): Promise<{
+  exceeded: boolean;
+  shouldBlock: boolean;
+  limit: number;
+  current: number;
+}> {
+  try {
+    const now = new Date();
+    const windowStart = new Date(now.getTime() - 10000); // 10 seconds window
+    
+    // Count recent requests from this IP
+    const { data: recentRequests, error } = await supabase
+      .from('rate_limit_logs')
+      .select('*')
+      .eq('ip_address', ip)
+      .gte('timestamp', windowStart.toISOString())
+      .order('timestamp', { ascending: false });
+    
+    if (error) {
+      console.error('Error checking rate limit:', error);
+      return { exceeded: false, shouldBlock: false, limit: 10, current: 0 };
+    }
+    
+    const requestCount = recentRequests?.length || 0;
+    const botType = detectBotType(userAgent);
+    const limit = getBotRateLimit(botType, pathname);
+    
+    // Check if should auto-block (multiple violations in last minute)
+    const recentViolations = recentRequests?.filter(req => 
+      req.limit_exceeded && 
+      new Date(req.timestamp).getTime() > now.getTime() - 60000
+    ) || [];
+    const shouldBlock = recentViolations.length >= 3;
+    
+    return {
+      exceeded: requestCount >= limit,
+      shouldBlock,
+      limit,
+      current: requestCount
+    };
+  } catch (error) {
+    console.error('Error checking rate limit:', error);
+    return { exceeded: false, shouldBlock: false, limit: 10, current: 0 };
+  }
+}
+
+function detectBotType(userAgent: string): string {
+  const ua = userAgent.toLowerCase();
+  
+  if (ua.includes('googlebot') || ua.includes('bingbot')) {
+    return 'search_engine';
+  }
+  if (ua.includes('gptbot') || ua.includes('ccbot') || ua.includes('perplexitybot')) {
+    return 'ai_crawler';
+  }
+  if (ua.includes('bot') || ua.includes('crawler') || ua.includes('spider')) {
+    return 'scraper';
+  }
+  if (!ua || ua.length < 10) {
+    return 'suspicious';
+  }
+  
+  return 'browser';
+}
+
+function getBotRateLimit(botType: string, pathname: string): number {
+  const limits = {
+    search_engine: 10,
+    ai_crawler: 5,
+    scraper: 1,
+    suspicious: 1,
+    browser: 3
+  };
+  
+  return limits[botType as keyof typeof limits] || 3;
+}
+
+function analyzeBotAccess(userAgent: string, pathname: string): {
+  allowed: boolean;
+  robotsTag?: string;
+} {
+  const ua = userAgent.toLowerCase();
+  
+  // Allow all access to search engines
+  if (ua.includes('googlebot') || ua.includes('bingbot')) {
+    return { allowed: true, robotsTag: 'index, follow' };
+  }
+  
+  // AI crawlers only allowed in /o/ path or essential files
+  if (ua.includes('gptbot') || ua.includes('ccbot') || ua.includes('perplexitybot')) {
+    const allowed = pathname.startsWith('/o/') || 
+                   pathname === '/robots.txt' || 
+                   pathname === '/sitemap.xml' ||
+                   pathname === '/';
+    return { 
+      allowed, 
+      robotsTag: allowed ? 'index, follow' : 'noindex, nofollow' 
+    };
+  }
+  
+  // Block empty or suspicious user agents on sensitive paths
+  if ((!ua || ua.length < 10 || ua === 'unknown') && isProtectedPath(pathname)) {
+    return { allowed: false, robotsTag: 'noindex, nofollow' };
+  }
+  
+  // Allow normal browsers and unknown bots on public content
+  return { allowed: true };
+}
+
+function isProtectedPath(pathname: string): boolean {
+  const protectedPaths = [
+    '/dashboard',
+    '/api/auth',
+    '/billing',
+    '/checkout',
+    '/preview',
+    '/webhooks',
+    '/admin',
+    '/management-console',
+    '/settings'
+  ];
+  
+  return protectedPaths.some(protectedPath => pathname.startsWith(protectedPath));
+}
+
+async function autoBlockIP(supabase: any, ip: string, reason: string): Promise<void> {
+  try {
+    await supabase.rpc('auto_block_ip', {
+      target_ip: ip,
+      block_reason: reason,
+      block_duration_minutes: 60 // 1 hour temporary block
+    });
+  } catch (error) {
+    console.error('Error auto-blocking IP:', error);
+  }
+}
+
+async function logAccess(
+  supabase: any,
+  ip: string,
+  userAgent: string,
+  pathname: string,
+  method: string,
+  statusCode: number,
+  startTime: number,
+  action: string
+): Promise<void> {
+  try {
+    const now = new Date();
+    const windowStart = new Date(now.getTime() - 10000);
+    const windowEnd = new Date(now.getTime() + 10000);
+    
+    await supabase
+      .from('rate_limit_logs')
+      .insert({
+        ip_address: ip,
+        user_agent: userAgent,
+        path: pathname,
+        method: method,
+        status_code: statusCode,
+        timestamp: now.toISOString(),
+        window_start: windowStart.toISOString(),
+        window_end: windowEnd.toISOString(),
+        limit_exceeded: statusCode === 429,
+        is_bot: detectBotType(userAgent) !== 'browser',
+        bot_type: detectBotType(userAgent)
+      });
+  } catch (error) {
+    // Don't throw errors for logging failures
+    console.error('Error logging access:', error);
   }
 }
 
