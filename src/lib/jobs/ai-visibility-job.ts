@@ -1,15 +1,32 @@
 import { NextRequest } from 'next/server';
+import { getAiVisibilityStatus } from '@/lib/ai-visibility-config';
 
 export interface AiVisibilityJobResult {
   success: boolean;
   summary?: any;
   error?: string;
   timestamp: string;
+  skipped?: boolean;
+  reason?: string;
 }
 
 export async function runAiVisibilityJob(): Promise<AiVisibilityJobResult> {
   try {
     console.log('[AI Visibility Job] Starting AI visibility check...');
+    
+    // Check if AI visibility is enabled
+    const status = await getAiVisibilityStatus();
+    if (!status.enabled) {
+      console.log('[AI Visibility Job] AI visibility monitoring is disabled, skipping job');
+      return {
+        success: true,
+        skipped: true,
+        reason: 'AI visibility monitoring disabled in configuration',
+        timestamp: new Date().toISOString()
+      };
+    }
+    
+    console.log('[AI Visibility Job] AI visibility enabled, proceeding with check...');
     
     // Call the main AI visibility check API
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.jp';

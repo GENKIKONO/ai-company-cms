@@ -1,56 +1,43 @@
 import { MetadataRoute } from 'next';
-import { createClient } from '@supabase/supabase-js';
+import { getAiVisibilityStatus } from '@/lib/ai-visibility-config';
 
 // AI Visibility Guard Enhanced Robots.txt Generation
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001';
   
   try {
-    // Get dynamic configuration from Supabase
-    const config = await getAIVisibilityConfig();
+    // Get AI visibility status (enabled/disabled only)
+    const status = await getAiVisibilityStatus();
     
     return {
-      rules: generateRobotRules(config),
+      rules: generateRobotRules(status.enabled),
       sitemap: `${baseUrl}/sitemap.xml`,
       host: baseUrl,
     };
   } catch (error) {
     console.error('Error generating robots.txt:', error);
-    // Fallback to static configuration
+    // Fallback to static configuration (AI monitoring enabled by default)
     return getStaticRobots(baseUrl);
   }
 }
 
-async function getAIVisibilityConfig(): Promise<any> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-  
-  const { data, error } = await supabase
-    .from('ai_visibility_config')
-    .select('config_key, config_value')
-    .eq('is_active', true);
-  
-  if (error) {
-    console.error('Error fetching AI visibility config:', error);
-    return getDefaultConfig();
-  }
-  
-  // Convert array to object
-  const config: any = {};
-  data?.forEach((item) => {
-    config[item.config_key] = item.config_value;
-  });
-  
-  return config;
-}
-
-function generateRobotRules(config: any): MetadataRoute.Robots['rules'] {
-  const allowedCrawlers = config.allowed_crawlers || getDefaultConfig().allowed_crawlers;
-  const blockedPaths = config.blocked_paths || getDefaultConfig().blocked_paths;
-  
+function generateRobotRules(aiVisibilityEnabled: boolean): MetadataRoute.Robots['rules'] {
   const rules: MetadataRoute.Robots['rules'] = [];
+  
+  const standardDisallowPaths = [
+    '/api/auth/',
+    '/management-console/',
+    '/dashboard/',
+    '/settings/',
+    '/billing/',
+    '/checkout/',
+    '/webhooks/',
+    '/preview/',
+    '/_next/',
+    '/private/',
+    '*.pdf$',
+    '*/temp/*',
+  ];
   
   // 1. General search engines (full access)
   rules.push({
@@ -64,35 +51,30 @@ function generateRobotRules(config: any): MetadataRoute.Robots['rules'] {
       '/organizations',
       '/api/docs', // API documentation
     ],
-    disallow: [
-      ...blockedPaths,
-      '/api/auth/',
-      '/management-console/',
-      '/dashboard/',
-      '/settings/',
-      '/billing/',
-      '/checkout/',
-      '/webhooks/',
-      '/preview/',
-      '/_next/',
-      '/private/',
-      '*.pdf$',
-      '*/temp/*',
-    ],
+    disallow: standardDisallowPaths,
   });
   
-  // 2. AI Crawlers (restricted to /o/ paths only)
+  // 2. AI Crawlers - access depends on AI visibility setting
   const aiCrawlers = ['GPTBot', 'ChatGPT-User', 'CCBot', 'PerplexityBot'];
   aiCrawlers.forEach(crawler => {
-    rules.push({
-      userAgent: crawler,
-      allow: [
-        '/o/', // Only allow organization pages
-        '/robots.txt',
-        '/sitemap.xml',
-      ],
-      disallow: '/', // Disallow everything else
-    });
+    if (aiVisibilityEnabled) {
+      // Allow AI crawlers to access organization pages
+      rules.push({
+        userAgent: crawler,
+        allow: [
+          '/o/', // Only allow organization pages
+          '/robots.txt',
+          '/sitemap.xml',
+        ],
+        disallow: '/', // Disallow everything else
+      });
+    } else {
+      // Block AI crawlers completely when visibility is disabled
+      rules.push({
+        userAgent: crawler,
+        disallow: '/',
+      });
+    }
   });
   
   // 3. Known good search engines (full access)
@@ -101,17 +83,7 @@ function generateRobotRules(config: any): MetadataRoute.Robots['rules'] {
     rules.push({
       userAgent: bot,
       allow: '/',
-      disallow: [
-        ...blockedPaths,
-        '/api/auth/',
-        '/management-console/',
-        '/dashboard/',
-        '/settings/',
-        '/billing/',
-        '/checkout/',
-        '/webhooks/',
-        '/preview/',
-      ],
+      disallow: standardDisallowPaths,
     });
   });
   
@@ -139,28 +111,7 @@ function generateRobotRules(config: any): MetadataRoute.Robots['rules'] {
   return rules;
 }
 
-function getDefaultConfig(): any {
-  return {
-    allowed_crawlers: {
-      search_engines: ["Googlebot", "Bingbot"],
-      ai_crawlers: ["GPTBot", "CCBot", "PerplexityBot"],
-      paths: {
-        "/o/": ["GPTBot", "CCBot", "PerplexityBot"],
-        "/": ["Googlebot", "Bingbot"]
-      }
-    },
-    blocked_paths: [
-      "/dashboard",
-      "/api/auth", 
-      "/billing",
-      "/checkout",
-      "/preview",
-      "/webhooks",
-      "/admin",
-      "/management-console"
-    ]
-  };
-}
+// Removed: getDefaultConfig() - no longer needed with enabled-only approach
 
 function getStaticRobots(baseUrl: string): MetadataRoute.Robots {
   return {

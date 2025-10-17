@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { updateLastCheck } from '@/lib/ai-visibility-config';
 
 // AI Visibility Monitoring System
 export async function POST(request: NextRequest) {
@@ -27,6 +28,9 @@ export async function POST(request: NextRequest) {
     if (!isDryRun) {
       // Save results to database
       await saveResults(supabase, results);
+      
+      // Update last check timestamp
+      await updateLastCheck();
       
       // Send notifications if needed
       await sendNotifications(results);

@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getAiVisibilityConfig } from '@/lib/ai-visibility-config';
+import { getAiVisibilityStatus } from '@/lib/ai-visibility-config';
 
 // Get latest AI visibility check results
 export async function GET(request: NextRequest) {
+  const startTime = Date.now();
+  
   try {
-    // Test configuration accessibility first - includes fallback handling
-    const config = await getAiVisibilityConfig();
-    console.log('[AI Visibility Latest] Configuration loaded successfully');
+    // Test status accessibility first - includes fallback handling
+    const status = await getAiVisibilityStatus();
+    
+    // Production logging (lightweight)
+    if (process.env.NODE_ENV === 'production') {
+      console.log(`[AI Visibility Latest] Success - enabled:${status.enabled} elapsed:${Date.now() - startTime}ms`);
+    }
     
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -43,6 +49,8 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
+      enabled: status.enabled,
+      last_check: status.last_check,
       results: logs,
       summary,
       lastCheck: logs?.[0]?.timestamp || null,
@@ -51,11 +59,18 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('[AI Visibility Latest] Fatal error:', error);
+    // Production error logging (one line)
+    if (process.env.NODE_ENV === 'production') {
+      console.error(`[AI Visibility Latest] Error elapsed:${Date.now() - startTime}ms - ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } else {
+      console.error('[AI Visibility Latest] Fatal error:', error);
+    }
     
     // Even in complete failure, return safe defaults
     return NextResponse.json({
       success: false,
+      enabled: true, // Safe default
+      last_check: null,
       results: [],
       summary: {
         total: 0,

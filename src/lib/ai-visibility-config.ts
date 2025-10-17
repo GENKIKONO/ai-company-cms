@@ -1,68 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
 
-interface AiVisibilityConfig {
-  allowed_crawlers: {
-    search_engines: string[];
-    ai_crawlers: string[];
-    paths: Record<string, string[]>;
-  };
-  rate_limits: {
-    default: { requests: number; window_seconds: number };
-    strict: { requests: number; window_seconds: number };
-    ai_crawlers: { requests: number; window_seconds: number };
-  };
-  blocked_paths: string[];
-  notification_settings: {
-    slack_webhook: string;
-    alert_thresholds: { P0: number; P1: number; P2: number };
-    daily_summary: boolean;
-  };
-  content_protection: {
-    jsonld_signing: boolean;
-    origin_tags: boolean;
-    signature_secret: string;
-  };
+interface AiVisibilityStatus {
+  enabled: boolean;
+  last_check?: string;
 }
 
-// Default safe configuration - allows all access
-const DEFAULT_CONFIG: AiVisibilityConfig = {
-  allowed_crawlers: {
-    search_engines: ["Googlebot", "Bingbot", "DuckDuckBot", "YandexBot"],
-    ai_crawlers: ["GPTBot", "CCBot", "PerplexityBot", "Claude-Web"],
-    paths: {
-      "/o/": ["GPTBot", "CCBot", "PerplexityBot", "Claude-Web", "Googlebot", "Bingbot"], // Allow all for /o/ path
-      "/": ["Googlebot", "Bingbot", "DuckDuckBot", "YandexBot"] // Search engines only for root
-    }
-  },
-  rate_limits: {
-    default: { requests: 5, window_seconds: 10 }, // More permissive
-    strict: { requests: 2, window_seconds: 5 },
-    ai_crawlers: { requests: 10, window_seconds: 60 } // More permissive for AI crawlers
-  },
-  blocked_paths: [
-    "/dashboard", "/api/auth", "/billing", "/checkout", 
-    "/preview", "/webhooks", "/admin", "/management-console"
-  ],
-  notification_settings: {
-    slack_webhook: "",
-    alert_thresholds: { P0: 1, P1: 5, P2: 10 },
-    daily_summary: true
-  },
-  content_protection: {
-    jsonld_signing: false, // Disabled in fallback mode
-    origin_tags: true,
-    signature_secret: "fallback-mode-secret"
-  }
+// Default safe configuration - enabled = true (allow monitoring)
+const DEFAULT_STATUS: AiVisibilityStatus = {
+  enabled: true // Safe default: monitoring enabled
 };
 
-let configCache: AiVisibilityConfig | null = null;
+let statusCache: AiVisibilityStatus | null = null;
 let cacheExpiry = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export async function getAiVisibilityConfig(): Promise<AiVisibilityConfig> {
-  // Return cached config if still valid
-  if (configCache && Date.now() < cacheExpiry) {
-    return configCache;
+export async function getAiVisibilityStatus(): Promise<AiVisibilityStatus> {
+  // Return cached status if still valid
+  if (statusCache && Date.now() < cacheExpiry) {
+    return statusCache;
   }
 
   try {
@@ -71,70 +26,68 @@ export async function getAiVisibilityConfig(): Promise<AiVisibilityConfig> {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const { data: configs, error } = await supabase
+    // Simple singleton query: SELECT enabled, last_check FROM ai_visibility_config LIMIT 1
+    const { data, error } = await supabase
       .from('ai_visibility_config')
-      .select('config_key, config_value')
-      .eq('is_active', true);
+      .select('enabled, last_check')
+      .limit(1)
+      .single();
 
     if (error) {
-      console.warn('[AI Visibility Config] Database error, using fallback config:', error.message);
-      await sendConfigErrorNotification(error);
-      return DEFAULT_CONFIG;
+      console.warn('[AI Visibility] Database error, using fallback enabled=true:', error.message);
+      await sendStatusErrorNotification(error);
+      return DEFAULT_STATUS;
     }
 
-    if (!configs || configs.length === 0) {
-      console.warn('[AI Visibility Config] No active configuration found, using fallback config');
-      await sendConfigErrorNotification(new Error('No active configuration found'));
-      return DEFAULT_CONFIG;
+    if (!data) {
+      console.warn('[AI Visibility] No configuration record found, using fallback enabled=true');
+      await sendStatusErrorNotification(new Error('No configuration record found'));
+      return DEFAULT_STATUS;
     }
 
-    // Parse database configuration
-    const dbConfig: Partial<AiVisibilityConfig> = {};
-    
-    configs.forEach(({ config_key, config_value }) => {
-      try {
-        switch (config_key) {
-          case 'allowed_crawlers':
-            dbConfig.allowed_crawlers = config_value;
-            break;
-          case 'rate_limits':
-            dbConfig.rate_limits = config_value;
-            break;
-          case 'blocked_paths':
-            dbConfig.blocked_paths = config_value;
-            break;
-          case 'notification_settings':
-            dbConfig.notification_settings = config_value;
-            break;
-          case 'content_protection':
-            dbConfig.content_protection = config_value;
-            break;
-        }
-      } catch (parseError) {
-        console.warn(`[AI Visibility Config] Failed to parse ${config_key}:`, parseError);
-      }
-    });
-
-    // Merge with defaults to ensure all required fields are present
-    const mergedConfig: AiVisibilityConfig = {
-      allowed_crawlers: dbConfig.allowed_crawlers || DEFAULT_CONFIG.allowed_crawlers,
-      rate_limits: dbConfig.rate_limits || DEFAULT_CONFIG.rate_limits,
-      blocked_paths: dbConfig.blocked_paths || DEFAULT_CONFIG.blocked_paths,
-      notification_settings: dbConfig.notification_settings || DEFAULT_CONFIG.notification_settings,
-      content_protection: dbConfig.content_protection || DEFAULT_CONFIG.content_protection
+    const status: AiVisibilityStatus = {
+      enabled: Boolean(data.enabled),
+      last_check: data.last_check || undefined
     };
 
-    // Cache the configuration
-    configCache = mergedConfig;
+    // Cache the status
+    statusCache = status;
     cacheExpiry = Date.now() + CACHE_DURATION;
 
-    console.log('[AI Visibility Config] Configuration loaded successfully from database');
-    return mergedConfig;
+    console.log('[AI Visibility] Status loaded successfully:', status);
+    return status;
 
   } catch (error) {
-    console.error('[AI Visibility Config] Fatal error loading configuration, using fallback:', error);
-    await sendConfigErrorNotification(error);
-    return DEFAULT_CONFIG;
+    console.warn('[AI Visibility] Fatal error loading status, using fallback enabled=true:', error);
+    await sendStatusErrorNotification(error);
+    return DEFAULT_STATUS;
+  }
+}
+
+// Update last_check timestamp (enabled-only DB schema)
+export async function updateLastCheck(): Promise<void> {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { error } = await supabase
+      .from('ai_visibility_config')
+      .update({ 
+        last_check: new Date().toISOString() 
+      })
+      .limit(1); // Update first record only (singleton)
+
+    if (error) {
+      console.warn('[AI Visibility] Failed to update last_check:', error.message);
+    } else {
+      // Clear cache to force refresh on next read
+      clearStatusCache();
+      console.log('[AI Visibility] Last check timestamp updated successfully');
+    }
+  } catch (error) {
+    console.warn('[AI Visibility] Error updating last_check:', error);
   }
 }
 
@@ -195,7 +148,7 @@ Sitemap: https://aiohub.jp/sitemap.xml
 `;
 }
 
-async function sendConfigErrorNotification(error: any) {
+async function sendStatusErrorNotification(error: any) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
   if (!webhookUrl) return;
 
@@ -206,21 +159,21 @@ async function sendConfigErrorNotification(error: any) {
           type: "header",
           text: {
             type: "plain_text",
-            text: "⚠️ AI Visibility Config Error - Using Fallback"
+            text: "⚠️ AI Visibility Status Error - Using Fallback"
           }
         },
         {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*Error:* ${error instanceof Error ? error.message : 'Unknown error'}\n*Time:* ${new Date().toISOString()}\n*Mode:* Safe fallback configuration active\n*Impact:* All AI crawlers allowed on /o/ path, search engines on all paths`
+            text: `*Error:* ${error instanceof Error ? error.message : 'Unknown error'}\n*Time:* ${new Date().toISOString()}\n*Mode:* Safe fallback enabled=true\n*Impact:* AI visibility monitoring enabled by default`
           }
         },
         {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "*Action Required:* Check ai_visibility_config table in Supabase"
+            text: "*Action Required:* Check ai_visibility_config table schema (should have 'enabled' boolean column)"
           }
         }
       ]
@@ -233,12 +186,12 @@ async function sendConfigErrorNotification(error: any) {
     });
 
   } catch (slackError) {
-    console.error('[AI Visibility Config] Failed to send error notification:', slackError);
+    console.error('[AI Visibility] Failed to send error notification:', slackError);
   }
 }
 
 // Clear cache (useful for testing or manual refresh)
-export function clearConfigCache() {
-  configCache = null;
+export function clearStatusCache() {
+  statusCache = null;
   cacheExpiry = 0;
 }

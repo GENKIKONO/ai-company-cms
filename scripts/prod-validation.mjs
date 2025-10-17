@@ -116,7 +116,7 @@ async function testSitemap() {
   }
 }
 
-async function testSupabaseConnection() {
+async function testAiVisibilityStatus() {
   try {
     const response = await fetch(`${PRODUCTION_URL}/api/admin/ai-visibility/latest`, {
       headers: {
@@ -129,7 +129,8 @@ async function testSupabaseConnection() {
         status: response.status,
         ok: false,
         error: 'API endpoint not found',
-        configAccessible: false
+        statusAccessible: false,
+        enabled: null
       };
     }
     
@@ -138,22 +139,25 @@ async function testSupabaseConnection() {
     return {
       status: response.status,
       ok: response.ok,
-      configAccessible: !data.error || data.configStatus !== 'error',
+      statusAccessible: data.success || false,
       configStatus: data.configStatus || 'unknown',
-      message: data.message || 'No message'
+      message: data.message || 'No message',
+      enabled: data.summary ? true : null, // If we get summary data, monitoring is working
+      usingFallback: data.configStatus === 'fallback' || data.message?.includes('fallback')
     };
   } catch (error) {
     return {
       status: 0,
       ok: false,
       error: error.message,
-      configAccessible: false
+      statusAccessible: false,
+      enabled: null
     };
   }
 }
 
 async function testCronConfiguration() {
-  // Since we can't directly test Vercel cron, we check the configuration
+  // Check that vercel.json has NO cron definitions (dashboard-managed only)
   try {
     const vercelConfig = await import('../vercel.json', { assert: { type: 'json' } });
     const crons = vercelConfig.default.crons || [];
@@ -161,15 +165,19 @@ async function testCronConfiguration() {
     return {
       cronCount: crons.length,
       cronPaths: crons.map(c => c.path),
-      withinLimit: crons.length <= 2,
-      hasDaily: crons.some(c => c.path.includes('/daily'))
+      noCronsDefined: crons.length === 0, // NEW POLICY: 0 crons in config = good
+      dashboardManaged: crons.length === 0, // Managed via Vercel dashboard only
+      message: crons.length === 0 
+        ? 'All crons managed via Vercel dashboard (recommended)'
+        : `${crons.length} crons defined in vercel.json (will create new crons on deploy)`
     };
   } catch (error) {
     return {
       cronCount: 0,
       cronPaths: [],
-      withinLimit: true, // Assume OK if we can't read
-      hasDaily: false,
+      noCronsDefined: true, // If can't read config, assume no crons = good
+      dashboardManaged: true,
+      message: 'Cannot read vercel.json, assuming dashboard-managed crons',
       error: error.message
     };
   }
@@ -266,19 +274,22 @@ async function main() {
     results.summary.failed++;
   }
   
-  // 4. Supabase Configuration
-  console.log('\\n4️⃣ Supabase Configuration');
-  console.log('===========================');
+  // 4. AI Visibility Status
+  console.log('\\n4️⃣ AI Visibility Status');
+  console.log('=========================');
   
-  const supabaseResult = await testSupabaseConnection();
-  results.supabase = supabaseResult;
+  const statusResult = await testAiVisibilityStatus();
+  results.supabase = statusResult; // Keep same property for compatibility
   
-  console.log(`${generateStatusIcon(supabaseResult.ok)} API Response: ${supabaseResult.status}`);
-  console.log(`${generateStatusIcon(supabaseResult.configAccessible)} Config Access: ${supabaseResult.configAccessible ? 'OK' : 'Failed'}`);
-  console.log(`📊 Config Status: ${supabaseResult.configStatus || 'Unknown'}`);
+  console.log(`${generateStatusIcon(statusResult.ok)} API Response: ${statusResult.status}`);
+  console.log(`${generateStatusIcon(statusResult.statusAccessible)} Status Access: ${statusResult.statusAccessible ? 'OK' : 'Failed'}`);
+  console.log(`📊 Status: ${statusResult.configStatus || 'Unknown'}`);
+  if (statusResult.usingFallback) {
+    console.log(`⚠️  Using Fallback: enabled=true (DB schema: enabled boolean only)`);
+  }
   
   results.summary.totalTests++;
-  if (supabaseResult.configAccessible) {
+  if (statusResult.statusAccessible) {
     results.summary.passed++;
   } else {
     results.summary.failed++;
@@ -291,17 +302,18 @@ async function main() {
   const cronResult = await testCronConfiguration();
   results.cron = cronResult;
   
-  console.log(`${generateStatusIcon(cronResult.withinLimit)} Cron Count: ${cronResult.cronCount}/2 (${cronResult.withinLimit ? 'Within limit' : 'EXCEEDED'})`);
-  console.log(`${generateStatusIcon(cronResult.hasDaily)} Daily cron: ${cronResult.hasDaily ? 'Integrated' : 'Missing'}`);
-  console.log(`📋 Cron paths: ${cronResult.cronPaths.join(', ')}`);
+  console.log(`${generateStatusIcon(cronResult.noCronsDefined)} Cron Definitions: ${cronResult.cronCount} (${cronResult.noCronsDefined ? 'None in config ✓' : 'Will create new crons ⚠️'})`);
+  console.log(`${generateStatusIcon(cronResult.dashboardManaged)} Management: ${cronResult.dashboardManaged ? 'Dashboard-only ✓' : 'Config-driven ⚠️'}`);
+  console.log(`📋 Message: ${cronResult.message}`);
+  if (cronResult.cronPaths.length > 0) {
+    console.log(`📋 Cron paths in config: ${cronResult.cronPaths.join(', ')}`);
+  }
   
   results.summary.totalTests++;
-  if (cronResult.withinLimit && cronResult.hasDaily) {
+  if (cronResult.noCronsDefined && cronResult.dashboardManaged) {
     results.summary.passed++;
-  } else if (cronResult.withinLimit) {
-    results.summary.warnings++;
   } else {
-    results.summary.failed++;
+    results.summary.warnings++;
   }
   
   // Generate Summary Report

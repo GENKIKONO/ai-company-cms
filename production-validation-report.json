@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-17T05:32:28.682Z",
+  "timestamp": "2025-10-17T05:59:22.055Z",
   "url": "https://aiohub.jp",
   "targetPath": "/o/luxucare",
   "httpTests": {
@@ -18,7 +18,7 @@
         "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
         "content-encoding": "br",
         "content-type": "text/html; charset=utf-8",
-        "date": "Fri, 17 Oct 2025 05:32:32 GMT",
+        "date": "Fri, 17 Oct 2025 05:59:25 GMT",
         "link": "</_next/static/css/37c91e728cfea998.css>; rel=preload; as=\"style\", </_next/static/css/a4d71e844cbfa3f7.css>; rel=preload; as=\"style\"",
         "referrer-policy": "origin-when-cross-origin",
         "server": "Vercel",
@@ -30,7 +30,7 @@
         "x-frame-options": "DENY",
         "x-matched-path": "/o/[slug]",
         "x-vercel-cache": "MISS",
-        "x-vercel-id": "kix1::iad1::f4zwd-1760679148959-3369cd701894"
+        "x-vercel-id": "kix1::iad1::w4qhz-1760680762174-6f5505ce0a2c"
       }
     },
     "GPTBot": {
@@ -48,7 +48,7 @@
         "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
         "content-encoding": "br",
         "content-type": "text/html; charset=utf-8",
-        "date": "Fri, 17 Oct 2025 05:32:33 GMT",
+        "date": "Fri, 17 Oct 2025 05:59:26 GMT",
         "link": "</_next/static/css/37c91e728cfea998.css>; rel=preload; as=\"style\", </_next/static/css/a4d71e844cbfa3f7.css>; rel=preload; as=\"style\"",
         "referrer-policy": "origin-when-cross-origin",
         "server": "Vercel",
@@ -60,7 +60,7 @@
         "x-frame-options": "DENY",
         "x-matched-path": "/o/[slug]",
         "x-vercel-cache": "MISS",
-        "x-vercel-id": "kix1::iad1::f4zwd-1760679152515-5ebc600aae77"
+        "x-vercel-id": "kix1::iad1::w4qhz-1760680765887-1e476fc373c0"
       }
     },
     "CCBot": {
@@ -78,7 +78,7 @@
         "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
         "content-encoding": "br",
         "content-type": "text/html; charset=utf-8",
-        "date": "Fri, 17 Oct 2025 05:32:34 GMT",
+        "date": "Fri, 17 Oct 2025 05:59:27 GMT",
         "link": "</_next/static/css/37c91e728cfea998.css>; rel=preload; as=\"style\", </_next/static/css/a4d71e844cbfa3f7.css>; rel=preload; as=\"style\"",
         "referrer-policy": "origin-when-cross-origin",
         "server": "Vercel",
@@ -90,7 +90,7 @@
         "x-frame-options": "DENY",
         "x-matched-path": "/o/[slug]",
         "x-vercel-cache": "MISS",
-        "x-vercel-id": "kix1::iad1::f4zwd-1760679153831-0faeb59d949d"
+        "x-vercel-id": "kix1::iad1::w4qhz-1760680766919-50616c941b56"
       }
     },
     "Mozilla": {
@@ -108,7 +108,7 @@
         "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
         "content-encoding": "br",
         "content-type": "text/html; charset=utf-8",
-        "date": "Fri, 17 Oct 2025 05:32:36 GMT",
+        "date": "Fri, 17 Oct 2025 05:59:28 GMT",
         "link": "</_next/static/css/37c91e728cfea998.css>; rel=preload; as=\"style\", </_next/static/css/a4d71e844cbfa3f7.css>; rel=preload; as=\"style\"",
         "referrer-policy": "origin-when-cross-origin",
         "server": "Vercel",
@@ -120,7 +120,7 @@
         "x-frame-options": "DENY",
         "x-matched-path": "/o/[slug]",
         "x-vercel-cache": "MISS",
-        "x-vercel-id": "kix1::iad1::f4zwd-1760679155166-0600ca4f5c02"
+        "x-vercel-id": "kix1::iad1::w4qhz-1760680767830-69bc065f6d26"
       }
     }
   },
@@ -137,7 +137,7 @@
   "sitemap": {
     "status": 200,
     "ok": true,
-    "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n<url>\n<loc>https://aiohub.jp</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>daily</changefreq>\n<priority>1</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/organizations</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>daily</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/search</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/favorites</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.5</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/dashboard</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.5</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/o/luxucare</loc>\n<lastmod>2025-10-13T15:55:35.006Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.8</priority>\n</url>\n</urlset>\n",
+    "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n<url>\n<loc>https://aiohub.jp</loc>\n<lastmod>2025-10-17T05:59:29.662Z</lastmod>\n<changefreq>daily</changefreq>\n<priority>1</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/organizations</loc>\n<lastmod>2025-10-17T05:59:29.662Z</lastmod>\n<changefreq>daily</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/search</loc>\n<lastmod>2025-10-17T05:59:29.662Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/favorites</loc>\n<lastmod>2025-10-17T05:59:29.662Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.5</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/dashboard</loc>\n<lastmod>2025-10-17T05:59:29.662Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.5</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/o/luxucare</loc>\n<lastmod>2025-10-13T15:55:35.006Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.8</priority>\n</url>\n</urlset>\n",
     "hasLuxucare": true,
     "hasValidXml": false
   },
@@ -145,19 +145,21 @@
     "status": 404,
     "ok": false,
     "error": "API endpoint not found",
-    "configAccessible": false
+    "statusAccessible": false,
+    "enabled": null
   },
   "cron": {
     "cronCount": 0,
     "cronPaths": [],
-    "withinLimit": true,
-    "hasDaily": false,
+    "noCronsDefined": true,
+    "dashboardManaged": true,
+    "message": "Cannot read vercel.json, assuming dashboard-managed crons",
     "error": "Module \"file:///Users/kounogenki/Documents/LuxuCare%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE/%E9%96%8B%E7%99%BA/vercel.json\" needs an import attribute of \"type: json\""
   },
   "summary": {
     "totalTests": 8,
-    "passed": 6,
+    "passed": 7,
     "failed": 1,
-    "warnings": 1
+    "warnings": 0
   }
 }
