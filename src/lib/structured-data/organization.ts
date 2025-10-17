@@ -131,8 +131,32 @@ export function generateOrganizationJsonLd(
   }
 
   // Same as (social media links, etc.)
+  const sameAsUrls: string[] = [];
+  
+  // Add same_as URLs from organization data
   if (organization.same_as && organization.same_as.length > 0) {
-    structuredData.sameAs = organization.same_as.filter(url => url.trim() !== '');
+    sameAsUrls.push(...organization.same_as.filter(url => url.trim() !== ''));
+  }
+  
+  // Add organization's official website URL if different from AIO Hub page
+  if (organization.url && organization.url.trim() !== '') {
+    const officialUrl = organization.url.trim();
+    const hubUrl = `${baseUrl}/o/${organization.slug}`;
+    if (officialUrl !== hubUrl && !sameAsUrls.includes(officialUrl)) {
+      sameAsUrls.push(officialUrl);
+    }
+  }
+  
+  // Add AIO Hub page URL as sameAs
+  if (organization.slug) {
+    const hubUrl = `${baseUrl}/o/${organization.slug}`;
+    if (!sameAsUrls.includes(hubUrl)) {
+      sameAsUrls.push(hubUrl);
+    }
+  }
+  
+  if (sameAsUrls.length > 0) {
+    structuredData.sameAs = sameAsUrls;
   }
 
   // Founding date

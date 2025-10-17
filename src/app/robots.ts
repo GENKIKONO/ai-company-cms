@@ -62,14 +62,17 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'GPTBot',
+        allow: '/o/',
         disallow: '/',
       },
       {
         userAgent: 'ChatGPT-User',
+        allow: '/o/',
         disallow: '/',
       },
       {
         userAgent: 'CCBot',
+        allow: '/o/',
         disallow: '/',
       }
     ],
