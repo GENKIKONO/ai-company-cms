@@ -70,11 +70,29 @@
     word-break: keep-all;         /* 単語途中で折り返さない */
     overflow-wrap: anywhere;      /* 行末で安全に折返し */
     text-wrap: var(--body-wrap);  /* 段落は自然に */
-    /* Mobile horizontal scroll prevention */
+    /* Mobile horizontal scroll prevention - CRITICAL FIX */
     max-width: 100%;
-    overflow-x: hidden;          /* 横方向のはみ出しを物理的に禁止 */
+    overflow-x: hidden !important;          /* 横方向のはみ出しを物理的に禁止 */
     overscroll-behavior-x: none; /* 横方向のバウンス/連鎖スクロール防止 */
     touch-action: pan-y;         /* 横ジェスチャーをページに渡さない（縦スクロールのみ） */
+  }
+  
+  /* Main content container - prevent overflow inheritance */
+  main {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* All images and media - prevent overflow at source */
+  img, video, iframe, object, embed, svg {
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: cover;
+  }
+  
+  /* Prevent fixed/absolute positioned elements from causing overflow */
+  *[class*="fixed"], *[class*="absolute"] {
+    max-width: 100vw;
   }
   
   /* iOSの横方向ゴム戻り対策 */
@@ -1405,6 +1423,247 @@ html {
   .content-above-deco {
     position: relative;
     z-index: 10;
+  }
+
+  /* === UI OPTIMIZATION: TAP TARGETS & ACCESSIBILITY === */
+  
+  /* 44px minimum tap target utility class */
+  .hit-44 {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(8px, (44px - 1lh) / 2) max(12px, (44px - 1em) / 2);
+    outline: none;
+    transition: all 0.15s ease;
+  }
+  
+  /* Focus ring for keyboard navigation */
+  .hit-44:focus-visible,
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid #3B82F6 !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+  }
+  
+  /* Ensure tap targets have adequate spacing from neighbors */
+  .hit-44 + .hit-44,
+  button + button,
+  a + a,
+  [role="button"] + [role="button"] {
+    margin-left: max(8px, 0.5rem);
+  }
+  
+  /* CTA button size optimization - prevent oversized CTAs */
+  .cta-optimized {
+    max-height: 56px !important;
+    font-size: clamp(14px, 2.5vw, 16px) !important;
+    padding: 12px 24px !important;
+    min-height: 44px !important;
+    min-width: 44px !important;
+    line-height: 1.4 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Mobile CTA stack optimization */
+  @media (max-width: 640px) {
+    .cta-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+    
+    .cta-stack .cta-optimized {
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    
+    /* Hide secondary CTAs in first viewport on mobile */
+    .cta-stack .cta-secondary {
+      display: none;
+    }
+    
+    /* Show only primary CTA in hero */
+    .hero-cta-mobile .cta-secondary {
+      display: none;
+    }
+  }
+  
+  /* Carousel container optimization - prevent page overflow */
+  .carousel-container {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden; /* Container itself never overflows */
+    position: relative;
+  }
+  
+  .carousel-wrapper {
+    overflow-x: auto !important;
+    overflow-y: visible;
+    overscroll-behavior-x: contain; /* Prevent horizontal scroll chaining */
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .carousel-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Carousel content - proper sizing */
+  .carousel-content {
+    display: flex;
+    gap: clamp(16px, 3vw, 24px);
+    padding: 0 clamp(16px, 4vw, 24px);
+    /* Show 1.1 cards on mobile for hint */
+    width: max-content;
+  }
+  
+  .carousel-item {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+    max-width: calc(100vw - 80px); /* Ensure single items don't overflow */
+  }
+  
+  /* Mobile carousel optimization */
+  @media (max-width: 640px) {
+    .carousel-item {
+      width: calc(100vw - 80px);
+      max-width: 320px;
+    }
+    
+    /* Show 1.1 cards */
+    .carousel-content {
+      padding-right: 20%;
+    }
+  }
+  
+  /* Tablet carousel */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .carousel-item {
+      width: calc(50vw - 40px);
+      max-width: 400px;
+    }
+  }
+  
+  /* Desktop carousel */
+  @media (min-width: 1025px) {
+    .carousel-wrapper {
+      overflow-x: visible; /* No scroll needed on desktop */
+    }
+    
+    .carousel-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      width: 100%;
+      padding: 0;
+    }
+    
+    .carousel-item {
+      width: auto;
+      max-width: none;
+    }
+  }
+  
+  /* Carousel navigation buttons */
+  .carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .carousel-nav:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .carousel-nav-prev {
+    left: 8px;
+  }
+  
+  .carousel-nav-next {
+    right: 8px;
+  }
+  
+  /* Hide nav buttons on desktop where they're not needed */
+  @media (min-width: 1025px) {
+    .carousel-nav {
+      display: none;
+    }
+  }
+  
+  /* Carousel dots indicator */
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px; /* Accessible tap target */
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .carousel-dot::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+  }
+  
+  .carousel-dot.active::before {
+    opacity: 1;
+    background: #3B82F6;
+  }
+  
+  /* Reduced motion support for carousels */
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-wrapper {
+      scroll-behavior: auto;
+    }
+    
+    .carousel-nav {
+      transition: none;
+    }
+    
+    .carousel-dot {
+      transition: none;
+    }
   }
 
 }

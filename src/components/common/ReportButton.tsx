@@ -70,7 +70,7 @@ export default function ReportButton({ organizationId, organizationName, classNa
     <>
       <button
         onClick={() => setShowModal(true)}
-        className={`inline-flex items-center gap-1 text-sm text-gray-500 hover:text-red-600 transition-colors ${className}`}
+        className={`hit-44 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-red-600 transition-colors ${className}`}
         title="不適切なコンテンツを通報"
       >
         <AlertTriangle size={16} />
@@ -150,14 +150,14 @@ export default function ReportButton({ organizationId, organizationName, classNa
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                      className="hit-44 flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors btn-nowrap"
                       disabled={submitting}
                     >
                       キャンセル
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
+                      className="hit-44 flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 btn-nowrap"
                       disabled={submitting || !reportType || !description.trim()}
                     >
                       {submitting ? '送信中...' : '通報する'}

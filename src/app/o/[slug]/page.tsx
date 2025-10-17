@@ -33,12 +33,12 @@ const getOrganizationDataCached = (slug: string) =>
       const { supabasePublic } = await import('@/lib/supabase-public');
       const supabase = supabasePublic();
       
-      // ✅ 厳密な取得条件（status='published'かつis_published=true の企業のみ）
+      // ✅ P0: public_unverified と published の両方を公開対象とする
       const { data: organization, error: orgError } = await supabase
         .from('organizations')
         .select('*')
         .eq('slug', slug)
-        .eq('status', 'published')
+        .in('status', ['published', 'public_unverified'])
         .eq('is_published', true)
         .maybeSingle();
 
@@ -46,7 +46,7 @@ const getOrganizationDataCached = (slug: string) =>
       if (orgError || !organization) {
         console.error(`[VERIFY] Public page failed for slug: ${slug}`, {
           error: orgError?.message,
-          requiredConditions: 'status=published AND is_published=true',
+          requiredConditions: 'status IN (published, public_unverified) AND is_published=true',
           client: 'anonymous'
         });
         
@@ -342,6 +342,14 @@ export default async function OrganizationDetailPage({
                           <span>認証済み法人</span>
                         </div>
                       )}
+                      {organization.status === 'public_unverified' && (
+                        <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                          <span>審査中</span>
+                        </div>
+                      )}
                     </div>
                     {organization.legal_form && (
                       <p className="text-lg text-gray-600 mt-1">{organization.legal_form}</p>
@@ -367,7 +375,7 @@ export default async function OrganizationDetailPage({
                       href={organization.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center"
+                      className="hit-44 cta-optimized px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center btn-nowrap"
                     >
                       公式サイトを開く
                     </Link>

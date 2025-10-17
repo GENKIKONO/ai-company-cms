@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
     let organizationData: Partial<Organization> = {
       ...normalizedBody,
       created_by: (authResult as AuthContext).user.id,
-      status: normalizedBody.status || 'draft',
+      status: normalizedBody.status || 'public_unverified', // P0: 新規組織は限定公開で開始
       is_published: false, // パートナー作成時は初期非公開
     };
 

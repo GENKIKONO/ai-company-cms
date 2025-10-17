@@ -1,7 +1,7 @@
 // データベース型定義
 
 export type UserRole = 'admin' | 'editor' | 'viewer';
-export type OrganizationStatus = 'draft' | 'published' | 'archived';
+export type OrganizationStatus = 'draft' | 'waiting_approval' | 'public_unverified' | 'published' | 'paused' | 'archived';
 export type PartnershipType = 'strategic' | 'technology' | 'distribution' | 'investment';
 export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
 
