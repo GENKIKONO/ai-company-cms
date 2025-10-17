@@ -1,0 +1,163 @@
+{
+  "timestamp": "2025-10-17T05:32:28.682Z",
+  "url": "https://aiohub.jp",
+  "targetPath": "/o/luxucare",
+  "httpTests": {
+    "Googlebot": {
+      "name": "Googlebot",
+      "userAgent": "Googlebot",
+      "url": "https://aiohub.jp/o/luxucare",
+      "statusCode": 200,
+      "ok": true,
+      "responseTime": 0,
+      "contentLength": 36436,
+      "hasJsonLd": true,
+      "hasCanonical": true,
+      "headers": {
+        "age": "0",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-encoding": "br",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Fri, 17 Oct 2025 05:32:32 GMT",
+        "link": "</_next/static/css/37c91e728cfea998.css>; rel=preload; as=\"style\", </_next/static/css/a4d71e844cbfa3f7.css>; rel=preload; as=\"style\"",
+        "referrer-policy": "origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=63072000",
+        "transfer-encoding": "chunked",
+        "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+        "x-content-type-options": "nosniff",
+        "x-dns-prefetch-control": "on",
+        "x-frame-options": "DENY",
+        "x-matched-path": "/o/[slug]",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "kix1::iad1::f4zwd-1760679148959-3369cd701894"
+      }
+    },
+    "GPTBot": {
+      "name": "GPTBot",
+      "userAgent": "GPTBot",
+      "url": "https://aiohub.jp/o/luxucare",
+      "statusCode": 200,
+      "ok": true,
+      "responseTime": 0,
+      "contentLength": 36436,
+      "hasJsonLd": true,
+      "hasCanonical": true,
+      "headers": {
+        "age": "0",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-encoding": "br",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Fri, 17 Oct 2025 05:32:33 GMT",
+        "link": "</_next/static/css/37c91e728cfea998.css>; rel=preload; as=\"style\", </_next/static/css/a4d71e844cbfa3f7.css>; rel=preload; as=\"style\"",
+        "referrer-policy": "origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=63072000",
+        "transfer-encoding": "chunked",
+        "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+        "x-content-type-options": "nosniff",
+        "x-dns-prefetch-control": "on",
+        "x-frame-options": "DENY",
+        "x-matched-path": "/o/[slug]",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "kix1::iad1::f4zwd-1760679152515-5ebc600aae77"
+      }
+    },
+    "CCBot": {
+      "name": "CCBot",
+      "userAgent": "CCBot",
+      "url": "https://aiohub.jp/o/luxucare",
+      "statusCode": 200,
+      "ok": true,
+      "responseTime": 0,
+      "contentLength": 36436,
+      "hasJsonLd": true,
+      "hasCanonical": true,
+      "headers": {
+        "age": "0",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-encoding": "br",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Fri, 17 Oct 2025 05:32:34 GMT",
+        "link": "</_next/static/css/37c91e728cfea998.css>; rel=preload; as=\"style\", </_next/static/css/a4d71e844cbfa3f7.css>; rel=preload; as=\"style\"",
+        "referrer-policy": "origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=63072000",
+        "transfer-encoding": "chunked",
+        "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+        "x-content-type-options": "nosniff",
+        "x-dns-prefetch-control": "on",
+        "x-frame-options": "DENY",
+        "x-matched-path": "/o/[slug]",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "kix1::iad1::f4zwd-1760679153831-0faeb59d949d"
+      }
+    },
+    "Mozilla": {
+      "name": "Mozilla",
+      "userAgent": "Mozilla",
+      "url": "https://aiohub.jp/o/luxucare",
+      "statusCode": 200,
+      "ok": true,
+      "responseTime": 0,
+      "contentLength": 36436,
+      "hasJsonLd": true,
+      "hasCanonical": true,
+      "headers": {
+        "age": "0",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-encoding": "br",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Fri, 17 Oct 2025 05:32:36 GMT",
+        "link": "</_next/static/css/37c91e728cfea998.css>; rel=preload; as=\"style\", </_next/static/css/a4d71e844cbfa3f7.css>; rel=preload; as=\"style\"",
+        "referrer-policy": "origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=63072000",
+        "transfer-encoding": "chunked",
+        "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+        "x-content-type-options": "nosniff",
+        "x-dns-prefetch-control": "on",
+        "x-frame-options": "DENY",
+        "x-matched-path": "/o/[slug]",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "kix1::iad1::f4zwd-1760679155166-0600ca4f5c02"
+      }
+    }
+  },
+  "robotsTxt": {
+    "status": 200,
+    "ok": true,
+    "content": "User-Agent: *\nAllow: /\nAllow: /ja/\nAllow: /en/\nAllow: /zh/\nAllow: /ko/\nAllow: /es/\nAllow: /fr/\nAllow: /de/\nAllow: /ja/directory\nAllow: /en/directory\nAllow: /zh/directory\nAllow: /ko/directory\nAllow: /es/directory\nAllow: /fr/directory\nAllow: /de/directory\nAllow: /ja/search\nAllow: /en/search\nAllow: /zh/search\nAllow: /ko/search\nAllow: /es/search\nAllow: /fr/search\nAllow: /de/search\nAllow: /ja/o/\nAllow: /en/o/\nAllow: /zh/o/\nAllow: /ko/o/\nAllow: /es/o/\nAllow: /fr/o/\nAllow: /de/o/\nAllow: /ja/api/docs\nAllow: /en/api/docs\nAllow: /zh/api/docs\nAllow: /ko/api/docs\nAllow: /es/api/docs\nAllow: /fr/api/docs\nAllow: /de/api/docs\nDisallow: /api/auth/\nDisallow: /management-console/\nDisallow: /dashboard/settings/\nDisallow: /_next/\nDisallow: /private/\nDisallow: *.pdf$\nDisallow: */temp/*\nDisallow: /ja/dashboard/settings/\nDisallow: /en/dashboard/settings/\nDisallow: /zh/dashboard/settings/\nDisallow: /ko/dashboard/settings/\nDisallow: /es/dashboard/settings/\nDisallow: /fr/dashboard/settings/\nDisallow: /de/dashboard/settings/\n\nUser-Agent: GPTBot\nAllow: /o/\nDisallow: /\n\nUser-Agent: ChatGPT-User\nAllow: /o/\nDisallow: /\n\nUser-Agent: CCBot\nAllow: /o/\nDisallow: /\n\nHost: https://aiohub.jp\nSitemap: https://aiohub.jp/sitemap.xml\n",
+    "hasGPTBot": true,
+    "hasCCBot": true,
+    "hasGooglebot": false,
+    "hasOPath": true,
+    "hasSitemap": true
+  },
+  "sitemap": {
+    "status": 200,
+    "ok": true,
+    "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n<url>\n<loc>https://aiohub.jp</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>daily</changefreq>\n<priority>1</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/organizations</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>daily</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/search</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/favorites</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.5</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/dashboard</loc>\n<lastmod>2025-10-17T05:32:38.123Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.5</priority>\n</url>\n<url>\n<loc>https://aiohub.jp/o/luxucare</loc>\n<lastmod>2025-10-13T15:55:35.006Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.8</priority>\n</url>\n</urlset>\n",
+    "hasLuxucare": true,
+    "hasValidXml": false
+  },
+  "supabase": {
+    "status": 404,
+    "ok": false,
+    "error": "API endpoint not found",
+    "configAccessible": false
+  },
+  "cron": {
+    "cronCount": 0,
+    "cronPaths": [],
+    "withinLimit": true,
+    "hasDaily": false,
+    "error": "Module \"file:///Users/kounogenki/Documents/LuxuCare%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE/%E9%96%8B%E7%99%BA/vercel.json\" needs an import attribute of \"type: json\""
+  },
+  "summary": {
+    "totalTests": 8,
+    "passed": 6,
+    "failed": 1,
+    "warnings": 1
+  }
+}

@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/ai-visibility",
+      "path": "/api/cron/daily",
       "schedule": "0 18 * * *"
     }
   ],
@@ -9,8 +9,8 @@
     "src/app/api/admin/ai-visibility/run/route.ts": {
       "maxDuration": 30
     },
-    "src/app/api/cron/ai-visibility/route.ts": {
-      "maxDuration": 60
+    "src/app/api/cron/daily/route.ts": {
+      "maxDuration": 120
     }
   },
   "headers": [

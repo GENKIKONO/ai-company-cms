@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
-// Vercel Cron job for AI Visibility checks
-// Schedule: Daily at 3:00 AM JST (18:00 UTC)
-export async function GET(request: NextRequest) {
+export interface AiVisibilityJobResult {
+  success: boolean;
+  summary?: any;
+  error?: string;
+  timestamp: string;
+}
+
+export async function runAiVisibilityJob(): Promise<AiVisibilityJobResult> {
   try {
-    // Verify this is actually a cron request from Vercel
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
-    console.log('[AI Visibility Cron] Starting scheduled check...');
+    console.log('[AI Visibility Job] Starting AI visibility check...');
     
     // Call the main AI visibility check API
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.jp';
@@ -24,20 +21,20 @@ export async function GET(request: NextRequest) {
       },
       body: JSON.stringify({
         dryRun: false,
-        source: 'cron',
+        source: 'daily-cron',
         timestamp: new Date().toISOString()
       })
     });
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[AI Visibility Cron] Check failed:', errorText);
+      console.error('[AI Visibility Job] Check failed:', errorText);
       throw new Error(`AI visibility check failed: ${response.status} ${errorText}`);
     }
     
     const result = await response.json();
     
-    console.log('[AI Visibility Cron] Check completed successfully:', {
+    console.log('[AI Visibility Job] Check completed successfully:', {
       summary: result.summary,
       timestamp: new Date().toISOString()
     });
@@ -47,34 +44,30 @@ export async function GET(request: NextRequest) {
       await sendSlackNotification(result.summary, result.results);
     }
     
-    return NextResponse.json({
+    return {
       success: true,
-      message: 'AI visibility check completed',
       summary: result.summary,
       timestamp: new Date().toISOString()
-    });
+    };
     
   } catch (error) {
-    console.error('[AI Visibility Cron] Error:', error);
+    console.error('[AI Visibility Job] Error:', error);
     
     // Send error notification
     await sendErrorNotification(error);
     
-    return NextResponse.json(
-      { 
-        error: 'Cron job failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      },
-      { status: 500 }
-    );
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    };
   }
 }
 
 async function sendSlackNotification(summary: any, results: any[]) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
   if (!webhookUrl) {
-    console.log('[AI Visibility Cron] No Slack webhook configured, skipping notification');
+    console.log('[AI Visibility Job] No Slack webhook configured, skipping notification');
     return;
   }
   
@@ -154,10 +147,10 @@ async function sendSlackNotification(summary: any, results: any[]) {
       throw new Error(`Slack notification failed: ${response.status}`);
     }
     
-    console.log('[AI Visibility Cron] Slack notification sent successfully');
+    console.log('[AI Visibility Job] Slack notification sent successfully');
     
   } catch (error) {
-    console.error('[AI Visibility Cron] Failed to send Slack notification:', error);
+    console.error('[AI Visibility Job] Failed to send Slack notification:', error);
   }
 }
 
@@ -172,14 +165,14 @@ async function sendErrorNotification(error: any) {
           type: "header",
           text: {
             type: "plain_text",
-            text: "💥 AI Visibility Cron Job Failed"
+            text: "💥 AI Visibility Job Failed"
           }
         },
         {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*Error:* ${error instanceof Error ? error.message : 'Unknown error'}\n*Time:* ${new Date().toISOString()}`
+            text: `*Error:* ${error instanceof Error ? error.message : 'Unknown error'}\n*Time:* ${new Date().toISOString()}\n*Source:* Daily Maintenance Cron`
           }
         }
       ]
@@ -192,6 +185,6 @@ async function sendErrorNotification(error: any) {
     });
     
   } catch (slackError) {
-    console.error('[AI Visibility Cron] Failed to send error notification:', slackError);
+    console.error('[AI Visibility Job] Failed to send error notification:', slackError);
   }
 }

@@ -1,45 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAiVisibilityConfig } from '@/lib/ai-visibility-config';
 
 // Get latest AI visibility check results
 export async function GET(request: NextRequest) {
   try {
+    // Test configuration accessibility first - includes fallback handling
+    const config = await getAiVisibilityConfig();
+    console.log('[AI Visibility Latest] Configuration loaded successfully');
+    
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
     
-    // Get latest results (last 24 hours)
+    // Get latest results (last 24 hours) with fallback handling
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     
-    const { data: logs, error } = await supabase
-      .from('ai_visibility_logs')
-      .select('*')
-      .gte('timestamp', yesterday)
-      .order('timestamp', { ascending: false })
-      .limit(100);
-    
-    if (error) {
-      console.error('Error fetching logs:', error);
-      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    let logs = [];
+    try {
+      const { data, error } = await supabase
+        .from('ai_visibility_logs')
+        .select('*')
+        .gte('timestamp', yesterday)
+        .order('timestamp', { ascending: false })
+        .limit(100);
+      
+      if (error) {
+        console.warn('[AI Visibility Latest] Database error, using empty dataset:', error.message);
+        // Don't throw - continue with empty logs for graceful degradation
+        logs = [];
+      } else {
+        logs = data || [];
+      }
+    } catch (dbError) {
+      console.warn('[AI Visibility Latest] Database connection failed, using empty dataset:', dbError);
+      logs = [];
     }
     
     // Generate summary
-    const summary = generateSummary(logs || []);
+    const summary = generateSummary(logs);
     
     return NextResponse.json({
       success: true,
-      results: logs || [],
+      results: logs,
       summary,
-      lastCheck: logs?.[0]?.timestamp || null
+      lastCheck: logs?.[0]?.timestamp || null,
+      configStatus: logs.length > 0 ? 'active' : 'fallback',
+      message: logs.length === 0 ? 'Using fallback mode due to database issues' : 'Data loaded successfully'
     });
     
   } catch (error) {
-    console.error('Error fetching latest results:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('[AI Visibility Latest] Fatal error:', error);
+    
+    // Even in complete failure, return safe defaults
+    return NextResponse.json({
+      success: false,
+      results: [],
+      summary: {
+        total: 0,
+        p0Issues: 0,
+        p1Issues: 0,
+        p2Issues: 0,
+        okChecks: 0,
+        avgResponseTime: 0,
+        uniqueUrls: 0,
+        uniqueUserAgents: 0,
+        topIssues: []
+      },
+      lastCheck: null,
+      configStatus: 'error',
+      message: 'Service temporarily unavailable - using safe defaults',
+      error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : 'Unknown error') : 'Service error'
+    });
   }
 }
 
