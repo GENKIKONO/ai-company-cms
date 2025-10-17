@@ -1,0 +1,125 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "メインコンテンツにスキップ" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "AIO Hub AI企業CMS" [ref=e7] [cursor=pointer]:
+          - /url: /
+        - navigation [ref=e8]:
+          - link "料金プラン" [ref=e9] [cursor=pointer]:
+            - /url: /pricing
+          - link "ヒアリング代行" [ref=e10] [cursor=pointer]:
+            - /url: /hearing-service
+      - link "ログイン" [ref=e13] [cursor=pointer]:
+        - /url: /auth/login
+  - main [ref=e14]:
+    - main [ref=e16]:
+      - generic [ref=e17]:
+        - heading "企業ディレクトリ" [level=1] [ref=e18]
+        - paragraph [ref=e19]:
+          - text: AIO Hubに登録された
+          - generic [ref=e20]: 1社
+          - text: の企業情報を検索・閲覧できます
+      - generic [ref=e21]:
+        - generic [ref=e23]:
+          - generic:
+            - img
+          - textbox "企業名、説明文、キーワードで検索..." [ref=e24]
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - generic [ref=e27]: 業種
+            - combobox "業種" [ref=e28]:
+              - option "すべて" [selected]
+              - option "農業・林業・漁業"
+              - option "建設業"
+              - option "製造業"
+              - option "電気・ガス・水道業"
+              - option "情報通信業"
+              - option "運輸・郵便業"
+              - option "卸売・小売業"
+              - option "金融・保険業"
+              - option "不動産・物品賃貸業"
+              - option "専門・技術サービス業"
+              - option "宿泊・飲食サービス業"
+              - option "生活関連サービス・娯楽業"
+              - option "教育・学習支援業"
+              - option "医療・福祉"
+              - option "公務"
+              - option "サービス業（他に分類されないもの）"
+              - option "IT・ソフトウェア"
+              - option "コンサルティング"
+              - option "マーケティング・広告"
+              - option "デザイン・クリエイティブ"
+              - option "メディア・出版"
+              - option "エンターテイメント"
+              - option "スポーツ・フィットネス"
+              - option "人材サービス"
+              - option "法務・会計"
+              - option "環境・エネルギー"
+              - option "研究・開発"
+              - option "輸入・輸出"
+              - option "NPO・団体"
+              - option "その他"
+          - generic [ref=e29]:
+            - generic [ref=e30]: 地域
+            - combobox "地域" [ref=e31]:
+              - option "すべて" [selected]
+              - option "高知市一宮西町四丁目"
+          - generic [ref=e32]:
+            - generic [ref=e33]: 企業規模
+            - combobox "企業規模" [ref=e34]:
+              - option "すべて" [selected]
+              - option "1〜5名"
+              - option "6〜20名"
+              - option "21〜50名"
+              - option "51〜100名"
+              - option "101〜300名"
+              - option "301名以上"
+          - generic [ref=e35]:
+            - generic [ref=e36]: 並び順
+            - combobox "並び順" [ref=e37]:
+              - option "更新日順" [selected]
+              - option "名前順"
+              - option "設立年順"
+              - option "従業員数順"
+              - option "サービス数順"
+          - generic [ref=e38]:
+            - generic [ref=e39]: 追加条件
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - checkbox "サービス有り" [ref=e42]
+                - generic [ref=e43]: サービス有り
+              - generic [ref=e44]:
+                - checkbox "導入事例有り" [ref=e45]
+                - generic [ref=e46]: 導入事例有り
+        - generic [ref=e48]:
+          - generic [ref=e49]: 1件の企業
+          - button "クリア" [ref=e50] [cursor=pointer]
+      - link "LuxuCare株式会社のロゴ LuxuCare株式会社 コンサルティング +3 AIOHubの運営会社です。 高知市一宮西町四丁目 サービス 1件 事例 1件" [ref=e52] [cursor=pointer]:
+        - /url: /o/luxucare
+        - generic [ref=e53] [cursor=pointer]:
+          - img "LuxuCare株式会社のロゴ" [ref=e54] [cursor=pointer]
+          - generic [ref=e55] [cursor=pointer]:
+            - heading "LuxuCare株式会社" [level=3] [ref=e57] [cursor=pointer]
+            - generic [ref=e58] [cursor=pointer]:
+              - generic [ref=e59] [cursor=pointer]: コンサルティング
+              - generic [ref=e60] [cursor=pointer]: "+3"
+        - paragraph [ref=e61] [cursor=pointer]: AIOHubの運営会社です。
+        - generic [ref=e62] [cursor=pointer]:
+          - generic [ref=e64] [cursor=pointer]:
+            - img [ref=e65] [cursor=pointer]
+            - text: 高知市一宮西町四丁目
+          - generic [ref=e68] [cursor=pointer]:
+            - generic [ref=e69] [cursor=pointer]:
+              - img [ref=e70] [cursor=pointer]
+              - text: サービス 1件
+            - generic [ref=e72] [cursor=pointer]:
+              - img [ref=e73] [cursor=pointer]
+              - text: 事例 1件
+        - img [ref=e76] [cursor=pointer]
+  - alert [ref=e78]
+```
