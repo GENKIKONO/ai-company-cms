@@ -122,19 +122,29 @@ export default function HearingServicePage() {
       
       <div className="min-h-screen bg-clean">
         {/* ヒーローセクション */}
-        <HeroSection />
+        <section className="mt-0">
+          <HeroSection />
+        </section>
         
         {/* サービス流れ説明 */}
-        <FlowSection />
+        <section className="mt-12 md:mt-16">
+          <FlowSection />
+        </section>
         
         {/* 料金プラン - 新PricingPlansコンポーネント */}
-        <PricingPlans />
+        <section className="mt-12 md:mt-16">
+          <PricingPlans />
+        </section>
         
         {/* よくある質問 */}
-        <FAQSection />
+        <section className="mt-12 md:mt-16">
+          <FAQSection />
+        </section>
         
         {/* CTA（申込導線） */}
-        <CTASection />
+        <section className="mt-12 md:mt-16">
+          <CTASection />
+        </section>
       </div>
     </>
   );

@@ -1,10 +1,10 @@
 /**
- * ヒアリング代行専用料金プランコンポーネント
- * アクセシビリティ・モバイル最適化対応
+ * AI最適化ヒアリング代行サービス料金プランコンポーネント
+ * アクセシビリティ・モバイル最適化・自然な価値提案対応
  */
 
 import Link from 'next/link';
-import { Check, Star, Zap, Crown, Building2, Phone, Calendar, Users } from 'lucide-react';
+import { Check, Star, Zap, Crown, Building2, MessageSquare, Target, Users } from 'lucide-react';
 
 interface PlanFeature {
   text: string;
@@ -26,90 +26,94 @@ interface HearingPlan {
   ctaHref: string;
   color: string;
   benefits: string[];
+  continuousSupport?: string;
 }
 
 const HEARING_PLANS: HearingPlan[] = [
   {
-    id: 'basic_hearing',
+    id: 'standard',
     name: 'スタンダード',
-    description: '基本的なヒアリング代行',
+    description: '1回ヒアリング＋AI構造化代行',
     price: '55,000円',
-    unit: '回',
-    icon: Phone,
+    unit: '（税別）',
+    icon: MessageSquare,
     popular: false,
     features: [
-      { text: 'ヒアリング時間：60分', included: true },
-      { text: '事前質問設計', included: true },
-      { text: 'ヒアリング実施', included: true },
-      { text: '要約レポート作成', included: true },
-      { text: '録音データ提供', included: true },
-      { text: '追加質問：最大3問', included: true },
-      { text: 'フォローアップ相談（30分）', included: false },
-      { text: '詳細分析レポート', included: false }
+      { text: 'ヒアリング実施（60分）', included: true },
+      { text: '第三者視点での企業価値整理', included: true },
+      { text: 'AI/SEO最適化構造データ作成', included: true },
+      { text: 'ChatGPT/Gemini対応構造化', included: true, highlight: true },
+      { text: 'JSON-LD形式での納品', included: true },
+      { text: '最短3日での納品', included: true },
+      { text: 'Q&A項目追加', included: false },
+      { text: '継続サポート', included: false }
     ],
-    ctaText: 'このプランで申し込む',
-    ctaHref: '/hearing/apply?plan=basic',
+    ctaText: 'このプランで依頼する',
+    ctaHref: '/contact?plan=standard',
     color: 'blue',
     benefits: [
-      '事前準備からレポートまで一貫対応',
-      '経験豊富なインタビュアーが担当',
-      '最短3日でレポート納品'
-    ]
+      '対話を通じた企業価値の言語化',
+      'AI検索に最適化された構造データ',
+      '迅速な納品で素早い効果実現'
+    ],
+    continuousSupport: 'なし（単発）'
   },
   {
-    id: 'premium_hearing',
-    name: 'プレミアム',
-    description: '詳細分析付きヒアリング代行',
-    price: '88,000円',
-    unit: '回',
+    id: 'business',
+    name: 'ビジネス',
+    description: '初回ヒアリング＋2ヶ月継続サポート',
+    price: '100,000円',
+    unit: '（税別）',
     badge: '人気',
-    icon: Crown,
+    icon: Target,
     popular: true,
     features: [
-      { text: 'ヒアリング時間：90分', included: true },
-      { text: '事前質問設計＋戦略相談', included: true },
-      { text: 'ヒアリング実施', included: true },
-      { text: '詳細分析レポート作成', included: true, highlight: true },
-      { text: '録音データ＋文字起こし', included: true },
-      { text: '追加質問：最大5問', included: true },
-      { text: 'フォローアップ相談（60分）', included: true, highlight: true },
-      { text: '改善提案書付き', included: true, highlight: true }
+      { text: 'スタンダードプランの全内容', included: true },
+      { text: '初回ヒアリング（90分）', included: true },
+      { text: '月1回フォローアップ（2ヶ月）', included: true, highlight: true },
+      { text: 'Q&A項目の段階的拡充', included: true, highlight: true },
+      { text: '市場反応に基づく調整', included: true },
+      { text: 'AI検索表現の継続改善', included: true },
+      { text: '再ヒアリング（1回 33,000円で追加可）', included: true },
+      { text: 'メール・チャットサポート', included: true }
     ],
-    ctaText: 'このプランで申し込む',
-    ctaHref: '/hearing/apply?plan=premium',
+    ctaText: 'このプランで依頼する',
+    ctaHref: '/contact?plan=business',
     color: 'purple',
     benefits: [
-      '戦略的な質問設計で深い洞察を獲得',
-      '分析結果に基づく改善提案',
-      '継続的なサポート体制'
-    ]
+      '継続的な情報ブラッシュアップ',
+      '市場反応を踏まえた表現調整',
+      '段階的な価値向上サポート'
+    ],
+    continuousSupport: '2ヶ月（1回/月フォロー）'
   },
   {
-    id: 'enterprise_hearing',
+    id: 'enterprise',
     name: 'エンタープライズ',
-    description: '包括的なヒアリング＆分析',
-    price: '165,000円',
-    unit: '回',
+    description: '複数回ヒアリング＋半年伴走支援',
+    price: '180,000円〜',
+    unit: '（税別）',
     icon: Building2,
     popular: false,
     features: [
-      { text: 'ヒアリング時間：120分', included: true },
-      { text: '事前戦略設計ミーティング', included: true },
-      { text: '複数回ヒアリング対応', included: true },
-      { text: '総合分析レポート', included: true },
-      { text: '全データ＋詳細文字起こし', included: true },
-      { text: '追加質問：無制限', included: true },
-      { text: '専任コンサルタント', included: true },
-      { text: '実装支援（3ヶ月）', included: true }
+      { text: 'ビジネスプランの全内容', included: true },
+      { text: '複数回ヒアリング（月1回×6ヶ月）', included: true },
+      { text: '事業部門別情報整理', included: true },
+      { text: '競合分析・ポジショニング設計', included: true, highlight: true },
+      { text: 'AI戦略コンサルティング', included: true, highlight: true },
+      { text: '実装支援・運用指導', included: true },
+      { text: '専任担当者によるサポート', included: true },
+      { text: 'カスタム機能開発相談', included: true }
     ],
-    ctaText: 'お問い合わせ',
-    ctaHref: '/contact?service=enterprise_hearing',
+    ctaText: '見積もり依頼',
+    ctaHref: '/contact?service=enterprise',
     color: 'indigo',
     benefits: [
-      '包括的な課題分析と解決策提示',
-      '実装まで一貫したサポート',
-      '専任チームによる手厚いフォロー'
-    ]
+      '包括的な企業価値戦略支援',
+      '長期的な競争力強化',
+      '専任チームによる伴走型サポート'
+    ],
+    continuousSupport: '6ヶ月伴走'
   }
 ];
 
@@ -123,16 +127,20 @@ export default function PricingPlans({
   showTitle = true 
 }: PricingPlansProps) {
   return (
-    <section className={`py-16 bg-gray-50 ${className}`} aria-labelledby="pricing-title">
+    <section 
+      className={`py-16 bg-gray-50 ${className}`} 
+      aria-labelledby="pricing-title"
+      data-component="PricingPlans"
+    >
       <div className="container mx-auto px-4">
         {showTitle && (
           <div className="text-center mb-12">
             <h2 id="pricing-title" className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              料金プラン（ヒアリング代行）
+              料金プラン（AI最適化ヒアリング代行）
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              お客様のニーズに合わせて最適なヒアリングプランをお選びください。
-              すべてのプランで録音データと要約レポートをご提供します。
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              対話を通じて企業価値を第三者視点で整理し、
+              ChatGPT・Gemini・Google AIに理解されやすい構造データとして言語化します。
             </p>
           </div>
         )}
@@ -216,6 +224,14 @@ export default function PricingPlans({
                       </li>
                     ))}
                   </ul>
+
+                  {/* Continuous Support Info */}
+                  {plan.continuousSupport && (
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                      <h5 className="text-sm font-semibold text-blue-900 mb-1">継続支援</h5>
+                      <p className="text-sm text-blue-800">{plan.continuousSupport}</p>
+                    </div>
+                  )}
 
                   {/* Benefits */}
                   <div className="mt-6">
@@ -327,6 +343,14 @@ export default function PricingPlans({
                     </li>
                   ))}
                 </ul>
+
+                {/* Continuous Support Info */}
+                {plan.continuousSupport && (
+                  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <h5 className="font-semibold text-blue-900 mb-2">継続支援</h5>
+                    <p className="text-blue-800">{plan.continuousSupport}</p>
+                  </div>
+                )}
 
                 {/* Benefits */}
                 <div className="mt-8">

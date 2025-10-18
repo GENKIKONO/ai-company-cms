@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
-import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 const faqData = [
   {
@@ -69,6 +68,21 @@ export default function FAQSection() {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  // Keyboard navigation for category tabs
+  const handleCategoryKeyDown = (event: React.KeyboardEvent, categoryId: string) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setActiveCategory(categoryId);
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      const currentIndex = categories.findIndex(cat => cat.id === activeCategory);
+      const nextIndex = event.key === 'ArrowRight' 
+        ? (currentIndex + 1) % categories.length 
+        : (currentIndex - 1 + categories.length) % categories.length;
+      setActiveCategory(categories[nextIndex].id);
+    }
+  };
+
   return (
     <section id="faq" className="section bg-clean">
       <div className="container">
@@ -86,55 +100,107 @@ export default function FAQSection() {
           </p>
         </div>
 
-        {/* カテゴリフィルター */}
+        {/* カテゴリフィルター - カード型ピルボタン */}
         <div className="mb-8 sm:mb-12">
-          <HorizontalScroller ariaLabel="FAQカテゴリフィルター" className="justify-center">
-            {categories.map((category) => (
+          {/* Mobile: Horizontal Scroll */}
+          <div className="lg:hidden">
+            <div 
+              className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar"
+              role="tablist"
+              aria-label="FAQカテゴリ選択"
+            >
+              {categories.map((category, index) => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  onKeyDown={(e) => handleCategoryKeyDown(e, category.id)}
+                  role="tab"
+                  aria-selected={activeCategory === category.id}
+                  aria-controls="faq-content"
+                  tabIndex={activeCategory === category.id ? 0 : -1}
+                  className={`
+                    snap-center flex-shrink-0 px-4 py-3 min-h-[44px] rounded-xl text-sm font-medium 
+                    transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                    ${activeCategory === category.id
+                      ? 'bg-blue-600 text-white shadow-lg' 
+                      : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50 hover:border-blue-300'
+                    }
+                  `}
+                >
+                  {category.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop: Centered Grid */}
+          <div className="hidden lg:flex lg:flex-wrap lg:justify-center lg:gap-3 lg:max-w-4xl lg:mx-auto">
+            {categories.map((category, index) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`snap-start min-w-max px-4 py-2 min-h-[44px] rounded-full text-sm font-medium transition-colors duration-200 ${
-                  activeCategory === category.id
-                    ? 'btn btn-primary'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                }`}
+                onKeyDown={(e) => handleCategoryKeyDown(e, category.id)}
+                role="tab"
+                aria-selected={activeCategory === category.id}
+                aria-controls="faq-content"
+                tabIndex={activeCategory === category.id ? 0 : -1}
+                className={`
+                  px-6 py-3 min-h-[44px] rounded-xl font-medium 
+                  transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                  ${activeCategory === category.id
+                    ? 'bg-blue-600 text-white shadow-lg scale-105' 
+                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:scale-102'
+                  }
+                `}
               >
                 {category.label}
               </button>
             ))}
-          </HorizontalScroller>
+          </div>
         </div>
 
         {/* FAQ リスト */}
-        <div className="space-y-4">
+        <div id="faq-content" className="space-y-3 mt-12 md:mt-16">
           {filteredFAQs.map((faq, index) => (
             <div
               key={index}
-              className="card border border-neutral-200 rounded-xl overflow-hidden"
+              className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden transition-shadow duration-200 hover:shadow-md"
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full px-4 sm:px-6 py-4 sm:py-5 text-left flex items-center justify-between hover:bg-neutral-50 transition-colors duration-200 min-h-[44px]"
+                aria-expanded={openIndex === index}
+                aria-controls={`faq-answer-${index}`}
+                className="w-full px-4 sm:px-6 py-4 sm:py-6 text-left flex items-center justify-between hover:bg-gray-50 transition-all duration-200 min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
-                <h3 className="text-body-large font-semibold text-neutral-900 pr-4 leading-6 sm:leading-7">
+                <h3 
+                  id={`faq-question-${index}`}
+                  className="text-base md:text-lg font-semibold text-gray-900 pr-4 leading-6 sm:leading-7"
+                >
                   {faq.question}
                 </h3>
-                <div className="flex-shrink-0">
-                  {openIndex === index ? (
-                    <ChevronUp className="w-5 h-5 text-neutral-500" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-neutral-500" />
-                  )}
+                <div className="flex-shrink-0 ml-4">
+                  <div className={`transform transition-transform duration-200 ${openIndex === index ? 'rotate-180' : ''}`}>
+                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                  </div>
                 </div>
               </button>
               
-              {openIndex === index && (
-                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-neutral-100">
-                  <div className="pt-4 text-body text-neutral-700 leading-7 sm:leading-8 whitespace-pre-line">
+              <div
+                id={`faq-answer-${index}`}
+                role="region"
+                aria-labelledby={`faq-question-${index}`}
+                className={`overflow-hidden transition-all duration-200 ${
+                  openIndex === index 
+                    ? 'max-h-96 opacity-100' 
+                    : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="px-4 sm:px-6 pb-4 sm:pb-6 border-t border-gray-100">
+                  <div className="pt-4 text-sm md:text-base text-gray-700 leading-6 sm:leading-7 whitespace-pre-line">
                     {faq.answer}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>

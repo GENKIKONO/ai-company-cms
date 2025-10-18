@@ -39,13 +39,17 @@ test.describe('Hearing Service Integration with PricingPlans', () => {
     const pricingCards = page.locator('article').filter({ hasNot: page.locator('[role="button"]') });
     await expect(pricingCards).toHaveCount(3);
     
-    // Verify plan names from new component
+    // Verify plan names from new component (updated structure)
     await expect(page.locator('text=スタンダード')).toBeVisible();
-    await expect(page.locator('text=プレミアム')).toBeVisible(); 
+    await expect(page.locator('text=ビジネス')).toBeVisible(); 
     await expect(page.locator('text=エンタープライズ')).toBeVisible();
     
-    // Verify "人気" badge on premium plan
+    // Verify "人気" badge on business plan
     await expect(page.locator('text=人気')).toBeVisible();
+    
+    // Verify data-component attribute for PricingPlans
+    const pricingComponent = page.locator('[data-component="PricingPlans"]');
+    await expect(pricingComponent).toBeVisible();
   });
 
   test('Production: CTA buttons meet 44px tap target requirement', async ({ page }) => {
@@ -102,9 +106,9 @@ test.describe('Hearing Service Integration with PricingPlans', () => {
     await secondCard.scrollIntoViewIfNeeded();
     await expect(secondCard).toBeVisible();
     
-    // Verify premium plan is accessible via scroll
-    const premiumTitle = secondCard.locator('text=プレミアム');
-    await expect(premiumTitle).toBeVisible();
+    // Verify business plan is accessible via scroll
+    const businessTitle = secondCard.locator('text=ビジネス');
+    await expect(businessTitle).toBeVisible();
   });
 
   test('Production: Desktop grid layout', async ({ page }) => {
@@ -175,7 +179,7 @@ test.describe('Hearing Service Integration with PricingPlans', () => {
       // Should have aria-label for screen readers
       const ariaLabel = await button.getAttribute('aria-label');
       expect(ariaLabel).toBeTruthy();
-      expect(ariaLabel).toMatch(/(スタンダード|プレミアム|エンタープライズ).*選択/);
+      expect(ariaLabel).toMatch(/(スタンダード|ビジネス|エンタープライズ).*選択/);
     }
     
     // Test keyboard navigation
@@ -207,7 +211,7 @@ test.describe('Hearing Service Integration with PricingPlans', () => {
     // Verify critical content is visible
     await expect(page.locator('text=料金プラン（ヒアリング代行）')).toBeVisible();
     await expect(page.locator('text=スタンダード')).toBeVisible();
-    await expect(page.locator('text=プレミアム')).toBeVisible();
+    await expect(page.locator('text=ビジネス')).toBeVisible();
     await expect(page.locator('text=エンタープライズ')).toBeVisible();
   });
 
@@ -238,6 +242,39 @@ test.describe('Hearing Service Integration with PricingPlans', () => {
     expect(ctaCount).toBeLessThanOrEqual(10); // Avoid excessive duplicates
   });
 
+  test('Production: FAQ tab keyboard navigation', async ({ page }) => {
+    await page.goto(`${PRODUCTION_URL}/hearing-service`);
+    await page.waitForLoadState('networkidle');
+    
+    // Scroll to FAQ section
+    await page.locator('text=よくある質問').scrollIntoViewIfNeeded();
+    
+    // Focus on first category tab
+    const firstTab = page.locator('[role="tab"]').first();
+    await firstTab.focus();
+    await expect(firstTab).toBeFocused();
+    
+    // Test arrow key navigation
+    await page.keyboard.press('ArrowRight');
+    const secondTab = page.locator('[role="tab"]').nth(1);
+    await expect(secondTab).toBeFocused();
+    
+    // Test Enter key selection
+    await page.keyboard.press('Enter');
+    const activeTab = page.locator('[aria-selected="true"]');
+    await expect(activeTab).toBeVisible();
+    
+    // Test Space key selection
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press(' ');
+    const newActiveTab = page.locator('[aria-selected="true"]');
+    await expect(newActiveTab).toBeVisible();
+    
+    // Verify FAQ content updates based on category selection
+    const faqContent = page.locator('#faq-content');
+    await expect(faqContent).toBeVisible();
+  });
+
   test('Production: Cache and revalidation verification', async ({ page }) => {
     // First request - may serve from cache
     await page.goto(`${PRODUCTION_URL}/hearing-service`);
@@ -253,7 +290,7 @@ test.describe('Hearing Service Integration with PricingPlans', () => {
     // Content should remain consistent
     await expect(page.locator('text=料金プラン（ヒアリング代行）')).toBeVisible();
     await expect(page.locator('text=スタンダード')).toBeVisible();
-    await expect(page.locator('text=プレミアム')).toBeVisible();
+    await expect(page.locator('text=ビジネス')).toBeVisible();
     
     // Verify no old pricing section remains
     const oldPricingText = ['ライトヒアリング', 'アドバンスヒアリング', 'フルヒアリング'];
