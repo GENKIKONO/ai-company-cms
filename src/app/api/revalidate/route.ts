@@ -14,13 +14,13 @@ export async function POST(request: NextRequest) {
     const expectedToken = process.env.REVALIDATE_TOKEN;
     
     if (!expectedToken) {
-      console.error('[Revalidate API] REVALIDATE_TOKEN environment variable not set');
+      console.warn('[Revalidate API] REVALIDATE_TOKEN is not set; returning 503 for safety.');
       return NextResponse.json(
         { 
-          error: 'Configuration error',
-          message: 'Revalidation token not configured' 
+          ok: false,
+          message: 'revalidate disabled' 
         },
-        { status: 500 }
+        { status: 503 }
       );
     }
     

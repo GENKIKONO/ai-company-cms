@@ -4,7 +4,7 @@
  */
 
 import Link from 'next/link';
-import { Check, Star, Zap, Crown, Building2, MessageSquare, Target, Users } from 'lucide-react';
+import { Check, Star, Zap, Crown, Building2, MessageSquare, Target, Users, Calendar, Phone } from 'lucide-react';
 
 interface PlanFeature {
   text: string;

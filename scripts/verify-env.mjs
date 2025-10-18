@@ -53,6 +53,12 @@ const REQUIRED_ENV_VARS = {
     required: false,
     example: 'your-admin-password',
     sensitive: true
+  },
+  'REVALIDATE_TOKEN': {
+    description: 'Token for on-demand ISR revalidation API',
+    required: false,
+    example: 'your-revalidate-token',
+    sensitive: true
   }
 };
 
@@ -128,7 +134,7 @@ function generateEnvTemplate() {
   const categories = {
     'Supabase Configuration (REQUIRED)': ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_ANON_KEY', 'NEXT_PUBLIC_SUPABASE_URL'],
     'Application URLs (REQUIRED)': ['NEXT_PUBLIC_APP_URL', 'NEXT_PUBLIC_SITE_URL'],
-    'Admin Settings (OPTIONAL)': ['ADMIN_EMAIL', 'ADMIN_OPS_PASSWORD']
+    'Admin Settings (OPTIONAL)': ['ADMIN_EMAIL', 'ADMIN_OPS_PASSWORD', 'REVALIDATE_TOKEN']
   };
   
   for (const [category, varNames] of Object.entries(categories)) {
