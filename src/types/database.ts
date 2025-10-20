@@ -69,6 +69,7 @@ export interface Organization {
   meta_keywords?: string[];
   keywords?: string[];
   website?: string;
+  website_url?: string;
   size?: number;
   // Enhanced organization settings (I1)
   favicon_url?: string;
