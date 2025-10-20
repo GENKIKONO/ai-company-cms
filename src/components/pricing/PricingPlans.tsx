@@ -148,7 +148,7 @@ export default function PricingPlans({
         {/* Mobile: Horizontal Scroll */}
         <div className="lg:hidden">
           <div 
-            className="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory no-scrollbar"
+            className="flex gap-4 overflow-x-auto pb-6 px-6 snap-x snap-mandatory no-scrollbar"
             style={{ scrollSnapType: 'x mandatory' }}
             role="tablist"
             aria-label="料金プラン選択"
@@ -158,7 +158,7 @@ export default function PricingPlans({
                 key={plan.id}
                 className={`
                   bg-white rounded-xl shadow-lg border-2 transition-all duration-200
-                  flex flex-col min-h-[600px] w-[85%] flex-shrink-0 snap-center p-6
+                  flex flex-col min-h-[600px] w-[80%] max-w-sm flex-shrink-0 snap-center p-6
                   hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                   ${plan.popular 
                     ? 'border-purple-500 relative' 

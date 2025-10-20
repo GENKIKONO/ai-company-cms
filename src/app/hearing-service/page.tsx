@@ -127,22 +127,22 @@ export default function HearingServicePage() {
         </section>
         
         {/* サービス流れ説明 */}
-        <section className="mt-12 md:mt-16">
+        <section className="mt-8 md:mt-16">
           <FlowSection />
         </section>
         
         {/* 料金プラン - 新PricingPlansコンポーネント */}
-        <section className="mt-12 md:mt-16">
+        <section className="mt-8 md:mt-16">
           <PricingPlans />
         </section>
         
         {/* よくある質問 */}
-        <section className="mt-12 md:mt-16">
+        <section className="mt-8 md:mt-16">
           <FAQSection />
         </section>
         
         {/* CTA（申込導線） */}
-        <section className="mt-12 md:mt-16">
+        <section className="mt-8 md:mt-16">
           <CTASection />
         </section>
       </div>
