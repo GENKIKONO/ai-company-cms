@@ -148,7 +148,7 @@ export default function PricingPlans({
         {/* Mobile: Horizontal Scroll */}
         <div className="lg:hidden">
           <div 
-            className="flex gap-6 overflow-x-auto pb-6 px-8 snap-x snap-mandatory no-scrollbar"
+            className="flex gap-6 overflow-x-auto pb-8 px-12 pt-6 snap-x snap-mandatory no-scrollbar"
             style={{ scrollSnapType: 'x mandatory' }}
             role="tablist"
             aria-label="料金プラン選択"
@@ -158,7 +158,7 @@ export default function PricingPlans({
                 key={plan.id}
                 className={`
                   bg-white rounded-xl shadow-lg border-2 transition-all duration-200
-                  flex flex-col min-h-[600px] w-[75%] max-w-xs flex-shrink-0 snap-center p-6
+                  flex flex-col min-h-[600px] w-[72%] max-w-sm flex-shrink-0 snap-center p-6 mt-4
                   hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                   ${plan.popular 
                     ? 'border-purple-500 relative' 
@@ -170,9 +170,9 @@ export default function PricingPlans({
                 tabIndex={index}
               >
                 {plan.badge && (
-                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-purple-500 text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-lg">
-                      {plan.badge}
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                    <span className="bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg border-2 border-white">
+                      ✨ {plan.badge}
                     </span>
                   </div>
                 )}
@@ -252,11 +252,11 @@ export default function PricingPlans({
                   <Link
                     href={plan.ctaHref}
                     className={`
-                      hit-44 cta-optimized block w-full text-center py-3 px-6 rounded-lg font-semibold 
-                      transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
+                      hit-44 cta-optimized block w-full text-center py-4 px-6 rounded-xl font-bold text-lg
+                      transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg
                       ${plan.popular
-                        ? 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500'
-                        : 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-500'
+                        ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 focus:ring-purple-500 transform hover:scale-105'
+                        : 'bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black focus:ring-gray-500 transform hover:scale-105'
                       }
                     `}
                     role="button"
@@ -289,9 +289,9 @@ export default function PricingPlans({
               tabIndex={index}
             >
               {plan.badge && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-full">
-                    {plan.badge}
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                  <span className="bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg border-2 border-white">
+                    ✨ {plan.badge}
                   </span>
                 </div>
               )}
@@ -371,11 +371,11 @@ export default function PricingPlans({
                 <Link
                   href={plan.ctaHref}
                   className={`
-                    hit-44 cta-optimized block w-full text-center py-4 px-6 rounded-lg font-semibold 
-                    transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
+                    hit-44 cta-optimized block w-full text-center py-4 px-6 rounded-xl font-bold text-lg
+                    transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg
                     ${plan.popular
-                      ? 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500'
-                      : 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-500'
+                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 focus:ring-purple-500 transform hover:scale-105'
+                      : 'bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black focus:ring-gray-500 transform hover:scale-105'
                     }
                   `}
                   role="button"
@@ -388,37 +388,6 @@ export default function PricingPlans({
           ))}
         </div>
 
-        {/* Additional Information */}
-        <div className="mt-12 text-center">
-          <div className="bg-blue-50 rounded-lg p-6 max-w-4xl mx-auto">
-            <h3 className="text-lg font-semibold text-blue-900 mb-3">
-              ご利用の流れ
-            </h3>
-            <div className="grid md:grid-cols-4 gap-4 text-sm text-blue-800">
-              <div className="flex items-center">
-                <Calendar className="h-5 w-5 mr-2 text-blue-600" />
-                <span>1. お申し込み</span>
-              </div>
-              <div className="flex items-center">
-                <Users className="h-5 w-5 mr-2 text-blue-600" />
-                <span>2. 事前打ち合わせ</span>
-              </div>
-              <div className="flex items-center">
-                <Phone className="h-5 w-5 mr-2 text-blue-600" />
-                <span>3. ヒアリング実施</span>
-              </div>
-              <div className="flex items-center">
-                <Star className="h-5 w-5 mr-2 text-blue-600" />
-                <span>4. レポート納品</span>
-              </div>
-            </div>
-          </div>
-          
-          <p className="text-sm text-gray-500 mt-6">
-            ※価格は税込。お支払いは銀行振込・クレジットカードに対応。<br />
-            詳細なお見積りや導入のご相談は、お気軽にお問い合わせください。
-          </p>
-        </div>
       </div>
     </section>
   );
