@@ -129,16 +129,16 @@ async function fetchOrganizations(
       name,
       slug,
       description,
-      website,
+      website_url,
       email_public,
       phone_public,
       industries,
-      founded,
+      established_at,
       employees,
-      address_prefecture,
-      address_city,
+      address_region,
+      address_locality,
       logo_url,
-      services(id, name, description, category)
+      services(id, name, description)
     `)
     .eq('status', 'published')
     .eq('is_published', true)
@@ -156,7 +156,7 @@ async function fetchOrganizations(
 
   // 所在地フィルター
   if (location) {
-    query = query.or(`address_prefecture.ilike.%${location}%,address_city.ilike.%${location}%`);
+    query = query.or(`address_region.ilike.%${location}%,address_locality.ilike.%${location}%`);
   }
 
   // ページネーション
