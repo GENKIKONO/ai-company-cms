@@ -16,12 +16,6 @@ export const fetchCache = 'force-no-store';
 export const metadata = {
   title: 'AIO Hub AI企業CMS',
   description: 'AI-powered enterprise CMS for company directory and service management',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
   robots: {
     index: true,
     follow: true,
@@ -33,6 +27,13 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 }
 
 export default function RootLayout({
