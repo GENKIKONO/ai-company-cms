@@ -30,7 +30,7 @@ export default function HeroSection() {
           
           {/* メインタイトル */}
           <div className="mb-6">
-            <h1 className="text-display text-neutral-900 mb-6 leading-tight">
+            <h1 className="text-display text-neutral-900 mb-6 hero-title-mobile">
               <span className="block jp-text">AIに</span>
               <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent jp-text">
                 伝わる企業情報へ
@@ -40,7 +40,7 @@ export default function HeroSection() {
           
           {/* サブタイトル */}
           <div className="mb-8">
-            <p className="text-body-large text-neutral-600 mb-8 jp-text leading-relaxed">
+            <p className="text-body-large text-neutral-600 mb-8 jp-text hero-lead-mobile">
               1時間のヒアリングで、あなたの会社の魅力を<span className="font-semibold text-primary">AIが理解しやすい構造</span>に最適化します
             </p>
           </div>
@@ -65,10 +65,10 @@ export default function HeroSection() {
           
           {/* CTAボタン */}
           <div className="mb-8">
-            <div className="flex flex-col sm:flex-row items-start justify-start gap-4 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start gap-4">
             <Link
               href="#pricing"
-              className="btn btn-primary btn-large gap-2"
+              className="btn-unified bg-blue-600 text-white hover:bg-blue-700"
             >
               <span className="jp-text">サービス詳細を見る</span>
               <ArrowRight className="w-5 h-5" />
@@ -76,7 +76,7 @@ export default function HeroSection() {
             
             <Link
               href="#faq"
-              className="btn btn-secondary btn-large gap-2"
+              className="btn-unified bg-white text-gray-900 border border-gray-300 hover:bg-gray-50"
             >
               <span className="jp-text">よくある質問</span>
             </Link>

@@ -70,56 +70,54 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="section bg-clean">
-      <div className="container">
+    <section className="py-10 bg-clean">
+      <div className="section-mobile">
         {/* セクションヘッダー */}
-        <div className="mb-12">
-          <h2 className="text-h2 text-neutral-900 mb-4 text-center text-balance">
+        <div className="mb-12 text-center">
+          <h2 className="text-h2 text-neutral-900 mb-4 text-balance">
             <span className="block jp-text">シンプルな3ステップ</span>
           </h2>
-          <p className="text-body-large text-center text-neutral-600 mx-auto jp-text">
+          <p className="text-body-large text-neutral-600 mx-auto jp-text">
             複雑な作業は一切不要。専門スタッフがすべて代行し、あなたの企業情報をAI時代に最適な形でお届けします。
           </p>
         </div>
 
-        {/* フローステップ */}
-        <div className="mb-12">
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-3">
-            {flowSteps.map((step, index) => {
-              const colors = getColorClasses(step.color);
-              const IconComponent = step.icon;
-              
-              return (
-                <div key={step.step} className="flex-shrink-0 w-64 snap-center">
-                  {/* コンパクトなステップ表示 */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-10 h-10 ${colors.bg} rounded-xl flex items-center justify-center`}>
-                      <IconComponent className={`w-6 h-6 ${colors.icon}`} />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${colors.step} text-white text-lg font-bold`}>
-                        {step.step === 1 ? '①' : step.step === 2 ? '②' : '③'}
-                      </span>
-                      <h3 className="text-h4 text-neutral-900 font-semibold jp-text">{step.title}</h3>
-                    </div>
+        {/* フローステップ - 縦積み3カード */}
+        <div className="mb-12 space-y-6 md:space-y-0 md:grid md:grid-cols-3 md:gap-8">
+          {flowSteps.map((step, index) => {
+            const colors = getColorClasses(step.color);
+            const IconComponent = step.icon;
+            
+            return (
+              <div key={step.step} className="w-full bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                {/* ステップヘッダー - 中央寄せ */}
+                <div className="text-center mb-4">
+                  <div className={`w-12 h-12 ${colors.bg} rounded-xl flex items-center justify-center mx-auto mb-3`}>
+                    <IconComponent className={`w-7 h-7 ${colors.icon}`} />
                   </div>
-                  
-                  {/* 説明 */}
-                  <p className="text-body-small text-neutral-600 mb-4 jp-text">{step.description}</p>
-                  
-                  {/* 詳細リスト（コンパクト表示） */}
-                  <ul className="space-y-1.5">
-                    {step.details.map((detail, detailIndex) => (
-                      <li key={detailIndex} className="flex items-start gap-2">
-                        <CheckCircle className={`w-3 h-3 ${colors.accent} mt-0.5 flex-shrink-0`} />
-                        <span className="text-xs text-neutral-700 jp-text">{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${colors.step} text-white text-lg font-bold`}>
+                      {step.step === 1 ? '①' : step.step === 2 ? '②' : '③'}
+                    </span>
+                    <h3 className="text-h4 text-neutral-900 font-semibold jp-text">{step.title}</h3>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+                
+                {/* 説明 */}
+                <p className="text-body-small text-neutral-600 mb-4 jp-text text-center">{step.description}</p>
+                
+                {/* 詳細リスト */}
+                <ul className="space-y-2">
+                  {step.details.map((detail, detailIndex) => (
+                    <li key={detailIndex} className="flex items-start gap-2">
+                      <CheckCircle className={`w-4 h-4 ${colors.accent} mt-0.5 flex-shrink-0`} />
+                      <span className="text-sm text-neutral-700 jp-text">{detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </div>
 
         {/* Before/After セクション */}

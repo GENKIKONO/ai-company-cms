@@ -148,7 +148,7 @@ export default function PricingPlans({
         {/* Mobile: Horizontal Scroll */}
         <div className="lg:hidden">
           <div 
-            className="flex gap-6 overflow-x-auto pb-8 px-12 pt-6 snap-x snap-mandatory no-scrollbar"
+            className="flex gap-6 overflow-x-auto pb-8 px-12 pt-12 snap-x snap-mandatory no-scrollbar"
             style={{ scrollSnapType: 'x mandatory' }}
             role="tablist"
             aria-label="料金プラン選択"
@@ -158,7 +158,7 @@ export default function PricingPlans({
                 key={plan.id}
                 className={`
                   bg-white rounded-xl shadow-lg border-2 transition-all duration-200
-                  flex flex-col min-h-[600px] w-[72%] max-w-sm flex-shrink-0 snap-center p-6 mt-4
+                  flex flex-col min-h-[600px] w-[72%] max-w-sm flex-shrink-0 snap-center p-6 mt-2
                   hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                   ${plan.popular 
                     ? 'border-purple-500 relative' 
@@ -271,7 +271,7 @@ export default function PricingPlans({
         </div>
 
         {/* Desktop: Grid Layout */}
-        <div className="hidden lg:grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="hidden lg:grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto pt-8">
           {HEARING_PLANS.map((plan, index) => (
             <article
               key={plan.id}

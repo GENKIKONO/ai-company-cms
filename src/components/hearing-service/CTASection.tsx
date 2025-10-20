@@ -1,8 +1,7 @@
 'use client';
 
-import { ArrowRight, Calendar, Shield, Clock, Star } from 'lucide-react';
+import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import Link from 'next/link';
-import HorizontalScroller from '@/components/ui/HorizontalScroller';
 
 export default function CTASection() {
   return (
@@ -32,59 +31,51 @@ export default function CTASection() {
 
           {/* 特徴ポイント */}
           <div className="mb-8 sm:mb-12">
-            <HorizontalScroller ariaLabel="サービス特徴" className="sm:grid-cols-2 lg:grid-cols-4">
-              <div className="snap-start min-w-[200px] sm:min-w-0 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400 mx-auto mb-2" />
+            <div className="flex flex-col gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 max-w-2xl lg:max-w-4xl mx-auto">
+              <div className="card-unified border-white/20">
+                <Clock className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                 <div className="text-white font-semibold text-sm">最短2週間</div>
                 <div className="text-blue-200 text-xs">スピード対応</div>
               </div>
-              <div className="snap-start min-w-[200px] sm:min-w-0 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400 mx-auto mb-2" />
-                <div className="text-white font-semibold text-sm">満足保証</div>
-                <div className="text-blue-200 text-xs">品質をお約束</div>
-              </div>
-              <div className="snap-start min-w-[200px] sm:min-w-0 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <Star className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-400 mx-auto mb-2" />
-                <div className="text-white font-semibold text-sm">4.8★評価</div>
-                <div className="text-blue-200 text-xs">高い満足度</div>
-              </div>
-              <div className="snap-start min-w-[200px] sm:min-w-0 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-pink-400 mx-auto mb-2" />
+              <div className="card-unified border-white/20">
+                <Calendar className="w-8 h-8 text-pink-400 mx-auto mb-2" />
                 <div className="text-white font-semibold text-sm">予約制</div>
                 <div className="text-blue-200 text-xs">確実な対応</div>
               </div>
-            </HorizontalScroller>
+              <div className="card-unified border-white/20 sm:col-span-2 lg:col-span-1">
+                <Clock className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                <div className="text-white font-semibold text-sm">専門対応</div>
+                <div className="text-blue-200 text-xs">AI最適化の専門家</div>
+              </div>
+            </div>
           </div>
 
           {/* メインCTAボタン */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 sm:mb-12">
             <Link
               href="/dashboard"
-              className="btn btn-primary btn-large gap-3"
+              className="btn-unified bg-white text-blue-900 hover:bg-gray-100"
               aria-label="今すぐヒアリングを申し込む"
             >
-              <span className="whitespace-nowrap">
-                <span className="hidden sm:inline">今すぐヒアリング<wbr/>を申し込む</span>
-                <span className="sm:hidden">ヒアリング申し込み</span>
-              </span>
+              <span className="jp-text">今すぐヒアリング申し込み</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
             
             <Link
               href="#pricing"
-              className="btn btn-secondary btn-large bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20"
+              className="btn-unified bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20"
               aria-label="料金プランを確認"
             >
-              料金プランを確認
+              <span className="jp-text">料金プランを確認</span>
             </Link>
           </div>
 
           {/* 申込みステップ */}
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/10 max-w-4xl mx-auto">
-            <h3 className="text-h3 text-white mb-6">申し込みは3ステップで完了</h3>
+            <h3 className="text-h3 text-white mb-6 text-center">申し込みは3ステップで完了</h3>
             
-            <HorizontalScroller ariaLabel="申し込みステップ" className="lg:grid-cols-3">
-              <div className="snap-start min-w-[240px] sm:min-w-0 text-center">
+            <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
+              <div className="text-center">
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <span className="text-white font-bold">1</span>
                 </div>
@@ -92,7 +83,7 @@ export default function CTASection() {
                 <p className="text-blue-200 text-sm leading-5">シングルまたは継続プランを選択</p>
               </div>
               
-              <div className="snap-start min-w-[240px] sm:min-w-0 text-center">
+              <div className="text-center">
                 <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <span className="text-white font-bold">2</span>
                 </div>
@@ -100,14 +91,14 @@ export default function CTASection() {
                 <p className="text-blue-200 text-sm leading-5">会社概要とヒアリング希望日程</p>
               </div>
               
-              <div className="snap-start min-w-[240px] sm:min-w-0 text-center">
+              <div className="text-center">
                 <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <span className="text-white font-bold">3</span>
                 </div>
                 <h4 className="text-white font-semibold mb-2">日程確定</h4>
                 <p className="text-blue-200 text-sm leading-5">担当者から連絡・ヒアリング実施</p>
               </div>
-            </HorizontalScroller>
+            </div>
           </div>
 
           {/* 追加情報 */}
