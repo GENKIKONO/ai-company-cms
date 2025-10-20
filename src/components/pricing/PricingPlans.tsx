@@ -148,7 +148,7 @@ export default function PricingPlans({
         {/* Mobile: Horizontal Scroll */}
         <div className="lg:hidden">
           <div 
-            className="flex gap-4 overflow-x-auto pb-6 px-6 snap-x snap-mandatory no-scrollbar"
+            className="flex gap-6 overflow-x-auto pb-6 px-8 snap-x snap-mandatory no-scrollbar"
             style={{ scrollSnapType: 'x mandatory' }}
             role="tablist"
             aria-label="料金プラン選択"
@@ -158,7 +158,7 @@ export default function PricingPlans({
                 key={plan.id}
                 className={`
                   bg-white rounded-xl shadow-lg border-2 transition-all duration-200
-                  flex flex-col min-h-[600px] w-[80%] max-w-sm flex-shrink-0 snap-center p-6
+                  flex flex-col min-h-[600px] w-[75%] max-w-xs flex-shrink-0 snap-center p-6
                   hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                   ${plan.popular 
                     ? 'border-purple-500 relative' 
@@ -170,8 +170,8 @@ export default function PricingPlans({
                 tabIndex={index}
               >
                 {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-purple-500 text-white text-sm font-semibold px-4 py-1 rounded-full">
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-purple-500 text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-lg">
                       {plan.badge}
                     </span>
                   </div>
