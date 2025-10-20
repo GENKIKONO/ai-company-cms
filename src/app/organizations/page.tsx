@@ -35,15 +35,19 @@ export default function OrganizationsPage() {
     async function fetchData() {
       setLoading(true);
       try {
-        // 公開済み企業とis_publishedがtrueの企業を取得（Free企業も含む）
-        const [orgsResult, industriesResult] = await Promise.all([
-          getOrganizations({ limit: 100 }),
+        // パブリックAPIから公開済み企業を取得
+        const [orgsResponse, industriesResult] = await Promise.all([
+          fetch('/api/public/organizations?limit=100'),
           getIndustries()
         ]);
 
-        if (orgsResult.data) {
-          setOrganizations(orgsResult.data);
+        if (orgsResponse.ok) {
+          const orgsData = await orgsResponse.json();
+          if (orgsData.data) {
+            setOrganizations(orgsData.data);
+          }
         }
+        
         if (industriesResult.data) {
           setIndustries(industriesResult.data);
         }
