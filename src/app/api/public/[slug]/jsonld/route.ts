@@ -8,13 +8,14 @@ import {
   generateFAQJsonLd,
   generatePostJsonLd
 } from '@/lib/utils/jsonld';
+import { buildSafeUrl, getSafeBaseUrl } from '@/lib/utils/safe-url';
 
 export const dynamic = 'force-dynamic';
 
-async function getOrganizationData(slug: string) {
+async function getOrganizationData(slug: string, request?: NextRequest) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/public/organizations/${slug}`, {
+    const apiUrl = buildSafeUrl(`/api/public/organizations/${slug}`, request);
+    const response = await fetch(apiUrl, {
       cache: 'no-store'
     });
     
@@ -40,8 +41,8 @@ export async function GET(
     const type = searchParams.get('type');
     const id = searchParams.get('id');
 
-    // 企業データを取得
-    const data = await getOrganizationData(resolvedParams.slug);
+    // 企業データを取得（リクエスト渡してフォールバック対応）
+    const data = await getOrganizationData(resolvedParams.slug, request);
     
     if (!data || !data.organization) {
       return NextResponse.json(
@@ -51,6 +52,7 @@ export async function GET(
     }
 
     const { organization, posts, services, case_studies, faqs } = data;
+    const baseUrl = getSafeBaseUrl(request);
 
     // タイプに応じてJSON-LDを生成
     switch (type) {
@@ -162,13 +164,13 @@ export async function GET(
         const blogJsonLd = {
           "@context": "https://schema.org",
           "@type": "Blog",
-          "@id": `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/o/${organization.slug}/posts`,
-          "url": `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/o/${organization.slug}/posts`,
+          "@id": `${baseUrl}/o/${organization.slug}/posts`,
+          "url": `${baseUrl}/o/${organization.slug}/posts`,
           "name": `${organization.name} - 記事・ブログ`,
           "description": `${organization.name}が発信する記事・ブログ一覧`,
           "publisher": {
             "@type": "Organization",
-            "@id": `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/o/${organization.slug}`,
+            "@id": `${baseUrl}/o/${organization.slug}`,
             "name": organization.name
           },
           "blogPost": posts.map((post: any) => generatePostJsonLd(post, organization))
@@ -188,12 +190,12 @@ export async function GET(
           const websiteJsonLd = {
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "@id": `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/o/${organization.slug}#website`,
-            "url": `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/o/${organization.slug}`,
+            "@id": `${baseUrl}/o/${organization.slug}#website`,
+            "url": `${baseUrl}/o/${organization.slug}`,
             "name": `${organization.name} - 企業情報`,
             "publisher": {
               "@type": "Organization",
-              "@id": `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/o/${organization.slug}`,
+              "@id": `${baseUrl}/o/${organization.slug}`,
               "name": organization.name
             }
           };
