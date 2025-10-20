@@ -31,19 +31,19 @@ export default function CTASection() {
 
           {/* 特徴ポイント */}
           <div className="mb-8 sm:mb-12">
-            <div className="flex flex-col gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 max-w-2xl lg:max-w-4xl mx-auto">
-              <div className="card-unified border-white/20">
-                <Clock className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+            <div className="highlights-unified max-w-2xl lg:max-w-4xl mx-auto">
+              <div className="border border-white/10 rounded-xl p-4 text-center">
+                <Clock className="w-7 h-7 text-blue-400 mx-auto mb-2" />
                 <div className="text-white font-semibold text-sm">最短2週間</div>
                 <div className="text-blue-200 text-xs">スピード対応</div>
               </div>
-              <div className="card-unified border-white/20">
-                <Calendar className="w-8 h-8 text-pink-400 mx-auto mb-2" />
+              <div className="border border-white/10 rounded-xl p-4 text-center">
+                <Calendar className="w-7 h-7 text-pink-400 mx-auto mb-2" />
                 <div className="text-white font-semibold text-sm">予約制</div>
                 <div className="text-blue-200 text-xs">確実な対応</div>
               </div>
-              <div className="card-unified border-white/20 sm:col-span-2 lg:col-span-1">
-                <Clock className="w-8 h-8 text-green-400 mx-auto mb-2" />
+              <div className="border border-white/10 rounded-xl p-4 text-center">
+                <Clock className="w-7 h-7 text-green-400 mx-auto mb-2" />
                 <div className="text-white font-semibold text-sm">専門対応</div>
                 <div className="text-blue-200 text-xs">AI最適化の専門家</div>
               </div>
@@ -51,7 +51,7 @@ export default function CTASection() {
           </div>
 
           {/* メインCTAボタン */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8 sm:mb-12 w-full">
             <Link
               href="/dashboard"
               className="btn-unified bg-white text-blue-900 hover:bg-gray-100"
@@ -63,7 +63,7 @@ export default function CTASection() {
             
             <Link
               href="#pricing"
-              className="btn-unified bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20"
+              className="btn-unified bg-white/80 backdrop-blur text-blue-700 hover:bg-white/90"
               aria-label="料金プランを確認"
             >
               <span className="jp-text">料金プランを確認</span>

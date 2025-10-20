@@ -62,12 +62,19 @@
   text-wrap: pretty; /* Global default for natural text wrapping */
 }
 
-/* Hearing Service Mobile Optimization - Unified Component Classes */
+/* Mobile Polish Optimization - Unified Component Classes */
 @layer components {
   /* Unified button styling for consistent CTA appearance */
   .btn-unified {
-    @apply w-full sm:w-auto min-w-[200px] h-12 px-6 rounded-xl font-semibold text-sm hit-44 
+    @apply h-12 px-5 rounded-xl font-semibold text-sm hit-44 
            flex items-center justify-center gap-2 transition-all duration-200;
+  }
+  
+  /* Outline button with improved contrast */
+  .btn-unified-outline {
+    @apply h-12 px-5 rounded-xl font-semibold text-sm hit-44 
+           flex items-center justify-center gap-2 transition-all duration-200
+           border-2 border-neutral-300 text-neutral-800 hover:border-neutral-400;
   }
   
   /* Unified card styling for consistent layout blocks */  
@@ -80,13 +87,40 @@
     @apply w-full max-w-[680px] mx-auto px-4 sm:px-0;
   }
   
-  /* Mobile-optimized hero typography */
-  .hero-title-mobile {
-    @apply text-center leading-tight text-balance sm:text-left;
+  /* Hero typography with left alignment */
+  .hero-title-unified {
+    @apply text-left leading-tight text-balance max-w-[22ch];
   }
   
-  .hero-lead-mobile {
-    @apply text-center leading-relaxed max-w-xl mx-auto sm:text-left sm:mx-0;
+  .hero-lead-unified {
+    @apply text-left leading-relaxed max-w-[36ch];
+  }
+  
+  /* Highlights list tightened spacing with enlarged icons */
+  .highlights-unified {
+    @apply grid grid-cols-1 gap-3 md:grid-cols-3;
+  }
+  
+  .highlight-item-unified {
+    @apply flex items-center gap-3 leading-tight;
+  }
+  
+  .highlight-icon-unified {
+    @apply w-7 h-7 flex-shrink-0;
+  }
+  
+  /* Contact cards standardized dimensions */
+  .contact-card-unified {
+    @apply min-h-[64px] px-5 rounded-xl flex items-center;
+  }
+  
+  .contact-icon-unified {
+    @apply w-5 h-5 mr-2;
+  }
+  
+  /* Mobile menu alignment */
+  .menu-item-unified {
+    @apply h-12 pl-4 flex items-center text-[15px] truncate;
   }
 }
 

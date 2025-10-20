@@ -4,7 +4,7 @@
  */
 
 import Link from 'next/link';
-import { Check, Star, Zap, Crown, Building2, MessageSquare, Target, Users, Calendar, Phone } from 'lucide-react';
+import { Check, Star, Zap, Crown, Building2, MessageSquare, Target, Users, Calendar, Phone, Sparkles } from 'lucide-react';
 
 interface PlanFeature {
   text: string;
@@ -170,9 +170,10 @@ export default function PricingPlans({
                 tabIndex={index}
               >
                 {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg border-2 border-white">
-                      ✨ {plan.badge}
+                  <div className="mb-4">
+                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-purple-100 text-purple-700">
+                      <Sparkles className="w-4 h-4 mr-1.5" aria-hidden="true" />
+                      {plan.badge}
                     </span>
                   </div>
                 )}
@@ -289,9 +290,10 @@ export default function PricingPlans({
               tabIndex={index}
             >
               {plan.badge && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                  <span className="bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg border-2 border-white">
-                    ✨ {plan.badge}
+                <div className="mb-4">
+                  <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-purple-100 text-purple-700">
+                    <Sparkles className="w-4 h-4 mr-1.5" aria-hidden="true" />
+                    {plan.badge}
                   </span>
                 </div>
               )}

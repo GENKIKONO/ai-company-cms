@@ -51,7 +51,7 @@ export default function MobileMenu({
           {/* コンテンツラッパ - FABとの重なり防止 */}
           <div className="nav-panel overflow-y-auto pb-[calc(96px+env(safe-area-inset-bottom))] pr-16 h-full">
             <div className="px-6 pt-6 space-y-6">
-              <div className="text-xl font-bold text-indigo-600">AIO Hub</div>
+              <div className="text-xl font-bold text-indigo-600 pl-4">AIO Hub</div>
               
               {/* いちばん上にログイン */}
               {!auth.loggedIn && (
@@ -81,14 +81,14 @@ export default function MobileMenu({
                 </div>
               )}
               
-              <nav className="space-y-3">
+              <nav className="space-y-1">
                 {links.map((l, i) => (
                   <Link
                     key={l.href}
                     href={l.href}
                     ref={auth.loggedIn && i === 0 ? firstLinkRef : undefined}
                     onClick={handleLinkClick}
-                    className="focus-clean nav-link nav-item block text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200 text-lg py-2"
+                    className="focus-clean nav-link nav-item menu-item-unified text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200"
                   >
                     {l.label}
                   </Link>
@@ -99,7 +99,7 @@ export default function MobileMenu({
                     <Link
                       href={auth.dashboardHref}
                       onClick={handleLinkClick}
-                      className="focus-clean nav-link nav-item block text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200 text-lg py-2"
+                      className="focus-clean nav-link nav-item menu-item-unified text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200"
                     >
                       マイページ
                     </Link>

@@ -30,7 +30,7 @@ export default function HeroSection() {
           
           {/* メインタイトル */}
           <div className="mb-6">
-            <h1 className="text-display text-neutral-900 mb-6 hero-title-mobile">
+            <h1 className="text-display text-neutral-900 mb-6 hero-title-unified">
               <span className="block jp-text">AIに</span>
               <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent jp-text">
                 伝わる企業情報へ
@@ -40,24 +40,24 @@ export default function HeroSection() {
           
           {/* サブタイトル */}
           <div className="mb-8">
-            <p className="text-body-large text-neutral-600 mb-8 jp-text hero-lead-mobile">
+            <p className="text-body-large text-neutral-600 mb-8 jp-text hero-lead-unified">
               1時間のヒアリングで、あなたの会社の魅力を<span className="font-semibold text-primary">AIが理解しやすい構造</span>に最適化します
             </p>
           </div>
           
           {/* 特徴ポイント */}
           <div className="mb-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 sm:gap-6 mb-8 text-neutral-700">
-              <div className="flex items-center gap-2">
-                <Brain className="w-5 h-5 text-blue-500" />
+            <div className="highlights-unified text-neutral-700">
+              <div className="highlight-item-unified">
+                <Brain className="highlight-icon-unified text-blue-500" />
                 <span className="text-body-small font-medium jp-text">専任スタッフがヒアリング</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-purple-500" />
+              <div className="highlight-item-unified">
+                <Target className="highlight-icon-unified text-purple-500" />
                 <span className="text-body-small font-medium jp-text">AI最適化構造で登録</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-indigo-500" />
+              <div className="highlight-item-unified">
+                <Sparkles className="highlight-icon-unified text-indigo-500" />
                 <span className="text-body-small font-medium jp-text">検索性・発見性向上</span>
               </div>
             </div>

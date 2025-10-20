@@ -96,11 +96,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="container">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h1 className="text-display text-neutral-900 mb-6 text-balance jp-text">
+                <h1 className="text-display text-neutral-900 mb-6 hero-title-unified jp-text">
                   AI企業CMS
                   <span className="text-primary block">AIO Hub</span>
                 </h1>
-                <p className="text-body-large text-neutral-600 mb-8 jp-text">
+                <p className="text-body-large text-neutral-600 mb-8 hero-lead-unified jp-text">
                   <strong>ゼロクリック時代</strong>にAIが理解・引用しやすい企業情報を構築。検索結果からAI回答まで、企業が"選ばれる"プラットフォームです。
                 </p>
                 
@@ -108,23 +108,23 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <Link 
                     href="/auth/signup" 
                     onClick={handleCtaClick}
-                    className="btn btn-primary btn-large"
+                    className="btn-unified bg-blue-600 text-white hover:bg-blue-700"
                   >
                     無料で始める
-                    <ArrowRight className="icon icon-sm" />
+                    <ArrowRight className="w-5 h-5" />
                   </Link>
                   <Link 
                     href="/organizations" 
-                    className="btn btn-secondary btn-large"
+                    className="btn-unified-outline bg-white"
                   >
                     企業ディレクトリを見る
                   </Link>
                 </div>
 
                 {/* Stats */}
-                <div className="flex gap-6 overflow-x-auto pb-2 snap-x snap-mandatory md:grid md:grid-cols-3">
+                <div className="grid grid-cols-3 gap-4 md:grid-cols-3">
                   {stats.map((stat, index) => (
-                    <div key={index} className="text-center flex-shrink-0 w-24 snap-center">
+                    <div key={index} className="text-center">
                       <div className="text-h2 text-primary mb-2">{stat.value}</div>
                       <div className="text-body-small text-neutral-600 jp-text">{stat.label}</div>
                     </div>
@@ -177,9 +177,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             {/* Evolution Timeline */}
             <div className="mb-12">
-              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-4">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-4">
                 {/* Traditional Search */}
-                <div className="card p-6 text-center bg-white flex-shrink-0 w-72 md:w-auto snap-center">
+                <div className="card p-6 text-center bg-white">
                   <div className="w-16 h-16 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -191,7 +191,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </div>
 
                 {/* Transition */}
-                <div className="card p-6 text-center bg-white flex-shrink-0 w-72 md:w-auto snap-center">
+                <div className="card p-6 text-center bg-white">
                   <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -203,7 +203,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </div>
 
                 {/* Future */}
-                <div className="card p-6 text-center bg-white flex-shrink-0 w-72 md:w-auto snap-center">
+                <div className="card p-6 text-center bg-white">
                   <div className="w-16 h-16 bg-success-50 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-success-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -219,9 +219,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             {/* Comparison Table - Split into two sections */}
             <div className="mb-8">
               <h3 className="text-h2 text-neutral-900 mb-6 jp-text text-center">検索体験の変化</h3>
-              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 md:gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-6">
                 {/* Traditional Search */}
-                <div className="card p-6 bg-neutral-50 border-l-4 border-neutral-400 flex-shrink-0 w-80 md:w-auto snap-center">
+                <div className="card p-6 bg-neutral-50 border-l-4 border-neutral-400">
                   <div className="mb-4">
                     <div className="badge badge-neutral mb-2">従来の検索</div>
                     <h4 className="text-h3 text-neutral-900 jp-text flex items-center gap-2">
@@ -263,7 +263,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </div>
 
                 {/* AI Era Search */}
-                <div className="card p-6 bg-primary-50 border-l-4 border-primary-600 relative overflow-hidden flex-shrink-0 w-80 md:w-auto snap-center">
+                <div className="card p-6 bg-primary-50 border-l-4 border-primary-600 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
                   <div className="relative">
                     <div className="mb-4">
@@ -413,14 +413,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/auth/signup" 
-                className="btn btn-primary btn-large"
+                className="btn-unified bg-blue-600 text-white hover:bg-blue-700"
               >
                 無料で始める
-                <ArrowRight className="icon icon-sm" />
+                <ArrowRight className="w-5 h-5" />
               </Link>
               <Link 
                 href="/hearing-service"
-                className="btn btn-secondary btn-large"
+                className="btn-unified-outline bg-white"
               >
                 ヒアリング代行サービス
               </Link>
@@ -463,14 +463,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/auth/signup" 
-                className="btn btn-primary btn-large"
+                className="btn-unified bg-blue-600 text-white hover:bg-blue-700"
               >
                 無料で始める
-                <ArrowRight className="icon icon-sm" />
+                <ArrowRight className="w-5 h-5" />
               </Link>
               <Link 
                 href="/hearing-service"
-                className="btn btn-secondary btn-large"
+                className="btn-unified-outline bg-white"
               >
                 ヒアリング代行サービス
               </Link>
