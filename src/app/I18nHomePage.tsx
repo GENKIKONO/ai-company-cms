@@ -450,7 +450,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 className="btn-unified bg-blue-600 text-white hover:bg-blue-700"
               >
                 無料で始める
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRightIcon className="w-5 h-5" />
               </Link>
               <Link 
                 href="/hearing-service"
@@ -500,7 +500,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 className="btn-unified bg-blue-600 text-white hover:bg-blue-700"
               >
                 無料で始める
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRightIcon className="w-5 h-5" />
               </Link>
               <Link 
                 href="/hearing-service"

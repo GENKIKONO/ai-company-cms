@@ -344,7 +344,7 @@ export const PartnershipIcon = createIcon(
 export const Icon = React.forwardRef<SVGSVGElement, IconProps & { name: string }>(
   ({ name, ...props }, ref) => {
     // Icon mapping
-    const icons: Record<string, React.ComponentType<IconProps>> = {
+    const icons: Record<string, React.ComponentType<any>> = {
       check: CheckIcon,
       'check-circle': CheckCircleIcon,
       x: XIcon,
@@ -390,48 +390,8 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps & { name: string }
       return null;
     }
     
-    return <IconComponent ref={ref} {...props} />;
+    return <IconComponent {...props} />;
   }
 );
 
 Icon.displayName = 'Icon';
-
-// Export all icons for direct usage
-export {
-  CheckIcon,
-  CheckCircleIcon,
-  XIcon,
-  AlertTriangleIcon,
-  InfoIcon,
-  ArrowRightIcon,
-  ArrowLeftIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
-  ChevronRightIcon,
-  ChevronLeftIcon,
-  ChevronUpIcon,
-  ChevronDownIcon,
-  PlusIcon,
-  MinusIcon,
-  SearchIcon,
-  MenuIcon,
-  UserIcon,
-  SettingsIcon,
-  HomeIcon,
-  BuildingIcon,
-  DocumentIcon,
-  MailIcon,
-  PhoneIcon,
-  MapPinIcon,
-  ExternalLinkIcon,
-  EyeIcon,
-  EyeOffIcon,
-  HeartIcon,
-  StarIcon,
-  LoadingIcon,
-  ServiceIcon,
-  CaseStudyIcon,
-  FAQIcon,
-  NewsIcon,
-  PartnershipIcon,
-};

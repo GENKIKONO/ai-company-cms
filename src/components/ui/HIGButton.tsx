@@ -171,7 +171,7 @@ const HIGButton = React.forwardRef<HTMLButtonElement, HIGButtonProps>(
             <LoadingIcon 
               size={16} 
               className="animate-spin" 
-              aria-hidden="true"
+              aria-hidden={true}
             />
             <span className="hig-sr-only">読み込み中...</span>
           </>
