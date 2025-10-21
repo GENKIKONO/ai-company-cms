@@ -2,7 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 統一デザインシステム */
+/* HIG Design System */
+@import '../styles/hig-design-tokens.css';
+
+/* Legacy Design Tokens (for gradual migration) */
 @import '../styles/design-tokens.css';
 
 /* Line clamp utilities */

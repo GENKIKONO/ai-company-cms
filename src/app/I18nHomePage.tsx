@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, Building2, Users, Zap } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/hooks/useI18n';
 import { useABTest } from '@/hooks/useABTest';
@@ -11,6 +10,20 @@ import FlowSection from '@/components/aio/FlowSection';
 import PricingTable from '@/components/pricing/PricingTable';
 import FAQSection from '@/components/aio/FAQSection';
 import { aioCopy } from '@/app/aio/copy';
+
+// HIG Components
+import { HIGButton } from '@/components/ui/HIGButton';
+import { HIGCard, HIGCardHeader, HIGCardContent, HIGCardTitle, HIGCardDescription } from '@/components/ui/HIGCard';
+import { HIGContainer, HIGSection, HIGStack, HIGGrid, HIGFlex, HIGCenter } from '@/components/layout/HIGLayout';
+import { 
+  CheckCircleIcon, 
+  ArrowRightIcon, 
+  BuildingIcon, 
+  UserIcon, 
+  ServiceIcon,
+  InfoIcon,
+  AlertTriangleIcon 
+} from '@/components/icons/HIGIcons';
 
 interface SiteSettings {
   title: string;
@@ -66,17 +79,17 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
   const features = [
     {
-      icon: Building2,
+      icon: BuildingIcon,
       title: "AI引用最適化",
       description: "企業情報を構造化データとして整備し、AIが理解・引用しやすい形に自動変換"
     },
     {
-      icon: Zap,
-      title: "ドメインパワー共有",
+      icon: ServiceIcon,
+      title: "ドメインパワー共有", 
       description: "信頼性の高いプラットフォームに情報を集約することで、検索・AI回答での露出を向上"
     },
     {
-      icon: Users,
+      icon: UserIcon,
       title: "アクセス流入促進",
       description: "構造化された企業情報から自社サイトやSNSへの質の高い流入を創出"
     }
@@ -89,79 +102,100 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-clean">
+    <div className="min-h-screen bg-[var(--color-background)]">
       <main>
         {/* Hero Section */}
-        <section className="section">
-          <div className="container">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h1 className="text-display text-neutral-900 mb-6 hero-title-unified jp-text">
+        <HIGSection spacing="xl" className="hig-section">
+          <HIGContainer>
+            <HIGGrid columns={2} gap="xl" className="items-center">
+              <HIGStack spacing="lg">
+                <h1 className="hig-text-h1 hig-jp-heading text-[var(--color-text-primary)]">
                   AI企業CMS
-                  <span className="text-primary block">AIO Hub</span>
+                  <span className="text-[var(--color-primary)] block">AIO Hub</span>
                 </h1>
-                <p className="text-body-large text-neutral-600 mb-8 hero-lead-unified jp-text">
+                <p className="hig-text-body hig-jp-body text-[var(--color-text-secondary)] text-lg leading-relaxed">
                   <strong>ゼロクリック時代</strong>にAIが理解・引用しやすい企業情報を構築。検索結果からAI回答まで、企業が"選ばれる"プラットフォームです。
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                  <Link 
-                    href="/auth/signup" 
+                <HIGFlex 
+                  direction="col" 
+                  className="sm:flex-row" 
+                  gap="md"
+                >
+                  <HIGButton
+                    variant="primary"
+                    size="lg"
                     onClick={handleCtaClick}
-                    className="btn-unified bg-blue-600 text-white hover:bg-blue-700"
+                    rightIcon={<ArrowRightIcon size={20} />}
+                    asChild
                   >
-                    無料で始める
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-                  <Link 
-                    href="/organizations" 
-                    className="btn-unified-outline bg-white"
+                    <Link href="/auth/signup">
+                      無料で始める
+                    </Link>
+                  </HIGButton>
+                  <HIGButton
+                    variant="secondary"
+                    size="lg"
+                    asChild
                   >
-                    企業ディレクトリを見る
-                  </Link>
-                </div>
+                    <Link href="/organizations">
+                      企業ディレクトリを見る
+                    </Link>
+                  </HIGButton>
+                </HIGFlex>
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 md:grid-cols-3">
+                <HIGGrid columns={3} gap="md">
                   {stats.map((stat, index) => (
                     <div key={index} className="text-center">
-                      <div className="text-h2 text-primary mb-2">{stat.value}</div>
-                      <div className="text-body-small text-neutral-600 jp-text">{stat.label}</div>
+                      <div className="hig-text-h2 text-[var(--color-primary)] mb-2 hig-jp-nowrap">
+                        {stat.value}<span className="hig-text-caption">{stat.unit}</span>
+                      </div>
+                      <div className="hig-text-caption text-[var(--color-text-secondary)] hig-jp-text">
+                        {stat.label}
+                      </div>
                     </div>
                   ))}
-                </div>
-              </div>
+                </HIGGrid>
+              </HIGStack>
 
-              <div>
-                <div className="card">
-                  <div className="space-y-6">
-                    <div className="badge badge-primary">
-                      <Zap className="icon icon-sm" />
-                      ゼロクリック対応
-                    </div>
-                    <h3 className="text-h3 text-neutral-900 jp-text">
-                      AIに選ばれる企業情報を構築
-                    </h3>
-                    <ul className="feature-list">
-                      <li className="feature-item">
-                        <CheckCircle className="feature-icon" />
-                        <span className="text-body jp-text">構造化データ自動生成</span>
-                      </li>
-                      <li className="feature-item">
-                        <CheckCircle className="feature-icon" />
-                        <span className="text-body jp-text">AI引用最適化</span>
-                      </li>
-                      <li className="feature-item">
-                        <CheckCircle className="feature-icon" />
-                        <span className="text-body jp-text">流入促進とSEO強化</span>
-                      </li>
-                    </ul>
+              <HIGCard variant="elevated" padding="lg">
+                <HIGStack spacing="lg">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] bg-opacity-10 text-[var(--color-primary)] rounded-full text-sm font-medium">
+                    <ServiceIcon size={16} />
+                    ゼロクリック対応
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+                  <HIGCardTitle className="hig-jp-heading">
+                    AIに選ばれる企業情報を構築
+                  </HIGCardTitle>
+                  <HIGStack spacing="md">
+                    <div className="flex items-start gap-3">
+                      <CheckCircleIcon 
+                        size={20} 
+                        className="text-[var(--color-success)] flex-shrink-0 mt-0.5" 
+                      />
+                      <span className="hig-text-body hig-jp-text">構造化データ自動生成</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircleIcon 
+                        size={20} 
+                        className="text-[var(--color-success)] flex-shrink-0 mt-0.5" 
+                      />
+                      <span className="hig-text-body hig-jp-text">AI引用最適化</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircleIcon 
+                        size={20} 
+                        className="text-[var(--color-success)] flex-shrink-0 mt-0.5" 
+                      />
+                      <span className="hig-text-body hig-jp-text">流入促進とSEO強化</span>
+                    </div>
+                  </HIGStack>
+                </HIGStack>
+              </HIGCard>
+            </HIGGrid>
+          </HIGContainer>
+        </HIGSection>
 
         {/* Zero-Click Era Evolution Section */}
         <section className="section bg-subtle">
