@@ -24,29 +24,32 @@ interface OrganizationPageData {
 // ✅ キャッシュ対応: 公開組織データ取得
 import { unstable_cache } from 'next/cache';
 
-const getOrganizationDataCached = (slug: string) =>
-  unstable_cache(
+const getOrganizationDataCached = (slug: string) => {
+  // slug正規化で大文字・空白・末尾文字問題を回避
+  const safeSlug = slug.toLowerCase().trim();
+  
+  return unstable_cache(
     async (): Promise<OrganizationPageData | null> => {
-      console.log(`[getOrganizationDataCached] Cache miss for slug: ${slug}`);
+      console.log(`[getOrganizationDataCached] Cache miss for slug: ${safeSlug}`);
       
       // 🚫 匿名クライアントで公開データのみ取得（cookies/auth依存禁止）
       const { supabasePublic } = await import('@/lib/supabase-public');
       const supabase = supabasePublic();
       
-      // ✅ P0: public_unverified と published の両方を公開対象とする
+      // ✅ P0: published のみを公開対象とする（enum準拠）
       const { data: organization, error: orgError } = await supabase
         .from('organizations')
         .select('*')
-        .eq('slug', slug)
-        .in('status', ['published', 'public_unverified'])
+        .eq('slug', safeSlug)
+        .eq('status', 'published')
         .eq('is_published', true)
         .maybeSingle();
 
       // ✅ VERIFY: Enhanced debugging for 404 issues with fallback diagnosis
       if (orgError || !organization) {
-        console.error(`[VERIFY] Public page failed for slug: ${slug}`, {
+        console.error(`[VERIFY] Public page failed for slug: ${safeSlug}`, {
           error: orgError?.message,
-          requiredConditions: 'status IN (published, public_unverified) AND is_published=true',
+          requiredConditions: 'status = published AND is_published=true',
           client: 'anonymous'
         });
         
@@ -173,12 +176,13 @@ const getOrganizationDataCached = (slug: string) =>
         qa_entries: qaEntriesResult.data || []
       };
     },
-    [`org-public-${slug}`],
+    [`org-public-${safeSlug}`],
     { 
-      tags: [`org-public:${slug}`, `org-public`], 
+      tags: [`org-public:${safeSlug}`, `org-public`], 
       revalidate: 300 // 5分キャッシュ 
     }
   )();
+};
 
 async function getOrganizationData(slug: string): Promise<OrganizationPageData | null> {
   try {
