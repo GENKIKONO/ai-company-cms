@@ -59,7 +59,7 @@ const getOrganizationDataCached = (slug: string) => {
           supabase
             .from('organizations')
             .select('slug, status, is_published')
-            .eq('slug', slug)
+            .eq('slug', safeSlug)
             .eq('status', 'published')
             .maybeSingle(),
           
@@ -67,7 +67,7 @@ const getOrganizationDataCached = (slug: string) => {
           supabase
             .from('organizations')
             .select('slug, status, is_published')
-            .eq('slug', slug)
+            .eq('slug', safeSlug)
             .eq('is_published', true)
             .maybeSingle(),
             
@@ -75,13 +75,13 @@ const getOrganizationDataCached = (slug: string) => {
           supabase
             .from('organizations')
             .select('slug, status, is_published')
-            .eq('slug', slug)
+            .eq('slug', safeSlug)
             .maybeSingle()
         ]);
         
         if (generalCheck.data) {
           const org = generalCheck.data;
-          console.error(`[VERIFY] 404 ROOT CAUSE IDENTIFIED for ${slug}:`, {
+          console.error(`[VERIFY] 404 ROOT CAUSE IDENTIFIED for ${safeSlug}:`, {
             exists: true,
             status: org.status,
             is_published: org.is_published,
@@ -96,12 +96,12 @@ const getOrganizationDataCached = (slug: string) => {
           
           // 🚨 Data inconsistency detected - log for fixing
           if (org.status === 'published' && org.is_published === false) {
-            console.error(`[VERIFY] DATA INCONSISTENCY: ${slug} has status=published but is_published=false`);
+            console.error(`[VERIFY] DATA INCONSISTENCY: ${safeSlug} has status=published but is_published=false`);
           } else if (org.status === 'draft' && org.is_published === true) {
-            console.error(`[VERIFY] DATA INCONSISTENCY: ${slug} has status=draft but is_published=true`);
+            console.error(`[VERIFY] DATA INCONSISTENCY: ${safeSlug} has status=draft but is_published=true`);
           }
         } else {
-          console.warn(`[VERIFY] Organization not found at all: ${slug}`);
+          console.warn(`[VERIFY] Organization not found at all: ${safeSlug}`);
         }
         
         return null;
