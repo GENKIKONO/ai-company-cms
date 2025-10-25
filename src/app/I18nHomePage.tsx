@@ -55,7 +55,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           setDynamicStats(stats);
         }
       } catch (error) {
-        console.error('Failed to fetch dynamic stats:', error);
+        // Stats fetch failed - using default values
       }
     };
     
@@ -201,11 +201,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         {/* Zero-Click Era Evolution Section */}
         <HIGSection spacing="xl" background="secondary" className="container-section">
           <HIGContainer size="xl" className="container-page">
-            <div className="text-center mb-12">
-              <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
+            <div className="text-center mb-[var(--space-xl)]">
+              <h2 className="hig-text-h1 text-[var(--color-text-primary)] mb-[var(--space-lg)] hig-jp-heading">
                 検索体験の変化とAI時代への対応
               </h2>
-              <p className="text-body-large text-neutral-600 jp-text">
+              <p className="hig-text-body text-[var(--color-text-secondary)] hig-jp-body">
                 SEOは残り続けますが、AIが情報を直接引用・回答する機会が急増。企業の発見機会を確保する新たなアプローチが必要です。
               </p>
             </div>

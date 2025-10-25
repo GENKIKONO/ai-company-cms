@@ -1,28 +1,30 @@
+import Image from 'next/image';
 import { serviceCopy } from '../copy';
-import VisualCard from '../../../components/marketing/VisualCard';
+import { HIGCard } from '@/components/ui/HIGCard';
 
 export default function Recap() {
   return (
-    <section className="py-24 md:py-32 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="hig-section bg-[var(--color-background-secondary)]">
+      <div className="hig-container">
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
+          <h2 className="hig-text-h1 text-[var(--color-text-primary)] mb-[var(--space-xl)] hig-jp-heading">
             {serviceCopy.recap.title}
           </h2>
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
+          <p className="hig-text-body text-[var(--color-text-secondary)] mb-[var(--space-xl)] max-w-4xl mx-auto hig-jp-body">
             {serviceCopy.recap.description}
           </p>
         </div>
 
-        {/* [CLEANUP] remove placeholder diagram */}
-        <div className="mt-16 max-w-4xl mx-auto">
-          <VisualCard
-            src="/illustrations/zero-click-hero.svg"
-            alt="AIの回答に企業が表示される未来像 - AI時代の企業情報発見の新しい形"
-            width={600}
-            height={400}
-            className="p-8"
-          />
+        <div className="mt-[var(--space-2xl)] max-w-4xl mx-auto">
+          <HIGCard variant="elevated" padding="lg" className="text-center">
+            <Image
+              src="/illustrations/zero-click-hero.svg"
+              alt="AIの回答に企業が表示される未来像 - AI時代の企業情報発見の新しい形"
+              width={600}
+              height={400}
+              className="mx-auto"
+            />
+          </HIGCard>
         </div>
       </div>
     </section>

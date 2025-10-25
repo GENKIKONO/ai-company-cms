@@ -9,23 +9,23 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", ...props }, ref) => {
-    const baseClasses = "hit-44 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 btn-nowrap";
+    const baseClasses = "hig-button inline-flex items-center justify-center font-medium transition-all duration-[var(--duration-fast)] ease-[var(--easing-standard)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-60 hig-jp-nowrap";
     
     const variants = {
-      default: "bg-primary text-primary-foreground hover:bg-primary/90",
-      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-      outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      ghost: "hover:bg-accent hover:text-accent-foreground",
-      link: "text-primary underline-offset-4 hover:underline",
+      default: "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] shadow-[var(--shadow-xs)]",
+      destructive: "bg-[var(--color-error)] text-white hover:opacity-90 shadow-[var(--shadow-xs)]",
+      outline: "border border-[var(--color-border-primary)] bg-[var(--color-background)] hover:bg-[var(--color-background-secondary)]",
+      secondary: "bg-[var(--color-background-secondary)] text-[var(--color-text-primary)] hover:bg-[var(--color-border-secondary)]",
+      ghost: "hover:bg-[var(--color-background-secondary)] text-[var(--color-text-primary)]",
+      link: "text-[var(--color-primary)] underline-offset-4 hover:underline",
     };
 
     const sizes = {
-      default: "h-10 px-4 py-2",
-      sm: "h-9 rounded-md px-3",
-      lg: "h-11 rounded-md px-8",
-      icon: "h-10 w-10",
-      cta: "cta-optimized", // Uses global CTA optimization classes
+      default: "h-11 px-[var(--space-md)] py-[var(--space-xs)] rounded-[var(--radius-lg)]",
+      sm: "h-10 px-[var(--space-sm)] rounded-[var(--radius-md)]",
+      lg: "h-12 px-[var(--space-lg)] rounded-[var(--radius-lg)]",
+      icon: "h-[var(--tap-target-size)] w-[var(--tap-target-size)] rounded-[var(--radius-lg)]",
+      cta: "h-12 px-[var(--space-lg)] rounded-[var(--radius-lg)]",
     };
 
     return (

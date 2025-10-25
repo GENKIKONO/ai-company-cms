@@ -47,8 +47,7 @@ export default async function HomePage() {
       };
     }
   } catch (e) {
-    console.error('Failed to load site settings:', e);
-    // エラー時はデフォルト設定を使用
+    // Settings load failed - using default values
   }
 
   return <I18nHomePage siteSettings={{

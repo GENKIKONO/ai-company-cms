@@ -5,7 +5,7 @@ import { MenuProvider } from '@/components/ui/MenuProvider'
 import FAB from '@/components/ui/FAB'
 import BuildBanner from '@/components/BuildBanner'
 import { env } from '@/lib/env'
-import WebVitalsReporter from '@/components/performance/WebVitalsReporter'
+// WebVitalsReporter removed for production optimization
 import { I18nProvider } from '@/components/layout/I18nProvider'
 
 // SSRで常に正しい認証UIが出るように
@@ -66,7 +66,7 @@ export default function RootLayout({
                 {children}
               </main>
               <FAB />
-              <WebVitalsReporter />
+              {/* WebVitalsReporter removed for production optimization */}
             </MenuProvider>
           </ToastProvider>
         </I18nProvider>

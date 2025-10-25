@@ -44,7 +44,7 @@ export function Select({ value, onValueChange, children }: SelectProps) {
     <select
       value={value}
       onChange={(e) => onValueChange(e.target.value)}
-      className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      className="w-full px-[var(--space-sm)] py-[var(--space-xs)] hig-text-body bg-[var(--color-background)] border border-[var(--color-border-primary)] rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-[var(--duration-fast)]"
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>
@@ -68,5 +68,5 @@ export function SelectItem({ value, children }: SelectItemProps) {
 }
 
 export function SelectValue({ placeholder }: SelectValueProps) {
-  return <span className="text-gray-500">{placeholder}</span>;
+  return <span className="text-[var(--color-text-tertiary)]">{placeholder}</span>;
 }
