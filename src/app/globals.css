@@ -26,6 +26,19 @@ html, body {
 .text-white, [class*="text-white"] {
   color: #0f172a !important;
 }
+
+/* 視認性向上: 薄いテキストを濃くする */
+.text-gray-100, .text-gray-200, .text-gray-300 {
+  color: #374151 !important; /* gray-700 */
+}
+
+/* 白背景での文字色確保 */
+.bg-white * {
+  color: inherit;
+}
+.bg-white .text-white {
+  color: #1f2937 !important; /* gray-800 */
+}
 /* Tailwind の dark 変種や媒体クエリを無効化 */
 @media (prefers-color-scheme: dark) {
   :root { color-scheme: light !important; }

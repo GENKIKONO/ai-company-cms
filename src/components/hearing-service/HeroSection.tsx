@@ -8,34 +8,34 @@ import { HIGGrid } from '@/components/layout/HIGLayout';
 
 export default function HeroSection() {
   return (
-    <section className="section bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
-      {/* 背景装飾 - 安全な配置で切り取り防止 */}
-      <div className="deco-img opacity-30">
-        <svg width="100%" height="100%" viewBox="0 0 1200 800" className="media-contain">
-          <circle cx="300" cy="200" r="120" fill="#bfdbfe" opacity="0.8">
-            <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/>
+    <section className="hig-section bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+      {/* 背景装飾 */}
+      <div className="absolute inset-0 opacity-20">
+        <svg width="100%" height="100%" viewBox="0 0 1200 800" className="w-full h-full">
+          <circle cx="300" cy="200" r="120" fill="#3b82f6" opacity="0.1">
+            <animate attributeName="opacity" values="0.1;0.2;0.1" dur="4s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="900" cy="300" r="120" fill="#c4b5fd" opacity="0.8">
-            <animate attributeName="opacity" values="0.8;0.4;0.8" dur="5s" repeatCount="indefinite"/>
+          <circle cx="900" cy="300" r="120" fill="#8b5cf6" opacity="0.1">
+            <animate attributeName="opacity" values="0.1;0.15;0.1" dur="5s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="200" cy="600" r="120" fill="#a5b4fc" opacity="0.8">
-            <animate attributeName="opacity" values="0.4;0.9;0.4" dur="6s" repeatCount="indefinite"/>
+          <circle cx="200" cy="600" r="120" fill="#6366f1" opacity="0.1">
+            <animate attributeName="opacity" values="0.05;0.15;0.05" dur="6s" repeatCount="indefinite"/>
           </circle>
         </svg>
       </div>
       
-      <div className="container relative z-10">
+      <div className="hig-container relative z-10 text-center">
           {/* バッジ */}
-          <div className="badge badge-primary mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
-            <span className="jp-text">AI時代の企業情報最適化</span>
+            <span>AI時代の企業情報最適化</span>
           </div>
           
           {/* メインタイトル */}
-          <div className="mb-6">
-            <h1 className="text-display text-neutral-900 mb-6 hig-jp-heading">
-              <span className="block jp-text">AIに</span>
-              <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent jp-text">
+          <div className="mb-8">
+            <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+              <span className="block text-slate-900">AIに</span>
+              <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 伝わる企業情報へ
               </span>
             </h1>
@@ -43,88 +43,64 @@ export default function HeroSection() {
           
           {/* サブタイトル */}
           <div className="mb-8">
-            <p className="text-body-large text-neutral-600 mb-8 jp-text hero-lead-unified">
-              1時間のヒアリングで、あなたの会社の魅力を<span className="font-semibold text-primary">AIが理解しやすい構造</span>に最適化します
+            <p className="text-xl text-slate-700 mb-8 leading-relaxed max-w-3xl mx-auto">
+              1時間のヒアリングで、あなたの会社の魅力を<span className="font-semibold text-blue-700">AIが理解しやすい構造</span>に最適化します
             </p>
           </div>
           
           {/* 特徴ポイント */}
-          <div className="mb-8">
-            <HIGGrid columns={3} gap="md" className="text-neutral-700">
-              <div className="flex items-center gap-3">
-                <Brain className="w-6 h-6 text-blue-500 flex-shrink-0" />
-                <span className="text-body-small font-medium hig-jp-text">専任スタッフがヒアリング</span>
+          <div className="mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              <div className="flex flex-col items-center gap-3 p-4 bg-white/80 rounded-2xl shadow-sm">
+                <Brain className="w-8 h-8 text-blue-600" />
+                <span className="text-lg font-medium text-slate-800">専任スタッフがヒアリング</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Target className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                <span className="text-body-small font-medium hig-jp-text">AI最適化構造で登録</span>
+              <div className="flex flex-col items-center gap-3 p-4 bg-white/80 rounded-2xl shadow-sm">
+                <Target className="w-8 h-8 text-purple-600" />
+                <span className="text-lg font-medium text-slate-800">AI最適化構造で登録</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-6 h-6 text-indigo-500 flex-shrink-0" />
-                <span className="text-body-small font-medium hig-jp-text">検索性・発見性向上</span>
+              <div className="flex flex-col items-center gap-3 p-4 bg-white/80 rounded-2xl shadow-sm">
+                <Sparkles className="w-8 h-8 text-indigo-600" />
+                <span className="text-lg font-medium text-slate-800">検索性・発見性向上</span>
               </div>
-            </HIGGrid>
+            </div>
           </div>
           
           {/* CTAボタン */}
-          <div className="mb-8">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start gap-4">
-            <HIGButton
-              variant="primary"
-              size="lg"
-              asChild
-            >
-              <Link href="#pricing">
-                <span className="jp-text">サービス詳細を見る</span>
+          <div className="mb-16">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link 
+                href="#pricing"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
+              >
+                <span>サービス詳細を見る</span>
                 <ArrowRight className="w-5 h-5" />
               </Link>
-            </HIGButton>
-            
-            <HIGButton
-              variant="secondary"
-              size="lg"
-              asChild
-            >
-              <Link href="#faq">
-                <span className="jp-text">よくある質問</span>
+              
+              <Link 
+                href="#faq"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-slate-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors border border-gray-200 shadow"
+              >
+                <span>よくある質問</span>
               </Link>
-            </HIGButton>
             </div>
           </div>
           
           {/* サービス特徴 */}
-          <div className="mt-12">
-            <div className="grid grid-3 gap-6">
-              <HIGCard 
-                variant="default" 
-                padding="md" 
-                className="bg-white/70 backdrop-blur-sm border border-white/60"
-              >
-                <HIGCardTitle level={3} className="text-blue-600 mb-2 jp-text">専門ヒアリング</HIGCardTitle>
-                <HIGCardContent className="pt-0">
-                  <p className="text-body text-neutral-700 jp-text">AI最適化の専門スタッフが企業情報を丁寧にヒアリング</p>
-                </HIGCardContent>
-              </HIGCard>
-              <HIGCard 
-                variant="default" 
-                padding="md" 
-                className="bg-white/70 backdrop-blur-sm border border-white/60"
-              >
-                <HIGCardTitle level={3} className="text-purple-600 mb-2 jp-text">構造化登録</HIGCardTitle>
-                <HIGCardContent className="pt-0">
-                  <p className="text-body text-neutral-700 jp-text">ヒアリング内容をJSON-LD形式で構造化・最適化して登録</p>
-                </HIGCardContent>
-              </HIGCard>
-              <HIGCard 
-                variant="default" 
-                padding="md" 
-                className="bg-white/70 backdrop-blur-sm border border-white/60"
-              >
-                <HIGCardTitle level={3} className="text-indigo-600 mb-2 jp-text">継続改善</HIGCardTitle>
-                <HIGCardContent className="pt-0">
-                  <p className="text-body text-neutral-700 jp-text">定期的な情報更新とAI検索最適化のサポート</p>
-                </HIGCardContent>
-              </HIGCard>
+          <div className="mt-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                <h3 className="text-2xl font-bold text-blue-600 mb-4">専門ヒアリング</h3>
+                <p className="text-gray-700 leading-relaxed">AI最適化の専門スタッフが企業情報を丁寧にヒアリング</p>
+              </div>
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                <h3 className="text-2xl font-bold text-purple-600 mb-4">構造化登録</h3>
+                <p className="text-gray-700 leading-relaxed">ヒアリング内容をJSON-LD形式で構造化・最適化して登録</p>
+              </div>
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                <h3 className="text-2xl font-bold text-indigo-600 mb-4">継続改善</h3>
+                <p className="text-gray-700 leading-relaxed">定期的な情報更新とAI検索最適化のサポート</p>
+              </div>
             </div>
           </div>
       </div>
