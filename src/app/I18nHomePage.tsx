@@ -198,8 +198,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </HIGSection>
 
         {/* Zero-Click Era Evolution Section */}
-        <section className="section bg-subtle">
-          <div className="container">
+        <HIGSection spacing="xl" background="secondary">
+          <HIGContainer size="xl">
             <div className="text-center mb-12">
               <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
                 検索体験の変化とAI時代への対応
@@ -227,7 +227,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </HIGCard>
 
                 {/* Transition */}
-                <div className="card p-6 text-center bg-white">
+                <HIGCard variant="default" padding="md" className="text-center bg-white">
                   <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -236,10 +236,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <div className="badge badge-warning mb-4">現在</div>
                   <h3 className="text-h3 text-neutral-900 mb-3 jp-text">AI回答の併存</h3>
                   <p className="text-body-small text-neutral-600 jp-text">検索結果とAI回答（ChatGPT、Google SGE等）が並存</p>
-                </div>
+                </HIGCard>
 
                 {/* Future */}
-                <div className="card p-6 text-center bg-white">
+                <HIGCard variant="default" padding="md" className="text-center bg-white">
                   <div className="w-16 h-16 bg-success-50 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-success-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -248,16 +248,16 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <div className="badge badge-success mb-4">将来</div>
                   <h3 className="text-h3 text-neutral-900 mb-3 jp-text">AI優先の情報発見</h3>
                   <p className="text-body-small text-neutral-600 jp-text">AIが直接回答し、クリックを経ずに情報が伝達される機会が増加</p>
-                </div>
+                </HIGCard>
               </div>
             </div>
 
             {/* Comparison Table - Split into two sections */}
             <div className="mb-8">
               <h3 className="text-h2 text-neutral-900 mb-6 jp-text text-center">検索体験の変化</h3>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-6">
+              <HIGGrid columns={2} gap="md">
                 {/* Traditional Search */}
-                <div className="card p-6 bg-neutral-50 border-l-4 border-neutral-400">
+                <HIGCard variant="default" padding="md" className="bg-neutral-50 border-l-4 border-neutral-400">
                   <div className="mb-4">
                     <div className="badge badge-neutral mb-2">従来の検索</div>
                     <h4 className="text-h3 text-neutral-900 jp-text flex items-center gap-2">
@@ -296,10 +296,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       <p className="text-body-small text-neutral-600 jp-text">キーワード最適化、コンテンツSEO</p>
                     </div>
                   </div>
-                </div>
+                </HIGCard>
 
                 {/* AI Era Search */}
-                <div className="card p-6 bg-primary-50 border-l-4 border-primary-600 relative overflow-hidden">
+                <HIGCard variant="default" padding="md" className="bg-primary-50 border-l-4 border-primary-600 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
                   <div className="relative">
                     <div className="mb-4">
@@ -341,14 +341,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </HIGCard>
+              </HIGGrid>
             </div>
 
             {/* Challenge and Solution */}
-            <div className="grid md:grid-cols-2 gap-8">
+            <HIGGrid columns={2} gap="lg">
               {/* Challenge */}
-              <div className="card p-6 bg-red-50 border-t-4 border-red-400 relative">
+              <HIGCard variant="default" padding="md" className="bg-red-50 border-t-4 border-red-400 relative">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-red-100 rounded-full -translate-y-12 translate-x-12 opacity-30"></div>
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
@@ -374,10 +374,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <span>早期対応企業と後発企業の格差拡大</span>
                   </li>
                 </ul>
-              </div>
+              </HIGCard>
 
               {/* Solution */}
-              <div className="card p-6 bg-blue-50 border-t-4 border-blue-400 relative">
+              <HIGCard variant="default" padding="md" className="bg-blue-50 border-t-4 border-blue-400 relative">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -translate-y-12 translate-x-12 opacity-30"></div>
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
@@ -403,14 +403,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <span>AI引用から自社サイトへの流入促進</span>
                   </li>
                 </ul>
-              </div>
-            </div>
-          </div>
-        </section>
+              </HIGCard>
+            </HIGGrid>
+          </HIGContainer>
+        </HIGSection>
 
         {/* Features Section */}
-        <section className="section bg-subtle">
-          <div className="container">
+        <HIGSection spacing="xl" background="secondary">
+          <HIGContainer size="xl">
             <div className="text-center mb-12">
               <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
                 ゼロクリック時代の企業戦略
@@ -420,9 +420,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </p>
             </div>
 
-            <div className="grid grid-3">
+            <HIGGrid columns={3} gap="md">
               {features.map((feature, index) => (
-                <div key={index} className="card text-center">
+                <HIGCard key={index} variant="default" padding="md" className="text-center">
                   <feature.icon className="icon icon-lg text-primary mx-auto mb-4" />
                   <h3 className="text-h3 text-neutral-900 mb-4 jp-text">
                     {feature.title}
@@ -430,15 +430,15 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <p className="text-body text-neutral-600 jp-text">
                     {feature.description}
                   </p>
-                </div>
+                </HIGCard>
               ))}
-            </div>
-          </div>
-        </section>
+            </HIGGrid>
+          </HIGContainer>
+        </HIGSection>
 
         {/* CTA Section */}
-        <section className="section">
-          <div className="container-narrow text-center">
+        <HIGSection spacing="xl">
+          <HIGContainer size="md" className="text-center">
             <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
               ゼロクリック時代に取り残されませんか？
             </h2>
@@ -463,8 +463,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="mt-8 text-body-small text-neutral-500 jp-text">
               無料トライアル • クレジットカード不要
             </div>
-          </div>
-        </section>
+          </HIGContainer>
+        </HIGSection>
 
         {/* Flow Section - ゼロクリック時代の課題と解決策 */}
         <FlowSection
@@ -485,8 +485,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         />
 
         {/* Final CTA Section */}
-        <section className="section bg-subtle">
-          <div className="container-narrow text-center">
+        <HIGSection spacing="xl" background="secondary">
+          <HIGContainer size="md" className="text-center">
             <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
               今すぐゼロクリック時代に備えましょう
             </h2>
@@ -511,12 +511,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="mt-8 text-body-small text-neutral-500 jp-text">
               永続無料プラン • クレジットカード不要 • 今すぐ開始
             </div>
-          </div>
-        </section>
+          </HIGContainer>
+        </HIGSection>
 
         {/* Footer */}
-        <footer className="section bg-neutral-900 text-white">
-          <div className="container">
+        <HIGSection spacing="xl" className="bg-neutral-900 text-white">
+          <HIGContainer size="xl">
             <div className="grid md:grid-cols-3 gap-8">
               <div>
                 <h3 className="text-h3 mb-4 jp-text">AIO Hub</h3>
@@ -547,8 +547,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 © 2024 AIO Hub. All rights reserved.
               </p>
             </div>
-          </div>
-        </footer>
+          </HIGContainer>
+        </HIGSection>
       </main>
     </div>
   );
