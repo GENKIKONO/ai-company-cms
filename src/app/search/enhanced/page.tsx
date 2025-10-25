@@ -245,7 +245,7 @@ export default function EnhancedSearchPage() {
         {/* ツールバー */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-600
+            <span className="text-sm text-slate-600">
               {results.total > 0 && (
                 `${((page - 1) * itemsPerPage) + 1} - ${Math.min(page * itemsPerPage, results.total)} / ${results.total.toLocaleString()}`
               )}
@@ -263,8 +263,8 @@ export default function EnhancedSearchPage() {
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'list' 
-                  ? 'bg-blue-100 text-blue-600  dark:text-blue-400' 
-                  : 'text-slate-500 hover:text-slate-600
+                  ? 'bg-blue-100 text-blue-600' 
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               <List className="w-5 h-5" />
@@ -273,8 +273,8 @@ export default function EnhancedSearchPage() {
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'grid' 
-                  ? 'bg-blue-100 text-blue-600  dark:text-blue-400' 
-                  : 'text-slate-500 hover:text-slate-600
+                  ? 'bg-blue-100 text-blue-600' 
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               <Grid className="w-5 h-5" />
@@ -286,7 +286,7 @@ export default function EnhancedSearchPage() {
         {loading && (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-            <span className="ml-3 text-slate-600
+            <span className="ml-3 text-slate-600">
               {t('search.searching')}...
             </span>
           </div>
@@ -319,7 +319,7 @@ export default function EnhancedSearchPage() {
             <h3 className="text-lg font-medium text-slate-900 mb-2">
               {t('search.noResults')}
             </h3>
-            <p className="text-slate-600mb-4">
+            <p className="text-slate-600 mb-4">
               {t('search.noResultsDescription')}
             </p>
             <button
@@ -333,7 +333,7 @@ export default function EnhancedSearchPage() {
                   companySize: []
                 }));
               }}
-              className="text-blue-600 hover:text-blue-800  "
+              className="text-blue-600 hover:text-blue-800"
             >
               {t('search.clearFilters')}
             </button>
@@ -353,7 +353,7 @@ export default function EnhancedSearchPage() {
                 </button>
               )}
               
-              <span className="px-4 py-2 text-sm text-slate-600
+              <span className="px-4 py-2 text-sm text-slate-600">
                 {t('pagination.page')} {page} / {Math.ceil(results.total / itemsPerPage)}
               </span>
               
