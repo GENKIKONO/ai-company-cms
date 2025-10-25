@@ -199,57 +199,54 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </HIGSection>
 
         {/* Zero-Click Era Evolution Section */}
-        <HIGSection spacing="xl" background="secondary" className="container-section">
+        <HIGSection spacing="xl" background="default" className="container-section bg-gray-50">
           <HIGContainer size="xl" className="container-page">
-            <div className="text-center mb-[var(--space-xl)]">
+            {/* ヘッダーカード */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-[var(--space-xl)] mb-[var(--space-xl)] shadow-sm text-center">
               <h2 className="hig-text-h1 text-[var(--color-text-primary)] mb-[var(--space-lg)] hig-jp-heading">
                 検索体験の変化とAI時代への対応
               </h2>
-              <p className="hig-text-body text-[var(--color-text-secondary)] hig-jp-body">
+              <p className="hig-text-body text-[var(--color-text-secondary)] hig-jp-body leading-relaxed max-w-3xl mx-auto">
                 SEOは残り続けますが、AIが情報を直接引用・回答する機会が急増。企業の発見機会を確保する新たなアプローチが必要です。
               </p>
             </div>
 
-            {/* Evolution Timeline */}
-            <div className="mb-12">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-4">
-                {/* Traditional Search */}
-                <HIGCard variant="default" padding="md" className="text-center bg-white">
-                  <HIGCardContent>
-                    <div className="w-16 h-16 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                    </div>
-                    <div className="badge badge-neutral mb-4">従来</div>
-                    <HIGCardTitle level={3} className="text-neutral-900 mb-3 jp-text">検索→クリック→サイト訪問</HIGCardTitle>
-                    <HIGCardDescription className="text-body-small text-neutral-600 jp-text">SEO対策による上位表示とクリック率向上が中心</HIGCardDescription>
-                  </HIGCardContent>
-                </HIGCard>
+            {/* Evolution Timeline Cards */}
+            <div className="grid grid-cols-1 gap-[var(--space-lg)] md:grid-cols-3">
+              {/* Traditional Search */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-[var(--space-lg)] shadow-sm text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-[var(--space-md)]">
+                  <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <div className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium mb-[var(--space-md)]">従来</div>
+                <h3 className="hig-text-h3 text-[var(--color-text-primary)] mb-[var(--space-sm)] hig-jp-heading">検索→クリック→サイト訪問</h3>
+                <p className="hig-text-caption text-[var(--color-text-secondary)] hig-jp-body">SEO対策による上位表示とクリック率向上が中心</p>
+              </div>
 
-                {/* Transition */}
-                <HIGCard variant="default" padding="md" className="text-center bg-white">
-                  <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                  </div>
-                  <div className="badge badge-warning mb-4">現在</div>
-                  <h3 className="text-h3 text-neutral-900 mb-3 jp-text">AI回答の併存</h3>
-                  <p className="text-body-small text-neutral-600 jp-text">検索結果とAI回答（ChatGPT、Google SGE等）が並存</p>
-                </HIGCard>
+              {/* Transition */}
+              <div className="bg-white rounded-2xl border border-orange-100 p-[var(--space-lg)] shadow-sm text-center">
+                <div className="w-16 h-16 bg-orange-50 rounded-xl flex items-center justify-center mx-auto mb-[var(--space-md)]">
+                  <svg className="w-8 h-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <div className="inline-block bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium mb-[var(--space-md)]">現在</div>
+                <h3 className="hig-text-h3 text-[var(--color-text-primary)] mb-[var(--space-sm)] hig-jp-heading">AI回答の併存</h3>
+                <p className="hig-text-caption text-[var(--color-text-secondary)] hig-jp-body">検索結果とAI回答（ChatGPT、Google SGE等）が並存</p>
+              </div>
 
-                {/* Future */}
-                <HIGCard variant="default" padding="md" className="text-center bg-white">
-                  <div className="w-16 h-16 bg-success-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-success-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div className="badge badge-success mb-4">将来</div>
-                  <h3 className="text-h3 text-neutral-900 mb-3 jp-text">AI優先の情報発見</h3>
-                  <p className="text-body-small text-neutral-600 jp-text">AIが直接回答し、クリックを経ずに情報が伝達される機会が増加</p>
-                </HIGCard>
+              {/* Future */}
+              <div className="bg-white rounded-2xl border border-green-100 p-[var(--space-lg)] shadow-sm text-center">
+                <div className="w-16 h-16 bg-green-50 rounded-xl flex items-center justify-center mx-auto mb-[var(--space-md)]">
+                  <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-[var(--space-md)]">将来</div>
+                <h3 className="hig-text-h3 text-[var(--color-text-primary)] mb-[var(--space-sm)] hig-jp-heading">AI優先の情報発見</h3>
+                <p className="hig-text-caption text-[var(--color-text-secondary)] hig-jp-body">AIが直接回答し、クリックを経ずに情報が伝達される機会が増加</p>
               </div>
             </div>
 
