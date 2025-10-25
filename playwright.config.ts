@@ -23,6 +23,8 @@ export default defineConfig({
     video: 'retain-on-failure',
     actionTimeout: 15000,
     navigationTimeout: 30000,
+    // SSL/TLS security: only bypass for local self-signed certificates
+    ignoreHTTPSErrors: process.env.LOCAL_SELF_SIGNED === 'true',
   },
 
   projects: [

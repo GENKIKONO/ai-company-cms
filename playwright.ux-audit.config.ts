@@ -22,6 +22,8 @@ export default defineConfig({
     video: 'off', // 監査では不要
     actionTimeout: 30000,
     navigationTimeout: 60000,
+    // SSL/TLS security: production should use valid certificates
+    ignoreHTTPSErrors: false,
   },
 
   projects: [

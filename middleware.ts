@@ -149,9 +149,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(target, req.url));
   }
 
-    // Add security headers to response
-    res.headers.set('X-Frame-Options', 'DENY');
-    res.headers.set('X-Content-Type-Options', 'nosniff');
+    // Add comprehensive security headers to response
+    addSecurityHeaders(res, isProduction);
     res.headers.set('X-Response-Time', `${Date.now() - startTime}ms`);
     
     // それ以外はそのまま通過
@@ -460,6 +459,82 @@ async function logAccess(
     // Don't throw errors for logging failures
     console.error('Error logging access:', error);
   }
+}
+
+/**
+ * Add comprehensive security headers
+ */
+function addSecurityHeaders(response: NextResponse, isProduction: boolean) {
+  // Basic security headers
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // HSTS (HTTP Strict Transport Security) - production only
+  if (isProduction) {
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  }
+  
+  // Cross-Origin policies
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+  
+  // Content Security Policy
+  const cspDirectives = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://vercel.live",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: blob: https://*.supabase.co https://*.aiohub.jp https://vercel.com",
+    "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live",
+    "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://vercel.live",
+    "media-src 'self' https://*.supabase.co",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self' https://checkout.stripe.com",
+    "frame-ancestors 'none'",
+    "upgrade-insecure-requests"
+  ];
+  
+  if (!isProduction) {
+    // Development adjustments
+    cspDirectives[1] = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://vercel.live http://localhost:*";
+    cspDirectives[5] = "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live http://localhost:* ws://localhost:*";
+  }
+  
+  response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
+  
+  // Permissions Policy (formerly Feature Policy)
+  const permissionsPolicy = [
+    'accelerometer=()',
+    'ambient-light-sensor=()',
+    'autoplay=(self)',
+    'battery=()',
+    'camera=()',
+    'display-capture=()',
+    'document-domain=()',
+    'encrypted-media=()',
+    'execution-while-not-rendered=()',
+    'execution-while-out-of-viewport=()',
+    'fullscreen=(self)',
+    'geolocation=()',
+    'gyroscope=()',
+    'magnetometer=()',
+    'microphone=()',
+    'midi=()',
+    'navigation-override=()',
+    'payment=(self)',
+    'picture-in-picture=()',
+    'publickey-credentials-get=(self)',
+    'screen-wake-lock=()',
+    'sync-xhr=()',
+    'usb=()',
+    'web-share=(self)',
+    'xr-spatial-tracking=()'
+  ];
+  
+  response.headers.set('Permissions-Policy', permissionsPolicy.join(', '));
 }
 
 // API と静的は除外（包括的マッチャー）
