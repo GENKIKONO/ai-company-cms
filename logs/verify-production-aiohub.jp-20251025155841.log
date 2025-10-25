@@ -1,0 +1,39 @@
+[0;36m[INFO][0m 🚀 Starting deployment verification for production environment
+[0;36m[INFO][0m Target: https://aiohub.jp
+[0;36m[INFO][0m Log file: /Users/kounogenki/Documents/LuxuCare株式会社/開発/logs/verify-production-aiohub.jp-20251025155841.log
+[0;36m[INFO][0m 1️⃣ Checking root connectivity...
+[0;32m[SUCCESS][0m ✅ Root endpoint (HTTP 200)
+[0;36m[INFO][0m 2️⃣ Checking well-known files...
+[0;32m[SUCCESS][0m ✅ robots.txt (HTTP 200 - acceptable)
+[0;32m[SUCCESS][0m ✅ sitemap.xml (HTTP 200)
+[0;36m[INFO][0m 3️⃣ Running comprehensive health check API...
+[0;32m[SUCCESS][0m ✅ Health check API passed
+[0;36m[INFO][0m 4️⃣ Testing organization API...
+[0;32m[SUCCESS][0m ✅ Organization API (expecting 401 for unauthenticated or 200) (HTTP 401)
+[0;36m[INFO][0m 5️⃣ Testing authentication endpoints...
+[0;32m[SUCCESS][0m ✅ Debug whoami endpoint (HTTP 200)
+=== SUMMARY BEGIN ===
+
+🔍 DEPLOYMENT VERIFICATION SUMMARY
+==================================
+Environment: production
+Domain: aiohub.jp
+Target URL: https://aiohub.jp
+Timestamp: Sat Oct 25 15:58:48 JST 2025
+Log file: /Users/kounogenki/Documents/LuxuCare株式会社/開発/logs/verify-production-aiohub.jp-20251025155841.log
+
+Results:
+  Total checks: 6
+  Passed: 6
+  Failed: 0
+  Success rate: 100%
+
+✅ Health check API: PASSED
+[0;32m[SUCCESS][0m 🎉 ✅ PRODUCTION verification passed
+✅ All critical systems operational
+✅ Ready for traffic
+
+Final Result: PASSED
+=== SUMMARY END ===
+
+[0;36m[INFO][0m Verification complete. Log saved to: /Users/kounogenki/Documents/LuxuCare株式会社/開発/logs/verify-production-aiohub.jp-20251025155841.log
