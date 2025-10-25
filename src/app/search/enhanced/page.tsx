@@ -196,14 +196,14 @@ export default function EnhancedSearchPage() {
   }, [results, filters.query, filters.sortBy]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ヘッダー */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">
             {t('search.enhanced.title')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-slate-600">
             {t('search.enhanced.subtitle')}
           </p>
         </div>
@@ -221,7 +221,7 @@ export default function EnhancedSearchPage() {
 
           {/* 検索サジェスト */}
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg mt-1">
+            <div className="absolute top-full left-0 right-0 z-50 bg-white  border border-gray-200 rounded-lg shadow-lg mt-1">
               {suggestions.map((suggestion, index) => (
                 <button
                   key={index}
@@ -230,10 +230,10 @@ export default function EnhancedSearchPage() {
                     setShowSuggestions(false);
                     performSearch({ ...filters, query: suggestion });
                   }}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg"
+                  className="w-full px-4 py-2 text-left hover:bg-gray-100  first:rounded-t-lg last:rounded-b-lg"
                 >
                   <span className="flex items-center gap-2">
-                    <Search className="w-4 h-4 text-gray-400" />
+                    <Search className="w-4 h-4 text-slate-500" />
                     {suggestion}
                   </span>
                 </button>
@@ -245,13 +245,13 @@ export default function EnhancedSearchPage() {
         {/* ツールバー */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-slate-600
               {results.total > 0 && (
                 `${((page - 1) * itemsPerPage) + 1} - ${Math.min(page * itemsPerPage, results.total)} / ${results.total.toLocaleString()}`
               )}
             </span>
             {filters.query && (
-              <span className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400">
+              <span className="flex items-center gap-1 text-sm text-blue-600">
                 <Zap className="w-4 h-4" />
                 {t('search.smartSearch')}
               </span>
@@ -263,8 +263,8 @@ export default function EnhancedSearchPage() {
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'list' 
-                  ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400' 
-                  : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                  ? 'bg-blue-100 text-blue-600  dark:text-blue-400' 
+                  : 'text-slate-500 hover:text-slate-600
               }`}
             >
               <List className="w-5 h-5" />
@@ -273,8 +273,8 @@ export default function EnhancedSearchPage() {
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'grid' 
-                  ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400' 
-                  : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                  ? 'bg-blue-100 text-blue-600  dark:text-blue-400' 
+                  : 'text-slate-500 hover:text-slate-600
               }`}
             >
               <Grid className="w-5 h-5" />
@@ -286,7 +286,7 @@ export default function EnhancedSearchPage() {
         {loading && (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-            <span className="ml-3 text-gray-600 dark:text-gray-300">
+            <span className="ml-3 text-slate-600
               {t('search.searching')}...
             </span>
           </div>
@@ -315,11 +315,11 @@ export default function EnhancedSearchPage() {
         {/* 検索結果なし */}
         {!loading && allResults.length === 0 && filters.query && (
           <div className="text-center py-12">
-            <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            <Search className="w-16 h-16 text-slate-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-900 mb-2">
               {t('search.noResults')}
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <p className="text-slate-600mb-4">
               {t('search.noResultsDescription')}
             </p>
             <button
@@ -333,7 +333,7 @@ export default function EnhancedSearchPage() {
                   companySize: []
                 }));
               }}
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+              className="text-blue-600 hover:text-blue-800  "
             >
               {t('search.clearFilters')}
             </button>
@@ -347,20 +347,20 @@ export default function EnhancedSearchPage() {
               {page > 1 && (
                 <button
                   onClick={() => performSearch(filters, page - 1)}
-                  className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
                 >
                   {t('pagination.previous')}
                 </button>
               )}
               
-              <span className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300">
+              <span className="px-4 py-2 text-sm text-slate-600
                 {t('pagination.page')} {page} / {Math.ceil(results.total / itemsPerPage)}
               </span>
               
               {page < Math.ceil(results.total / itemsPerPage) && (
                 <button
                   onClick={() => performSearch(filters, page + 1)}
-                  className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
                 >
                   {t('pagination.next')}
                 </button>
