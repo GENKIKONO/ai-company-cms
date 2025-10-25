@@ -5,6 +5,40 @@
 /* HIG Design System */
 @import '../styles/hig-design-tokens.css';
 
+/* デザイントークン */
+:root{
+  /* デザイントークン */
+  --space-1: 8px;  --space-2: 12px; --space-3: 16px; --space-4: 24px; --space-5: 32px;
+  --radius: 14px;
+  --shadow: 0 6px 24px rgba(0,0,0,.06);
+}
+
+/* コンテナ一式（ページ/セクション） */
+.container-page{ max-width: 1200px; margin-inline:auto; padding-inline: clamp(16px, 4vw, 32px); }
+.container-section{ padding-block: clamp(32px, 6vw, 72px); }
+
+/* カード一式 */
+.card{ border-radius: var(--radius); box-shadow: var(--shadow); background: var(--card,#fff); }
+.card-title{ @apply jp-heading text-xl sm:text-2xl font-semibold; }
+.card-text{ @apply jp-body text-[15px] leading-7 text-gray-600; }
+
+/* 日本語組版（CSSのみで統一） */
+html[lang="ja"] .jp-heading{ text-wrap: balance; line-height:1.25; }
+html[lang="ja"] .jp-body{ line-break: strict; word-break: keep-all; text-wrap: pretty; }
+@supports (word-break: auto-phrase){
+  html[lang="ja"] .jp-body, html[lang="ja"] .jp-heading{ word-break: auto-phrase; }
+}
+/* 非対応ブラウザのフォールバック */
+@supports not (text-wrap: balance){ html[lang="ja"] .jp-heading{ text-align:center; } }
+@supports not (text-wrap: pretty){ html[lang="ja"] .jp-body{ line-height: 1.8; } }
+
+/* CTA/リンクの安全な改行禁止（必要最低限） */
+.btn-nowrap{ white-space: nowrap !important; word-break: keep-all !important; }
+.footer-link-nowrap{ display:inline-block; white-space: nowrap; }
+
+/* 見出しの"1 文字行"を避ける（ゆるい対策） */
+.no-widow{ hanging-punctuation: allow-end; orphans:2; widows:2; }
+
 /* Legacy Design Tokens removed - now fully HIG-compliant */
 
 /* Line clamp utilities */

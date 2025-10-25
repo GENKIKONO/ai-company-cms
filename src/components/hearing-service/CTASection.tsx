@@ -57,7 +57,7 @@ export default function CTASection() {
             <HIGButton
               variant="primary"
               size="lg"
-              className="bg-white text-blue-900 hover:bg-gray-100"
+              className="bg-white text-blue-900 hover:bg-gray-100 btn-nowrap"
               asChild
             >
               <Link 

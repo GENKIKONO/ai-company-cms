@@ -127,6 +127,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     size="lg"
                     onClick={handleCtaClick}
                     rightIcon={<ArrowRightIcon size={20} />}
+                    className="btn-nowrap"
                     asChild
                   >
                     <Link href="/auth/signup">
@@ -198,8 +199,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </HIGSection>
 
         {/* Zero-Click Era Evolution Section */}
-        <HIGSection spacing="xl" background="secondary">
-          <HIGContainer size="xl">
+        <HIGSection spacing="xl" background="secondary" className="container-section">
+          <HIGContainer size="xl" className="container-page">
             <div className="text-center mb-12">
               <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
                 検索体験の変化とAI時代への対応
@@ -409,8 +410,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </HIGSection>
 
         {/* Features Section */}
-        <HIGSection spacing="xl" background="secondary">
-          <HIGContainer size="xl">
+        <HIGSection spacing="xl" background="secondary" className="container-section">
+          <HIGContainer size="xl" className="container-page">
             <div className="text-center mb-12">
               <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
                 ゼロクリック時代の企業戦略
@@ -437,8 +438,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </HIGSection>
 
         {/* CTA Section */}
-        <HIGSection spacing="xl">
-          <HIGContainer size="md" className="text-center">
+        <HIGSection spacing="xl" className="container-section">
+          <HIGContainer size="md" className="container-page text-center">
             <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
               ゼロクリック時代に取り残されませんか？
             </h2>
@@ -447,7 +448,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <HIGButton variant="primary" size="lg" asChild>
+              <HIGButton variant="primary" size="lg" className="btn-nowrap" asChild>
                 <Link href="/auth/signup">
                   無料で始める
                   <ArrowRightIcon className="w-5 h-5" />
@@ -485,7 +486,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         />
 
         {/* Final CTA Section */}
-        <HIGSection spacing="xl" background="secondary">
+        <HIGSection spacing="xl" background="secondary" className="container-section">
           <HIGContainer size="md" className="text-center">
             <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
               今すぐゼロクリック時代に備えましょう
@@ -495,7 +496,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <HIGButton variant="primary" size="lg" asChild>
+              <HIGButton variant="primary" size="lg" className="btn-nowrap" asChild>
                 <Link href="/auth/signup">
                   無料で始める
                   <ArrowRightIcon className="w-5 h-5" />
@@ -515,8 +516,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </HIGSection>
 
         {/* Footer */}
-        <HIGSection spacing="xl" className="bg-neutral-900 text-white">
-          <HIGContainer size="xl">
+        <HIGSection spacing="xl" className="bg-neutral-900 text-white container-section">
+          <HIGContainer size="xl" className="container-page">
             <div className="grid md:grid-cols-3 gap-8">
               <div>
                 <h3 className="text-h3 mb-4 jp-text">AIO Hub</h3>
