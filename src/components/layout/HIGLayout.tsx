@@ -90,11 +90,11 @@ export interface HIGSectionProps
   as?: 'section' | 'div' | 'article' | 'aside' | 'main';
 }
 
-const HIGSection = React.forwardRef<HTMLElement, HIGSectionProps>(
+const HIGSection = React.forwardRef<HTMLDivElement, HIGSectionProps>(
   ({ className, spacing, background, as: Comp = 'section', ...props }, ref) => {
     return (
       <Comp
-        ref={ref}
+        ref={ref as any}
         className={cn(sectionVariants({ spacing, background, className }))}
         {...props}
       />

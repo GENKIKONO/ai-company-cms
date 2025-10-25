@@ -142,23 +142,23 @@ const HIGCardTitle = React.forwardRef<
     level?: 1 | 2 | 3 | 4 | 5 | 6;
   }
 >(({ className, level = 3, children, ...props }, ref) => {
-  const Comp = `h${level}` as keyof JSX.IntrinsicElements;
-  
-  return (
-    <Comp
-      ref={ref}
-      className={cn(
+  const Component = React.createElement(
+    `h${level}`,
+    {
+      ref,
+      className: cn(
         'hig-text-h3',
         'hig-jp-heading',
         'text-[var(--color-text-primary)]',
         'leading-tight',
         className
-      )}
-      {...props}
-    >
-      {children}
-    </Comp>
+      ),
+      ...props,
+    },
+    children
   );
+  
+  return Component;
 });
 
 HIGCardTitle.displayName = 'HIGCardTitle';
