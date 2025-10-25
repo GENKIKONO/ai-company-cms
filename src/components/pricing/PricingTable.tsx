@@ -134,19 +134,19 @@ export default function PricingTable() {
         {/* Mobile: Carousel, Desktop: Grid */}
         <div className="lg:hidden">
           {/* Mobile Carousel */}
-          <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory">
+          <div className="flex gap-4 overflow-x-auto pb-6 px-4 snap-x snap-mandatory">
             {PLANS.map((plan) => (
               <div
                 key={plan.id}
-                className={`card flex flex-col relative p-6 flex-shrink-0 w-80 snap-center ${
+                className={`bg-white rounded-2xl border-2 shadow-lg flex flex-col relative p-6 flex-shrink-0 w-80 snap-center ${
                   plan.popular
-                    ? 'border-primary border-2'
-                    : 'hover:border-neutral-300'
-                }`}
+                    ? 'border-blue-500 shadow-blue-100'
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-xl'
+                } transition-all duration-200`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="badge badge-primary">
+                    <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
                       人気
                     </span>
                   </div>
@@ -154,7 +154,7 @@ export default function PricingTable() {
 
                 {plan.badge && (
                   <div className="absolute -top-3 -right-3">
-                    <span className="badge badge-accent">
+                    <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
                       {plan.badge}
                     </span>
                   </div>
@@ -245,15 +245,15 @@ export default function PricingTable() {
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`card flex flex-col relative p-6 ${
+              className={`bg-white rounded-2xl border-2 shadow-lg flex flex-col relative p-6 ${
                 plan.popular
-                  ? 'border-primary border-2'
-                  : 'hover:border-neutral-300'
-              }`}
+                  ? 'border-blue-500 shadow-blue-100'
+                  : 'border-gray-200 hover:border-gray-300 hover:shadow-xl'
+              } transition-all duration-200`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="badge badge-primary">
+                  <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
                     人気
                   </span>
                 </div>
@@ -261,7 +261,7 @@ export default function PricingTable() {
 
               {plan.badge && (
                 <div className="absolute -top-3 -right-3">
-                  <span className="badge badge-accent">
+                  <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
                     {plan.badge}
                   </span>
                 </div>

@@ -301,7 +301,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
                   <div className="relative">
                     <div className="mb-4">
-                      <div className="badge badge-primary mb-2">AI時代の検索</div>
+                      <div className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full mb-2">AI時代の検索</div>
                       <h4 className="text-h3 text-primary-700 jp-text flex items-center gap-2">
                         <svg className="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />

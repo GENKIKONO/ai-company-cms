@@ -158,7 +158,7 @@ export default function PricingPlans({
                 key={plan.id}
                 className={`
                   bg-white rounded-xl shadow-lg border-2 transition-all duration-200
-                  flex flex-col min-h-[600px] w-[72%] max-w-sm flex-shrink-0 snap-center p-6 mt-2
+                  flex flex-col min-h-[600px] w-[85%] md:w-[72%] max-w-sm flex-shrink-0 snap-center p-6 mt-2
                   hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                   ${plan.popular 
                     ? 'border-purple-500 relative' 

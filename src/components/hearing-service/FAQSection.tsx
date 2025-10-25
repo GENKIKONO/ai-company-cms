@@ -88,7 +88,7 @@ export default function FAQSection() {
       <div className="container">
         {/* セクションヘッダー */}
         <div className="mb-12">
-          <div className="badge badge-primary mb-4 mx-auto">
+          <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 text-sm font-medium rounded-full mb-4 mx-auto">
             <HelpCircle className="w-4 h-4" />
             <span className="jp-text">よくある質問</span>
           </div>
