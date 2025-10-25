@@ -40,9 +40,9 @@ interface HearingPlan {
 const HEARING_PLANS: HearingPlan[] = [
   {
     id: 'standard',
-    name: 'スタンダード',
+    name: 'ベーシック',
     description: '1回ヒアリング＋AI構造化代行',
-    price: '55,000円',
+    price: '50,000円',
     unit: '（税別）',
     icon: MessageSquare,
     popular: false,
@@ -76,7 +76,7 @@ const HEARING_PLANS: HearingPlan[] = [
     icon: Target,
     popular: true,
     features: [
-      { text: 'スタンダードプランの全内容', included: true },
+      { text: 'ベーシックプランの全内容', included: true },
       { text: '初回ヒアリング（90分）', included: true },
       { text: '月1回フォローアップ（2ヶ月）', included: true, highlight: true },
       { text: 'Q&A項目の段階的拡充', included: true, highlight: true },
@@ -160,7 +160,7 @@ export default function PricingPlans({
               <article
                 key={plan.id}
                 className={`
-                  card relative min-h-[600px] transition-all duration-200
+                  card relative min-h-[600px] shadow-sm border border-slate-200 bg-white transition-all duration-200
                   hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                   ${plan.popular 
                     ? 'border-purple-500' 
@@ -197,7 +197,7 @@ export default function PricingPlans({
                       {plan.price}
                     </span>
                     <span className="text-secondary ml-1">
-                      /{plan.unit}
+                      {plan.unit}
                     </span>
                   </div>
                 </div>
@@ -210,7 +210,7 @@ export default function PricingPlans({
                       <li key={featureIndex} className="flex items-start">
                         <Check
                           className={`h-5 w-5 mt-0.5 mr-3 flex-shrink-0 ${
-                            feature.included ? 'text-green-500' : 'text-gray-300'
+                            feature.included ? 'text-green-500' : 'text-slate-600'
                           }`}
                           aria-hidden="true"
                         />
@@ -255,14 +255,7 @@ export default function PricingPlans({
                 <div className="mt-auto">
                   <Link
                     href={plan.ctaHref}
-                    className={`
-                      hit-44 cta-optimized block w-full text-center py-4 px-6 rounded-xl font-bold text-lg
-                      transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg
-                      ${plan.popular
-                        ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 focus:ring-purple-500 transform hover:scale-105'
-                        : 'bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black focus:ring-gray-500 transform hover:scale-105'
-                      }
-                    `}
+                    className="hit-44 cta-optimized block w-full text-center py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg bg-[#3B82F6] text-white hover:bg-[#2563EB] focus:ring-[#93C5FD] transform hover:scale-105"
                     role="button"
                     aria-label={`${plan.name}プランを選択`}
                   >
@@ -280,12 +273,12 @@ export default function PricingPlans({
             <article
               key={plan.id}
               className={`
-                bg-white rounded-xl shadow-lg border-2 transition-all duration-200
+                bg-white rounded-xl shadow-sm border border-slate-200 transition-all duration-200
                 flex flex-col h-full p-8
                 hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                 ${plan.popular 
                   ? 'border-purple-500 relative' 
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'hover:border-gray-300'
                 }
               `}
               role="tabpanel"
@@ -317,7 +310,7 @@ export default function PricingPlans({
                     {plan.price}
                   </span>
                   <span className="text-gray-600 ml-1">
-                    /{plan.unit}
+                    {plan.unit}
                   </span>
                 </div>
               </div>
@@ -330,7 +323,7 @@ export default function PricingPlans({
                     <li key={featureIndex} className="flex items-start">
                       <Check
                         className={`h-5 w-5 mt-1 mr-3 flex-shrink-0 ${
-                          feature.included ? 'text-green-500' : 'text-gray-300'
+                          feature.included ? 'text-green-500' : 'text-slate-600'
                         }`}
                         aria-hidden="true"
                       />
@@ -375,14 +368,7 @@ export default function PricingPlans({
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className={`
-                    hit-44 cta-optimized block w-full text-center py-4 px-6 rounded-xl font-bold text-lg
-                    transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg
-                    ${plan.popular
-                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 focus:ring-purple-500 transform hover:scale-105'
-                      : 'bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black focus:ring-gray-500 transform hover:scale-105'
-                    }
-                  `}
+                  className="hit-44 cta-optimized block w-full text-center py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg bg-[#3B82F6] text-white hover:bg-[#2563EB] focus:ring-[#93C5FD] transform hover:scale-105"
                   role="button"
                   aria-label={`${plan.name}プランを選択`}
                 >

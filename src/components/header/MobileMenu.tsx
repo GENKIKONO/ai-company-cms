@@ -81,14 +81,14 @@ export default function MobileMenu({
                 </div>
               )}
               
-              <nav className="flex flex-col items-start gap-2 px-4">
+              <nav className="flex flex-col items-start gap-2 pl-0">
                 {links.map((l, i) => (
                   <Link
                     key={l.href}
                     href={l.href}
                     ref={auth.loggedIn && i === 0 ? firstLinkRef : undefined}
                     onClick={handleLinkClick}
-                    className="focus-clean text-primary font-medium hover:text-blue-600 transition-colors duration-200 py-2"
+                    className="focus-clean text-primary font-medium hover:text-blue-600 transition-colors duration-200 py-2 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none"
                   >
                     {l.label}
                   </Link>
@@ -99,7 +99,7 @@ export default function MobileMenu({
                     <Link
                       href={auth.dashboardHref}
                       onClick={handleLinkClick}
-                      className="focus-clean text-primary font-medium hover:text-blue-600 transition-colors duration-200 py-2"
+                      className="focus-clean text-primary font-medium hover:text-blue-600 transition-colors duration-200 py-2 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none"
                     >
                       マイページ
                     </Link>

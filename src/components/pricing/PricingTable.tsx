@@ -146,7 +146,7 @@ export default function PricingTable() {
             {PLANS.map((plan) => (
               <div
                 key={plan.id}
-                className={`card relative ${
+                className={`card relative shadow-sm border border-slate-200 bg-white ${
                   plan.popular
                     ? 'border-blue-500 shadow-blue-100'
                     : 'hover:border-gray-300 hover:shadow-xl'
@@ -178,7 +178,7 @@ export default function PricingTable() {
                       {plan.price}
                     </span>
                     {plan.id !== 'free' && (
-                      <span className="text-secondary ml-1">/月</span>
+                      <span className="text-secondary ml-1">（税別）/月</span>
                     )}
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export default function PricingTable() {
                     <li key={index} className="flex items-start">
                       <Check
                         className={`h-4 w-4 shrink-0 mt-0.5 mr-3 ${
-                          feature.included ? 'text-green-500' : 'text-gray-300'
+                          feature.included ? 'text-green-500' : 'text-slate-600'
                         }`}
                       />
                       <div className="flex-1">
@@ -219,11 +219,7 @@ export default function PricingTable() {
                 <div className="mt-auto">
                   <Link
                     href={plan.ctaHref}
-                    className={`btn-nowrap block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors ${
-                      plan.popular
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-gray-100 text-primary hover:bg-gray-200'
-                    }`}
+                    className="btn-nowrap block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors bg-[#3B82F6] text-white hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#93C5FD] focus:ring-offset-2"
                   >
                     {plan.ctaText}
                   </Link>
@@ -246,7 +242,7 @@ export default function PricingTable() {
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`card relative flex flex-col ${
+              className={`card relative flex flex-col shadow-sm border border-slate-200 bg-white ${
                 plan.popular
                   ? 'border-blue-500 shadow-blue-100'
                   : 'hover:border-gray-300 hover:shadow-xl'
@@ -277,7 +273,7 @@ export default function PricingTable() {
                     {plan.price}
                   </span>
                   {plan.id !== 'free' && (
-                    <span className="text-secondary ml-1">/月</span>
+                    <span className="text-secondary ml-1">（税別）/月</span>
                   )}
                 </div>
               </div>
@@ -294,7 +290,7 @@ export default function PricingTable() {
                   <li key={index} className="flex items-start">
                     <Check
                       className={`h-4 w-4 shrink-0 mt-0.5 mr-3 ${
-                        feature.included ? 'text-green-500' : 'text-gray-300'
+                        feature.included ? 'text-green-500' : 'text-slate-600'
                       }`}
                     />
                     <div className="flex-1">
@@ -318,11 +314,7 @@ export default function PricingTable() {
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className={`btn-nowrap block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors ${
-                    plan.popular
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-100 text-primary hover:bg-gray-200'
-                  }`}
+                  className="btn-nowrap block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors bg-[#3B82F6] text-white hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#93C5FD] focus:ring-offset-2"
                 >
                   {plan.ctaText}
                 </Link>
@@ -348,7 +340,7 @@ export default function PricingTable() {
 
         <div className="mt-12 text-center">
           <p className="text-sm text-secondary">
-            ※価格は税込。詳細機能についてはお問い合わせください。<br/>
+            ※価格は税別。詳細機能についてはお問い合わせください。<br/>
             お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
           </p>
         </div>

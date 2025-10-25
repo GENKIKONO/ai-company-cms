@@ -101,6 +101,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     { label: "導入事例", value: formatNumber(dynamicStats.cases), unit: "件" },
   ];
 
+  const showStats = (dynamicStats.organizations + dynamicStats.services + dynamicStats.cases) > 0;
+  const featureBadges = ["構造化データ自動生成", "AI検索最適化", "JSON-LD対応"];
+
   return (
     <div className="min-h-screen">
       <main>
@@ -134,19 +137,29 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   </Link>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4">
-                  {stats.map((stat, index) => (
-                    <div key={index} className="text-center">
-                      <div className="text-2xl font-bold text-blue-600 mb-1">
-                        {stat.value}<span className="text-sm text-secondary">{stat.unit}</span>
+                {/* Stats or Feature Badges */}
+                {showStats ? (
+                  <div className="grid grid-cols-3 gap-4">
+                    {stats.map((stat, index) => (
+                      <div key={index} className="text-center">
+                        <div className="text-2xl font-bold text-blue-600 mb-1">
+                          {stat.value}<span className="text-sm text-secondary">{stat.unit}</span>
+                        </div>
+                        <div className="text-sm text-secondary">
+                          {stat.label}
+                        </div>
                       </div>
-                      <div className="text-sm text-secondary">
-                        {stat.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {featureBadges.map((badge) => (
+                      <span key={badge} className="rounded-full bg-slate-100 text-slate-700 px-3 py-1 text-xs font-medium">
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="card">
@@ -378,7 +391,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
             </div>
             <div className="border-t border-gray-200 mt-8 pt-8 text-center">
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-slate-600">
                 © 2024 AIO Hub. All rights reserved.
               </p>
             </div>

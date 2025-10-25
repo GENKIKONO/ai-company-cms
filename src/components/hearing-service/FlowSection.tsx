@@ -71,7 +71,7 @@ const getColorClasses = (color: string) => {
 export default function FlowSection() {
   return (
     <section className="py-10 bg-clean">
-      <div className="section-mobile">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* セクションヘッダー */}
         <div className="mb-12 text-center">
           <h2 className="text-h2 text-neutral-900 mb-4 text-balance">
@@ -83,7 +83,7 @@ export default function FlowSection() {
         </div>
 
         {/* フローステップ - 縦積み3カード */}
-        <div className="mb-12 space-y-6 md:space-y-0 md:grid md:grid-cols-3 md:gap-8">
+        <div className="mb-12 space-y-6 md:space-y-0 md:grid md:grid-cols-3 gap-8 lg:gap-10">
           {flowSteps.map((step, index) => {
             const colors = getColorClasses(step.color);
             const IconComponent = step.icon;
@@ -131,7 +131,7 @@ export default function FlowSection() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="grid grid-cols-2 gap-8 lg:gap-10">
             {/* Before */}
             <div className="bg-white rounded-2xl p-6 border-2 border-red-200">
               <div className="text-center mb-4">

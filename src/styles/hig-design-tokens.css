@@ -176,10 +176,33 @@ html, body {
   grid-auto-flow: column; 
   grid-auto-columns: 85%;
   gap: var(--space); 
-  padding-inline: var(--safe-left) var(--safe-right);
+  padding-inline: max(env(safe-area-inset-left), 16px) max(env(safe-area-inset-right), 16px);
   overflow-x: auto; 
   scroll-snap-type: x mandatory; 
   -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+/* Edge fade indicators for mobile scroll */
+.hscroll:before,
+.hscroll:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hscroll:before {
+  left: 0;
+  background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0));
+}
+
+.hscroll:after {
+  right: 0;
+  background: linear-gradient(270deg, #fff, rgba(255, 255, 255, 0));
 }
 
 @media (min-width: 1024px) {
