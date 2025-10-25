@@ -27,21 +27,39 @@
   --line-height-relaxed: 1.6;
   
   /* === Colors (WCAG 2.1 AA Compliant) === */
+  /* Unified Text Colors */
+  --color-text-primary: #0f172a;   /* slate-900 */
+  --color-text-secondary: #475569; /* slate-600 */
+  --color-text-tertiary: #767680;
+  --color-text-disabled: #B0B0B8;
+  
+  /* Background Colors */
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f9fafb;      /* セクション分割用 */
+  --color-bg-accent: #f0f4ff;      /* 淡い青 */
+  --color-background: #FFFFFF;
+  --color-background-secondary: #F2F2F7;
+  --color-background-tertiary: #FFFFFF;
+  
   /* Primary Colors */
   --color-primary: #007AFF;
   --color-primary-light: #0A84FF;
   --color-primary-dark: #0056CC;
   
-  /* Neutral Colors */
-  --color-text-primary: #000000;
-  --color-text-secondary: #3C3C43;
-  --color-text-tertiary: #767680;
-  --color-text-disabled: #B0B0B8;
+  /* Border and Shadows */
+  --color-border: #e5e7eb;         /* gray-200 */
+  --shadow-card: 0 1px 2px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.06);
+  --radius-card: 16px;
   
-  /* Background Colors */
-  --color-background: #FFFFFF;
-  --color-background-secondary: #F2F2F7;
-  --color-background-tertiary: #FFFFFF;
+  /* Container and Spacing */
+  --container-max: 80rem; /* 1280px */
+  --space: clamp(12px, 2.2vw, 24px);
+  --space-lg: clamp(24px, 4vw, 48px);
+  --section-pad-y: clamp(40px, 8vw, 112px);
+  
+  /* Safe Area */
+  --safe-left: max(env(safe-area-inset-left), 16px);
+  --safe-right: max(env(safe-area-inset-right), 16px);
   
   /* System Colors */
   --color-success: #34C759;
@@ -114,27 +132,74 @@
   --hanging-punctuation: allow-end;
 }
 
-/* === Dark Mode Support (System Preference) === */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark Mode Colors */
-    --color-text-primary: #FFFFFF;
-    --color-text-secondary: #EBEBF5;
-    --color-text-tertiary: #EBEBF5;
-    --color-text-disabled: #48484A;
-    
-    --color-background: #000000;
-    --color-background-secondary: #1C1C1E;
-    --color-background-tertiary: #2C2C2E;
-    
-    --color-border-primary: #38383A;
-    --color-border-secondary: #48484A;
-    --color-border-tertiary: #58585A;
-    
-    --color-primary: #0A84FF;
-    --color-primary-light: #64D2FF;
-    --color-primary-dark: #0A84FF;
+/* === Light Theme Enforcement (Dark Mode Disabled) === */
+:root { 
+  color-scheme: light !important; 
+}
+
+html, body { 
+  background: var(--color-bg) !important; 
+  color: var(--color-text-primary); 
+}
+
+/* Common Utility Classes */
+.site-container { 
+  max-width: var(--container-max); 
+  margin-inline: auto; 
+  padding-inline: var(--safe-left) var(--safe-right); 
+}
+
+.section { 
+  padding-block: var(--section-pad-y); 
+  background: var(--color-bg); 
+}
+
+.section--alt { 
+  padding-block: var(--section-pad-y); 
+  background: var(--color-bg-subtle); 
+}
+
+.card {
+  background: #fff; 
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card); 
+  box-shadow: var(--shadow-card);
+  padding: calc(var(--space) * 1.5);
+}
+
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+
+/* Horizontal Scroll for Pricing Plans */
+.hscroll {
+  display: grid; 
+  grid-auto-flow: column; 
+  grid-auto-columns: 85%;
+  gap: var(--space); 
+  padding-inline: var(--safe-left) var(--safe-right);
+  overflow-x: auto; 
+  scroll-snap-type: x mandatory; 
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 1024px) {
+  .hscroll { 
+    grid-auto-flow: initial; 
+    grid-template-columns: repeat(3, 1fr); 
+    overflow: visible; 
   }
+}
+
+/* Image Overflow Prevention */
+img, svg, video { 
+  max-width: 100%; 
+  height: auto; 
+}
+
+/* Button Text Wrapping */
+.btn-nowrap { 
+  white-space: nowrap; 
+  word-break: keep-all; 
 }
 
 /* === High Contrast Mode Support === */

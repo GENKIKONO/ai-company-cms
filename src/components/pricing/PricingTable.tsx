@@ -7,6 +7,15 @@ import Link from 'next/link';
 import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
 import { formatJPY, PRICING_CONFIG } from '@/lib/pricing';
 
+// Dynamic class mapping for Tailwind purge safety
+const ICON_COLOR_MAP: Record<string, string> = {
+  blue: "text-blue-600",
+  green: "text-emerald-600", 
+  purple: "text-purple-600",
+  indigo: "text-indigo-600",
+  gray: "text-slate-600",
+};
+
 interface PlanFeature {
   text: string;
   included: boolean;
@@ -120,29 +129,29 @@ const PLANS: PricingPlan[] = [
 
 export default function PricingTable() {
   return (
-    <section className="section bg-subtle">
-      <div className="container">
+    <section className="section--alt">
+      <div className="site-container">
         <div className="text-center mb-12">
-          <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
             シンプルで明確な料金体系
           </h2>
-          <p className="text-body-large text-neutral-600 jp-text">
+          <p className="text-lg text-secondary max-w-3xl mx-auto">
             無料から始めて、必要になったら拡張。最小の入力で、Schema.org準拠の企業情報構造化を実現します。
           </p>
         </div>
 
-        {/* Mobile: Carousel, Desktop: Grid */}
+        {/* Mobile: Horizontal Scroll */}
         <div className="lg:hidden">
-          {/* Mobile Carousel */}
-          <div className="flex gap-4 overflow-x-auto pb-6 px-4 snap-x snap-mandatory">
+          <div className="hscroll">
             {PLANS.map((plan) => (
               <div
                 key={plan.id}
-                className={`bg-white rounded-2xl border-2 shadow-lg flex flex-col relative p-6 flex-shrink-0 w-80 snap-center ${
+                className={`card relative ${
                   plan.popular
                     ? 'border-blue-500 shadow-blue-100'
-                    : 'border-gray-200 hover:border-gray-300 hover:shadow-xl'
+                    : 'hover:border-gray-300 hover:shadow-xl'
                 } transition-all duration-200`}
+                style={{ scrollSnapAlign: 'center' }}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -152,40 +161,32 @@ export default function PricingTable() {
                   </div>
                 )}
 
-                {plan.badge && (
-                  <div className="absolute -top-3 -right-3">
-                    <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                      {plan.badge}
-                    </span>
-                  </div>
-                )}
-
                 <div className="mb-6">
                   <div className="mb-4">
-                    <plan.icon className={`h-8 w-8 text-${plan.color}-600`} />
+                    <plan.icon className={`h-8 w-8 ${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
                   </div>
-                  <h3 className="text-h3 text-neutral-900 mb-2 jp-text">{plan.name}</h3>
-                  <p className="text-body text-neutral-600 mb-4 jp-text">{plan.description}</p>
+                  <h3 className="text-xl font-semibold text-primary mb-2">{plan.name}</h3>
+                  <p className="text-secondary mb-4">{plan.description}</p>
                   
                   <div className="mb-4">
                     {plan.originalPrice && (
-                      <span className="text-body text-neutral-400 line-through mr-2">
+                      <span className="text-sm text-gray-400 line-through mr-2">
                         {plan.originalPrice}
                       </span>
                     )}
-                    <span className="text-h1 text-neutral-900">
+                    <span className="text-2xl font-bold text-primary">
                       {plan.price}
                     </span>
                     {plan.id !== 'free' && (
-                      <span className="text-neutral-600 ml-1">/月</span>
+                      <span className="text-secondary ml-1">/月</span>
                     )}
                   </div>
                 </div>
 
-                <ul className="mb-8 space-y-2 sm:space-y-2.5 flex-1">
+                <ul className="mb-8 space-y-3 flex-1">
                   {plan.inheritedFeatures && (
                     <li className="mb-4 pb-3 border-b border-gray-100">
-                      <span className="text-body-small text-primary font-medium">
+                      <span className="text-sm text-blue-600 font-medium">
                         {plan.inheritedFeatures}
                       </span>
                     </li>
@@ -193,20 +194,20 @@ export default function PricingTable() {
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
                       <Check
-                        className={`icon icon-sm shrink-0 mt-0.5 mr-3 ${
-                          feature.included ? 'text-success' : 'text-neutral-300'
+                        className={`h-4 w-4 shrink-0 mt-0.5 mr-3 ${
+                          feature.included ? 'text-green-500' : 'text-gray-300'
                         }`}
                       />
                       <div className="flex-1">
                         <span
-                          className={`text-body-small jp-text ${
-                            feature.included ? 'text-neutral-700' : 'text-neutral-400'
+                          className={`text-sm ${
+                            feature.included ? 'text-primary' : 'text-gray-400'
                           }`}
                         >
                           {feature.text}
                         </span>
                         {feature.subtext && (
-                          <div className="mt-1 text-body-small text-neutral-500 pl-2 border-l-2 border-neutral-200 jp-text">
+                          <div className="mt-1 text-sm text-secondary pl-2 border-l-2 border-gray-200">
                             {feature.subtext}
                           </div>
                         )}
@@ -218,10 +219,10 @@ export default function PricingTable() {
                 <div className="mt-auto">
                   <Link
                     href={plan.ctaHref}
-                    className={`btn w-full ${
+                    className={`btn-nowrap block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors ${
                       plan.popular
-                        ? 'btn-primary'
-                        : 'btn-secondary'
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-gray-100 text-primary hover:bg-gray-200'
                     }`}
                   >
                     {plan.ctaText}
@@ -240,15 +241,15 @@ export default function PricingTable() {
           </div>
         </div>
 
-        {/* Desktop: Responsive Grid */}
-        <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-6 justify-center items-stretch max-w-7xl mx-auto mb-12">
+        {/* Desktop: Grid Layout */}
+        <div className="hidden lg:grid lg:grid-cols-4 gap-6 mb-12">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`bg-white rounded-2xl border-2 shadow-lg flex flex-col relative p-6 ${
+              className={`card relative flex flex-col ${
                 plan.popular
                   ? 'border-blue-500 shadow-blue-100'
-                  : 'border-gray-200 hover:border-gray-300 hover:shadow-xl'
+                  : 'hover:border-gray-300 hover:shadow-xl'
               } transition-all duration-200`}
             >
               {plan.popular && (
@@ -259,40 +260,32 @@ export default function PricingTable() {
                 </div>
               )}
 
-              {plan.badge && (
-                <div className="absolute -top-3 -right-3">
-                  <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                    {plan.badge}
-                  </span>
-                </div>
-              )}
-
               <div className="mb-6">
                 <div className="mb-4">
-                  <plan.icon className={`h-8 w-8 text-${plan.color}-600`} />
+                  <plan.icon className={`h-8 w-8 ${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
                 </div>
-                <h3 className="text-h3 text-neutral-900 mb-2 jp-text">{plan.name}</h3>
-                <p className="text-body text-neutral-600 mb-4 jp-text">{plan.description}</p>
+                <h3 className="text-xl font-semibold text-primary mb-2">{plan.name}</h3>
+                <p className="text-secondary mb-4">{plan.description}</p>
                 
                 <div className="mb-4">
                   {plan.originalPrice && (
-                    <span className="text-body text-neutral-400 line-through mr-2">
+                    <span className="text-sm text-gray-400 line-through mr-2">
                       {plan.originalPrice}
                     </span>
                   )}
-                  <span className="text-h1 text-neutral-900">
+                  <span className="text-2xl font-bold text-primary">
                     {plan.price}
                   </span>
                   {plan.id !== 'free' && (
-                    <span className="text-neutral-600 ml-1">/月</span>
+                    <span className="text-secondary ml-1">/月</span>
                   )}
                 </div>
               </div>
 
-              <ul className="mb-8 space-y-2 sm:space-y-2.5 flex-1">
+              <ul className="mb-8 space-y-3 flex-1">
                 {plan.inheritedFeatures && (
                   <li className="mb-4 pb-3 border-b border-gray-100">
-                    <span className="text-body-small text-primary font-medium">
+                    <span className="text-sm text-blue-600 font-medium">
                       {plan.inheritedFeatures}
                     </span>
                   </li>
@@ -300,20 +293,20 @@ export default function PricingTable() {
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
                     <Check
-                      className={`icon icon-sm shrink-0 mt-0.5 mr-3 ${
-                        feature.included ? 'text-success' : 'text-neutral-300'
+                      className={`h-4 w-4 shrink-0 mt-0.5 mr-3 ${
+                        feature.included ? 'text-green-500' : 'text-gray-300'
                       }`}
                     />
                     <div className="flex-1">
                       <span
-                        className={`text-body-small jp-text ${
-                          feature.included ? 'text-neutral-700' : 'text-neutral-400'
+                        className={`text-sm ${
+                          feature.included ? 'text-primary' : 'text-gray-400'
                         }`}
                       >
                         {feature.text}
                       </span>
                       {feature.subtext && (
-                        <div className="mt-1 text-body-small text-neutral-500 pl-2 border-l-2 border-neutral-200 jp-text">
+                        <div className="mt-1 text-sm text-secondary pl-2 border-l-2 border-gray-200">
                           {feature.subtext}
                         </div>
                       )}
@@ -325,10 +318,10 @@ export default function PricingTable() {
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className={`btn w-full ${
+                  className={`btn-nowrap block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors ${
                     plan.popular
-                      ? 'btn-primary'
-                      : 'btn-secondary'
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-gray-100 text-primary hover:bg-gray-200'
                   }`}
                 >
                   {plan.ctaText}
@@ -336,7 +329,7 @@ export default function PricingTable() {
               </div>
 
               {plan.comingSoon && (
-                <div className="mt-4 text-body-small text-neutral-500">
+                <div className="mt-4 text-sm text-secondary">
                   {plan.comingSoon.map((note, index) => (
                     <p key={index}>{note}</p>
                   ))}
@@ -348,13 +341,13 @@ export default function PricingTable() {
         
         {/* Enterprise consultation note */}
         <div className="text-center mb-8">
-          <p className="text-body text-neutral-600 jp-text">
+          <p className="text-secondary">
             Enterpriseプランの詳細な機能や導入サポートについては、お気軽にお問い合わせください
           </p>
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-body-small text-neutral-500 jp-text">
+          <p className="text-sm text-secondary">
             ※価格は税込。詳細機能についてはお問い合わせください。<br/>
             お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
           </p>

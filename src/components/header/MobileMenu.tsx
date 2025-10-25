@@ -67,28 +67,28 @@ export default function MobileMenu({
 
               {/* ログイン済みユーザー情報 */}
               {auth.loggedIn && (
-                <div className="flex items-center space-x-3 p-3 bg-indigo-50 rounded-lg">
-                  <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center">
+                <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                     <span className="text-sm font-medium text-white">
                       U
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-medium text-primary">
                       ログイン中
                     </p>
                   </div>
                 </div>
               )}
               
-              <nav className="space-y-1">
+              <nav className="flex flex-col items-start gap-2 px-4">
                 {links.map((l, i) => (
                   <Link
                     key={l.href}
                     href={l.href}
                     ref={auth.loggedIn && i === 0 ? firstLinkRef : undefined}
                     onClick={handleLinkClick}
-                    className="focus-clean nav-link nav-item menu-item-unified text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200"
+                    className="focus-clean text-primary font-medium hover:text-blue-600 transition-colors duration-200 py-2"
                   >
                     {l.label}
                   </Link>
@@ -99,14 +99,14 @@ export default function MobileMenu({
                     <Link
                       href={auth.dashboardHref}
                       onClick={handleLinkClick}
-                      className="focus-clean nav-link nav-item menu-item-unified text-gray-900 font-medium hover:text-indigo-600 transition-colors duration-200"
+                      className="focus-clean text-primary font-medium hover:text-blue-600 transition-colors duration-200 py-2"
                     >
                       マイページ
                     </Link>
                     <Link
                       href={auth.logoutHref}
                       onClick={handleLinkClick}
-                      className="focus-clean nav-link nav-item w-full block text-center bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 transition-colors duration-200 mt-6"
+                      className="focus-clean block text-center bg-gray-100 text-primary font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200 mt-6"
                     >
                       ログアウト
                     </Link>

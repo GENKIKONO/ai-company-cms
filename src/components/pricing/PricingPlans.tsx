@@ -6,6 +6,14 @@
 import Link from 'next/link';
 import { Check, Star, Zap, Crown, Building2, MessageSquare, Target, Users, Calendar, Phone, Sparkles } from 'lucide-react';
 
+// Dynamic class mapping for Tailwind purge safety
+const ICON_COLOR_MAP: Record<string, string> = {
+  blue: "text-blue-600",
+  purple: "text-purple-600",
+  indigo: "text-indigo-600",
+  gray: "text-slate-600",
+};
+
 interface PlanFeature {
   text: string;
   included: boolean;
@@ -128,17 +136,17 @@ export default function PricingPlans({
 }: PricingPlansProps) {
   return (
     <section 
-      className={`py-16 bg-gray-50 ${className}`} 
+      className={`section--alt ${className}`} 
       aria-labelledby="pricing-title"
       data-component="PricingPlans"
     >
-      <div className="container mx-auto px-4">
+      <div className="site-container">
         {showTitle && (
           <div className="text-center mb-12">
-            <h2 id="pricing-title" className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 id="pricing-title" className="text-3xl md:text-4xl font-bold text-primary mb-4">
               料金プラン（AI最適化ヒアリング代行）
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-secondary max-w-3xl mx-auto">
               対話を通じて企業価値を第三者視点で整理し、
               ChatGPT・Gemini・Google AIに理解されやすい構造データとして言語化します。
             </p>
@@ -147,27 +155,22 @@ export default function PricingPlans({
 
         {/* Mobile: Horizontal Scroll */}
         <div className="lg:hidden">
-          <div 
-            className="flex gap-6 overflow-x-auto pb-8 px-12 pt-12 snap-x snap-mandatory no-scrollbar"
-            style={{ scrollSnapType: 'x mandatory' }}
-            role="tablist"
-            aria-label="料金プラン選択"
-          >
+          <div className="hscroll">
             {HEARING_PLANS.map((plan, index) => (
               <article
                 key={plan.id}
                 className={`
-                  bg-white rounded-xl shadow-lg border-2 transition-all duration-200
-                  flex flex-col min-h-[600px] w-[85%] md:w-[72%] max-w-sm flex-shrink-0 snap-center p-6 mt-2
+                  card relative min-h-[600px] transition-all duration-200
                   hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                   ${plan.popular 
-                    ? 'border-purple-500 relative' 
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-purple-500' 
+                    : 'hover:border-gray-300'
                   }
                 `}
                 role="tabpanel"
                 aria-labelledby={`plan-${plan.id}-title`}
                 tabIndex={index}
+                style={{ scrollSnapAlign: 'center' }}
               >
                 {plan.badge && (
                   <div className="mb-4">
@@ -181,19 +184,19 @@ export default function PricingPlans({
                 {/* Header */}
                 <div className="text-center mb-6">
                   <div className="mb-4">
-                    <plan.icon className={`h-10 w-10 mx-auto text-${plan.color}-600`} />
+                    <plan.icon className={`h-10 w-10 mx-auto ${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
                   </div>
-                  <h3 id={`plan-${plan.id}-title`} className="text-xl font-bold text-gray-900 mb-2">
+                  <h3 id={`plan-${plan.id}-title`} className="text-xl font-bold text-primary mb-2">
                     {plan.name}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-4">
+                  <p className="text-secondary text-sm mb-4">
                     {plan.description}
                   </p>
                   <div className="mb-4">
-                    <span className="text-3xl font-bold text-gray-900">
+                    <span className="text-3xl font-bold text-primary">
                       {plan.price}
                     </span>
-                    <span className="text-gray-600 ml-1">
+                    <span className="text-secondary ml-1">
                       /{plan.unit}
                     </span>
                   </div>

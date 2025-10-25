@@ -61,19 +61,13 @@ export default function FAB() {
         ui-fab
         fixed z-[1000] 
         w-14 h-14 
-        rounded-full 
-        bg-gradient-to-r from-indigo-500 to-fuchsia-500 
-        text-white 
+        text-primary
         active:scale-95
         grid place-items-center 
         will-change-transform
         transition-all duration-200
         focus:outline-none 
-        focus:ring-2 
-        focus:ring-indigo-400 
-        focus:ring-opacity-75
-        focus:ring-offset-2
-        focus:ring-offset-white
+        focus:ring-0
         leading-none
         select-none
         md:hidden

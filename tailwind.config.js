@@ -7,6 +7,9 @@ module.exports = {
     './src/app/globals.css',
   ],
   safelist: [
+    // Color classes for dynamic icons
+    'text-blue-600','text-indigo-600','text-violet-600','text-emerald-600','text-slate-600','text-purple-600',
+    // Existing classes
     'jp-heading',
     'jp-body',
     'jp-cta',
