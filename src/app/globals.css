@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   1. ライトテーマ固定（ダークモード完全無効化）
+   ============================================================ */
+:root { 
+  color-scheme: light !important; 
+}
+html { 
+  background: #fff !important; 
+  color: #0f172a !important;
+}
+/* Tailwind の dark 変種や媒体クエリを無効化 */
+@media (prefers-color-scheme: dark) {
+  :root { color-scheme: light !important; }
+  html, body { 
+    background: #fff !important; 
+    color: #0f172a !important; 
+  }
+}
+
 /* HIG Design System */
 @import '../styles/hig-design-tokens.css';
 
@@ -13,18 +32,103 @@
   --shadow: 0 6px 24px rgba(0,0,0,.06);
 }
 
-/* コンテナ一式（ページ/セクション） */
+/* ============================================================
+   2. HIG外枠の強制適用（中央寄せ・白基調・余白）
+   ============================================================ */
+.hig-container {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 24px);
+}
+.hig-section {
+  padding-block: clamp(32px, 6vw, 96px);
+  background: #fff;
+}
+.hig-card {
+  background: #fff;
+  border: 1px solid #eef1f4;
+  border-radius: 16px;
+  padding: clamp(16px, 2.5vw, 28px);
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+
+/* ============================================================
+   3. 色とコントラストの統一
+   ============================================================ */
+/* 主要テキスト: #0f172a (Tailwind slate-900) */
+/* 補助テキスト: #334155～#475569 (slate-700~600) */
+
+/* コンテナ一式（ページ/セクション）- 既存互換 */
 .container-page{ max-width: 1200px; margin-inline:auto; padding-inline: clamp(16px, 4vw, 32px); }
 .container-section{ padding-block: clamp(32px, 6vw, 72px); }
 
 /* カード一式 */
 .card{ border-radius: var(--radius); box-shadow: var(--shadow); background: var(--card,#fff); }
-.card-title{ @apply jp-heading text-xl sm:text-2xl font-semibold; }
-.card-text{ @apply jp-body text-[15px] leading-7 text-gray-600; }
+.card-title{ @apply jp-heading text-xl sm:text-2xl font-semibold; color: #0f172a; }
+.card-text{ @apply jp-body text-[15px] leading-7; color: #475569; }
 
-/* 日本語組版（CSSのみで統一） */
-html[lang="ja"] .jp-heading{ text-wrap: balance; line-height:1.25; }
-html[lang="ja"] .jp-body{ line-break: strict; word-break: keep-all; text-wrap: pretty; }
+/* ============================================================
+   4. PC/モバイル レスポンシブの揃え
+   ============================================================ */
+.hig-cards-scroll {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 85%;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+}
+.hig-cards-scroll > * {
+  scroll-snap-align: center;
+}
+@media (min-width: 1024px) {
+  .hig-cards-scroll {
+    grid-auto-flow: initial;
+    grid-auto-columns: initial;
+    overflow: visible;
+    scroll-snap-type: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+/* 画像・アイコンはみ出し禁止 */
+img, svg, video {
+  max-width: 100%;
+  height: auto;
+}
+.prose, .jp-body {
+  overflow-wrap: anywhere;
+}
+
+/* CTAテキストの途中改行禁止 */
+.btn-nowrap {
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+/* ============================================================
+   5. 日本語組版（CSSのみで統一）
+   ============================================================ */
+html[lang="ja"] {
+  line-break: strict;
+  word-break: normal;
+  text-wrap: balance;
+}
+html[lang="ja"] .jp-heading{ 
+  text-wrap: balance; 
+  line-height: 1.25; 
+  color: #0f172a;
+}
+html[lang="ja"] .jp-body{ 
+  line-break: strict; 
+  word-break: keep-all; 
+  text-wrap: pretty; 
+  color: #475569;
+}
 @supports (word-break: auto-phrase){
   html[lang="ja"] .jp-body, html[lang="ja"] .jp-heading{ word-break: auto-phrase; }
 }

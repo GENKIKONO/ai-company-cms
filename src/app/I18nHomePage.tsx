@@ -513,35 +513,35 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </HIGSection>
 
         {/* Footer */}
-        <HIGSection spacing="xl" className="bg-neutral-900 text-white container-section">
+        <HIGSection spacing="xl" className="bg-gray-50 container-section">
           <HIGContainer size="xl" className="container-page">
             <div className="grid md:grid-cols-3 gap-8">
               <div>
-                <h3 className="text-h3 mb-4 jp-text">AIO Hub</h3>
-                <p className="text-body text-neutral-300 jp-text">
+                <h3 className="text-h3 mb-4 jp-text text-slate-900">AIO Hub</h3>
+                <p className="text-body text-slate-600 jp-text">
                   AI技術を活用した企業情報の統合管理プラットフォーム
                 </p>
               </div>
               <div>
-                <h4 className="text-body font-semibold mb-4 jp-text">リンク</h4>
+                <h4 className="text-body font-semibold mb-4 jp-text text-slate-900">リンク</h4>
                 <ul className="space-y-2">
-                  <li><Link href="/organizations" className="text-neutral-300 hover:text-white">企業ディレクトリ</Link></li>
-                  <li><Link href="/search" className="text-neutral-300 hover:text-white">検索</Link></li>
-                  <li><Link href="/dashboard" className="text-neutral-300 hover:text-white">ダッシュボード</Link></li>
+                  <li><Link href="/organizations" className="text-slate-600 hover:text-slate-900">企業ディレクトリ</Link></li>
+                  <li><Link href="/search" className="text-slate-600 hover:text-slate-900">検索</Link></li>
+                  <li><Link href="/dashboard" className="text-slate-600 hover:text-slate-900">ダッシュボード</Link></li>
                 </ul>
               </div>
               <div>
-                <h4 className="text-body font-semibold mb-4 jp-text">サポート</h4>
+                <h4 className="text-body font-semibold mb-4 jp-text text-slate-900">サポート</h4>
                 <ul className="space-y-2">
-                  <li><Link href="/help" className="text-neutral-300 hover:text-white">ヘルプ</Link></li>
-                  <li><Link href="/contact" className="text-neutral-300 hover:text-white">お問い合わせ</Link></li>
-                  <li><Link href="/terms" className="text-neutral-300 hover:text-white">利用規約</Link></li>
-                  <li><Link href="/privacy" className="text-neutral-300 hover:text-white">プライバシー</Link></li>
+                  <li><Link href="/help" className="text-slate-600 hover:text-slate-900">ヘルプ</Link></li>
+                  <li><Link href="/contact" className="text-slate-600 hover:text-slate-900">お問い合わせ</Link></li>
+                  <li><Link href="/terms" className="text-slate-600 hover:text-slate-900">利用規約</Link></li>
+                  <li><Link href="/privacy" className="text-slate-600 hover:text-slate-900">プライバシー</Link></li>
                 </ul>
               </div>
             </div>
-            <div className="border-t border-neutral-700 mt-8 pt-8 text-center">
-              <p className="text-body-small text-neutral-400 jp-text">
+            <div className="border-t border-slate-200 mt-8 pt-8 text-center">
+              <p className="text-body-small text-slate-500 jp-text">
                 © 2024 AIO Hub. All rights reserved.
               </p>
             </div>
