@@ -8,8 +8,22 @@
 :root { 
   color-scheme: light !important; 
 }
-html { 
+html, body { 
   background: #fff !important; 
+  color: #0f172a !important;
+}
+/* 全要素に対する強制的な背景・文字色設定 */
+* {
+  background-color: inherit !important;
+}
+/* 黒背景を持つ要素を強制的に白背景に */
+.bg-black, .bg-neutral-900, .bg-slate-900, .bg-gray-900,
+[class*="bg-black"], [class*="bg-neutral-900"], [class*="bg-slate-900"], [class*="bg-gray-900"] {
+  background: #fff !important;
+  color: #0f172a !important;
+}
+/* 白文字を黒文字に */
+.text-white, [class*="text-white"] {
   color: #0f172a !important;
 }
 /* Tailwind の dark 変種や媒体クエリを無効化 */
@@ -35,6 +49,7 @@ html {
 /* ============================================================
    2. HIG外枠の強制適用（中央寄せ・白基調・余白）
    ============================================================ */
+/* 全ページの基本レイアウト */
 .hig-container {
   max-width: 1280px;
   margin-inline: auto;
@@ -48,8 +63,23 @@ html {
   background: #fff;
   border: 1px solid #eef1f4;
   border-radius: 16px;
-  padding: clamp(16px, 2.5vw, 28px);
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+
+/* 全体レイアウトの中央寄せ強制 */
+main, section, .container {
+  max-width: 1280px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: clamp(16px, 3vw, 24px) !important;
+  padding-right: clamp(16px, 3vw, 24px) !important;
+}
+
+/* コンテンツ幅の統一 */
+.section, .container-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-left: clamp(16px, 3vw, 24px);
+  padding-right: clamp(16px, 3vw, 24px);
 }
 
 /* ============================================================
