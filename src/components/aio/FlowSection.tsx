@@ -84,7 +84,7 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
         </div>
 
         {/* フローステップ */}
-        <div className="section-gap">
+        <div className="hig-space-stack-xl">
           <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {steps.map((step, index) => {
               const colors = getColorClasses(step.color);

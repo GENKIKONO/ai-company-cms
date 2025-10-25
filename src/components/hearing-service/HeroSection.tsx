@@ -2,6 +2,9 @@
 
 import { ArrowRight, Sparkles, Brain, Target } from 'lucide-react';
 import Link from 'next/link';
+import { HIGButton } from '@/components/ui/HIGButton';
+import { HIGCard, HIGCardTitle, HIGCardContent } from '@/components/ui/HIGCard';
+import { HIGGrid } from '@/components/layout/HIGLayout';
 
 export default function HeroSection() {
   return (
@@ -30,7 +33,7 @@ export default function HeroSection() {
           
           {/* メインタイトル */}
           <div className="mb-6">
-            <h1 className="text-display text-neutral-900 mb-6 hero-title-unified">
+            <h1 className="text-display text-neutral-900 mb-6 hig-jp-heading">
               <span className="block jp-text">AIに</span>
               <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent jp-text">
                 伝わる企業情報へ
@@ -47,57 +50,81 @@ export default function HeroSection() {
           
           {/* 特徴ポイント */}
           <div className="mb-8">
-            <div className="highlights-unified text-neutral-700">
-              <div className="highlight-item-unified">
-                <Brain className="highlight-icon-unified text-blue-500" />
-                <span className="text-body-small font-medium jp-text">専任スタッフがヒアリング</span>
+            <HIGGrid columns={3} gap="md" className="text-neutral-700">
+              <div className="flex items-center gap-3">
+                <Brain className="w-6 h-6 text-blue-500 flex-shrink-0" />
+                <span className="text-body-small font-medium hig-jp-text">専任スタッフがヒアリング</span>
               </div>
-              <div className="highlight-item-unified">
-                <Target className="highlight-icon-unified text-purple-500" />
-                <span className="text-body-small font-medium jp-text">AI最適化構造で登録</span>
+              <div className="flex items-center gap-3">
+                <Target className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                <span className="text-body-small font-medium hig-jp-text">AI最適化構造で登録</span>
               </div>
-              <div className="highlight-item-unified">
-                <Sparkles className="highlight-icon-unified text-indigo-500" />
-                <span className="text-body-small font-medium jp-text">検索性・発見性向上</span>
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-6 h-6 text-indigo-500 flex-shrink-0" />
+                <span className="text-body-small font-medium hig-jp-text">検索性・発見性向上</span>
               </div>
-            </div>
+            </HIGGrid>
           </div>
           
           {/* CTAボタン */}
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start gap-4">
-            <Link
-              href="#pricing"
-              className="btn-unified bg-blue-600 text-white hover:bg-blue-700"
+            <HIGButton
+              variant="primary"
+              size="lg"
+              asChild
             >
-              <span className="jp-text">サービス詳細を見る</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+              <Link href="#pricing">
+                <span className="jp-text">サービス詳細を見る</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </HIGButton>
             
-            <Link
-              href="#faq"
-              className="btn-unified bg-white text-gray-900 border border-gray-300 hover:bg-gray-50"
+            <HIGButton
+              variant="secondary"
+              size="lg"
+              asChild
             >
-              <span className="jp-text">よくある質問</span>
-            </Link>
+              <Link href="#faq">
+                <span className="jp-text">よくある質問</span>
+              </Link>
+            </HIGButton>
             </div>
           </div>
           
           {/* サービス特徴 */}
           <div className="mt-12">
             <div className="grid grid-3 gap-6">
-              <div className="card bg-white/70 backdrop-blur-sm border border-white/60">
-                <h3 className="text-h3 text-blue-600 mb-2 jp-text">専門ヒアリング</h3>
-                <p className="text-body text-neutral-700 jp-text">AI最適化の専門スタッフが企業情報を丁寧にヒアリング</p>
-              </div>
-              <div className="card bg-white/70 backdrop-blur-sm border border-white/60">
-                <h3 className="text-h3 text-purple-600 mb-2 jp-text">構造化登録</h3>
-                <p className="text-body text-neutral-700 jp-text">ヒアリング内容をJSON-LD形式で構造化・最適化して登録</p>
-              </div>
-              <div className="card bg-white/70 backdrop-blur-sm border border-white/60">
-                <h3 className="text-h3 text-indigo-600 mb-2 jp-text">継続改善</h3>
-                <p className="text-body text-neutral-700 jp-text">定期的な情報更新とAI検索最適化のサポート</p>
-              </div>
+              <HIGCard 
+                variant="default" 
+                padding="md" 
+                className="bg-white/70 backdrop-blur-sm border border-white/60"
+              >
+                <HIGCardTitle level={3} className="text-blue-600 mb-2 jp-text">専門ヒアリング</HIGCardTitle>
+                <HIGCardContent className="pt-0">
+                  <p className="text-body text-neutral-700 jp-text">AI最適化の専門スタッフが企業情報を丁寧にヒアリング</p>
+                </HIGCardContent>
+              </HIGCard>
+              <HIGCard 
+                variant="default" 
+                padding="md" 
+                className="bg-white/70 backdrop-blur-sm border border-white/60"
+              >
+                <HIGCardTitle level={3} className="text-purple-600 mb-2 jp-text">構造化登録</HIGCardTitle>
+                <HIGCardContent className="pt-0">
+                  <p className="text-body text-neutral-700 jp-text">ヒアリング内容をJSON-LD形式で構造化・最適化して登録</p>
+                </HIGCardContent>
+              </HIGCard>
+              <HIGCard 
+                variant="default" 
+                padding="md" 
+                className="bg-white/70 backdrop-blur-sm border border-white/60"
+              >
+                <HIGCardTitle level={3} className="text-indigo-600 mb-2 jp-text">継続改善</HIGCardTitle>
+                <HIGCardContent className="pt-0">
+                  <p className="text-body text-neutral-700 jp-text">定期的な情報更新とAI検索最適化のサポート</p>
+                </HIGCardContent>
+              </HIGCard>
             </div>
           </div>
       </div>

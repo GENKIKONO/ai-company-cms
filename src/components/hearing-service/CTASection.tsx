@@ -2,6 +2,8 @@
 
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import Link from 'next/link';
+import { HIGButton } from '@/components/ui/HIGButton';
+import { HIGGrid } from '@/components/layout/HIGLayout';
 
 export default function CTASection() {
   return (
@@ -31,7 +33,7 @@ export default function CTASection() {
 
           {/* 特徴ポイント */}
           <div className="mb-8 sm:mb-12">
-            <div className="highlights-unified max-w-2xl lg:max-w-4xl mx-auto">
+            <HIGGrid columns={3} gap="md" className="max-w-2xl lg:max-w-4xl mx-auto">
               <div className="border border-white/10 rounded-xl p-4 text-center">
                 <Clock className="w-7 h-7 text-blue-400 mx-auto mb-2" />
                 <div className="text-white font-semibold text-sm">最短2週間</div>
@@ -47,27 +49,39 @@ export default function CTASection() {
                 <div className="text-white font-semibold text-sm">専門対応</div>
                 <div className="text-blue-200 text-xs">AI最適化の専門家</div>
               </div>
-            </div>
+            </HIGGrid>
           </div>
 
           {/* メインCTAボタン */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8 sm:mb-12 w-full">
-            <Link
-              href="/dashboard"
-              className="btn-unified bg-white text-blue-900 hover:bg-gray-100"
-              aria-label="今すぐヒアリングを申し込む"
+            <HIGButton
+              variant="primary"
+              size="lg"
+              className="bg-white text-blue-900 hover:bg-gray-100"
+              asChild
             >
-              <span className="jp-text">今すぐヒアリング申し込み</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+              <Link 
+                href="/dashboard"
+                aria-label="今すぐヒアリングを申し込む"
+              >
+                <span className="jp-text">今すぐヒアリング申し込み</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </HIGButton>
             
-            <Link
-              href="#pricing"
-              className="btn-unified bg-white/80 backdrop-blur text-blue-700 hover:bg-white/90"
-              aria-label="料金プランを確認"
+            <HIGButton
+              variant="secondary"
+              size="lg"
+              className="bg-white/80 backdrop-blur text-blue-700 hover:bg-white/90"
+              asChild
             >
-              <span className="jp-text">料金プランを確認</span>
-            </Link>
+              <Link 
+                href="#pricing"
+                aria-label="料金プランを確認"
+              >
+                <span className="jp-text">料金プランを確認</span>
+              </Link>
+            </HIGButton>
           </div>
 
           {/* 申込みステップ */}

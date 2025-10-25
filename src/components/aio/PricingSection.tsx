@@ -2,6 +2,7 @@
 
 import { Check, Star, Crown, Zap } from 'lucide-react';
 import Link from 'next/link';
+import { HIGContainer, HIGSection } from '@/components/layout/HIGLayout';
 
 interface PricingPlan {
   readonly name: string;
@@ -53,8 +54,8 @@ const getColorClasses = (color: string, popular: boolean = false) => {
 
 export default function PricingSection({ title, description, plans, notes }: PricingSectionProps) {
   return (
-    <section id="pricing" className="section-gap bg-gray-50">
-      <div className="container-wide">
+    <HIGSection spacing="xl" background="secondary" as="section" id="pricing">
+      <HIGContainer size="xl">
         {/* セクションヘッダー */}
         <div className="text-center heading-guard-top heading-guard-btm">
           <h2 className="text-heading-2 text-gray-900 mb-6 measure-heading mx-auto text-balance">
@@ -66,7 +67,7 @@ export default function PricingSection({ title, description, plans, notes }: Pri
         </div>
 
         {/* 料金プラン */}
-        <div className="section-gap">
+        <div className="hig-space-stack-xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-24 max-w-5xl mx-auto">
           {plans.map((plan) => {
             const colors = getColorClasses(plan.color, plan.popular);
@@ -141,7 +142,7 @@ export default function PricingSection({ title, description, plans, notes }: Pri
         </div>
 
         {/* 追加情報 */}
-        <div className="section-gap text-center">
+        <div className="hig-space-stack-xl text-center">
           <div className="ui-card p-8 max-w-4xl mx-auto">
             <h3 className="text-heading-3 text-gray-900 mb-6 measure-heading mx-auto text-balance">料金に関する補足</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
@@ -164,7 +165,7 @@ export default function PricingSection({ title, description, plans, notes }: Pri
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </HIGContainer>
+    </HIGSection>
   );
 }

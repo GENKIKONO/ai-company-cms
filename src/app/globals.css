@@ -5,8 +5,7 @@
 /* HIG Design System */
 @import '../styles/hig-design-tokens.css';
 
-/* Legacy Design Tokens (for gradual migration) */
-@import '../styles/design-tokens.css';
+/* Legacy Design Tokens removed - now fully HIG-compliant */
 
 /* Line clamp utilities */
 .line-clamp-2 {
@@ -67,49 +66,10 @@
 
 /* Mobile Polish Optimization - Unified Component Classes */
 @layer components {
-  /* Unified button styling for consistent CTA appearance */
-  .btn-unified {
-    @apply h-12 px-5 rounded-xl font-semibold text-sm hit-44 
-           flex items-center justify-center gap-2 transition-all duration-200;
-  }
-  
-  /* Outline button with improved contrast */
-  .btn-unified-outline {
-    @apply h-12 px-5 rounded-xl font-semibold text-sm hit-44 
-           flex items-center justify-center gap-2 transition-all duration-200
-           border-2 border-neutral-300 text-neutral-800 hover:border-neutral-400;
-  }
-  
-  /* Unified card styling for consistent layout blocks */  
-  .card-unified {
-    @apply w-full rounded-xl p-4 border bg-white/10 backdrop-blur-sm text-center;
-  }
   
   /* Mobile section wrapper for consistent spacing */
   .section-mobile {
     @apply w-full max-w-[680px] mx-auto px-4 sm:px-0;
-  }
-  
-  /* Hero typography with left alignment */
-  .hero-title-unified {
-    @apply text-left leading-tight text-balance max-w-[22ch];
-  }
-  
-  .hero-lead-unified {
-    @apply text-left leading-relaxed max-w-[36ch];
-  }
-  
-  /* Highlights list tightened spacing with enlarged icons */
-  .highlights-unified {
-    @apply grid grid-cols-1 gap-3 md:grid-cols-3;
-  }
-  
-  .highlight-item-unified {
-    @apply flex items-center gap-3 leading-tight;
-  }
-  
-  .highlight-icon-unified {
-    @apply w-7 h-7 flex-shrink-0;
   }
   
   /* Contact cards standardized dimensions */
