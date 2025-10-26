@@ -138,12 +138,19 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </Link>
               </div>
 
-              {/* 信頼性バッジ */}
+              {/* 機能チップ */}
               <div className="flex flex-wrap justify-center gap-3">
-                {featureBadges.map((badge) => (
-                  <span key={badge} className="rounded-full bg-blue-50 text-blue-700 px-4 py-2 text-sm font-medium">
-                    {badge}
-                  </span>
+                {featureBadges.map((badge, index) => (
+                  <div 
+                    key={badge} 
+                    className="group inline-flex items-center gap-2 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 px-4 py-2 text-sm font-medium transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`${badge}の詳細を確認`}
+                  >
+                    <CheckCircleIcon size={16} className="text-blue-600 group-hover:text-blue-700" />
+                    <span>{badge}</span>
+                  </div>
                 ))}
               </div>
             </div>

@@ -214,18 +214,12 @@ export default function FAQSection() {
             <p className="text-body text-neutral-600 mb-6 leading-6 sm:leading-7">
               お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <div className="flex justify-center">
               <a
                 href="mailto:support@luxucare.jp"
                 className="btn btn-primary btn-large"
               >
                 メールで問い合わせ
-              </a>
-              <a
-                href="tel:03-1234-5678"
-                className="btn btn-secondary btn-large"
-              >
-                電話で問い合わせ
               </a>
             </div>
           </div>

@@ -173,16 +173,6 @@ export default function SearchResultCard(props: SearchResultCardProps) {
 
             {/* 連絡先情報 */}
             <div className="flex flex-wrap gap-4 mt-3 pt-3 border-t border-slate-200 ">
-              {org.telephone && (
-                <a 
-                  href={`tel:${org.telephone}`}
-                  className="flex items-center gap-2 text-sm text-slate-600  hover:text-blue-600  transition-colors"
-                  aria-label={`電話: ${org.telephone}`}
-                >
-                  <Phone className="w-4 h-4" aria-hidden="true" />
-                  {org.telephone}
-                </a>
-              )}
               {org.url && (
                 <a 
                   href={org.url}

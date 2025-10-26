@@ -438,6 +438,26 @@ html[lang="ja"] .jp-body{
     white-space: normal !important;
   }
   
+  /* Full-bleed section for seamless edge-to-edge backgrounds */
+  .section--full-bleed {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+  
+  /* Ensure proper contrast for text on colored backgrounds */
+  .section--cta {
+    color: #ffffff;
+    --text-on-accent: #ffffff;
+  }
+  
+  .section--cta * {
+    color: inherit;
+  }
+  
   /* CTA専用：強力改行禁止 */
   .jp-cta {
     text-wrap: nowrap !important;

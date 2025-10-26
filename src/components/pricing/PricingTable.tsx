@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
 import { formatJPY, PRICING_CONFIG } from '@/lib/pricing';
 import { HIGButton } from '@/components/ui/HIGButton';
+import { PLAN_LABELS, formatPriceLabel } from '@/config/planLabels';
 
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
@@ -43,7 +44,7 @@ interface PricingPlan {
 const PLANS: PricingPlan[] = [
   {
     id: 'starter',
-    name: 'Starter',
+    name: PLAN_LABELS.starter,
     description: 'AI最適化CMS体験',
     price: '¥2,980',
     badge: '14日間無料',
@@ -63,7 +64,7 @@ const PLANS: PricingPlan[] = [
   },
   {
     id: 'pro',
-    name: 'Pro',
+    name: PLAN_LABELS.pro,
     description: 'AI Visibility・成長分析',
     price: '¥8,000',
     icon: Zap,
@@ -84,7 +85,7 @@ const PLANS: PricingPlan[] = [
   },
   {
     id: 'business',
-    name: 'Business',
+    name: PLAN_LABELS.business,
     description: '分析＋ブランド特化',
     price: '¥15,000',
     icon: Crown,
@@ -132,8 +133,8 @@ export default function PricingTable() {
                 } transition-all duration-200`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center px-3 py-1 badge-primary text-sm font-medium rounded-full">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                    <span className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full shadow-lg">
                       人気
                     </span>
                   </div>
@@ -216,7 +217,8 @@ export default function PricingTable() {
         </div>
 
         {/* Desktop: Grid Layout */}
-        <div className="hidden lg:grid lg:grid-cols-4 gap-6 mb-12">
+        <div className="hidden lg:block mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
@@ -227,8 +229,8 @@ export default function PricingTable() {
               } transition-all duration-200`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center px-3 py-1 badge-primary text-sm font-medium rounded-full">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                  <span className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full shadow-lg">
                     人気
                   </span>
                 </div>
@@ -251,7 +253,7 @@ export default function PricingTable() {
                     {plan.price}
                   </span>
                   {plan.id !== 'free' && (
-                    <span className="ml-1" style={{ color: 'var(--text-secondary)' }}>**（税別）**/月</span>
+                    <span className="ml-1" style={{ color: 'var(--text-secondary)' }}>（税別）/月</span>
                   )}
                 </div>
               </div>
@@ -307,6 +309,7 @@ export default function PricingTable() {
               )}
             </div>
           ))}
+          </div>
         </div>
         
         {/* Enterprise consultation note */}

@@ -5,6 +5,7 @@
 
 import Link from 'next/link';
 import { Check, Star, Zap, Crown, Building2, MessageSquare, Target, Users, Calendar, Phone, Sparkles } from 'lucide-react';
+import { PLAN_LABELS } from '@/config/planLabels';
 
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
@@ -40,7 +41,7 @@ interface HearingPlan {
 const HEARING_PLANS: HearingPlan[] = [
   {
     id: 'standard',
-    name: 'ベーシック',
+    name: PLAN_LABELS.starter,
     description: '1回ヒアリング＋AI構造化代行',
     price: '50,000円',
     unit: '（税別）',
@@ -68,7 +69,7 @@ const HEARING_PLANS: HearingPlan[] = [
   },
   {
     id: 'business',
-    name: 'ビジネス',
+    name: PLAN_LABELS.business,
     description: '初回ヒアリング＋2ヶ月継続サポート',
     price: '100,000円',
     unit: '（税別）',
@@ -97,7 +98,7 @@ const HEARING_PLANS: HearingPlan[] = [
   },
   {
     id: 'enterprise',
-    name: 'エンタープライズ',
+    name: PLAN_LABELS.enterprise,
     description: '複数回ヒアリング＋半年伴走支援',
     price: '180,000円〜',
     unit: '（税別）',
