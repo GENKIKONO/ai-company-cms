@@ -107,45 +107,72 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
   return (
     <div className="min-h-screen">
       <main>
-        {/* Hero Section - Apple HIG準拠 */}
-        <section className="section-apple-hero bg-white relative overflow-hidden">
-          <div className="site-container text-center relative z-10">
-            {/* Product badge - Apple style */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full mb-8 transition-all duration-300 hover:bg-blue-100">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-              <span className="text-caption text-blue">ChatGPTがあなたの会社を正確に紹介</span>
+        {/* Hero Section - Apple Visual Hierarchy強化 */}
+        <section className="section-apple-hero bg-white relative overflow-hidden min-h-screen flex items-center">
+          <div className="site-container text-center relative z-10 w-full">
+            {/* Product badge - より目立つ配置 */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full mb-6 transition-all duration-300 hover:bg-blue-100">
+              <div className="w-2 h-2 bg-blue rounded-full animate-pulse" />
+              <span className="text-caption text-blue font-medium">ChatGPTがあなたの会社を正確に紹介</span>
             </div>
             
-            {/* Hero headline - Apple Typography */}
-            <h1 className="text-display mb-6 max-w-4xl mx-auto">
-              AIに選ばれる企業になる
+            {/* Hero headline - 70%画面占有 */}
+            <h1 className="text-display mb-8 max-w-5xl mx-auto leading-tight">
+              AIに選ばれる<br />企業になる
             </h1>
             
-            {/* Value proposition - 簡潔化 */}
-            <p className="text-body-large mb-8 max-w-2xl mx-auto">
+            {/* Value proposition - より強いコントラスト */}
+            <p className="text-body-large mb-12 max-w-xl mx-auto text-secondary">
               構造化データで、確実な検索露出
             </p>
 
-            {/* Primary CTA - Apple Interactive Elements */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            {/* Primary CTA - 1.5倍大型化 */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Link
                 href="/auth/signup"
                 onClick={handleCtaClick}
-                className="btn-apple btn-apple-primary"
+                className="btn-apple btn-apple-primary text-lg px-8 py-4 transform hover:scale-105 transition-transform"
+                style={{ minHeight: '56px', fontSize: '18px' }}
               >
                 無料で体験する
                 <ArrowRightIcon size={20} className="ml-2" />
               </Link>
               <Link
                 href="/aio"
-                className="btn-apple btn-apple-secondary"
+                className="btn-apple btn-apple-secondary text-lg px-8 py-4"
+                style={{ minHeight: '56px', fontSize: '18px' }}
               >
                 デモを見る
               </Link>
             </div>
             
-            <div className="text-caption">
+            {/* 副次情報 - opacity低減 */}
+            <div className="text-caption opacity-60">
               14日間無料 • クレジットカード不要
+            </div>
+            
+            {/* Visual proof - AI検索結果モックアップ再追加（簡潔版） */}
+            <div className="mt-16 max-w-3xl mx-auto">
+              <div className="bg-surface rounded-2xl p-6 shadow-large border border-gray-100">
+                <div className="bg-white rounded-xl p-4 shadow-medium">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-5 h-5 bg-blue rounded" />
+                    <span className="text-caption font-medium">ChatGPT</span>
+                  </div>
+                  <div className="text-left">
+                    <div className="text-caption text-tertiary mb-2">「[企業名]について教えて」</div>
+                    <div className="text-body">
+                      <strong>[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
+                      <br /><br />
+                      <strong>主なサービス：</strong> 構造化データによる企業情報最適化<br />
+                      <strong>導入実績：</strong> 300社以上の企業が導入済み
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center mt-3">
+                  <span className="text-caption text-secondary">↑ AIO Hub導入後のAI回答例</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -245,11 +272,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </div>
             </div>
 
-            {/* CTA */}
+            {/* CTA - 1.5倍サイズ強化 */}
             <div className="text-center">
               <Link
                 href="/auth/signup"
-                className="btn-apple btn-apple-primary"
+                className="btn-apple btn-apple-primary text-lg px-8 py-4 transform hover:scale-105 transition-transform"
+                style={{ minHeight: '56px', fontSize: '18px' }}
               >
                 14日間無料で体験する
                 <ArrowRightIcon size={16} className="ml-2" />
@@ -270,11 +298,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         {/* Features - Apple HIG準拠 */}
         <section className="section-apple bg-white">
           <div className="site-container">
-            <div className="text-center mb-8">
-              <h2 className="text-title1 mb-4">
+            <div className="text-center mb-12">
+              <h2 className="text-title1 mb-6">
                 3つの価値
               </h2>
-              <p className="text-body-large max-w-2xl mx-auto">
+              <p className="text-body-large max-w-2xl mx-auto opacity-80">
                 企業情報をAIが理解しやすい形に最適化
               </p>
             </div>
@@ -288,7 +316,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   <h3 className="text-title3 mb-3">
                     {feature.title}
                   </h3>
-                  <p className="text-body text-secondary">
+                  <p className="text-body text-secondary opacity-70">
                     {feature.description}
                   </p>
                 </div>
@@ -320,14 +348,15 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
               <Link
                 href="/auth/signup"
-                className="btn-apple btn-apple-primary"
+                className="btn-apple btn-apple-primary text-xl px-10 py-5 transform hover:scale-105 transition-transform"
+                style={{ minHeight: '64px', fontSize: '20px' }}
               >
                 今すぐ無料で始める
-                <ArrowRightIcon size={16} className="ml-2" />
+                <ArrowRightIcon size={18} className="ml-2" />
               </Link>
               <Link
                 href="/hearing-service"
-                className="btn-apple btn-apple-secondary"
+                className="btn-apple btn-apple-secondary opacity-90"
               >
                 専門ヒアリング相談
               </Link>

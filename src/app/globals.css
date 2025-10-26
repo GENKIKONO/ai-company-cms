@@ -11,6 +11,9 @@
 html, body { 
   background: #fff !important; 
   color: #0f172a !important;
+  /* Performance最適化 - BR-03準拠 */
+  font-display: swap; /* FOIT防止 */
+  contain: layout style paint; /* Containment API */
 }
 /* 全要素に対する強制的な背景・文字色設定 */
 * {
@@ -114,6 +117,62 @@ html, body {
   --radius-medium: 12px;
   --radius-large: 16px;
   --radius-xl: 24px;
+  
+  /* Apple Standard Animation - BR-01準拠 */
+  --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);    /* Apple標準 */
+  --ease-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);  /* 減速 */
+  --ease-accelerate: cubic-bezier(0.4, 0.0, 1, 1);    /* 加速 */
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);     /* Apple独自 */
+  
+  /* Animation Duration - 短時間原則 */
+  --duration-instant: 0.1s;   /* Active feedback */
+  --duration-fast: 0.15s;     /* Button hover */
+  --duration-standard: 0.2s;  /* Transitions */
+  --duration-slow: 0.3s;      /* Page transitions */
+  
+  /* reduced-motion対応 */
+  --motion-duration: var(--duration-standard);
+  --motion-easing: var(--ease-standard);
+}
+
+/* reduced-motion設定への対応 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration: 0.01ms !important;
+    --motion-easing: linear !important;
+  }
+  
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Performance最適化 - Core Web Vitals向上 */
+/* GPU加速の最適化 */
+.btn-apple,
+.card-apple,
+.section-apple-hero {
+  transform: translateZ(0); /* GPU layer強制 */
+  backface-visibility: hidden; /* 裏面非表示 */
+}
+
+/* CLS防止 - Layout Shift最小化 */
+img, video {
+  height: auto;
+  max-width: 100%;
+}
+
+/* Intersection Observer用のplaceholder最適化 */
+.lazy-loading {
+  opacity: 0;
+  transition: opacity var(--duration-standard) var(--ease-standard);
+}
+
+.lazy-loaded {
+  opacity: 1;
 }
 
 /* ============================================================
@@ -2515,7 +2574,8 @@ html, body {
   font-weight: 500;
   font-family: var(--font-family-system);
   letter-spacing: var(--letter-spacing-body);
-  transition: all 0.15s ease-out;
+  transition: all var(--duration-fast) var(--ease-standard);
+  will-change: transform, background-color, box-shadow;
   cursor: pointer;
   border: none;
   text-decoration: none;
@@ -2535,7 +2595,7 @@ html, body {
 .btn-apple-primary:active {
   background-color: var(--color-blue-pressed);
   transform: scale(0.96);
-  transition-duration: 0.1s;
+  transition-duration: var(--duration-instant);
 }
 
 .btn-apple-secondary {
@@ -2552,7 +2612,7 @@ html, body {
 .btn-apple-secondary:active {
   background-color: rgba(0, 0, 0, 0.1);
   transform: scale(0.96);
-  transition-duration: 0.1s;
+  transition-duration: var(--duration-instant);
 }
 
 /* Focus states for accessibility */
@@ -2591,4 +2651,5 @@ html, body {
 .section-apple-hero {
   padding-top: var(--space-12);
   padding-bottom: var(--space-12);
+}
 }

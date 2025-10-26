@@ -116,6 +116,9 @@ const nextConfig = {
     webpackBuildWorker: true,
     optimizeCss: true,
     optimizePackageImports: ['lucide-react'],
+    // Performance最適化 - BR-03準拠
+    gzipSize: true,
+    craCompat: true,
   },
 
   // 本番ビルド最適化

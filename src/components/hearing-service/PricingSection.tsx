@@ -73,10 +73,11 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
           ))}
         </div>
 
-        {/* CTAボタン */}
+        {/* CTAボタン - Apple HIG 44px準拠 */}
         <Link
           href={generateContactUrl(planId)}
-          className={`btn btn-large w-full text-center ${colors.button}`}
+          className={`btn-apple ${colors.button} w-full text-center py-4 px-6 text-lg font-semibold transform hover:scale-105 transition-transform`}
+          style={{ minHeight: '56px', fontSize: '18px' }}
           rel="noopener noreferrer"
         >
           <span className="jp-text">{plan.ctaText}</span>

@@ -264,7 +264,8 @@ export default function PricingPlans({
                 <div className="mt-auto">
                   <Link
                     href={plan.ctaHref}
-                    className="hit-44 cta-optimized block w-full text-center py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg bg-[#3B82F6] text-white hover:bg-[#2563EB] focus:ring-[#93C5FD] transform hover:scale-105"
+                    className="btn-apple btn-apple-primary w-full text-center py-4 px-6 text-lg font-semibold transform hover:scale-105 transition-transform"
+                    style={{ minHeight: '56px', fontSize: '18px' }}
                     role="button"
                     aria-label={`${plan.name}プランを選択`}
                   >
@@ -385,7 +386,8 @@ export default function PricingPlans({
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className="hit-44 cta-optimized block w-full text-center py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg bg-[#3B82F6] text-white hover:bg-[#2563EB] focus:ring-[#93C5FD] transform hover:scale-105"
+                  className="btn-apple btn-apple-primary w-full text-center py-4 px-6 text-lg font-semibold transform hover:scale-105 transition-transform"
+                  style={{ minHeight: '56px', fontSize: '18px' }}
                   role="button"
                   aria-label={`${plan.name}プランを選択`}
                 >
