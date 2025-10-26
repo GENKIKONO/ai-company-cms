@@ -447,24 +447,8 @@ html[lang="ja"] .jp-body{
   
   /* Ensure proper contrast for text on colored backgrounds */
   .section--cta {
-    color: #ffffff !important;
+    color: #ffffff;
     --text-on-accent: #ffffff;
-  }
-  
-  .section--cta * {
-    color: #ffffff !important;
-  }
-  
-  .section--cta h1,
-  .section--cta h2,
-  .section--cta h3,
-  .section--cta h4,
-  .section--cta h5,
-  .section--cta h6,
-  .section--cta p,
-  .section--cta span,
-  .section--cta div {
-    color: #ffffff !important;
   }
   
   /* CTA専用：強力改行禁止 */
