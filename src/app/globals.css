@@ -4133,6 +4133,23 @@ section[class*="bg-[var(--color-primary-dark)]"] p.hig-jp-body {
   display: block !important;
 }
 
+/* Force display step cards text content specifically */
+.hig-section .hig-grid h4,
+.hig-section .hig-grid p,
+.hig-section .hig-grid span,
+section[class*="bg-[var(--color-primary-dark)]"] .hig-grid h4,
+section[class*="bg-[var(--color-primary-dark)]"] .hig-grid p,
+section[class*="bg-[var(--color-primary-dark)]"] .hig-grid span {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+section[class*="bg-[var(--color-primary-dark)]"] .hig-grid span {
+  display: inline !important;
+}
+
 @media (max-width: 768px) {
   .apple-comparison-grid {
     grid-template-columns: 1fr;

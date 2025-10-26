@@ -85,7 +85,7 @@ export default function CTASection() {
           </div>
 
           {/* 申込みステップ */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-[var(--radius-xl)] p-[var(--space-lg)] border border-white/10 max-w-4xl mx-auto">
+          <div className="backdrop-blur-sm rounded-[var(--radius-xl)] p-[var(--space-lg)] border border-white/10 max-w-4xl mx-auto">
             <h3 className="hig-text-h3 text-white mb-[var(--space-lg)] text-center hig-jp-heading">申し込みは3ステップで完了</h3>
             
             <div className="hig-grid hig-grid--3-cols gap-[var(--space-lg)]">
