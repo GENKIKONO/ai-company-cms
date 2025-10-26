@@ -23,7 +23,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import type { QuestionWithDetails } from '@/types/database';
-import { translateQuestionStatus } from '@/lib/qnaStats';
+import { translateQuestionStatus } from '@/lib/qna-stats';
 
 interface QuestionStats {
   total: number;

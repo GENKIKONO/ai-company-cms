@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import React, { useState, useEffect } from 'react';
 import { 
   HIGCard,
@@ -28,7 +31,7 @@ import {
   QAStatsFilters,
   getPresetDateRange,
   validateDateRange
-} from '@/lib/qnaStats';
+} from '@/lib/qna-stats';
 
 export default function CompanyQAStatsPage() {
   // State管理

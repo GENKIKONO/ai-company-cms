@@ -131,7 +131,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   </Link>
                   <Link
                     href="/organizations"
-                    className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-primary font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                    className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-[#3B82F6] text-white font-semibold rounded-lg hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] transition-colors"
                   >
                     企業ディレクトリを見る
                   </Link>
@@ -154,7 +154,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {featureBadges.map((badge) => (
-                      <span key={badge} className="rounded-full bg-slate-100 text-slate-700 px-3 py-1 text-xs font-medium">
+                      <span key={badge} className="rounded-full bg-slate-200 text-slate-800 px-3 py-1 text-xs font-medium">
                         {badge}
                       </span>
                     ))}
@@ -300,7 +300,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </Link>
               <Link
                 href="/hearing-service"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-primary font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-[#3B82F6] text-white font-semibold rounded-lg hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] transition-colors"
               >
                 ヒアリング代行サービス
               </Link>
@@ -350,7 +350,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </Link>
               <Link
                 href="/hearing-service"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-primary font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-[#3B82F6] text-white font-semibold rounded-lg hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] transition-colors"
               >
                 ヒアリング代行サービス
               </Link>

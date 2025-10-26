@@ -7,7 +7,7 @@ import {
   generateQAExportFileName,
   validateDateRange,
   getDefaultDateRange
-} from '@/lib/qnaStats';
+} from '@/lib/qna-stats';
 
 export async function GET(request: NextRequest) {
   try {

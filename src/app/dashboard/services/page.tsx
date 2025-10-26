@@ -165,7 +165,7 @@ export default function ServicesManagementPage() {
                       )}
                       <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
                         {service.category && (
-                          <span className="bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded-full">
+                          <span className="bg-slate-200 text-slate-800 px-2 py-1 text-xs rounded-full">
                             {service.category}
                           </span>
                         )}

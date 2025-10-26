@@ -384,14 +384,14 @@ export default function LandingPage({ stats }: Props) {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <h3 className="text-xl font-bold">AIO Hub</h3>
-              <p className="text-gray-400">AI対応企業ディレクトリプラットフォーム</p>
+              <p className="text-gray-300">AI対応企業ディレクトリプラットフォーム</p>
             </div>
             <div className="flex space-x-6">
-              <Link href="/directory" className="text-gray-400 hover:text-white">企業一覧</Link>
-              <Link href="/dashboard" className="text-gray-400 hover:text-white">マイページ</Link>
+              <Link href="/directory" className="text-gray-300 hover:text-white transition-colors">企業一覧</Link>
+              <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">マイページ</Link>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
             <p>&copy; 2024 AIO Hub. AI企業ディレクトリプラットフォーム - Next.js, Supabase, Stripe で構築</p>
           </div>
         </div>

@@ -297,7 +297,7 @@ export default function PricingPlans({
               {/* Header */}
               <div className="text-center mb-8">
                 <div className="mb-4">
-                  <plan.icon className={`h-12 w-12 mx-auto text-${plan.color}-600`} />
+                  <plan.icon className={`h-12 w-12 mx-auto ${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
                 </div>
                 <h3 id={`desktop-plan-${plan.id}-title`} className="text-2xl font-bold text-gray-900 mb-2">
                   {plan.name}

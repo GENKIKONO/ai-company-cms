@@ -123,13 +123,13 @@ export default function I18nSafeAuthHeader({
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm transition-colors">
+    <header className="bg-white shadow-sm transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
           <div className="flex items-center">
             <Link 
               href="/" 
-              className="text-2xl font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
             >
               {t('ui.header.title')}
             </Link>
@@ -138,13 +138,13 @@ export default function I18nSafeAuthHeader({
               <nav className="ml-10 hidden md:flex space-x-8">
                 <button
                   onClick={() => window.location.href = '/dashboard'}
-                  className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                  className="text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   {t('ui.header.dashboard')}
                 </button>
                 <Link 
                   href="/dashboard/billing" 
-                  className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                  className="text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   {t('ui.header.subscription')}
                 </Link>
@@ -156,7 +156,7 @@ export default function I18nSafeAuthHeader({
             {effectiveAuthState ? (
               <>
                 <div 
-                  className="hidden sm:block text-sm text-gray-700 dark:text-gray-300 max-w-[200px] truncate"
+                  className="hidden sm:block text-sm text-slate-700 max-w-[200px] truncate"
                   data-testid="user-menu"
                 >
                   {t('ui.header.greeting', { 

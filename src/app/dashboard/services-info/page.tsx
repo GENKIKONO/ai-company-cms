@@ -162,14 +162,14 @@ export default function ServicesInfoPage() {
           organization ? (
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-900 font-medium"
+              className="px-6 py-3 bg-[#3B82F6] text-white rounded-md hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] font-medium"
             >
               ダッシュボードに戻る
             </button>
           ) : (
             <button
               onClick={() => router.push('/organizations/new')}
-              className="px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-900 font-medium"
+              className="px-6 py-3 bg-[#3B82F6] text-white rounded-md hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] font-medium"
             >
               企業情報を登録する
             </button>
@@ -178,7 +178,7 @@ export default function ServicesInfoPage() {
           <>
             <button
               onClick={() => router.push('/auth/signup')}
-              className="px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-900 font-medium"
+              className="px-6 py-3 bg-[#3B82F6] text-white rounded-md hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] font-medium"
             >
               無料で始める
             </button>

@@ -1,0 +1,308 @@
+{
+  "timestamp": "2025-10-26T00:11:06.435Z",
+  "summary": {
+    "total": 26,
+    "passed": 17,
+    "failed": 0,
+    "warnings": 9
+  },
+  "tests": [
+    {
+      "category": "API Authorization",
+      "name": "非管理者アクセス制限",
+      "status": "pass",
+      "details": "正しく認証エラーを返す (401)",
+      "data": {
+        "status": 401,
+        "error": "Authentication required"
+      },
+      "timestamp": "2025-10-26T00:11:06.503Z"
+    },
+    {
+      "category": "API Authorization",
+      "name": "管理者レスポンス構造",
+      "status": "pass",
+      "details": "期待される構造を定義",
+      "data": {
+        "totals": {
+          "views": "number",
+          "downloads": "number"
+        },
+        "daily": "array",
+        "byMaterial": "array",
+        "topMaterials": "array",
+        "userAgents": "object",
+        "period": {
+          "from": "string",
+          "to": "string"
+        }
+      },
+      "timestamp": "2025-10-26T00:11:06.503Z"
+    },
+    {
+      "category": "API Authorization",
+      "name": "匿名化検証",
+      "status": "pass",
+      "details": "機密フィールド除外確認: ip_address, raw_user_agent",
+      "data": {
+        "excludedFields": [
+          "ip_address",
+          "raw_user_agent"
+        ]
+      },
+      "timestamp": "2025-10-26T00:11:06.503Z"
+    },
+    {
+      "category": "CSV Export",
+      "name": "daily export認証",
+      "status": "pass",
+      "details": "正しく認証要求",
+      "data": {
+        "status": 401
+      },
+      "timestamp": "2025-10-26T00:11:06.536Z"
+    },
+    {
+      "category": "CSV Export",
+      "name": "daily export headers",
+      "status": "warning",
+      "details": "Content-Dispositionヘッダー未確認",
+      "data": {
+        "disposition": null
+      },
+      "timestamp": "2025-10-26T00:11:06.536Z"
+    },
+    {
+      "category": "CSV Export",
+      "name": "byMaterial export認証",
+      "status": "pass",
+      "details": "正しく認証要求",
+      "data": {
+        "status": 401
+      },
+      "timestamp": "2025-10-26T00:11:06.560Z"
+    },
+    {
+      "category": "CSV Export",
+      "name": "byMaterial export headers",
+      "status": "warning",
+      "details": "Content-Dispositionヘッダー未確認",
+      "data": {
+        "disposition": null
+      },
+      "timestamp": "2025-10-26T00:11:06.560Z"
+    },
+    {
+      "category": "CSV Export",
+      "name": "UTF-8 BOM",
+      "status": "pass",
+      "details": "generateCSV関数でBOM付与実装済み",
+      "data": {
+        "bom": "\\uFEFF"
+      },
+      "timestamp": "2025-10-26T00:11:06.560Z"
+    },
+    {
+      "category": "Dashboard UI",
+      "name": "ページアクセス",
+      "status": "pass",
+      "details": "管理画面が正常に読み込み",
+      "data": {
+        "status": 200
+      },
+      "timestamp": "2025-10-26T00:11:06.619Z"
+    },
+    {
+      "category": "Dashboard UI",
+      "name": "ダッシュボードタイトル",
+      "status": "warning",
+      "details": "UI要素が見つからない",
+      "data": {
+        "found": false
+      },
+      "timestamp": "2025-10-26T00:11:06.619Z"
+    },
+    {
+      "category": "Dashboard UI",
+      "name": "期間フィルター",
+      "status": "warning",
+      "details": "UI要素が見つからない",
+      "data": {
+        "found": false
+      },
+      "timestamp": "2025-10-26T00:11:06.619Z"
+    },
+    {
+      "category": "Dashboard UI",
+      "name": "プリセットボタン",
+      "status": "warning",
+      "details": "UI要素が見つからない",
+      "data": {
+        "found": false
+      },
+      "timestamp": "2025-10-26T00:11:06.619Z"
+    },
+    {
+      "category": "Dashboard UI",
+      "name": "CSVエクスポート",
+      "status": "warning",
+      "details": "UI要素が見つからない",
+      "data": {
+        "found": false
+      },
+      "timestamp": "2025-10-26T00:11:06.620Z"
+    },
+    {
+      "category": "Dashboard UI",
+      "name": "KPI表示",
+      "status": "warning",
+      "details": "UI要素が見つからない",
+      "data": {
+        "found": false
+      },
+      "timestamp": "2025-10-26T00:11:06.620Z"
+    },
+    {
+      "category": "Dashboard UI",
+      "name": "日別推移",
+      "status": "warning",
+      "details": "UI要素が見つからない",
+      "data": {
+        "found": false
+      },
+      "timestamp": "2025-10-26T00:11:06.620Z"
+    },
+    {
+      "category": "Dashboard UI",
+      "name": "人気資料",
+      "status": "warning",
+      "details": "UI要素が見つからない",
+      "data": {
+        "found": false
+      },
+      "timestamp": "2025-10-26T00:11:06.620Z"
+    },
+    {
+      "category": "Dashboard UI",
+      "name": "HIGコンポーネント",
+      "status": "pass",
+      "details": "HIGデザインシステム使用",
+      "data": {
+        "hig": true
+      },
+      "timestamp": "2025-10-26T00:11:06.620Z"
+    },
+    {
+      "category": "Privacy",
+      "name": "ホームページ統計非表示",
+      "status": "pass",
+      "details": "統計関連情報の露出なし",
+      "data": {
+        "url": "/",
+        "keywords": []
+      },
+      "timestamp": "2025-10-26T00:11:08.745Z"
+    },
+    {
+      "category": "Privacy",
+      "name": "料金ページ統計非表示",
+      "status": "pass",
+      "details": "統計関連情報の露出なし",
+      "data": {
+        "url": "/pricing",
+        "keywords": []
+      },
+      "timestamp": "2025-10-26T00:11:09.459Z"
+    },
+    {
+      "category": "Privacy",
+      "name": "404ページ統計非表示",
+      "status": "pass",
+      "details": "統計関連情報の露出なし",
+      "data": {
+        "url": "/non-existent-page",
+        "keywords": []
+      },
+      "timestamp": "2025-10-26T00:11:10.099Z"
+    },
+    {
+      "category": "Privacy",
+      "name": "/api/public/stats API統計非表示",
+      "status": "pass",
+      "details": "レスポンスに統計情報なし",
+      "data": {
+        "api": "/api/public/stats"
+      },
+      "timestamp": "2025-10-26T00:11:10.823Z"
+    },
+    {
+      "category": "Privacy",
+      "name": "/api/public/organizations API統計非表示",
+      "status": "pass",
+      "details": "レスポンスに統計情報なし",
+      "data": {
+        "api": "/api/public/organizations"
+      },
+      "timestamp": "2025-10-26T00:11:11.314Z"
+    },
+    {
+      "category": "Privacy",
+      "name": "/api/health API統計非表示",
+      "status": "pass",
+      "details": "レスポンスに統計情報なし",
+      "data": {
+        "api": "/api/health"
+      },
+      "timestamp": "2025-10-26T00:11:12.747Z"
+    },
+    {
+      "category": "Stats Logging",
+      "name": "view action",
+      "status": "pass",
+      "details": "正常レスポンス (200)",
+      "data": {
+        "status": 200,
+        "response": {
+          "success": true,
+          "data": {
+            "id": "496659d3-4887-4dac-98ea-31886d16f5c7",
+            "action": "view",
+            "created_at": "2025-10-26T00:11:13.615902+00:00"
+          }
+        }
+      },
+      "timestamp": "2025-10-26T00:11:13.464Z"
+    },
+    {
+      "category": "Stats Logging",
+      "name": "download action",
+      "status": "pass",
+      "details": "正常レスポンス (200)",
+      "data": {
+        "status": 200,
+        "response": {
+          "success": true,
+          "data": {
+            "id": "fb1c092e-76c9-44ac-a12a-0aebafa9ba9b",
+            "action": "download",
+            "created_at": "2025-10-26T00:11:13.755369+00:00"
+          }
+        }
+      },
+      "timestamp": "2025-10-26T00:11:13.596Z"
+    },
+    {
+      "category": "Stats Logging",
+      "name": "invalid action",
+      "status": "pass",
+      "details": "正常レスポンス (400)",
+      "data": {
+        "status": 400,
+        "response": {
+          "error": "action must be \"view\" or \"download\""
+        }
+      },
+      "timestamp": "2025-10-26T00:11:13.619Z"
+    }
+  ]
+}

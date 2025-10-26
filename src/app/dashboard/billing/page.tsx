@@ -144,7 +144,7 @@ export default function BillingPage() {
       case 'trialing':
         return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">トライアル中</span>;
       default:
-        return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-sm">未契約</span>;
+        return <span className="bg-slate-200 text-slate-800 px-2 py-1 rounded-full text-sm">未契約</span>;
     }
   }
 
@@ -271,7 +271,7 @@ export default function BillingPage() {
             <button
               onClick={handleManageBilling}
               disabled={actionLoading || !organization.stripe_customer_id}
-              className="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="px-6 py-3 bg-[#3B82F6] text-white rounded-md hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {actionLoading ? '処理中...' : '請求の管理'}
             </button>

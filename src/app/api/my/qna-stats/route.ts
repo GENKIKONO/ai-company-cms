@@ -7,14 +7,14 @@ import {
   getDefaultDateRange,
   normalizeUserAgent,
   debugLog
-} from '@/lib/qnaStats';
+} from '@/lib/qna-stats';
 import type { 
   QAStatsResponse,
   QAStatsTotals,
   QAStatsDailyPoint,
   QAStatsSummary,
   QAStatsTopEntry
-} from '@/lib/qnaStats';
+} from '@/lib/qna-stats';
 
 export async function GET(request: NextRequest) {
   try {

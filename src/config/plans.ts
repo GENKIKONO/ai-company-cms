@@ -16,7 +16,7 @@ export const PLAN_LIMITS = {
     system_monitoring: false,
     qa_items: 5,  // Q&A項目制限追加
     case_studies: 2,  // 導入事例制限追加
-    posts: 5,  // 記事制限追加
+    posts: 0,  // 記事機能なし（ベーシック以上）
     faqs: 5  // FAQ制限追加
   },
   basic: { 
@@ -88,10 +88,10 @@ export type PlanType = keyof typeof PLAN_LIMITS;
  * プラン名（表示用）
  */
 export const PLAN_NAMES = {
-  free: 'Free',
-  basic: 'Basic',
-  business: 'Business',
-  enterprise: 'Enterprise'
+  free: 'フリー',
+  basic: 'ベーシック',
+  business: 'ビジネス',
+  enterprise: 'エンタープライズ'
 } as const;
 
 /**
@@ -110,6 +110,7 @@ export const PLAN_FEATURES = {
   basic: [
     'サービス登録：10件まで',
     'Q&A項目：20件まで',
+    '記事投稿：50件まで',
     '営業資料添付（最大5個）',
     '外部リンク表示機能',
     'カテゴリタグ検索対応',
@@ -120,6 +121,7 @@ export const PLAN_FEATURES = {
   business: [
     'サービス登録：50件まで',
     'Q&A項目：無制限',
+    '記事投稿：無制限',
     '営業資料添付（最大20個）',
     '外部埋め込み：20個まで',
     '大サイズ企業ロゴ',
@@ -149,7 +151,7 @@ export function formatPrice(planType: PlanType): string {
   const price = PLAN_PRICES[planType];
   if (price === null) return 'お問い合わせ';
   if (price === 0) return '無料';
-  return `¥${price.toLocaleString()}/月`;
+  return `¥${price.toLocaleString()}/月（税込）`;
 }
 
 /**
@@ -268,4 +270,22 @@ export function getQALimitMessage(planType: PlanType): string {
   const limit = PLAN_LIMITS[planType].qa_items;
   if (limit === Number.POSITIVE_INFINITY) return '';
   return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（Q&A項目上限: ${limit}件）。`;
+}
+
+/**
+ * 記事制限チェック
+ */
+export function isPostLimitReached(planType: PlanType, currentCount: number): boolean {
+  const limit = PLAN_LIMITS[planType].posts;
+  return currentCount >= limit;
+}
+
+/**
+ * 記事制限メッセージ
+ */
+export function getPostLimitMessage(planType: PlanType): string {
+  const limit = PLAN_LIMITS[planType].posts;
+  if (limit === 0) return `記事機能は${PLAN_NAMES.basic}以上のプランで利用可能です。`;
+  if (limit === Number.POSITIVE_INFINITY) return '';
+  return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（記事上限: ${limit}件）。`;
 }

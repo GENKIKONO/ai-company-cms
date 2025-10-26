@@ -3,7 +3,7 @@
  * 管理者・企業担当者専用の詳細分析とエクスポート機能
  */
 
-import { normalizeUserAgent, anonymizeIP, validateDateRange, getPresetDateRange, getDefaultDateRange, generateCSV, createErrorResponse, createSuccessResponse, debugLog } from './materialStats';
+import { normalizeUserAgent, anonymizeIP, validateDateRange, getPresetDateRange, getDefaultDateRange, generateCSV, createErrorResponse, createSuccessResponse, debugLog } from './material-stats';
 
 // =================================
 // Q&A Stats 型定義
@@ -236,4 +236,4 @@ export {
   createErrorResponse,
   createSuccessResponse,
   debugLog
-} from './materialStats';
+} from './material-stats';

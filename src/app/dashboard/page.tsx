@@ -39,7 +39,7 @@ export default async function DashboardPage() {
             <p className="text-gray-600 mb-4">ダッシュボードにアクセスするにはログインが必要です。</p>
             <Link
               href="/auth/login"
-              className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-md text-center block"
+              className="w-full bg-[#3B82F6] hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] text-white font-medium py-2 px-4 rounded-md text-center block"
             >
               ログインページへ
             </Link>
@@ -80,7 +80,7 @@ export default async function DashboardPage() {
             <p className="text-gray-600 mb-4">ダッシュボードを使用するには企業情報の登録が必要です。</p>
             <Link
               href="/organizations/new"
-              className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-md text-center block"
+              className="w-full bg-[#3B82F6] hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] text-white font-medium py-2 px-4 rounded-md text-center block"
               data-testid="create-organization"
             >
               企業を作成
@@ -406,8 +406,8 @@ export default async function DashboardPage() {
               <div className="flex items-center space-x-3">
                 <span className={`px-3 py-1 text-sm font-medium rounded-full ${
                   org.is_published 
-                    ? 'bg-gray-100 text-gray-800' 
-                    : 'bg-gray-100 text-gray-600'
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-slate-200 text-slate-700'
                 }`}>
                   {org.is_published ? '公開中' : '下書き'}
                 </span>
@@ -518,7 +518,7 @@ export default async function DashboardPage() {
           <p className="text-gray-600 mb-4">数秒後にリロードしてください。</p>
           <Link
             href="/dashboard"
-            className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-md text-center block"
+            className="w-full bg-[#3B82F6] hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] text-white font-medium py-2 px-4 rounded-md text-center block"
           >
             再読み込み
           </Link>

@@ -141,9 +141,9 @@ export const getHearingPlanColorClasses = (color: string) => {
  */
 export function formatHearingPrice(plan: typeof HEARING_SERVICE_PLANS[HearingServicePlanId]): string {
   if ('priceRange' in plan && plan.priceRange) {
-    return `¥${plan.priceRange}`;
+    return `¥${plan.priceRange}（税込）`;
   }
-  return `¥${plan.price.toLocaleString()}`;
+  return `¥${plan.price.toLocaleString()}（税込）`;
 }
 
 /**

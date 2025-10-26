@@ -61,7 +61,7 @@ export default function FAB() {
         ui-fab
         fixed z-[1000] 
         w-14 h-14 
-        text-primary
+        text-slate-700 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl border border-slate-200
         active:scale-95
         grid place-items-center 
         will-change-transform

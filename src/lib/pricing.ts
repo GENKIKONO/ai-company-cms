@@ -12,7 +12,7 @@ const CURRENCY = process.env.CURRENCY || 'JPY';
  * 日本円を税込み表記でフォーマット
  */
 export function formatJPY(n: number): string {
-  return `¥${n.toLocaleString('ja-JP')}`;
+  return `¥${n.toLocaleString('ja-JP')}（税込）`;
 }
 
 /**

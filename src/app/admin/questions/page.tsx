@@ -28,7 +28,7 @@ import {
   Search
 } from 'lucide-react';
 import type { QuestionWithDetails } from '@/types/database';
-import { translateQuestionStatus, generateQuestionsCSV } from '@/lib/qnaStats';
+import { translateQuestionStatus, generateQuestionsCSV } from '@/lib/qna-stats';
 
 interface QuestionStats {
   total: number;

@@ -108,7 +108,7 @@ export default function AdvancedSearchFilters({
     filters.priceRange?.max;
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
+    <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
       {/* 基本検索バー */}
       <div className="flex gap-4 mb-4">
         <div className="flex-1">
@@ -118,7 +118,7 @@ export default function AdvancedSearchFilters({
             value={filters.query}
             onChange={(e) => updateFilters({ query: e.target.value })}
             onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-            className="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+            className="w-full px-4 py-3 text-lg border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-slate-900"
           />
         </div>
         <button
@@ -138,7 +138,7 @@ export default function AdvancedSearchFilters({
             className={`px-3 py-1 rounded-full text-sm transition-colors ${
               filters.type === type
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
             {t(`search.types.${type}`)}
@@ -148,7 +148,7 @@ export default function AdvancedSearchFilters({
 
       {/* 結果カウントと高度なフィルターの切り替え */}
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-slate-600">
           {resultsCount > 0 ? (
             t('search.resultsCount', { count: resultsCount.toLocaleString() })
           ) : (
@@ -194,7 +194,7 @@ export default function AdvancedSearchFilters({
                     onChange={() => toggleArrayFilter('industries', industry)}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">{industry}</span>
+                  <span className="text-sm text-slate-700">{industry}</span>
                 </label>
               ))}
             </div>

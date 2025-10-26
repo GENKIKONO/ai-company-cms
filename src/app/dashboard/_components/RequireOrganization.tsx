@@ -93,7 +93,7 @@ export function RequireOrganization({
                   <p className="mb-2">企業作成後に利用可能になる機能：</p>
                   <ul className="text-left space-y-1">
                     <li>• サービス管理</li>
-                    <li>• 記事投稿</li>
+                    <li>• 記事投稿（ベーシック以上）</li>
                     <li>• 導入事例作成</li>
                     <li>• FAQ管理</li>
                     <li>• データエクスポート</li>
