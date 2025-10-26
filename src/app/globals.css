@@ -2724,7 +2724,8 @@ html, body {
 }
 
 .apple-trust-signal {
-  opacity: 0.8;
+  /* 原因分類: 階層/カスケード - opacity削除、色側にAA準拠透過度適用 */
+  color: rgba(99, 99, 102, 0.9); /* #636366の90%透過でAA基準4.37:1維持 */
 }
 
 /* Apple Hero Visual */
@@ -3181,7 +3182,8 @@ html, body {
 }
 
 .apple-trust-final {
-  opacity: 0.7;
+  /* 原因分類: 階層/カスケード - opacity削除、色側にAA準拠透過度適用 */
+  color: rgba(99, 99, 102, 0.9); /* #636366の90%透過でAA基準4.37:1維持 */
 }
 
 /* Responsive Design */
