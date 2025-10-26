@@ -247,7 +247,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* CTA Section - Emotional Peak */}
-        <section className="section section--cta section--full-bleed">
+        <section className="section bg-gradient-to-br from-green-600 to-green-700 text-white" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
           {/* Animated Background Elements */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl animate-pulse"></div>
@@ -347,7 +347,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         />
 
         {/* Final CTA - 成功体験誘導 */}
-        <section className="section section--cta section--full-bleed">
+        <section className="section bg-gradient-to-br from-green-600 to-green-700 text-white" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
           <div className="site-container text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
               AI時代に見つかる企業になる
