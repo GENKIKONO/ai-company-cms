@@ -385,7 +385,7 @@ section > .site-container, section > .hig-container {
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: 0em;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
 }
 
 .text-body {
@@ -393,7 +393,7 @@ section > .site-container, section > .hig-container {
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: 0em;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
 }
 
 .text-caption {
@@ -2475,7 +2475,7 @@ html, body {
   letter-spacing: var(--letter-spacing-body);
   font-weight: 400;
   font-family: var(--font-family-system);
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
 }
 
 .text-caption {
@@ -2484,7 +2484,7 @@ html, body {
   letter-spacing: var(--letter-spacing-caption);
   font-weight: 500;
   font-family: var(--font-family-system);
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
 }
 
 /* Apple Color Variants */
@@ -2715,7 +2715,7 @@ html, body {
   line-height: 1.4;
   letter-spacing: -0.01em;
   margin-bottom: var(--space-8);
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
   max-width: 480px;
 }
 
@@ -2776,7 +2776,7 @@ html, body {
   padding: var(--space-3);
   margin-bottom: var(--space-4);
   font-size: 14px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
 }
 
 .apple-search-result {
@@ -2927,7 +2927,7 @@ html, body {
 }
 
 .apple-text-secondary {
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため主要テキストと同色に統一 */
 }
 
 .apple-link {
@@ -2965,7 +2965,7 @@ html, body {
 }
 
 .apple-text-secondary {
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため主要テキストと同色に統一 */
 }
 
 .apple-text-blue {
@@ -3251,7 +3251,7 @@ html, body {
 
 .apple-pricing-card {
   background: #ffffff;
-  border: 1px solid var(--apple-gray-300);
+  border: 1px solid #e5e7eb;
   border-radius: 16px;
   padding: 32px;
   position: relative;
@@ -3262,12 +3262,12 @@ html, body {
 }
 
 .apple-pricing-card:hover {
-  border-color: var(--apple-blue);
+  border-color: #007AFF;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 .apple-pricing-card-popular {
-  border-color: var(--apple-blue);
+  border-color: #007AFF;
   background: linear-gradient(135deg, #ffffff 0%, #f7f9ff 100%);
   box-shadow: 0 8px 32px rgba(0, 122, 255, 0.15);
 }
@@ -3284,7 +3284,7 @@ html, body {
   display: inline-flex;
   align-items: center;
   padding: 8px 16px;
-  background: var(--apple-blue);
+  background: #007AFF;
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
@@ -3312,7 +3312,7 @@ html, body {
 
 .apple-pricing-original {
   font-size: 15px;
-  color: var(--apple-gray-400);
+  color: var(--color-text-secondary);
   text-decoration: line-through;
   margin-right: 8px;
 }
@@ -3329,7 +3329,7 @@ html, body {
 
 .apple-pricing-period {
   font-size: 17px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
   margin-left: 4px;
 }
 
@@ -3341,12 +3341,12 @@ html, body {
 .apple-pricing-inherited {
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--apple-gray-200);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .apple-pricing-inherited-text {
   font-size: 15px;
-  color: var(--apple-blue);
+  color: #007AFF;
   font-weight: 600;
 }
 
@@ -3365,11 +3365,11 @@ html, body {
 }
 
 .apple-pricing-check-included {
-  color: var(--apple-green);
+  color: #34C759;
 }
 
 .apple-pricing-check-disabled {
-  color: var(--apple-gray-400);
+  color: var(--color-text-secondary);
 }
 
 .apple-pricing-feature-content {
@@ -3383,15 +3383,15 @@ html, body {
 }
 
 .apple-pricing-feature-disabled {
-  color: var(--apple-gray-400);
+  color: var(--color-text-secondary);
 }
 
 .apple-pricing-feature-subtext {
   margin-top: 8px;
   font-size: 15px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
   padding-left: 16px;
-  border-left: 2px solid var(--apple-gray-200);
+  border-left: 2px solid #e5e7eb;
 }
 
 .apple-pricing-cta {
@@ -3407,7 +3407,7 @@ html, body {
   text-align: center;
   margin-top: 48px;
   padding-top: 32px;
-  border-top: 1px solid var(--apple-gray-200);
+  border-top: 1px solid #e5e7eb;
 }
 
 .apple-pricing-footer p:first-child {
@@ -3447,7 +3447,7 @@ html, body {
   color: var(--color-text-primary);
   margin-bottom: 24px;
   padding-bottom: 8px;
-  border-bottom: 2px solid var(--apple-blue);
+  border-bottom: 2px solid #007AFF;
 }
 
 .apple-faq-items {
@@ -3458,7 +3458,7 @@ html, body {
 
 .apple-faq-item {
   background: #ffffff;
-  border: 1px solid var(--apple-gray-300);
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -3466,7 +3466,7 @@ html, body {
 }
 
 .apple-faq-item:hover {
-  border-color: var(--apple-blue);
+  border-color: #007AFF;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
@@ -3509,12 +3509,12 @@ html, body {
 .apple-faq-chevron {
   width: 20px;
   height: 20px;
-  color: var(--apple-gray-400);
+  color: var(--color-text-secondary);
   transition: all 0.3s ease;
 }
 
 .apple-faq-question:hover .apple-faq-chevron {
-  color: var(--apple-blue);
+  color: #007AFF;
 }
 
 .apple-faq-answer {
@@ -3523,7 +3523,7 @@ html, body {
 
 .apple-faq-answer-content {
   padding-top: 16px;
-  border-top: 1px solid var(--apple-gray-200);
+  border-top: 1px solid #e5e7eb;
 }
 
 .apple-faq-support {
@@ -3580,8 +3580,8 @@ html, body {
    ============================================================ */
 
 .apple-footer {
-  background: var(--apple-gray-100);
-  border-top: 1px solid var(--apple-gray-200);
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
   margin-top: 64px;
 }
 
@@ -3621,13 +3621,13 @@ html, body {
 .apple-footer-link {
   font-size: 15px;
   line-height: 1.4;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .apple-footer-link:hover {
-  color: var(--apple-blue);
+  color: #007AFF;
 }
 
 .apple-footer-bottom {
@@ -3635,7 +3635,7 @@ html, body {
   justify-content: space-between;
   align-items: flex-start;
   padding-top: 32px;
-  border-top: 1px solid var(--apple-gray-200);
+  border-top: 1px solid #e5e7eb;
 }
 
 .apple-footer-brand {
@@ -3655,7 +3655,7 @@ html, body {
 .apple-footer-description {
   font-size: 15px;
   line-height: 1.4;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
   margin: 0;
 }
 
@@ -3683,7 +3683,7 @@ html, body {
   justify-content: center;
   width: 44px;
   height: 44px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
   text-decoration: none;
   border-radius: 22px;
   transition: all 0.3s ease;
@@ -3691,7 +3691,7 @@ html, body {
 }
 
 .apple-footer-social-link:hover {
-  color: var(--apple-blue);
+  color: #007AFF;
   background: rgba(0, 122, 255, 0.1);
 }
 
@@ -3765,7 +3765,7 @@ html, body {
 .apple-hero-subtitle {
   font-size: 17px;
   line-height: 1.47;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
   margin-bottom: 48px;
   max-width: 480px;
   margin-left: auto;
@@ -3921,7 +3921,7 @@ html, body {
 }
 
 .apple-comparison-example {
-  background: var(--apple-gray-100);
+  background: #f9fafb;
   border-radius: 8px;
   padding: var(--space-3);
   margin-bottom: var(--space-2);
@@ -3934,7 +3934,7 @@ html, body {
 .apple-comparison-text {
   font-size: 15px;
   line-height: 1.5;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary); /* 視認性確保のため統一 */
 }
 
 .apple-comparison-structured {
@@ -3961,7 +3961,7 @@ html, body {
 
 .apple-comparison-primary {
   background: rgba(0, 122, 255, 0.05);
-  border-left-color: var(--apple-blue);
+  border-left-color: #007AFF;
 }
 
 .apple-comparison-secondary {
@@ -3980,7 +3980,7 @@ html, body {
   justify-content: center;
   gap: 8px;
   padding-top: var(--space-4);
-  border-top: 1px solid var(--apple-gray-200);
+  border-top: 1px solid #e5e7eb;
 }
 
 .apple-comparison-status-icon {
