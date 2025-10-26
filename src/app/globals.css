@@ -154,7 +154,19 @@ section > .site-container, section > .hig-container {
 
 .section--cta {
   background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
-  color: white;
+  color: white !important;
+}
+
+.section--cta h1,
+.section--cta h2,
+.section--cta h3,
+.section--cta h4,
+.section--cta h5,
+.section--cta h6,
+.section--cta p,
+.section--cta span,
+.section--cta div {
+  color: white !important;
 }
 
 /* CTA統一スタイリング */
@@ -187,9 +199,6 @@ section > .site-container, section > .hig-container {
   --cta-blue-hover: #1d4ed8;
 }
 
-.section--cta * {
-  color: white !important;
-}
 
 .section--cta .card {
   background: rgba(255, 255, 255, 0.1) !important;
