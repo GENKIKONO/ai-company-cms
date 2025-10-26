@@ -15,7 +15,7 @@ export default function HeroSection() {
           
           {/* Apple式サブタイトル - 短い補助文 */}
           <p className="apple-hero-subtitle">
-            1時間のヒアリングで企業情報を構造化
+            対話を通じて企業価値を構造化し、AI検索で発見される企業プロフィールを構築
           </p>
           
           {/* Apple式CTA - 単一のプライマリボタン */}

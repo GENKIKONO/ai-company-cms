@@ -9,7 +9,7 @@ export default function GreenBandSection() {
             企業の魅力を、AIが理解できる形に
           </h2>
           <p className="apple-green-subtitle">
-            ヒアリングによって得られた情報を構造化し、検索エンジンやAIが正確に理解できるデータとして整備します
+            対話を通じて企業価値を第三者視点で整理し、AIに理解されやすい構造データとして言語化します
           </p>
         </div>
       </div>
