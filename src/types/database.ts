@@ -502,3 +502,112 @@ export interface OrganizationWithOwner extends Organization {
   owner_avatar_url?: string;
   owner_role?: UserRole;
 }
+
+// Sales Materials Types
+export type SalesAction = 'view' | 'download';
+
+export interface SalesMaterial {
+  id: string;
+  organization_id: string;
+  title: string;
+  file_path: string;
+  file_type?: string;
+  file_size?: number;
+  uploaded_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SalesMaterialStat {
+  id: string;
+  material_id: string;
+  user_id?: string;
+  company_id?: string;
+  action: SalesAction;
+  user_agent?: string;
+  ip_address?: string;
+  created_at: string;
+}
+
+export interface SalesMaterialStatsSummary {
+  material_id: string;
+  material_title: string;
+  organization_name: string;
+  total_views: number;
+  total_downloads: number;
+  unique_viewers: number;
+  unique_downloaders: number;
+  last_viewed_at?: string;
+  last_downloaded_at?: string;
+}
+
+export interface SalesMaterialDailyStats {
+  date: string;
+  material_id: string;
+  views: number;
+  downloads: number;
+  unique_views: number;
+  unique_downloads: number;
+}
+
+// Q&A Stats Types
+export type QAStatsAction = 'view';
+
+export interface QAViewStat {
+  id: string;
+  qna_id: string;
+  user_id?: string;
+  company_id?: string;
+  action: QAStatsAction;
+  user_agent?: string;
+  ip_address?: string;
+  created_at: string;
+}
+
+export interface QAStatsSummary {
+  qna_id: string;
+  question: string;
+  organization_name: string;
+  category_name?: string;
+  total_views: number;
+  unique_viewers: number;
+  last_viewed_at?: string;
+}
+
+export interface QADailyStats {
+  date: string;
+  qna_id: string;
+  views: number;
+  unique_views: number;
+}
+
+// Questions Box Types
+export type QuestionStatus = 'open' | 'answered' | 'closed';
+
+export interface Question {
+  id: string;
+  company_id: string;
+  user_id: string;
+  question_text: string;
+  status: QuestionStatus;
+  answer_text?: string;
+  created_at: string;
+  answered_at?: string;
+  answered_by?: string;
+}
+
+export interface QuestionWithDetails extends Question {
+  user_email?: string;
+  user_full_name?: string;
+  company_name?: string;
+  answerer_name?: string;
+}
+
+export interface QuestionFormData {
+  company_id: string;
+  question_text: string;
+}
+
+export interface QuestionAnswerData {
+  answer_text: string;
+}

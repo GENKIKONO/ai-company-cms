@@ -65,8 +65,45 @@ export default function QAPublicDisplay({ organizationSlug, className = '' }: QA
       newExpanded.delete(entryId);
     } else {
       newExpanded.add(entryId);
+      // Q&A閲覧統計のログ送信（新規展開時のみ）
+      logQAView(entryId);
     }
     setExpandedItems(newExpanded);
+  };
+
+  const logQAView = async (qnaId: string) => {
+    try {
+      // 重複計測防止: sessionStorageで同一セッション内の重複viewを防ぐ
+      const sessionKey = `qna_view_${qnaId}`;
+      const hasAlreadyViewed = sessionStorage.getItem(sessionKey);
+      
+      if (hasAlreadyViewed) {
+        console.log(`Q&A ${qnaId} already viewed in this session, skipping duplicate log`);
+        return;
+      }
+
+      // 統計ログ送信
+      const response = await fetch('/api/qna/stats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          qna_id: qnaId,
+          action: 'view',
+          user_agent: navigator.userAgent,
+        }),
+      });
+
+      // 成功時のみセッションフラグを設定
+      if (response.ok) {
+        sessionStorage.setItem(sessionKey, new Date().toISOString());
+      }
+      
+    } catch (error) {
+      // サイレントエラー：統計ログの失敗はユーザー体験に影響させない
+      console.warn('Failed to log Q&A view:', error);
+    }
   };
 
   const groupedEntries = entries.reduce((groups, entry) => {

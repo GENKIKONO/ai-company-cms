@@ -6,8 +6,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { format, subDays, parseISO } from 'date-fns';
-import { ja } from 'date-fns/locale';
 
 interface UsageData {
   date: string;
@@ -38,11 +36,12 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
       setError(null);
 
       const endDate = new Date();
-      const startDate = subDays(endDate, days);
+      const startDate = new Date(endDate);
+      startDate.setDate(endDate.getDate() - days);
       
       const params = new URLSearchParams({
-        startDate: format(startDate, 'yyyy-MM-dd'),
-        endDate: format(endDate, 'yyyy-MM-dd')
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0]
       });
       
       if (organizationId) {
@@ -164,7 +163,7 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
               onClick={() => setSelectedMetric(metric.key)}
               className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 selectedMetric === metric.key
-                  ? `bg-${metric.color}-100 text-${metric.color}-700 border border-${metric.color}-300`
+                  ? `bg-blue-100 text-blue-700 border border-blue-300`
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -212,7 +211,7 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                       <div className="bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
                         <div className="font-medium">
-                          {format(parseISO(item.date), 'M/d', { locale: ja })}
+                          {new Date(item.date).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' })}
                         </div>
                         <div>{formatTooltipValue(item)}</div>
                       </div>
@@ -221,7 +220,7 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
                   
                   {/* 日付ラベル */}
                   <div className="text-xs text-gray-400 transform -rotate-45 origin-top-left">
-                    {format(parseISO(item.date), 'M/d', { locale: ja })}
+                    {new Date(item.date).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' })}
                   </div>
                 </div>
               ))}
