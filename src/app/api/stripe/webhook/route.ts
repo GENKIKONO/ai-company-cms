@@ -74,7 +74,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
 
     // イベント処理
     let processingSuccess = false;
-    let errorMessage = '';
+    const errorMessage = '';
 
     switch (event.type) {
       case 'customer.subscription.created':

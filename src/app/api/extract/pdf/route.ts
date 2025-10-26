@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       
       // シンプルなPDFテキスト抽出（実際の本格的なPDF解析ライブラリが必要な場合は後で追加）
       let text = '';
-      let title = file.name.replace('.pdf', '');
+      const title = file.name.replace('.pdf', '');
       const headings: string[] = [];
 
       // PDFからのテキスト抽出は簡易版として、ファイル名と基本情報を返す

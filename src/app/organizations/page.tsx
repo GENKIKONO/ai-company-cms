@@ -75,7 +75,7 @@ export default function OrganizationsPage() {
 
   // フィルタリング済みの企業一覧
   const filteredOrganizations = useMemo(() => {
-    let filtered = organizations.filter(org => {
+    const filtered = organizations.filter(org => {
       const matchesSearch = !filters.search || 
         org.name.toLowerCase().includes(filters.search.toLowerCase()) ||
         org.description?.toLowerCase().includes(filters.search.toLowerCase()) ||

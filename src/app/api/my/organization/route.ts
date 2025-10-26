@@ -636,7 +636,7 @@ async function revalidateOrgCache(userId: string, orgSlug?: string, oldSlug?: st
 
 // PUT - 既存の企業情報を更新（トランザクション強化）
 export async function PUT(request: NextRequest) {
-  let transaction: any = null;
+  const transaction: any = null;
   try {
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await supabaseServer();

@@ -73,7 +73,7 @@ export function normalizeArrayFields<T extends Record<string, any>>(
  * Post データの正規化
  */
 export function normalizePostPayload(data: any) {
-  let normalized = normalizeEmptyStrings(data, [
+  const normalized = normalizeEmptyStrings(data, [
     'content_markdown',
     'content_html',
     'slug'
@@ -155,7 +155,7 @@ export function normalizeServicePayload(data: any) {
  * CaseStudy データの正規化
  */
 export function normalizeCaseStudyPayload(data: any) {
-  let normalized = normalizeEmptyStrings(data, [
+  const normalized = normalizeEmptyStrings(data, [
     'problem',
     'solution', 
     'result'

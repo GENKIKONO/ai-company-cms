@@ -137,7 +137,7 @@ function extractFromHTML(html: string, sourceUrl: string) {
     }
 
     // スクリプトとスタイルを除去
-    let cleanHtml = html
+    const cleanHtml = html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
       .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
