@@ -65,8 +65,8 @@ html, body {
   
   /* Apple Standard Text Colors */
   --color-text-primary: #1D1D1F;    /* Apple標準黒 */
-  --color-text-secondary: #86868B;  /* Apple標準グレー */
-  --color-text-tertiary: #C6C6C8;   /* Apple薄グレー */
+  --color-text-secondary: #636366;  /* AA準拠グレー (4.5:1) */
+  --color-text-tertiary: #8E8E93;   /* AA大文字準拠グレー (3.0:1) */
   
   /* Apple Standard Backgrounds */
   --color-background: #FFFFFF;      /* 純白 */
@@ -3320,14 +3320,14 @@ html, body {
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
-  color: var(--apple-label);
+  color: var(--color-text-primary);
   font-variant-numeric: lining-nums tabular-nums;
   font-feature-settings: "lnum", "tnum";
 }
 
 .apple-pricing-period {
   font-size: 17px;
-  color: var(--apple-secondary-label);
+  color: var(--color-text-secondary);
   margin-left: 4px;
 }
 
@@ -3377,7 +3377,7 @@ html, body {
 .apple-pricing-feature-text {
   font-size: 17px;
   line-height: 1.4;
-  color: var(--apple-label);
+  color: var(--color-text-primary);
 }
 
 .apple-pricing-feature-disabled {
@@ -3387,7 +3387,7 @@ html, body {
 .apple-pricing-feature-subtext {
   margin-top: 8px;
   font-size: 15px;
-  color: var(--apple-secondary-label);
+  color: var(--color-text-secondary);
   padding-left: 16px;
   border-left: 2px solid var(--apple-gray-200);
 }
@@ -3442,7 +3442,7 @@ html, body {
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  color: var(--apple-label);
+  color: var(--color-text-primary);
   margin-bottom: 24px;
   padding-bottom: 8px;
   border-bottom: 2px solid var(--apple-blue);
@@ -3490,7 +3490,7 @@ html, body {
   font-size: 17px;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--apple-label);
+  color: var(--color-text-primary);
   flex: 1;
   margin-right: 16px;
 }
@@ -3602,7 +3602,7 @@ html, body {
   font-size: 17px;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--apple-label);
+  color: var(--color-text-primary);
   margin-bottom: 16px;
 }
 
@@ -3619,7 +3619,7 @@ html, body {
 .apple-footer-link {
   font-size: 15px;
   line-height: 1.4;
-  color: var(--apple-secondary-label);
+  color: var(--color-text-secondary);
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -3647,13 +3647,13 @@ html, body {
 .apple-footer-brand-text {
   font-size: 24px;
   font-weight: 700;
-  color: var(--apple-label);
+  color: var(--color-text-primary);
 }
 
 .apple-footer-description {
   font-size: 15px;
   line-height: 1.4;
-  color: var(--apple-secondary-label);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -3681,7 +3681,7 @@ html, body {
   justify-content: center;
   width: 44px;
   height: 44px;
-  color: var(--apple-secondary-label);
+  color: var(--color-text-secondary);
   text-decoration: none;
   border-radius: 22px;
   transition: all 0.3s ease;
@@ -3755,7 +3755,7 @@ html, body {
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.025em;
-  color: var(--apple-label);
+  color: var(--color-text-primary);
   margin-bottom: 32px;
   font-family: var(--font-family-system);
 }
@@ -3763,7 +3763,7 @@ html, body {
 .apple-hero-subtitle {
   font-size: 17px;
   line-height: 1.47;
-  color: var(--apple-secondary-label);
+  color: var(--color-text-secondary);
   margin-bottom: 48px;
   max-width: 480px;
   margin-left: auto;
@@ -3932,7 +3932,7 @@ html, body {
 .apple-comparison-text {
   font-size: 15px;
   line-height: 1.5;
-  color: var(--apple-secondary-label);
+  color: var(--color-text-secondary);
 }
 
 .apple-comparison-structured {
