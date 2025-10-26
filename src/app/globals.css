@@ -2865,6 +2865,27 @@ html, body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* Force button visibility with higher specificity */
+.apple-pricing-cta .apple-button-primary,
+a.apple-button.apple-button-primary {
+  background: #007AFF !important;
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-size: inherit !important;
+  display: inline-flex !important;
+}
+
+.apple-pricing-cta .apple-button-secondary,
+a.apple-button.apple-button-secondary {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-size: inherit !important;
+  display: inline-flex !important;
+}
+
 /* Apple Section System */
 .apple-section {
   padding: var(--space-10) 0;
