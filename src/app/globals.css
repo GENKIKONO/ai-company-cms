@@ -2944,8 +2944,6 @@ html, body {
 .apple-link:hover {
   color: var(--color-blue-hover);
 }
-  margin-bottom: var(--space-3);
-}
 
 .apple-body-large {
   font-size: 19px;
