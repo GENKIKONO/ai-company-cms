@@ -53,14 +53,14 @@ async function checkSubscriptionStatus(org: Organization): Promise<PreflightChec
   try {
     // 要件定義準拠: Subscription.active チェック
     const isActive = org.subscription_status === 'active' || org.subscription_status === 'trialing';
-    const hasValidPlan = org.plan && org.plan !== 'free';
+    const hasValidPlan = org.plan && ['trial', 'starter', 'pro', 'business', 'enterprise'].includes(org.plan);
 
     if (isActive && hasValidPlan) {
       check.status = 'pass';
       check.message = `Subscription active (${org.plan})`;
-    } else if (org.plan === 'free') {
+    } else if (org.plan === 'trial') {
       check.status = 'warning';
-      check.message = 'Free plan has limited features';
+      check.message = 'Trial plan has limited features';
     } else {
       check.status = 'fail';
       check.message = 'Active subscription required for publishing';

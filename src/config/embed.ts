@@ -187,7 +187,17 @@ export const EMBED_OEM = {
  * プランの埋め込み制限を取得
  */
 export function getEmbedLimits(plan: PlanType) {
-  return EMBED_LIMITS[plan] || EMBED_LIMITS.free;
+  // Map new plan names to existing embed limits
+  const planMapping: Record<PlanType, keyof typeof EMBED_LIMITS> = {
+    trial: 'free',
+    starter: 'free', 
+    pro: 'standard',
+    business: 'standard',
+    enterprise: 'enterprise'
+  };
+  
+  const embedPlan = planMapping[plan] || 'free';
+  return EMBED_LIMITS[embedPlan];
 }
 
 /**

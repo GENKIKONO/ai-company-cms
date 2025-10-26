@@ -205,7 +205,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="mt-16">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-                  ゼロクリック時代の企業戦略
+                  AI時代の企業戦略
                 </h2>
                 <p className="text-lg text-secondary">
                   AIが情報を直接回答する時代に、企業が"選ばれる"ための仕組みを提供
@@ -254,7 +254,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               緊急：AI時代の取り残しリスク
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              ゼロクリック時代に<br />
+              AI時代に<br />
               <span className="text-yellow-300">取り残されませんか？</span>
             </h2>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
@@ -269,7 +269,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 asChild
               >
                 <Link href="/auth/signup">
-                  無料で始める
+                  14日間無料で試す
                   <ArrowRightIcon className="w-5 h-5" />
                 </Link>
               </HIGButton>

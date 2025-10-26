@@ -95,9 +95,10 @@ export interface Organization {
   // Stripe subscription fields
   stripe_customer_id?: string;
   stripe_subscription_id?: string;
-  plan?: 'free' | 'basic' | 'business' | 'enterprise';
+  plan?: 'trial' | 'starter' | 'pro' | 'business' | 'enterprise';
   subscription_status?: 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'paused';
   current_period_end?: string;
+  trial_end_date?: string;
   // Section visibility controls
   show_services?: boolean;
   show_posts?: boolean;
@@ -315,7 +316,7 @@ export interface OrganizationFormData {
   same_as?: string[];
   industries?: string[];
   status?: OrganizationStatus;
-  plan?: 'free' | 'basic' | 'business' | 'enterprise';
+  plan?: 'trial' | 'starter' | 'pro' | 'business' | 'enterprise';
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string[];

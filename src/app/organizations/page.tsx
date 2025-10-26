@@ -63,12 +63,13 @@ export default function OrganizationsPage() {
 
   // プラン重み付けソート関数
   const getOrganizationWeight = (org: Organization) => {
-    const plan = org.plan || 'free';
+    const plan = org.plan || 'trial';
     switch (plan) {
-      case 'enterprise': return 4;
-      case 'business': return 3;
-      case 'basic': return 2;
-      case 'free': return 1;
+      case 'enterprise': return 5;
+      case 'business': return 4;
+      case 'pro': return 3;
+      case 'starter': return 2;
+      case 'trial': return 1;
       default: return 1;
     }
   };

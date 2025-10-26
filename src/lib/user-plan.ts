@@ -29,7 +29,7 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
     
     if (authError || !user) {
       console.warn('[getUserPlan] No authenticated user');
-      return { plan: 'free', isActive: false };
+      return { plan: 'trial', isActive: false };
     }
 
     // Get user's organization with subscription info
@@ -47,12 +47,12 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
 
     if (orgError) {
       console.error('[getUserPlan] Error fetching organization:', orgError);
-      return { plan: 'free', isActive: false };
+      return { plan: 'trial', isActive: false };
     }
 
     if (!organization) {
       console.log('[getUserPlan] No organization found for user');
-      return { plan: 'free', isActive: false };
+      return { plan: 'trial', isActive: false };
     }
 
     // If organization has Stripe subscription, check its status
@@ -83,13 +83,13 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
     
     return {
       plan,
-      isActive: plan !== 'free',
+      isActive: plan !== 'trial',
       customerId: organization.stripe_customer_id
     };
 
   } catch (error) {
     console.error('[getUserPlan] Unexpected error:', error);
-    return { plan: 'free', isActive: false };
+    return { plan: 'trial', isActive: false };
   }
 }
 
@@ -99,11 +99,11 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
  */
 export function getUserPlanClient(organizationData?: any): UserPlanInfo {
   if (!organizationData) {
-    return { plan: 'free', isActive: false };
+    return { plan: 'trial', isActive: false };
   }
 
-  const plan = (organizationData.plan || 'free') as PlanType;
-  const isActive = plan !== 'free' && organizationData.stripe_subscription_id;
+  const plan = (organizationData.plan || 'trial') as PlanType;
+  const isActive = plan !== 'trial' && organizationData.stripe_subscription_id;
   
   return {
     plan,

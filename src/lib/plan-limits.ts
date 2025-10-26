@@ -1,47 +1,72 @@
 // Plan limits for Single-Org Mode (client-safe)
 // NOTE: This file is deprecated. Use @/config/plans.ts instead.
-// Kept for backward compatibility.
+// Kept for backward compatibility - updated to match new plan structure.
 
 export const PLAN_LIMITS = {
-  free: { 
-    services: 1, 
-    materials: 0, 
+  trial: { 
+    services: 5, 
+    materials: 10, 
     embeds: 1,
-    external_links: 0,
-    category_tags: 0,
-    logo_size: 'small',
-    verified_badge: false,
-    ai_reports: false,
-    system_monitoring: false,
-    qa_items: 5,
-    case_studies: 2,
-    posts: 5,
-    faqs: 5
-  },
-  basic: { 
-    services: 10, 
-    materials: 5, 
-    embeds: 5,
     external_links: Number.POSITIVE_INFINITY,
     category_tags: Number.POSITIVE_INFINITY,
     logo_size: 'medium',
     verified_badge: false,
     ai_reports: false,
     system_monitoring: false,
-    qa_items: 20,
-    case_studies: 10,
-    posts: 50,
-    faqs: 20
+    qa_items: 10,
+    case_studies: 5,
+    posts: 10,
+    faqs: 10,
+    trial_days: 14,
+    structured_score: true,
+    ai_visibility_reports: false,
+    team_management: false
+  },
+  starter: { 
+    services: 5, 
+    materials: 10, 
+    embeds: 1,
+    external_links: Number.POSITIVE_INFINITY,
+    category_tags: Number.POSITIVE_INFINITY,
+    logo_size: 'medium',
+    verified_badge: false,
+    ai_reports: false,
+    system_monitoring: false,
+    qa_items: 10,
+    case_studies: 5,
+    posts: 10,
+    faqs: 10,
+    structured_score: true,
+    ai_visibility_reports: false,
+    team_management: false
+  },
+  pro: { 
+    services: 20, 
+    materials: 10, 
+    embeds: 5,
+    external_links: Number.POSITIVE_INFINITY,
+    category_tags: Number.POSITIVE_INFINITY,
+    logo_size: 'medium',
+    verified_badge: false,
+    ai_reports: true,
+    system_monitoring: false,
+    qa_items: 50,
+    case_studies: 20,
+    posts: 100,
+    faqs: 50,
+    structured_score: true,
+    ai_visibility_reports: false,
+    team_management: false
   },
   business: { 
-    services: 50, 
-    materials: 20, 
+    services: Number.POSITIVE_INFINITY, 
+    materials: Number.POSITIVE_INFINITY, 
     embeds: 20,
     external_links: Number.POSITIVE_INFINITY,
     category_tags: Number.POSITIVE_INFINITY,
     logo_size: 'large',
     verified_badge: true,
-    ai_reports: 'basic',
+    ai_reports: 'advanced',
     system_monitoring: true,
     qa_items: Number.POSITIVE_INFINITY,
     case_studies: Number.POSITIVE_INFINITY,
@@ -49,7 +74,10 @@ export const PLAN_LIMITS = {
     faqs: Number.POSITIVE_INFINITY,
     approval_flow: true,
     auth_badges: true,
-    search_console: true
+    search_console: false,
+    structured_score: true,
+    ai_visibility_reports: true,
+    team_management: true
   },
   enterprise: { 
     services: Number.POSITIVE_INFINITY, 
@@ -70,7 +98,10 @@ export const PLAN_LIMITS = {
     search_console: true,
     custom_features: true,
     dedicated_support: true,
-    sla_guarantee: true
+    sla_guarantee: true,
+    structured_score: true,
+    ai_visibility_reports: true,
+    team_management: true
   }
 } as const;
 

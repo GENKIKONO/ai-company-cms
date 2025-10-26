@@ -51,7 +51,7 @@ function fromOrg(org?: Organization | null): OrganizationFormData {
     logo_url: org?.logo_url ?? '',
     same_as: org?.same_as ?? [],
     industries: org?.industries ?? [],
-    plan: org?.plan ?? 'free'
+    plan: org?.plan ?? 'trial'
   };
 }
 

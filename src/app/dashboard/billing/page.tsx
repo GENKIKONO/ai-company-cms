@@ -125,7 +125,7 @@ export default function BillingPage() {
   }
 
   function getPlanLimits(plan: string) {
-    return PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+    return PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.starter;
   }
 
   function formatDate(dateString?: string) {
@@ -173,10 +173,10 @@ export default function BillingPage() {
   }
 
   const { organization, currentCounts } = data;
-  const currentPlan = organization.plan || 'free';
+  const currentPlan = organization.plan || 'trial';
   const limits = getPlanLimits(currentPlan);
   const isActive = organization.subscription_status === 'active' || organization.subscription_status === 'trialing';
-  const canUpgrade = !isActive || currentPlan === 'free';
+  const canUpgrade = !isActive || currentPlan === 'trial';
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -213,8 +213,9 @@ export default function BillingPage() {
           <div>
             <div className="text-sm text-gray-500 mb-1">プラン</div>
             <div className="text-lg font-medium text-gray-900 capitalize">
-              {currentPlan === 'free' ? 'Free (¥0)' : 
-               currentPlan === 'basic' ? 'Basic (¥5,000（税別）/月)' : 
+              {currentPlan === 'trial' ? 'Trial (14日間無料)' : 
+               currentPlan === 'starter' ? 'Starter (¥2,980（税別）/月)' : 
+               currentPlan === 'pro' ? 'Pro (¥8,000（税別）/月)' : 
                currentPlan === 'business' ? 'Business (¥15,000（税別）/月)' : 
                currentPlan === 'enterprise' ? 'Enterprise (¥30,000（税別）〜/月)' : currentPlan}
             </div>
@@ -265,7 +266,7 @@ export default function BillingPage() {
               disabled={actionLoading}
               className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
-              {actionLoading ? '処理中...' : 'Basicプランで購読 (¥5,000/月)'}
+              {actionLoading ? '処理中...' : 'Starterプランで購読 (¥2,980/月)'}
             </button>
           ) : (
             <button
@@ -294,17 +295,18 @@ export default function BillingPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">機能</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Free</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Basic</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trial</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Starter</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pro</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Business</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enterprise</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">サービス</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.business.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td></tr>
-              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Q&A項目</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.qa_items}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.qa_items}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td></tr>
-              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">営業資料</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.free.materials}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.basic.materials}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.business.materials}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td></tr>
-              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">料金</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥0</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥5,000/月</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥15,000/月</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥30,000〜/月</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">サービス</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.trial.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.starter.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.services}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Q&A項目</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.trial.qa_items}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.starter.qa_items}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.qa_items}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">営業資料</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.trial.materials}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.starter.materials}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{PLAN_LIMITS.pro.materials}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">無制限</td></tr>
+              <tr><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">料金</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥0 (14日間)</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥2,980/月</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥8,000/月</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥15,000/月</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">¥30,000〜/月</td></tr>
             </tbody>
           </table>
         </div>

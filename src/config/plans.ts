@@ -4,45 +4,64 @@
  */
 
 export const PLAN_LIMITS = {
-  free: { 
-    services: 1, 
-    materials: 0, 
+  trial: { 
+    services: 5, 
+    materials: 10, 
     embeds: 1,
-    external_links: 0,
-    category_tags: 0,
-    logo_size: 'small',
-    verified_badge: false,
-    ai_reports: false,
-    system_monitoring: false,
-    qa_items: 5,  // Q&A項目制限追加
-    case_studies: 2,  // 導入事例制限追加
-    posts: 0,  // 記事機能なし（ベーシック以上）
-    faqs: 5  // FAQ制限追加
-  },
-  basic: { 
-    services: 10, 
-    materials: 5, 
-    embeds: 5,
     external_links: Number.POSITIVE_INFINITY,
     category_tags: Number.POSITIVE_INFINITY,
     logo_size: 'medium',
     verified_badge: false,
     ai_reports: false,
     system_monitoring: false,
-    qa_items: 20,  // Basic: 20項目まで
-    case_studies: 10,  // 導入事例制限
-    posts: 50,  // 記事制限
-    faqs: 20  // FAQ制限
+    qa_items: 10,  // Trial: 10項目まで
+    case_studies: 5,  // 導入事例制限
+    posts: 10,  // 記事制限
+    faqs: 10,  // FAQ制限
+    trial_days: 14,  // 14日間トライアル
+    structured_score: true  // 構造化スコア表示
+  },
+  starter: { 
+    services: 5, 
+    materials: 10, 
+    embeds: 1,
+    external_links: Number.POSITIVE_INFINITY,
+    category_tags: Number.POSITIVE_INFINITY,
+    logo_size: 'medium',
+    verified_badge: false,
+    ai_reports: false,
+    system_monitoring: false,
+    qa_items: 10,  // Starter: 10項目まで
+    case_studies: 5,  // 導入事例制限
+    posts: 10,  // 記事制限
+    faqs: 10,  // FAQ制限
+    structured_score: true  // 構造化スコア表示
+  },
+  pro: { 
+    services: 20, 
+    materials: 10, 
+    embeds: 5,
+    external_links: Number.POSITIVE_INFINITY,
+    category_tags: Number.POSITIVE_INFINITY,
+    logo_size: 'medium',
+    verified_badge: false,
+    ai_reports: true,
+    system_monitoring: false,
+    qa_items: 50,  // Pro: 50項目まで
+    case_studies: 20,  // 導入事例制限
+    posts: 100,  // 記事制限
+    faqs: 50,  // FAQ制限
+    structured_score: true  // 構造化スコア表示
   },
   business: { 
-    services: 50, 
-    materials: 20, 
+    services: Number.POSITIVE_INFINITY, 
+    materials: Number.POSITIVE_INFINITY, 
     embeds: 20,
     external_links: Number.POSITIVE_INFINITY,
     category_tags: Number.POSITIVE_INFINITY,
     logo_size: 'large',
     verified_badge: true,
-    ai_reports: 'basic',
+    ai_reports: 'advanced',
     system_monitoring: true,
     qa_items: Number.POSITIVE_INFINITY,  // Business: 無制限
     case_studies: Number.POSITIVE_INFINITY,  // 導入事例無制限
@@ -50,7 +69,10 @@ export const PLAN_LIMITS = {
     faqs: Number.POSITIVE_INFINITY,  // FAQ無制限
     approval_flow: true,  // 承認フロー機能
     auth_badges: true,  // 認証バッジ機能
-    search_console: false  // Search Console連携（未実装）
+    search_console: false,  // Search Console連携（未実装）
+    structured_score: true,  // 構造化スコア表示
+    ai_visibility_reports: true,  // AI Visibilityレポート
+    team_management: true  // チーム権限管理
   },
   enterprise: { 
     services: Number.POSITIVE_INFINITY, 
@@ -76,8 +98,9 @@ export const PLAN_LIMITS = {
 } as const;
 
 export const PLAN_PRICES = {
-  free: 0,
-  basic: 5000,
+  trial: 0,
+  starter: 2980,
+  pro: 8000,
   business: 15000,
   enterprise: 30000 // ¥30,000〜
 } as const;
@@ -88,49 +111,57 @@ export type PlanType = keyof typeof PLAN_LIMITS;
  * プラン名（表示用）
  */
 export const PLAN_NAMES = {
-  free: 'フリー',
-  basic: 'ベーシック',
-  business: 'ビジネス',
-  enterprise: 'エンタープライズ'
+  trial: 'トライアル',
+  starter: 'Starter',
+  pro: 'Pro',
+  business: 'Business',
+  enterprise: 'Enterprise'
 } as const;
 
 /**
  * プラン機能リスト
  */
 export const PLAN_FEATURES = {
-  free: [
-    '基本的な企業情報管理',
-    'サービス登録：1件まで',
-    'Q&A項目：5件まで',
-    'SEO最適化・構造化データ出力',
-    '外部埋め込み：1個まで',
-    '小サイズ企業ロゴ',
-    'Hub上での公開のみ'
+  trial: [
+    'ロゴ・企業情報を構造化公開（JSON‑LD）',
+    'サービス登録：5件まで',
+    'Q&A項目：10件まで',
+    'Hub内構造化＋自社サイト埋め込み',
+    'SEO最適化・構造化データ自動生成',
+    '構造化スコア表示',
+    'メールサポート',
+    '14日間無料'
   ],
-  basic: [
-    'サービス登録：10件まで',
-    'Q&A項目：20件まで',
-    '記事投稿：50件まで',
-    '営業資料添付（最大5個）',
-    '外部リンク表示機能',
-    'カテゴリタグ検索対応',
-    '外部埋め込み：5個まで',
-    '中サイズ企業ロゴ',
+  starter: [
+    'ロゴ・企業情報を構造化公開（JSON‑LD）',
+    'サービス登録：5件まで',
+    'Q&A項目：10件まで',
+    'Hub内構造化＋自社サイト埋め込み',
+    'SEO最適化・構造化データ自動生成',
+    '構造化スコア表示',
     'メールサポート'
   ],
-  business: [
-    'サービス登録：50件まで',
-    'Q&A項目：無制限',
-    '記事投稿：無制限',
-    '営業資料添付（最大20個）',
-    '外部埋め込み：20個まで',
-    '大サイズ企業ロゴ',
-    'Verified法人バッジ',
-    '承認フロー機能',
-    '認証バッジ機能',
-    'AI解析レポート（基本版）',
-    'システム監視機能',
+  pro: [
+    'Starterプランのすべての機能に加えて',
+    'サービス登録：20件まで',
+    'Q&A項目：50件まで',
+    '営業資料添付（最大10個）',
+    'AI Visibility分析レポート',
+    '外部リンク表示機能',
+    'カテゴリタグ検索対応',
     '優先サポート'
+  ],
+  business: [
+    'Proプランのすべての機能に加えて',
+    'サービス登録：無制限',
+    'Q&A項目：無制限',
+    '営業資料添付（無制限）',
+    'Verified法人バッジ',
+    'AI解析レポート（拡張版）',
+    'ブランド分析・競合監視',
+    'チーム権限管理',
+    'カスタム機能開発相談',
+    '専任サポート・個別相談'
   ],
   enterprise: [
     'すべての機能無制限',
@@ -285,7 +316,7 @@ export function isPostLimitReached(planType: PlanType, currentCount: number): bo
  */
 export function getPostLimitMessage(planType: PlanType): string {
   const limit = PLAN_LIMITS[planType].posts;
-  if (limit === 0) return `記事機能は${PLAN_NAMES.basic}以上のプランで利用可能です。`;
+  if (limit === 0) return `記事機能は${PLAN_NAMES.pro}以上のプランで利用可能です。`;
   if (limit === Number.POSITIVE_INFINITY) return '';
   return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（記事上限: ${limit}件）。`;
 }

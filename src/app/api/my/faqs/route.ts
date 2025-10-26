@@ -102,8 +102,8 @@ export async function POST(request: NextRequest) {
     }
 
     // プラン制限チェック
-    const currentPlan = orgData.plan || 'free';
-    const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+    const currentPlan = orgData.plan || 'trial';
+    const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.trial;
     
     if (planLimits.faqs > 0) {
       const { count: currentCount, error: countError } = await supabase
