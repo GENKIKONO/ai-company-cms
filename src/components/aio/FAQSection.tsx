@@ -36,29 +36,29 @@ export default function FAQSection({ title, description, categories }: FAQSectio
   };
 
   return (
-    <section id="faq" className="section section--clean">
-      <div className="site-container">
+    <section id="faq" className="apple-section">
+      <div className="apple-container">
         {/* セクションヘッダー */}
-        <div className="text-center mb-12">
-          <h2 className="text-h1 text-neutral-900 mb-6 jp-text">
+        <div className="apple-section-header">
+          <h2 className="apple-title1">
             {title}
           </h2>
-          <p className="text-body-large text-neutral-600 jp-text">
+          <p className="apple-body-large apple-text-secondary">
             {description}
           </p>
         </div>
 
         {/* FAQ カテゴリー */}
-        <div className="space-y-12">
+        <div className="apple-faq-categories">
           {categories.map((category, categoryIndex) => (
-            <div key={categoryIndex}>
+            <div key={categoryIndex} className="apple-faq-category">
               {/* カテゴリータイトル */}
-              <h3 className="text-h2 text-neutral-900 mb-6 pb-2 border-b-2 border-primary/20 jp-text">
+              <h3 className="apple-faq-category-title">
                 {category.title}
               </h3>
               
               {/* FAQ アイテム */}
-              <div className="space-y-4">
+              <div className="apple-faq-items">
                 {category.items.map((item, itemIndex) => {
                   const key = `${categoryIndex}-${itemIndex}`;
                   const isOpen = openItems.has(key);
@@ -66,30 +66,30 @@ export default function FAQSection({ title, description, categories }: FAQSectio
                   return (
                     <div
                       key={itemIndex}
-                      className="card hover:border-primary/30 transition-colors duration-200"
+                      className="apple-faq-item"
                     >
                       {/* 質問部分 */}
                       <button
                         onClick={() => toggleItem(categoryIndex, itemIndex)}
-                        className="w-full px-6 py-4 text-left flex items-center justify-between group"
+                        className="apple-faq-question"
                       >
-                        <span className="text-body font-semibold text-neutral-900 group-hover:text-primary transition-colors duration-200 jp-text">
+                        <span className="apple-faq-question-text">
                           {item.question}
                         </span>
-                        <div className="flex-shrink-0 ml-4">
+                        <div className="apple-faq-icon">
                           {isOpen ? (
-                            <ChevronUp className="icon icon-sm text-neutral-400 group-hover:text-primary transition-colors duration-200" />
+                            <ChevronUp className="apple-faq-chevron" />
                           ) : (
-                            <ChevronDown className="icon icon-sm text-neutral-400 group-hover:text-primary transition-colors duration-200" />
+                            <ChevronDown className="apple-faq-chevron" />
                           )}
                         </div>
                       </button>
                       
                       {/* 回答部分 */}
                       {isOpen && (
-                        <div className="px-6 pb-4">
-                          <div className="pt-2 border-t border-neutral-200">
-                            <p className="text-body text-neutral-700 jp-text">
+                        <div className="apple-faq-answer">
+                          <div className="apple-faq-answer-content">
+                            <p className="apple-body apple-text-secondary">
                               {item.answer}
                             </p>
                           </div>
@@ -104,17 +104,17 @@ export default function FAQSection({ title, description, categories }: FAQSectio
         </div>
         
         {/* 追加サポート */}
-        <div className="mt-12 text-center">
-          <div className="card bg-subtle p-8">
-            <h3 className="text-h3 text-neutral-900 mb-2 jp-text">
+        <div className="apple-faq-support">
+          <div className="apple-faq-support-card">
+            <h3 className="apple-title3">
               その他のご質問がございましたら
             </h3>
-            <p className="text-body-large text-neutral-600 mb-6 jp-text">
+            <p className="apple-body-large apple-text-secondary">
               AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
             </p>
             <a
               href="/contact"
-              className="btn btn-primary"
+              className="apple-button apple-button-primary apple-button-medium"
             >
               お問い合わせフォーム
             </a>

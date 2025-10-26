@@ -109,84 +109,84 @@ const PLANS: PricingPlan[] = [
 
 export default function PricingTable() {
   return (
-    <section className="section section--alt">
-      <div className="site-container">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
+    <section className="apple-section">
+      <div className="apple-container">
+        <div className="apple-section-header">
+          <h2 className="apple-title1">
             シンプルで明確な料金体系
           </h2>
-          <p className="text-lg text-secondary max-w-3xl mx-auto">
+          <p className="apple-body-large apple-text-secondary">
             無料から始めて、必要になったら拡張。最小の入力で、Schema.org準拠の企業情報構造化を実現します。
           </p>
         </div>
 
         {/* Mobile: Vertical Stack */}
         <div className="lg:hidden">
-          <div className="space-y-6">
+          <div className="apple-pricing-mobile">
             {PLANS.map((plan) => (
               <div
                 key={plan.id}
-                className={`card relative shadow-sm border border-secondary bg-white ${
+                className={`apple-pricing-card ${
                   plan.popular
-                    ? 'border-accent bg-accent'
-                    : 'hover:border-primary hover:shadow-xl'
-                } transition-all duration-200`}
+                    ? 'apple-pricing-card-popular'
+                    : ''
+                }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                    <span className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full shadow-lg">
+                  <div className="apple-pricing-badge">
+                    <span className="apple-pricing-badge-text">
                       人気
                     </span>
                   </div>
                 )}
 
-                <div className="mb-6">
-                  <div className="mb-4">
-                    <plan.icon className={`h-8 w-8 ${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
+                <div className="apple-pricing-header">
+                  <div className="apple-pricing-icon">
+                    <plan.icon className={`${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
                   </div>
-                  <h3 className="text-xl font-semibold text-primary mb-2">{plan.name}</h3>
-                  <p className="text-secondary mb-4">{plan.description}</p>
+                  <h3 className="apple-title3">{plan.name}</h3>
+                  <p className="apple-body apple-text-secondary">{plan.description}</p>
                   
-                  <div className="mb-4">
+                  <div className="apple-pricing-price">
                     {plan.originalPrice && (
-                      <span className="text-sm text-gray-400 line-through mr-2">
+                      <span className="apple-pricing-original">
                         {plan.originalPrice}
                       </span>
                     )}
-                    <span className="text-2xl font-bold text-primary">
+                    <span className="apple-pricing-current">
                       {plan.price}
                     </span>
                     {plan.id !== 'free' && (
-                      <span className="text-secondary ml-1">（税別）/月</span>
+                      <span className="apple-pricing-period">（税別）/月</span>
                     )}
                   </div>
                 </div>
 
-                <ul className="mb-8 space-y-3 flex-1">
+                <ul className="apple-pricing-features">
                   {plan.inheritedFeatures && (
-                    <li className="mb-4 pb-3 border-b border-gray-100">
-                      <span className="text-sm text-blue-600 font-medium">
+                    <li className="apple-pricing-inherited">
+                      <span className="apple-pricing-inherited-text">
                         {plan.inheritedFeatures}
                       </span>
                     </li>
                   )}
                   {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start">
+                    <li key={index} className="apple-pricing-feature">
                       <Check
-                        className={`h-4 w-4 shrink-0 mt-0.5 mr-3 ${
-                          feature.included ? 'text-green-500' : 'text-slate-600'
+                        className={`apple-pricing-check ${
+                          feature.included ? 'apple-pricing-check-included' : 'apple-pricing-check-disabled'
                         }`}
                       />
-                      <div className="flex-1">
+                      <div className="apple-pricing-feature-content">
                         <span
-                          className={`text-sm ${
-                            feature.included ? 'text-primary' : 'text-gray-400'
+                          className={`apple-pricing-feature-text ${
+                            feature.included ? '' : 'apple-pricing-feature-disabled'
                           }`}
                         >
                           {feature.text}
                         </span>
                         {feature.subtext && (
-                          <div className="mt-1 text-sm text-secondary pl-2 border-l-2 border-gray-200">
+                          <div className="apple-pricing-feature-subtext">
                             {feature.subtext}
                           </div>
                         )}
@@ -195,19 +195,19 @@ export default function PricingTable() {
                   ))}
                 </ul>
 
-                <div className="mt-auto">
+                <div className="apple-pricing-cta">
                   <Link
                     href={plan.ctaHref}
-                    className="hig-cta-primary w-full"
+                    className="apple-button apple-button-primary apple-button-large"
                   >
                     {plan.ctaText}
                   </Link>
                 </div>
 
                 {plan.comingSoon && (
-                  <div className="mt-4 text-body-small text-neutral-500">
+                  <div className="apple-pricing-coming-soon">
                     {plan.comingSoon.map((note, index) => (
-                      <p key={index}>{note}</p>
+                      <p key={index} className="apple-text-caption apple-text-secondary">{note}</p>
                     ))}
                   </div>
                 )}
@@ -217,72 +217,72 @@ export default function PricingTable() {
         </div>
 
         {/* Desktop: Grid Layout */}
-        <div className="hidden lg:block mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="apple-pricing-desktop">
+          <div className="apple-pricing-grid">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`card relative flex flex-col shadow-sm border border-secondary bg-white ${
+              className={`apple-pricing-card ${
                 plan.popular
-                  ? 'border-accent bg-accent'
-                  : 'hover:border-primary hover:shadow-xl'
-              } transition-all duration-200`}
+                  ? 'apple-pricing-card-popular'
+                  : ''
+              }`}
             >
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                  <span className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full shadow-lg">
+                <div className="apple-pricing-badge">
+                  <span className="apple-pricing-badge-text">
                     人気
                   </span>
                 </div>
               )}
 
-              <div className="mb-6">
-                <div className="mb-4">
-                  <plan.icon className={`h-8 w-8 ${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
+              <div className="apple-pricing-header">
+                <div className="apple-pricing-icon">
+                  <plan.icon className={`${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
                 </div>
-                <h3 className="text-xl font-semibold text-primary mb-2">{plan.name}</h3>
-                <p className="text-secondary mb-4">{plan.description}</p>
+                <h3 className="apple-title3">{plan.name}</h3>
+                <p className="apple-body apple-text-secondary">{plan.description}</p>
                 
-                <div className="mb-4">
+                <div className="apple-pricing-price">
                   {plan.originalPrice && (
-                    <span className="text-sm text-gray-400 line-through mr-2">
+                    <span className="apple-pricing-original">
                       {plan.originalPrice}
                     </span>
                   )}
-                  <span className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <span className="apple-pricing-current">
                     {plan.price}
                   </span>
                   {plan.id !== 'free' && (
-                    <span className="ml-1" style={{ color: 'var(--text-secondary)' }}>（税別）/月</span>
+                    <span className="apple-pricing-period">（税別）/月</span>
                   )}
                 </div>
               </div>
 
-              <ul className="mb-8 space-y-3 flex-1">
+              <ul className="apple-pricing-features">
                 {plan.inheritedFeatures && (
-                  <li className="mb-4 pb-3 border-b border-gray-100">
-                    <span className="text-sm text-blue-600 font-medium">
+                  <li className="apple-pricing-inherited">
+                    <span className="apple-pricing-inherited-text">
                       {plan.inheritedFeatures}
                     </span>
                   </li>
                 )}
                 {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start">
+                  <li key={index} className="apple-pricing-feature">
                     <Check
-                      className={`h-4 w-4 shrink-0 mt-0.5 mr-3 ${
-                        feature.included ? 'text-green-500' : 'text-slate-600'
+                      className={`apple-pricing-check ${
+                        feature.included ? 'apple-pricing-check-included' : 'apple-pricing-check-disabled'
                       }`}
                     />
-                    <div className="flex-1">
+                    <div className="apple-pricing-feature-content">
                       <span
-                        className={`text-sm ${
-                          feature.included ? 'text-primary' : 'text-gray-400'
+                        className={`apple-pricing-feature-text ${
+                          feature.included ? '' : 'apple-pricing-feature-disabled'
                         }`}
                       >
                         {feature.text}
                       </span>
                       {feature.subtext && (
-                        <div className="mt-1 text-sm text-secondary pl-2 border-l-2 border-gray-200">
+                        <div className="apple-pricing-feature-subtext">
                           {feature.subtext}
                         </div>
                       )}
@@ -291,19 +291,19 @@ export default function PricingTable() {
                 ))}
               </ul>
 
-              <div className="mt-auto">
+              <div className="apple-pricing-cta">
                 <Link
                   href={plan.ctaHref}
-                  className="hig-cta-primary w-full"
+                  className="apple-button apple-button-primary apple-button-large"
                 >
                   {plan.ctaText}
                 </Link>
               </div>
 
               {plan.comingSoon && (
-                <div className="mt-4 text-sm text-secondary">
+                <div className="apple-pricing-coming-soon">
                   {plan.comingSoon.map((note, index) => (
-                    <p key={index}>{note}</p>
+                    <p key={index} className="apple-text-caption apple-text-secondary">{note}</p>
                   ))}
                 </div>
               )}
@@ -313,14 +313,12 @@ export default function PricingTable() {
         </div>
         
         {/* Enterprise consultation note */}
-        <div className="text-center mb-8">
-          <p className="text-secondary">
+        <div className="apple-pricing-footer">
+          <p className="apple-body apple-text-secondary">
             Enterpriseプランの詳細な機能や導入サポートについては、お気軽にお問い合わせください
           </p>
-        </div>
 
-        <div className="mt-12 text-center">
-          <p className="text-sm text-secondary">
+          <p className="apple-text-caption apple-text-secondary">
             ※価格は税別。詳細機能についてはお問い合わせください。<br/>
             お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
           </p>
