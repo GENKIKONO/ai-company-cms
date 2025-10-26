@@ -768,6 +768,7 @@ html {
     will-change: transform; 
     transform: translateZ(0); 
   }
+}
   
   /* ヘッダーリンクのフォーカス制御 */
   .nav-link { 
@@ -1881,5 +1882,3 @@ html {
   .no-scrollbar::-webkit-scrollbar {
     display: none;             /* Safari and Chrome */
   }
-
-}
