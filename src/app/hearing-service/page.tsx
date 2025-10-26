@@ -5,8 +5,10 @@
 
 import { Metadata } from 'next';
 import HeroSection from '@/components/hearing-service/HeroSection';
+import GreenBandSection from '@/components/hearing-service/GreenBandSection';
+import ComparisonSection from '@/components/hearing-service/ComparisonSection';
 import FlowSection from '@/components/hearing-service/FlowSection';
-import PricingPlans from '@/components/pricing/PricingPlans';
+import ApplePricingPlans from '@/components/pricing/ApplePricingPlans';
 import FAQSection from '@/components/hearing-service/FAQSection';
 import CTASection from '@/components/hearing-service/CTASection';
 
@@ -126,15 +128,19 @@ export default function HearingServicePage() {
           <HeroSection />
         </section>
         
+        {/* 緑のフルブリードセクション */}
+        <GreenBandSection />
+        
+        {/* 構造化前後の違い */}
+        <ComparisonSection />
+        
         {/* サービス流れ説明 */}
         <section className="mt-8 md:mt-16">
           <FlowSection />
         </section>
         
-        {/* 料金プラン - 新PricingPlansコンポーネント */}
-        <section className="mt-8 md:mt-16">
-          <PricingPlans />
-        </section>
+        {/* 料金プラン - Apple HIG準拠 */}
+        <ApplePricingPlans />
         
         {/* よくある質問 */}
         <section className="mt-8 md:mt-16">

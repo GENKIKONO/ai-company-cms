@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 const faqData = [
   {
@@ -46,178 +46,86 @@ const faqData = [
   }
 ];
 
-const categories = [
-  { id: 'all', label: 'すべて' },
-  { id: 'process', label: 'プロセス' },
-  { id: 'timeline', label: 'スケジュール' },
-  { id: 'target', label: '対象・要件' },
-  { id: 'result', label: '成果・効果' },
-  { id: 'pricing', label: '料金' },
-  { id: 'policy', label: '契約・キャンセル' }
-];
 
 export default function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
-  const filteredFAQs = activeCategory === 'all' 
-    ? faqData 
-    : faqData.filter(faq => faq.category === activeCategory);
-
-  const toggleFAQ = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-
-  // Keyboard navigation for category tabs
-  const handleCategoryKeyDown = (event: React.KeyboardEvent, categoryId: string) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      setActiveCategory(categoryId);
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      event.preventDefault();
-      const currentIndex = categories.findIndex(cat => cat.id === activeCategory);
-      const nextIndex = event.key === 'ArrowRight' 
-        ? (currentIndex + 1) % categories.length 
-        : (currentIndex - 1 + categories.length) % categories.length;
-      setActiveCategory(categories[nextIndex].id);
+  const toggleItem = (index: string) => {
+    const newOpenItems = new Set(openItems);
+    if (newOpenItems.has(index)) {
+      newOpenItems.delete(index);
+    } else {
+      newOpenItems.add(index);
     }
+    setOpenItems(newOpenItems);
   };
+
 
   return (
-    <section id="faq" className="section--alt">
-      <div className="site-container">
+    <section id="faq" className="apple-section">
+      <div className="apple-container">
         {/* セクションヘッダー */}
-        <div className="mb-12">
-          <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 text-sm font-medium rounded-full mb-4 mx-auto">
-            <HelpCircle className="w-4 h-4" />
-            <span className="jp-text">よくある質問</span>
-          </div>
-          <h2 className="text-display text-neutral-900 mb-4 text-center">
-            <span className="block jp-text">お客様からよくいただくご質問</span>
-          </h2>
-          <p className="text-body-large text-center text-neutral-600 mx-auto jp-text">
+        <div className="apple-section-header">
+          <h2 className="apple-title1">よくある質問</h2>
+          <p className="apple-body-large apple-text-secondary">
             ご不明な点がございましたら、お気軽にお問い合わせください。
           </p>
         </div>
 
-        {/* カテゴリフィルター - カード型ピルボタン */}
-        <div className="mb-8 sm:mb-12">
-          {/* Mobile: Horizontal Scroll */}
-          <div className="lg:hidden">
-            <div 
-              className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar"
-              role="tablist"
-              aria-label="FAQカテゴリ選択"
-            >
-              {categories.map((category, index) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  onKeyDown={(e) => handleCategoryKeyDown(e, category.id)}
-                  role="tab"
-                  aria-selected={activeCategory === category.id}
-                  aria-controls="faq-content"
-                  tabIndex={activeCategory === category.id ? 0 : -1}
-                  className={`
-                    snap-center flex-shrink-0 px-4 py-3 min-h-[44px] rounded-xl text-sm font-medium 
-                    transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                    ${activeCategory === category.id
-                      ? 'bg-blue-600 text-white shadow-lg' 
-                      : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50 hover:border-blue-300'
-                    }
-                  `}
-                >
-                  {category.label}
-                </button>
-              ))}
+        {/* Apple FAQ Accordion */}
+        <div className="apple-faq-categories">
+          <div className="apple-faq-category">
+            <div className="apple-faq-items">
+              {faqData.map((faq, index) => {
+                const key = `faq-${index}`;
+                const isOpen = openItems.has(key);
+                return (
+                  <div key={index} className="apple-faq-item">
+                    <button
+                      onClick={() => toggleItem(key)}
+                      className="apple-faq-question"
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-answer-${key}`}
+                    >
+                      <span className="apple-faq-question-text">
+                        {faq.question}
+                      </span>
+                      <div className="apple-faq-icon">
+                        <ChevronDown 
+                          className={`apple-faq-chevron ${isOpen ? 'rotate-180' : ''}`}
+                        />
+                      </div>
+                    </button>
+                    {isOpen && (
+                      <div 
+                        id={`faq-answer-${key}`}
+                        className="apple-faq-answer"
+                      >
+                        <div className="apple-faq-answer-content">
+                          <div className="apple-body" style={{ whiteSpace: 'pre-line' }}>
+                            {faq.answer}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          </div>
-
-          {/* Desktop: Centered Grid */}
-          <div className="hidden lg:flex lg:flex-wrap lg:justify-center lg:gap-3 lg:max-w-4xl lg:mx-auto">
-            {categories.map((category, index) => (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                onKeyDown={(e) => handleCategoryKeyDown(e, category.id)}
-                role="tab"
-                aria-selected={activeCategory === category.id}
-                aria-controls="faq-content"
-                tabIndex={activeCategory === category.id ? 0 : -1}
-                className={`
-                  px-6 py-3 min-h-[44px] rounded-xl font-medium 
-                  transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                  ${activeCategory === category.id
-                    ? 'bg-blue-600 text-white shadow-lg scale-105' 
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:scale-102'
-                  }
-                `}
-              >
-                {category.label}
-              </button>
-            ))}
           </div>
         </div>
 
-        {/* FAQ リスト */}
-        <div id="faq-content" className="space-y-3 mt-12 md:mt-16">
-          {filteredFAQs.map((faq, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden transition-shadow duration-200 hover:shadow-md"
-            >
-              <button
-                onClick={() => toggleFAQ(index)}
-                aria-expanded={openIndex === index}
-                aria-controls={`faq-answer-${index}`}
-                className="w-full px-4 sm:px-6 py-4 sm:py-6 text-left flex items-center justify-between hover:bg-gray-50 transition-all duration-200 min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                <h3 
-                  id={`faq-question-${index}`}
-                  className="text-base md:text-lg font-semibold text-gray-900 pr-4 leading-6 sm:leading-7"
-                >
-                  {faq.question}
-                </h3>
-                <div className="flex-shrink-0 ml-4">
-                  <div className={`transform transition-transform duration-200 ${openIndex === index ? 'rotate-180' : ''}`}>
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
-                  </div>
-                </div>
-              </button>
-              
-              <div
-                id={`faq-answer-${index}`}
-                role="region"
-                aria-labelledby={`faq-question-${index}`}
-                className={`overflow-hidden transition-all duration-200 ${
-                  openIndex === index 
-                    ? 'max-h-96 opacity-100' 
-                    : 'max-h-0 opacity-0'
-                }`}
-              >
-                <div className="px-4 sm:px-6 pb-4 sm:pb-6 border-t border-gray-100">
-                  <div className="pt-4 text-sm md:text-base text-gray-700 leading-6 sm:leading-7 whitespace-pre-line">
-                    {faq.answer}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* 追加サポート */}
-        <div className="mt-12 sm:mt-16 text-center">
-          <div className="bg-gradient-to-r from-primary-50 to-indigo-50 rounded-2xl p-4 sm:p-6 lg:p-8 border border-blue-200">
-            <h3 className="text-h3 text-neutral-900 mb-4">
-              他にもご質問がございますか？
-            </h3>
-            <p className="text-body text-neutral-600 mb-6 leading-6 sm:leading-7">
+        {/* Apple FAQ Support */}
+        <div className="apple-faq-support">
+          <div className="apple-faq-support-card">
+            <h3 className="apple-title3">他にもご質問がございますか？</h3>
+            <p className="apple-body apple-text-secondary">
               お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
             </p>
-            <div className="flex justify-center">
+            <div>
               <a
                 href="mailto:support@luxucare.jp"
-                className="btn btn-primary btn-large"
+                className="apple-button apple-button-primary apple-button-large"
               >
                 メールで問い合わせ
               </a>

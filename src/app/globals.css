@@ -2897,15 +2897,53 @@ html, body {
   line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
-  margin-bottom: var(--space-4);
 }
 
 .apple-title3 {
-  font-size: clamp(18px, 3vw, 24px);
+  font-size: 20px;
   font-weight: 600;
   line-height: 1.25;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   color: var(--color-text-primary);
+}
+
+.apple-body {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.47;
+  letter-spacing: -0.011em;
+  color: var(--color-text-primary);
+}
+
+.apple-body-large {
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.47;
+  letter-spacing: -0.011em;
+  color: var(--color-text-primary);
+}
+
+.apple-caption {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.38;
+  letter-spacing: -0.006em;
+  color: var(--color-text-primary);
+}
+
+.apple-text-secondary {
+  color: var(--apple-secondary-label);
+}
+
+.apple-link {
+  color: var(--apple-blue);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.apple-link:hover {
+  color: var(--color-blue-hover);
+}
   margin-bottom: var(--space-3);
 }
 
@@ -3692,5 +3730,289 @@ html, body {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+  }
+}
+
+/* ============================================================
+   APPLE HERO SECTION - COMPLETE REDESIGN
+   ============================================================ */
+
+.apple-hero-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  padding: 200px 0 240px;
+  text-align: center;
+}
+
+.apple-hero-content {
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+.apple-hero-title {
+  font-size: clamp(48px, 8vw, 72px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--apple-label);
+  margin-bottom: 32px;
+  font-family: var(--font-family-system);
+}
+
+.apple-hero-subtitle {
+  font-size: 17px;
+  line-height: 1.47;
+  color: var(--apple-secondary-label);
+  margin-bottom: 48px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.apple-hero-cta {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .apple-hero-section {
+    padding: 120px 0 160px;
+  }
+  
+  .apple-hero-title {
+    margin-bottom: 24px;
+  }
+  
+  .apple-hero-subtitle {
+    margin-bottom: 40px;
+  }
+}
+
+/* ============================================================
+   APPLE GREEN BAND SECTION - FULL BLEED
+   ============================================================ */
+
+.apple-green-band {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background: #0A5D3F;
+  background: linear-gradient(135deg, #0A5D3F 0%, #0B5A3C 100%);
+  padding: 120px 0;
+  text-align: center;
+  color: white;
+}
+
+.apple-green-content {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.apple-green-title {
+  font-size: clamp(36px, 6vw, 48px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: white;
+  margin-bottom: 24px;
+  font-family: var(--font-family-system);
+}
+
+.apple-green-subtitle {
+  font-size: 19px;
+  line-height: 1.47;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .apple-green-band {
+    padding: 80px 0;
+  }
+  
+  .apple-green-title {
+    margin-bottom: 20px;
+  }
+  
+  .apple-green-subtitle {
+    font-size: 17px;
+  }
+}
+
+/* ============================================================
+   APPLE COMPARISON SECTION - BEFORE/AFTER CARDS
+   ============================================================ */
+
+.apple-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.apple-comparison-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: var(--space-6);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all var(--duration-standard) var(--ease-standard);
+  position: relative;
+  overflow: hidden;
+}
+
+.apple-comparison-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.apple-comparison-before {
+  border: 2px solid #fecaca;
+}
+
+.apple-comparison-after {
+  border: 2px solid #bbf7d0;
+}
+
+.apple-comparison-header {
+  text-align: center;
+  margin-bottom: var(--space-4);
+}
+
+.apple-comparison-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.apple-comparison-badge-before {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.apple-comparison-badge-after {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.apple-comparison-badge-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.apple-comparison-content {
+  margin-bottom: var(--space-4);
+}
+
+.apple-comparison-example {
+  background: var(--apple-gray-100);
+  border-radius: 8px;
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.apple-comparison-example:last-child {
+  margin-bottom: 0;
+}
+
+.apple-comparison-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--apple-secondary-label);
+}
+
+.apple-comparison-structured {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.apple-comparison-structured-item {
+  border-radius: 8px;
+  padding: var(--space-3);
+  border-left: 4px solid;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.apple-comparison-structured-item div {
+  margin-bottom: 4px;
+}
+
+.apple-comparison-structured-item div:last-child {
+  margin-bottom: 0;
+}
+
+.apple-comparison-primary {
+  background: rgba(0, 122, 255, 0.05);
+  border-left-color: var(--apple-blue);
+}
+
+.apple-comparison-secondary {
+  background: rgba(147, 51, 234, 0.05);
+  border-left-color: #9333ea;
+}
+
+.apple-comparison-tertiary {
+  background: rgba(99, 102, 241, 0.05);
+  border-left-color: #6366f1;
+}
+
+.apple-comparison-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--apple-gray-200);
+}
+
+.apple-comparison-status-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.apple-comparison-error {
+  color: #dc2626;
+}
+
+.apple-comparison-success {
+  color: #16a34a;
+}
+
+.apple-comparison-status-text {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .apple-comparison-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .apple-comparison-card {
+    padding: var(--space-4);
+  }
+  
+  .apple-comparison-badge {
+    padding: 10px 16px;
+    font-size: 14px;
   }
 }
