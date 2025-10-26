@@ -117,12 +117,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   AI時代の企業情報管理
                 </div>
                 <h1 className="text-display hig-jp-heading" style={{ color: 'var(--color-text-primary)' }}>
-                  AIに選ばれる企業になる
+                  AI時代に"見つかる"企業へ
                   <span className="block" style={{ color: 'var(--color-primary)' }}>AIO Hub</span>
                 </h1>
                 <p className="text-body-responsive hig-jp-body" style={{ color: 'var(--color-text-secondary)' }}>
-                  構造化された企業情報でAI回答・検索結果に最適化。<br />
-                  ゼロクリック時代も企業が見つけられる仕組みを構築します。
+                  AIがあなたの情報を最適に理解・推薦するための企業CMS。<br />
+                  構造化された企業情報で、検索からAI回答まで確実に見つけられます。
                 </p>
               </div>
               
@@ -133,7 +133,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   onClick={handleCtaClick}
                   className="hig-cta-primary text-lg px-8 py-4 gap-3"
                 >
-                  無料で始める
+                  14日間無料で試す
                   <ArrowRightIcon size={24} />
                 </Link>
               </div>
@@ -343,22 +343,22 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <section className="section section--cta">
           <div className="site-container text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              AI時代に選ばれる企業になる
+              AI時代に見つかる企業になる
             </h2>
             <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-              無料プランでAIO Hubの価値を体験し、<br />AI時代の企業情報戦略を今すぐ始めましょう。
+              14日間の無料トライアルでAIO Hubの価値を体験し、<br />AI時代の企業情報戦略を今すぐ始めましょう。
             </p>
             
             <Link
               href="/auth/signup"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors shadow-lg text-lg gap-3"
             >
-              無料で始める
+              14日間無料で試す
               <ArrowRightIcon size={24} />
             </Link>
 
             <div className="mt-6 text-sm text-white/80">
-              永続無料プラン • クレジットカード不要
+              クレジットカード登録なしで始められます
             </div>
           </div>
         </section>

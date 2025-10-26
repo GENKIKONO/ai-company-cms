@@ -10,9 +10,9 @@ import { HIGButton } from '@/components/ui/HIGButton';
 
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
-  blue: "text-blue-600",
-  green: "text-emerald-600", 
-  purple: "text-purple-600",
+  blue: "text-cyan-600",      // Starter - 水色系
+  green: "text-blue-600",     // Pro - 青系
+  purple: "text-slate-800",   // Business - 黒系
   indigo: "text-indigo-600",
   gray: "text-slate-600",
 };
@@ -42,89 +42,67 @@ interface PricingPlan {
 
 const PLANS: PricingPlan[] = [
   {
-    id: 'free',
-    name: 'Free',
-    description: '無料で始めるAI最適化',
-    price: PRICING_CONFIG.free.displayPrice,
+    id: 'starter',
+    name: 'Starter',
+    description: 'AI最適化CMS体験',
+    price: '¥2,980',
+    badge: '14日間無料',
     icon: Star,
     popular: false,
     features: [
       { text: 'ロゴ・企業情報を構造化公開（JSON‑LD）', included: true },
-      { text: 'サービス1件登録', included: true },
-      { text: 'Q&A項目：5件まで', included: true },
-      { text: 'Hub内構造化のみ（自社サイト埋め込み不可）', included: true },
+      { text: 'サービス登録：5件まで', included: true },
+      { text: 'Q&A項目：10件まで', included: true },
+      { text: 'Hub内構造化＋自社サイト埋め込み', included: true },
       { text: 'SEO最適化・構造化データ自動生成', included: true },
-      { text: '外部CTA・問い合わせフォーム連携', included: false }
+      { text: 'メールサポート', included: true }
     ],
-    ctaText: '無料で始める',
-    ctaHref: '/organizations',
+    ctaText: '14日間無料で試す',
+    ctaHref: '/auth/signup',
     color: 'blue'
   },
   {
-    id: 'basic',
-    name: 'Basic',
-    description: '基本的なAI最適化運用',
-    price: PRICING_CONFIG.basic.displayPrice,
+    id: 'pro',
+    name: 'Pro',
+    description: 'AI Visibility・成長分析',
+    price: '¥8,000',
     icon: Zap,
-    popular: false,
-    inheritedFeatures: 'Freeプランのすべての機能に加えて',
+    popular: true,
+    inheritedFeatures: 'Starterプランのすべての機能に加えて',
     features: [
-      { text: 'サービス登録：10件まで', included: true },
-      { text: 'Q&A項目：20件まで', included: true },
-      { text: 'Hub＋自社サイト埋め込み対応', included: true },
-      { text: '営業資料添付（最大5個）', included: true },
+      { text: 'サービス登録：20件まで', included: true },
+      { text: 'Q&A項目：50件まで', included: true },
+      { text: '営業資料添付（最大10個）', included: true },
+      { text: 'AI Visibility分析レポート', included: true },
       { text: '外部リンク表示機能', included: true },
       { text: 'カテゴリタグ検索対応', included: true },
-      { text: 'メールサポート', included: true }
+      { text: '優先サポート', included: true }
     ],
-    ctaText: 'このプランで始める',
-    ctaHref: '/organizations',
+    ctaText: '14日間無料で試す',
+    ctaHref: '/auth/signup',
     color: 'green'
   },
   {
     id: 'business',
     name: 'Business',
-    description: '本格的なAI最適化運用',
-    price: PRICING_CONFIG.business.displayPrice,
+    description: '分析＋ブランド特化',
+    price: '¥15,000',
     icon: Crown,
-    popular: true,
-    inheritedFeatures: 'Basicプランのすべての機能に加えて',
-    features: [
-      { text: 'サービス登録：50件まで', included: true },
-      { text: 'Q&A項目：無制限', included: true },
-      { text: '営業資料添付（最大20個）', included: true },
-      { text: 'Verified法人バッジ', included: true },
-      { text: '承認フロー機能', included: true },
-      { text: '認証バッジ機能', included: true },
-      { text: 'AI解析レポート（基本版）', included: true },
-      { text: 'システム監視機能', included: true },
-      { text: '優先サポート・個別相談', included: true }
-    ],
-    ctaText: 'このプランで始める',
-    ctaHref: '/organizations',
-    color: 'purple'
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    description: 'エンタープライズ向け完全運用',
-    price: PRICING_CONFIG.enterprise.displayPrice,
-    icon: Building2,
     popular: false,
-    inheritedFeatures: 'Businessプランのすべての機能に加えて',
+    inheritedFeatures: 'Proプランのすべての機能に加えて',
     features: [
-      { text: 'すべての機能無制限', included: true },
-      { text: 'SVG対応大サイズロゴ', included: true },
+      { text: 'サービス登録：無制限', included: true },
+      { text: 'Q&A項目：無制限', included: true },
+      { text: '営業資料添付（無制限）', included: true },
+      { text: 'Verified法人バッジ', included: true },
       { text: 'AI解析レポート（拡張版）', included: true },
-      { text: 'カスタム機能開発', included: true },
-      { text: '専任サポート', included: true },
-      { text: 'SLA保証', included: true },
-      { text: 'ホワイトラベル対応', included: true },
-      { text: 'API優先アクセス', included: true }
+      { text: 'ブランド分析・競合監視', included: true },
+      { text: 'カスタム機能開発相談', included: true },
+      { text: '専任サポート・個別相談', included: true }
     ],
-    ctaText: 'お問い合わせ',
-    ctaHref: '/contact',
-    color: 'indigo'
+    ctaText: '14日間無料で試す',
+    ctaHref: '/auth/signup',
+    color: 'purple'
   }
 ];
 
@@ -221,7 +199,7 @@ export default function PricingTable() {
                     href={plan.ctaHref}
                     className="hig-cta-primary w-full"
                   >
-                    {plan.id === 'enterprise' ? '詳細を見る' : '無料で始める'}
+                    {plan.ctaText}
                   </Link>
                 </div>
 
@@ -316,7 +294,7 @@ export default function PricingTable() {
                   href={plan.ctaHref}
                   className="hig-cta-primary w-full"
                 >
-                  {plan.id === 'enterprise' ? '詳細を見る' : '無料で始める'}
+                  {plan.ctaText}
                 </Link>
               </div>
 

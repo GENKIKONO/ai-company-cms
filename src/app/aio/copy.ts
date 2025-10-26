@@ -238,12 +238,12 @@ export const aioCopy = {
         title: 'プラン・機能',
         items: [
           {
-            question: 'フリープランでも効果はありますか？',
-            answer: 'はい。基本的なJSON-LD生成・SEO最適化により、主力サービス1件の検索性向上を実感いただけます。本格運用にはスタンダードプランでの複数サービス登録を推奨します。'
+            question: '14日間の無料トライアルで何ができますか？',
+            answer: 'Starterプランの全機能をお試しいただけます。JSON-LD生成・SEO最適化により、登録したサービスの検索性向上を実感いただけます。クレジットカード登録なしで始められます。'
           },
           {
-            question: 'データの更新頻度はどの程度ですか？',
-            answer: 'リアルタイム更新に対応。フォームでの情報変更が即座にJSON-LD・メタデータ・サイトマップに反映され、検索エンジンとAIプラットフォームへの情報提供が自動化されます。'
+            question: 'トライアル後の料金はいつから発生しますか？',
+            answer: '14日間のトライアル期間終了後、継続利用される場合のみ料金が発生します。トライアル中にキャンセルされた場合は一切費用はかかりません。'
           }
         ]
       }
@@ -253,8 +253,8 @@ export const aioCopy = {
   // CTA Section
   cta: {
     title: 'AIOで、今すぐ始める\n企業情報の構造化',
-    description: 'フリープランなら永続無料。5分の入力で、あなたの企業情報の構造化を開始できます。',
-    primaryText: '無料でAIOを始める',
+    description: '14日間無料トライアル。5分の入力で、あなたの企業情報のAI最適化を開始できます。',
+    primaryText: '14日間無料で試す',
     primaryHref: '/organizations',
     secondaryText: 'ヒアリング代行を利用する',
     secondaryHref: '/hearing-service',
