@@ -25,9 +25,9 @@ html, body {
   background: #fff !important;
   color: #0f172a !important;
 }
-/* 白文字を黒文字に */
+/* 白文字は白文字のまま維持 */
 .text-white, [class*="text-white"] {
-  color: #0f172a !important;
+  color: white !important;
 }
 
 /* 視認性向上: 薄いテキストを濃くする */
@@ -40,7 +40,7 @@ html, body {
   color: inherit;
 }
 .bg-white .text-white {
-  color: #1f2937 !important; /* gray-800 */
+  color: white !important;
 }
 /* Tailwind の dark 変種や媒体クエリを無効化 */
 @media (prefers-color-scheme: dark) {
