@@ -259,13 +259,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </div>
             
             {/* Hero headline with Apple typography */}
-            <h2 className="text-5xl md:text-6xl font-semibold text-gray-900 mb-6 leading-tight tracking-tight">
+            <h2 className="text-display mb-6">
               AI時代に<br />
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">選ばれる企業</span>になる
             </h2>
             
             {/* Subtitle with refined spacing */}
-            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-body-large mb-12 max-w-2xl mx-auto">
               構造化された企業情報で、AI検索・ChatGPT回答での<br />
               露出を確保し、新たなビジネス機会を創出します。
             </p>
@@ -353,23 +353,23 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         {/* Final CTA - Apple-inspired minimal design */}
         <section className="py-20 bg-gray-50">
           <div className="site-container text-center">
-            <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight">
+            <h2 className="text-title1 mb-6">
               AI時代に見つかる企業になる
             </h2>
-            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-body-large mb-10 max-w-2xl mx-auto">
               14日間の無料体験で、AI検索に最適化された<br />
               企業情報の効果を実感してください。
             </p>
             
             <Link
               href="/auth/signup"
-              className="inline-flex items-center justify-center px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg text-lg gap-3"
+              className="btn-primary text-lg px-10 py-4"
             >
               今すぐ無料で始める
               <ArrowRightIcon size={20} />
             </Link>
             
-            <div className="mt-6 text-sm text-gray-500">
+            <div className="mt-6 text-caption">
               クレジットカード不要 • 設定も簡単
             </div>
           </div>
