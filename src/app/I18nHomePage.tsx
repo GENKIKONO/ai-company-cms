@@ -103,7 +103,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <Link
                 href="/auth/signup"
                 className="apple-button apple-button-primary apple-button-large"
-                onClick={() => trackConversion('hero_cta_click')}
+                onClick={() => trackConversion()}
               >
                 <span>無料で体験する</span>
                 <ArrowRightIcon className="apple-button-icon" />
