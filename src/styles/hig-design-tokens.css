@@ -188,6 +188,93 @@ html, body {
 .text-primary { color: var(--color-text-primary); }
 .text-secondary { color: var(--color-text-secondary); }
 
+/* HIG Border Colors */
+.border-primary { border-color: var(--color-border-primary); }
+.border-secondary { border-color: var(--color-border-secondary); }
+.border-accent { border-color: var(--color-primary); }
+
+/* HIG Background Colors */
+.bg-accent { background-color: var(--color-bg-accent); }
+.bg-subtle { background-color: var(--color-bg-subtle); }
+
+/* HIG Badge Colors */
+.badge-primary { 
+  background-color: rgba(0, 122, 255, 0.1); 
+  color: var(--color-primary); 
+}
+.badge-success { 
+  background-color: rgba(52, 199, 89, 0.1); 
+  color: var(--color-success); 
+}
+
+/* HIG Spacing Utilities */
+.space-y-hig > * + * { margin-top: var(--space); }
+.space-y-hig-lg > * + * { margin-top: var(--space-lg); }
+.space-x-hig > * + * { margin-left: var(--space); }
+.space-x-hig-lg > * + * { margin-left: var(--space-lg); }
+
+.mb-hig { margin-bottom: var(--space); }
+.mb-hig-lg { margin-bottom: var(--space-lg); }
+.mt-hig { margin-top: var(--space); }
+.mt-hig-lg { margin-top: var(--space-lg); }
+.py-hig { padding-top: var(--space); padding-bottom: var(--space); }
+.py-hig-lg { padding-top: var(--space-lg); padding-bottom: var(--space-lg); }
+
+/* HIG Responsive Grid System */
+.hig-grid {
+  display: grid;
+  gap: var(--space);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.hig-grid-2 {
+  display: grid;
+  gap: var(--space);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .hig-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.hig-grid-3 {
+  display: grid;
+  gap: var(--space);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .hig-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hig-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* HIG Responsive Typography */
+.text-display {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+}
+
+.text-heading {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+}
+
+.text-body-responsive {
+  font-size: clamp(0.875rem, 2.5vw, 1.125rem);
+  line-height: var(--line-height-normal);
+}
+
 /* Horizontal Scroll for Pricing Plans */
 .hscroll {
   display: grid; 

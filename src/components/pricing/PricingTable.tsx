@@ -6,6 +6,7 @@
 import Link from 'next/link';
 import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
 import { formatJPY, PRICING_CONFIG } from '@/lib/pricing';
+import { HIGButton } from '@/components/ui/HIGButton';
 
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
@@ -129,7 +130,7 @@ const PLANS: PricingPlan[] = [
 
 export default function PricingTable() {
   return (
-    <section className="section--alt">
+    <section className="section section--alt">
       <div className="site-container">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
@@ -140,22 +141,21 @@ export default function PricingTable() {
           </p>
         </div>
 
-        {/* Mobile: Horizontal Scroll */}
+        {/* Mobile: Vertical Stack */}
         <div className="lg:hidden">
-          <div className="hscroll">
+          <div className="space-y-6">
             {PLANS.map((plan) => (
               <div
                 key={plan.id}
-                className={`card relative shadow-sm border border-slate-200 bg-white ${
+                className={`card relative shadow-sm border border-secondary bg-white ${
                   plan.popular
-                    ? 'border-blue-500 shadow-blue-100'
-                    : 'hover:border-gray-300 hover:shadow-xl'
+                    ? 'border-accent bg-accent'
+                    : 'hover:border-primary hover:shadow-xl'
                 } transition-all duration-200`}
-                style={{ scrollSnapAlign: 'center' }}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                    <span className="inline-flex items-center px-3 py-1 badge-primary text-sm font-medium rounded-full">
                       人気
                     </span>
                   </div>
@@ -219,9 +219,9 @@ export default function PricingTable() {
                 <div className="mt-auto">
                   <Link
                     href={plan.ctaHref}
-                    className="btn-nowrap block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors bg-[#3B82F6] text-white hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#93C5FD] focus:ring-offset-2"
+                    className="hig-cta-primary w-full"
                   >
-                    {plan.ctaText}
+                    {plan.id === 'enterprise' ? '詳細を見る' : '無料で始める'}
                   </Link>
                 </div>
 
@@ -242,15 +242,15 @@ export default function PricingTable() {
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`card relative flex flex-col shadow-sm border border-slate-200 bg-white ${
+              className={`card relative flex flex-col shadow-sm border border-secondary bg-white ${
                 plan.popular
-                  ? 'border-blue-500 shadow-blue-100'
-                  : 'hover:border-gray-300 hover:shadow-xl'
+                  ? 'border-accent bg-accent'
+                  : 'hover:border-primary hover:shadow-xl'
               } transition-all duration-200`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                  <span className="inline-flex items-center px-3 py-1 badge-primary text-sm font-medium rounded-full">
                     人気
                   </span>
                 </div>
@@ -269,11 +269,11 @@ export default function PricingTable() {
                       {plan.originalPrice}
                     </span>
                   )}
-                  <span className="text-2xl font-bold text-primary">
+                  <span className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                     {plan.price}
                   </span>
                   {plan.id !== 'free' && (
-                    <span className="text-secondary ml-1">（税別）/月</span>
+                    <span className="ml-1" style={{ color: 'var(--text-secondary)' }}>**（税別）**/月</span>
                   )}
                 </div>
               </div>
@@ -314,9 +314,9 @@ export default function PricingTable() {
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className="btn-nowrap block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors bg-[#3B82F6] text-white hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#93C5FD] focus:ring-offset-2"
+                  className="hig-cta-primary w-full"
                 >
-                  {plan.ctaText}
+                  {plan.id === 'enterprise' ? '詳細を見る' : '無料で始める'}
                 </Link>
               </div>
 

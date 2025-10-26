@@ -107,109 +107,58 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
   return (
     <div className="min-h-screen">
       <main>
-        {/* Hero Section */}
-        <section className="section bg-gradient-to-br from-white to-blue-50" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+        {/* Hero Section - 導入：価値を3秒で伝える */}
+        <section className="section section--hero">
           <div className="site-container">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div className="space-y-6">
-                <h1 className="text-4xl md:text-5xl font-bold text-primary leading-tight">
-                  AI企業CMS
-                  <span className="text-blue-600 block">AIO Hub</span>
-                </h1>
-                <p className="text-lg text-secondary leading-relaxed">
-                  <strong>ゼロクリック時代</strong>にAIが理解・引用しやすい企業情報を構築。検索結果からAI回答まで、企業が"選ばれる"プラットフォームです。
-                </p>
-                
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href="/auth/signup"
-                    onClick={handleCtaClick}
-                    className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    無料で始める
-                    <ArrowRightIcon size={20} className="ml-2" />
-                  </Link>
-                  <Link
-                    href="/organizations"
-                    className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-[#3B82F6] text-white font-semibold rounded-lg hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] transition-colors"
-                  >
-                    企業ディレクトリを見る
-                  </Link>
+            <div className="text-center space-y-8 max-w-4xl mx-auto">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                  <ServiceIcon size={16} />
+                  AI時代の企業情報管理
                 </div>
-
-                {/* Stats or Feature Badges */}
-                {showStats ? (
-                  <div className="grid grid-cols-3 gap-4">
-                    {stats.map((stat, index) => (
-                      <div key={index} className="text-center">
-                        <div className="text-2xl font-bold text-blue-600 mb-1">
-                          {stat.value}<span className="text-sm text-secondary">{stat.unit}</span>
-                        </div>
-                        <div className="text-sm text-secondary">
-                          {stat.label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {featureBadges.map((badge) => (
-                      <span key={badge} className="rounded-full bg-slate-200 text-slate-800 px-3 py-1 text-xs font-medium">
-                        {badge}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                <h1 className="text-display hig-jp-heading" style={{ color: 'var(--color-text-primary)' }}>
+                  AIに選ばれる企業になる
+                  <span className="block" style={{ color: 'var(--color-primary)' }}>AIO Hub</span>
+                </h1>
+                <p className="text-body-responsive hig-jp-body" style={{ color: 'var(--color-text-secondary)' }}>
+                  構造化された企業情報でAI回答・検索結果に最適化。<br />
+                  ゼロクリック時代も企業が見つけられる仕組みを構築します。
+                </p>
+              </div>
+              
+              {/* 単一CTA */}
+              <div className="flex justify-center">
+                <Link
+                  href="/auth/signup"
+                  onClick={handleCtaClick}
+                  className="hig-cta-primary text-lg px-8 py-4 gap-3"
+                >
+                  無料で始める
+                  <ArrowRightIcon size={24} />
+                </Link>
               </div>
 
-              <div className="card">
-                <div className="space-y-6">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                    <ServiceIcon size={16} />
-                    ゼロクリック対応
-                  </div>
-                  <h2 className="text-2xl font-bold text-primary">
-                    AIに選ばれる企業情報を構築
-                  </h2>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                      <CheckCircleIcon 
-                        size={20} 
-                        className="text-green-500 flex-shrink-0 mt-0.5" 
-                      />
-                      <span className="text-primary">構造化データ自動生成</span>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircleIcon 
-                        size={20} 
-                        className="text-green-500 flex-shrink-0 mt-0.5" 
-                      />
-                      <span className="text-primary">AI引用最適化</span>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircleIcon 
-                        size={20} 
-                        className="text-green-500 flex-shrink-0 mt-0.5" 
-                      />
-                      <span className="text-primary">流入促進とSEO強化</span>
-                    </div>
-                  </div>
-                </div>
+              {/* 信頼性バッジ */}
+              <div className="flex flex-wrap justify-center gap-3">
+                {featureBadges.map((badge) => (
+                  <span key={badge} className="rounded-full bg-blue-50 text-blue-700 px-4 py-2 text-sm font-medium">
+                    {badge}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
         </section>
 
-        {/* Zero-Click Era Evolution Section */}
-        <section className="section--alt" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+        {/* Problem & Vision - 理解：課題提示とAI時代の文脈 */}
+        <section className="section section--alt">
           <div className="site-container">
-            {/* Header Card */}
-            <div className="card text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-                検索体験の変化とAI時代への対応
+            <div className="text-center mb-16">
+              <h2 className="text-heading hig-jp-heading mb-6" style={{ color: 'var(--color-text-primary)' }}>
+                検索からAI回答へ<br />企業発見の仕組みが変わった
               </h2>
-              <p className="text-lg text-secondary leading-relaxed max-w-3xl mx-auto">
-                SEOは残り続けますが、AIが情報を直接引用・回答する機会が急増。企業の発見機会を確保する新たなアプローチが必要です。
+              <p className="text-body-responsive hig-jp-body max-w-3xl mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
+                AIが情報を直接引用・回答する時代。<br />従来のSEOだけでは企業が見つけられない新たな課題が生まれています。
               </p>
             </div>
 
@@ -291,7 +240,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* CTA Section - Emotional Peak */}
-        <section className="section--cta" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+        <section className="section section--cta">
           {/* Animated Background Elements */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl animate-pulse"></div>
@@ -313,19 +262,27 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/auth/signup"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors shadow-lg"
+              <HIGButton
+                variant="primary"
+                size="lg"
+                className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg"
+                asChild
               >
-                無料で始める
-                <ArrowRightIcon className="w-5 h-5 ml-2" />
-              </Link>
-              <Link
-                href="/hearing-service"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-400 border-2 border-white/20 transition-colors shadow-lg"
+                <Link href="/auth/signup">
+                  無料で始める
+                  <ArrowRightIcon className="w-5 h-5" />
+                </Link>
+              </HIGButton>
+              <HIGButton
+                variant="secondary"
+                size="lg"
+                className="bg-blue-500 text-white hover:bg-blue-400 border-2 border-white/20 shadow-lg"
+                asChild
               >
-                ヒアリング代行サービス
-              </Link>
+                <Link href="/hearing-service">
+                  ヒアリング代行サービス
+                </Link>
+              </HIGButton>
             </div>
 
             <div className="mt-8 text-sm text-blue-200">
@@ -334,7 +291,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </section>
 
-        {/* Flow Section */}
+        {/* Solution / How It Works - 理解：AIO Hubの強み・ステップ */}
         <FlowSection
           title={aioCopy.flow.title}
           description={aioCopy.flow.description}
@@ -342,7 +299,37 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           beforeAfter={aioCopy.flow.beforeAfter}
         />
 
-        {/* Pricing Section */}
+        {/* Features - 理解：主要機能を3つに絞る */}
+        <section className="section section--clean">
+          <div className="site-container">
+            <div className="text-center mb-16">
+              <h2 className="text-heading hig-jp-heading mb-6" style={{ color: 'var(--color-text-primary)' }}>
+                AIO Hubの3つの価値
+              </h2>
+              <p className="text-body-responsive hig-jp-body max-w-3xl mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
+                企業情報をAIが理解しやすい形に最適化し、発見機会を最大化します
+              </p>
+            </div>
+            
+            <div className="hig-grid--3-cols">
+              {features.map((feature, index) => (
+                <div key={index} className="hig-card text-center">
+                  <div className="w-16 h-16 mx-auto mb-6 bg-blue-50 rounded-xl flex items-center justify-center">
+                    <feature.icon size={32} className="text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing - 行動：料金とCTA */}
         <PricingTable />
 
         {/* FAQ Section */}
@@ -352,50 +339,26 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           categories={aioCopy.faq.categories}
         />
 
-        {/* Final CTA Section - Success Emotional Peak */}
-        <section className="section--cta" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
-          {/* Success Celebration Elements */}
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-20 left-20 w-4 h-4 bg-yellow-300 rounded-full animate-ping"></div>
-            <div className="absolute top-40 right-32 w-3 h-3 bg-yellow-300 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
-            <div className="absolute bottom-32 left-1/4 w-2 h-2 bg-yellow-300 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-yellow-300 rounded-full animate-ping" style={{ animationDelay: '1.5s' }}></div>
-          </div>
-          
-          <div className="site-container text-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 text-green-800 rounded-full text-sm font-bold mb-6 shadow-xl">
-              <CheckCircleIcon size={16} />
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-              </svg>
-              AI時代の成功企業になる
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              今すぐゼロクリック時代に<br />
-              <span className="text-yellow-300">備えましょう</span>
+        {/* Final CTA - 成功体験誘導 */}
+        <section className="section section--cta">
+          <div className="site-container text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              AI時代に選ばれる企業になる
             </h2>
-            <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto leading-relaxed">
-              無料プランでAIO Hubの価値を体験し、AI時代の企業情報戦略を始めてください。
+            <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+              無料プランでAIO Hubの価値を体験し、<br />AI時代の企業情報戦略を今すぐ始めましょう。
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/auth/signup"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-white text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors shadow-lg"
-              >
-                無料で始める
-                <ArrowRightIcon className="w-5 h-5 ml-2" />
-              </Link>
-              <Link
-                href="/hearing-service"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-400 border-2 border-white/20 transition-colors shadow-lg"
-              >
-                ヒアリング代行サービス
-              </Link>
-            </div>
+            <Link
+              href="/auth/signup"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors shadow-lg text-lg gap-3"
+            >
+              無料で始める
+              <ArrowRightIcon size={24} />
+            </Link>
 
-            <div className="mt-8 text-sm text-green-200">
-              永続無料プラン • クレジットカード不要 • 今すぐ開始
+            <div className="mt-6 text-sm text-white/80">
+              永続無料プラン • クレジットカード不要
             </div>
           </div>
         </section>

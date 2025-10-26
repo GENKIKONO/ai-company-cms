@@ -36,8 +36,8 @@ export default function FAQSection({ title, description, categories }: FAQSectio
   };
 
   return (
-    <section id="faq" className="section">
-      <div className="container">
+    <section id="faq" className="section section--clean">
+      <div className="site-container">
         {/* セクションヘッダー */}
         <div className="text-center mb-12">
           <h2 className="text-h1 text-neutral-900 mb-6 jp-text">

@@ -91,7 +91,7 @@ export default function PricingSection() {
   
   return (
     <section id="pricing" className="section bg-subtle">
-      <div className="container">
+      <div className="site-container">
         {/* セクションヘッダー */}
         <div className="mb-12 lg:mb-16">
           <h2 className="text-h2 text-neutral-900 mb-6 text-center text-balance">

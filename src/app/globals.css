@@ -102,23 +102,89 @@ section > .site-container, section > .hig-container {
   padding-right: clamp(16px, 3vw, 24px);
 }
 
-/* コンテンツ幅の統一 */
-.section, .container-section {
+/* コンテンツ幅の統一 - sectionクラスからmax-width制約を削除 */
+.container-section {
   max-width: 1280px;
   margin: 0 auto;
   padding-left: clamp(16px, 3vw, 24px);
   padding-right: clamp(16px, 3vw, 24px);
 }
 
-/* セクション背景色のスムーズな遷移 */
-.section--alt {
+/* === 統一セクション&コンテナシステム（HIG準拠） === */
+.section {
+  width: 100%;
+  margin: 0;
+  padding: 0;
   position: relative;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding-block: var(--space-3xl);
+}
+
+.section > .site-container {
+  max-width: var(--container-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--safe-area-horizontal);
+  padding-right: var(--safe-area-horizontal);
+}
+
+@media (min-width: 768px) {
+  .section > .site-container {
+    padding-left: var(--safe-area-horizontal-desktop);
+    padding-right: var(--safe-area-horizontal-desktop);
+  }
+}
+
+/* Section Background Variants */
+.section--hero {
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-subtle) 100%);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section--alt {
+  background: var(--color-bg-subtle);
+}
+
+.section--clean {
+  background: var(--color-bg);
+}
+
+.section--neutral {
+  background: var(--color-background-secondary);
 }
 
 .section--cta {
-  position: relative;
-  background: linear-gradient(135deg, #059669 0%, #065f46 100%);
+  background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+  color: white;
+}
+
+/* CTA統一スタイリング */
+.hig-cta-primary {
+  background: var(--color-primary);
+  color: white;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: none;
+  font-weight: var(--font-weight-medium);
+  min-height: var(--tap-target-size);
+  transition: all var(--duration-fast) var(--easing-standard);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hig-cta-primary:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+/* 主要カラー定義（AA準拠） */
+:root {
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-light: #e5eaf0;
+  --cta-blue: #2563eb;
+  --cta-blue-hover: #1d4ed8;
 }
 
 .section--cta * {

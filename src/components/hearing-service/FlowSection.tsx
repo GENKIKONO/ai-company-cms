@@ -70,8 +70,8 @@ const getColorClasses = (color: string) => {
 
 export default function FlowSection() {
   return (
-    <section className="py-10 bg-clean">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="section--alt">
+      <div className="site-container">
         {/* セクションヘッダー */}
         <div className="mb-12 text-center">
           <h2 className="text-h2 text-neutral-900 mb-4 text-balance">

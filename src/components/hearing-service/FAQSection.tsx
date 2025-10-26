@@ -84,8 +84,8 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="faq" className="section bg-clean">
-      <div className="container">
+    <section id="faq" className="section--alt">
+      <div className="site-container">
         {/* セクションヘッダー */}
         <div className="mb-12">
           <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 text-sm font-medium rounded-full mb-4 mx-auto">
