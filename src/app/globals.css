@@ -48,6 +48,8 @@ html, body {
   html, body { 
     background: #fff !important; 
     color: #0f172a !important; 
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: "lnum", "tnum";
   }
 }
 
@@ -2915,14 +2917,6 @@ html, body {
   color: var(--color-text-primary);
 }
 
-.apple-body-large {
-  font-size: 19px;
-  font-weight: 400;
-  line-height: 1.47;
-  letter-spacing: -0.011em;
-  color: var(--color-text-primary);
-}
-
 .apple-caption {
   font-size: 15px;
   font-weight: 400;
@@ -2932,11 +2926,11 @@ html, body {
 }
 
 .apple-text-secondary {
-  color: var(--apple-secondary-label);
+  color: var(--color-text-secondary);
 }
 
 .apple-link {
-  color: var(--apple-blue);
+  color: var(--color-blue);
   text-decoration: none;
   transition: color var(--duration-fast) var(--ease-standard);
 }
@@ -2950,7 +2944,7 @@ html, body {
   font-weight: 400;
   line-height: 1.47;
   letter-spacing: -0.011em;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   max-width: 640px;
 }
 
@@ -3136,6 +3130,9 @@ html, body {
     0 2px 8px rgba(0, 0, 0, 0.06),
     0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all var(--duration-standard) var(--ease-standard);
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
 }
 
 .apple-feature-card:hover {
@@ -3324,6 +3321,8 @@ html, body {
   line-height: 1.1;
   letter-spacing: -0.02em;
   color: var(--apple-label);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum", "tnum";
 }
 
 .apple-pricing-period {
@@ -3395,6 +3394,7 @@ html, body {
 
 .apple-pricing-cta {
   margin-top: auto;
+  padding-top: 16px;
 }
 
 .apple-pricing-coming-soon {
@@ -3802,7 +3802,7 @@ html, body {
   margin-right: -50vw;
   background: #0A5D3F;
   background: linear-gradient(135deg, #0A5D3F 0%, #0B5A3C 100%);
-  padding: 120px 0;
+  padding: 80px 24px;
   text-align: center;
   color: white;
 }
