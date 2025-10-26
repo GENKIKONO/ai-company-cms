@@ -61,13 +61,13 @@ export default function FAB() {
         ui-fab
         fixed z-[1000] 
         w-14 h-14 
-        text-slate-700 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl border border-slate-200
+        text-white bg-blue-600 hover:bg-blue-700 shadow-xl hover:shadow-2xl border-2 border-white
         active:scale-95
         grid place-items-center 
         will-change-transform
         transition-all duration-200
         focus:outline-none 
-        focus:ring-0
+        focus:ring-2 focus:ring-blue-300 focus:ring-offset-2
         leading-none
         select-none
         md:hidden

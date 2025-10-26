@@ -160,10 +160,10 @@ export default function PricingPlans({
               <article
                 key={plan.id}
                 className={`
-                  card relative min-h-[600px] shadow-sm border border-slate-200 bg-white transition-all duration-200
+                  card relative max-h-[480px] overflow-hidden shadow-sm border border-slate-200 bg-white transition-all duration-200
                   hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                   ${plan.popular 
-                    ? 'border-purple-500' 
+                    ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-indigo-50' 
                     : 'hover:border-gray-300'
                   }
                 `}
@@ -206,7 +206,7 @@ export default function PricingPlans({
                 <div className="flex-1 mb-6">
                   <h4 className="font-semibold text-gray-900 mb-4">含まれる内容</h4>
                   <ul className="space-y-3" role="list">
-                    {plan.features.map((feature, featureIndex) => (
+                    {plan.features.slice(0, 3).map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
                         <Check
                           className={`h-5 w-5 mt-0.5 mr-3 flex-shrink-0 ${
@@ -227,6 +227,14 @@ export default function PricingPlans({
                         </span>
                       </li>
                     ))}
+                    {plan.features.length > 3 && (
+                      <li className="flex items-start">
+                        <Check className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0 text-green-500" aria-hidden="true" />
+                        <span className="text-sm text-gray-600">
+                          他 {plan.features.length - 3} 項目を含む
+                        </span>
+                      </li>
+                    )}
                   </ul>
 
                   {/* Continuous Support Info */}
@@ -319,7 +327,7 @@ export default function PricingPlans({
               <div className="flex-1 mb-8">
                 <h4 className="font-semibold text-gray-900 mb-6">含まれる内容</h4>
                 <ul className="space-y-4" role="list">
-                  {plan.features.map((feature, featureIndex) => (
+                  {plan.features.slice(0, 3).map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start">
                       <Check
                         className={`h-5 w-5 mt-1 mr-3 flex-shrink-0 ${
@@ -340,6 +348,14 @@ export default function PricingPlans({
                       </span>
                     </li>
                   ))}
+                  {plan.features.length > 3 && (
+                    <li className="flex items-start">
+                      <Check className="h-5 w-5 mt-1 mr-3 flex-shrink-0 text-green-500" aria-hidden="true" />
+                      <span className="text-gray-600">
+                        他 {plan.features.length - 3} 項目を含む
+                      </span>
+                    </li>
+                  )}
                 </ul>
 
                 {/* Continuous Support Info */}

@@ -108,7 +108,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     <div className="min-h-screen">
       <main>
         {/* Hero Section */}
-        <section className="section">
+        <section className="section bg-gradient-to-br from-white to-blue-50" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
           <div className="site-container">
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div className="space-y-6">
@@ -201,7 +201,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* Zero-Click Era Evolution Section */}
-        <section className="section--alt">
+        <section className="section--alt bg-gradient-to-br from-slate-50 to-gray-100" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
           <div className="site-container">
             {/* Header Card */}
             <div className="card text-center mb-12">
@@ -276,37 +276,59 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   </div>
                 ))}
               </div>
+
+              {/* Subtle CTA Reappearance */}
+              <div className="text-center mt-12">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium border border-blue-200 hover:bg-blue-100 transition-colors">
+                  <ArrowRightIcon size={16} />
+                  <Link href="/auth/signup" className="hover:underline">
+                    今すぐAI最適化を始める
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="section">
-          <div className="site-container text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-              ゼロクリック時代に取り残されませんか？
+        {/* CTA Section - Emotional Peak */}
+        <section className="section bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white relative overflow-hidden" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute bottom-10 right-10 w-24 h-24 bg-white rounded-full blur-lg animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-white rounded-full blur-md animate-pulse" style={{ animationDelay: '2s' }}></div>
+          </div>
+          
+          <div className="site-container text-center relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-full text-sm font-bold mb-6 shadow-lg animate-bounce">
+              <AlertTriangleIcon size={16} />
+              緊急：AI時代の取り残しリスク
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+              ゼロクリック時代に<br />
+              <span className="text-yellow-300">取り残されませんか？</span>
             </h2>
-            <p className="text-lg text-secondary mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
               AIが企業を"選ぶ"時代。構造化された情報で検索・AI回答での露出を確保し、新たな流入機会を創出しましょう。
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/auth/signup"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors shadow-lg"
               >
                 無料で始める
                 <ArrowRightIcon className="w-5 h-5 ml-2" />
               </Link>
               <Link
                 href="/hearing-service"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-[#3B82F6] text-white font-semibold rounded-lg hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] transition-colors"
+                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-400 border-2 border-white/20 transition-colors shadow-lg"
               >
                 ヒアリング代行サービス
               </Link>
             </div>
 
-            <div className="mt-8 text-sm text-secondary">
+            <div className="mt-8 text-sm text-blue-200">
               無料トライアル • クレジットカード不要
             </div>
           </div>
@@ -330,33 +352,46 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           categories={aioCopy.faq.categories}
         />
 
-        {/* Final CTA Section */}
-        <section className="section--alt">
-          <div className="site-container text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-              今すぐゼロクリック時代に備えましょう
+        {/* Final CTA Section - Success Emotional Peak */}
+        <section className="section--alt bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700 text-white relative overflow-hidden" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+          {/* Success Celebration Elements */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-20 left-20 w-4 h-4 bg-yellow-300 rounded-full animate-ping"></div>
+            <div className="absolute top-40 right-32 w-3 h-3 bg-yellow-300 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+            <div className="absolute bottom-32 left-1/4 w-2 h-2 bg-yellow-300 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-yellow-300 rounded-full animate-ping" style={{ animationDelay: '1.5s' }}></div>
+          </div>
+          
+          <div className="site-container text-center relative z-10">
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 text-green-800 rounded-full text-sm font-bold mb-6 shadow-xl">
+              <CheckCircleIcon size={16} />
+              ✨ AI時代の成功企業になる
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+              今すぐゼロクリック時代に<br />
+              <span className="text-yellow-300">備えましょう</span>
             </h2>
-            <p className="text-lg text-secondary mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto leading-relaxed">
               無料プランでAIO Hubの価値を体験し、AI時代の企業情報戦略を始めてください。
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/auth/signup"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-white text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors shadow-lg"
               >
                 無料で始める
                 <ArrowRightIcon className="w-5 h-5 ml-2" />
               </Link>
               <Link
                 href="/hearing-service"
-                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-[#3B82F6] text-white font-semibold rounded-lg hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] transition-colors"
+                className="btn-nowrap inline-flex items-center justify-center px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-400 border-2 border-white/20 transition-colors shadow-lg"
               >
                 ヒアリング代行サービス
               </Link>
             </div>
 
-            <div className="mt-8 text-sm text-secondary">
+            <div className="mt-8 text-sm text-green-200">
               永続無料プラン • クレジットカード不要 • 今すぐ開始
             </div>
           </div>
