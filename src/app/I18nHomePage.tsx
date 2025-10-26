@@ -246,54 +246,58 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </section>
 
-        {/* CTA Section - Emotional Peak */}
-        <section className="section bg-gradient-to-br from-green-600 to-green-700 text-white" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
-          {/* Animated Background Elements */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl animate-pulse"></div>
-            <div className="absolute bottom-10 right-10 w-24 h-24 bg-white rounded-full blur-lg animate-pulse" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-white rounded-full blur-md animate-pulse" style={{ animationDelay: '2s' }}></div>
-          </div>
+        {/* CTA Section - Apple-inspired Design */}
+        <section className="py-24 relative overflow-hidden">
+          {/* Subtle gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-white"></div>
           
           <div className="site-container text-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-full text-sm font-bold mb-6 shadow-lg animate-bounce">
-              <AlertTriangleIcon size={16} />
-              緊急：AI時代の取り残しリスク
+            {/* Alert badge with Apple-style design */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium mb-8 shadow-sm border border-orange-200">
+              <AlertTriangleIcon size={14} className="text-orange-600" />
+              AI時代の新たな挑戦
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+            
+            {/* Hero headline with Apple typography */}
+            <h2 className="text-5xl md:text-6xl font-semibold text-gray-900 mb-6 leading-tight tracking-tight">
               AI時代に<br />
-              <span className="text-yellow-300">取り残されませんか？</span>
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">選ばれる企業</span>になる
             </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
-              AIが企業を"選ぶ"時代。構造化された情報で検索・AI回答での露出を確保し、新たな流入機会を創出しましょう。
+            
+            {/* Subtitle with refined spacing */}
+            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
+              構造化された企業情報で、AI検索・ChatGPT回答での<br />
+              露出を確保し、新たなビジネス機会を創出します。
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* Apple-style button group */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <HIGButton
                 variant="primary"
                 size="lg"
-                className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg border-0 rounded-xl px-8 py-4 text-lg font-medium transition-all duration-200"
                 asChild
               >
                 <Link href="/auth/signup">
-                  14日間無料で試す
-                  <ArrowRightIcon className="w-5 h-5" />
+                  14日間無料で始める
+                  <ArrowRightIcon className="w-5 h-5 ml-2" />
                 </Link>
               </HIGButton>
               <HIGButton
                 variant="secondary"
                 size="lg"
-                className="bg-blue-500 text-white hover:bg-blue-400 border-2 border-white/20 shadow-lg"
+                className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 rounded-xl px-8 py-4 text-lg font-medium transition-all duration-200 shadow-sm"
                 asChild
               >
                 <Link href="/hearing-service">
-                  ヒアリング代行サービス
+                  専門ヒアリングサービス
                 </Link>
               </HIGButton>
             </div>
 
-            <div className="mt-8 text-sm text-blue-200">
-              無料トライアル • クレジットカード不要
+            {/* Subtle footer text */}
+            <div className="text-sm text-gray-500">
+              クレジットカード不要 • いつでもキャンセル可能
             </div>
           </div>
         </section>
@@ -346,26 +350,27 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           categories={aioCopy.faq.categories}
         />
 
-        {/* Final CTA - 成功体験誘導 */}
-        <section className="section bg-gradient-to-br from-green-600 to-green-700 text-white" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
+        {/* Final CTA - Apple-inspired minimal design */}
+        <section className="py-20 bg-gray-50">
           <div className="site-container text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight">
               AI時代に見つかる企業になる
             </h2>
-            <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-              14日間の無料トライアルでAIO Hubの価値を体験し、<br />AI時代の企業情報戦略を今すぐ始めましょう。
+            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              14日間の無料体験で、AI検索に最適化された<br />
+              企業情報の効果を実感してください。
             </p>
             
             <Link
               href="/auth/signup"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors shadow-lg text-lg gap-3"
+              className="inline-flex items-center justify-center px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg text-lg gap-3"
             >
-              14日間無料で試す
-              <ArrowRightIcon size={24} />
+              今すぐ無料で始める
+              <ArrowRightIcon size={20} />
             </Link>
-
-            <div className="mt-6 text-sm text-white/80">
-              クレジットカード登録なしで始められます
+            
+            <div className="mt-6 text-sm text-gray-500">
+              クレジットカード不要 • 設定も簡単
             </div>
           </div>
         </section>
