@@ -4110,6 +4110,29 @@ div[class*="hig-grid"] div[class*="text-center"] p {
   display: block !important;
 }
 
+/* Force display main CTA message */
+.hig-section h2.hig-text-h2,
+section[class*="bg-[var(--color-primary-dark)]"] h2.hig-text-h2,
+.hig-section h2.hig-jp-heading,
+section[class*="bg-[var(--color-primary-dark)]"] h2.hig-jp-heading {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+.hig-section p.hig-text-body,
+section[class*="bg-[var(--color-primary-dark)]"] p.hig-text-body,
+.hig-section p.hig-jp-body,
+section[class*="bg-[var(--color-primary-dark)]"] p.hig-jp-body {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
 @media (max-width: 768px) {
   .apple-comparison-grid {
     grid-template-columns: 1fr;
