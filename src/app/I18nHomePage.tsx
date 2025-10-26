@@ -11,16 +11,11 @@ import PricingTable from '@/components/pricing/PricingTable';
 import FAQSection from '@/components/aio/FAQSection';
 import { aioCopy } from '@/app/aio/copy';
 
-// HIG Components
-import { HIGButton } from '@/components/ui/HIGButton';
-import { HIGCard, HIGCardHeader, HIGCardContent, HIGCardTitle, HIGCardDescription } from '@/components/ui/HIGCard';
-import { HIGContainer, HIGSection, HIGStack, HIGGrid, HIGFlex, HIGCenter } from '@/components/layout/HIGLayout';
 import { 
   CheckCircleIcon, 
   ArrowRightIcon, 
   BuildingIcon, 
   UserIcon, 
-  ServiceIcon,
   InfoIcon,
   AlertTriangleIcon 
 } from '@/components/icons/HIGIcons';
@@ -55,355 +50,266 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           setDynamicStats(stats);
         }
       } catch (error) {
-        // Stats fetch failed - using default values
+        // Keep default stats on error
       }
     };
-    
+
     fetchDynamicStats();
-    setTimeout(() => {
-      applyJapaneseSoftBreaks();
-    }, 100);
   }, []);
 
   useSEO({
-    title: t('pages.home.title'),
-    description: t('pages.home.description'),
-    canonical: 'https://aiohub.jp/',
-    keywords: ['AI', 'CMS', '企業管理', 'DX', 'デジタル変革'],
-    type: 'website',
+    title: siteSettings.title,
+    description: siteSettings.tagline,
   });
 
-  const handleCtaClick = () => {
-    trackConversion();
-  };
-
+  // Features data
   const features = [
     {
       icon: BuildingIcon,
-      title: "AI引用最適化",
-      description: "企業情報を構造化データとして整備し、AIが理解・引用しやすい形に自動変換"
-    },
-    {
-      icon: ServiceIcon,
-      title: "ドメインパワー共有", 
-      description: "信頼性の高いプラットフォームに情報を集約することで、検索・AI回答での露出を向上"
+      title: "構造化企業情報",
+      description: "ChatGPT・Geminiが理解しやすい形式で企業情報を最適化"
     },
     {
       icon: UserIcon,
-      title: "アクセス流入促進",
-      description: "構造化された企業情報から自社サイトやSNSへの質の高い流入を創出"
+      title: "AI検索対応",
+      description: "Google AI検索で確実に見つけられる企業プロフィール"
+    },
+    {
+      icon: InfoIcon,
+      title: "自動更新",
+      description: "最新の企業情報を継続的に反映・メンテナンス"
     }
   ];
 
-  const stats = [
-    { label: "登録企業", value: formatNumber(dynamicStats.organizations), unit: "社" },
-    { label: "管理サービス", value: formatNumber(dynamicStats.services), unit: "件" },
-    { label: "導入事例", value: formatNumber(dynamicStats.cases), unit: "件" },
-  ];
-
-  const showStats = (dynamicStats.organizations + dynamicStats.services + dynamicStats.cases) > 0;
-  const featureBadges = ["構造化データ自動生成", "AI検索最適化", "JSON-LD対応"];
-
   return (
-    <div className="min-h-screen">
-      <main>
-        {/* Hero Section - Apple Visual Hierarchy強化 */}
-        <section className="section-apple-hero bg-white relative overflow-hidden min-h-screen flex items-center">
-          <div className="site-container text-center relative z-10 w-full">
-            {/* Product badge - より目立つ配置 */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full mb-6 transition-all duration-300 hover:bg-blue-100">
-              <div className="w-2 h-2 bg-blue rounded-full animate-pulse" />
-              <span className="text-caption text-blue font-medium">ChatGPTがあなたの会社を正確に紹介</span>
-            </div>
-            
-            {/* Hero headline - 70%画面占有 */}
-            <h1 className="text-display mb-8 max-w-5xl mx-auto leading-tight">
-              AIに選ばれる<br />企業になる
+    <div className="apple-page">
+      {/* Hero Section - True Apple Scale */}
+      <section className="apple-hero">
+        <div className="apple-hero-container">
+          <div className="apple-hero-content">
+            {/* Hero Typography with Apple Scale */}
+            <h1 className="apple-hero-title">
+              AIに選ばれる
+              <br />
+              企業になる
             </h1>
             
-            {/* Value proposition - より強いコントラスト */}
-            <p className="text-body-large mb-12 max-w-xl mx-auto text-secondary">
+            <p className="apple-hero-subtitle">
               構造化データで、確実な検索露出
             </p>
-
-            {/* Primary CTA - 1.5倍大型化 */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            
+            {/* Hero CTA - Apple Sizing */}
+            <div className="apple-hero-cta">
               <Link
                 href="/auth/signup"
-                onClick={handleCtaClick}
-                className="btn-apple btn-apple-primary text-lg px-8 py-4 transform hover:scale-105 transition-transform"
-                style={{ minHeight: '56px', fontSize: '18px' }}
+                className="apple-button apple-button-primary apple-button-large"
+                onClick={() => trackConversion('hero_cta_click')}
               >
-                無料で体験する
-                <ArrowRightIcon size={20} className="ml-2" />
-              </Link>
-              <Link
-                href="/aio"
-                className="btn-apple btn-apple-secondary text-lg px-8 py-4"
-                style={{ minHeight: '56px', fontSize: '18px' }}
-              >
-                デモを見る
+                <span>無料で体験する</span>
+                <ArrowRightIcon className="apple-button-icon" />
               </Link>
             </div>
             
-            {/* 副次情報 - opacity低減 */}
-            <div className="text-caption opacity-60">
-              14日間無料 • クレジットカード不要
+            {/* Trust Signal */}
+            <div className="apple-trust-signal">
+              <p className="apple-text-caption">
+                {formatNumber(dynamicStats.organizations)}社以上が利用中
+              </p>
             </div>
-            
-            {/* Visual proof - AI検索結果モックアップ再追加（簡潔版） */}
-            <div className="mt-16 max-w-3xl mx-auto">
-              <div className="bg-surface rounded-2xl p-6 shadow-large border border-gray-100">
-                <div className="bg-white rounded-xl p-4 shadow-medium">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-5 h-5 bg-blue rounded" />
-                    <span className="text-caption font-medium">ChatGPT</span>
-                  </div>
-                  <div className="text-left">
-                    <div className="text-caption text-tertiary mb-2">「[企業名]について教えて」</div>
-                    <div className="text-body">
+          </div>
+          
+          {/* Hero Visual - Apple Style Mockup */}
+          <div className="apple-hero-visual">
+            <div className="apple-device-mockup">
+              <div className="apple-screen">
+                <div className="apple-demo-content">
+                  <div className="apple-demo-search">
+                    <div className="apple-search-bar">
+                      <span>「[企業名]について教えて」</span>
+                    </div>
+                    <div className="apple-search-result">
                       <strong>[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
                       <br /><br />
-                      <strong>主なサービス：</strong> 構造化データによる企業情報最適化<br />
-                      <strong>導入実績：</strong> 300社以上の企業が導入済み
+                      <strong>主なサービス：</strong> 構造化データによる企業情報最適化
+                      <br />
+                      <strong>導入実績：</strong> 300社以上
                     </div>
                   </div>
-                </div>
-                <div className="text-center mt-3">
-                  <span className="text-caption text-secondary">↑ AIO Hub導入後のAI回答例</span>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Problem vs Solution - Apple HIG準拠 */}
-        <section className="section-apple bg-surface relative">
-          <div className="site-container relative z-10">
-            <div className="text-center mb-8">
-              <h2 className="text-title1 mb-4">
-                AI時代の新しい課題
-              </h2>
-              <p className="text-body-large max-w-2xl mx-auto">
-                ChatGPTやGoogle AI検索が主流になる中、構造化されていない企業情報は正確に引用されません
-              </p>
+      {/* Problem vs Solution - Apple Cards */}
+      <section className="apple-section">
+        <div className="apple-container">
+          <div className="apple-section-header">
+            <h2 className="apple-title1">AI時代の新しい課題</h2>
+            <p className="apple-body-large">
+              ChatGPTやGoogle AI検索が主流になる中、構造化されていない企業情報は正確に引用されません
+            </p>
+          </div>
+          
+          <div className="apple-comparison-grid">
+            {/* BEFORE Card */}
+            <div className="apple-card apple-card-problem">
+              <div className="apple-card-header">
+                <div className="apple-status-icon apple-status-error">
+                  <AlertTriangleIcon />
+                </div>
+                <div>
+                  <div className="apple-text-caption apple-text-secondary">現在の課題</div>
+                  <h3 className="apple-title3">見つけてもらえない企業</h3>
+                </div>
+              </div>
+              
+              <div className="apple-demo-response apple-demo-response-error">
+                <div className="apple-demo-avatar">AI</div>
+                <div className="apple-demo-text">
+                  申し訳ございませんが、詳細な情報を見つけることができませんでした
+                </div>
+              </div>
+              
+              <ul className="apple-feature-list">
+                <li className="apple-feature-item apple-feature-error">
+                  <span className="apple-feature-indicator"></span>
+                  企業情報が散在・非構造化
+                </li>
+                <li className="apple-feature-item apple-feature-error">
+                  <span className="apple-feature-indicator"></span>
+                  AIが理解・引用できない形式
+                </li>
+              </ul>
             </div>
 
-            {/* Before vs After Comparison - Apple Card Style */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto mb-8">
-              {/* BEFORE - Problem State */}
-              <div className="card-apple">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
-                    <AlertTriangleIcon size={16} className="text-red-600" />
-                  </div>
-                  <div>
-                    <div className="text-caption text-secondary mb-1">現在の課題</div>
-                    <h3 className="text-title3">見つけてもらえない企業</h3>
-                  </div>
+            {/* AFTER Card */}
+            <div className="apple-card apple-card-solution">
+              <div className="apple-card-header">
+                <div className="apple-status-icon apple-status-success">
+                  <CheckCircleIcon />
                 </div>
-                
-                {/* Mockup of poor AI response */}
-                <div className="bg-surface rounded-lg p-4 border-l-4 border-red-400 mb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-4 h-4 bg-gray-400 rounded" />
-                    <span className="text-caption">ChatGPT</span>
-                  </div>
-                  <div className="text-caption text-secondary mb-2">「[企業名]について教えて」</div>
-                  <div className="text-body text-secondary">
-                    申し訳ございませんが、詳細な情報を見つけることができませんでした
-                  </div>
+                <div>
+                  <div className="apple-text-caption apple-text-blue">AIO Hub導入後</div>
+                  <h3 className="apple-title3">AIに選ばれる企業へ</h3>
                 </div>
-
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <div className="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center mt-1">
-                      <div className="w-2 h-2 bg-red-500 rounded-full" />
-                    </div>
-                    <span className="text-body">企業情報が散在・非構造化</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center mt-1">
-                      <div className="w-2 h-2 bg-red-500 rounded-full" />
-                    </div>
-                    <span className="text-body">AIが理解・引用できない形式</span>
-                  </li>
-                </ul>
               </div>
-
-              {/* AFTER - Solution State */}
-              <div className="card-apple bg-blue-50">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-blue rounded-lg flex items-center justify-center">
-                    <CheckCircleIcon size={16} className="text-white" />
-                  </div>
-                  <div>
-                    <div className="text-caption text-blue mb-1">AIO Hub導入後</div>
-                    <h3 className="text-title3">AIに選ばれる企業へ</h3>
-                  </div>
+              
+              <div className="apple-demo-response apple-demo-response-success">
+                <div className="apple-demo-avatar apple-demo-avatar-ai">AI</div>
+                <div className="apple-demo-text">
+                  <strong>[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
+                  <br /><br />
+                  <strong>主なサービス：</strong> 構造化データによる企業情報最適化
+                  <br />
+                  <strong>導入実績：</strong> 300社以上
                 </div>
-                
-                {/* Mockup of improved AI response */}
-                <div className="bg-white rounded-lg p-4 border-l-4 border-blue mb-4 shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-4 h-4 bg-blue rounded" />
-                    <span className="text-caption font-medium">ChatGPT</span>
-                  </div>
-                  <div className="text-caption text-secondary mb-2">「[企業名]について教えて」</div>
-                  <div className="text-body leading-relaxed">
-                    <strong>[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
-                    <br /><br />
-                    <strong>主なサービス：</strong> 構造化データによる企業情報最適化
-                    <br />
-                    <strong>導入実績：</strong> 300社以上
-                  </div>
-                </div>
-
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckCircleIcon size={16} className="text-green-500 mt-1" />
-                    <span className="text-body">構造化された企業情報</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircleIcon size={16} className="text-green-500 mt-1" />
-                    <span className="text-body">AI検索に最適化されたデータ</span>
-                  </li>
-                </ul>
               </div>
-            </div>
-
-            {/* CTA - 1.5倍サイズ強化 */}
-            <div className="text-center">
-              <Link
-                href="/auth/signup"
-                className="btn-apple btn-apple-primary text-lg px-8 py-4 transform hover:scale-105 transition-transform"
-                style={{ minHeight: '56px', fontSize: '18px' }}
-              >
-                14日間無料で体験する
-                <ArrowRightIcon size={16} className="ml-2" />
-              </Link>
+              
+              <ul className="apple-feature-list">
+                <li className="apple-feature-item apple-feature-success">
+                  <CheckCircleIcon className="apple-feature-check" />
+                  構造化された企業情報
+                </li>
+                <li className="apple-feature-item apple-feature-success">
+                  <CheckCircleIcon className="apple-feature-check" />
+                  AI検索に最適化されたデータ
+                </li>
+              </ul>
             </div>
           </div>
-        </section>
-
-
-        {/* Solution / How It Works - 理解：AIO Hubの強み・ステップ */}
-        <FlowSection
-          title={aioCopy.flow.title}
-          description={aioCopy.flow.description}
-          steps={aioCopy.flow.steps}
-          beforeAfter={aioCopy.flow.beforeAfter}
-        />
-
-        {/* Features - Apple HIG準拠 */}
-        <section className="section-apple bg-white">
-          <div className="site-container">
-            <div className="text-center mb-12">
-              <h2 className="text-title1 mb-6">
-                3つの価値
-              </h2>
-              <p className="text-body-large max-w-2xl mx-auto opacity-80">
-                企業情報をAIが理解しやすい形に最適化
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {features.map((feature, index) => (
-                <div key={index} className="card-apple text-center">
-                  <div className="w-12 h-12 mx-auto mb-4 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <feature.icon size={24} className="text-blue" />
-                  </div>
-                  <h3 className="text-title3 mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-body text-secondary opacity-70">
-                    {feature.description}
-                  </p>
-                </div>
-              ))}
-            </div>
+          
+          {/* Section CTA */}
+          <div className="apple-section-cta">
+            <Link
+              href="/auth/signup"
+              className="apple-button apple-button-primary apple-button-medium"
+            >
+              <span>14日間無料で体験する</span>
+              <ArrowRightIcon className="apple-button-icon" />
+            </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Pricing - 行動：料金とCTA */}
-        <PricingTable />
+      {/* Features Section - Apple 3-Column */}
+      <section className="apple-section apple-section-alt">
+        <div className="apple-container">
+          <div className="apple-section-header">
+            <h2 className="apple-title1">3つの価値</h2>
+            <p className="apple-body-large apple-text-secondary">
+              企業情報をAIが理解しやすい形に最適化
+            </p>
+          </div>
+          
+          <div className="apple-features-grid">
+            {features.map((feature, index) => (
+              <div key={index} className="apple-feature-card">
+                <div className="apple-feature-icon">
+                  <feature.icon />
+                </div>
+                <h3 className="apple-title3">{feature.title}</h3>
+                <p className="apple-body apple-text-secondary">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-        {/* FAQ Section */}
-        <FAQSection
-          title={aioCopy.faq.title}
-          description={aioCopy.faq.description}
-          categories={aioCopy.faq.categories}
-        />
+      {/* Flow Section */}
+      <FlowSection
+        title={aioCopy.flow.title}
+        description={aioCopy.flow.description}
+        steps={aioCopy.flow.steps}
+        beforeAfter={aioCopy.flow.beforeAfter}
+      />
 
-        {/* Final CTA - Apple HIG準拠 */}
-        <section className="section-apple-large bg-surface">
-          <div className="site-container text-center">
-            <h2 className="text-title1 mb-4">
-              AI時代に見つかる企業になる
-            </h2>
-            <p className="text-body-large mb-8 max-w-xl mx-auto">
+      {/* Pricing Section */}
+      <PricingTable />
+
+      {/* FAQ Section */}
+      <FAQSection
+        title={aioCopy.faq.title}
+        description={aioCopy.faq.description}
+        categories={aioCopy.faq.categories}
+      />
+
+      {/* Final CTA - Apple Scale */}
+      <section className="apple-section apple-cta-section">
+        <div className="apple-container">
+          <div className="apple-cta-content">
+            <h2 className="apple-title1">AI時代に見つかる企業になる</h2>
+            <p className="apple-body-large">
               14日間の無料体験で効果を実感
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+            <div className="apple-cta-buttons">
               <Link
                 href="/auth/signup"
-                className="btn-apple btn-apple-primary text-xl px-10 py-5 transform hover:scale-105 transition-transform"
-                style={{ minHeight: '64px', fontSize: '20px' }}
+                className="apple-button apple-button-primary apple-button-large"
               >
-                今すぐ無料で始める
-                <ArrowRightIcon size={18} className="ml-2" />
+                <span>今すぐ無料で始める</span>
+                <ArrowRightIcon className="apple-button-icon" />
               </Link>
               <Link
                 href="/hearing-service"
-                className="btn-apple btn-apple-secondary opacity-90"
+                className="apple-button apple-button-secondary apple-button-large"
               >
                 専門ヒアリング相談
               </Link>
             </div>
             
-            <div className="text-caption">
-              クレジットカード不要 • いつでもキャンセル可能
-            </div>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <section className="section bg-gray-50">
-          <div className="site-container">
-            <div className="grid md:grid-cols-3 gap-8">
-              <div>
-                <h3 className="text-xl font-semibold mb-4 text-primary">AIO Hub</h3>
-                <p className="text-secondary">
-                  AI技術を活用した企業情報の統合管理プラットフォーム
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-4 text-primary">リンク</h4>
-                <ul className="space-y-2">
-                  <li><Link href="/organizations" className="text-secondary hover:text-primary">企業ディレクトリ</Link></li>
-                  <li><Link href="/search" className="text-secondary hover:text-primary">検索</Link></li>
-                  <li><Link href="/dashboard" className="text-secondary hover:text-primary">ダッシュボード</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-4 text-primary">サポート</h4>
-                <ul className="space-y-2">
-                  <li><Link href="/help" className="text-secondary hover:text-primary">ヘルプ</Link></li>
-                  <li><Link href="/contact" className="text-secondary hover:text-primary">お問い合わせ</Link></li>
-                  <li><Link href="/terms" className="text-secondary hover:text-primary">利用規約</Link></li>
-                  <li><Link href="/privacy" className="text-secondary hover:text-primary">プライバシー</Link></li>
-                </ul>
-              </div>
-            </div>
-            <div className="border-t border-gray-200 mt-8 pt-8 text-center">
-              <p className="text-sm text-slate-600">
-                © 2024 AIO Hub. All rights reserved.
+            <div className="apple-trust-final">
+              <p className="apple-text-caption">
+                クレジットカード不要・いつでも解約可能
               </p>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
     </div>
   );
 }
