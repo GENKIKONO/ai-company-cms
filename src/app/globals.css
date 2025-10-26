@@ -78,13 +78,28 @@ html, body {
   border-radius: 16px;
 }
 
-/* 全体レイアウトの中央寄せ強制 */
-main, section, .container {
+/* 全体レイアウトの中央寄せ強制 - セクション背景は全幅適用 */
+main, .container {
   max-width: 1280px;
   margin-left: auto !important;
   margin-right: auto !important;
   padding-left: clamp(16px, 3vw, 24px) !important;
   padding-right: clamp(16px, 3vw, 24px) !important;
+}
+
+/* セクション背景を全幅に適用、コンテンツは中央寄せ */
+section {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+section > .site-container, section > .hig-container {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(16px, 3vw, 24px);
+  padding-right: clamp(16px, 3vw, 24px);
 }
 
 /* コンテンツ幅の統一 */
@@ -93,6 +108,27 @@ main, section, .container {
   margin: 0 auto;
   padding-left: clamp(16px, 3vw, 24px);
   padding-right: clamp(16px, 3vw, 24px);
+}
+
+/* セクション背景色のスムーズな遷移 */
+.section--alt {
+  position: relative;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.section--cta {
+  position: relative;
+  background: linear-gradient(135deg, #059669 0%, #065f46 100%);
+}
+
+.section--cta * {
+  color: white !important;
+}
+
+.section--cta .card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px);
 }
 
 /* ============================================================

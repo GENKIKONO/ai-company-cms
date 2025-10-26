@@ -201,7 +201,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* Zero-Click Era Evolution Section */}
-        <section className="section--alt bg-gradient-to-br from-slate-50 to-gray-100" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+        <section className="section--alt" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
           <div className="site-container">
             {/* Header Card */}
             <div className="card text-center mb-12">
@@ -291,7 +291,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
 
         {/* CTA Section - Emotional Peak */}
-        <section className="section bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white relative overflow-hidden" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+        <section className="section--cta" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
           {/* Animated Background Elements */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl animate-pulse"></div>
@@ -353,7 +353,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         />
 
         {/* Final CTA Section - Success Emotional Peak */}
-        <section className="section--alt bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700 text-white relative overflow-hidden" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+        <section className="section--cta" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
           {/* Success Celebration Elements */}
           <div className="absolute inset-0 opacity-20">
             <div className="absolute top-20 left-20 w-4 h-4 bg-yellow-300 rounded-full animate-ping"></div>
@@ -365,7 +365,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="site-container text-center relative z-10">
             <div className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 text-green-800 rounded-full text-sm font-bold mb-6 shadow-xl">
               <CheckCircleIcon size={16} />
-              ✨ AI時代の成功企業になる
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+              </svg>
+              AI時代の成功企業になる
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
               今すぐゼロクリック時代に<br />
