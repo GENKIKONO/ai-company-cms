@@ -4032,6 +4032,84 @@ a.apple-button.apple-button-secondary {
   font-weight: 500;
 }
 
+/* Force display GreenBandSection text */
+.apple-green-band h2,
+.apple-green-band .apple-green-title,
+.apple-green-content h2,
+.apple-green-content .apple-green-title {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+.apple-green-band p,
+.apple-green-band .apple-green-subtitle,
+.apple-green-content p,
+.apple-green-content .apple-green-subtitle {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Force display CTASection text */
+.hig-section h2,
+.hig-section h3,
+.hig-section h4,
+section[class*="bg-[var(--color-primary-dark)]"] h2,
+section[class*="bg-[var(--color-primary-dark)]"] h3,
+section[class*="bg-[var(--color-primary-dark)]"] h4 {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+.hig-section p,
+section[class*="bg-[var(--color-primary-dark)]"] p {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Force display feature cards text */
+.hig-card .text-white,
+.hig-card div[class*="text-white"],
+.hig-card .font-semibold,
+.hig-card .hig-text-caption {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Force display all CTASection button text */
+.hig-section .hig-jp-text,
+.hig-section span[class*="hig-jp"],
+.hig-section .hig-button span,
+section[class*="bg-[var(--color-primary-dark)]"] .hig-button span,
+section[class*="bg-[var(--color-primary-dark)]"] .hig-jp-text {
+  color: inherit !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline !important;
+}
+
+/* Force display step numbers and text in application steps */
+.hig-grid .hig-grid--3-cols > div span,
+.hig-grid .hig-grid--3-cols > div h4,
+.hig-grid .hig-grid--3-cols > div p,
+div[class*="hig-grid"] div[class*="text-center"] span,
+div[class*="hig-grid"] div[class*="text-center"] h4,
+div[class*="hig-grid"] div[class*="text-center"] p {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
 @media (max-width: 768px) {
   .apple-comparison-grid {
     grid-template-columns: 1fr;
