@@ -28,8 +28,8 @@
   
   /* === Colors (WCAG 2.1 AA Compliant) === */
   /* Unified Text Colors */
-  --color-text-primary: #0f172a;   /* slate-900 */
-  --color-text-secondary: #475569; /* slate-600 */
+  --color-text-primary: #1D1D1F;   /* Apple標準黒 - HIG準拠 */
+  --color-text-secondary: #636366; /* AA準拠グレー (4.85:1) - Apple HIG準拠 */
   --color-text-tertiary: #767680;
   --color-text-disabled: #B0B0B8;
   
