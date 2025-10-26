@@ -159,7 +159,7 @@ export default function AIVisibilityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-red-600">{metrics.p0Issues}</div>
-                <p className="text-xs text-muted-foreground">P0 - Immediate attention</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">P0 - Immediate attention</p>
               </CardContent>
             </Card>
 
@@ -170,7 +170,7 @@ export default function AIVisibilityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-orange-600">{metrics.p1Issues}</div>
-                <p className="text-xs text-muted-foreground">P1 - Should fix soon</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">P1 - Should fix soon</p>
               </CardContent>
             </Card>
 
@@ -181,7 +181,7 @@ export default function AIVisibilityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-yellow-600">{metrics.p2Issues}</div>
-                <p className="text-xs text-muted-foreground">P2 - Optimize when possible</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">P2 - Optimize when possible</p>
               </CardContent>
             </Card>
 
@@ -192,7 +192,7 @@ export default function AIVisibilityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">{metrics.okChecks}</div>
-                <p className="text-xs text-muted-foreground">No issues detected</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">No issues detected</p>
               </CardContent>
             </Card>
           </div>
@@ -207,7 +207,7 @@ export default function AIVisibilityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.avgResponseTime}ms</div>
-                <p className="text-xs text-muted-foreground">Average across all checks</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">Average across all checks</p>
               </CardContent>
             </Card>
 
@@ -217,7 +217,7 @@ export default function AIVisibilityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.uniqueUrls}</div>
-                <p className="text-xs text-muted-foreground">Unique endpoints checked</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">Unique endpoints checked</p>
               </CardContent>
             </Card>
 
@@ -227,7 +227,7 @@ export default function AIVisibilityDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.uniqueUserAgents}</div>
-                <p className="text-xs text-muted-foreground">Different crawlers tested</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">Different crawlers tested</p>
               </CardContent>
             </Card>
           </div>

@@ -177,7 +177,7 @@ export default function AdminReviewsPage() {
           <CardContent className="p-6 text-center">
             <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-4" />
             <h3 className="text-lg font-medium">審査待ちの組織はありません</h3>
-            <p className="text-muted-foreground">すべての審査が完了しています。</p>
+            <p className="text-[var(--color-text-secondary)]">すべての審査が完了しています。</p>
           </CardContent>
         </Card>
       ) : (
@@ -201,19 +201,19 @@ export default function AdminReviewsPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <span className="text-muted-foreground">法人番号:</span>
+                      <span className="text-[var(--color-text-secondary)]">法人番号:</span>
                       <p className="font-mono">{org.corporate_number || '未登録'}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">電話番号:</span>
+                      <span className="text-[var(--color-text-secondary)]">電話番号:</span>
                       <p>{org.telephone}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">所在地:</span>
+                      <span className="text-[var(--color-text-secondary)]">所在地:</span>
                       <p>{org.address_region} {org.address_locality}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">申請日:</span>
+                      <span className="text-[var(--color-text-secondary)]">申請日:</span>
                       <p>{formatDate(org.created_at)}</p>
                     </div>
                   </div>
@@ -234,19 +234,19 @@ export default function AdminReviewsPage() {
                           <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
-                                <span className="text-muted-foreground">組織ID:</span>
+                                <span className="text-[var(--color-text-secondary)]">組織ID:</span>
                                 <p className="font-mono">{org.id}</p>
                               </div>
                               <div>
-                                <span className="text-muted-foreground">スラッグ:</span>
+                                <span className="text-[var(--color-text-secondary)]">スラッグ:</span>
                                 <p>{org.slug}</p>
                               </div>
                               <div>
-                                <span className="text-muted-foreground">メール:</span>
+                                <span className="text-[var(--color-text-secondary)]">メール:</span>
                                 <p>{org.email || '未登録'}</p>
                               </div>
                               <div>
-                                <span className="text-muted-foreground">更新日:</span>
+                                <span className="text-[var(--color-text-secondary)]">更新日:</span>
                                 <p>{formatDate(org.updated_at)}</p>
                               </div>
                             </div>
@@ -262,12 +262,12 @@ export default function AdminReviewsPage() {
                                     <div key={history.id} className="text-sm border rounded p-2">
                                       <div className="flex justify-between">
                                         <span className="font-medium">{history.action}</span>
-                                        <span className="text-muted-foreground">
+                                        <span className="text-[var(--color-text-secondary)]">
                                           {formatDate(history.created_at)}
                                         </span>
                                       </div>
                                       {history.reason && (
-                                        <p className="text-muted-foreground mt-1">{history.reason}</p>
+                                        <p className="text-[var(--color-text-secondary)] mt-1">{history.reason}</p>
                                       )}
                                     </div>
                                   ))}
@@ -306,7 +306,7 @@ export default function AdminReviewsPage() {
                           <div className="space-y-4">
                             <div>
                               <h4 className="font-medium">{selectedOrg?.name}</h4>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-sm text-[var(--color-text-secondary)]">
                                 この組織の審査を行います
                               </p>
                             </div>
