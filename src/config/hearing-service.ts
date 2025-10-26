@@ -8,7 +8,7 @@ import { Star, Zap, Crown, RotateCcw } from 'lucide-react';
 export const HEARING_SERVICE_PLANS = {
   light: {
     id: 'light',
-    name: 'ライトヒアリング',
+    name: 'Light',
     badge: '基本構造化',
     description: '企業の基本情報を短時間でAI最適化',
     price: 30000,
@@ -33,7 +33,7 @@ export const HEARING_SERVICE_PLANS = {
   },
   advance: {
     id: 'advance',
-    name: 'アドバンスヒアリング',
+    name: 'Advance',
     badge: '戦略構造化',
     description: '採用・PR・B2B向けQ&A拡充で深度ある情報構造',
     price: 70000,
@@ -57,7 +57,7 @@ export const HEARING_SERVICE_PLANS = {
   },
   full: {
     id: 'full',
-    name: 'フルヒアリング',
+    name: 'Full',
     badge: '包括構造化',
     description: 'AI引用を前提とした完全構造化プロフィール',
     price: 120000,
@@ -79,7 +79,7 @@ export const HEARING_SERVICE_PLANS = {
   },
   continuous: {
     id: 'continuous',
-    name: '継続フォロー',
+    name: 'Continuous',
     badge: '運用サポート',
     description: '月次ヒアリング＋更新代行で継続的な最適化',
     price: 30000,

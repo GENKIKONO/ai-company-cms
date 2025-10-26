@@ -174,8 +174,8 @@ export default function PricingPlans({
                 style={{ scrollSnapAlign: 'center' }}
               >
                 {plan.badge && (
-                  <div className="mb-4">
-                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-purple-100 text-purple-700">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                    <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-purple-600 text-white shadow-lg">
                       <Sparkles className="w-4 h-4 mr-1.5" aria-hidden="true" />
                       {plan.badge}
                     </span>
@@ -295,8 +295,8 @@ export default function PricingPlans({
               tabIndex={index}
             >
               {plan.badge && (
-                <div className="mb-4">
-                  <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-purple-100 text-purple-700">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                  <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-purple-600 text-white shadow-lg">
                     <Sparkles className="w-4 h-4 mr-1.5" aria-hidden="true" />
                     {plan.badge}
                   </span>

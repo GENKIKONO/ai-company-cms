@@ -218,7 +218,7 @@ export default function PricingTable() {
 
         {/* Desktop: Grid Layout */}
         <div className="hidden lg:block mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
