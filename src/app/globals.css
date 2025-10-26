@@ -441,21 +441,30 @@ html[lang="ja"] .jp-body{
   /* Full-bleed section for seamless edge-to-edge backgrounds */
   .section--full-bleed {
     width: 100vw;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
   }
   
   /* Ensure proper contrast for text on colored backgrounds */
   .section--cta {
-    color: #ffffff;
+    color: #ffffff !important;
     --text-on-accent: #ffffff;
   }
   
   .section--cta * {
-    color: inherit;
+    color: #ffffff !important;
+  }
+  
+  .section--cta h1,
+  .section--cta h2,
+  .section--cta h3,
+  .section--cta h4,
+  .section--cta h5,
+  .section--cta h6,
+  .section--cta p,
+  .section--cta span,
+  .section--cta div {
+    color: #ffffff !important;
   }
   
   /* CTA専用：強力改行禁止 */
