@@ -2824,9 +2824,9 @@ html, body {
 
 /* Button Sizes */
 .apple-button-large {
-  padding: var(--space-4) var(--space-6);
-  font-size: 18px;
-  min-height: 56px;
+  padding: var(--space-3) var(--space-5);
+  font-size: 16px;
+  min-height: 48px;
 }
 
 .apple-button-medium {
@@ -3841,7 +3841,7 @@ a.apple-button.apple-button-secondary {
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
-  color: white;
+  color: white !important;
   margin-bottom: 24px;
   font-family: var(--font-family-system);
 }
@@ -3849,7 +3849,7 @@ a.apple-button.apple-button-secondary {
 .apple-green-subtitle {
   font-size: 19px;
   line-height: 1.47;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.9) !important;
   max-width: 600px;
   margin: 0 auto;
 }
