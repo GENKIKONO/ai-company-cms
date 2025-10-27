@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { PLAN_NAMES } from '@/config/plans';
 import type { PlanType } from '@/config/plans';
+import { logger } from '@/lib/utils/logger';
 
 interface OrganizationLimit {
   id: string;
@@ -63,7 +64,7 @@ export function EmbedLimitCard() {
       setStats(result.stats || stats);
     } catch (err) {
       setError(err instanceof Error ? err.message : '不明なエラー');
-      console.error('Failed to fetch limit data:', err);
+      logger.error('Failed to fetch limit data:', err);
     } finally {
       setLoading(false);
     }
@@ -209,7 +210,7 @@ export function EmbedLimitCard() {
                       {org.embedLimit !== -1 && (
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
-                            className={`h-2 rounded-full transition-all ${getProgressBarColor(embedPercentage)}`}
+                            className={`h-2 rounded-full progress-bar ${getProgressBarColor(embedPercentage)}`}
                             style={{ width: `${Math.min(embedPercentage, 100)}%` }}
                           />
                         </div>
@@ -227,7 +228,7 @@ export function EmbedLimitCard() {
                       {org.monthlyLimit !== -1 && (
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
-                            className={`h-2 rounded-full transition-all ${getProgressBarColor(viewPercentage)}`}
+                            className={`h-2 rounded-full progress-bar ${getProgressBarColor(viewPercentage)}`}
                             style={{ width: `${Math.min(viewPercentage, 100)}%` }}
                           />
                         </div>

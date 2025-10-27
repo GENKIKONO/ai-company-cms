@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
+import { HIGButton } from '@/design-system';
 
 interface Service {
   id: string;
@@ -375,13 +376,14 @@ export default function EditServicePage() {
         )}
 
         <div className="flex space-x-4">
-          <button
+          <HIGButton
             type="submit"
             disabled={saving}
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            variant="primary"
+            size="medium"
           >
             {saving ? '更新中...' : '更新'}
-          </button>
+          </HIGButton>
           <button
             type="button"
             onClick={() => router.push('/dashboard/services')}

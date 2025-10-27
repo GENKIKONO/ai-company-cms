@@ -1,4 +1,5 @@
 import './globals.css'
+import '@/design-system' // 新しいデザインシステム読み込み
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 import Footer from '@/components/layout/Footer'
 import { ToastProvider } from '@/components/ui/toast'

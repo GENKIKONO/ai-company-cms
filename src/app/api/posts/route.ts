@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { apiLogger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -101,7 +102,7 @@ USING (org_id IN (
       }, { status: 201 });
 
     } catch (dbError) {
-      console.error('Database error:', dbError);
+      apiLogger.error('POST', '/api/posts', dbError instanceof Error ? dbError : new Error(String(dbError)), { userId: user.id, orgId: orgData.id });
       return NextResponse.json({
         ok: false,
         error: 'データベースエラーが発生しました'
@@ -109,7 +110,7 @@ USING (org_id IN (
     }
 
   } catch (error) {
-    console.error('Posts API error:', error);
+    apiLogger.error('POST', '/api/posts', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : 'Unknown error'

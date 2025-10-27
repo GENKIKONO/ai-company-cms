@@ -13,6 +13,7 @@ import {
 } from '@/lib/api/error-responses';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('[POST /api/billing/checkout] Checkout session creation failed:', error);
+    logger.error('[POST /api/billing/checkout] Checkout session creation failed', error instanceof Error ? error : new Error(String(error)));
     return handleApiError(error);
   }
 }

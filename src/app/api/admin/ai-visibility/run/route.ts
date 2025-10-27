@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { updateLastCheck } from '@/lib/ai-visibility-config';
+import { logger } from '@/lib/utils/logger';
 
 // AI Visibility Monitoring System
 export async function POST(request: NextRequest) {
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
     const isDryRun = body.dryRun || false;
     const urls = body.urls || getDefaultUrls();
     
-    console.log(`[AI Visibility] Starting ${isDryRun ? 'dry run' : 'full run'} check`);
+    logger.debug('Debug', `[AI Visibility] Starting ${isDryRun ? 'dry run' : 'full run'} check`);
     
     const results = await runAIVisibilityCheck(urls, isDryRun);
     
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('AI Visibility check error:', error);
+    logger.error('AI Visibility check error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('AI Visibility dry run error:', error);
+    logger.error('AI Visibility dry run error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -428,7 +429,7 @@ async function saveResults(supabase: any, results: any[]) {
           environment: process.env.NODE_ENV || 'production'
         });
     } catch (error) {
-      console.error('Error saving result:', error);
+      logger.error('Error saving result', error instanceof Error ? error : new Error(String(error)));
     }
   }
 }
@@ -438,9 +439,9 @@ async function sendNotifications(results: any[]) {
   const summary = generateSummary(results);
   
   if (summary.p0Issues > 0) {
-    console.log(`🚨 P0 Alert: ${summary.p0Issues} critical issues found`);
+    logger.debug('Debug', `🚨 P0 Alert: ${summary.p0Issues} critical issues found`);
     // Send immediate Slack notification
   }
   
-  console.log(`📊 AI Visibility Summary: P0:${summary.p0Issues} P1:${summary.p1Issues} P2:${summary.p2Issues} OK:${summary.okChecks}`);
+  logger.debug('Debug', `📊 AI Visibility Summary: P0:${summary.p0Issues} P1:${summary.p1Issues} P2:${summary.p2Issues} OK:${summary.okChecks}`);
 }

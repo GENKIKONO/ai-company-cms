@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { BackLink } from '@/components/ui/back-link';
 import { getAppUrl } from '@/lib/utils/env';
+import { logger } from '@/lib/utils/logger';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -96,7 +97,7 @@ export default function SignupPage() {
       setShowResendButton(true);
       
     } catch (err) {
-      console.error('Signup error:', err);
+      logger.error('Signup error:', err);
       setError(err instanceof Error ? err.message : 'アカウント作成に失敗しました');
     } finally {
       setIsLoading(false);

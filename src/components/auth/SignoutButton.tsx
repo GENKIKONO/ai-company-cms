@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/utils/logger';
 
 interface SignoutButtonProps {
   className?: string;
@@ -35,7 +36,7 @@ export default function SignoutButton({ className, children, onClick }: SignoutB
         alert('ログアウトに失敗しました');
       }
     } catch (error) {
-      console.error('Signout error:', error);
+      logger.error('Signout error', error instanceof Error ? error : new Error(String(error)));
       alert('ログアウトに失敗しました');
     } finally {
       setIsLoading(false);

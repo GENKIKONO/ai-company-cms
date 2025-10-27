@@ -4,6 +4,7 @@ export const revalidate = 0;
 import { NextRequest } from 'next/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 import { 
   createErrorResponse,
   createSuccessResponse,
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
     const { data: rawStats, error: statsError } = await baseQuery;
 
     if (statsError) {
-      console.error('Error fetching Q&A stats:', statsError);
+      logger.error('Error fetching Q&A stats:', statsError);
       return createErrorResponse('Failed to fetch Q&A stats', 500);
     }
 
@@ -209,7 +210,7 @@ export async function GET(request: NextRequest) {
     return createSuccessResponse(response);
 
   } catch (error) {
-    console.error('Q&A Stats API error:', error);
+    logger.error('Q&A Stats API error', error instanceof Error ? error : new Error(String(error)));
     return createErrorResponse('Internal server error', 500);
   }
 }

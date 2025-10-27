@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { HIGButton } from '@/design-system';
 import supabaseClient from '@/lib/supabase-client';
 import type { FAQFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 const POPULAR_CATEGORIES = [
   '料金・プラン',
@@ -96,7 +98,7 @@ export default function NewFAQPage() {
         setErrors({ submit: 'FAQの作成に失敗しました' });
       }
     } catch (error) {
-      console.error('Failed to create FAQ:', error);
+      logger.error('Failed to create FAQ', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: error instanceof Error ? error.message : 'FAQの作成に失敗しました' });
     } finally {
       setSubmitting(false);
@@ -295,13 +297,14 @@ export default function NewFAQPage() {
               >
                 キャンセル
               </Link>
-              <button
+              <HIGButton
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="primary"
+                size="medium"
               >
                 {submitting ? '作成中...' : 'FAQを作成'}
-              </button>
+              </HIGButton>
             </div>
           </div>
         </form>

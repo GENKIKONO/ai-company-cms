@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import sharp from 'sharp';
+import { logger } from '@/lib/utils/logger';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_WIDTH = 1600;
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
         const parsedOptions = JSON.parse(options);
         optimizationOptions = { ...optimizationOptions, ...parsedOptions };
       } catch (error) {
-        console.error('Options parsing error:', error);
+        logger.error('Options parsing error', error instanceof Error ? error : new Error(String(error)));
       }
     }
 
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Image optimization error:', error);
+    logger.error('Image optimization error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: '画像最適化に失敗しました' },
       { status: 500 }

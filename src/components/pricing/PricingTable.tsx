@@ -8,7 +8,7 @@ import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
 import { formatJPY, PRICING_CONFIG } from '@/lib/pricing';
 import { HIGButton } from '@/components/ui/HIGButton';
 import { PLAN_LABELS, formatPriceLabel } from '@/config/planLabels';
-import { PrimaryCTA } from '@/components/ui/UnifiedCTA';
+import { PrimaryCTA } from '@/design-system';
 
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
@@ -111,11 +111,11 @@ const PLANS: PricingPlan[] = [
 export default function PricingTable() {
   return (
     <>
-        <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-          <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>
+        <div className="text-center mb-64">
+          <h2 className="text-h2-large">
             シンプルで明確な料金体系
           </h2>
-          <p style={{ fontSize: '20px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
+          <p className="text-body-large">
             無料から始めて、必要になったら拡張。最小の入力で、Schema.org準拠の企業情報構造化を実現します。
           </p>
         </div>

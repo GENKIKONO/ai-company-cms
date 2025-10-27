@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, Eye, Check, X, Filter } from 'lucide-react';
+import { HIGButton } from '@/design-system';
 
 interface Report {
   id: string;
@@ -307,13 +308,14 @@ export default function AdminReportsPage() {
                 <div className="border-t pt-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">対応アクション</h4>
                   <div className="flex gap-2 flex-wrap">
-                    <button
+                    <HIGButton
                       onClick={() => updateReportStatus(selectedReport.id, 'reviewing')}
                       disabled={updating || selectedReport.status === 'reviewing'}
-                      className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
+                      variant="primary"
+                      size="small"
                     >
                       確認中にする
-                    </button>
+                    </HIGButton>
                     <button
                       onClick={() => updateReportStatus(selectedReport.id, 'resolved')}
                       disabled={updating || selectedReport.status === 'resolved'}

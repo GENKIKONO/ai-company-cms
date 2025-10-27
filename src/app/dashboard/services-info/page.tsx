@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { logger } from '@/lib/utils/logger';
 
 export default function ServicesInfoPage() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function ServicesInfoPage() {
           setOrganization(org);
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        logger.error('Auth check failed', error instanceof Error ? error : new Error(String(error)));
       } finally {
         setLoading(false);
       }
@@ -162,14 +163,14 @@ export default function ServicesInfoPage() {
           organization ? (
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-6 py-3 bg-[#3B82F6] text-white rounded-md hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] font-medium"
+              className="px-6 py-3 bg-[var(--color-blue-600)] text-white rounded-md hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] font-medium"
             >
               ダッシュボードに戻る
             </button>
           ) : (
             <button
               onClick={() => router.push('/organizations/new')}
-              className="px-6 py-3 bg-[#3B82F6] text-white rounded-md hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] font-medium"
+              className="px-6 py-3 bg-[var(--color-blue-600)] text-white rounded-md hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] font-medium"
             >
               企業情報を登録する
             </button>
@@ -178,7 +179,7 @@ export default function ServicesInfoPage() {
           <>
             <button
               onClick={() => router.push('/auth/signup')}
-              className="px-6 py-3 bg-[#3B82F6] text-white rounded-md hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] font-medium"
+              className="px-6 py-3 bg-[var(--color-blue-600)] text-white rounded-md hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] font-medium"
             >
               無料で始める
             </button>

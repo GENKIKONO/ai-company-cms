@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { QAEntryFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: NextRequest) {
   const supabase = await supabaseServer();
@@ -55,7 +56,7 @@ export async function GET(req: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (error) {
-      console.error('Error fetching entries:', error);
+      logger.error('Error fetching entries', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to fetch entries' }, { status: 500 });
     }
 
@@ -72,7 +73,7 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -153,7 +154,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Error creating entry:', error);
+      logger.error('Error creating entry', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to create entry' }, { status: 500 });
     }
 
@@ -173,7 +174,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ data: entry }, { status: 201 });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

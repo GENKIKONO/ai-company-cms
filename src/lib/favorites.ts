@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 // お気に入り機能のユーティリティ（localStorage使用）
 
 const FAVORITES_KEY = 'aiohub_favorites';
@@ -20,7 +22,7 @@ export function getFavorites(): FavoriteOrganization[] {
     const stored = localStorage.getItem(FAVORITES_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    console.error('Failed to get favorites:', error);
+    logger.error('Failed to get favorites', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -57,7 +59,7 @@ export function addToFavorites(organization: {
       detail: { action: 'added', organization: newFavorite }
     }));
   } catch (error) {
-    console.error('Failed to add to favorites:', error);
+    logger.error('Failed to add to favorites', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -76,7 +78,7 @@ export function removeFromFavorites(organizationId: string): void {
       detail: { action: 'removed', organizationId }
     }));
   } catch (error) {
-    console.error('Failed to remove from favorites:', error);
+    logger.error('Failed to remove from favorites', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -88,7 +90,7 @@ export function isFavorite(organizationId: string): boolean {
     const favorites = getFavorites();
     return favorites.some(fav => fav.id === organizationId);
   } catch (error) {
-    console.error('Failed to check favorite status:', error);
+    logger.error('Failed to check favorite status', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -101,7 +103,7 @@ export function getFavoritesCount(): number {
     const favorites = getFavorites();
     return favorites.length;
   } catch (error) {
-    console.error('Failed to get favorites count:', error);
+    logger.error('Failed to get favorites count', error instanceof Error ? error : new Error(String(error)));
     return 0;
   }
 }
@@ -118,7 +120,7 @@ export function clearFavorites(): void {
       detail: { action: 'cleared' }
     }));
   } catch (error) {
-    console.error('Failed to clear favorites:', error);
+    logger.error('Failed to clear favorites', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -128,7 +130,7 @@ export function exportFavorites(): string {
     const favorites = getFavorites();
     return JSON.stringify(favorites, null, 2);
   } catch (error) {
-    console.error('Failed to export favorites:', error);
+    logger.error('Failed to export favorites', error instanceof Error ? error : new Error(String(error)));
     return '[]';
   }
 }
@@ -163,7 +165,7 @@ export function importFavorites(jsonData: string): boolean {
     
     return true;
   } catch (error) {
-    console.error('Failed to import favorites:', error);
+    logger.error('Failed to import favorites', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }

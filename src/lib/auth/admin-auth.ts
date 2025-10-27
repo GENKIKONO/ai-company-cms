@@ -6,6 +6,7 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { env } from '@/lib/env';
+import { logger } from '@/lib/utils/logger';
 
 export interface AuthContext {
   user: {
@@ -83,7 +84,7 @@ export async function requireAdminAuth(request: NextRequest): Promise<AuthResult
       }
     };
   } catch (error) {
-    console.error('Admin auth error:', error);
+    logger.error('Admin auth error', error instanceof Error ? error : new Error(String(error)));
     return {
       success: false,
       error: 'Authentication failed'
@@ -255,8 +256,8 @@ export function logSecurityEvent(event: {
   // 本番環境では外部ログサービスに送信
   if (process.env.NODE_ENV === 'production') {
     // TODO: Send to external logging service (Sentry, CloudWatch, etc.)
-    console.log('SECURITY EVENT:', logEntry);
+    logger.debug('SECURITY EVENT', logEntry);
   } else {
-    console.log('🔒 Security Event:', logEntry);
+    logger.debug('🔒 Security Event', logEntry);
   }
 }

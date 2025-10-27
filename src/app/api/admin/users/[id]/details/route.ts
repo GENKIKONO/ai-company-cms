@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       .eq('created_by', id);
 
     if (orgError) {
-      console.error('Error fetching organizations:', orgError);
+      logger.error('Error fetching organizations:', orgError);
     }
 
     return NextResponse.json({
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

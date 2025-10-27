@@ -171,7 +171,7 @@ export default function PricingPlans({
                 role="tabpanel"
                 aria-labelledby={`plan-${plan.id}-title`}
                 tabIndex={index}
-                style={{ scrollSnapAlign: 'center' }}
+className="scroll-snap-center"
               >
                 {plan.badge && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
@@ -265,7 +265,7 @@ export default function PricingPlans({
                   <Link
                     href={plan.ctaHref}
                     className="btn-apple btn-apple-primary w-full text-center py-4 px-6 text-lg font-semibold transform hover:scale-105 transition-transform"
-                    style={{ minHeight: '56px', fontSize: '18px' }}
+                    className="btn-lg"
                     role="button"
                     aria-label={`${plan.name}プランを選択`}
                   >
@@ -386,8 +386,7 @@ export default function PricingPlans({
               <div className="mt-auto">
                 <Link
                   href={plan.ctaHref}
-                  className="btn-apple btn-apple-primary w-full text-center py-4 px-6 text-lg font-semibold transform hover:scale-105 transition-transform"
-                  style={{ minHeight: '56px', fontSize: '18px' }}
+                  className="btn-apple btn-apple-primary btn-lg w-full text-center py-4 px-6 font-semibold transform hover:scale-105 transition-transform"
                   role="button"
                   aria-label={`${plan.name}プランを選択`}
                 >

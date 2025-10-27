@@ -8,6 +8,7 @@
 import React from 'react';
 import type { Organization } from '@/types/database';
 import { generateWidgetPreview } from '@/lib/embed/generator';
+import { logger } from '@/lib/utils/logger';
 
 interface WidgetPreviewProps {
   organization: Organization;
@@ -63,7 +64,7 @@ export function WidgetPreview({ organization, services = [], options, baseUrl }:
             justify-content: center;
             min-height: 200px;
             padding: 20px;
-            background: ${options.theme === 'dark' ? '#f0f0f0' : '#ffffff'};
+            background: ${options.theme === 'dark' ? 'var(--color-gray-light)' : 'var(--bg-white)'};
           }
           
           .widget-preview-content {
@@ -85,7 +86,7 @@ export function WidgetPreview({ organization, services = [], options, baseUrl }:
       </div>
     );
   } catch (error) {
-    console.error('Widget preview generation failed:', error);
+    logger.error('Widget preview generation failed', error instanceof Error ? error : new Error(String(error)));
     
     return (
       <div className="widget-preview-error">
@@ -106,14 +107,14 @@ export function WidgetPreview({ organization, services = [], options, baseUrl }:
             justify-content: center;
             min-height: 200px;
             padding: 20px;
-            background: #fff5f5;
-            border: 1px solid #fed7d7;
+            background: var(--color-danger-bg);
+            border: 1px solid var(--color-danger-border);
             border-radius: 8px;
           }
           
           .error-content {
             text-align: center;
-            color: #c53030;
+            color: var(--color-alert-danger-text);
           }
           
           .error-icon {
@@ -128,7 +129,7 @@ export function WidgetPreview({ organization, services = [], options, baseUrl }:
           
           .error-detail {
             font-size: 12px;
-            color: #e53e3e;
+            color: var(--color-danger);
             font-family: monospace;
           }
         `}</style>
@@ -195,7 +196,7 @@ export function WidgetPreviewThumbnail({
           height: ${config.height};
           padding: 12px;
           background: white;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-default);
           border-radius: 6px;
           box-shadow: none;
           font-size: ${config.fontSize};
@@ -231,19 +232,19 @@ export function WidgetPreviewThumbnail({
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          color: #1a202c;
+          color: var(--color-text-dark);
         }
         
         .thumbnail-location {
           font-size: 0.9em;
-          color: #718096;
+          color: var(--color-text-light);
           margin-top: 2px;
         }
         
         .thumbnail-description {
           flex: 1;
           margin: 0;
-          color: #4a5568;
+          color: var(--color-text-medium);
           line-height: 1.3;
           font-size: 0.95em;
         }
@@ -251,9 +252,9 @@ export function WidgetPreviewThumbnail({
         .thumbnail-footer {
           margin-top: auto;
           padding-top: 6px;
-          border-top: 1px solid #f7fafc;
+          border-top: 1px solid var(--color-background-muted);
           text-align: center;
-          color: #a0aec0;
+          color: var(--color-placeholder-text);
           font-size: 0.8em;
         }
       `}</style>

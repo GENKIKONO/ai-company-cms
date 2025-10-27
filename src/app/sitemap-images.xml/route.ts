@@ -5,6 +5,7 @@
 
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 interface ImageSitemapItem {
   loc: string;
@@ -119,7 +120,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Image sitemap generation failed:', error);
+    logger.error('Image sitemap generation failed', error instanceof Error ? error : new Error(String(error)));
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

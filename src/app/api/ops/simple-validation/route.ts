@@ -4,13 +4,14 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const format = url.searchParams.get('format') || 'json';
 
-    console.log('🔍 Starting simplified validation checks...');
+    logger.debug('Debug', '🔍 Starting simplified validation checks...');
     const startTime = Date.now();
 
     const checks = [];
@@ -52,8 +53,8 @@ export async function GET(request: NextRequest) {
       execution_time: executionTime,
     };
 
-    console.log(`✅ Validation completed in ${executionTime}ms`);
-    console.log(`📊 Status: ${overall_status} | Critical: ${critical_issues} | Warnings: ${warning_issues} | Passed: ${passed_checks}/${total_checks}`);
+    logger.debug('Debug', `✅ Validation completed in ${executionTime}ms`);
+    logger.debug('Debug', `📊 Status: ${overall_status} | Critical: ${critical_issues} | Warnings: ${warning_issues} | Passed: ${passed_checks}/${total_checks}`);
 
     if (format === 'markdown') {
       const markdown = generateValidationMarkdown(report);
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('❌ Validation Error:', error);
+    logger.error('❌ Validation Error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       success: false,

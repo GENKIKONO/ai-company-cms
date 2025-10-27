@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase-server';
 import LoginForm from './LoginForm';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,7 +26,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       redirect(redirectUrl);
     }
   } catch (error) {
-    console.error('[Login] Session check error:', error);
+    logger.error('[Login] Session check error', error instanceof Error ? error : new Error(String(error)));
   }
 
   // ログインフォームを表示

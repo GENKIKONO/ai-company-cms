@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { createAIOHubProducts, getAIOHubProducts } from '@/lib/stripe';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (insertError) {
-      console.error('Database insert error:', insertError);
+      logger.error('Database insert error:', insertError);
       // Stripeの商品は作成済みなので、データベースエラーでも成功として扱う
     }
 
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Stripe products initialization error:', error);
+    logger.error('Stripe products initialization error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Stripe商品の作成に失敗しました' },
       { status: 500 }

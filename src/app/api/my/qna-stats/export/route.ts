@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 import { 
   createErrorResponse,
   generateQADailyCSV,
@@ -100,7 +101,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Company Q&A Stats Export API error:', error);
+    logger.error('Company Q&A Stats Export API error', error instanceof Error ? error : new Error(String(error)));
     return createErrorResponse('Internal server error', 500);
   }
 }

@@ -2,6 +2,7 @@
 import FallbackHeader from './FallbackHeader';
 import ClientAuthHeader from './ClientAuthHeader';
 import { getUserWithAdmin } from '@/lib/auth/server';
+import { logger } from '@/lib/utils/logger';
 
 export default async function SafeAuthHeader() {
   try {
@@ -34,7 +35,7 @@ export default async function SafeAuthHeader() {
       initialIsAdmin={isAdmin}
     />;
   } catch (e) {
-    console.error('[SafeAuthHeader] AuthHeader render failed:', e);
+    logger.error('[SafeAuthHeader] AuthHeader render failed:', e);
     return <FallbackHeader />;
   }
 }

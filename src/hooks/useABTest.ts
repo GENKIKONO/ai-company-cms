@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 /**
  * A/B Test hook - minimal implementation for build compatibility
  */
@@ -15,7 +17,7 @@ export function useABTest(testName: string): UseABTestReturn {
     // Safe no-op implementation
     // In a real implementation, this would track conversion events
     if (typeof window !== 'undefined') {
-      console.log(`A/B Test conversion tracked for ${testName}`);
+      logger.debug('Debug', `A/B Test conversion tracked for ${testName}`);
     }
   };
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useToast } from '@/components/ui/toast';
+import { logger } from '@/lib/utils/logger';
 
 interface SiteSettingsData {
   hero_title: string;
@@ -70,7 +71,7 @@ export default function SiteSettingsForm({ initialData }: SiteSettingsFormProps)
         throw new Error(errorData.reason || 'サイト文言の保存に失敗しました');
       }
     } catch (error) {
-      console.error('Site settings save error:', error);
+      logger.error('Site settings save error', error instanceof Error ? error : new Error(String(error)));
       addToast({
         type: 'error',
         title: '保存エラー',
@@ -120,7 +121,7 @@ export default function SiteSettingsForm({ initialData }: SiteSettingsFormProps)
         throw new Error(errorData.reason || 'リセットに失敗しました');
       }
     } catch (error) {
-      console.error('Site settings reset error:', error);
+      logger.error('Site settings reset error', error instanceof Error ? error : new Error(String(error)));
       addToast({
         type: 'error',
         title: 'リセットエラー',

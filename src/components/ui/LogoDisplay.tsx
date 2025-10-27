@@ -39,6 +39,18 @@ export const LogoDisplay: React.FC<LogoDisplayProps> = ({
     );
   }
 
+  // Use pre-defined size classes for common sizes, fall back to inline styles for custom sizes
+  const getSizeClass = (size: number): string | null => {
+    switch (size) {
+      case 24: return 'avatar-size-xs';
+      case 32: return 'avatar-size-sm';
+      case 48: return 'avatar-size-md';
+      case 64: return 'avatar-size-lg';
+      case 80: return 'avatar-size-xl';
+      default: return null;
+    }
+  };
+
   const roundedClasses = {
     full: 'rounded-full',
     lg: 'rounded-lg',
@@ -46,17 +58,21 @@ export const LogoDisplay: React.FC<LogoDisplayProps> = ({
     sm: 'rounded-sm',
   };
 
+  const sizeClass = getSizeClass(size);
+  const customStyle = sizeClass ? {} : {
+    width: `${size}px`,
+    height: `${size}px`,
+  };
+
   return (
     <div
       className={cn(
         'flex-shrink-0 bg-white ring-1 ring-gray-200 overflow-hidden',
+        sizeClass,
         roundedClasses[rounded],
         className
       )}
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-      }}
+      style={customStyle}
     >
       <Image
         src={logoUrl}

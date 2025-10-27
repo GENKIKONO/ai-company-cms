@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateOrganizationJsonLd } from '@/lib/json-ld';
 import { generateIframeHtml } from '@/lib/embed/html-template';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +41,7 @@ async function getOrganizationData(slug: string) {
     const result = await response.json();
     return result.data;
   } catch (error) {
-    console.error('Failed to fetch organization data for iframe:', error);
+    logger.error('Failed to fetch organization data for iframe', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -93,10 +94,10 @@ export async function GET(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>企業情報が見つかりません</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
-        .error { background: white; padding: 24px; border-radius: 8px; border-left: 4px solid #f44336; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .error h2 { margin: 0 0 8px 0; color: #d32f2f; font-size: 18px; }
-        .error p { margin: 0; color: #666; font-size: 14px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: var(--color-gray-light); }
+        .error { background: white; padding: 24px; border-radius: 8px; border-left: 4px solid var(--color-error); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .error h2 { margin: 0 0 8px 0; color: var(--color-red-600); font-size: 18px; }
+        .error p { margin: 0; color: var(--color-notification-text); font-size: 14px; }
     </style>
 </head>
 <body>
@@ -166,7 +167,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Iframe generation error:', error);
+    logger.error('Iframe generation error', error instanceof Error ? error : new Error(String(error)));
     
     const errorHtml = `
 <!DOCTYPE html>
@@ -176,10 +177,10 @@ export async function GET(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>読み込みエラー</title>
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 20px; background: #ffebee; }
-        .error { background: white; padding: 20px; border-radius: 6px; border: 1px solid #f44336; }
-        .error h2 { color: #c62828; margin: 0 0 10px 0; }
-        .error p { color: #666; margin: 0; }
+        body { font-family: sans-serif; margin: 0; padding: 20px; background: var(--color-danger-bg); }
+        .error { background: white; padding: 20px; border-radius: 6px; border: 1px solid var(--color-error); }
+        .error h2 { color: var(--color-alert-danger-text); margin: 0 0 10px 0; }
+        .error p { color: var(--color-notification-text); margin: 0; }
     </style>
 </head>
 <body>

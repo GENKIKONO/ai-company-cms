@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Check, MessageSquare, Target, Building2, Sparkles } from 'lucide-react';
-import { PrimaryCTA, SecondaryCTA } from '@/components/ui/UnifiedCTA';
+import { PrimaryCTA, SecondaryCTA } from '@/design-system';
 
 interface PlanFeature {
   text: string;

@@ -7,6 +7,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { getCookieDomain } from '@/lib/env';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -47,11 +48,11 @@ export async function POST(request: NextRequest) {
       maxAge: 0 // 即時無効化
     });
 
-    console.log('[OPS_LOGOUT] Cookie invalidated for domain:', domain);
+    logger.debug('[OPS_LOGOUT] Cookie invalidated for domain', domain);
     return response;
 
   } catch (error) {
-    console.error('[POST /ops/logout] Unexpected error:', error);
+    logger.error('[POST /ops/logout] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         code: 'INTERNAL_ERROR',

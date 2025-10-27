@@ -4,6 +4,7 @@
  */
 
 import type { Organization } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export interface WidgetOptions {
   theme?: 'light' | 'dark' | 'auto';
@@ -56,28 +57,28 @@ function escapeJsonForJs(obj: any): string {
 function getThemeStyles(theme: WidgetOptions['theme'] = 'light'): string {
   const themes = {
     light: {
-      background: '#ffffff',
-      text: '#333333',
-      secondary: '#666666',
-      border: '#e1e5e9',
-      accent: '#4f46e5',
-      hover: '#f8f9fa'
+      background: 'var(--bg-white)',
+      text: 'var(--color-embed-text)',
+      secondary: 'var(--color-embed-secondary)',
+      border: 'var(--color-embed-border)',
+      accent: 'var(--color-embed-accent)',
+      hover: 'var(--color-embed-hover)'
     },
     dark: {
-      background: '#1a1a1a',
-      text: '#ffffff',
-      secondary: '#cccccc',
-      border: '#333333',
-      accent: '#6366f1',
-      hover: '#2d2d2d'
+      background: 'var(--color-embed-dark-bg)',
+      text: 'var(--color-embed-dark-text)',
+      secondary: 'var(--color-embed-dark-secondary)',
+      border: 'var(--color-embed-dark-border)',
+      accent: 'var(--color-embed-dark-accent)',
+      hover: 'var(--color-embed-dark-hover)'
     },
     auto: {
-      background: 'var(--bg-color, #ffffff)',
-      text: 'var(--text-color, #333333)',
-      secondary: 'var(--secondary-color, #666666)',
-      border: 'var(--border-color, #e1e5e9)',
-      accent: 'var(--accent-color, #4f46e5)',
-      hover: 'var(--hover-color, #f8f9fa)'
+      background: 'var(--bg-color, var(--bg-white))',
+      text: 'var(--text-color, var(--color-embed-text))',
+      secondary: 'var(--secondary-color, var(--color-embed-secondary))',
+      border: 'var(--border-color, var(--color-embed-border))',
+      accent: 'var(--accent-color, var(--color-embed-accent))',
+      hover: 'var(--hover-color, var(--color-embed-hover))'
     }
   };
 
@@ -148,13 +149,13 @@ function generateOrganizationHtml(
   </h3>`;
 
   const descriptionHtml = options.showDescription && organization.description
-    ? `<p style="margin: 0 0 12px 0; color: #666; font-size: 0.9em; line-height: 1.4;">
+    ? `<p style="margin: 0 0 12px 0; color: var(--color-embed-secondary); font-size: 0.9em; line-height: 1.4;">
          ${escapeHtml(organization.description.substring(0, 120))}${organization.description.length > 120 ? '...' : ''}
        </p>`
     : '';
 
   const locationHtml = organization.address_region
-    ? `<div style="font-size: 0.85em; color: #888; margin-bottom: 8px;">
+    ? `<div style="font-size: 0.85em; color: var(--color-embed-tertiary); margin-bottom: 8px;">
          📍 ${escapeHtml(organization.address_region)}
        </div>`
     : '';
@@ -162,7 +163,7 @@ function generateOrganizationHtml(
   const urlHtml = organization.url
     ? `<div style="margin-top: 12px;">
          <a href="${escapeHtml(organization.url)}" target="_blank" rel="noopener noreferrer" 
-            style="color: #4f46e5; text-decoration: none; font-size: 0.9em; font-weight: 500;">
+            style="color: var(--color-embed-accent); text-decoration: none; font-size: 0.9em; font-weight: 500;">
            🌐 公式サイト
          </a>
        </div>`
@@ -187,17 +188,17 @@ function generateServicesHtml(services: any[] = []): string {
 
   const serviceItems = services.slice(0, 3).map(service => `
     <li style="margin-bottom: 6px; font-size: 0.85em;">
-      <span style="color: #4f46e5;">•</span> ${escapeHtml(service.name)}
+      <span style="color: var(--color-embed-accent);">•</span> ${escapeHtml(service.name)}
     </li>
   `).join('');
 
   return `
-    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee;">
-      <h4 style="margin: 0 0 8px 0; font-size: 0.9em; font-weight: 600; color: #666;">サービス</h4>
+    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--color-embed-border-light);">
+      <h4 style="margin: 0 0 8px 0; font-size: 0.9em; font-weight: 600; color: var(--color-embed-secondary);">サービス</h4>
       <ul style="margin: 0; padding: 0; list-style: none;">
         ${serviceItems}
       </ul>
-      ${services.length > 3 ? `<div style="font-size: 0.8em; color: #888; margin-top: 8px;">他 ${services.length - 3} 件</div>` : ''}
+      ${services.length > 3 ? `<div style="font-size: 0.8em; color: var(--color-embed-tertiary); margin-top: 8px;">他 ${services.length - 3} 件</div>` : ''}
     </div>
   `;
 }
@@ -232,14 +233,14 @@ export function generateEmbedWidget(config: EmbedGeneratorOptions): string {
   
   // 既存のwidgetがある場合は重複を防ぐ
   if (window.LuxuCareWidgetLoaded) {
-    console.warn('LuxuCare Widget is already loaded');
+    logger.warn('LuxuCare Widget is already loaded');
     return;
   }
   window.LuxuCareWidgetLoaded = true;
 
   // エラーハンドリング
   function logError(message, error) {
-    console.error('LuxuCare Widget:', message, error);
+    logger.error('LuxuCare Widget:', message, error);
   }
 
   try {
@@ -262,8 +263,8 @@ export function generateEmbedWidget(config: EmbedGeneratorOptions): string {
       <div id="${widgetId}" class="luxucare-widget" style="${themeStyles}${sizeStyles}${customCSS}">
         ${orgHtml}
         ${servicesHtml}
-        <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #eee; text-align: center;">
-          <a href="${escapeHtml(baseUrl)}" target="_blank" style="color: #888; text-decoration: none; font-size: 0.7em;">
+        <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--color-embed-border-light); text-align: center;">
+          <a href="${escapeHtml(baseUrl)}" target="_blank" style="color: var(--color-embed-tertiary); text-decoration: none; font-size: 0.7em;">
             Powered by LuxuCare CMS
           </a>
         </div>
@@ -316,7 +317,7 @@ export function generateEmbedWidget(config: EmbedGeneratorOptions): string {
     const container = document.currentScript?.parentElement;
     if (container) {
       container.innerHTML = \`
-        <div style="padding: 12px; border: 1px solid #f44336; background: #ffebee; border-radius: 4px; color: #c62828; font-size: 14px;">
+        <div style="padding: 12px; border: 1px solid var(--color-error); background: var(--color-danger-bg); border-radius: 4px; color: var(--color-alert-danger-text); font-size: 14px;">
           Widget読み込みエラー
         </div>
       \`;
@@ -340,8 +341,8 @@ export function generateWidgetPreview(config: EmbedGeneratorOptions): string {
     <div class="luxucare-widget-preview" style="${themeStyles}${sizeStyles}">
       ${orgHtml}
       ${servicesHtml}
-      <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #eee; text-align: center;">
-        <span style="color: #888; font-size: 0.7em;">Powered by LuxuCare CMS</span>
+      <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--color-embed-border-light); text-align: center;">
+        <span style="color: var(--color-embed-tertiary); font-size: 0.7em;">Powered by LuxuCare CMS</span>
       </div>
     </div>
   `;

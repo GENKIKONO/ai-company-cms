@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { sendWelcomeEmail } from '@/lib/emails';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
     const result = await sendWelcomeEmail(email, userName);
 
     if (!result.success) {
-      console.error('Failed to send welcome email:', result.error);
+      logger.error('Failed to send welcome email:', result.error);
       return NextResponse.json(
         { error: 'ウェルカムメールの送信に失敗しました' },
         { status: 500 }
@@ -37,9 +38,9 @@ export async function POST(request: NextRequest) {
           provider: 'resend',
           metadata: { resend_id: result.data?.id }
         });
-      console.log('Email log recorded');
+      logger.debug('Debug', 'Email log recorded');
     } catch (err) {
-      console.warn('Failed to log email:', err);
+      logger.warn('Failed to log email', err);
     }
 
     return NextResponse.json({
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Welcome email API error:', error);
+    logger.error('Welcome email API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'ウェルカムメールの送信に失敗しました' },
       { status: 500 }

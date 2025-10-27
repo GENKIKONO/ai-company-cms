@@ -1,21 +1,22 @@
 'use client';
 
 import { auth } from '@/lib/auth';
+import { logger } from '@/lib/utils/logger';
 
 export default function SignOutButton() {
   const handleSignOut = async () => {
     try {
-      console.log('[SignOutButton] Complete logout starting...');
+      logger.debug('Debug', '[SignOutButton] Complete logout starting...');
       
       // 完全なログアウト処理
       await auth.signOut();
       
-      console.log('[SignOutButton] Logout completed, redirecting to home...');
+      logger.debug('Debug', '[SignOutButton] Logout completed, redirecting to home...');
       
       // 強制的にホームページにリダイレクト
       window.location.href = '/';
     } catch (error) {
-      console.error('[SignOutButton] Logout failed:', error);
+      logger.error('[SignOutButton] Logout failed', error instanceof Error ? error : new Error(String(error)));
       
       // エラーが発生した場合でも強制的にリロード
       window.location.reload();

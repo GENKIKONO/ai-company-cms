@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { faqSchema } from '@/lib/validation';
+import { logger } from '@/lib/utils/logger';
 
 interface FAQData {
   id?: string;
@@ -54,7 +55,7 @@ export default function FAQForm({
       setErrors({});
       await onSubmit(formData);
     } catch (error) {
-      console.error('FAQ form submission error:', error);
+      logger.error('FAQ form submission error', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: 'FAQの保存に失敗しました' });
     }
   };

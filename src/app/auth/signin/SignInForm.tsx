@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-client';
+import { logger } from '@/lib/utils/logger';
 
 interface SignInFormProps {
   redirectUrl?: string;
@@ -46,7 +47,7 @@ export default function SignInForm({ redirectUrl }: SignInFormProps) {
       router.replace(targetUrl);
       
     } catch (err) {
-      console.error('Sign in error:', err);
+      logger.error('Sign in error:', err);
       setError('ログインに失敗しました。');
     } finally {
       setIsLoading(false);

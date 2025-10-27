@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { JSDOM } from 'jsdom';
+import { logger } from '@/lib/utils/logger';
 
 interface ExtractionResult {
   title?: string;
@@ -88,7 +89,7 @@ async function extractFromURL(url: string): Promise<ExtractionResult> {
       url
     };
   } catch (error) {
-    console.error('URL extraction error:', error);
+    logger.error('URL extraction error', error instanceof Error ? error : new Error(String(error)));
     throw new Error('URLからの情報抽出に失敗しました');
   }
 }
@@ -173,7 +174,7 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Extraction API error:', error);
+    logger.error('Extraction API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'サーバーエラーが発生しました' },
       { status: 500 }

@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase-server';
 import { env } from '@/lib/env';
 import SiteSettingsForm from './SiteSettingsForm';
+import { logger } from '@/lib/utils/logger';
 
 // 管理者チェック関数
 function isAdmin(userEmail?: string): boolean {
@@ -47,7 +48,7 @@ export default async function SiteSettingsPage() {
       currentSettings = result.data;
     }
   } catch (e) {
-    console.error('Failed to fetch site settings:', e);
+    logger.error('Failed to fetch site settings:', e);
     // フォールバック用デフォルト値
     currentSettings = {
       hero_title: 'AIO Hub AI企業CMS',

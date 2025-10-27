@@ -18,6 +18,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import Link from 'next/link';
+import { logger } from '@/lib/utils/logger';
 
 interface Organization {
   id: string;
@@ -64,7 +65,7 @@ export default function AskQuestionPage() {
         setUser(data.user);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      logger.error('Auth check failed', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -78,7 +79,7 @@ export default function AskQuestionPage() {
         setOrganizations(data.data || []);
       }
     } catch (error) {
-      console.error('Failed to load organizations:', error);
+      logger.error('Failed to load organizations', error instanceof Error ? error : new Error(String(error)));
       setError('企業一覧の読み込みに失敗しました');
     } finally {
       setLoading(false);
@@ -137,7 +138,7 @@ export default function AskQuestionPage() {
         setError(errorData.error || '質問の投稿に失敗しました');
       }
     } catch (error) {
-      console.error('Question submission failed:', error);
+      logger.error('Question submission failed', error instanceof Error ? error : new Error(String(error)));
       setError('質問の投稿に失敗しました');
     } finally {
       setSubmitting(false);

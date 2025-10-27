@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import type { QuestionWithDetails } from '@/types/database';
 import { translateQuestionStatus, generateQuestionsCSV } from '@/lib/qna-stats';
+import { logger } from '@/lib/utils/logger';
 
 interface QuestionStats {
   total: number;
@@ -92,7 +93,7 @@ export default function AdminQuestionsPage() {
       setQuestions(result.data || []);
       
     } catch (err) {
-      console.error('Failed to load questions:', err);
+      logger.error('Failed to load questions:', err);
       setError(err instanceof Error ? err.message : '質問の取得に失敗しました');
     } finally {
       setLoading(false);
@@ -168,7 +169,7 @@ export default function AdminQuestionsPage() {
         alert(errorData.error || '回答の送信に失敗しました');
       }
     } catch (error) {
-      console.error('Answer submission failed:', error);
+      logger.error('Answer submission failed', error instanceof Error ? error : new Error(String(error)));
       alert('回答の送信に失敗しました');
     } finally {
       setSubmitting(null);
@@ -197,7 +198,7 @@ export default function AdminQuestionsPage() {
         alert(errorData.error || 'ステータスの更新に失敗しました');
       }
     } catch (error) {
-      console.error('Status update failed:', error);
+      logger.error('Status update failed', error instanceof Error ? error : new Error(String(error)));
       alert('ステータスの更新に失敗しました');
     }
   };
@@ -220,7 +221,7 @@ export default function AdminQuestionsPage() {
         alert(errorData.error || '質問の削除に失敗しました');
       }
     } catch (error) {
-      console.error('Question deletion failed:', error);
+      logger.error('Question deletion failed', error instanceof Error ? error : new Error(String(error)));
       alert('質問の削除に失敗しました');
     }
   };
@@ -243,7 +244,7 @@ export default function AdminQuestionsPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed', error instanceof Error ? error : new Error(String(error)));
       alert('エクスポートに失敗しました');
     } finally {
       setExporting(false);

@@ -5,6 +5,7 @@
 
 import { supabaseClient } from '@/lib/supabase-client';
 import { type Organization, type Service, type CaseStudy } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export interface AdvancedSearchFilters {
   query: string;
@@ -102,7 +103,7 @@ export async function performAdvancedSearch(
 
     return results;
   } catch (error) {
-    console.error('Advanced search error:', error);
+    logger.error('Advanced search error', error instanceof Error ? error : new Error(String(error)));
     return results;
   }
 }
@@ -194,7 +195,7 @@ async function searchOrganizations(filters: AdvancedSearchFilters) {
   const { data, error } = await query;
 
   if (error) {
-    console.error('Organization search error:', error);
+    logger.error('Organization search error', error instanceof Error ? error : new Error(String(error)));
     return { type: 'organizations', data: [] };
   }
 
@@ -249,7 +250,7 @@ async function searchServices(filters: AdvancedSearchFilters) {
   const { data, error } = await query;
 
   if (error) {
-    console.error('Service search error:', error);
+    logger.error('Service search error', error instanceof Error ? error : new Error(String(error)));
     return { type: 'services', data: [] };
   }
 
@@ -294,7 +295,7 @@ async function searchCaseStudies(filters: AdvancedSearchFilters) {
   const { data, error } = await query;
 
   if (error) {
-    console.error('Case study search error:', error);
+    logger.error('Case study search error', error instanceof Error ? error : new Error(String(error)));
     return { type: 'case_studies', data: [] };
   }
 
@@ -403,7 +404,7 @@ async function getFacets(filters: AdvancedSearchFilters) {
     }
 
   } catch (error) {
-    console.error('Facets fetch error:', error);
+    logger.error('Facets fetch error', error instanceof Error ? error : new Error(String(error)));
   }
 
   return facets;
@@ -476,7 +477,7 @@ export async function getSearchSuggestions(query: string, limit = 10): Promise<s
 
     return Array.from(suggestions).slice(0, limit);
   } catch (error) {
-    console.error('Search suggestions error:', error);
+    logger.error('Search suggestions error', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }

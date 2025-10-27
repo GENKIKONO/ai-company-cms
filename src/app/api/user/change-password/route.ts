@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, '現在のパスワードを入力してください'),
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (updateError) {
-      console.error('Password update error:', updateError);
+      logger.error('Password update error:', updateError);
       return NextResponse.json(
         { 
           error: 'Update failed',
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Change password error:', error);
+    logger.error('Change password error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { 
         error: 'Internal server error',

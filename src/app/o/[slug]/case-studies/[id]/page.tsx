@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateCaseStudyJsonLd } from '@/lib/utils/jsonld';
 import type { Organization, CaseStudy } from '@/types/database';
+import { PrimaryCTA } from '@/design-system';
 import { LogoImage } from '@/components/ui/optimized-image';
+import { logger } from '@/lib/utils/logger';
 
 interface CaseStudyDetailData {
   caseStudy: CaseStudy;
@@ -39,7 +41,7 @@ async function getCaseStudyData(slug: string, caseStudyId: string): Promise<Case
       organization
     };
   } catch (error) {
-    console.error('Failed to fetch case study data:', error);
+    logger.error('Failed to fetch case study data', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -300,15 +302,13 @@ export default async function CaseStudyDetailPage({
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               {organization.email && (
-                <a 
+                <PrimaryCTA 
                   href={`mailto:${organization.email}?subject=${encodeURIComponent(`「${caseStudy.title}」類似案件について`)}`}
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  size="large"
+                  icon="mail"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
                   メールでお問い合わせ
-                </a>
+                </PrimaryCTA>
               )}
               {organization.telephone && (
                 <a 
@@ -336,15 +336,13 @@ export default async function CaseStudyDetailPage({
               導入事例一覧に戻る
             </Link>
             
-            <Link 
+            <PrimaryCTA 
               href={`/o/${organization.slug}`}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              size="medium"
+              icon="arrow-right"
             >
               {organization.name} トップページへ
-              <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
+            </PrimaryCTA>
           </div>
         </main>
       </div>

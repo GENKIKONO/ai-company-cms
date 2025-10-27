@@ -2,6 +2,7 @@
 
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { type FAQ, type FAQFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 // FAQ一覧取得（特定企業）
 export async function getFAQs(organizationId: string) {
@@ -15,7 +16,7 @@ export async function getFAQs(organizationId: string) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error fetching FAQs:', error);
+    logger.error('Error fetching FAQs', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -36,7 +37,7 @@ export async function getFAQ(faqId: string) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error fetching FAQ:', error);
+    logger.error('Error fetching FAQ', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -71,7 +72,7 @@ export async function createFAQ(organizationId: string, faqData: FAQFormData) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error creating FAQ:', error);
+    logger.error('Error creating FAQ', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -96,7 +97,7 @@ export async function updateFAQ(faqId: string, faqData: Partial<FAQFormData>) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error updating FAQ:', error);
+    logger.error('Error updating FAQ', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -112,7 +113,7 @@ export async function deleteFAQ(faqId: string) {
     if (error) throw error;
     return { error: null };
   } catch (error) {
-    console.error('Error deleting FAQ:', error);
+    logger.error('Error deleting FAQ', error instanceof Error ? error : new Error(String(error)));
     return { error };
   }
 }
@@ -136,7 +137,7 @@ export async function reorderFAQs(organizationId: string, faqIds: string[]) {
 
     return { error: null };
   } catch (error) {
-    console.error('Error reordering FAQs:', error);
+    logger.error('Error reordering FAQs', error instanceof Error ? error : new Error(String(error)));
     return { error };
   }
 }
@@ -157,7 +158,7 @@ export async function getFAQCategories() {
 
     return { data: categories, error: null };
   } catch (error) {
-    console.error('Error fetching FAQ categories:', error);
+    logger.error('Error fetching FAQ categories', error instanceof Error ? error : new Error(String(error)));
     return { data: [], error };
   }
 }

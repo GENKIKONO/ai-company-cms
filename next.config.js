@@ -15,6 +15,9 @@ const nextConfig = {
     minimumCacheTTL: 31536000, // 1年
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // 最適化を有効化（Next.js 15対応）
+    loader: 'default',
+    unoptimized: false,
   },
   
   // セキュリティ & パフォーマンスヘッダー
@@ -114,6 +117,17 @@ const nextConfig = {
   // 実験的機能
   experimental: {
     optimizePackageImports: ['lucide-react'],
+    optimizeCss: true, // CSS最適化を有効化
+  },
+  
+  // Turbopack設定（非推奨のturbo設定から移行）
+  turbopack: {
+    rules: {
+      '*.css': {
+        loaders: ['css-loader'],
+        as: 'css',
+      },
+    },
   },
 
   // 本番ビルド最適化

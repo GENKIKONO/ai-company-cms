@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 /**
  * Memory Cache System
  * 高速なメモリベースキャッシュシステム
@@ -156,7 +158,7 @@ class MemoryCache {
     }
 
     if (cleaned > 0) {
-      console.log(`🧹 Cache cleanup: ${cleaned} expired entries removed`);
+      logger.debug('Debug', `🧹 Cache cleanup: ${cleaned} expired entries removed`);
     }
   }
 

@@ -12,6 +12,7 @@ import {
   HIGCardGrid
 } from '@/components/ui/HIGCard';
 import { HIGButton } from '@/components/ui/HIGButton';
+import { logger } from '@/lib/utils/logger';
 import { 
   BarChart3, 
   Download, 
@@ -79,7 +80,7 @@ export default function CompanyQAStatsPage() {
       setStats(result);
       
     } catch (err) {
-      console.error('Failed to load Q&A stats:', err);
+      logger.error('Failed to load Q&A stats:', err);
       setError(err instanceof Error ? err.message : 'Failed to load Q&A stats');
     } finally {
       setLoading(false);
@@ -143,7 +144,7 @@ export default function CompanyQAStatsPage() {
       document.body.removeChild(a);
 
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed', error instanceof Error ? error : new Error(String(error)));
       alert('エクスポートに失敗しました');
     } finally {
       setExporting(null);

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 import { 
   createErrorResponse,
   createSuccessResponse,
@@ -88,7 +89,7 @@ export async function GET(request: NextRequest) {
     const { data: rawStats, error: statsError } = await baseQuery;
 
     if (statsError) {
-      console.error('Error fetching company Q&A stats:', statsError);
+      logger.error('Error fetching company Q&A stats:', statsError);
       return createErrorResponse('Failed to fetch Q&A stats', 500);
     }
 
@@ -215,7 +216,7 @@ export async function GET(request: NextRequest) {
     return createSuccessResponse(response);
 
   } catch (error) {
-    console.error('Company Q&A Stats API error:', error);
+    logger.error('Company Q&A Stats API error', error instanceof Error ? error : new Error(String(error)));
     return createErrorResponse('Internal server error', 500);
   }
 }

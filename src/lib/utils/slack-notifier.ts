@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 /**
  * Slack通知ユーティリティ
  * システムアラート、エラー、重要なイベントの通知
@@ -42,7 +44,7 @@ export class SlackNotifier {
    */
   async sendMessage(message: SlackMessage): Promise<boolean> {
     if (!this.enabled || !this.webhookUrl) {
-      console.log('[Slack] Notification disabled or webhook URL not configured');
+      logger.debug('Debug', '[Slack] Notification disabled or webhook URL not configured');
       return false;
     }
 
@@ -66,10 +68,10 @@ export class SlackNotifier {
         throw new Error(`Slack API error: ${response.status} ${response.statusText}`);
       }
 
-      console.log('[Slack] Notification sent successfully');
+      logger.debug('Debug', '[Slack] Notification sent successfully');
       return true;
     } catch (error) {
-      console.error('[Slack] Failed to send notification:', error);
+      logger.error('[Slack] Failed to send notification', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }

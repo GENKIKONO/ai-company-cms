@@ -9,6 +9,7 @@ import {
   HIGCardGrid
 } from '@/components/ui/HIGCard';
 import { HIGButton } from '@/components/ui/HIGButton';
+import { logger } from '@/lib/utils/logger';
 import { 
   BarChart3, 
   Download, 
@@ -72,7 +73,7 @@ export default function MaterialStatsPage() {
       setStats(result);
       
     } catch (err) {
-      console.error('Failed to load stats:', err);
+      logger.error('Failed to load stats:', err);
       setError(err instanceof Error ? err.message : 'Failed to load stats');
     } finally {
       setLoading(false);
@@ -136,7 +137,7 @@ export default function MaterialStatsPage() {
       document.body.removeChild(a);
 
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed', error instanceof Error ? error : new Error(String(error)));
       alert('エクスポートに失敗しました');
     } finally {
       setExporting(null);
@@ -333,7 +334,7 @@ export default function MaterialStatsPage() {
                             <div className="text-xs text-[var(--color-primary)] w-8">閲覧</div>
                             <div className="flex-1 bg-[var(--color-background-secondary)] rounded-full h-3 overflow-hidden">
                               <div 
-                                className="bg-[var(--color-primary)] h-full rounded-full transition-all duration-300"
+                                className="bg-[var(--color-primary)] h-full rounded-full progress-bar duration-300"
                                 style={{ width: `${Math.max(day.views / maxValue * 100, 2)}%` }}
                               ></div>
                             </div>
@@ -343,7 +344,7 @@ export default function MaterialStatsPage() {
                             <div className="text-xs text-[var(--color-secondary)] w-8">DL</div>
                             <div className="flex-1 bg-[var(--color-background-secondary)] rounded-full h-3 overflow-hidden">
                               <div 
-                                className="bg-[var(--color-secondary)] h-full rounded-full transition-all duration-300"
+                                className="bg-[var(--color-secondary)] h-full rounded-full progress-bar duration-300"
                                 style={{ width: `${Math.max(day.downloads / maxValue * 100, 2)}%` }}
                               ></div>
                             </div>
@@ -450,7 +451,7 @@ export default function MaterialStatsPage() {
                             <div className="flex items-center justify-center">
                               <div className="w-16 bg-[var(--color-background-secondary)] rounded-full h-2 overflow-hidden">
                                 <div 
-                                  className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] h-full rounded-full"
+                                  className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] h-full rounded-full progress-bar"
                                   style={{ width: `${Math.min((summary.views + summary.downloads * 2) / Math.max(...stats.byMaterial.map(s => s.views + s.downloads * 2)) * 100, 100)}%` }}
                                 ></div>
                               </div>

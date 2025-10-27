@@ -4,6 +4,7 @@
  */
 
 import type { Organization, FAQ } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface FAQPageJsonLd {
   '@context': string;
@@ -91,7 +92,7 @@ export function generateFAQPageJsonLd(faqs: FAQ[], org?: Organization): FAQPageJ
   
   // Safety guard: if organization is provided but slug is undefined/empty, return null
   if (org && (!org || !org.slug || !org.slug.trim())) { 
-    console.log('[VERIFY][JSON-LD] skip because slug empty');
+    logger.debug('Debug', '[VERIFY][JSON-LD] skip because slug empty');
     return null;
   }
 
@@ -160,7 +161,7 @@ export function generateCategoryFAQPageJsonLd(
   
   // Safety guard: if organization is provided but slug is undefined/empty, return null
   if (org && (!org || !org.slug || !org.slug.trim())) { 
-    console.log('[VERIFY][JSON-LD] skip because slug empty');
+    logger.debug('Debug', '[VERIFY][JSON-LD] skip because slug empty');
     return null;
   }
 

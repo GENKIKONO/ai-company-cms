@@ -1,0 +1,673 @@
+/* Display Utilities */
+.hidden {
+  display: none;
+}
+
+.block {
+  display: block;
+}
+
+.flex {
+  display: flex;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.grid {
+  display: grid;
+}
+
+/* Visibility Utilities */
+.invisible {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
+}
+
+/* Common Layout Utilities */
+.center {
+  text-align: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+/* Spacing Utilities */
+.gap-2 {
+  gap: 8px;
+}
+
+.gap-3 {
+  gap: 12px;
+}
+
+.gap-4 {
+  gap: 16px;
+}
+
+.gap-6 {
+  gap: 24px;
+}
+
+/* Margin Auto */
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Max Width */
+.max-w-800 {
+  max-width: 800px;
+}
+
+/* Text Alignment */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+/* Layout Grid */
+.grid-auto-fit-300 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+}
+
+.grid-auto-fit-250 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 32px;
+}
+
+.grid-auto-fit-400 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 48px;
+}
+
+/* Flexbox Patterns */
+.flex-center-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.flex-center-gap-16 {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.flex-center-gap-12 {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Container Patterns */
+.content-center-800 {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Typography */
+.text-h1-large {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.text-h2-large {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.text-h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.text-body-large {
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.text-body {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* List Item with Icon */
+.list-item-with-icon {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.icon-check-green {
+  color: var(--color-success);
+  margin-right: 8px;
+  display: inline-flex;
+}
+
+.icon-ai-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 8px;
+  font-size: 12px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-ai-primary {
+  background-color: var(--bg-primary);
+}
+
+.icon-ai-error {
+  background-color: var(--color-danger);
+}
+
+/* Status Colors */
+.text-error {
+  color: var(--color-danger);
+}
+
+.text-success {
+  color: var(--color-success-light);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+/* Badge/Tag Component */
+.tag {
+  padding: 8px 16px;
+  background-color: rgba(var(--shadow-primary), 0.1);
+  color: var(--bg-primary);
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* Card Patterns */
+.card-feature {
+  background-color: var(--bg-white);
+  border-radius: 16px;
+  padding: 40px 32px;
+  box-shadow: 0 4px 20px rgba(var(--shadow-black), 0.08);
+  border: 1px solid rgba(var(--shadow-black), 0.05);
+  text-align: center;
+  height: 100%;
+}
+
+.card-step {
+  background-color: var(--bg-white);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(var(--shadow-black), 0.05);
+  text-align: center;
+  height: 100%;
+  position: relative;
+}
+
+/* Spacing */
+.mb-64 {
+  margin-bottom: 64px;
+}
+
+.mb-48 {
+  margin-bottom: 48px;
+}
+
+.mb-32 {
+  margin-bottom: 32px;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mb-8 {
+  margin-bottom: 8px;
+}
+
+.mt-48 {
+  margin-top: 48px;
+}
+
+/* Step Number Badge */
+.step-number {
+  width: 80px;
+  height: 80px;
+  background-color: var(--bg-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 36px;
+  font-weight: 700;
+  color: white;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* Lists */
+.list-feature {
+  text-align: left;
+  line-height: 1.6;
+  font-size: 17px;
+  color: var(--text-secondary);
+}
+
+/* AI Demo Box */
+.ai-demo-box {
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.ai-demo-success {
+  background-color: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
+}
+
+.ai-demo-error {
+  background-color: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  text-align: left;
+}
+
+.ai-demo-result {
+  background-color: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+/* Typography for AI demos */
+.text-small {
+  font-size: 15px;
+  color: var(--color-gray-500);
+}
+
+.text-small-list {
+  text-align: left;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.list-error-item {
+  margin-bottom: 8px;
+  color: var(--color-danger);
+}
+
+.list-success-item {
+  margin-bottom: 8px;
+  color: var(--color-success-light);
+  display: flex;
+  align-items: center;
+}
+
+/* Flex classes */
+.flex-justify-center {
+  display: flex;
+  justify-content: center;
+}
+
+/* Section spacing */
+.section-padding-y-80 {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.section-padding-y-40 {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+/* Hero section container */
+.hero-container {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 16px;
+  padding: 80px clamp(16px, 4vw, 24px);
+}
+
+/* Text sizes for headers */
+.text-hero {
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+
+.text-section-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.text-description {
+  font-size: 18px;
+  line-height: 1.5;
+  margin-bottom: 32px;
+  color: var(--text-secondary);
+}
+
+/* Complex grid layouts */
+.grid-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Step card specific styling */
+.card-step-grey {
+  text-align: center;
+  padding: 40px 24px;
+  background-color: var(--color-gray-100);
+  border-radius: 16px;
+  border: 1px solid rgba(var(--shadow-black), 0.05);
+}
+
+/* Comparison section styles */
+.comparison-card-error {
+  background-color: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+}
+
+.comparison-card-success {
+  background-color: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+}
+
+/* Security section title styles */
+.text-security-title {
+  font-size: clamp(28px, 4.2vw, 40px);
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--color-white);
+}
+
+.text-security-description {
+  font-size: 20px;
+  line-height: 1.5;
+  color: rgba(var(--shadow-white), 0.9);
+}
+
+/* Security feature styles */
+.text-feature-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.text-feature-white {
+  color: rgba(var(--shadow-white), 0.8);
+}
+
+/* Comparison section header styles */
+.text-comparison-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.text-comparison-error {
+  color: var(--color-red-600);
+}
+
+.text-comparison-primary {
+  color: var(--bg-primary);
+}
+
+/* CTA section styles */
+.text-cta-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.text-cta-large {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+/* Color indicators */
+.color-primary {
+  color: var(--bg-primary);
+}
+
+.color-error {
+  color: var(--color-danger);
+}
+
+.color-success {
+  color: var(--color-success-light);
+}
+
+/* Scroll snap */
+.scroll-snap-center {
+  scroll-snap-align: center;
+}
+
+/* Button sizing */
+.btn-lg {
+  min-height: 56px;
+  font-size: 18px;
+}
+
+/* FAB Positioning Utilities */
+.fab-position {
+  position: fixed;
+  right: clamp(16px, 3vw, 24px);
+  bottom: calc(env(safe-area-inset-bottom) + 20px);
+  z-index: 1000;
+  min-height: 56px;
+  min-width: 56px;
+}
+
+/* Layout Debug Utilities */
+.debug-overlay {
+  z-index: 9999;
+}
+
+/* Progress Bar Base */
+.progress-bar {
+  transition: width 1000ms ease-out;
+}
+
+/* Avatar Size Utilities */
+.avatar-size-xs {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+
+.avatar-size-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+
+.avatar-size-md {
+  width: 48px;
+  height: 48px;
+  font-size: 19px;
+}
+
+.avatar-size-lg {
+  width: 64px;
+  height: 64px;
+  font-size: 26px;
+}
+
+.avatar-size-xl {
+  width: 80px;
+  height: 80px;
+  font-size: 32px;
+}
+
+/* Scroll Snap Utilities */
+.scroll-snap-x {
+  scroll-snap-type: x mandatory;
+  scroll-snap-stop: normal;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-snap-center {
+  scroll-snap-align: center;
+}
+
+/* Safe Area Utilities */
+.safe-area-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-md, 16px));
+}
+
+/* Color Template Backgrounds */
+.bg-template-default {
+  background-color: var(--bg-white);
+}
+
+.bg-template-blue {
+  background-color: var(--color-blue-500);
+}
+
+.bg-template-green {
+  background-color: #10b981;
+}
+
+.bg-template-purple {
+  background-color: #8b5cf6;
+}
+
+.bg-template-red {
+  background-color: #ef4444;
+}
+
+.bg-template-orange {
+  background-color: #f59e0b;
+}
+
+.bg-template-dark {
+  background-color: #1f2937;
+}
+
+/* Dynamic Width Classes (for animations) */
+.w-dynamic {
+  transition: width 1000ms ease-out;
+}
+
+/* Horizontal Scroller Utilities */
+.scroll-padding-inline {
+  scroll-padding-inline-start: 24px;
+  scroll-padding-inline-end: 24px;
+}
+
+/* Text Utilities */
+.whitespace-pre-line {
+  white-space: pre-line;
+}
+
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
+}
+
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
+/* Aspect Ratio Utilities */
+.aspect-video {
+  aspect-ratio: 16/9;
+}
+
+.aspect-square {
+  aspect-ratio: 1/1;
+}
+
+.aspect-wide {
+  aspect-ratio: 3/2;
+}
+
+.aspect-photo {
+  aspect-ratio: 4/3;
+}
+
+/* Margin Bottom Utilities */
+.mb-40 {
+  margin-bottom: 40px;
+}
+
+/* Flex Item Utilities */
+.flex-items-center-mb-8 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Text Color on Dark Background */
+.text-white-on-dark {
+  color: var(--bg-white);
+}
+
+.text-white-90 {
+  color: rgba(255, 255, 255, 0.9);
+}

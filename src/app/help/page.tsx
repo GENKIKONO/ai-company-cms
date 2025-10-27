@@ -1,4 +1,5 @@
 import { BackLink } from '@/components/ui/back-link';
+import { PrimaryCTA } from '@/design-system';
 
 export default function HelpPage() {
   return (
@@ -94,12 +95,12 @@ export default function HelpPage() {
                 <p className="text-blue-800 mb-4">
                   上記で解決しない場合は、お気軽にお問い合わせください。
                 </p>
-                <a 
-                  href="/contact" 
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                <PrimaryCTA 
+                  href="/contact"
+                  size="medium"
                 >
                   お問い合わせフォームへ
-                </a>
+                </PrimaryCTA>
               </div>
             </section>
           </div>

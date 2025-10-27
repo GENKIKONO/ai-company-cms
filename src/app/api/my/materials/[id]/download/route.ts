@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       .download(material.file_path);
 
     if (downloadError) {
-      console.error('File download error:', downloadError);
+      logger.error('File download error:', downloadError);
       return NextResponse.json({ 
         error: 'File download failed',
         details: downloadError.message 
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
   } catch (error: any) {
-    console.error('Material download API error:', {
+    logger.error('Material download API error:', {
       message: error.message,
       stack: error.stack,
       name: error.name,

@@ -15,6 +15,7 @@ import {
 } from '@/lib/api/error-responses';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -76,7 +77,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('Database query error:', error);
+      logger.error('Database query error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Failed to fetch pending reviews' },
         { status: 500 }
@@ -185,7 +186,7 @@ export async function POST(request: NextRequest) {
       .eq('id', organizationId);
 
     if (updateError) {
-      console.error('Organization update error:', updateError);
+      logger.error('Organization update error:', updateError);
       return NextResponse.json(
         { error: 'Failed to update organization status' },
         { status: 500 }
@@ -205,7 +206,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (auditError) {
-      console.error('Audit log error:', auditError);
+      logger.error('Audit log error:', auditError);
       // 監査ログエラーは警告のみ、メイン処理は継続
     }
 

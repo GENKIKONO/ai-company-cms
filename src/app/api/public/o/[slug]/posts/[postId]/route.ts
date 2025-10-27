@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { createError, errorToResponse } from '@/lib/error-handler';
 import crypto from 'crypto';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(
   request: NextRequest,
@@ -53,7 +54,7 @@ export async function GET(
             }
           }
         } catch (authErr) {
-          console.log('Auth check failed for preview:', authErr);
+          logger.debug('Auth check failed for preview', authErr);
         }
       }
     }
@@ -135,13 +136,13 @@ export async function GET(
         //   .update({ view_count: (post.view_count || 0) + 1 })
         //   .eq('id', postId);
       } catch (error) {
-        console.error('Post view tracking error:', error);
+        logger.error('Post view tracking error', error instanceof Error ? error : new Error(String(error)));
       }
     }, 0);
 
     const duration = Date.now() - startTime;
     
-    console.log('[Public Post API Success]', {
+    logger.debug('[Public Post API Success]', {
       method: 'GET',
       path: `/api/public/o/${slug}/posts/${postId}`,
       status: 200,
@@ -157,7 +158,7 @@ export async function GET(
     const duration = Date.now() - startTime;
     const { status, body } = errorToResponse(error, requestId);
     
-    console.error('[Public Post API Error]', {
+    logger.error('[Public Post API Error]', {
       method: 'GET',
       path: `/api/public/o/${resolvedParams.slug}/posts/${resolvedParams.postId}`,
       status,
@@ -204,7 +205,7 @@ export async function HEAD(
     });
 
   } catch (error) {
-    console.error('POST HEAD request error:', error);
+    logger.error('POST HEAD request error', error instanceof Error ? error : new Error(String(error)));
     return new Response(null, { status: 500 });
   }
 }

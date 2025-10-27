@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/utils/logger';
 import { 
   Shield, 
   Activity, 
@@ -58,7 +59,7 @@ export default function AIVisibilityDashboard() {
         setLastCheck(data.lastCheck);
       }
     } catch (error) {
-      console.error('Error loading results:', error);
+      logger.error('Error loading results', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -82,10 +83,10 @@ export default function AIVisibilityDashboard() {
         setResults(data.results || []);
         setLastCheck(new Date().toISOString());
       } else {
-        console.error('Check failed:', response.statusText);
+        logger.error('Check failed:', response.statusText);
       }
     } catch (error) {
-      console.error('Error running check:', error);
+      logger.error('Error running check', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }

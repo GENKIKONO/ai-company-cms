@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { stripe } from '@/lib/stripe';
+import { logger } from '@/lib/utils/logger';
 import {
   requireAuth,
   requireSelfServeAccess,
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Customer portal error:', error);
+    logger.error('Customer portal error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'カスタマーポータルセッションの作成に失敗しました' },
       { status: 500 }

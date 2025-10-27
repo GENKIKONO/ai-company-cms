@@ -5,6 +5,7 @@ import { supabaseBrowser } from '@/lib/supabase-client';
 import Image from 'next/image';
 import LetterAvatar from './ui/LetterAvatar';
 import { useToast } from './ui/toast';
+import { logger } from '@/lib/utils/logger';
 
 interface OrgLogoUploaderProps {
   organizationId: string;
@@ -79,7 +80,7 @@ export default function OrgLogoUploader({
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        console.error('[UPLOAD] API error:', result);
+        logger.error('[UPLOAD] API error:', result);
         
         // エラータイプに応じたメッセージ
         if (response.status === 401) {
@@ -122,7 +123,7 @@ export default function OrgLogoUploader({
       });
 
     } catch (error) {
-      console.error('[UPLOAD] Unexpected error:', error);
+      logger.error('[UPLOAD] Unexpected error', error instanceof Error ? error : new Error(String(error)));
       addToast({
         type: 'error',
         title: 'アップロード失敗',

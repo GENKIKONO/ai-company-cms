@@ -45,26 +45,26 @@ export default function UnifiedCTA({
   // バリアント別スタイル
   const variantStyles = {
     primary: `
-      background: #0A84FF !important;
-      color: #FFFFFF !important;
+      background: var(--color-primary-blue) !important;
+      color: var(--bg-white) !important;
       border: none;
-      box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
-      hover:background: #066CEB !important;
-      focus:ring-color: #1B6DFF;
+      box-shadow: 0 4px 12px rgba(var(--shadow-primary), 0.3);
+      hover:background: var(--color-primary-blue-hover) !important;
+      focus:ring-color: var(--color-primary-blue-focus);
       transform: translateY(0);
       hover:transform: translateY(-2px) scale(1.02);
-      hover:box-shadow: 0 8px 24px rgba(10, 132, 255, 0.4);
+      hover:box-shadow: 0 8px 24px rgba(var(--shadow-primary), 0.4);
     `,
     secondary: `
-      background: #FFFFFF !important;
+      background: var(--bg-white) !important;
       color: var(--text-primary) !important;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      hover:background: rgba(0, 0, 0, 0.05) !important;
-      focus:ring-color: #0A84FF;
+      border: 1px solid rgba(var(--shadow-black), 0.1);
+      box-shadow: 0 1px 3px rgba(var(--shadow-black), 0.1);
+      hover:background: rgba(var(--shadow-black), 0.05) !important;
+      focus:ring-color: var(--color-primary-blue);
       transform: translateY(0);
       hover:transform: translateY(-1px) scale(1.02);
-      hover:box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      hover:box-shadow: 0 4px 12px rgba(var(--shadow-black), 0.15);
     `
   };
 
@@ -76,28 +76,18 @@ export default function UnifiedCTA({
   };
 
   // 最終的なクラス名
-  const finalClassName = `${baseStyles} ${sizeStyles[size]} ${className}`.trim();
+  const variantClass = variant === 'primary' ? 'unified-cta-primary' : 'unified-cta-secondary';
+  const finalClassName = `${baseStyles} ${sizeStyles[size]} ${variantClass} ${className}`.trim();
 
-  // インラインスタイル（重要度を確実にするため）
+  // 必要最小限のインラインスタイル（border-radiusのみ）
   const inlineStyle = {
-    borderRadius: '980px',
-    ...(variant === 'primary' ? {
-      backgroundColor: '#0A84FF',
-      color: '#FFFFFF',
-      border: 'none',
-      boxShadow: '0 4px 12px rgba(10, 132, 255, 0.3)'
-    } : {
-      backgroundColor: '#FFFFFF',
-      color: 'var(--text-primary)',
-      border: '1px solid rgba(0, 0, 0, 0.1)',
-      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-    })
+    borderRadius: '980px'
   };
 
   const content = (
     <>
       <span style={{ 
-        color: variant === 'primary' ? '#FFFFFF' : 'inherit' 
+        color: variant === 'primary' ? 'var(--bg-white)' : 'inherit' 
       }}>{children}</span>
       {showArrow && (
         <ArrowRightIcon 

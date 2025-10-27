@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { PrimaryCTA } from '@/design-system';
 
 export const metadata: Metadata = {
   title: 'サービス概要 | AIO Hub AI企業CMS',
@@ -95,12 +96,12 @@ export default function AboutPage() {
             </section>
 
             <div className="text-center mt-12">
-              <a 
+              <PrimaryCTA 
                 href="/auth/signup"
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors"
+                size="large"
               >
                 無料で始める
-              </a>
+              </PrimaryCTA>
             </div>
           </div>
         </div>

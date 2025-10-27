@@ -195,6 +195,7 @@ npm install @aiohub/sdk
 
 // 初期化
 import { AIO HubSDK } from '@aiohub/sdk';
+import { logger } from '@/lib/utils/logger';
 
 const client = new AIO HubSDK({
   apiKey: 'your-api-key',
@@ -221,11 +222,11 @@ const searchResults = await client.search.faceted({
 // リアルタイム共同編集
 const collaboration = client.collaboration.join('org-id');
 collaboration.on('nullJoined', (null) => {
-  console.log('新しいユーザーが参加:', null);
+  logger.debug('新しいユーザーが参加', null);
 });
 
 collaboration.on('fieldEdit', (edit) => {
-  console.log('フィールドが編集されました:', edit);
+  logger.debug('フィールドが編集されました', edit);
 });`,
     
     python: `# インストール

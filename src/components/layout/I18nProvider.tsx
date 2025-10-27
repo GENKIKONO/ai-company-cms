@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { I18nManager } from '@/lib/utils/i18n';
+import { logger } from '@/lib/utils/logger';
 
 export type Locale = 'ja' | 'en' | 'zh' | 'ko';
 type SupportedLocale = Locale;
@@ -41,7 +42,7 @@ export function I18nProvider({ children, initialLocale }: I18nProviderProps) {
     // setLocaleState(newLocale); // 削除
     // i18nManager.setLocale(newLocale); // 削除
     // document.documentElement.lang は変更しない
-    console.log('setLocale called but ignored (Japanese-only mode):', newLocale);
+    logger.debug('setLocale called but ignored (Japanese-only mode)', newLocale);
   };
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { Resend } from 'resend';
+import { logger } from '@/lib/utils/logger';
 
 // Resend configuration
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -17,15 +18,15 @@ export const EMAIL_TEMPLATES = {
           <meta charset="utf-8">
           <title>AIO Hub AI企業CMSへようこそ</title>
         </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333;">
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: var(--color-email-text);">
           <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 40px;">
-              <h1 style="color: #2563eb; margin: 0;">AIO Hub AI企業CMS</h1>
-              <p style="color: #6b7280; margin: 10px 0 0 0;">企業情報管理プラットフォーム</p>
+              <h1 style="color: var(--color-email-primary); margin: 0;">AIO Hub AI企業CMS</h1>
+              <p style="color: var(--text-muted); margin: 10px 0 0 0;">企業情報管理プラットフォーム</p>
             </div>
             
-            <div style="background: #f8fafc; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
-              <h2 style="color: #1f2937; margin: 0 0 20px 0;">ようこそ、${userName}さん！</h2>
+            <div style="background: var(--color-email-background); padding: 30px; border-radius: 8px; margin-bottom: 30px;">
+              <h2 style="color: var(--color-email-dark); margin: 0 0 20px 0;">ようこそ、${userName}さん！</h2>
               <p style="margin: 0 0 20px 0;">AIO Hub AI企業CMSにご登録いただき、ありがとうございます。</p>
               <p style="margin: 0 0 20px 0;">このプラットフォームでは、以下のことができます：</p>
               
@@ -40,15 +41,15 @@ export const EMAIL_TEMPLATES = {
             
             <div style="text-align: center; margin-bottom: 30px;">
               <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" 
-                 style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">
+                 style="display: inline-block; background: var(--color-email-primary); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">
                 ダッシュボードを開く
               </a>
             </div>
             
-            <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; text-align: center;">
-              <p style="color: #6b7280; font-size: 14px; margin: 0;">
+            <div style="border-top: 1px solid var(--color-email-border); padding-top: 20px; text-align: center;">
+              <p style="color: var(--text-muted); font-size: 14px; margin: 0;">
                 ご質問がございましたら、お気軽にお問い合わせください。<br>
-                <a href="mailto:support@aiohub.ai" style="color: #2563eb;">support@aiohub.ai</a>
+                <a href="mailto:support@aiohub.ai" style="color: var(--color-email-primary);">support@aiohub.ai</a>
               </p>
             </div>
           </div>
@@ -86,14 +87,14 @@ AIO Hub チーム
           <meta charset="utf-8">
           <title>決済失敗のお知らせ</title>
         </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333;">
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: var(--color-email-text);">
           <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 40px;">
-              <h1 style="color: #dc2626; margin: 0;">決済失敗のお知らせ</h1>
+              <h1 style="color: var(--color-email-error); margin: 0;">決済失敗のお知らせ</h1>
             </div>
             
-            <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-              <h2 style="color: #dc2626; margin: 0 0 15px 0;">⚠️ 決済処理に失敗しました</h2>
+            <div style="background: var(--color-email-error-bg); border: 1px solid var(--color-email-error-border); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+              <h2 style="color: var(--color-email-error); margin: 0 0 15px 0;">⚠️ 決済処理に失敗しました</h2>
               <p style="margin: 0 0 15px 0;">
                 ${userName}さん、「${organizationName}」のサブスクリプション決済処理に失敗しました。
               </p>
@@ -103,7 +104,7 @@ AIO Hub チーム
             </div>
             
             <div style="margin-bottom: 30px;">
-              <h3 style="color: #1f2937; margin: 0 0 15px 0;">必要な対応</h3>
+              <h3 style="color: var(--color-email-dark); margin: 0 0 15px 0;">必要な対応</h3>
               <ol style="padding-left: 20px; margin: 0;">
                 <li style="margin-bottom: 10px;">サブスクリプション管理画面で決済情報を確認</li>
                 <li style="margin-bottom: 10px;">クレジットカード情報の更新（必要に応じて）</li>
@@ -113,22 +114,22 @@ AIO Hub チーム
             
             <div style="text-align: center; margin-bottom: 30px;">
               <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing" 
-                 style="display: inline-block; background: #dc2626; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">
+                 style="display: inline-block; background: var(--color-email-error); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">
                 サブスクリプション管理
               </a>
             </div>
             
-            <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-              <p style="margin: 0; color: #6b7280; font-size: 14px;">
+            <div style="background: var(--color-gray-50); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+              <p style="margin: 0; color: var(--text-muted); font-size: 14px;">
                 <strong>注意:</strong> 決済が完了するまで、一部の機能が制限される場合があります。
                 速やかな対応をお願いいたします。
               </p>
             </div>
             
-            <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; text-align: center;">
-              <p style="color: #6b7280; font-size: 14px; margin: 0;">
+            <div style="border-top: 1px solid var(--color-email-border); padding-top: 20px; text-align: center;">
+              <p style="color: var(--text-muted); font-size: 14px; margin: 0;">
                 ご不明な点がございましたら、お気軽にお問い合わせください。<br>
-                <a href="mailto:support@aiohub.ai" style="color: #2563eb;">support@aiohub.ai</a>
+                <a href="mailto:support@aiohub.ai" style="color: var(--color-email-primary);">support@aiohub.ai</a>
               </p>
             </div>
           </div>
@@ -174,14 +175,14 @@ export async function sendWelcomeEmail(email: string, userName: string) {
     });
 
     if (error) {
-      console.error('Error sending welcome email:', error);
+      logger.error('Error sending welcome email', error instanceof Error ? error : new Error(String(error)));
       return { success: false, error };
     }
 
-    console.log('Welcome email sent successfully:', data);
+    logger.debug('Welcome email sent successfully', data);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    logger.error('Error sending welcome email', error instanceof Error ? error : new Error(String(error)));
     return { success: false, error };
   }
 }
@@ -204,14 +205,14 @@ export async function sendPaymentFailedEmail(
     });
 
     if (error) {
-      console.error('Error sending payment failed email:', error);
+      logger.error('Error sending payment failed email', error instanceof Error ? error : new Error(String(error)));
       return { success: false, error };
     }
 
-    console.log('Payment failed email sent successfully:', data);
+    logger.debug('Payment failed email sent successfully', data);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending payment failed email:', error);
+    logger.error('Error sending payment failed email', error instanceof Error ? error : new Error(String(error)));
     return { success: false, error };
   }
 }
@@ -238,14 +239,14 @@ export async function sendEmail({
     });
 
     if (error) {
-      console.error('Error sending email:', error);
+      logger.error('Error sending email', error instanceof Error ? error : new Error(String(error)));
       return { success: false, error };
     }
 
-    console.log('Email sent successfully:', data);
+    logger.debug('Email sent successfully', data);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending email:', error);
+    logger.error('Error sending email', error instanceof Error ? error : new Error(String(error)));
     return { success: false, error };
   }
 }

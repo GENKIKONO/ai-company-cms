@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Service } from '@/types/database';
 import PublicPageLinks from '../components/PublicPageLinks';
+import { logger } from '@/lib/utils/logger';
 
 export default function ServicesManagementPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -29,7 +30,7 @@ export default function ServicesManagementPage() {
       setServices(result.data || []);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch services:', err);
+      logger.error('Failed to fetch services:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch services');
     } finally {
       setLoading(false);
@@ -50,7 +51,7 @@ export default function ServicesManagementPage() {
 
       setServices(services.filter(service => service.id !== id));
     } catch (err) {
-      console.error('Failed to delete service:', err);
+      logger.error('Failed to delete service:', err);
       alert('削除に失敗しました: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };

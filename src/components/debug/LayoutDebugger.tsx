@@ -105,8 +105,7 @@ export default function LayoutDebugger() {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-4 right-4 z-50 bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-mono shadow-lg hover:bg-red-700 transition-colors"
-        style={{ zIndex: 9999 }}
+        className="fixed bottom-4 right-4 debug-overlay bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-mono shadow-lg hover:bg-red-700 transition-colors"
       >
         DEBUG
       </button>
@@ -114,7 +113,7 @@ export default function LayoutDebugger() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" style={{ zIndex: 9999 }}>
+    <div className="fixed inset-0 debug-overlay bg-black/50 backdrop-blur-sm">
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow-2xl p-6 max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold">Layout Debugger</h3>

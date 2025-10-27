@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Post } from '@/types/database';
+import { PrimaryCTA } from '@/design-system';
 import PublicPageLinks from '../components/PublicPageLinks';
+import { logger } from '@/lib/utils/logger';
 
 export default function PostsManagementPage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -29,7 +31,7 @@ export default function PostsManagementPage() {
       setPosts(result.data || []);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch posts:', err);
+      logger.error('Failed to fetch posts:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch posts');
     } finally {
       setLoading(false);
@@ -51,7 +53,7 @@ export default function PostsManagementPage() {
       // リストから削除
       setPosts(posts.filter(post => post.id !== id));
     } catch (err) {
-      console.error('Failed to delete post:', err);
+      logger.error('Failed to delete post:', err);
       alert('削除に失敗しました: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };
@@ -193,12 +195,12 @@ export default function PostsManagementPage() {
                     </div>
                     
                     <div className="flex items-center space-x-2 ml-4">
-                      <Link
+                      <PrimaryCTA
                         href={`/dashboard/posts/${post.id}/edit`}
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                        size="small"
                       >
                         編集
-                      </Link>
+                      </PrimaryCTA>
                       <button
                         onClick={() => handleDelete(post.id)}
                         className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"

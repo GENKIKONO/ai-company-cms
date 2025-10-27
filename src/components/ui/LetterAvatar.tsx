@@ -37,6 +37,18 @@ export const LetterAvatar: React.FC<LetterAvatarProps> = ({
 
   const initials = getInitials(name);
   
+  // Use pre-defined size classes for common sizes, fall back to inline styles for custom sizes
+  const getSizeClass = (size: number): string | null => {
+    switch (size) {
+      case 24: return 'avatar-size-xs';
+      case 32: return 'avatar-size-sm';
+      case 48: return 'avatar-size-md';
+      case 64: return 'avatar-size-lg';
+      case 80: return 'avatar-size-xl';
+      default: return null;
+    }
+  };
+  
   const roundedClasses = {
     full: 'rounded-full',
     lg: 'rounded-lg',
@@ -44,18 +56,22 @@ export const LetterAvatar: React.FC<LetterAvatarProps> = ({
     sm: 'rounded-sm',
   };
 
+  const sizeClass = getSizeClass(size);
+  const customStyle = sizeClass ? {} : {
+    width: `${size}px`,
+    height: `${size}px`,
+    fontSize: `${Math.max(12, size * 0.4)}px`,
+  };
+
   return (
     <div
       className={cn(
         'flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold shadow-sm',
+        sizeClass,
         roundedClasses[rounded],
         className
       )}
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        fontSize: `${Math.max(12, size * 0.4)}px`,
-      }}
+      style={customStyle}
       title={name}
     >
       {initials}

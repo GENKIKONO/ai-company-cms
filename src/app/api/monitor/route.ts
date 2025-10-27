@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Monitor API Error:', error);
+    logger.error('❌ Monitor API Error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       timestamp: new Date().toISOString(),

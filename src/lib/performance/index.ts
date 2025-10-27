@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { logger } from '@/lib/utils/logger';
 
 // Web Vitals Monitoring Types
 export interface WebVitalsData {
@@ -38,7 +39,7 @@ export class PerformanceMonitor {
       observer.observe({ entryTypes: ['longtask'] });
       this.observers.push(observer);
     } catch (e) {
-      console.warn('Long task observation not supported');
+      logger.warn('Long task observation not supported');
     }
   }
 
@@ -54,7 +55,7 @@ export class PerformanceMonitor {
       observer.observe({ entryTypes: ['layout-shift'] });
       this.observers.push(observer);
     } catch (e) {
-      console.warn('Layout shift observation not supported');
+      logger.warn('Layout shift observation not supported');
     }
   }
 
@@ -70,7 +71,7 @@ export class PerformanceMonitor {
       observer.observe({ entryTypes: ['resource'] });
       this.observers.push(observer);
     } catch (e) {
-      console.warn('Resource observation not supported');
+      logger.warn('Resource observation not supported');
     }
   }
 

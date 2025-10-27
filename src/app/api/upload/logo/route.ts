@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 // Organization logo upload API with Service Role bypass (fixed auth)
 export async function POST(request: NextRequest) {
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (uploadError) {
-      console.error('Logo upload error:', uploadError);
+      logger.error('Logo upload error:', uploadError);
       return NextResponse.json({ 
         success: false, 
         error: uploadError.message 
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
       .eq('id', organizationId);
 
     if (updateError) {
-      console.error('Database update error:', updateError);
+      logger.error('Database update error:', updateError);
       return NextResponse.json({ 
         success: false, 
         error: 'Failed to update organization record' 
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('Logo upload API error:', {
+    logger.error('Logo upload API error:', {
       message: error.message,
       stack: error.stack,
       name: error.name,

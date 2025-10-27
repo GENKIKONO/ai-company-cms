@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getOrganizations, getIndustries } from '@/lib/organizations';
 import { type Organization } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface SearchFilters {
   search: string;
@@ -52,7 +53,7 @@ export default function OrganizationsPage() {
           setIndustries(industriesResult.data);
         }
       } catch (error) {
-        console.error('Failed to fetch organizations:', error);
+        logger.error('Failed to fetch organizations', error instanceof Error ? error : new Error(String(error)));
       } finally {
         setLoading(false);
       }

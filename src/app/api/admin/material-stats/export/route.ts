@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
+import { logger } from '@/lib/utils/logger';
 import {
   MaterialStatsDailyPoint,
   MaterialStatsSummary,
@@ -109,7 +110,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('CSV export error:', error);
+    logger.error('CSV export error', error instanceof Error ? error : new Error(String(error)));
     return createErrorResponse('Export failed', 500);
   }
 }

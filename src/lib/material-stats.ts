@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 /**
  * 営業資料統計機能の型定義とユーティリティ関数
  * 管理者専用の詳細分析とエクスポート機能
@@ -280,7 +282,7 @@ export function createSuccessResponse(data: any, status: number = 200) {
  */
 export function debugLog(message: string, data?: any): void {
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[MaterialStats] ${message}`, data ? data : '');
+    logger.debug('Debug', `[MaterialStats] ${message}`, data ? data : '');
   }
 }
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
+import { HIGButton } from '@/design-system';
 
 export default function NewServicePage() {
   const [loading, setLoading] = useState(false);
@@ -258,13 +259,14 @@ export default function NewServicePage() {
         )}
 
         <div className="flex space-x-4">
-          <button
+          <HIGButton
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            variant="primary"
+            size="medium"
           >
             {loading ? '作成中...' : '作成'}
-          </button>
+          </HIGButton>
           <button
             type="button"
             onClick={() => router.back()}

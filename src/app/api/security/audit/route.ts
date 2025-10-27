@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { runSecurityAudit, generateSecurityReport } from '@/lib/security/audit';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,13 +21,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🔐 Starting security audit...');
+    logger.debug('Debug', '🔐 Starting security audit...');
     const auditResult = await runSecurityAudit(request);
     
     // ログ出力
-    console.log(`🔐 Security audit completed: Score ${auditResult.score}/100`);
+    logger.debug('Debug', `🔐 Security audit completed: Score ${auditResult.score}/100`);
     if (!auditResult.passed) {
-      console.warn('⚠️ Security audit failed - critical issues detected');
+      logger.warn('⚠️ Security audit failed - critical issues detected');
     }
 
     // Markdown形式での出力
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Security audit error:', error);
+    logger.error('❌ Security audit error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       error: 'Security audit failed',
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
       
       // 重大な問題がある場合はアラート
       if (auditResult.summary.critical > 0) {
-        console.error('🚨 CRITICAL SECURITY ISSUES DETECTED:');
+        logger.error('🚨 CRITICAL SECURITY ISSUES DETECTED:');
         auditResult.checks
           .filter(c => c.severity === 'critical' && !c.passed)
           .forEach(check => {
@@ -126,7 +127,7 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('❌ Security audit POST error:', error);
+    logger.error('❌ Security audit POST error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       error: 'Security audit failed',

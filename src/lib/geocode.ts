@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 /**
  * Japanese address geocoding utility
  * Handles address normalization and geocoding with OpenStreetMap Nominatim API
@@ -225,14 +227,14 @@ export async function geocodeJP(address: string): Promise<GeocodeResult> {
     try {
       const result = await queryNominatim(prefectureCityMatch[1]);
       if (result) {
-        console.warn('Only prefecture/city level geocoding succeeded for:', address);
+        logger.warn('Only prefecture/city level geocoding succeeded for', address);
         return {
           ...result,
           normalized: normalized
         };
       }
     } catch (error) {
-      console.warn('Prefecture/city fallback also failed:', error);
+      logger.warn('Prefecture/city fallback also failed', error);
     }
   }
   

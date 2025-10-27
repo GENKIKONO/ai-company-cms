@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/utils/logger';
 
 interface DashboardActionsProps {
   organization: any;
@@ -34,7 +35,7 @@ export default function DashboardActions({ organization, context = 'quickActions
       document.body.appendChild(toast);
       setTimeout(() => document.body.removeChild(toast), 3000);
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      logger.error('Failed to copy to clipboard', error instanceof Error ? error : new Error(String(error)));
       
       // エラートースト
       const toast = document.createElement('div');
@@ -77,7 +78,7 @@ export default function DashboardActions({ organization, context = 'quickActions
       document.body.appendChild(toast);
       setTimeout(() => document.body.removeChild(toast), 3000);
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed', error instanceof Error ? error : new Error(String(error)));
       
       // エラートースト
       const toast = document.createElement('div');

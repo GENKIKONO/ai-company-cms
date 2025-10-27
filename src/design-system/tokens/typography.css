@@ -1,0 +1,7 @@
+/* タイポグラフィ仕様（数字の見え方統一） */
+html, body {
+  font-feature-settings: "lnum","tnum","liga","kern";
+  font-variant-numeric: lining-nums tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}

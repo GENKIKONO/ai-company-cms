@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { stripe, getAIOHubProducts, createStripeCustomer } from '@/lib/stripe';
+import { logger } from '@/lib/utils/logger';
 import {
   requireAuth,
   requireSelfServeAccess,
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Stripe checkout error:', error);
+    logger.error('Stripe checkout error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'チェックアウトセッションの作成に失敗しました' },
       { status: 500 }

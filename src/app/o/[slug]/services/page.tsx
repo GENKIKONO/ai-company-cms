@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateServiceJsonLd, generateOrganizationJsonLd } from '@/lib/utils/jsonld';
 import type { Organization, Service } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface ServicesPageData {
   organization: Organization;
@@ -26,7 +27,7 @@ async function getServicesData(slug: string): Promise<ServicesPageData | null> {
       services: result.data.services || []
     };
   } catch (error) {
-    console.error('Failed to fetch services data:', error);
+    logger.error('Failed to fetch services data', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

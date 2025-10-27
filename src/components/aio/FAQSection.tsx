@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { PrimaryCTA } from '@/components/ui/UnifiedCTA';
+import { PrimaryCTA } from '@/design-system';
 
 interface FAQItem {
   readonly question: string;

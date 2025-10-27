@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('Starting coordinate fields migration...');
+    logger.debug('Debug', 'Starting coordinate fields migration...');
     
     // Service Role クライアント作成
     const supabase = createClient(
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    console.log('Testing coordinate field update on organization:', testOrg.id);
+    logger.debug('Testing coordinate field update on organization', testOrg.id);
 
     // まず座標フィールドの追加を試みる（既存のDBスキーマに応じて自動で処理される）
     const { error: updateError } = await supabase
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
       .eq('id', testOrg.id);
 
     if (updateError) {
-      console.error('Coordinate field update failed:', updateError);
+      logger.error('Coordinate field update failed:', updateError);
       
       // もしエラーが発生した場合、フィールドが存在しない可能性がある
       return NextResponse.json({ 
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log('Successfully updated organization with coordinates');
+    logger.debug('Debug', 'Successfully updated organization with coordinates');
 
     // 更新が成功したら座標フィールドが利用可能
     return NextResponse.json({ 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('Migration API error:', error);
+    logger.error('Migration API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ 
       success: false, 
       error: error.message || 'Migration failed' 

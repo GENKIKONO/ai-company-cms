@@ -1,7 +1,7 @@
 'use client';
 
 import { supabaseBrowser } from '@/lib/supabase-client';
-import { vLog } from '@/lib/utils/logger';
+import { vLog, logger } from '@/lib/utils/logger';
 import { type Organization, type OrganizationFormData, type OrganizationWithOwner } from '@/types/database';
 
 // 企業一覧取得
@@ -55,7 +55,7 @@ export async function getOrganizations(options: {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error fetching organizations:', error);
+    logger.error('Error fetching organizations', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -86,7 +86,7 @@ export async function getOrganization(id: string) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error fetching organization:', error);
+    logger.error('Error fetching organization', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -113,7 +113,7 @@ export async function createOrganization(organizationData: OrganizationFormData)
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error creating organization:', error);
+    logger.error('Error creating organization', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -141,12 +141,12 @@ export async function updateOrganization(id: string, organizationData: Partial<O
     // but we add a small delay to ensure it completes before any navigation
     if (typeof window !== 'undefined') {
       // Optional: Signal that data should be refetched on next navigation
-      console.log('✅ Organization updated, server cache invalidated');
+      logger.debug('Debug', '✅ Organization updated, server cache invalidated');
     }
     
     return { data: result.data, error: null };
   } catch (error) {
-    console.error('Error updating organization:', error);
+    logger.error('Error updating organization', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -206,7 +206,7 @@ export async function updateOrganizationStatus(id: string, status: 'draft' | 'pu
       return { data: result.data, error: null };
     }
   } catch (error) {
-    console.error('Error updating organization status:', error);
+    logger.error('Error updating organization status', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -229,7 +229,7 @@ export async function getOrganizationStats() {
 
     return { data: stats, error: null };
   } catch (error) {
-    console.error('Error fetching organization stats:', error);
+    logger.error('Error fetching organization stats', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -252,7 +252,7 @@ export async function getOrganizationBySlug(slug: string) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error fetching organization by slug:', error);
+    logger.error('Error fetching organization by slug', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -296,7 +296,7 @@ export async function getIndustries() {
     
     return { data: industriesList, error: null };
   } catch (error) {
-    console.error('Error getting industries:', error);
+    logger.error('Error getting industries', error instanceof Error ? error : new Error(String(error)));
     return { data: [], error };
   }
 }
@@ -394,7 +394,7 @@ export async function globalSearch(options: {
 
     return { data: results, error: null };
   } catch (error) {
-    console.error('Error performing global search:', error);
+    logger.error('Error performing global search', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -416,7 +416,7 @@ export async function getServiceCategories() {
 
     return { data: allCategories, error: null };
   } catch (error) {
-    console.error('Error fetching service categories:', error);
+    logger.error('Error fetching service categories', error instanceof Error ? error : new Error(String(error)));
     return { data: [], error };
   }
 }

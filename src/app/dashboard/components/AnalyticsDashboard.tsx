@@ -8,6 +8,7 @@ import TeamManagement from '@/components/team/TeamManagement';
 import { getTrialStatus, type TrialStatus } from '@/lib/trial-manager';
 import type { Organization } from '@/types/database';
 import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { logger } from '@/lib/utils/logger';
 
 interface AnalyticsDashboardProps {
   organization: Organization;
@@ -63,7 +64,7 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
 
         setStats(mockStats);
       } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
+        logger.error('Failed to fetch dashboard data', error instanceof Error ? error : new Error(String(error)));
       } finally {
         setLoading(false);
       }

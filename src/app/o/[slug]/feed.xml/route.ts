@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { generateRss } from '@/lib/feed/rss-generator';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(
   request: NextRequest, 
@@ -46,7 +47,7 @@ export async function GET(
       .limit(10);
 
     if (postsError) {
-      console.error('Organization RSS feed error:', postsError);
+      logger.error('Organization RSS feed error:', postsError);
       return new NextResponse('Internal Server Error', { status: 500 });
     }
 
@@ -84,7 +85,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Organization RSS feed generation failed:', error);
+    logger.error('Organization RSS feed generation failed', error instanceof Error ? error : new Error(String(error)));
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

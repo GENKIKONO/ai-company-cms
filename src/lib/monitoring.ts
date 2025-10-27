@@ -1,6 +1,7 @@
 // 監視・ログ・通知システム
 import { SentryUtils } from '@/lib/utils/sentry-utils';
 import { slackNotifier } from '@/lib/utils/slack-notifier';
+import { logger as mainLogger } from '@/lib/utils/logger';
 
 // エラー通知機能
 export async function notifyError(error: Error, context?: Record<string, any>) {
@@ -24,7 +25,7 @@ export async function notifyError(error: Error, context?: Record<string, any>) {
       timestamp: new Date().toISOString(),
     });
   } catch (notifyError) {
-    console.error('Failed to send error notification:', notifyError);
+    mainLogger.error('Failed to send error notification', notifyError instanceof Error ? notifyError : new Error(String(notifyError)));
     SentryUtils.captureException(
       notifyError instanceof Error ? notifyError : new Error('Failed to send error notification'), 
       { originalError: error.message }
@@ -116,8 +117,8 @@ export function trackPerformance(metricName: string, value: number, context?: Re
       });
     }
 
-    // コンソールログ
-    console.log(`Performance [${metricName}]:`, value, context);
+    // Performance logging
+    mainLogger.debug(`Performance [${metricName}]`, { value, ...context });
 
     // Plausible custom events (クライアントサイドのみ)
     if (typeof window !== 'undefined' && window.plausible) {
@@ -129,7 +130,7 @@ export function trackPerformance(metricName: string, value: number, context?: Re
       });
     }
   } catch (error) {
-    console.error('Failed to track performance:', error);
+    mainLogger.error('Failed to track performance', error instanceof Error ? error : new Error('Failed to track performance'));
     SentryUtils.captureException(error instanceof Error ? error : new Error('Failed to track performance'));
   }
 }
@@ -189,9 +190,9 @@ export async function trackBusinessEvent(
     }
 
     // ログ記録
-    console.log(`Business Event [${event}]:`, { userId, orgId, data });
+    mainLogger.info(`Business Event [${event}]`, { userId, orgId, data });
   } catch (error) {
-    console.error('Failed to track business event:', error);
+    mainLogger.error('Failed to track business event', error instanceof Error ? error : new Error('Failed to track business event'));
     SentryUtils.captureException(error instanceof Error ? error : new Error('Failed to track business event'));
   }
 }
@@ -342,11 +343,11 @@ export const performanceMonitor = {
   },
   
   track: (metric: string, value: number) => {
-    console.log(`Performance metric: ${metric} = ${value}`);
+    mainLogger.debug('Performance metric', { metric, value });
   },
   
   recordWebVitals: (metric: { name: string; value: number; rating: string }) => {
-    console.log(`Web Vitals: ${metric.name} = ${metric.value} (${metric.rating})`);
+    mainLogger.debug('Web Vitals', metric);
     // 実際の実装では、これらのメトリクスをデータベースやモニタリングサービスに送信
   }
 };
@@ -363,38 +364,17 @@ export const errorMonitor = {
   },
   
   captureError: (error: Error, context?: Record<string, any>) => {
-    console.error('Error captured:', error.message, context);
+    mainLogger.error('Error captured', error, context);
     SentryUtils.captureException(error, context);
   },
   
   resetStats: () => {
-    console.log('Error stats reset');
+    mainLogger.debug('Error stats reset');
   }
 };
 
-// ロガー
-export const logger = {
-  info: (message: string, meta?: Record<string, any>) => {
-    console.log(`[INFO] ${message}`, meta);
-  },
-  
-  warn: (message: string, meta?: Record<string, any>) => {
-    console.warn(`[WARN] ${message}`, meta);
-  },
-  
-  error: (message: string, error?: Error | Record<string, any>) => {
-    console.error(`[ERROR] ${message}`, error);
-    if (error instanceof Error) {
-      SentryUtils.captureException(error);
-    }
-  },
-  
-  debug: (message: string, meta?: Record<string, any>) => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug(`[DEBUG] ${message}`, meta);
-    }
-  }
-};
+// Use the main logger from utils/logger.ts
+export const logger = mainLogger;
 
 // 型定義（グローバル）
 declare global {

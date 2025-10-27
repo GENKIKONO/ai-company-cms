@@ -4,6 +4,7 @@
 
 import { unstable_cache } from 'next/cache';
 import { serverFetch } from './serverFetch';
+import { logger } from '@/lib/utils/logger';
 
 // 🚫 キャッシュを使わない組織取得を re-export
 export { getCurrentUserOrganization } from './organizations-server';
@@ -85,7 +86,7 @@ export async function getOrganizationStatsSafe(): Promise<SafeDataResult<SafeSta
     const errorId = `stats-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const errorNote = error instanceof Error ? error.message : 'Unknown error';
     
-    console.error('[getOrganizationStatsSafe] Error:', error);
+    logger.error('[getOrganizationStatsSafe] Error', error instanceof Error ? error : new Error(String(error)));
     
     await logToDiag({
       errorId,
@@ -114,7 +115,7 @@ export async function getCaseStudiesStatsSafe(orgId?: string): Promise<SafeDataR
     const result = await serverFetch(`/api/dashboard/case-studies-stats?orgId=${orgId}`);
     
     if (!result.ok) {
-      console.warn('[getCaseStudiesStatsSafe] API returned non-ok status:', result.status);
+      logger.warn('[getCaseStudiesStatsSafe] API returned non-ok status', result.status);
       return { data: { total: 0, published: 0 } };
     }
 
@@ -125,7 +126,7 @@ export async function getCaseStudiesStatsSafe(orgId?: string): Promise<SafeDataR
     const errorId = `case-studies-stats-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const errorNote = error instanceof Error ? error.message : 'Unknown error';
     
-    console.error('[getCaseStudiesStatsSafe] Error:', error);
+    logger.error('[getCaseStudiesStatsSafe] Error', error instanceof Error ? error : new Error(String(error)));
     
     await logToDiag({
       errorId,

@@ -8,6 +8,7 @@ import { EmbedUsageChart } from '@/components/admin/EmbedUsageChart';
 import { EmbedLimitCard } from '@/components/admin/EmbedLimitCard';
 import { EmbedTopSources } from '@/components/admin/EmbedTopSources';
 import { EmbedRealtimeStats } from '@/components/admin/EmbedRealtimeStats';
+import { HIGButton } from '@/design-system';
 
 export default async function EmbedDashboardPage() {
   return (
@@ -61,9 +62,9 @@ export default async function EmbedDashboardPage() {
             管理アクション
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+            <HIGButton variant="primary" size="medium">
               埋め込み設定をエクスポート
-            </button>
+            </HIGButton>
             <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
               使用状況レポート生成
             </button>

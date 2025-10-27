@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { PostFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 // エラーログ送信関数（失敗しても無視）
 async function logErrorToDiag(errorInfo: any) {
@@ -55,7 +56,7 @@ export async function GET(
           { status: 404 }
         );
       }
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
@@ -66,7 +67,7 @@ export async function GET(
 
   } catch (error) {
     const errorId = `get-post-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    console.error('[GET /api/my/posts/[id]] Unexpected error:', { errorId, error });
+    logger.error('[GET /api/my/posts/[id]] Unexpected error:', { errorId, error });
     
     logErrorToDiag({
       errorId,
@@ -160,7 +161,7 @@ export async function PUT(
       .single();
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       
       // 制約違反の場合
       if (error.code === '23505' && error.message.includes('unique_posts_slug_per_org')) {
@@ -180,7 +181,7 @@ export async function PUT(
 
   } catch (error) {
     const errorId = `put-post-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    console.error('[PUT /api/my/posts/[id]] Unexpected error:', { errorId, error });
+    logger.error('[PUT /api/my/posts/[id]] Unexpected error:', { errorId, error });
     
     logErrorToDiag({
       errorId,
@@ -236,7 +237,7 @@ export async function DELETE(
       .eq('id', postId);
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
@@ -247,7 +248,7 @@ export async function DELETE(
 
   } catch (error) {
     const errorId = `delete-post-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    console.error('[DELETE /api/my/posts/[id]] Unexpected error:', { errorId, error });
+    logger.error('[DELETE /api/my/posts/[id]] Unexpected error:', { errorId, error });
     
     logErrorToDiag({
       errorId,

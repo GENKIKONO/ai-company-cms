@@ -124,42 +124,42 @@ export default function HearingServicePage() {
       <div className="min-h-screen">
         {/* ヒーローセクション */}
         <section className="sec-white">
-          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div className="site-container section-padding-y-80">
             <HeroSection />
           </div>
         </section>
         
         {/* 構造化前後の違い */}
         <section className="sec-alt">
-          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div className="site-container section-padding-y-80">
             <ComparisonSection />
           </div>
         </section>
         
         {/* サービス流れ説明 */}
         <section className="sec-white">
-          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div className="site-container section-padding-y-80">
             <FlowSection />
           </div>
         </section>
         
         {/* 料金プラン - Apple HIG準拠 */}
         <section className="sec-alt">
-          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div className="site-container section-padding-y-80">
             <ApplePricingPlans />
           </div>
         </section>
         
         {/* よくある質問 */}
         <section className="sec-white">
-          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div className="site-container section-padding-y-80">
             <FAQSection />
           </div>
         </section>
         
         {/* CTA（申込導線） */}
         <section className="sec-alt">
-          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div className="site-container section-padding-y-80">
             <CTASection />
           </div>
         </section>

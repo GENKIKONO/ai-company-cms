@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,14 +44,14 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching users:', error);
+      logger.error('Error fetching users', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
 
     return NextResponse.json({ data: users });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (error) {
-      console.error('Public services API error:', error);
+      logger.error('Public services API error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Public services API failed:', error);
+    logger.error('Public services API failed', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

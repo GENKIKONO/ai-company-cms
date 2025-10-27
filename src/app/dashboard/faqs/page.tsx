@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { FAQ } from '@/types/database';
 import PublicPageLinks from '../components/PublicPageLinks';
+import { PrimaryCTA } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 export default function FAQsManagementPage() {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
@@ -29,7 +31,7 @@ export default function FAQsManagementPage() {
       setFaqs(result.data || []);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch FAQs:', err);
+      logger.error('Failed to fetch FAQs:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch FAQs');
     } finally {
       setLoading(false);
@@ -50,7 +52,7 @@ export default function FAQsManagementPage() {
 
       setFaqs(faqs.filter(faq => faq.id !== id));
     } catch (err) {
-      console.error('Failed to delete FAQ:', err);
+      logger.error('Failed to delete FAQ:', err);
       alert('削除に失敗しました: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };
@@ -175,12 +177,12 @@ export default function FAQsManagementPage() {
                     </div>
                     
                     <div className="flex items-center space-x-2 ml-4">
-                      <Link
+                      <PrimaryCTA
                         href={`/dashboard/faqs/${faq.id}/edit`}
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                        size="small"
                       >
                         編集
-                      </Link>
+                      </PrimaryCTA>
                       <button
                         onClick={() => handleDelete(faq.id)}
                         className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-client';
+import { logger } from '@/lib/utils/logger';
 
 interface LoginFormProps {
   redirectUrl?: string;
@@ -57,14 +58,14 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
         const hasSupabaseAuthToken = /sb-[^=;]+-auth-token=/.test(cookieString);
         
         if (!hasSupabaseAuthToken) {
-          console.warn('[LoginForm] セッションCookieが設定されていません、もう少し待機します');
+          logger.warn('[LoginForm] セッションCookieが設定されていません、もう少し待機します');
           // さらに1秒待機
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
         // ダッシュボードへ遷移
         const targetUrl = redirectUrl || '/dashboard';
-        console.log('[LoginForm] リダイレクト開始:', targetUrl);
+        logger.debug('[LoginForm] リダイレクト開始', targetUrl);
         
         // 強制的にページをリロードして認証状態を確実に反映
         window.location.href = targetUrl;
@@ -73,7 +74,7 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
       }
       
     } catch (err) {
-      console.error('Login error:', err);
+      logger.error('Login error:', err);
       setError('ログインに失敗しました。');
     } finally {
       setIsLoading(false);

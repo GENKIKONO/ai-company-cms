@@ -13,11 +13,13 @@ import { geocodeJP, isValidJapaneseCoordinates } from '@/lib/geocode';
 import { type Coordinates } from '@/types/geo';
 import ServicesTab from '@/components/ServicesTab';
 import CaseStudiesTab from '@/components/CaseStudiesTab';
+import { HIGButton } from '@/design-system';
 import FAQsTab from '@/components/FAQsTab';
 import PostsTab from '@/components/PostsTab';
 import OrgLogoUploader from '@/components/OrgLogoUploader';
 import AddressDisplay from '@/components/address/AddressDisplay';
 import QAManager from '@/components/qa/QAManager';
+import { logger } from '@/lib/utils/logger';
 
 // プラン別タグ数制限
 const TAG_LIMIT: Record<string, number | 'unlimited'> = {
@@ -104,7 +106,7 @@ export default function EditOrganizationPage() {
         }
         
         // 企業データと業界一覧を取得
-        console.log('[VERIFY] Fetching fresh organization data for edit page:', organizationId);
+        logger.debug('[VERIFY] Fetching fresh organization data for edit page', organizationId);
         
         const [orgResult, industriesResult] = await Promise.all([
           getOrganization(organizationId),
@@ -113,7 +115,7 @@ export default function EditOrganizationPage() {
 
         if (orgResult.data) {
           const org = orgResult.data;
-          console.log('[VERIFY] Fresh organization loaded for edit:', { 
+          logger.debug('[VERIFY] Fresh organization loaded for edit', { 
             id: org.id, 
             slug: org.slug, 
             name: org.name,
@@ -122,7 +124,7 @@ export default function EditOrganizationPage() {
           setOrganization(org);
           // フォームデータはuseEffectで自動同期される
         } else {
-          console.warn('[VERIFY] No organization data found, redirecting to dashboard');
+          logger.warn('[VERIFY] No organization data found, redirecting to dashboard');
           router.push('/dashboard');
         }
         
@@ -130,7 +132,7 @@ export default function EditOrganizationPage() {
           setIndustries(industriesResult.data);
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
+        logger.error('Failed to fetch data', error instanceof Error ? error : new Error(String(error)));
         router.push('/dashboard');
       } finally {
         setLoading(false);
@@ -144,7 +146,7 @@ export default function EditOrganizationPage() {
 
   // organization更新時のフォーム自動同期
   useEffect(() => {
-    console.log('[VERIFY] Syncing form data from organization', {
+    logger.debug('[VERIFY] Syncing form data from organization', {
       orgId: organization?.id,
       slug: organization?.slug,
       updated_at: organization?.updated_at
@@ -153,12 +155,12 @@ export default function EditOrganizationPage() {
     // 🔥 FORCED SYNC: Always overwrite form with latest organization data
     if (organization) {
       const syncedFormData = fromOrg(organization);
-      console.log('[SYNC_EFFECT] Forcing form sync with organization data:', syncedFormData);
+      logger.debug('[SYNC_EFFECT] Forcing form sync with organization data', syncedFormData);
       setFormData(syncedFormData);
       
       // 🔥 Initialize coordinates from database if available
       if (organization.lat && organization.lng) {
-        console.log('[SYNC_EFFECT] Initializing coordinates from database:', {
+        logger.debug('[SYNC_EFFECT] Initializing coordinates from database', {
           lat: organization.lat,
           lng: organization.lng
         });
@@ -241,10 +243,10 @@ export default function EditOrganizationPage() {
     setSubmitting(true);
     try {
       const result = await updateOrganization(organizationId, formData);
-      console.log('[VERIFY] Organization save result', result);
+      logger.debug('[VERIFY] Organization save result', result);
       
       if (result.data) {
-        console.log('[VERIFY] edit/save synced', { 
+        logger.debug('[VERIFY] edit/save synced', { 
           id: result.data.id, 
           slug: result.data.slug, 
           status: result.data.status,
@@ -254,7 +256,7 @@ export default function EditOrganizationPage() {
         
         // 🔥 FORCED SYNCHRONIZATION: Overwrite with API response to prevent form reversion
         const freshFormData = fromOrg(result.data);
-        console.log('[FORCED_SYNC] Overwriting form data with API response:', freshFormData);
+        logger.debug('[FORCED_SYNC] Overwriting form data with API response', freshFormData);
         
         // Set organization state first
         setOrganization(result.data);
@@ -263,22 +265,22 @@ export default function EditOrganizationPage() {
         setFormData(freshFormData);
         setTimeout(() => {
           setFormData(fromOrg(result.data));
-          console.log('[FORCED_SYNC] Double-sync completed');
+          logger.debug('Debug', '[FORCED_SYNC] Double-sync completed');
         }, 0);
         
         setErrors({ success: '企業情報を更新しました' });
         
         // ✅ slug変更時のURL同期
         if (result.data.slug && result.data.slug !== organizationId) {
-          console.log('[VERIFY] Slug changed, updating URL:', result.data.slug);
+          logger.debug('[VERIFY] Slug changed, updating URL', result.data.slug);
           router.replace(`/organizations/${organizationId}`);
         }
       } else {
-        console.error('[VERIFY] org save failed: no data returned');
+        logger.error('[VERIFY] org save failed: no data returned');
         setErrors({ submit: '企業情報の更新に失敗しました' });
       }
     } catch (error) {
-      console.error('Failed to update organization:', error);
+      logger.error('Failed to update organization', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: '企業情報の更新に失敗しました' });
     } finally {
       setSubmitting(false);
@@ -292,7 +294,7 @@ export default function EditOrganizationPage() {
         setOrganization(prev => prev ? { ...prev, status: newStatus } : null);
       }
     } catch (error) {
-      console.error('Failed to update status:', error);
+      logger.error('Failed to update status', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -325,7 +327,7 @@ export default function EditOrganizationPage() {
         }, 3000);
       }
     } catch (error) {
-      console.error('Geocoding failed:', error);
+      logger.error('Geocoding failed', error instanceof Error ? error : new Error(String(error)));
       setErrors({ 
         ...errors, 
         address: error instanceof Error ? error.message : '位置の特定に失敗しました' 
@@ -829,12 +831,14 @@ export default function EditOrganizationPage() {
                   onChange={(e) => handleInputChange('address_street', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <button
+                <HIGButton
                   type="button"
                   onClick={handleDetectLocation}
                   disabled={geocoding || !getFullAddress()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                  variant="primary"
+                  size="medium"
                   aria-label="住所から位置を検出"
+                  className="flex items-center gap-2 whitespace-nowrap"
                 >
                   {geocoding ? (
                     <>
@@ -849,7 +853,7 @@ export default function EditOrganizationPage() {
                       位置を検出
                     </>
                   )}
-                </button>
+                </HIGButton>
               </div>
               
               {/* 住所入力ヒント */}
@@ -863,7 +867,7 @@ export default function EditOrganizationPage() {
               )}
               
               {/* 成功メッセージ */}
-              <div id="geocode-success" className="mt-2 text-sm text-green-600" style={{ display: 'none' }}>
+              <div id="geocode-success" className="mt-2 text-sm text-green-600 hidden">
                 位置を特定しました！住所プレビューが更新されました。
               </div>
             </div>
@@ -1123,13 +1127,14 @@ export default function EditOrganizationPage() {
                 >
                   戻る
                 </Link>
-                <button
+                <HIGButton
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  variant="primary"
+                  size="medium"
                 >
                   {submitting ? '保存中...' : '変更を保存'}
-                </button>
+                </HIGButton>
               </div>
             </div>
           </div>

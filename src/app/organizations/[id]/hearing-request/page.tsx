@@ -5,6 +5,8 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar, Mail, Users, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+import { PrimaryCTA, HIGButton } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 interface HearingRequestFormData {
   purpose: string;
@@ -87,7 +89,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
         alert(`エラー: ${error.message || 'ヒアリング依頼の送信に失敗しました。'}`);
       }
     } catch (error) {
-      console.error('Hearing request submission error:', error);
+      logger.error('Hearing request submission error', error instanceof Error ? error : new Error(String(error)));
       alert('ヒアリング依頼の送信中にエラーが発生しました。');
     } finally {
       setIsSubmitting(false);
@@ -108,13 +110,13 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
             ご依頼いただきありがとうございます。<br />
             担当者より3営業日以内にご連絡いたします。
           </p>
-          <Link
+          <PrimaryCTA
             href="/dashboard"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            size="large"
+            icon="arrow-left"
           >
-            <ArrowLeft size={18} />
             ダッシュボードに戻る
-          </Link>
+          </PrimaryCTA>
         </div>
       </div>
     );
@@ -223,13 +225,15 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
               >
                 キャンセル
               </Link>
-              <button
+              <HIGButton
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="primary"
+                size="large"
+                className="flex-1"
               >
                 {isSubmitting ? '送信中...' : 'ヒアリング依頼を送信'}
-              </button>
+              </HIGButton>
             </div>
           </form>
         </div>

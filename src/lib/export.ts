@@ -257,19 +257,19 @@ export class ExportService {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIO Hub 企業レポート</title>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 40px; color: #333; }
-        .header { border-bottom: 2px solid #4F46E5; padding-bottom: 20px; margin-bottom: 30px; }
-        .title { color: #4F46E5; font-size: 28px; margin: 0; }
-        .subtitle { color: #6B7280; font-size: 14px; margin: 5px 0 0 0; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 40px; color: var(--color-export-text); }
+        .header { border-bottom: 2px solid var(--color-export-primary); padding-bottom: 20px; margin-bottom: 30px; }
+        .title { color: var(--color-export-primary); font-size: 28px; margin: 0; }
+        .subtitle { color: var(--color-export-secondary); font-size: 14px; margin: 5px 0 0 0; }
         .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
-        .stat-card { background: #F9FAFB; padding: 20px; border-radius: 8px; border-left: 4px solid #4F46E5; }
-        .stat-value { font-size: 24px; font-weight: bold; color: #1F2937; }
-        .stat-label { font-size: 12px; color: #6B7280; margin-top: 5px; }
-        .organization { border: 1px solid #E5E7EB; margin: 10px 0; padding: 15px; border-radius: 6px; }
-        .org-name { font-weight: bold; color: #1F2937; margin-bottom: 5px; }
-        .org-info { font-size: 14px; color: #6B7280; }
+        .stat-card { background: var(--color-export-bg); padding: 20px; border-radius: 8px; border-left: 4px solid var(--color-export-primary); }
+        .stat-value { font-size: 24px; font-weight: bold; color: var(--color-gray-800); }
+        .stat-label { font-size: 12px; color: var(--color-export-secondary); margin-top: 5px; }
+        .organization { border: 1px solid var(--border-light); margin: 10px 0; padding: 15px; border-radius: 6px; }
+        .org-name { font-weight: bold; color: var(--color-gray-800); margin-bottom: 5px; }
+        .org-info { font-size: 14px; color: var(--color-export-secondary); }
         .industries { margin-top: 10px; }
-        .industry-tag { background: #EBF4FF; color: #1E40AF; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px; }
+        .industry-tag { background: var(--color-export-info-bg); color: var(--color-export-info-text); padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -315,7 +315,7 @@ export class ExportService {
         </div>
     `).join('')}
     
-    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #E5E7EB; text-align: center; color: #6B7280; font-size: 12px;">
+    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-light); text-align: center; color: var(--color-export-secondary); font-size: 12px;">
         Powered by AIO Hub - AI企業ディレクトリ
     </div>
 </body>
@@ -346,13 +346,13 @@ export class ExportService {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>企業比較レポート - AIO Hub</title>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 40px; color: #333; }
-        .header { border-bottom: 2px solid #4F46E5; padding-bottom: 20px; margin-bottom: 30px; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 40px; color: var(--color-export-text); }
+        .header { border-bottom: 2px solid var(--color-export-primary); padding-bottom: 20px; margin-bottom: 30px; }
         .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .comparison-table th, .comparison-table td { border: 1px solid #E5E7EB; padding: 12px; text-align: left; }
-        .comparison-table th { background: #F9FAFB; font-weight: 600; }
-        .metric-row { background: #FAFAFA; }
-        .highlight-best { background: #ECFDF5; color: #047857; font-weight: bold; }
+        .comparison-table th, .comparison-table td { border: 1px solid var(--border-light); padding: 12px; text-align: left; }
+        .comparison-table th { background: var(--color-export-bg); font-weight: 600; }
+        .metric-row { background: var(--color-export-bg-alt); }
+        .highlight-best { background: var(--color-export-success-bg); color: var(--color-export-success-text); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -402,7 +402,7 @@ export class ExportService {
         </tbody>
     </table>
     
-    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #E5E7EB; text-align: center; color: #6B7280; font-size: 12px;">
+    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-light); text-align: center; color: var(--color-export-secondary); font-size: 12px;">
         Powered by AIO Hub
     </div>
 </body>

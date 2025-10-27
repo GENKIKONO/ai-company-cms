@@ -12,6 +12,7 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { supabaseServer } from '@/lib/supabase-server';
 import { env } from '@/lib/env';
+import { logger } from '@/lib/utils/logger';
 
 export interface OpsGuardResult {
   isAuthorized: boolean;
@@ -40,7 +41,7 @@ export async function checkOpsAdmin(): Promise<OpsGuardResult> {
     const { data: { user }, error } = await supabase.auth.getUser();
     
     if (error || !user) {
-      console.error('[checkOpsAdmin] Missing Supabase session:', error?.message || 'no user');
+      logger.error('[checkOpsAdmin] Missing Supabase session:', error?.message || 'no user');
       return {
         isAuthorized: false,
         reason: 'MISSING_SESSION'
@@ -49,7 +50,7 @@ export async function checkOpsAdmin(): Promise<OpsGuardResult> {
     
     // ADMIN_EMAIL照合（小文字・trim）
     if (!isAdmin(user.email)) {
-      console.error('[checkOpsAdmin] Not admin user:', user.email);
+      logger.error('[checkOpsAdmin] Not admin user:', user.email);
       return {
         isAuthorized: false,
         user,
@@ -62,7 +63,7 @@ export async function checkOpsAdmin(): Promise<OpsGuardResult> {
     const opsAdminCookie = cookieStore.get('ops_admin');
     
     if (!opsAdminCookie || opsAdminCookie.value !== '1') {
-      console.error('[checkOpsAdmin] Missing ops_admin cookie for admin:', user.email);
+      logger.error('[checkOpsAdmin] Missing ops_admin cookie for admin:', user.email);
       return {
         isAuthorized: false,
         user,
@@ -76,7 +77,7 @@ export async function checkOpsAdmin(): Promise<OpsGuardResult> {
     };
     
   } catch (error) {
-    console.error('[checkOpsAdmin] Unexpected error:', error);
+    logger.error('[checkOpsAdmin] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return {
       isAuthorized: false,
       reason: 'INTERNAL_ERROR'
@@ -92,7 +93,7 @@ export async function requireOpsAdminPage(): Promise<void> {
   const result = await checkOpsAdmin();
   
   if (!result.isAuthorized) {
-    console.error('[requireOpsAdminPage] Access denied:', result.reason);
+    logger.error('[requireOpsAdminPage] Access denied:', result.reason);
     redirect('/ops/login');
   }
 }
@@ -150,7 +151,7 @@ export async function getOpsAdminStatus() {
       }
     };
   } catch (error) {
-    console.error('[getOpsAdminStatus] Unexpected error:', error);
+    logger.error('[getOpsAdminStatus] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return {
       error: error instanceof Error ? error.message : 'Unknown error',
       overall: { isAuthorized: false }

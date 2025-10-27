@@ -281,29 +281,29 @@ export async function optimizeImage(file: File, options?: {
 // カラーパレット定義
 export const OGP_COLOR_PALETTES = {
   default: {
-    backgroundColor: '#1a365d',
-    textColor: '#2d3748',
-    accentColor: '#3182ce'
+    backgroundColor: 'var(--color-ogp-dark-bg)',
+    textColor: 'var(--color-ogp-dark-text)',
+    accentColor: 'var(--color-ogp-dark-accent)'
   },
   modern: {
-    backgroundColor: '#2d3748',
-    textColor: '#4a5568',
-    accentColor: '#38b2ac'
+    backgroundColor: 'var(--color-ogp-modern-bg)',
+    textColor: 'var(--color-ogp-modern-text)',
+    accentColor: 'var(--color-ogp-modern-accent)'
   },
   minimal: {
-    backgroundColor: '#f7fafc',
-    textColor: '#2d3748',
-    accentColor: '#4299e1'
+    backgroundColor: 'var(--color-ogp-clean-bg)',
+    textColor: 'var(--color-ogp-clean-text)',
+    accentColor: 'var(--color-ogp-clean-accent)'
   },
   corporate: {
-    backgroundColor: '#1a202c',
-    textColor: '#e2e8f0',
-    accentColor: '#63b3ed'
+    backgroundColor: 'var(--color-ogp-corporate-bg)',
+    textColor: 'var(--color-ogp-corporate-text)',
+    accentColor: 'var(--color-ogp-corporate-accent)'
   },
   warm: {
-    backgroundColor: '#742a2a',
-    textColor: '#fed7d7',
-    accentColor: '#f56565'
+    backgroundColor: 'var(--color-ogp-elegant-bg)',
+    textColor: 'var(--color-ogp-elegant-text)',
+    accentColor: 'var(--color-ogp-elegant-accent)'
   }
 };
 

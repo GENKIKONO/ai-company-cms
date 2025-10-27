@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
+import { logger } from '@/lib/utils/logger';
 import { 
   createErrorResponse,
   generateQADailyCSV,
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Q&A Stats Export API error:', error);
+    logger.error('Q&A Stats Export API error', error instanceof Error ? error : new Error(String(error)));
     return createErrorResponse('Internal server error', 500);
   }
 }

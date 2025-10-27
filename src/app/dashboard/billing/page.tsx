@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { PLAN_LIMITS } from '@/config/plans';
 import type { Organization } from '@/types/database';
+import { HIGButton } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 interface BillingData {
   organization: Organization;
@@ -71,7 +73,7 @@ export default function BillingPage() {
         },
       });
     } catch (error) {
-      console.error('Failed to fetch billing data:', error);
+      logger.error('Failed to fetch billing data', error instanceof Error ? error : new Error(String(error)));
       setError('Failed to load billing information');
     } finally {
       setLoading(false);
@@ -96,7 +98,7 @@ export default function BillingPage() {
       const { url } = await response.json();
       window.location.href = url;
     } catch (error) {
-      console.error('Checkout failed:', error);
+      logger.error('Checkout failed', error instanceof Error ? error : new Error(String(error)));
       setError('Failed to start checkout process');
     } finally {
       setActionLoading(false);
@@ -117,7 +119,7 @@ export default function BillingPage() {
       const { url } = await response.json();
       window.location.href = url;
     } catch (error) {
-      console.error('Portal creation failed:', error);
+      logger.error('Portal creation failed', error instanceof Error ? error : new Error(String(error)));
       setError('Failed to open billing portal');
     } finally {
       setActionLoading(false);
@@ -261,18 +263,19 @@ export default function BillingPage() {
         {/* Action Buttons */}
         <div className="mt-6 pt-6 border-t border-gray-200 flex gap-4">
           {canUpgrade ? (
-            <button
+            <HIGButton
               onClick={handleSubscribe}
               disabled={actionLoading}
-              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              variant="primary"
+              size="large"
             >
               {actionLoading ? '処理中...' : 'Starterプランで購読 (¥2,980/月)'}
-            </button>
+            </HIGButton>
           ) : (
             <button
               onClick={handleManageBilling}
               disabled={actionLoading || !organization.stripe_customer_id}
-              className="px-6 py-3 bg-[#3B82F6] text-white rounded-md hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="px-6 py-3 bg-[var(--color-blue-600)] text-white rounded-md hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {actionLoading ? '処理中...' : '請求の管理'}
             </button>

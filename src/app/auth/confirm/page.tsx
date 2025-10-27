@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-client';
+import { logger } from '@/lib/utils/logger';
 
 // Next.js 15: Force dynamic rendering to resolve useSearchParams prerender warning
 export const dynamic = 'force-dynamic';
@@ -27,7 +28,7 @@ function ConfirmPageContent() {
         
         // Development only: mask sensitive tokens
         if (process.env.NODE_ENV === 'development') {
-          console.log('Confirmation params:', { 
+          logger.debug('Confirmation params', { 
             token_hash: token_hash ? '[REDACTED]' : null, 
             type, 
             token: token ? '[REDACTED]' : null 
@@ -53,7 +54,7 @@ function ConfirmPageContent() {
           });
 
           if (verifyError) {
-            console.error('Email verification error:', verifyError);
+            logger.error('Email verification error:', verifyError);
             let errorMessage = 'メール確認に失敗しました';
             
             if (verifyError.message.includes('expired')) {
@@ -76,7 +77,7 @@ function ConfirmPageContent() {
           });
 
           if (verifyError) {
-            console.error('Token verification error:', verifyError);
+            logger.error('Token verification error:', verifyError);
             setError('メール確認に失敗しました（従来形式）');
             return;
           }
@@ -91,7 +92,7 @@ function ConfirmPageContent() {
         }, 3000);
         
       } catch (err) {
-        console.error('Confirmation error:', err);
+        logger.error('Confirmation error:', err);
         setError(err instanceof Error ? err.message : 'メール確認中にエラーが発生しました');
       } finally {
         setLoading(false);

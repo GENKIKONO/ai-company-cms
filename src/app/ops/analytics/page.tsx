@@ -180,10 +180,9 @@ export default async function AnalyticsPage() {
               {apiStats.hourlyDistribution.map((hour) => (
                 <div key={hour.hour} className="text-center">
                   <div 
-                    className="bg-blue-500 mx-auto mb-2 rounded"
+                    className="bg-blue-500 mx-auto mb-2 rounded w-4"
                     style={{
-                      height: `${Math.max(hour.requests / 10, 4)}px`,
-                      width: '16px'
+                      height: `${Math.max(hour.requests / 10, 4)}px`
                     }}
                   ></div>
                   <span className="text-xs text-gray-600">{hour.hour}</span>

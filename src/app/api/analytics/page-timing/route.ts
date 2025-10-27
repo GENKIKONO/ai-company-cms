@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logPerformanceMetrics } from '@/lib/api/audit-logger';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to record page timing:', error);
+    logger.error('Failed to record page timing', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Failed to record page timing' },
       { status: 500 }

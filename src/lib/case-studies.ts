@@ -2,6 +2,7 @@
 
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { type CaseStudy, type CaseStudyFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 // ケーススタディ一覧取得（特定企業）
 export async function getCaseStudies(organizationId: string) {
@@ -15,7 +16,7 @@ export async function getCaseStudies(organizationId: string) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error fetching case studies:', error);
+    logger.error('Error fetching case studies', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -36,7 +37,7 @@ export async function getCaseStudy(caseStudyId: string) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error fetching case study:', error);
+    logger.error('Error fetching case study', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -56,7 +57,7 @@ export async function createCaseStudy(organizationId: string, caseStudyData: Cas
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error creating case study:', error);
+    logger.error('Error creating case study', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -74,7 +75,7 @@ export async function updateCaseStudy(caseStudyId: string, caseStudyData: Partia
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error updating case study:', error);
+    logger.error('Error updating case study', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -90,7 +91,7 @@ export async function deleteCaseStudy(caseStudyId: string) {
     if (error) throw error;
     return { error: null };
   } catch (error) {
-    console.error('Error deleting case study:', error);
+    logger.error('Error deleting case study', error instanceof Error ? error : new Error(String(error)));
     return { error };
   }
 }
@@ -111,7 +112,7 @@ export async function getClientIndustries() {
 
     return { data: industries, error: null };
   } catch (error) {
-    console.error('Error fetching client industries:', error);
+    logger.error('Error fetching client industries', error instanceof Error ? error : new Error(String(error)));
     return { data: [], error };
   }
 }

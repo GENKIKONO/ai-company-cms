@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { BackLink } from '@/components/ui/back-link';
+import { logger } from '@/lib/utils/logger';
 
 function ResetPasswordConfirmContent() {
   const [password, setPassword] = useState('');
@@ -61,7 +62,7 @@ function ResetPasswordConfirmContent() {
       }, 2000);
 
     } catch (err) {
-      console.error('Password update error:', err);
+      logger.error('Password update error:', err);
       setError('パスワードの更新に失敗しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);

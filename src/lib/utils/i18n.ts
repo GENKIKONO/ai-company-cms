@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 /**
  * 国際化（i18n）ユーティリティ (L1)
  * 多言語対応とローカライゼーション機能
@@ -698,7 +700,7 @@ export class I18nManager {
       try {
         localStorage.setItem('aiohub_locale', locale);
       } catch (error) {
-        console.warn('Failed to save locale to storage:', error);
+        logger.warn('Failed to save locale to storage', error);
       }
     }
   }
@@ -709,7 +711,7 @@ export class I18nManager {
         const stored = localStorage.getItem('aiohub_locale');
         return stored as SupportedLocale;
       } catch (error) {
-        console.warn('Failed to load locale from storage:', error);
+        logger.warn('Failed to load locale from storage', error);
       }
     }
     return null;

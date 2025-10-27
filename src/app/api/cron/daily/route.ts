@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runAiVisibilityJob } from '@/lib/jobs/ai-visibility-job';
+import { logger } from '@/lib/utils/logger';
 
 // Unified Daily Maintenance Cron
 // Schedule: Daily at 3:00 AM JST (18:00 UTC)
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    console.log('[Daily Cron] Starting daily maintenance tasks...');
+    logger.debug('Debug', '[Daily Cron] Starting daily maintenance tasks...');
     const startTime = Date.now();
     const results = {
       aiVisibility: null as any,
@@ -25,36 +26,36 @@ export async function GET(request: NextRequest) {
     
     // 1. AI visibility integrated job
     try {
-      console.log('[Daily Cron] Running AI visibility check...');
+      logger.debug('Debug', '[Daily Cron] Running AI visibility check...');
       results.aiVisibility = await runAiVisibilityJob();
-      console.log('[Daily Cron] AI visibility check completed:', results.aiVisibility.success ? 'SUCCESS' : 'FAILED');
+      logger.debug('[Daily Cron] AI visibility check completed', results.aiVisibility.success ? 'SUCCESS' : 'FAILED');
     } catch (error) {
       const errorMsg = `AI Visibility job failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      console.error('[Daily Cron]', errorMsg);
+      logger.error('[Daily Cron]', errorMsg);
       results.errors.push(errorMsg);
       results.aiVisibility = { success: false, error: errorMsg, timestamp: new Date().toISOString() };
     }
     
     // 2. Database cleanup job
     try {
-      console.log('[Daily Cron] Running database cleanup...');
+      logger.debug('Debug', '[Daily Cron] Running database cleanup...');
       results.cleanup = await runDatabaseCleanup();
-      console.log('[Daily Cron] Database cleanup completed:', results.cleanup.success ? 'SUCCESS' : 'FAILED');
+      logger.debug('[Daily Cron] Database cleanup completed', results.cleanup.success ? 'SUCCESS' : 'FAILED');
     } catch (error) {
       const errorMsg = `Database cleanup failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      console.error('[Daily Cron]', errorMsg);
+      logger.error('[Daily Cron]', errorMsg);
       results.errors.push(errorMsg);
       results.cleanup = { success: false, error: errorMsg, timestamp: new Date().toISOString() };
     }
     
     // 3. Health check job
     try {
-      console.log('[Daily Cron] Running health checks...');
+      logger.debug('Debug', '[Daily Cron] Running health checks...');
       results.healthCheck = await runHealthCheck();
-      console.log('[Daily Cron] Health checks completed:', results.healthCheck.success ? 'SUCCESS' : 'FAILED');
+      logger.debug('[Daily Cron] Health checks completed', results.healthCheck.success ? 'SUCCESS' : 'FAILED');
     } catch (error) {
       const errorMsg = `Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      console.error('[Daily Cron]', errorMsg);
+      logger.error('[Daily Cron]', errorMsg);
       results.errors.push(errorMsg);
       results.healthCheck = { success: false, error: errorMsg, timestamp: new Date().toISOString() };
     }
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('[Daily Cron] Fatal error:', error);
+    logger.error('[Daily Cron] Fatal error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json(
       { 
@@ -103,7 +104,7 @@ async function runDatabaseCleanup() {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.jp';
     
     // Simulate cleanup - in real implementation, call actual cleanup API
-    console.log('[Daily Cron] Database cleanup simulated (would clean logs > 30 days)');
+    logger.debug('[Daily Cron] Database cleanup simulated (would clean logs > 30 days)');
     
     return {
       success: true,
@@ -146,7 +147,7 @@ async function runHealthCheck() {
 async function sendMaintenanceSummary(results: any, duration: number) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
   if (!webhookUrl) {
-    console.log('[Daily Cron] No Slack webhook configured, skipping summary notification');
+    logger.debug('Debug', '[Daily Cron] No Slack webhook configured, skipping summary notification');
     return;
   }
   
@@ -201,9 +202,9 @@ async function sendMaintenanceSummary(results: any, duration: number) {
       throw new Error(`Slack notification failed: ${response.status}`);
     }
     
-    console.log('[Daily Cron] Maintenance summary sent to Slack');
+    logger.debug('Debug', '[Daily Cron] Maintenance summary sent to Slack');
     
   } catch (error) {
-    console.error('[Daily Cron] Failed to send maintenance summary:', error);
+    logger.error('[Daily Cron] Failed to send maintenance summary', error instanceof Error ? error : new Error(String(error)));
   }
 }

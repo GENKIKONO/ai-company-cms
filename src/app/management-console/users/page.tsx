@@ -7,6 +7,8 @@ import {
   FileText, Briefcase, HelpCircle, BookOpen, ExternalLink, 
   MoreVertical, Play, Pause, Archive, AlertTriangle, Plus, X, CreditCard, Star
 } from 'lucide-react';
+import { HIGButton } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 interface UserData {
   id: string;
@@ -175,7 +177,7 @@ export default function UsersManagementPage() {
       const data = await response.json();
       setUsers(data.users || []);
     } catch (err) {
-      console.error('Fetch users error:', err);
+      logger.error('Fetch users error:', err);
       setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
     } finally {
       setLoading(false);
@@ -249,7 +251,7 @@ export default function UsersManagementPage() {
       const details = await response.json();
       setUserDetails(details);
     } catch (err) {
-      console.error('Fetch user details error:', err);
+      logger.error('Fetch user details error:', err);
       alert(err instanceof Error ? err.message : 'ユーザー詳細の取得中にエラーが発生しました');
     } finally {
       setLoadingDetails(false);
@@ -299,7 +301,7 @@ export default function UsersManagementPage() {
       await fetchUserDetails(selectedUser.id);
       alert(`コンテンツの${actionNames[action as keyof typeof actionNames]}が完了しました`);
     } catch (err) {
-      console.error('Content action error:', err);
+      logger.error('Content action error:', err);
       alert(err instanceof Error ? err.message : 'コンテンツ操作中にエラーが発生しました');
     } finally {
       setActionLoading(false);
@@ -331,7 +333,7 @@ export default function UsersManagementPage() {
       setCreateType(null);
       alert('コンテンツが正常に作成されました');
     } catch (err) {
-      console.error('Proxy content creation error:', err);
+      logger.error('Proxy content creation error:', err);
       alert(err instanceof Error ? err.message : 'コンテンツ作成中にエラーが発生しました');
     } finally {
       setCreateLoading(false);
@@ -366,7 +368,7 @@ export default function UsersManagementPage() {
       setShowPlanModal(false);
       alert('プランが正常に変更されました');
     } catch (err) {
-      console.error('Plan change error:', err);
+      logger.error('Plan change error:', err);
       alert(err instanceof Error ? err.message : 'プラン変更中にエラーが発生しました');
     } finally {
       setPlanLoading(false);
@@ -704,13 +706,15 @@ export default function UsersManagementPage() {
                             )}
                           </span>
                         </div>
-                        <button
+                        <HIGButton
                           onClick={() => setShowPlanModal(true)}
-                          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 flex items-center"
+                          variant="primary"
+                          size="small"
+                          className="flex items-center"
                         >
                           <Edit className="h-3 w-3 mr-1" />
                           プラン変更
-                        </button>
+                        </HIGButton>
                       </div>
                       
                       {userDetails.organizations[0]?.admin_plan_override && userDetails.organizations[0]?.admin_plan_notes && (
@@ -1185,10 +1189,12 @@ function PlanChangeForm({ onSubmit, onCancel, loading, currentPlan }: {
         >
           キャンセル
         </button>
-        <button
+        <HIGButton
           type="submit"
           disabled={loading || !formData.override_reason.trim()}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center"
+          variant="primary"
+          size="medium"
+          className="flex-1 flex items-center justify-center"
         >
           {loading ? (
             <>
@@ -1198,7 +1204,7 @@ function PlanChangeForm({ onSubmit, onCancel, loading, currentPlan }: {
           ) : (
             '変更'
           )}
-        </button>
+        </HIGButton>
       </div>
     </form>
   );
@@ -1451,10 +1457,12 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
         >
           キャンセル
         </button>
-        <button
+        <HIGButton
           type="submit"
           disabled={loading}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center"
+          variant="primary"
+          size="medium"
+          className="flex-1 flex items-center justify-center"
         >
           {loading ? (
             <>
@@ -1464,7 +1472,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
           ) : (
             '作成'
           )}
-        </button>
+        </HIGButton>
       </div>
     </form>
   );

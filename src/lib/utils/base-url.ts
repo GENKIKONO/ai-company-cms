@@ -4,6 +4,7 @@
  */
 
 import { headers } from 'next/headers';
+import { logger } from '@/lib/utils/logger';
 
 /**
  * サーバーサイドでのベースURL解決
@@ -32,7 +33,7 @@ export async function resolveBaseUrl(): Promise<string> {
     
     throw new Error('Cannot resolve base URL - no host header or environment variable');
   } catch (error) {
-    console.error('[resolveBaseUrl] Error:', error);
+    logger.error('[resolveBaseUrl] Error', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }

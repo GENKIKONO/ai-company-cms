@@ -1,0 +1,329 @@
+/* ============================================================
+   Animations Module
+   Keyframes, transitions, and motion system
+   ============================================================ */
+
+/* 1. Apple Standard Animation System - BR-01 Compliant */
+:root {
+  /* Apple Standard Animation */
+  --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);    /* Apple standard */
+  --ease-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);  /* Deceleration */
+  --ease-accelerate: cubic-bezier(0.4, 0.0, 1, 1);    /* Acceleration */
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);     /* Apple custom */
+  
+  /* Animation Duration - Short time principle */
+  --duration-instant: 0.1s;   /* Active feedback */
+  --duration-fast: 0.15s;     /* Button hover */
+  --duration-standard: 0.2s;  /* Transitions */
+  --duration-slow: 0.3s;      /* Page transitions */
+  
+  /* Reduced motion support */
+  --motion-duration: var(--duration-standard);
+  --motion-easing: var(--ease-standard);
+}
+
+/* 2. Reduced Motion Settings Support */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration: 0.01ms !important;
+    --motion-easing: linear !important;
+  }
+  
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Additional reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 3. Smooth Scrolling with Motion Preference Respect */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* 4. Apple-style Keyframe Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 5. Shimmer Animation for Skeletons */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* 6. Gradient Animation */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 7. Apple-style Loading States */
+@keyframes loading-dots {
+  0%, 20% {
+    color: rgba(0, 0, 0, 0.4);
+    text-shadow: 0.25em 0 0 rgba(0, 0, 0, 0.2),
+                 0.5em 0 0 rgba(0, 0, 0, 0.2);
+  }
+  40% {
+    color: rgba(0, 0, 0, 1);
+    text-shadow: 0.25em 0 0 rgba(0, 0, 0, 0.4),
+                 0.5em 0 0 rgba(0, 0, 0, 0.2);
+  }
+  60% {
+    text-shadow: 0.25em 0 0 rgba(0, 0, 0, 1),
+                 0.5em 0 0 rgba(0, 0, 0, 0.4);
+  }
+  80%, 100% {
+    text-shadow: 0.25em 0 0 rgba(0, 0, 0, 1),
+                 0.5em 0 0 rgba(0, 0, 0, 1);
+  }
+}
+
+/* 8. Animation Utility Classes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.6s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.loading-dots::after {
+  content: " ...";
+  animation: loading-dots 1.4s infinite;
+}
+
+/* 9. Staggered Animation Delays */
+.animate-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animate-delay-500 {
+  animation-delay: 500ms;
+}
+
+/* 10. Apple-style Interaction States */
+.apple-button {
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.apple-button:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.apple-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* 11. Apple-style Card Hover Effects */
+.apple-card {
+  transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: translateZ(0);
+}
+
+.apple-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* 12. Parallax Effects */
+.parallax-slow {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* 13. Section Transition Effects */
+.section-fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.section-fade-in.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 14. Lazy Loading States */
+.lazy-loading {
+  opacity: 0;
+  transition: opacity var(--duration-standard) var(--ease-standard);
+}
+
+.lazy-loaded {
+  opacity: 1;
+}
+
+/* 15. Skip Link Animation */
+.skip-link {
+  @apply absolute -translate-y-full left-4 z-50 px-4 py-2 bg-blue-600 text-white rounded-md;
+  @apply focus:translate-y-0 transition-transform duration-200;
+}
+
+/* 16. Motion Preferences - Disable Animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-pulse-subtle,
+  .animate-fade-in-up,
+  .animate-scale-in,
+  .animate-slide-in-right,
+  .animate-gradient {
+    animation: none;
+  }
+  
+  .apple-card,
+  .section-fade-in {
+    transition: none;
+  }
+  
+  .apple-button:hover,
+  .apple-card:hover {
+    transform: none;
+  }
+}
+
+/* 17. Reduced Motion Support for Carousels */
+@media (prefers-reduced-motion: reduce) {
+  .carousel-wrapper {
+    scroll-behavior: auto;
+  }
+}
+
+/* 18. Performance Optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Common elements that benefit from GPU acceleration */
+.btn-apple,
+.card-apple,
+.section-apple-hero {
+  transform: translateZ(0); /* Force GPU layer */
+  backface-visibility: hidden; /* Hide back face */
+}
+
+/* 19. High Contrast Focus Indicators */
+@media (prefers-contrast: high) {
+  *:focus-visible {
+    outline: 3px solid currentColor !important;
+    outline-offset: 2px !important;
+  }
+}

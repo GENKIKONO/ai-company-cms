@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { AnalyticsEngine } from '@/lib/analytics/comprehensive-analytics';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -110,7 +111,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error: any) {
-    console.error('❌ Analytics Dashboard API Error:', error);
+    logger.error('❌ Analytics Dashboard API Error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       success: false,
@@ -154,7 +155,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('❌ Analytics Event Tracking Error:', error);
+    logger.error('❌ Analytics Event Tracking Error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       success: false,

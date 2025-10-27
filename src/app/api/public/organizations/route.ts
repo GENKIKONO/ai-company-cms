@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { cacheHelpers } from '@/lib/cache/memory-cache';
+import { logger } from '@/lib/utils/logger';
 import { 
   withPerformanceMonitoring, 
   conditionalResponse,
@@ -78,7 +79,7 @@ async function handler(request: NextRequest): Promise<NextResponse> {
     return response;
 
   } catch (error) {
-    console.error('❌ Public Organizations API Error:', error);
+    logger.error('❌ Public Organizations API Error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json(
       { 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/utils/logger';
 
 interface PublishToggleProps {
   organizationId: string;
@@ -40,7 +41,7 @@ export default function PublishToggle({
       }
 
       const result = await response.json();
-      console.log('[VERIFY] dashboard publish toggle', {
+      logger.debug('[VERIFY] dashboard publish toggle', {
         organizationId,
         previousState: currentPublishState,
         newState: !currentPublishState,
@@ -54,7 +55,7 @@ export default function PublishToggle({
       router.refresh();
       
     } catch (error) {
-      console.error('Failed to toggle publish status:', error);
+      logger.error('Failed to toggle publish status', error instanceof Error ? error : new Error(String(error)));
       alert('公開状態の更新に失敗しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);

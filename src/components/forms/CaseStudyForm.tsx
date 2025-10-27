@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { caseStudySchema } from '@/lib/validation';
+import { logger } from '@/lib/utils/logger';
 
 interface CaseStudyData {
   id?: string;
@@ -85,7 +86,7 @@ export default function CaseStudyForm({
       setErrors({});
       await onSubmit(formData);
     } catch (error) {
-      console.error('Case study form submission error:', error);
+      logger.error('Case study form submission error', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: '導入事例の保存に失敗しました' });
     }
   };

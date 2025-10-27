@@ -103,7 +103,7 @@ export default async function HeroSection({
 
           {/* Right Column - Image */}
           <div className="mt-[var(--space-xl)] md:mt-0">
-            <div className="hig-card relative w-full" style={{'aspectRatio': '16/9'} as React.CSSProperties}>
+            <div className="hig-card relative w-full aspect-video">
               <Image
                 src={imageSrc}
                 alt="検索からAI直接回答へのシフト図（ゼロクリック時代の可視化）"

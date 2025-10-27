@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { PrimaryCTA } from '@/components/ui/UnifiedCTA';
+import { PrimaryCTA } from '@/design-system';
 
 const faqData = [
   {
@@ -103,7 +103,7 @@ export default function FAQSection() {
                         className="apple-faq-answer"
                       >
                         <div className="apple-faq-answer-content">
-                          <div className="apple-body" style={{ whiteSpace: 'pre-line' }}>
+                          <div className="apple-body whitespace-pre-line">
                             {faq.answer}
                           </div>
                         </div>

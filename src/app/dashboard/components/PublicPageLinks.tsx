@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { PrimaryCTA } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 interface PublicPageLinksProps {
   contentType: 'services' | 'posts' | 'case-studies' | 'faq';
@@ -21,7 +23,7 @@ export default function PublicPageLinks({ contentType, className = '' }: PublicP
           setOrgSlug(result.data?.slug || null);
         }
       } catch (error) {
-        console.error('Failed to fetch organization slug:', error);
+        logger.error('Failed to fetch organization slug', error instanceof Error ? error : new Error(String(error)));
       } finally {
         setLoading(false);
       }
@@ -65,16 +67,15 @@ export default function PublicPageLinks({ contentType, className = '' }: PublicP
   };
 
   return (
-    <Link
+    <PrimaryCTA
       href={getPublicUrl()}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors ${className}`}
+      size="small"
+      icon="external-link"
+      className={className}
     >
-      <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-      </svg>
       {getLabel()}
-    </Link>
+    </PrimaryCTA>
   );
 }

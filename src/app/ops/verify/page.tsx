@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase-server';
 import { requireOpsAdminPage, getOpsAdminStatus } from '@/lib/ops-guard';
+import { logger } from '@/lib/utils/logger';
 
 export default async function OpsVerifyPage() {
   // 管理者運用認証ガード
@@ -131,7 +132,7 @@ export default async function OpsVerifyPage() {
                       fetch('/api/my/organization?debug=1', { credentials: 'include' })
                         .then(r => r.json())
                         .then(data => {
-                          console.log('Org API Response:', data);
+                          logger.debug('Org API Response', data);
                           alert(`Status: ${data.code || 'OK'}, Details in console`);
                         })
                         .catch(err => alert(`Error: ${err.message}`));

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateCaseStudyJsonLd, generateOrganizationJsonLd } from '@/lib/utils/jsonld';
 import type { Organization, CaseStudy } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface CaseStudiesPageData {
   organization: Organization;
@@ -26,7 +27,7 @@ async function getCaseStudiesData(slug: string): Promise<CaseStudiesPageData | n
       case_studies: result.data.case_studies || []
     };
   } catch (error) {
-    console.error('Failed to fetch case studies data:', error);
+    logger.error('Failed to fetch case studies data', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { QAEntryFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await supabaseServer();
@@ -37,14 +38,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       if (error.code === 'PGRST116') {
         return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
       }
-      console.error('Error fetching entry:', error);
+      logger.error('Error fetching entry', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to fetch entry' }, { status: 500 });
     }
 
     return NextResponse.json({ data: entry });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -145,7 +146,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       .single();
 
     if (error) {
-      console.error('Error updating entry:', error);
+      logger.error('Error updating entry', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to update entry' }, { status: 500 });
     }
 
@@ -173,7 +174,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ data: entry });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -217,7 +218,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting entry:', error);
+      logger.error('Error deleting entry', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to delete entry' }, { status: 500 });
     }
 
@@ -237,7 +238,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return NextResponse.json({ message: 'Entry deleted successfully' });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

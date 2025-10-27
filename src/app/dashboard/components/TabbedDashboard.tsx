@@ -8,6 +8,7 @@ import { LoadingSkeleton, EmptyState } from '@/components/ui/loading-skeleton';
 import { OrganizationPreview } from '@/components/ui/organization-preview';
 import { useApiList } from '@/hooks/useApiClient';
 import { useSuccessToast, useErrorToast } from '@/components/ui/toast';
+import { logger } from '@/lib/utils/logger';
 
 interface TabbedDashboardProps {
   organizationId: string;
@@ -83,7 +84,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
         faqs: faqsData.data?.length || 0
       });
     } catch (error) {
-      console.error('Failed to load content stats:', error);
+      logger.error('Failed to load content stats', error instanceof Error ? error : new Error(String(error)));
     }
   };
 

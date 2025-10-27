@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 // 権限レベル定義
 export enum HearingRole {
@@ -157,7 +158,7 @@ export async function checkHearingPermission(
     }
 
   } catch (error) {
-    console.error('Permission check error:', error);
+    logger.error('Permission check error', error instanceof Error ? error : new Error(String(error)));
     return { allowed: false, reason: '権限チェック中にエラーが発生しました' };
   }
 }
@@ -371,7 +372,7 @@ export async function checkActiveDelegation(
     return { valid: true, delegation };
 
   } catch (error) {
-    console.error('Delegation check error:', error);
+    logger.error('Delegation check error', error instanceof Error ? error : new Error(String(error)));
     return { valid: false, reason: '委任チェック中にエラーが発生しました' };
   }
 }
@@ -408,7 +409,7 @@ export async function checkRateLimit(
       .gte('timestamp', windowStart);
 
     if (error) {
-      console.error('Rate limit check error:', error);
+      logger.error('Rate limit check error', error instanceof Error ? error : new Error(String(error)));
       return { allowed: true }; // エラー時は制限なし
     }
 
@@ -421,7 +422,7 @@ export async function checkRateLimit(
     };
 
   } catch (error) {
-    console.error('Rate limit check error:', error);
+    logger.error('Rate limit check error', error instanceof Error ? error : new Error(String(error)));
     return { allowed: true };
   }
 }

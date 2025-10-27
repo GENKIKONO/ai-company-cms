@@ -45,33 +45,33 @@ function escapeHtml(unsafe: string): string {
 function generateCSSVariables(theme: IframeOptions['theme'] = 'light'): string {
   const themes = {
     light: {
-      '--bg-primary': '#ffffff',
-      '--bg-secondary': '#f8f9fa',
-      '--text-primary': '#212529',
-      '--text-secondary': '#6c757d',
-      '--border-color': '#dee2e6',
-      '--accent-color': '#4f46e5',
-      '--hover-color': '#f1f3f4',
+      '--bg-primary': 'var(--bg-white)',
+      '--bg-secondary': 'var(--color-embed-hover)',
+      '--text-primary': 'var(--color-embed-text)',
+      '--text-secondary': 'var(--color-embed-secondary)',
+      '--border-color': 'var(--color-embed-border)',
+      '--accent-color': 'var(--color-embed-accent)',
+      '--hover-color': 'var(--color-embed-hover)',
       '--shadow': '0 2px 4px rgba(0,0,0,0.1)'
     },
     dark: {
-      '--bg-primary': '#1a1a1a',
-      '--bg-secondary': '#2d2d2d',
-      '--text-primary': '#ffffff',
-      '--text-secondary': '#cccccc',
-      '--border-color': '#404040',
-      '--accent-color': '#6366f1',
-      '--hover-color': '#3a3a3a',
+      '--bg-primary': 'var(--color-embed-dark-bg)',
+      '--bg-secondary': 'var(--color-embed-dark-hover)',
+      '--text-primary': 'var(--color-embed-dark-text)',
+      '--text-secondary': 'var(--color-embed-dark-secondary)',
+      '--border-color': 'var(--color-embed-dark-border)',
+      '--accent-color': 'var(--color-embed-dark-accent)',
+      '--hover-color': 'var(--color-embed-dark-hover)',
       '--shadow': '0 2px 4px rgba(0,0,0,0.3)'
     },
     auto: {
-      '--bg-primary': 'light-dark(#ffffff, #1a1a1a)',
-      '--bg-secondary': 'light-dark(#f8f9fa, #2d2d2d)',
-      '--text-primary': 'light-dark(#212529, #ffffff)',
-      '--text-secondary': 'light-dark(#6c757d, #cccccc)',
-      '--border-color': 'light-dark(#dee2e6, #404040)',
-      '--accent-color': 'light-dark(#4f46e5, #6366f1)',
-      '--hover-color': 'light-dark(#f1f3f4, #3a3a3a)',
+      '--bg-primary': 'light-dark(var(--bg-white), var(--color-embed-dark-bg))',
+      '--bg-secondary': 'light-dark(var(--color-embed-hover), var(--color-embed-dark-hover))',
+      '--text-primary': 'light-dark(var(--color-embed-text), var(--color-embed-dark-text))',
+      '--text-secondary': 'light-dark(var(--color-embed-secondary), var(--color-embed-dark-secondary))',
+      '--border-color': 'light-dark(var(--color-embed-border), var(--color-embed-dark-border))',
+      '--accent-color': 'light-dark(var(--color-embed-accent), var(--color-embed-dark-accent))',
+      '--hover-color': 'light-dark(var(--color-embed-hover), var(--color-embed-dark-hover))',
       '--shadow': 'light-dark(0 2px 4px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.3))'
     }
   };

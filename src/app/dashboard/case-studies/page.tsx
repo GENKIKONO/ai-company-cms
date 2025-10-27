@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { CaseStudy } from '@/types/database';
 import PublicPageLinks from '../components/PublicPageLinks';
+import { logger } from '@/lib/utils/logger';
 
 export default function CaseStudiesManagementPage() {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
@@ -29,7 +30,7 @@ export default function CaseStudiesManagementPage() {
       setCaseStudies(result.data || []);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch case studies:', err);
+      logger.error('Failed to fetch case studies:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch case studies');
     } finally {
       setLoading(false);
@@ -50,7 +51,7 @@ export default function CaseStudiesManagementPage() {
 
       setCaseStudies(caseStudies.filter(caseStudy => caseStudy.id !== id));
     } catch (err) {
-      console.error('Failed to delete case study:', err);
+      logger.error('Failed to delete case study:', err);
       alert('削除に失敗しました: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };

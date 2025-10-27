@@ -4,6 +4,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 import type { CaseStudy, CaseStudyFormData } from '@/types/database';
 import { PLAN_LIMITS } from '@/lib/plan-limits';
 import { normalizeCaseStudyPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import { logger } from '@/lib/utils/logger';
 
 async function logErrorToDiag(errorInfo: any) {
   try {
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest) {
         .eq('organization_id', orgData.id);
 
       if (countError) {
-        console.error('Error counting case studies:', countError);
+        logger.error('Error counting case studies:', countError);
         return NextResponse.json(
           { error: 'Database error', message: countError.message },
           { status: 500 }

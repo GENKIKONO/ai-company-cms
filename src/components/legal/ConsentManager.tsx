@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabaseBrowser } from '@/lib/supabase-client';
+import { logger } from '@/lib/utils/logger';
 
 interface ConsentRecord {
   id: string;
@@ -214,7 +215,7 @@ export default function ConsentManager({
         onConsentChange?.(consentMap);
       }
     } catch (error) {
-      console.error('Failed to load consents:', error);
+      logger.error('Failed to load consents', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -263,10 +264,10 @@ export default function ConsentManager({
         });
 
       if (error) {
-        console.error('Failed to record consent:', error);
+        logger.error('Failed to record consent', error instanceof Error ? error : new Error(String(error)));
       }
     } catch (error) {
-      console.error('Failed to record consent:', error);
+      logger.error('Failed to record consent', error instanceof Error ? error : new Error(String(error)));
     }
   };
 

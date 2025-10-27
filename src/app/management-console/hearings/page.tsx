@@ -8,6 +8,8 @@
 import { useState, useEffect } from 'react';
 import { Metadata } from 'next';
 import { Calendar, Clock, User, Building, Phone, Mail, MessageSquare, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { HIGButton } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 interface HearingRequest {
   id: string;
@@ -97,7 +99,7 @@ export default function AdminHearingsPage() {
       const data = await response.json();
       setHearingRequests(data.hearing_requests || []);
     } catch (err) {
-      console.error('Fetch error:', err);
+      logger.error('Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
@@ -235,7 +237,7 @@ export default function AdminHearingsPage() {
       fetchHearingRequests();
 
     } catch (error) {
-      console.error('Content creation error:', error);
+      logger.error('Content creation error', error instanceof Error ? error : new Error(String(error)));
       alert('代行コンテンツ作成に失敗しました');
     } finally {
       setIsCreatingContent(false);
@@ -537,12 +539,13 @@ export default function AdminHearingsPage() {
                   </div>
 
                   <div className="ml-4">
-                    <button
+                    <HIGButton
                       onClick={() => handleOpenModal(request)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                      variant="primary"
+                      size="small"
                     >
                       詳細・編集
-                    </button>
+                    </HIGButton>
                   </div>
                 </div>
               </div>
@@ -701,10 +704,12 @@ export default function AdminHearingsPage() {
                       </div>
 
                       <div className="mt-4 pt-4 border-t border-blue-200">
-                        <button
+                        <HIGButton
                           onClick={handleCreateContent}
                           disabled={isCreatingContent || !interviewSummary.trim()}
-                          className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+                          variant="primary"
+                          size="medium"
+                          className="w-full"
                         >
                           {isCreatingContent ? (
                             <div className="flex items-center justify-center gap-2">
@@ -714,7 +719,7 @@ export default function AdminHearingsPage() {
                           ) : (
                             '🚀 代行コンテンツ作成開始'
                           )}
-                        </button>
+                        </HIGButton>
                         
                         {!interviewSummary.trim() && (
                           <p className="text-xs text-red-500 mt-1">

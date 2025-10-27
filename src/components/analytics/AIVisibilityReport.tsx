@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Brain, TrendingUp, Search, Eye, Download, RefreshCw } from 'lucide-react';
 import type { Organization } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface AIVisibilityMetrics {
   structuredDataScore: number;
@@ -62,7 +63,7 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
 
       setMetrics(mockMetrics);
     } catch (error) {
-      console.error('Failed to generate AI visibility report:', error);
+      logger.error('Failed to generate AI visibility report', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
       setGenerating(false);

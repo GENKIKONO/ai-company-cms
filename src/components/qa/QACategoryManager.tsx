@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import type { QACategory, QACategoryFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface QACategoryManagerProps {
   onCategoryChange?: () => void;
@@ -38,7 +39,7 @@ export default function QACategoryManager({ onCategoryChange }: QACategoryManage
         setCategories(data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      logger.error('Error fetching categories', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -90,7 +91,7 @@ export default function QACategoryManager({ onCategoryChange }: QACategoryManage
         alert(error.error || 'Failed to create category');
       }
     } catch (error) {
-      console.error('Error creating category:', error);
+      logger.error('Error creating category', error instanceof Error ? error : new Error(String(error)));
       alert('Failed to create category');
     }
   };
@@ -112,7 +113,7 @@ export default function QACategoryManager({ onCategoryChange }: QACategoryManage
         alert(error.error || 'Failed to update category');
       }
     } catch (error) {
-      console.error('Error updating category:', error);
+      logger.error('Error updating category', error instanceof Error ? error : new Error(String(error)));
       alert('Failed to update category');
     }
   };
@@ -131,7 +132,7 @@ export default function QACategoryManager({ onCategoryChange }: QACategoryManage
         alert(error.error || 'Failed to delete category');
       }
     } catch (error) {
-      console.error('Error deleting category:', error);
+      logger.error('Error deleting category', error instanceof Error ? error : new Error(String(error)));
       alert('Failed to delete category');
     }
   };

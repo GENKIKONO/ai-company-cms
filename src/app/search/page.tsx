@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { globalSearch, getIndustries, getServiceCategories } from '@/lib/organizations';
 import { type Organization, type Service, type CaseStudy } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 // Next.js 15: Force dynamic rendering to resolve useSearchParams prerender warning
 export const dynamic = 'force-dynamic';
@@ -88,7 +89,7 @@ function SearchPageContent() {
         setResults(result.data);
       }
     } catch (error) {
-      console.error('Search failed:', error);
+      logger.error('Search failed', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }

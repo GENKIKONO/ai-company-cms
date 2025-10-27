@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import Image from 'next/image';
+import { logger } from '@/lib/utils/logger';
 
 interface ServiceImageUploaderProps {
   serviceId?: string; // 新規作成時はundefined
@@ -61,7 +62,7 @@ export default function ServiceImageUploader({
             .from('service-images')
             .remove([key]);
         } catch (removeError) {
-          console.warn('Failed to remove existing service image:', removeError);
+          logger.warn('Failed to remove existing service image', removeError);
         }
       }
 
@@ -91,7 +92,7 @@ export default function ServiceImageUploader({
       setPreviewUrl(publicUrl);
 
     } catch (uploadError) {
-      console.error('Service image upload error:', uploadError);
+      logger.error('Service image upload error:', uploadError);
       setError('サービス画像のアップロードに失敗しました');
       setPreviewUrl(currentImageUrl || null);
     } finally {
@@ -119,7 +120,7 @@ export default function ServiceImageUploader({
         .remove([key]);
 
       if (removeError) {
-        console.warn('Failed to remove service image from storage:', removeError);
+        logger.warn('Failed to remove service image from storage', removeError);
       }
 
       // プレビューをクリア
@@ -129,7 +130,7 @@ export default function ServiceImageUploader({
       onImageChange(null);
 
     } catch (clearError) {
-      console.error('Service image clear error:', clearError);
+      logger.error('Service image clear error:', clearError);
       setError('サービス画像の削除に失敗しました');
     } finally {
       setUploading(false);

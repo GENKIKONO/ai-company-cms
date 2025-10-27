@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-client';
+import { logger } from '@/lib/utils/logger';
 
 export default function CallbackPage() {
   const [loading, setLoading] = useState(true);
@@ -16,7 +17,7 @@ export default function CallbackPage() {
         const { error: authError } = await supabaseBrowser.auth.getSession();
         
         if (authError) {
-          console.error('Auth callback error:', authError);
+          logger.error('Auth callback error:', authError);
           setError('認証に失敗しました');
           return;
         }
@@ -44,7 +45,7 @@ export default function CallbackPage() {
         }
         
       } catch (err) {
-        console.error('Callback error:', err);
+        logger.error('Callback error:', err);
         setError(err instanceof Error ? err.message : '認証処理中にエラーが発生しました');
       } finally {
         setLoading(false);

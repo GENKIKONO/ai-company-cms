@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
+import { apiLogger } from '@/lib/utils/logger';
 import type { QuestionAnswerData, QuestionWithDetails } from '@/types/database';
 
 interface RouteParams {
@@ -90,7 +91,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
   } catch (error) {
-    console.error('Question GET error:', error);
+    apiLogger.error('GET', `/api/questions/[id]`, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -202,7 +203,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       .single();
 
     if (updateError) {
-      console.error('Error updating question:', updateError);
+      apiLogger.error('PUT', `/api/questions/${questionId}`, updateError, { userId: user.id, questionId });
       return NextResponse.json(
         { error: 'Failed to update question' },
         { status: 500 }
@@ -232,7 +233,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
   } catch (error) {
-    console.error('Question PUT error:', error);
+    apiLogger.error('PUT', `/api/questions/[id]`, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -263,7 +264,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       .eq('id', questionId);
 
     if (error) {
-      console.error('Error deleting question:', error);
+      apiLogger.error('DELETE', `/api/questions/${questionId}`, error, { questionId });
       return NextResponse.json(
         { error: 'Failed to delete question' },
         { status: 500 }
@@ -276,7 +277,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
   } catch (error) {
-    console.error('Question DELETE error:', error);
+    apiLogger.error('DELETE', `/api/questions/[id]`, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 import { useErrorToast } from '@/components/ui/toast';
+import { logger } from '@/lib/utils/logger';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -26,7 +27,7 @@ export default function AdminLoginPage() {
       });
 
       if (error) {
-        console.error('Login error:', error);
+        logger.error('Login error', error instanceof Error ? error : new Error(String(error)));
         errorToast('ログインに失敗しました: ' + error.message);
         return;
       }
@@ -34,7 +35,7 @@ export default function AdminLoginPage() {
       // 管理者権限チェック
       const response = await fetch('/api/admin/verify');
       const result = await response.json();
-      console.log('Admin verification result:', result);
+      logger.debug('Admin verification result', result);
 
       if (!result.isAdmin) {
         // 管理者でない場合はログアウト

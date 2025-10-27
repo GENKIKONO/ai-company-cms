@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { supabaseServer } from '@/lib/supabase-server';
 import { requireOpsAdminPage } from '@/lib/ops-guard';
+import { logger } from '@/lib/utils/logger';
 
 interface StatusData {
   hasSession: boolean;
@@ -42,7 +43,7 @@ async function getOpsStatus(): Promise<StatusData | null> {
     if (!response.ok) return null;
     return await response.json();
   } catch (error) {
-    console.error('[getOpsStatus] Error:', error);
+    logger.error('[getOpsStatus] Error', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

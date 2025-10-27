@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { CheckCircle, XCircle, Clock, Eye, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/utils/logger';
 
 interface Organization {
   id: string;
@@ -63,7 +64,7 @@ export default function AdminReviewsPage() {
       const result = await response.json();
       setOrganizations(result.data || []);
     } catch (error) {
-      console.error('Error fetching reviews:', error);
+      logger.error('Error fetching reviews', error instanceof Error ? error : new Error(String(error)));
       toast({
         title: "エラー",
         description: "審査データの取得に失敗しました",
@@ -107,7 +108,7 @@ export default function AdminReviewsPage() {
       setReason('');
       
     } catch (error) {
-      console.error('Error performing review action:', error);
+      logger.error('Error performing review action', error instanceof Error ? error : new Error(String(error)));
       toast({
         title: "エラー",
         description: "審査処理に失敗しました",

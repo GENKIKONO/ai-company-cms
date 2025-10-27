@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: NextRequest) {
   const supabase = await supabaseServer();
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
       .limit(limit);
 
     if (error) {
-      console.error('Error fetching public entries:', error);
+      logger.error('Error fetching public entries', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to fetch entries' }, { status: 500 });
     }
 
@@ -67,7 +68,7 @@ export async function GET(req: NextRequest) {
       .order('sort_order', { ascending: true });
 
     if (catError) {
-      console.error('Error fetching categories:', catError);
+      logger.error('Error fetching categories:', catError);
     }
 
     return NextResponse.json({
@@ -77,7 +78,7 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

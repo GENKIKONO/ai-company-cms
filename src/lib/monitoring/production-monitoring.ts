@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 interface MonitoringConfig {
   supabaseUrl: string;
@@ -112,7 +113,7 @@ export class ProductionMonitor {
       return metrics;
 
     } catch (error) {
-      console.error('❌ Health check failed:', error);
+      logger.error('❌ Health check failed', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -167,7 +168,7 @@ export class ProductionMonitor {
       };
 
     } catch (error) {
-      console.error('Database health check failed:', error);
+      logger.error('Database health check failed', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -258,7 +259,7 @@ export class ProductionMonitor {
       };
 
     } catch (error) {
-      console.error('Failed to get performance metrics:', error);
+      logger.error('Failed to get performance metrics', error instanceof Error ? error : new Error(String(error)));
       return {
         avgResponseTime: 0,
         p95ResponseTime: 0,
@@ -295,7 +296,7 @@ export class ProductionMonitor {
       });
 
     } catch (error) {
-      console.error('Failed to get error metrics:', error);
+      logger.error('Failed to get error metrics', error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }
@@ -375,7 +376,7 @@ export class ProductionMonitor {
         });
 
     } catch (error) {
-      console.error('Failed to send alert:', error);
+      logger.error('Failed to send alert', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -442,7 +443,7 @@ export class ProductionMonitor {
           error_count: metrics.errors.reduce((sum, e) => sum + e.count, 0),
         });
     } catch (error) {
-      console.error('Failed to save metrics:', error);
+      logger.error('Failed to save metrics', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -512,7 +513,7 @@ if (process.env.NODE_ENV === 'production') {
     try {
       await productionMonitor.checkSystemHealth();
     } catch (error) {
-      console.error('Monitoring check failed:', error);
+      logger.error('Monitoring check failed', error instanceof Error ? error : new Error(String(error)));
     }
   }, 60000); // 1分間隔
 }

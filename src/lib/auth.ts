@@ -3,6 +3,7 @@
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { User } from '@supabase/supabase-js';
 import { type AppUser, type UserRole } from '@/types/database';
+import { authLogger } from '@/lib/utils/logger';
 
 // ユーザーの権限をチェック
 export function hasPermission(userRole: UserRole, requiredRole: UserRole): boolean {
@@ -30,13 +31,13 @@ export async function getCurrentUser(): Promise<AppUser | null> {
       .single()
 
     if (error) {
-      console.error('Error fetching user profile:', error)
+      authLogger.error('fetch user profile', error);
       return null
     }
 
     return profile
   } catch (error) {
-    console.error('Error getting current user:', error)
+    authLogger.error('get current user', error instanceof Error ? error : new Error(String(error)));
     return null
   }
 }
@@ -70,7 +71,7 @@ export const auth = {
         })
 
       if (profileError) {
-        console.error('Error creating user profile:', profileError)
+        authLogger.error('create user profile', profileError);
       }
     }
 
@@ -104,12 +105,12 @@ export const auth = {
   // サインアウト - 完全なセッション クリア
   signOut: async () => {
     try {
-      console.log('[auth.signOut] Starting complete sign out process');
+      authLogger.info('Starting complete sign out process');
       
       // 1. Supabase クライアント サインアウト
       const { error: signOutError } = await supabaseBrowser.auth.signOut();
       if (signOutError) {
-        console.error('[auth.signOut] Supabase signOut error:', signOutError);
+        authLogger.error('Supabase signOut', signOutError);
       }
       
       // 2. 全ての認証関連 Cookie を手動削除
@@ -139,11 +140,11 @@ export const auth = {
         });
       }
       
-      console.log('[auth.signOut] Complete sign out finished');
+      authLogger.info('Complete sign out finished');
       
       if (signOutError) throw signOutError;
     } catch (error) {
-      console.error('[auth.signOut] Sign out process failed:', error);
+      authLogger.error('Sign out process failed', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   },

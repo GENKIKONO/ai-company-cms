@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { PrimaryCTA } from '@/design-system';
 import supabaseClient from '@/lib/supabase-client';
 import type { FAQ } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export default function MyFAQsPage() {
   const router = useRouter();
@@ -38,7 +40,7 @@ export default function MyFAQsPage() {
       const result = await response.json();
       setFaqs(result.data || []);
     } catch (error) {
-      console.error('Failed to fetch FAQs:', error);
+      logger.error('Failed to fetch FAQs', error instanceof Error ? error : new Error(String(error)));
       setError('FAQの取得に失敗しました');
     } finally {
       setLoading(false);
@@ -72,7 +74,7 @@ export default function MyFAQsPage() {
       // FAQリストから削除
       setFaqs(prev => prev.filter(faq => faq.id !== id));
     } catch (error) {
-      console.error('Failed to delete FAQ:', error);
+      logger.error('Failed to delete FAQ', error instanceof Error ? error : new Error(String(error)));
       setError('FAQの削除に失敗しました');
     } finally {
       setDeleting(null);
@@ -114,15 +116,13 @@ export default function MyFAQsPage() {
           <div className="text-sm text-gray-600">
             {faqs.length}件のFAQが登録されています
           </div>
-          <Link
+          <PrimaryCTA
             href="/my/faqs/new"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            size="medium"
+            icon="plus"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
             新しいFAQを追加
-          </Link>
+          </PrimaryCTA>
         </div>
 
         {/* FAQリスト */}
@@ -135,12 +135,12 @@ export default function MyFAQsPage() {
             <p className="text-gray-600 mb-6">
               最初のFAQを追加して、お客様からのよくある質問に対応しましょう
             </p>
-            <Link
+            <PrimaryCTA
               href="/my/faqs/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              size="medium"
             >
               FAQを追加
-            </Link>
+            </PrimaryCTA>
           </div>
         ) : (
           <div className="space-y-4">

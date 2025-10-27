@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 import { getIndustries } from '@/lib/organizations';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
+import { logger } from '@/lib/utils/logger';
 import { type AppUser, type OrganizationFormData } from '@/types/database';
 import OrgLogoUploader from '@/components/OrgLogoUploader';
 
@@ -71,7 +72,7 @@ export default function NewOrganizationPage() {
           setIndustries(industriesResult.data);
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        logger.error('Auth check failed', error instanceof Error ? error : new Error(String(error)));
         router.push('/login');
       } finally {
         setLoading(false);
@@ -275,18 +276,13 @@ export default function NewOrganizationPage() {
       
       const minimalData = cleanData;
       
-      // 📥 送信前の詳細ログ
-      console.info('🚀 送信直前のフォームデータ:', {
+      // Debug logging for development
+      logger.debug('Organization form submission', {
         name: formData.name,
         slug: formData.slug,
-        // 空文字かどうかもチェック
         allKeys: Object.keys(formData),
         emptyStringFields: Object.entries(formData).filter(([k, v]) => v === '').map(([k]) => k),
-      });
-      console.info('📤 実際の送信データ:', minimalData);
-      console.info('🔍 foundedフィールド除外確認:', {
-        foundedInFormData: 'founded' in formData ? 'PRESENT' : 'ABSENT',
-        foundedInOutput: 'founded' in minimalData ? 'PRESENT' : 'ABSENT',
+        minimalData
       });
       
       // Single-Org API経由で作成
@@ -298,9 +294,7 @@ export default function NewOrganizationPage() {
         delete (payload as any).established_at;
       }
       
-      console.log('Frontend: FINAL payload before fetch:', payload);
-      console.log('Frontend: Payload keys:', Object.keys(payload));
-      console.log('Frontend: Payload types:', Object.entries(payload).map(([k, v]) => [k, typeof v, v]));
+      logger.debug('Final organization payload', { payload, keys: Object.keys(payload) });
 
       const response = await fetch('/api/my/organization', {
         method: 'POST',
@@ -313,7 +307,7 @@ export default function NewOrganizationPage() {
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.log('Organization create error:', errorData);
+        logger.error('Organization create error', errorData);
         
         // 新しいAPIエラーレスポンス形式に対応
         if (response.status === 409) {
@@ -331,7 +325,7 @@ export default function NewOrganizationPage() {
         } else if (response.status === 400) {
           if (errorData.code === 'VALIDATION_ERROR' && errorData.details && Array.isArray(errorData.details)) {
             // デバッグ用: 詳細エラーをコンソールに出力
-            console.log('Validation error details:', errorData.details);
+            logger.error('Validation error details', errorData.details);
             
             // Zod詳細エラーを各フィールドにマッピング
             const fieldErrors: Record<string, string> = {};
@@ -367,16 +361,12 @@ export default function NewOrganizationPage() {
       
       const result = await response.json();
       
-      // デバッグ用：レスポンス構造をログ出力
-      console.log('Frontend: API Response Status:', response.status);
-      console.log('Frontend: API Response Data:', result);
-      console.log('Frontend: Response Structure Check:', {
+      // Debug API response structure
+      logger.debug('API Response', {
+        status: response.status,
         hasData: !!result.data,
         hasDataId: !!result.data?.id,
-        hasId: !!result.id,
-        hasMessage: !!result.message,
-        responseKeys: Object.keys(result),
-        dataKeys: result.data ? Object.keys(result.data) : 'no data'
+        responseKeys: Object.keys(result)
       });
       
       // 成功条件：APIの実際のレスポンス構造に基づいて判定
@@ -390,15 +380,15 @@ export default function NewOrganizationPage() {
       );
       
       if (isSuccessful) {
-        console.log('Frontend: Organization creation/retrieval successful, redirecting to dashboard...');
+        logger.info('Organization creation/retrieval successful');
         // Single-Org モードでは企業作成後はダッシュボードにリダイレクト
         router.push('/dashboard');
       } else {
-        console.error('Frontend: Organization creation failed - unexpected response structure');
+        logger.error('Organization creation failed - unexpected response structure', result);
         setErrors({ submit: '企業の作成に失敗しました' });
       }
     } catch (error) {
-      console.error('Failed to create organization:', error);
+      logger.error('Failed to create organization', error instanceof Error ? error : new Error(String(error)));
       if (error instanceof Error) {
         if (error.message.includes('401') || error.message.includes('Unauthorized')) {
           setErrors({ submit: 'ログインが必要です。再度ログインしてください。' });

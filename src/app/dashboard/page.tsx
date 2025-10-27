@@ -8,6 +8,7 @@ import TabbedDashboard from './components/TabbedDashboard';
 import PerformanceMetrics from './components/PerformanceMetrics';
 import DashboardActions from './components/DashboardActions';
 import { hasEntitlementSync } from '@/lib/feature-flags/gate';
+import { logger } from '@/lib/utils/logger';
 
 // 強制的に動的SSRにして、認証状態を毎回評価
 export const dynamic = 'force-dynamic';
@@ -16,14 +17,14 @@ export const revalidate = 0;
 
 export default async function DashboardPage() {
   try {
-    console.log('[Dashboard] Rendering started');
-    console.log('[VERIFY][MOBILE_UI] Dashboard with mobile optimizations loading');
+    logger.debug('Debug', '[Dashboard] Rendering started');
+    logger.debug('Debug', '[VERIFY][MOBILE_UI] Dashboard with mobile optimizations loading');
     
     // 1. まず認証状態をチェック
     const supabase = await supabaseServer();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    console.log('[Dashboard] Auth check:', { 
+    logger.debug('[Dashboard] Auth check', { 
       hasUser: !!user, 
       userId: user?.id, 
       authError: authError?.message 
@@ -31,7 +32,7 @@ export default async function DashboardPage() {
 
     // 認証状態のエラーまたは未ログインの場合
     if (authError || !user) {
-      console.log('[Dashboard] No authentication - redirecting to login');
+      logger.debug('Debug', '[Dashboard] No authentication - redirecting to login');
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
@@ -39,7 +40,7 @@ export default async function DashboardPage() {
             <p className="text-gray-600 mb-4">ダッシュボードにアクセスするにはログインが必要です。</p>
             <Link
               href="/auth/login"
-              className="w-full bg-[#3B82F6] hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] text-white font-medium py-2 px-4 rounded-md text-center block"
+              className="w-full bg-[var(--color-blue-600)] hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] text-white font-medium py-2 px-4 rounded-md text-center block"
             >
               ログインページへ
             </Link>
@@ -54,7 +55,7 @@ export default async function DashboardPage() {
       getOrganizationStatsSafe()
     ]);
 
-    console.log('[VERIFY] Dashboard fetched organization', {
+    logger.debug('[VERIFY] Dashboard fetched organization', {
       hasUser: !!user,
       hasOrg: !!org,
       slug: org?.slug,
@@ -72,7 +73,7 @@ export default async function DashboardPage() {
 
     // 3. 認証済みでも組織がない場合 → 企業作成導線
     if (!org || !org.id) {
-      console.log('[Dashboard] Authenticated user but no organization found');
+      logger.debug('Debug', '[Dashboard] Authenticated user but no organization found');
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
@@ -80,7 +81,7 @@ export default async function DashboardPage() {
             <p className="text-gray-600 mb-4">ダッシュボードを使用するには企業情報の登録が必要です。</p>
             <Link
               href="/organizations/new"
-              className="w-full bg-[#3B82F6] hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] text-white font-medium py-2 px-4 rounded-md text-center block"
+              className="w-full bg-[var(--color-blue-600)] hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] text-white font-medium py-2 px-4 rounded-md text-center block"
               data-testid="create-organization"
             >
               企業を作成
@@ -91,7 +92,7 @@ export default async function DashboardPage() {
     }
 
     // 4. 組織あり → ダッシュボードUI
-    console.log('[Dashboard] Rendering dashboard UI for user:', user.id, 'org:', org.id);
+    logger.debug('[Dashboard] Rendering dashboard UI for user', user.id, 'org:', org.id);
 
 
   return (
@@ -509,7 +510,7 @@ export default async function DashboardPage() {
     </div>
   );
   } catch (error) {
-    console.error('[Dashboard] 予期しないエラー:', error);
+    logger.error('[Dashboard] 予期しないエラー', error instanceof Error ? error : new Error(String(error)));
     // フォールバック UI
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -518,7 +519,7 @@ export default async function DashboardPage() {
           <p className="text-gray-600 mb-4">数秒後にリロードしてください。</p>
           <Link
             href="/dashboard"
-            className="w-full bg-[#3B82F6] hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] text-white font-medium py-2 px-4 rounded-md text-center block"
+            className="w-full bg-[var(--color-blue-600)] hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] text-white font-medium py-2 px-4 rounded-md text-center block"
           >
             再読み込み
           </Link>

@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { timingSafeEqual } from 'crypto';
 import { env, getCookieDomain } from '@/lib/env';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     // パスフレーズの基本検証
     if (!passphrase || typeof passphrase !== 'string') {
-      console.error('[OPS_LOGIN] Missing passphrase');
+      logger.error('[OPS_LOGIN] Missing passphrase');
       return NextResponse.json(
         {
           code: 'VALIDATION_ERROR',
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     const trimmedPassphrase = passphrase.trim();
     if (trimmedPassphrase === '') {
-      console.error('[OPS_LOGIN] Empty passphrase');
+      logger.error('[OPS_LOGIN] Empty passphrase');
       return NextResponse.json(
         {
           code: 'EMPTY_PASSPHRASE',
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // 環境変数検証
     if (!env.ADMIN_OPS_PASSWORD) {
-      console.error('[OPS_LOGIN] ADMIN_OPS_PASSWORD not configured');
+      logger.error('[OPS_LOGIN] ADMIN_OPS_PASSWORD not configured');
       return NextResponse.json(
         {
           code: 'OPS_PASSWORD_NOT_SET',
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error('[OPS_LOGIN] Missing Supabase session:', authError?.message || 'no user');
+      logger.error('[OPS_LOGIN] Missing Supabase session:', authError?.message || 'no user');
       return NextResponse.json(
         {
           code: 'MISSING_SESSION',
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
 
     // ADMIN_EMAIL 照合（小文字・trim）
     if (!isAdmin(user.email)) {
-      console.error('[OPS_LOGIN] Not admin user:', user.email);
+      logger.error('[OPS_LOGIN] Not admin user:', user.email);
       return NextResponse.json(
         {
           code: 'ADMIN_EMAIL_MISMATCH',
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
 
     // 長さ不一致チェック（timingSafeEqual前の事前判定）
     if (inputBuffer.length !== expectedBuffer.length) {
-      console.error('[OPS_LOGIN] Password length mismatch for admin:', user.email);
+      logger.error('[OPS_LOGIN] Password length mismatch for admin:', user.email);
       return NextResponse.json(
         {
           code: 'INVALID_PASSPHRASE',
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
 
     // タイミングセーフ比較
     if (!timingSafeEqual(inputBuffer, expectedBuffer)) {
-      console.error('[OPS_LOGIN] Invalid passphrase for admin:', user.email);
+      logger.error('[OPS_LOGIN] Invalid passphrase for admin:', user.email);
       return NextResponse.json(
         {
           code: 'INVALID_PASSPHRASE',
@@ -157,7 +158,7 @@ export async function POST(request: NextRequest) {
     return response;
 
   } catch (error) {
-    console.error('[POST /ops/login] Unexpected error:', error);
+    logger.error('[POST /ops/login] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         code: 'INTERNAL_ERROR',

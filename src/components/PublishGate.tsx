@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/utils/logger';
 
 interface PublishGateProps {
   organizationId: string;
@@ -48,7 +49,7 @@ export default function PublishGate({
         setGateResult(result);
         setLastCheck(new Date());
       } else {
-        console.error('Publish gate check failed:', result);
+        logger.error('Publish gate check failed:', result);
         setGateResult({
           canPublish: false,
           errors: [result.error || 'チェックに失敗しました'],
@@ -57,7 +58,7 @@ export default function PublishGate({
         });
       }
     } catch (error) {
-      console.error('Publish gate check error:', error);
+      logger.error('Publish gate check error', error instanceof Error ? error : new Error(String(error)));
       setGateResult({
         canPublish: false,
         errors: ['チェック中にエラーが発生しました'],
@@ -96,7 +97,7 @@ export default function PublishGate({
         await checkPublishGate();
       }
     } catch (error) {
-      console.error('Publish error:', error);
+      logger.error('Publish error', error instanceof Error ? error : new Error(String(error)));
       alert('公開中にエラーが発生しました');
     } finally {
       setIsPublishing(false);

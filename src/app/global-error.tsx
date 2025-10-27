@@ -2,6 +2,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
+import { PrimaryCTA, SecondaryCTA } from '@/design-system';
 
 export default function GlobalError({
   error,
@@ -35,19 +36,21 @@ export default function GlobalError({
             </div>
             
             <div className="space-y-3">
-              <button
+              <PrimaryCTA
                 onClick={reset}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                size="medium"
+                className="w-full"
               >
                 再試行
-              </button>
+              </PrimaryCTA>
               
-              <button
+              <SecondaryCTA
                 onClick={() => window.location.href = '/'}
-                className="w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+                size="medium"
+                className="w-full"
               >
                 ホームに戻る
-              </button>
+              </SecondaryCTA>
             </div>
             
             {process.env.NODE_ENV === 'development' && (

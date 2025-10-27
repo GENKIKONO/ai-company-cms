@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import type { QuestionWithDetails } from '@/types/database';
 import { translateQuestionStatus } from '@/lib/qna-stats';
+import { logger } from '@/lib/utils/logger';
 
 interface QuestionStats {
   total: number;
@@ -74,7 +75,7 @@ export default function MyQuestionsPage() {
       setQuestions(result.data || []);
       
     } catch (err) {
-      console.error('Failed to load questions:', err);
+      logger.error('Failed to load questions:', err);
       setError(err instanceof Error ? err.message : '質問の取得に失敗しました');
     } finally {
       setLoading(false);

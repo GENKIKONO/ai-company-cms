@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 async function count(supabase: any, table: string, orgId: string, where?: Record<string, any>) {
   try {
@@ -85,7 +86,7 @@ export async function GET(req: Request) {
       }
     });
   } catch (e: any) {
-    console.error('Export API error:', e);
+    logger.error('Export API error:', e);
     return new NextResponse(`error,${e.message}`, { 
       status: 500,
       headers: {

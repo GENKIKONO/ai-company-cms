@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Users, UserPlus, Shield, Crown, Edit3, Eye, Trash2, Mail } from 'lucide-react';
 import type { UserRole } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface TeamMember {
   id: string;
@@ -73,7 +74,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
 
       setMembers(mockMembers);
     } catch (error) {
-      console.error('Failed to fetch team members:', error);
+      logger.error('Failed to fetch team members', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -101,7 +102,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
       setInviteEmail('');
       setShowInviteForm(false);
     } catch (error) {
-      console.error('Failed to invite member:', error);
+      logger.error('Failed to invite member', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -114,7 +115,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
         member.id === memberId ? { ...member, role: newRole } : member
       ));
     } catch (error) {
-      console.error('Failed to update member role:', error);
+      logger.error('Failed to update member role', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -127,7 +128,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
 
       setMembers(members.filter(member => member.id !== memberId));
     } catch (error) {
-      console.error('Failed to remove member:', error);
+      logger.error('Failed to remove member', error instanceof Error ? error : new Error(String(error)));
     }
   };
 

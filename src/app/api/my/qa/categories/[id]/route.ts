@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { QACategoryFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await supabaseServer();
@@ -34,14 +35,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       if (error.code === 'PGRST116') {
         return NextResponse.json({ error: 'Category not found' }, { status: 404 });
       }
-      console.error('Error fetching category:', error);
+      logger.error('Error fetching category', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to fetch category' }, { status: 500 });
     }
 
     return NextResponse.json({ data: category });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -106,7 +107,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       if (error.code === '23505') {
         return NextResponse.json({ error: 'Category slug already exists' }, { status: 409 });
       }
-      console.error('Error updating category:', error);
+      logger.error('Error updating category', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to update category' }, { status: 500 });
     }
 
@@ -128,7 +129,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ data: category });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -175,7 +176,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       .limit(1);
 
     if (entriesError) {
-      console.error('Error checking entries:', entriesError);
+      logger.error('Error checking entries:', entriesError);
       return NextResponse.json({ error: 'Failed to check category usage' }, { status: 500 });
     }
 
@@ -191,7 +192,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting category:', error);
+      logger.error('Error deleting category', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });
     }
 
@@ -210,7 +211,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return NextResponse.json({ message: 'Category deleted successfully' });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@
  */
 
 import { QueryCacheManager } from './database-optimization';
+import { logger } from '@/lib/utils/logger';
 
 // キャッシュ戦略設定
 export interface CacheStrategy {
@@ -123,11 +124,11 @@ export class CacheManager {
     const cached = await QueryCacheManager.get<T>(key);
     
     if (cached) {
-      console.log(`🎯 Cache hit: ${key}`);
+      logger.debug('Debug', `🎯 Cache hit: ${key}`);
       return cached;
     }
     
-    console.log(`🔄 Cache miss: ${key}, fetching fresh data`);
+    logger.debug('Debug', `🔄 Cache miss: ${key}, fetching fresh data`);
     
     // フレッシュデータを取得
     const data = await fetchFn();
@@ -231,9 +232,9 @@ export class CacheWarmer {
     
     try {
       const popularOrgs = await builder.getPopularOrganizations(20);
-      console.log(`🔥 Warmed cache for ${popularOrgs.length} popular organizations`);
+      logger.debug('Debug', `🔥 Warmed cache for ${popularOrgs.length} popular organizations`);
     } catch (error) {
-      console.error('Cache warming failed for popular organizations:', error);
+      logger.error('Cache warming failed for popular organizations', error instanceof Error ? error : new Error(String(error)));
     }
   }
   
@@ -247,7 +248,7 @@ export class CacheWarmer {
       try {
         const builder = new OptimizedQueryBuilder('cache_warming');
         await builder.getOrganizationOptimized(slug, true);
-        console.log(`🔥 Warmed cache for organization: ${slug}`);
+        logger.debug('Debug', `🔥 Warmed cache for organization: ${slug}`);
       } catch (error) {
         console.error(`Cache warming failed for organization ${slug}:`, error);
       }
@@ -266,7 +267,7 @@ export class CacheWarmer {
       try {
         const builder = new OptimizedQueryBuilder('cache_warming');
         await builder.searchOptimized(query);
-        console.log(`🔥 Warmed cache for search: ${query}`);
+        logger.debug('Debug', `🔥 Warmed cache for search: ${query}`);
       } catch (error) {
         console.error(`Cache warming failed for search "${query}":`, error);
       }

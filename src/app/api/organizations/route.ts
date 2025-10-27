@@ -22,6 +22,7 @@ import { buildOrgInsert } from '@/lib/utils/org-whitelist';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Organization, OrganizationFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 import {
   organizationCreateSchema,
   organizationUpdateSchema,
@@ -126,7 +127,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return handleApiError(error);
     }
 
@@ -148,7 +149,7 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('[GET /api/organizations] Unexpected error:', error);
+    logger.error('[GET /api/organizations] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return handleApiError(error);
   }
 }
@@ -252,7 +253,7 @@ export async function POST(request: NextRequest) {
     // 🚀 GPT恒久対策: 空文字の日付フィールドを検出（デバッグ用）
     const emptyDates = findEmptyDateFields(organizationData as any, ['established_at']);
     if (emptyDates.length) {
-      console.warn('⚠️ [/api/organizations] Empty date fields detected, normalizing:', emptyDates);
+      logger.warn('⚠️ [/api/organizations] Empty date fields detected, normalizing', emptyDates);
     }
 
     // 🚀 GPT恒久対策: INSERT直前の確実な正規化
@@ -274,7 +275,7 @@ export async function POST(request: NextRequest) {
 
     // ホワイトリスト処理の前にこの修正を行う
     const insertPayload = buildOrgInsert(organizationData);
-    console.log('API/organizations INSERT payload (final):', insertPayload);
+    logger.debug('API/organizations INSERT payload (final)', insertPayload);
 
     const { data, error } = await supabase
       .from('organizations')
@@ -283,7 +284,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return handleApiError(error);
     }
 
@@ -306,7 +307,7 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('[POST /api/organizations] Unexpected error:', error);
+    logger.error('[POST /api/organizations] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return handleApiError(error);
   }
 }

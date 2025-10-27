@@ -94,7 +94,7 @@ export function StructuredDataScore({ organization, className = '' }: Structured
         {/* プログレスバー */}
         <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
           <div 
-            className={`h-3 rounded-full transition-all duration-1000 ease-out ${
+            className={`h-3 rounded-full progress-bar ${
               score >= 80 ? 'bg-green-500' : 
               score >= 60 ? 'bg-blue-500' : 
               score >= 40 ? 'bg-yellow-500' : 'bg-red-500'

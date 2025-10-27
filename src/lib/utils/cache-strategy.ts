@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 /**
  * キャッシュ戦略ユーティリティ (I2)
  * ブラウザキャッシュ、Service Worker、メモリキャッシュの管理
@@ -293,7 +295,7 @@ export class BrowserStorageCache {
         this.storage.setItem(this.prefix + key, JSON.stringify(entry));
       } catch {
         // それでも失敗する場合は諦める
-        console.warn('Failed to store cache entry:', key);
+        logger.warn('Failed to store cache entry', key);
       }
     }
   }

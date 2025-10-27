@@ -191,7 +191,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Dashboard stats error:', error);
+    logger.error('Dashboard stats error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : 'Unknown error',

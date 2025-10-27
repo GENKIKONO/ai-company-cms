@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 /**
  * 動的サイトマップ生成ユーティリティ (K1)
  * 組織・サービス・投稿・FAQ等の動的コンテンツからサイトマップを自動生成
@@ -115,7 +117,7 @@ export class SitemapGenerator {
         .eq('status', 'published');
 
       if (error) {
-        console.error('Failed to fetch organizations for sitemap:', error);
+        logger.error('Failed to fetch organizations for sitemap', error instanceof Error ? error : new Error(String(error)));
         return [];
       }
 
@@ -206,7 +208,7 @@ export class SitemapGenerator {
 
       return urls;
     } catch (error) {
-      console.error('Error generating organizations sitemap:', error);
+      logger.error('Error generating organizations sitemap', error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }

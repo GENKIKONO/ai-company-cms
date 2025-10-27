@@ -5,6 +5,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 import type { Service, ServiceFormData } from '@/types/database';
 import { normalizeServicePayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { PLAN_LIMITS, PlanType, getServiceLimitMessage } from '@/config/plans';
+import { logger } from '@/lib/utils/logger';
 
 // エラーログ送信関数（失敗しても無視）
 async function logErrorToDiag(errorInfo: any) {
@@ -55,7 +56,7 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
@@ -66,7 +67,7 @@ export async function GET() {
 
   } catch (error) {
     const errorId = generateErrorId('get-services');
-    console.error('[GET /api/my/services] Unexpected error:', { errorId, error });
+    logger.error('[GET /api/my/services] Unexpected error:', { errorId, error });
     
     // エラーログを診断APIに送信
     logErrorToDiag({
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
         .eq('organization_id', orgData.id);
 
       if (countError) {
-        console.error('Error counting services:', countError);
+        logger.error('Error counting services:', countError);
         return NextResponse.json(
           { error: 'Database error', message: countError.message },
           { status: 500 }
@@ -162,7 +163,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
@@ -173,7 +174,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     const errorId = generateErrorId('post-services');
-    console.error('[POST /api/my/services] Unexpected error:', { errorId, error });
+    logger.error('[POST /api/my/services] Unexpected error:', { errorId, error });
     
     // エラーログを診断APIに送信
     logErrorToDiag({

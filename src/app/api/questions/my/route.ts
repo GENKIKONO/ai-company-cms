@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { QuestionWithDetails } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 // GET: 現在のユーザーが投稿した質問一覧
 export async function GET(request: NextRequest) {
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
     const { data: questions, error } = await query;
 
     if (error) {
-      console.error('Error fetching user questions:', error);
+      logger.error('Error fetching user questions', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Failed to fetch questions' },
         { status: 500 }
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('My questions API error:', error);
+    logger.error('My questions API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

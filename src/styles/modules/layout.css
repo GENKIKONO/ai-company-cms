@@ -1,0 +1,413 @@
+/* ============================================================
+   Layout Module
+   Container, Section, and Grid Systems (Apple HIG Compliant)
+   ============================================================ */
+
+/* 1. Base Layout Containers */
+/* Site container system */
+.site-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-inline: clamp(16px, 4vw, 24px);
+  position: relative;
+  z-index: 1;
+}
+
+/* Full bleed section site containers */
+.sec-white .site-container,
+.sec-alt .site-container,
+.sec-primary .site-container {
+  padding-left: clamp(16px, 4vw, 24px);
+  padding-right: clamp(16px, 4vw, 24px);
+}
+
+/* HIG Container system */
+.hig-container {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 24px);
+}
+
+/* General container */
+.container {
+  max-width: 1280px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: clamp(16px, 3vw, 24px) !important;
+  padding-right: clamp(16px, 3vw, 24px) !important;
+}
+
+/* 2. Section Layout System */
+/* Base section layout - full bleed support */
+main {
+  /* Remove main max-width to enable full bleed */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+section {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+section > .site-container, 
+section > .hig-container {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(16px, 3vw, 24px);
+  padding-right: clamp(16px, 3vw, 24px);
+}
+
+/* Section with full bleed capability */
+.section {
+  position: relative;
+  z-index: 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+}
+
+/* Alternative section layout */
+.section {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  padding-block: var(--space-3xl);
+}
+
+.section > .site-container {
+  max-width: var(--container-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--safe-area-horizontal);
+  padding-right: var(--safe-area-horizontal);
+}
+
+@media (min-width: 768px) {
+  .section > .site-container {
+    padding-left: var(--safe-area-horizontal-desktop);
+    padding-right: var(--safe-area-horizontal-desktop);
+  }
+}
+
+/* 3. Container Variants */
+/* Content width unification */
+.container-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-left: clamp(16px, 3vw, 24px);
+  padding-right: clamp(16px, 3vw, 24px);
+}
+
+/* Page container */
+.container-page { 
+  max-width: 1200px; 
+  margin-inline: auto; 
+  padding-inline: clamp(16px, 4vw, 32px); 
+}
+
+/* Section container */
+.container-section { 
+  padding-block: var(--space-16); 
+}
+
+/* Article container */
+.container-article {
+  max-width: 1000px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+/* Hero container */
+.container-hero {
+  max-width: 1140px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+/* 4. Apple HIG Section Spacing */
+.hig-section {
+  padding-block: clamp(32px, 6vw, 96px);
+  background: var(--bg-white);
+}
+
+.section {
+  padding: var(--space-16) 0;
+}
+
+.section-large {
+  padding: var(--space-24) 0;
+}
+
+.section-small {
+  padding: var(--space-12) 0;
+}
+
+/* 5. Responsive Grid System */
+/* Mobile responsive grid center alignment */
+@media (max-width: 768px) {
+  .sec-white [style*="display: grid"],
+  .sec-alt [style*="display: grid"],
+  .sec-primary [style*="display: grid"] {
+    grid-template-columns: 1fr !important;
+    justify-items: center;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+/* Horizontal scroll grid system */
+.hscroll-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 85%;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+}
+
+@media (min-width: 768px) {
+  .hscroll-grid {
+    grid-auto-flow: initial;
+    grid-auto-columns: initial;
+    overflow: visible;
+    scroll-snap-type: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+/* Apple comparison grid */
+.apple-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+/* Apple features grid */
+.apple-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+}
+
+/* Apple pricing grid */
+.apple-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+/* 6. Container Queries Support */
+.container-card {
+  container-type: inline-size;
+  container-name: card;
+}
+
+.container-section {
+  container-type: inline-size;
+  container-name: section;
+}
+
+@container card (min-width: 320px) {
+  .card-container {
+    padding: clamp(1rem, 3vw, 1.25rem);
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+}
+
+@container card (min-width: 480px) {
+  .card-container {
+    padding: clamp(1.25rem, 4vw, 1.5rem);
+    font-size: clamp(1rem, 3vw, 1.125rem);
+  }
+}
+
+@container section (min-width: 768px) {
+  .section-container {
+    padding: clamp(2rem, 5vw, 3rem);
+  }
+}
+
+/* 7. Specialized Container Systems */
+/* Wide container system - more space utilization */
+.wide-container {
+  max-width: 95vw;
+  margin: 0 auto;
+  padding-inline: max(1.5rem, 3vw);
+}
+
+/* Responsive balanced container with fluid layout */
+.balanced-container {
+  width: 100%;
+  margin: 0 auto;
+  padding-inline: clamp(16px, 5vw, 40px);
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .balanced-container {
+    max-width: 800px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .balanced-container {
+    max-width: min(80vw, 1120px);
+  }
+}
+
+@media (min-width: 1600px) {
+  .balanced-container {
+    max-width: 1280px;
+  }
+}
+
+/* Ultra-wide container for hero sections */
+.ultra-wide-container {
+  max-width: 98vw;
+  margin: 0 auto;
+  padding-inline: max(1rem, 2vw);
+}
+
+/* 8. Apple Hero Container System */
+.apple-hero-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .apple-hero-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: var(--space-6);
+  }
+}
+
+/* Apple main container */
+.apple-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+/* 9. Card Grid Systems */
+.card-grid {
+  display: grid;
+  grid-template-rows: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+@media (max-width: 640px) {
+  .card-grid {
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+/* UI pricing grid */
+.ui-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  justify-items: center;
+  place-items: stretch;
+  max-width: calc(2 * 360px + 2rem);
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .ui-pricing-grid {
+    display: flex;
+  }
+}
+
+/* 12-column grid system */
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+}
+
+/* 10. Overflow Prevention */
+/* Main content container - prevent overflow inheritance */
+main {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Carousel container optimization - prevent page overflow */
+.carousel-container {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden; /* Container itself never overflows */
+  position: relative;
+}
+
+/* 11. Section Layout Utilities */
+.section-pad {
+  padding-inline: clamp(1.25rem, 2vw, 2rem);
+}
+
+/* 12. Footer Grid System */
+.apple-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 48px 32px;
+  margin-bottom: 48px;
+}
+
+/* 13. Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .apple-container {
+    padding: 0 var(--space-3);
+  }
+  
+  .apple-comparison-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .apple-features-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .apple-pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .apple-comparison-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .apple-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 24px;
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .apple-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

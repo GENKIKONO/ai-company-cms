@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { CalendarIcon, UserIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { markdownToHtml, truncateMarkdown } from '@/lib/markdown';
+import { PrimaryCTA } from '@/design-system';
 import { JsonLdModal } from '@/components/ui/json-ld-modal';
 import { LogoImage } from '@/components/ui/optimized-image';
+import { logger } from '@/lib/utils/logger';
 
 interface Post {
   id: string;
@@ -48,7 +50,7 @@ async function getPost(slug: string, postId: string, isPreview: boolean = false)
     const result = await response.json();
     return result.data;
   } catch (error) {
-    console.error('Failed to fetch post:', error);
+    logger.error('Failed to fetch post', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -291,12 +293,13 @@ export default async function PostPage({
 
           {/* Footer */}
           <div className="mt-8 text-center">
-            <Link
+            <PrimaryCTA
               href={`/o/${post.organization.slug}`}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              size="medium"
+              icon="arrow-right"
             >
               {post.organization.name} の他の記事を見る
-            </Link>
+            </PrimaryCTA>
           </div>
         </div>
       </div>

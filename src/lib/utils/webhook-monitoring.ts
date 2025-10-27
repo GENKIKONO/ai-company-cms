@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 // ================================
 // WEBHOOK MONITORING UTILITIES
 // ================================
@@ -103,7 +105,7 @@ export async function getWebhookHealthMetrics(hoursBack: number = 24): Promise<W
     };
 
   } catch (error) {
-    console.error('Failed to get webhook health metrics:', error);
+    logger.error('Failed to get webhook health metrics', error instanceof Error ? error : new Error(String(error)));
     return {
       totalEvents: 0,
       successfulEvents: 0,
@@ -198,13 +200,13 @@ export async function cleanupOldWebhookEvents(): Promise<{ deleted: number; erro
     }
 
     const deletedCount = count || 0;
-    console.log(`Cleaned up ${deletedCount} old webhook events`);
+    logger.debug('Debug', `Cleaned up ${deletedCount} old webhook events`);
     
     return { deleted: deletedCount };
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Failed to cleanup old webhook events:', error);
+    logger.error('Failed to cleanup old webhook events', error instanceof Error ? error : new Error(String(error)));
     return { deleted: 0, error: errorMessage };
   }
 }

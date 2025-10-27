@@ -258,7 +258,7 @@ export function generateAntiScrapingMeasures(content: string, options?: {
   
   if (opts.addTrackingPixel) {
     // Add tracking pixel for monitoring
-    const trackingPixel = `<img src="/api/track?t=${Date.now()}" style="display:none" alt="" />`;
+    const trackingPixel = `<img src="/api/track?t=${Date.now()}" class="hidden" alt="" />`;
     protectedContent = protectedContent.replace(
       /<\/body>/i,
       `${trackingPixel}</body>`

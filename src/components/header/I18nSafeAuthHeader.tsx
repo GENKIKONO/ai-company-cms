@@ -6,6 +6,7 @@ import { User } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { auth } from '@/lib/auth';
+import { logger } from '@/lib/utils/logger';
 
 interface I18nSafeAuthHeaderProps {
   user?: User | null;
@@ -28,13 +29,13 @@ export default function I18nSafeAuthHeader({
     
     const checkAuthState = async () => {
       try {
-        console.log('[I18nSafeAuthHeader] Checking auth state...');
+        logger.debug('Debug', '[I18nSafeAuthHeader] Checking auth state...');
         
         // クライアント側の実際の認証状態を確認
         const { data: { user: currentUser } } = await supabaseBrowser.auth.getUser();
         const actuallyAuthenticated = !!currentUser;
         
-        console.log('[I18nSafeAuthHeader] Auth state check:', {
+        logger.debug('[I18nSafeAuthHeader] Auth state check', {
           propsIsAuthenticated: isAuthenticated,
           actuallyAuthenticated,
           hasUser: !!currentUser,
@@ -47,7 +48,7 @@ export default function I18nSafeAuthHeader({
           
           // 不整合検出時の自動修正
           if (isAuthenticated && !actuallyAuthenticated) {
-            console.warn('[I18nSafeAuthHeader] Auth state mismatch detected - forcing full logout');
+            logger.warn('[I18nSafeAuthHeader] Auth state mismatch detected - forcing full logout');
             try {
               // 認証Cookieも明示的にクリア
               document.cookie.split(";").forEach(function(c) { 
@@ -65,7 +66,7 @@ export default function I18nSafeAuthHeader({
                 window.location.href = '/';
               }, 100);
             } catch (error) {
-              console.error('[I18nSafeAuthHeader] Auto logout failed:', error);
+              logger.error('[I18nSafeAuthHeader] Auto logout failed', error instanceof Error ? error : new Error(String(error)));
               
               // 強制的にCookieクリア + リロード
               document.cookie.split(";").forEach(function(c) { 
@@ -79,7 +80,7 @@ export default function I18nSafeAuthHeader({
           }
         }
       } catch (error) {
-        console.error('[I18nSafeAuthHeader] Auth state check failed:', error);
+        logger.error('[I18nSafeAuthHeader] Auth state check failed', error instanceof Error ? error : new Error(String(error)));
         if (mounted) {
           setActualAuthState(false);
           setAuthStateChecked(true);
@@ -92,7 +93,7 @@ export default function I18nSafeAuthHeader({
     
     // 認証状態変更のリスナー
     const { data: { subscription } } = supabaseBrowser.auth.onAuthStateChange((event, session) => {
-      console.log('[I18nSafeAuthHeader] Auth state changed:', event, !!session);
+      logger.debug('[I18nSafeAuthHeader] Auth state changed', event, !!session);
       if (mounted) {
         setActualAuthState(!!session);
       }

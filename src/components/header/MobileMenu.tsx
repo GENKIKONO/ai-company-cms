@@ -106,7 +106,7 @@ export default function MobileMenu({
                     <Link
                       href={auth.logoutHref}
                       onClick={handleLinkClick}
-                      className="focus-clean block text-center bg-[#3B82F6] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] transition-colors duration-200 mt-6"
+                      className="focus-clean block text-center bg-[var(--color-blue-600)] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] transition-colors duration-200 mt-6"
                     >
                       ログアウト
                     </Link>

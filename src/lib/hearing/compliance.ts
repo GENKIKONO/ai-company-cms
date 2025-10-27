@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 // リスクレベル定義
 export enum RiskLevel {
@@ -177,7 +178,7 @@ export async function performComplianceCheck(
     };
 
   } catch (error) {
-    console.error('Compliance check error:', error);
+    logger.error('Compliance check error', error instanceof Error ? error : new Error(String(error)));
     
     // エラー時は最高リスクレベルで返す
     return {
@@ -535,7 +536,7 @@ export async function reportComplianceViolation(
     return true;
 
   } catch (error) {
-    console.error('Compliance violation report error:', error);
+    logger.error('Compliance violation report error', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }

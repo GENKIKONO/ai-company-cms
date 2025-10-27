@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getAiVisibilityStatus } from '@/lib/ai-visibility-config';
+import { logger } from '@/lib/utils/logger';
 
 export interface AiVisibilityJobResult {
   success: boolean;
@@ -12,12 +13,12 @@ export interface AiVisibilityJobResult {
 
 export async function runAiVisibilityJob(): Promise<AiVisibilityJobResult> {
   try {
-    console.log('[AI Visibility Job] Starting AI visibility check...');
+    logger.debug('Debug', '[AI Visibility Job] Starting AI visibility check...');
     
     // Check if AI visibility is enabled
     const status = await getAiVisibilityStatus();
     if (!status.enabled) {
-      console.log('[AI Visibility Job] AI visibility monitoring is disabled, skipping job');
+      logger.debug('Debug', '[AI Visibility Job] AI visibility monitoring is disabled, skipping job');
       return {
         success: true,
         skipped: true,
@@ -26,7 +27,7 @@ export async function runAiVisibilityJob(): Promise<AiVisibilityJobResult> {
       };
     }
     
-    console.log('[AI Visibility Job] AI visibility enabled, proceeding with check...');
+    logger.debug('Debug', '[AI Visibility Job] AI visibility enabled, proceeding with check...');
     
     // Call the main AI visibility check API
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.jp';
@@ -45,7 +46,7 @@ export async function runAiVisibilityJob(): Promise<AiVisibilityJobResult> {
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[AI Visibility Job] Check failed:', errorText);
+      logger.error('[AI Visibility Job] Check failed:', errorText);
       throw new Error(`AI visibility check failed: ${response.status} ${errorText}`);
     }
     
@@ -68,7 +69,7 @@ export async function runAiVisibilityJob(): Promise<AiVisibilityJobResult> {
     };
     
   } catch (error) {
-    console.error('[AI Visibility Job] Error:', error);
+    logger.error('[AI Visibility Job] Error', error instanceof Error ? error : new Error(String(error)));
     
     // Send error notification
     await sendErrorNotification(error);
@@ -84,7 +85,7 @@ export async function runAiVisibilityJob(): Promise<AiVisibilityJobResult> {
 async function sendSlackNotification(summary: any, results: any[]) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
   if (!webhookUrl) {
-    console.log('[AI Visibility Job] No Slack webhook configured, skipping notification');
+    logger.debug('Debug', '[AI Visibility Job] No Slack webhook configured, skipping notification');
     return;
   }
   
@@ -164,10 +165,10 @@ async function sendSlackNotification(summary: any, results: any[]) {
       throw new Error(`Slack notification failed: ${response.status}`);
     }
     
-    console.log('[AI Visibility Job] Slack notification sent successfully');
+    logger.debug('Debug', '[AI Visibility Job] Slack notification sent successfully');
     
   } catch (error) {
-    console.error('[AI Visibility Job] Failed to send Slack notification:', error);
+    logger.error('[AI Visibility Job] Failed to send Slack notification', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -202,6 +203,6 @@ async function sendErrorNotification(error: any) {
     });
     
   } catch (slackError) {
-    console.error('[AI Visibility Job] Failed to send error notification:', slackError);
+    logger.error('[AI Visibility Job] Failed to send error notification:', slackError);
   }
 }

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import type { QuestionWithDetails } from '@/types/database';
 import { translateQuestionStatus } from '@/lib/qna-stats';
+import { logger } from '@/lib/utils/logger';
 
 interface QuestionStats {
   total: number;
@@ -79,7 +80,7 @@ export default function CompanyQuestionsPage() {
       setCompany(result.company || null);
       
     } catch (err) {
-      console.error('Failed to load questions:', err);
+      logger.error('Failed to load questions:', err);
       setError(err instanceof Error ? err.message : '質問の取得に失敗しました');
     } finally {
       setLoading(false);
@@ -158,7 +159,7 @@ export default function CompanyQuestionsPage() {
         alert(errorData.error || '回答の送信に失敗しました');
       }
     } catch (error) {
-      console.error('Answer submission failed:', error);
+      logger.error('Answer submission failed', error instanceof Error ? error : new Error(String(error)));
       alert('回答の送信に失敗しました');
     } finally {
       setSubmitting(null);
@@ -190,7 +191,7 @@ export default function CompanyQuestionsPage() {
         alert(errorData.error || 'ステータスの更新に失敗しました');
       }
     } catch (error) {
-      console.error('Status update failed:', error);
+      logger.error('Status update failed', error instanceof Error ? error : new Error(String(error)));
       alert('ステータスの更新に失敗しました');
     }
   };

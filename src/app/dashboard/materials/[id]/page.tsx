@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SalesMaterial } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export default function MaterialViewPage() {
   const params = useParams();
@@ -35,7 +36,7 @@ export default function MaterialViewPage() {
       setMaterial(result.data);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch material:', err);
+      logger.error('Failed to fetch material:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch material');
     } finally {
       setLoading(false);
@@ -49,7 +50,7 @@ export default function MaterialViewPage() {
       const hasAlreadyViewed = sessionStorage.getItem(sessionKey);
       
       if (hasAlreadyViewed) {
-        console.log(`Material ${materialId} already viewed in this session, skipping duplicate log`);
+        logger.debug('Debug', `Material ${materialId} already viewed in this session, skipping duplicate log`);
         return;
       }
 
@@ -73,7 +74,7 @@ export default function MaterialViewPage() {
       
     } catch (error) {
       // サイレントエラー：統計ログの失敗はユーザー体験に影響させない
-      console.warn('Failed to log material view:', error);
+      logger.warn('Failed to log material view', error);
     }
   };
 
@@ -105,7 +106,7 @@ export default function MaterialViewPage() {
         });
       } catch (statsError) {
         // 統計ログ失敗はサイレント（ユーザー体験に影響させない）
-        console.warn('Failed to log download stats:', statsError);
+        logger.warn('Failed to log download stats', statsError);
       }
 
       // ファイルダウンロード処理
@@ -120,7 +121,7 @@ export default function MaterialViewPage() {
       document.body.removeChild(a);
 
     } catch (error) {
-      console.error('Download failed:', error);
+      logger.error('Download failed', error instanceof Error ? error : new Error(String(error)));
       alert('ダウンロードに失敗しました');
     } finally {
       setDownloading(false);

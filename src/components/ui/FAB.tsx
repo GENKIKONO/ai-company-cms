@@ -58,8 +58,7 @@ export default function FAB() {
       onClick={toggle}
       onKeyDown={handleKeyDown}
       className="
-        ui-fab
-        fixed z-[1000] 
+        ui-fab fab-position
         w-14 h-14 
         text-white bg-blue-600 hover:bg-blue-700 shadow-xl hover:shadow-2xl border-2 border-white
         active:scale-95
@@ -72,12 +71,6 @@ export default function FAB() {
         select-none
         md:hidden
       "
-      style={{
-        right: 'clamp(16px, 3vw, 24px)',
-        bottom: 'calc(env(safe-area-inset-bottom) + 20px)',
-        minHeight: '56px',
-        minWidth: '56px'
-      }}
     >
       <span className="sr-only">
         {open ? "メニューを閉じる" : "メニューを開く"}

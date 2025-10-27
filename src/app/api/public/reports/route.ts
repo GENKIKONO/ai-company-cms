@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { env } from '@/lib/env';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -168,7 +169,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error('Database insert error:', insertError);
+      logger.error('Database insert error:', insertError);
       return NextResponse.json(
         {
           error: 'DATABASE_ERROR',
@@ -188,7 +189,7 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Report API error:', error);
+    logger.error('Report API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',

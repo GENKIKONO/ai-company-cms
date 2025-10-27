@@ -5,6 +5,7 @@ import { stripe, verifyWebhookSignature, updateSubscriptionInDB } from '@/lib/st
 import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { SentryUtils } from '@/lib/utils/sentry-utils';
 import { sendPaymentFailedEmail } from '@/lib/emails';
+import { logger } from '@/lib/utils/logger';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -41,13 +42,13 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
       .maybeSingle();
 
     if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
-      console.error('Error checking webhook event:', checkError);
+      logger.error('Error checking webhook event:', checkError);
       return { success: false, processed: false, error: 'Database error' };
     }
 
     // 既に処理済みの場合はスキップ
     if (existingEvent?.processed) {
-      console.log(`Event ${event.id} already processed, skipping`);
+      logger.debug('Debug', `Event ${event.id} already processed, skipping`);
       return { success: true, processed: true };
     }
 
@@ -68,7 +69,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
       });
 
     if (upsertError) {
-      console.error('Error upserting webhook event:', upsertError);
+      logger.error('Error upserting webhook event:', upsertError);
       return { success: false, processed: false, error: 'Failed to record event' };
     }
 
@@ -99,7 +100,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
         break;
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        logger.debug('Debug', `Unhandled event type: ${event.type}`);
         processingSuccess = true; // 未対応イベントは成功として扱う
     }
 
@@ -158,7 +159,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
     }
 
   } catch (error) {
-    console.error('Error processing webhook event:', error);
+    logger.error('Error processing webhook event', error instanceof Error ? error : new Error(String(error)));
     
     const processingTime = Date.now() - startTime;
     SentryUtils.trackWebhookEvent(event.type, false, {
@@ -194,7 +195,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription): Prom
     const organizationId = subscription.metadata.organization_id;
 
     if (!organizationId) {
-      console.error('No organization_id in subscription metadata');
+      logger.error('No organization_id in subscription metadata');
       return false;
     }
 
@@ -231,7 +232,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription): Prom
       });
 
     if (error) {
-      console.error('Error updating subscription:', error);
+      logger.error('Error updating subscription', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
 
@@ -280,17 +281,17 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription): Prom
       );
 
       if (userUpdateError) {
-        console.error('Failed to update user plan in auth metadata:', userUpdateError);
+        logger.error('Failed to update user plan in auth metadata:', userUpdateError);
       } else {
-        console.log(`✅ User plan synced: ${organization.created_by} → ${newPlan}`);
+        logger.debug('Debug', `✅ User plan synced: ${organization.created_by} → ${newPlan}`);
       }
     }
 
-    console.log(`Subscription ${subscription.id} updated to status: ${status}`);
+    logger.debug('Debug', `Subscription ${subscription.id} updated to status: ${status}`);
     return true;
 
   } catch (error) {
-    console.error('Error handling subscription change:', error);
+    logger.error('Error handling subscription change', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -301,7 +302,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
     const organizationId = subscription.metadata.organization_id;
 
     if (!organizationId) {
-      console.error('No organization_id in subscription metadata');
+      logger.error('No organization_id in subscription metadata');
       return false;
     }
 
@@ -316,7 +317,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
       .eq('stripe_subscription_id', subscription.id);
 
     if (subError) {
-      console.error('Error updating cancelled subscription:', subError);
+      logger.error('Error updating cancelled subscription:', subError);
       return false;
     }
 
@@ -348,35 +349,35 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
       );
 
       if (userUpdateError) {
-        console.error('Failed to update user plan on cancellation:', userUpdateError);
+        logger.error('Failed to update user plan on cancellation:', userUpdateError);
       } else {
-        console.log(`✅ User plan reset to free: ${organization.created_by}`);
+        logger.debug('Debug', `✅ User plan reset to free: ${organization.created_by}`);
       }
     }
 
-    console.log(`Subscription ${subscription.id} cancelled`);
+    logger.debug('Debug', `Subscription ${subscription.id} cancelled`);
     return true;
 
   } catch (error) {
-    console.error('Error handling subscription deletion:', error);
+    logger.error('Error handling subscription deletion', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
 
 async function handlePaymentSucceeded(invoice: Stripe.Invoice): Promise<boolean> {
   try {
-    console.log(`Payment succeeded for invoice ${invoice.id}`);
+    logger.debug('Debug', `Payment succeeded for invoice ${invoice.id}`);
     // 必要に応じて支払い成功時の処理を追加
     return true;
   } catch (error) {
-    console.error('Error handling payment success:', error);
+    logger.error('Error handling payment success', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
   try {
-    console.log(`Payment failed for invoice ${invoice.id}`);
+    logger.debug('Debug', `Payment failed for invoice ${invoice.id}`);
     
     const supabase = supabaseBrowserAdmin();
     
@@ -414,14 +415,14 @@ async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
             user.full_name || user.email,
             orgData.name
           );
-          console.log(`Payment failed email sent to ${user.email}`);
+          logger.debug('Debug', `Payment failed email sent to ${user.email}`);
         }
       }
     }
 
     return true;
   } catch (error) {
-    console.error('Error handling payment failure:', error);
+    logger.error('Error handling payment failure', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -435,14 +436,14 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session):
     const notes = session.metadata?.notes;
 
     if (!organizationId) {
-      console.error('No organization_id in checkout session metadata');
+      logger.error('No organization_id in checkout session metadata');
       return false;
     }
 
     // Get the subscription from the session
     const subscriptionId = session.subscription as string;
     if (!subscriptionId) {
-      console.error('No subscription ID in checkout session');
+      logger.error('No subscription ID in checkout session');
       return false;
     }
 
@@ -482,7 +483,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session):
       });
 
     if (subError) {
-      console.error('Error creating/updating subscription:', subError);
+      logger.error('Error creating/updating subscription:', subError);
       return false;
     }
 
@@ -498,11 +499,11 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session):
         .in('status', ['draft', 'paused']);
     }
 
-    console.log(`Checkout session completed for organization ${organizationId}, subscription ${subscription.id}`);
+    logger.debug('Debug', `Checkout session completed for organization ${organizationId}, subscription ${subscription.id}`);
     return true;
 
   } catch (error) {
-    console.error('Error handling checkout session completion:', error);
+    logger.error('Error handling checkout session completion', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -528,11 +529,11 @@ async function handleSingleOrgWebhook(event: Stripe.Event): Promise<boolean> {
         return true;
 
       default:
-        console.log(`Unhandled Single-Org webhook event: ${event.type}`);
+        logger.debug('Debug', `Unhandled Single-Org webhook event: ${event.type}`);
         return true; // Return true for unhandled events to acknowledge receipt
     }
   } catch (error) {
-    console.error('Single-Org webhook processing error:', error);
+    logger.error('Single-Org webhook processing error', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -556,7 +557,7 @@ export async function POST(request: NextRequest) {
     if (!event) {
       // If verification fails or webhook secret is not configured
       if (!process.env.STRIPE_WEBHOOK_SECRET) {
-        console.warn('Webhook received but STRIPE_WEBHOOK_SECRET not configured');
+        logger.warn('Webhook received but STRIPE_WEBHOOK_SECRET not configured');
         return NextResponse.json({ received: true, processed: false, warning: 'Webhook not configured' });
       }
       
@@ -579,7 +580,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Webhook error:', error);
+    logger.error('Webhook error', error instanceof Error ? error : new Error(String(error)));
     
     // Use Sentry if available, otherwise just log
     if (typeof SentryUtils !== 'undefined') {

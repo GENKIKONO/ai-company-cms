@@ -4,6 +4,7 @@
  */
 
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 export interface AnalyticsEvent {
   event_type: string;
@@ -117,10 +118,10 @@ export class AnalyticsEngine {
         .insert(eventData);
 
       if (error) {
-        console.error('Analytics event tracking error:', error);
+        logger.error('Analytics event tracking error', error instanceof Error ? error : new Error(String(error)));
       }
     } catch (error) {
-      console.error('Failed to track analytics event:', error);
+      logger.error('Failed to track analytics event', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -237,7 +238,7 @@ export class AnalyticsEngine {
         conversion_rate: 2.3, // 仮の値
       };
     } catch (error) {
-      console.error('Failed to get usage metrics:', error);
+      logger.error('Failed to get usage metrics', error instanceof Error ? error : new Error(String(error)));
       return {
         daily_active_users: 0,
         weekly_active_users: 0,
@@ -336,7 +337,7 @@ export class AnalyticsEngine {
         search_queries,
       };
     } catch (error) {
-      console.error('Failed to get content metrics:', error);
+      logger.error('Failed to get content metrics', error instanceof Error ? error : new Error(String(error)));
       return {
         popular_organizations: [],
         popular_services: [],
@@ -367,7 +368,7 @@ export class AnalyticsEngine {
         cache_hit_rate: 85.7, // %
       };
     } catch (error) {
-      console.error('Failed to get performance metrics:', error);
+      logger.error('Failed to get performance metrics', error instanceof Error ? error : new Error(String(error)));
       return {
         average_page_load_time: 0,
         api_response_times: [],
@@ -439,7 +440,7 @@ export class AnalyticsEngine {
         },
       };
     } catch (error) {
-      console.error('Failed to get business metrics:', error);
+      logger.error('Failed to get business metrics', error instanceof Error ? error : new Error(String(error)));
       return {
         organizations_created: 0,
         services_published: 0,
@@ -530,7 +531,7 @@ export class AnalyticsEngine {
         recent_events: recent_events || [],
       };
     } catch (error) {
-      console.error('Failed to get real-time stats:', error);
+      logger.error('Failed to get real-time stats', error instanceof Error ? error : new Error(String(error)));
       return {
         active_users: 0,
         current_page_views: 0,

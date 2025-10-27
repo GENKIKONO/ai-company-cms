@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
+import { logger } from '@/lib/utils/logger';
 
 // Phase 3で本格実装予定
 export const dynamic = 'force-dynamic';
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[GET /api/oem/keys] Error:', error);
+    logger.error('[GET /api/oem/keys] Error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[POST /api/oem/keys] Error:', error);
+    logger.error('[POST /api/oem/keys] Error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -149,7 +150,7 @@ export async function DELETE(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[DELETE /api/oem/keys] Error:', error);
+    logger.error('[DELETE /api/oem/keys] Error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

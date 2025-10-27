@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('Applying coordinate fields migration...');
+    logger.debug('Debug', 'Applying coordinate fields migration...');
     
     // Service Role クライアント作成
     const supabase = createClient(
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (migrationError) {
-      console.error('Migration SQL execution failed:', migrationError);
+      logger.error('Migration SQL execution failed:', migrationError);
       
       // Try alternative approach using individual queries
       const { error: alterError1 } = await supabase
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log('Migration applied successfully');
+    logger.debug('Debug', 'Migration applied successfully');
 
     // Test the migration by updating an organization with coordinates
     const { data: testOrg, error: testOrgError } = await supabase
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
       .eq('id', testOrg.id);
 
     if (updateError) {
-      console.error('Coordinate field update test failed:', updateError);
+      logger.error('Coordinate field update test failed:', updateError);
       return NextResponse.json({ 
         success: false, 
         error: `Coordinate fields test failed: ${updateError.message}`,
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log('Migration verification successful');
+    logger.debug('Debug', 'Migration verification successful');
 
     return NextResponse.json({ 
       success: true, 
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('Migration API error:', error);
+    logger.error('Migration API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ 
       success: false, 
       error: error.message || 'Migration failed' 

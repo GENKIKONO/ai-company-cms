@@ -6,6 +6,7 @@
 
 import { supabaseServer } from '@/lib/supabase-server';
 import type { PlanType } from '@/config/plans';
+import { logger } from '@/lib/utils/logger';
 
 export interface UserPlanInfo {
   plan: PlanType;
@@ -28,7 +29,7 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
-      console.warn('[getUserPlan] No authenticated user');
+      logger.warn('[getUserPlan] No authenticated user');
       return { plan: 'trial', isActive: false };
     }
 
@@ -46,12 +47,12 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
       .maybeSingle();
 
     if (orgError) {
-      console.error('[getUserPlan] Error fetching organization:', orgError);
+      logger.error('[getUserPlan] Error fetching organization:', orgError);
       return { plan: 'trial', isActive: false };
     }
 
     if (!organization) {
-      console.log('[getUserPlan] No organization found for user');
+      logger.debug('Debug', '[getUserPlan] No organization found for user');
       return { plan: 'trial', isActive: false };
     }
 
@@ -88,7 +89,7 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
     };
 
   } catch (error) {
-    console.error('[getUserPlan] Unexpected error:', error);
+    logger.error('[getUserPlan] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return { plan: 'trial', isActive: false };
   }
 }

@@ -5,6 +5,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 import type { Post, PostFormData } from '@/types/database';
 import { normalizePostPayload, validateSlug, createAuthError, createNotFoundError, createConflictError, createValidationError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { logger } from '@/lib/utils/logger';
 
 // エラーログ送信関数（失敗しても無視）
 async function logErrorToDiag(errorInfo: any) {
@@ -55,7 +56,7 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
@@ -66,7 +67,7 @@ export async function GET() {
 
   } catch (error) {
     const errorId = generateErrorId('get-posts');
-    console.error('[GET /api/my/posts] Unexpected error:', { errorId, error });
+    logger.error('[GET /api/my/posts] Unexpected error:', { errorId, error });
     
     // エラーログを診断APIに送信
     logErrorToDiag({
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
         .eq('organization_id', orgData.id);
 
       if (countError) {
-        console.error('Error counting posts:', countError);
+        logger.error('Error counting posts:', countError);
         return NextResponse.json(
           { error: 'Database error', message: countError.message },
           { status: 500 }
@@ -176,7 +177,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       
       // 制約違反の場合
       if (error.code === '23505') {
@@ -195,7 +196,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     const errorId = generateErrorId('post-posts');
-    console.error('[POST /api/my/posts] Unexpected error:', { errorId, error });
+    logger.error('[POST /api/my/posts] Unexpected error:', { errorId, error });
     
     // エラーログを診断APIに送信
     logErrorToDiag({

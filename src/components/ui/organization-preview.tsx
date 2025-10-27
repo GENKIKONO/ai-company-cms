@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { JsonLdModal } from './json-ld-modal';
 import { useApiClient } from '@/hooks/useApiClient';
+import { logger } from '@/lib/utils/logger';
 
 interface OrganizationPreviewProps {
   organizationId: string;
@@ -46,7 +47,7 @@ export function OrganizationPreview({
           setJsonLdData(jsonLd);
         }
       } catch (err) {
-        console.error('Failed to fetch JSON-LD data:', err);
+        logger.error('Failed to fetch JSON-LD data:', err);
       }
     }
 

@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { monitoringIntegration } from '@/lib/utils/monitoring-integration';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Health check API failed:', error);
+    logger.error('Health check API failed', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json(
       { 

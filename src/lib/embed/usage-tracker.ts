@@ -5,6 +5,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import type { PlanType } from '@/config/plans';
+import { logger } from '@/lib/utils/logger';
 
 // 使用状況データ型
 export interface EmbedUsage {
@@ -84,7 +85,7 @@ export class EmbedUsageTracker {
         this.scheduleFlush();
       }
     } catch (error) {
-      console.error('Usage tracking failed:', error);
+      logger.error('Usage tracking failed', error instanceof Error ? error : new Error(String(error)));
       // トラッキングエラーは無視（メイン機能に影響しない）
     }
   }
@@ -169,7 +170,7 @@ export class EmbedUsageTracker {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Failed to fetch daily stats:', error);
+      logger.error('Failed to fetch daily stats', error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }
@@ -195,7 +196,7 @@ export class EmbedUsageTracker {
       if (error && error.code !== 'PGRST116') throw error;
       return data;
     } catch (error) {
-      console.error('Failed to fetch monthly stats:', error);
+      logger.error('Failed to fetch monthly stats', error instanceof Error ? error : new Error(String(error)));
       return null;
     }
   }
@@ -233,7 +234,7 @@ export class EmbedUsageTracker {
         remaining: limitCheck.remaining
       };
     } catch (error) {
-      console.error('Failed to check monthly limit:', error);
+      logger.error('Failed to check monthly limit', error instanceof Error ? error : new Error(String(error)));
       // エラー時は制限なしとして扱う（安全側）
       return {
         allowed: true,
@@ -268,7 +269,7 @@ export class EmbedUsageTracker {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Failed to fetch top sources:', error);
+      logger.error('Failed to fetch top sources', error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }
@@ -302,7 +303,7 @@ export class EmbedUsageTracker {
         averageResponseTime: 0
       };
     } catch (error) {
-      console.error('Failed to fetch realtime stats:', error);
+      logger.error('Failed to fetch realtime stats', error instanceof Error ? error : new Error(String(error)));
       return {
         activeWidgets: 0,
         todayViews: 0,
@@ -327,12 +328,12 @@ export class EmbedUsageTracker {
         .insert(batch);
 
       if (error) {
-        console.error('Failed to flush usage batch:', error);
+        logger.error('Failed to flush usage batch', error instanceof Error ? error : new Error(String(error)));
         // 失敗したデータを戻す（再試行用）
         this.batchQueue.unshift(...batch);
       }
     } catch (error) {
-      console.error('Batch flush error:', error);
+      logger.error('Batch flush error', error instanceof Error ? error : new Error(String(error)));
     }
 
     // タイマーをクリア

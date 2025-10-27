@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { logger } from '@/lib/utils/logger';
 
 interface RealtimeStats {
   totalActiveWidgets: number;
@@ -87,7 +88,7 @@ export function EmbedRealtimeStats() {
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : '不明なエラー');
-      console.error('Failed to fetch realtime stats:', err);
+      logger.error('Failed to fetch realtime stats:', err);
       setLoading(false);
     }
   };
@@ -262,7 +263,7 @@ export function EmbedRealtimeStats() {
                   return (
                     <div
                       key={index}
-                      className="flex-1 bg-purple-500 rounded-t"
+                      className="flex-1 bg-purple-500 rounded-t progress-bar"
                       style={{ height: `${Math.min(height, 100)}%` }}
                       title={`${formatResponseTime(metric.responseTime)} at ${new Date(metric.timestamp).toLocaleTimeString()}`}
                     />
@@ -280,7 +281,7 @@ export function EmbedRealtimeStats() {
                   return (
                     <div
                       key={index}
-                      className="flex-1 bg-red-500 rounded-t"
+                      className="flex-1 bg-red-500 rounded-t progress-bar"
                       style={{ height: `${Math.min(height, 100)}%` }}
                       title={`${metric.errorRate.toFixed(2)}% at ${new Date(metric.timestamp).toLocaleTimeString()}`}
                     />
@@ -299,7 +300,7 @@ export function EmbedRealtimeStats() {
                   return (
                     <div
                       key={index}
-                      className="flex-1 bg-blue-500 rounded-t"
+                      className="flex-1 bg-blue-500 rounded-t progress-bar"
                       style={{ height: `${Math.max(height, 2)}%` }}
                       title={`${metric.requestCount.toLocaleString()} requests at ${new Date(metric.timestamp).toLocaleTimeString()}`}
                     />

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { normalizeDashboardStats, getDefaultStats, type DashboardStats } from '@/lib/normalizers/dashboard';
+import { logger } from '@/lib/utils/logger';
 
 export default function PerformanceMetrics() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -19,7 +20,7 @@ export default function PerformanceMetrics() {
           setStats(getDefaultStats());
         }
       } catch (error) {
-        console.error('Failed to fetch dashboard stats:', error);
+        logger.error('Failed to fetch dashboard stats', error instanceof Error ? error : new Error(String(error)));
         // 通信失敗時もクラッシュを防ぐ
         setStats(getDefaultStats());
       } finally {

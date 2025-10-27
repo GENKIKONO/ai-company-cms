@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { memoryCache } from '@/lib/cache/memory-cache';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -116,7 +117,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Public Stats API Error:', error);
+    logger.error('❌ Public Stats API Error', error instanceof Error ? error : new Error(String(error)));
     
     // エラー時はデフォルト値を返す
     return NextResponse.json({

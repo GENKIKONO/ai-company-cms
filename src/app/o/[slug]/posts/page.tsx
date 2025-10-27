@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateOrganizationJsonLd } from '@/lib/utils/jsonld';
 import type { Organization, Post } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface PostsPageData {
   organization: Organization;
@@ -26,7 +27,7 @@ async function getPostsData(slug: string): Promise<PostsPageData | null> {
       posts: result.data.posts || []
     };
   } catch (error) {
-    console.error('Failed to fetch posts data:', error);
+    logger.error('Failed to fetch posts data', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

@@ -8,6 +8,7 @@ import AdvancedSearchFilters, { type AdvancedFilters } from '@/components/search
 import SearchResultCard from '@/components/search/SearchResultCard';
 import { performAdvancedSearch, getSearchSuggestions, type AdvancedSearchResults } from '@/lib/search/advanced-search';
 import { Search, Loader2, BookmarkCheck, Grid, List, Zap } from 'lucide-react';
+import { logger } from '@/lib/utils/logger';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -90,7 +91,7 @@ export default function EnhancedSearchPage() {
       setResults(searchResults);
       setPage(pageNum);
     } catch (error) {
-      console.error('Search failed:', error);
+      logger.error('Search failed', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -118,7 +119,7 @@ export default function EnhancedSearchPage() {
       const suggestions = await getSearchSuggestions(query);
       setSuggestions(suggestions);
     } catch (error) {
-      console.error('Suggestions fetch failed:', error);
+      logger.error('Suggestions fetch failed', error instanceof Error ? error : new Error(String(error)));
       setSuggestions([]);
     }
   }, []);

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseServer } from '@/lib/supabase-server';
 import { handleApiError, validationError, notFoundError } from '@/lib/api/error-responses';
+import { logger } from '@/lib/utils/logger';
 
 // パブリケーション状態スキーマ
 const publishStatusSchema = z.object({
@@ -34,7 +35,7 @@ async function revalidatePublicationCache(userId: string, orgSlug?: string) {
     const tag = `org:${userId}`;
     revalidateTag(tag);
     
-    console.log('[VERIFY] Publication cache invalidation completed', { 
+    logger.debug('[VERIFY] Publication cache invalidation completed', { 
       tag, 
       paths: pathsToRevalidate.length,
       slug: orgSlug 
@@ -42,7 +43,7 @@ async function revalidatePublicationCache(userId: string, orgSlug?: string) {
     
     return true;
   } catch (error) {
-    console.error('[VERIFY] Publication cache invalidation failed', error);
+    logger.error('[VERIFY] Publication cache invalidation failed', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -53,7 +54,7 @@ export const fetchCache = 'force-no-store';
 // PUT - 公開状態の統一更新
 export async function PUT(request: NextRequest) {
   try {
-    console.log('[my/organization/publish] PUT handler start');
+    logger.debug('Debug', '[my/organization/publish] PUT handler start');
     
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await supabaseServer();
@@ -65,7 +66,7 @@ export async function PUT(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.warn('[my/organization/publish] PUT Not authenticated', { authError, hasUser: !!user });
+      logger.warn('[my/organization/publish] PUT Not authenticated', { authError, hasUser: !!user });
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
@@ -74,7 +75,7 @@ export async function PUT(request: NextRequest) {
     try {
       const rawBody = await request.json();
       body = publishStatusSchema.parse(rawBody);
-      console.log('[VERIFY] Publication request', { is_published: body.is_published });
+      logger.debug('[VERIFY] Publication request', { is_published: body.is_published });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return validationError({ is_published: error.errors.map(e => e.message) }, 'Invalid publication status');
@@ -90,7 +91,7 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (fetchError || !existingOrg) {
-      console.warn('[my/organization/publish] Organization not found', { userId: user.id, error: fetchError });
+      logger.warn('[my/organization/publish] Organization not found', { userId: user.id, error: fetchError });
       return notFoundError('Organization');
     }
 
@@ -100,7 +101,7 @@ export async function PUT(request: NextRequest) {
     
     // 現在の状態と同じ場合は早期リターン（idempotent）
     if (existingOrg.is_published === newIsPublished && existingOrg.status === newStatus) {
-      console.log('[VERIFY] Publication state unchanged (idempotent)', { 
+      logger.debug('[VERIFY] Publication state unchanged (idempotent)', { 
         is_published: newIsPublished,
         status: newStatus 
       });
@@ -130,7 +131,7 @@ export async function PUT(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    console.log('[VERIFY] Updating publication state', updateData);
+    logger.debug('[VERIFY] Updating publication state', updateData);
 
     const { data, error } = await supabase
       .from('organizations')
@@ -141,17 +142,17 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('[my/organization/publish] Database error:', error);
+      logger.error('[my/organization/publish] Database error', error instanceof Error ? error : new Error(String(error)));
       return handleApiError(error);
     }
 
     // ✅ 統一キャッシュ無効化
     const cacheResult = await revalidatePublicationCache(user.id, data.slug);
     if (!cacheResult) {
-      console.warn('[VERIFY] Cache invalidation had issues but publication update succeeded');
+      logger.warn('[VERIFY] Cache invalidation had issues but publication update succeeded');
     }
 
-    console.log('[VERIFY] Publication state updated successfully', {
+    logger.debug('[VERIFY] Publication state updated successfully', {
       orgId: data.id,
       slug: data.slug,
       is_published: data.is_published,
@@ -174,7 +175,7 @@ export async function PUT(request: NextRequest) {
 
   } catch (error) {
     const errorId = `publish-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    console.error('[PUT /api/my/organization/publish] Unexpected error:', { errorId, error });
+    logger.error('[PUT /api/my/organization/publish] Unexpected error:', { errorId, error });
     
     return handleApiError(error);
   }

@@ -2,6 +2,7 @@
 // 組織の公開情報とコンテンツを取得
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,7 @@ export async function GET(
     const { slug } = await params;
     
     // Claude改善: より詳細なログ記録でデバッグを支援
-    console.log(`[API] Fetching organization data for slug: ${slug}`);
+    logger.debug('Debug', `[API] Fetching organization data for slug: ${slug}`);
     
     const supabase = await supabaseServer();
     
@@ -73,7 +74,7 @@ export async function GET(
     ]);
 
     // Claude改善: データ取得の結果をログ記録
-    console.log(`[API] Content counts for ${organization.name}: posts=${postsResult.data?.length || 0}, services=${servicesResult.data?.length || 0}, case_studies=${caseStudiesResult.data?.length || 0}, faqs=${faqsResult.data?.length || 0}`);
+    logger.debug('Debug', `[API] Content counts for ${organization.name}: posts=${postsResult.data?.length || 0}, services=${servicesResult.data?.length || 0}, case_studies=${caseStudiesResult.data?.length || 0}, faqs=${faqsResult.data?.length || 0}`);
 
     return NextResponse.json({
       data: {
@@ -87,7 +88,7 @@ export async function GET(
 
   } catch (error) {
     // Claude改善: エラーログを詳細化
-    console.error('[API] Failed to fetch organization data:', {
+    logger.error('[API] Failed to fetch organization data:', {
       error: error instanceof Error ? error.message : error,
       stack: error instanceof Error ? error.stack : undefined
     });
@@ -132,7 +133,7 @@ export async function HEAD(
     });
 
   } catch (error) {
-    console.error('[API] HEAD request failed:', error);
+    logger.error('[API] HEAD request failed', error instanceof Error ? error : new Error(String(error)));
     return new NextResponse(null, { status: 500 });
   }
 }

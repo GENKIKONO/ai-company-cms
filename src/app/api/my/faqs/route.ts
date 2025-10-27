@@ -5,6 +5,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 import type { FAQ, FAQFormData } from '@/types/database';
 import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { logger } from '@/lib/utils/logger';
 
 async function logErrorToDiag(errorInfo: any) {
   try {
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
         .eq('organization_id', orgData.id);
 
       if (countError) {
-        console.error('Error counting FAQs:', countError);
+        logger.error('Error counting FAQs:', countError);
         return NextResponse.json(
           { error: 'Database error', message: countError.message },
           { status: 500 }

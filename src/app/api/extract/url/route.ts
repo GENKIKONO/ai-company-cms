@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { extractionRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      console.error('URL extraction error:', error);
+      logger.error('URL extraction error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'サイトの内容を取得できませんでした' },
         { status: 500 }
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('URL extraction API error:', error);
+    logger.error('URL extraction API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'テキスト抽出に失敗しました' },
       { status: 500 }
@@ -202,7 +203,7 @@ function extractFromHTML(html: string, sourceUrl: string) {
     };
 
   } catch (error) {
-    console.error('HTML parsing error:', error);
+    logger.error('HTML parsing error', error instanceof Error ? error : new Error(String(error)));
     return {
       text: 'テキストの抽出に失敗しました',
       title: title || 'Unknown',

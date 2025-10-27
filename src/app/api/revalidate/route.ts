@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
     const expectedToken = process.env.REVALIDATE_TOKEN;
     
     if (!expectedToken) {
-      console.warn('[Revalidate API] REVALIDATE_TOKEN is not set; returning 503 for safety.');
+      logger.warn('[Revalidate API] REVALIDATE_TOKEN is not set; returning 503 for safety.');
       return NextResponse.json(
         { 
           ok: false,
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
     
     if (!token || token !== expectedToken) {
-      console.error('[Revalidate API] Invalid or missing token');
+      logger.error('[Revalidate API] Invalid or missing token');
       return NextResponse.json(
         { 
           error: 'Unauthorized',
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ISR キャッシュの再検証実行
-    console.log(`[Revalidate API] Revalidating path: ${pathToRevalidate}`);
+    logger.debug('Debug', `[Revalidate API] Revalidating path: ${pathToRevalidate}`);
     
     try {
       revalidatePath(pathToRevalidate);
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
       );
       
     } catch (revalidateError) {
-      console.error('[Revalidate API] Revalidation failed:', revalidateError);
+      logger.error('[Revalidate API] Revalidation failed:', revalidateError);
       return NextResponse.json(
         { 
           error: 'Revalidation Failed',
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('[Revalidate API] Unexpected error:', error);
+    logger.error('[Revalidate API] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { 
         error: 'Internal Server Error',

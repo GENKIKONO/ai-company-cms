@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { HIGButton } from '@/design-system';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
 import { createFAQ, getFAQCategories, getPopularFAQCategories } from '@/lib/faqs';
 import { type AppUser, type Organization, type FAQFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export default function NewFAQPage() {
   const router = useRouter();
@@ -55,7 +57,7 @@ export default function NewFAQPage() {
           setCategories(categoriesResult.data);
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
+        logger.error('Failed to fetch data', error instanceof Error ? error : new Error(String(error)));
         router.push('/dashboard');
       } finally {
         setLoading(false);
@@ -111,7 +113,7 @@ export default function NewFAQPage() {
         setErrors({ submit: 'FAQの作成に失敗しました' });
       }
     } catch (error) {
-      console.error('Failed to create FAQ:', error);
+      logger.error('Failed to create FAQ', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: 'FAQの作成に失敗しました' });
     } finally {
       setSubmitting(false);
@@ -358,13 +360,14 @@ export default function NewFAQPage() {
               >
                 キャンセル
               </Link>
-              <button
+              <HIGButton
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="primary"
+                size="medium"
               >
                 {submitting ? '作成中...' : 'FAQを作成'}
-              </button>
+              </HIGButton>
             </div>
           </div>
         </form>

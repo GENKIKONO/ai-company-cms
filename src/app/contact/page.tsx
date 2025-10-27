@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { BackLink } from '@/components/ui/back-link';
+import { PrimaryCTA, HIGButton } from '@/design-system';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -58,12 +59,12 @@ export default function ContactPage() {
               </p>
             </div>
             
-            <Link 
+            <PrimaryCTA 
               href="/help" 
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              size="medium"
             >
               ヘルプセンターへ戻る
-            </Link>
+            </PrimaryCTA>
           </div>
         </div>
       </div>
@@ -179,13 +180,15 @@ export default function ContactPage() {
             </div>
             
             <div>
-              <button
+              <HIGButton
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                variant="primary"
+                size="large"
+                className="w-full"
               >
                 {isSubmitting ? '送信中...' : '送信する'}
-              </button>
+              </HIGButton>
             </div>
           </form>
         </div>

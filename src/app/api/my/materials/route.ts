@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { PLAN_LIMITS, PlanType, getMaterialLimitMessage } from '@/config/plans';
 import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +41,7 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
@@ -51,7 +52,7 @@ export async function GET() {
 
   } catch (error) {
     const errorId = generateErrorId('get-materials');
-    console.error('[GET /api/my/materials] Unexpected error:', { errorId, error });
+    logger.error('[GET /api/my/materials] Unexpected error:', { errorId, error });
     return createInternalError(errorId);
   }
 }
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest) {
         .eq('organization_id', orgData.id);
 
       if (countError) {
-        console.error('Error counting materials:', countError);
+        logger.error('Error counting materials:', countError);
         return NextResponse.json(
           { error: 'Database error', message: countError.message },
           { status: 500 }
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
@@ -149,7 +150,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     const errorId = generateErrorId('post-materials');
-    console.error('[POST /api/my/materials] Unexpected error:', { errorId, error });
+    logger.error('[POST /api/my/materials] Unexpected error:', { errorId, error });
     return createInternalError(errorId);
   }
 }

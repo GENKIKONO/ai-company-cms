@@ -1,6 +1,7 @@
 // src/lib/organizations-server.ts
 import { supabaseServer } from '@/lib/supabase-server';
 import { unstable_cache } from 'next/cache';
+import { logger } from '@/lib/utils/logger';
 
 export type OrgLite = {
   id: string;
@@ -38,14 +39,14 @@ export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
   const supabase = await supabaseServer();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   
-  console.log('[getCurrentUserOrganization] Auth check:', {
+  logger.debug('[getCurrentUserOrganization] Auth check', {
     hasUser: !!user,
     userId: user?.id,
     authError: authError?.message
   });
   
   if (authError || !user) {
-    console.log('[getCurrentUserOrganization] No user authenticated');
+    logger.debug('Debug', '[getCurrentUserOrganization] No user authenticated');
     return null;
   }
 
@@ -73,7 +74,7 @@ export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
     .limit(1)
     .single();
 
-  console.log('[getCurrentUserOrganization] Query result:', {
+  logger.debug('[getCurrentUserOrganization] Query result', {
     userId: user.id,
     hasData: !!data,
     data: data,
@@ -82,7 +83,7 @@ export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
   });
 
   if (error) {
-    console.error('[getCurrentUserOrganization] select error', error);
+    logger.error('[getCurrentUserOrganization] select error', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
   return data as OrgLite;
@@ -104,7 +105,7 @@ export const getOrganizationByIdCached = (orgId: string) =>
         .single();
 
       if (error) {
-        console.error('[getOrganizationByIdCached] select error', error);
+        logger.error('[getOrganizationByIdCached] select error', error instanceof Error ? error : new Error(String(error)));
         return null;
       }
       return data as OrgFull;
@@ -132,7 +133,7 @@ export const getOrganizationByUserIdCached = (userId: string) =>
         .single();
 
       if (error) {
-        console.error('[getOrganizationByUserIdCached] select error', error);
+        logger.error('[getOrganizationByUserIdCached] select error', error instanceof Error ? error : new Error(String(error)));
         return null;
       }
       return data as OrgLite;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { QACategoryFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: NextRequest) {
   const supabase = await supabaseServer();
@@ -30,14 +31,14 @@ export async function GET(req: NextRequest) {
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('Error fetching categories:', error);
+      logger.error('Error fetching categories', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
     }
 
     return NextResponse.json({ data: categories });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
       if (error.code === '23505') {
         return NextResponse.json({ error: 'Category slug already exists' }, { status: 409 });
       }
-      console.error('Error creating category:', error);
+      logger.error('Error creating category', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });
     }
 
@@ -109,7 +110,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ data: category }, { status: 201 });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

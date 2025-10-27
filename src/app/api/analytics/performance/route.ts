@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/utils/logger';
 // 認証は動的インポートで処理
 
 interface PerformanceData {
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Performance API error:', error);
+    logger.error('Performance API error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json(
       { 
@@ -166,7 +167,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Performance stats API error:', error);
+    logger.error('Performance stats API error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json(
       { 
@@ -382,7 +383,7 @@ async function notifyPerformanceIssues(
       timestamp: new Date(data.timestamp).toISOString()
     });
   } catch (error) {
-    console.error('Failed to send Slack notification:', error);
+    logger.error('Failed to send Slack notification', error instanceof Error ? error : new Error(String(error)));
   }
 }
 

@@ -10,6 +10,7 @@ import { env } from '@/lib/env';
 import { determineUserFlow, calculateUserAccess, canAccessApiEndpoint } from '@/lib/auth/flow-detection';
 import { unauthorizedError, forbiddenError } from './error-responses';
 import { createApiUsageMiddleware, BusinessEventLogger, logSecurityEvent } from './audit-logger';
+import { logger } from '@/lib/utils/logger';
 
 export interface AuthContext {
   user: any;
@@ -77,7 +78,7 @@ export async function requireAuth(request: NextRequest): Promise<AuthContext | R
       userAccess,
     };
   } catch (error) {
-    console.error('Auth middleware error:', error);
+    logger.error('Auth middleware error', error instanceof Error ? error : new Error(String(error)));
     return unauthorizedError('Authentication failed');
   }
 }

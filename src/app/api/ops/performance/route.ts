@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { CacheAnalytics, CacheWarmer } from '@/lib/performance/cache-strategy';
 import { QueryCacheManager } from '@/lib/performance/database-optimization';
+import { logger } from '@/lib/utils/logger';
 
 // Admin認証チェック
 
@@ -169,7 +170,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error: any) {
-    console.error('❌ Performance API Error:', error);
+    logger.error('❌ Performance API Error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       success: false,
@@ -246,7 +247,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error: any) {
-    console.error('❌ Performance API POST Error:', error);
+    logger.error('❌ Performance API POST Error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       success: false,
@@ -418,7 +419,7 @@ if (process.env.NODE_ENV === 'development') {
         performanceHistory = performanceHistory.slice(-500);
       }
     } catch (error) {
-      console.error('Periodic metrics collection failed:', error);
+      logger.error('Periodic metrics collection failed', error instanceof Error ? error : new Error(String(error)));
     }
   }, 5 * 60 * 1000); // 5分間隔
 }

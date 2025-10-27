@@ -5,6 +5,7 @@
 
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 export interface ApiErrorResponse {
   error: {
@@ -136,7 +137,7 @@ export function handleZodError(error: ZodError): NextResponse<ApiErrorResponse> 
  * データベースエラーを統一レスポンスに変換
  */
 export function handleDatabaseError(error: any): NextResponse<ApiErrorResponse> {
-  console.error('Database error:', error);
+  logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
 
   // PostgreSQL固有エラーコードのハンドリング
   if (error.code === '23505') { // unique_violation
@@ -164,7 +165,7 @@ export function handleDatabaseError(error: any): NextResponse<ApiErrorResponse> 
  * 汎用エラーハンドラー
  */
 export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
-  console.error('API Error:', error);
+  logger.error('API Error', error instanceof Error ? error : new Error(String(error)));
 
   if (error instanceof ZodError) {
     return handleZodError(error);

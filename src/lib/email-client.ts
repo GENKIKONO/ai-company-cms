@@ -1,4 +1,6 @@
 'use client';
+import { logger } from '@/lib/utils/logger';
+
 
 // Client-side email utilities for triggering email notifications
 
@@ -20,7 +22,7 @@ export async function triggerWelcomeEmail(email: string, userName: string) {
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error triggering welcome email:', error);
+    logger.error('Error triggering welcome email', error instanceof Error ? error : new Error(String(error)));
     return { success: false, error };
   }
 }
@@ -38,14 +40,14 @@ export async function handleUserRegistrationComplete(user: {
     );
 
     if (emailResult.success) {
-      console.log('Welcome email sent successfully');
+      logger.debug('Debug', 'Welcome email sent successfully');
     } else {
-      console.warn('Failed to send welcome email:', emailResult.error);
+      logger.warn('Failed to send welcome email', emailResult.error);
     }
 
     return emailResult;
   } catch (error) {
-    console.error('Error in post-registration process:', error);
+    logger.error('Error in post-registration process', error instanceof Error ? error : new Error(String(error)));
     return { success: false, error };
   }
 }
@@ -73,7 +75,7 @@ export async function updateEmailPreferences(preferences: {
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error updating email preferences:', error);
+    logger.error('Error updating email preferences', error instanceof Error ? error : new Error(String(error)));
     return { success: false, error };
   }
 }

@@ -12,6 +12,7 @@ import {
   HIGCardGrid
 } from '@/components/ui/HIGCard';
 import { HIGButton } from '@/components/ui/HIGButton';
+import { logger } from '@/lib/utils/logger';
 import { 
   BarChart3, 
   Download, 
@@ -79,7 +80,7 @@ export default function QAStatsPage() {
       setStats(result);
       
     } catch (err) {
-      console.error('Failed to load Q&A stats:', err);
+      logger.error('Failed to load Q&A stats:', err);
       setError(err instanceof Error ? err.message : 'Failed to load Q&A stats');
     } finally {
       setLoading(false);
@@ -144,7 +145,7 @@ export default function QAStatsPage() {
       document.body.removeChild(a);
 
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed', error instanceof Error ? error : new Error(String(error)));
       alert('エクスポートに失敗しました');
     } finally {
       setExporting(null);
@@ -412,7 +413,7 @@ export default function QAStatsPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-32 bg-[var(--color-background-secondary)] rounded-full h-2">
                           <div 
-                            className="bg-[var(--color-primary)] h-2 rounded-full transition-all duration-300"
+                            className="bg-[var(--color-primary)] h-2 rounded-full progress-bar duration-300"
                             style={{ 
                               width: `${stats.totals.views > 0 ? (count / stats.totals.views) * 100 : 0}%` 
                             }}

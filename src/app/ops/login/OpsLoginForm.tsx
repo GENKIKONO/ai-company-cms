@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/utils/logger';
 
 export default function OpsLoginForm() {
   const [passphrase, setPassphrase] = useState('');
@@ -66,7 +67,7 @@ export default function OpsLoginForm() {
         }
       }
     } catch (error) {
-      console.error('Ops login error:', error);
+      logger.error('Ops login error', error instanceof Error ? error : new Error(String(error)));
       setError('ネットワークエラーが発生しました');
     } finally {
       setLoading(false);

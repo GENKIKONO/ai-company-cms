@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseBrowserAdmin } from '@/lib/supabase-server';
 import { stripe } from '@/lib/stripe';
+import { logger } from '@/lib/utils/logger';
 
 const MONTHLY_PRICE_ID = process.env.STRIPE_MONTHLY_PRICE_ID || 'price_monthly_placeholder';
 const SETUP_FEE_PRODUCT_ID = process.env.STRIPE_SETUP_FEE_PRODUCT_ID || 'prod_setup_placeholder';
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Note: Add business event tracking in production
-    console.log('Checkout session created:', {
+    logger.debug('Checkout session created', {
       organization_id,
       plan_type,
       setup_fee_amount,
@@ -156,7 +157,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Checkout creation error:', error);
+    logger.error('Checkout creation error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json(
       { error: 'Failed to create checkout session' },

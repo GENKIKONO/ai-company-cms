@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { generateOGPImage, optimizeImage, OGP_COLOR_PALETTES } from '@/lib/ogp';
+import { logger } from '@/lib/utils/logger';
 
 interface Props {
   companyName: string;
@@ -49,7 +50,7 @@ export default function OGPManager({ companyName, description, logoUrl, onOGPGen
         onOGPGenerated?.(result.imageUrl, metadata);
       }
     } catch (error) {
-      console.error('OGP generation error:', error);
+      logger.error('OGP generation error', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsGenerating(false);
     }
@@ -81,11 +82,11 @@ export default function OGPManager({ companyName, description, logoUrl, onOGPGen
       });
 
       if (result.success) {
-        console.log('Image optimized:', result.result);
+        logger.debug('Image optimized', result.result);
         // 実際の実装では最適化された画像をアップロードして URL を取得
       }
     } catch (error) {
-      console.error('Image optimization error:', error);
+      logger.error('Image optimization error', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsOptimizing(false);
     }

@@ -6,6 +6,7 @@
 import { SentryUtils } from './sentry-utils';
 import { slackNotifier } from './slack-notifier';
 import { WebhookAlert, checkWebhookAlerts, getWebhookHealthMetrics } from './webhook-monitoring';
+import { logger } from '@/lib/utils/logger';
 
 export interface MonitoringConfig {
   sentry: {
@@ -152,7 +153,7 @@ export class MonitoringIntegration {
       };
 
     } catch (error) {
-      console.error('System health check failed:', error);
+      logger.error('System health check failed', error instanceof Error ? error : new Error(String(error)));
       
       return {
         overall: 'unhealthy',
@@ -187,7 +188,7 @@ export class MonitoringIntegration {
       SentryUtils.addBreadcrumb('Health check', 'monitoring');
       return true;
     } catch (error) {
-      console.error('Sentry health check failed:', error);
+      logger.error('Sentry health check failed', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -202,7 +203,7 @@ export class MonitoringIntegration {
       // テスト送信は行わず、設定の存在のみチェック
       return Boolean(this.config.slack.webhookUrl);
     } catch (error) {
-      console.error('Slack health check failed:', error);
+      logger.error('Slack health check failed', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -221,7 +222,7 @@ export class MonitoringIntegration {
       // サーバーサイドでは設定の存在のみチェック
       return Boolean(this.config.plausible.domain);
     } catch (error) {
-      console.error('Plausible health check failed:', error);
+      logger.error('Plausible health check failed', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -236,7 +237,7 @@ export class MonitoringIntegration {
       const metrics = await getWebhookHealthMetrics(1); // 過去1時間
       return metrics.successRate >= this.config.webhook.alertThresholds.failureRate;
     } catch (error) {
-      console.error('Webhook health check failed:', error);
+      logger.error('Webhook health check failed', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -260,7 +261,7 @@ export class MonitoringIntegration {
       const { error } = await supabase.from('organizations').select('id').limit(1);
       return !error;
     } catch (error) {
-      console.error('Database health check failed:', error);
+      logger.error('Database health check failed', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -292,7 +293,7 @@ export class MonitoringIntegration {
       
       return true;
     } catch (error) {
-      console.error('Stripe health check failed:', error);
+      logger.error('Stripe health check failed', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -365,7 +366,7 @@ export class MonitoringIntegration {
         );
       }
     } catch (error) {
-      console.error('Failed to process alerts:', error);
+      logger.error('Failed to process alerts', error instanceof Error ? error : new Error(String(error)));
       SentryUtils.captureException(error instanceof Error ? error : new Error('Failed to process alerts'));
     }
   }

@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { WidgetPreview } from '@/components/embed/WidgetPreview';
 import { getCurrentUser } from '@/lib/auth';
+import { HIGButton } from '@/design-system';
 import { getOrganization } from '@/lib/organizations';
 import { Organization, Service } from '@/types/database';
 import Link from 'next/link';
+import { logger } from '@/lib/utils/logger';
 
 export default function EmbedPage() {
   const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ export default function EmbedPage() {
       setServices(servicesData.data || []);
 
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      logger.error('Failed to fetch data', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -81,7 +83,7 @@ export default function EmbedPage() {
   width="100%"
   height="400"
   frameborder="0"
-  style="border: 1px solid #e2e8f0; border-radius: 8px;">
+  style="border: 1px solid var(--border-default); border-radius: 8px;">
 </iframe>`;
     
     setEmbedCode(code);
@@ -92,7 +94,7 @@ export default function EmbedPage() {
       await navigator.clipboard.writeText(embedCode);
       alert('埋め込みコードをコピーしました！');
     } catch (error) {
-      console.error('Failed to copy:', error);
+      logger.error('Failed to copy', error instanceof Error ? error : new Error(String(error)));
       alert('コピーに失敗しました');
     }
   };
@@ -306,12 +308,13 @@ export default function EmbedPage() {
           <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900">埋め込みコード</h2>
-              <button
+              <HIGButton
                 onClick={copyToClipboard}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                variant="primary"
+                size="small"
               >
                 コードをコピー
-              </button>
+              </HIGButton>
             </div>
             
             <div className="bg-gray-100 rounded-md p-4 overflow-x-auto">

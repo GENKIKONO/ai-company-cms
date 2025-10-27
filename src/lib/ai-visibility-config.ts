@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 interface AiVisibilityStatus {
   enabled: boolean;
@@ -34,13 +35,13 @@ export async function getAiVisibilityStatus(): Promise<AiVisibilityStatus> {
       .single();
 
     if (error) {
-      console.warn('[AI Visibility] Database error, using fallback enabled=true:', error.message);
+      logger.warn('[AI Visibility] Database error, using fallback enabled=true', error.message);
       await sendStatusErrorNotification(error);
       return DEFAULT_STATUS;
     }
 
     if (!data) {
-      console.warn('[AI Visibility] No configuration record found, using fallback enabled=true');
+      logger.warn('[AI Visibility] No configuration record found, using fallback enabled=true');
       await sendStatusErrorNotification(new Error('No configuration record found'));
       return DEFAULT_STATUS;
     }
@@ -54,11 +55,11 @@ export async function getAiVisibilityStatus(): Promise<AiVisibilityStatus> {
     statusCache = status;
     cacheExpiry = Date.now() + CACHE_DURATION;
 
-    console.log('[AI Visibility] Status loaded successfully:', status);
+    logger.debug('[AI Visibility] Status loaded successfully', status);
     return status;
 
   } catch (error) {
-    console.warn('[AI Visibility] Fatal error loading status, using fallback enabled=true:', error);
+    logger.warn('[AI Visibility] Fatal error loading status, using fallback enabled=true', error);
     await sendStatusErrorNotification(error);
     return DEFAULT_STATUS;
   }
@@ -80,14 +81,14 @@ export async function updateLastCheck(): Promise<void> {
       .limit(1); // Update first record only (singleton)
 
     if (error) {
-      console.warn('[AI Visibility] Failed to update last_check:', error.message);
+      logger.warn('[AI Visibility] Failed to update last_check', error.message);
     } else {
       // Clear cache to force refresh on next read
       clearStatusCache();
-      console.log('[AI Visibility] Last check timestamp updated successfully');
+      logger.debug('Debug', '[AI Visibility] Last check timestamp updated successfully');
     }
   } catch (error) {
-    console.warn('[AI Visibility] Error updating last_check:', error);
+    logger.warn('[AI Visibility] Error updating last_check', error);
   }
 }
 
@@ -186,7 +187,7 @@ async function sendStatusErrorNotification(error: any) {
     });
 
   } catch (slackError) {
-    console.error('[AI Visibility] Failed to send error notification:', slackError);
+    logger.error('[AI Visibility] Failed to send error notification:', slackError);
   }
 }
 

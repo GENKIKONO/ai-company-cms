@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/utils/logger';
 
 interface UsageData {
   date: string;
@@ -58,7 +59,7 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
       setData(result.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : '不明なエラー');
-      console.error('Failed to fetch usage data:', err);
+      logger.error('Failed to fetch usage data:', err);
     } finally {
       setLoading(false);
     }
@@ -203,7 +204,7 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
                   {/* バー */}
                   <div className="w-full max-w-8 mb-2 relative">
                     <div
-                      className={`w-full ${getMetricColor()} rounded-t transition-all duration-300 group-hover:opacity-80`}
+                      className={`w-full ${getMetricColor()} rounded-t progress-bar duration-300 group-hover:opacity-80`}
                       style={{ height: `${getBarHeight(item)}%` }}
                     />
                     

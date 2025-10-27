@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import sharp from 'sharp';
+import { logger } from '@/lib/utils/logger';
 
 const OGP_WIDTH = 1200;
 const OGP_HEIGHT = 630;
@@ -202,7 +203,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('OGP generation error:', error);
+    logger.error('OGP generation error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'OGP生成に失敗しました' },
       { status: 500 }

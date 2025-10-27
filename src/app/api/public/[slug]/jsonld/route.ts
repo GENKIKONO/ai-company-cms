@@ -9,6 +9,7 @@ import {
   generatePostJsonLd
 } from '@/lib/utils/jsonld';
 import { buildSafeUrl, getSafeBaseUrl } from '@/lib/utils/safe-url';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +27,7 @@ async function getOrganizationData(slug: string, request?: NextRequest) {
     const result = await response.json();
     return result.data;
   } catch (error) {
-    console.error('Failed to fetch organization data:', error);
+    logger.error('Failed to fetch organization data', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -226,7 +227,7 @@ export async function GET(
     }
 
   } catch (error) {
-    console.error('Failed to generate JSON-LD:', error);
+    logger.error('Failed to generate JSON-LD', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

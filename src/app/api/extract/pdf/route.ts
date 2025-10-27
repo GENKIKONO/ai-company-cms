@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { extractionRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent } from '@/lib/monitoring';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (error) {
-      console.error('PDF parsing error:', error);
+      logger.error('PDF parsing error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'PDFの解析に失敗しました' },
         { status: 500 }
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('PDF extraction API error:', error);
+    logger.error('PDF extraction API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'ファイル処理に失敗しました' },
       { status: 500 }

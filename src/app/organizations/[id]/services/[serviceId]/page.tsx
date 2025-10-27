@@ -8,6 +8,8 @@ import { getOrganization } from '@/lib/organizations';
 import { getService, updateService, deleteService, getServiceCategories } from '@/lib/services';
 import { type AppUser, type Organization, type Service, type ServiceFormData } from '@/types/database';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
+import { HIGButton } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 export default function EditServicePage() {
   const router = useRouter();
@@ -86,7 +88,7 @@ export default function EditServicePage() {
           setCategories(categoriesResult.data);
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
+        logger.error('Failed to fetch data', error instanceof Error ? error : new Error(String(error)));
         router.push('/dashboard');
       } finally {
         setLoading(false);
@@ -152,7 +154,7 @@ export default function EditServicePage() {
         setErrors({ submit: 'サービス情報の更新に失敗しました' });
       }
     } catch (error) {
-      console.error('Failed to update service:', error);
+      logger.error('Failed to update service', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: 'サービス情報の更新に失敗しました' });
     } finally {
       setSubmitting(false);
@@ -164,7 +166,7 @@ export default function EditServicePage() {
       await deleteService(serviceId);
       router.push(`/organizations/${organizationId}`);
     } catch (error) {
-      console.error('Failed to delete service:', error);
+      logger.error('Failed to delete service', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: 'サービスの削除に失敗しました' });
     }
   };
@@ -392,13 +394,14 @@ export default function EditServicePage() {
               >
                 戻る
               </Link>
-              <button
+              <HIGButton
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="primary"
+                size="medium"
               >
                 {submitting ? '保存中...' : '変更を保存'}
-              </button>
+              </HIGButton>
             </div>
           </div>
         </form>

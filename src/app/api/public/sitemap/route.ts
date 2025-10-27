@@ -1,6 +1,7 @@
 // サイトマップAPI: /api/public/sitemap
 // 最低限のサイトマップJSON（将来XML化対応）
 import { NextResponse } from 'next/server';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +27,7 @@ async function getAllPublishedOrganizations() {
     const result = await response.json();
     return result.data || [];
   } catch (error) {
-    console.error('Failed to fetch organizations:', error);
+    logger.error('Failed to fetch organizations', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -177,7 +178,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Failed to generate sitemap:', error);
+    logger.error('Failed to generate sitemap', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Failed to generate sitemap' },
       { status: 500 }

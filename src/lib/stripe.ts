@@ -2,6 +2,7 @@
 import { loadStripe } from '@stripe/stripe-js';
 import Stripe from 'stripe';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 import type { Organization } from '@/types/database';
 
 // Initialize Stripe.js with publishable key
@@ -154,7 +155,7 @@ export const getAIOHubProducts = async () => {
     });
     return products.data;
   } catch (error) {
-    console.error('Error fetching AIO Hub products:', error);
+    logger.error('Error fetching AIO Hub products', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 };
@@ -191,7 +192,7 @@ export const createAIOHubProducts = async () => {
     
     return products;
   } catch (error) {
-    console.error('Error creating AIO Hub products:', error);
+    logger.error('Error creating AIO Hub products', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -207,7 +208,7 @@ export const createStripeCustomer = async (email: string, name?: string) => {
     });
     return customer;
   } catch (error) {
-    console.error('Error creating Stripe customer:', error);
+    logger.error('Error creating Stripe customer', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -242,13 +243,13 @@ export async function getOrCreateCustomer(organization: Organization): Promise<s
       .eq('id', organization.id);
 
     if (error) {
-      console.error('Failed to save customer ID to database:', error);
+      logger.error('Failed to save customer ID to database', error);
       throw new Error('Failed to save customer ID');
     }
 
     return customer.id;
   } catch (error) {
-    console.error('Failed to create Stripe customer:', error);
+    logger.error('Failed to create Stripe customer', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to create customer');
   }
 }
@@ -269,7 +270,7 @@ export async function getPortalUrl(customerId: string, returnUrl?: string): Prom
 
     return portalSession.url;
   } catch (error) {
-    console.error('Failed to create portal session:', error);
+    logger.error('Failed to create portal session', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to create portal session');
   }
 }
@@ -312,7 +313,7 @@ export async function createCheckoutSession(params: CreateCheckoutSessionParams)
 
     return session.url;
   } catch (error) {
-    console.error('Failed to create checkout session:', error);
+    logger.error('Failed to create checkout session', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to create checkout session');
   }
 }
@@ -324,14 +325,14 @@ export function verifyWebhookSignature(body: string, signature: string): Stripe.
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   
   if (!webhookSecret) {
-    console.warn('STRIPE_WEBHOOK_SECRET not configured - webhook verification skipped');
+    logger.warn('STRIPE_WEBHOOK_SECRET not configured - webhook verification skipped');
     return null;
   }
 
   try {
     return stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
-    console.error('Webhook signature verification failed:', error);
+    logger.error('Webhook signature verification failed', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -354,7 +355,7 @@ export async function updateSubscriptionInDB(subscriptionId: string) {
       .single();
 
     if (fetchError || !org) {
-      console.error('Organization not found for customer:', customerId);
+      logger.error('Organization not found for customer', { customerId, error: fetchError });
       return;
     }
 
@@ -378,10 +379,10 @@ export async function updateSubscriptionInDB(subscriptionId: string) {
       .eq('id', org.id);
 
     if (updateError) {
-      console.error('Failed to update subscription in database:', updateError);
+      logger.error('Failed to update subscription in database', updateError);
     }
   } catch (error) {
-    console.error('Failed to update subscription:', error);
+    logger.error('Failed to update subscription', error instanceof Error ? error : new Error(String(error)));
   }
 }
 

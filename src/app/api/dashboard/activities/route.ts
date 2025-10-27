@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: Request) {
   try {
@@ -25,7 +26,7 @@ export async function GET(req: Request) {
         .limit(5);
 
       if (error) {
-        console.error('Activities fetch error:', error);
+        logger.error('Activities fetch error', error instanceof Error ? error : new Error(String(error)));
         
         // テーブルが存在しない場合は空配列を返す
         if (error.code === '42P01' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
@@ -39,7 +40,7 @@ export async function GET(req: Request) {
 
       return NextResponse.json(data || []);
     } catch (error: any) {
-      console.error('Activities API error:', error);
+      logger.error('Activities API error', error instanceof Error ? error : new Error(String(error)));
       
       // PostgreSQLエラーコード42P01は「テーブルが存在しない」
       if (error.code === '42P01' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
@@ -51,7 +52,7 @@ export async function GET(req: Request) {
       }, { status: 500 });
     }
   } catch (error: any) {
-    console.error('API route error:', error);
+    logger.error('API route error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 });

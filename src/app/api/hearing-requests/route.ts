@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error('Database insert error:', insertError);
+      logger.error('Database insert error:', insertError);
       return NextResponse.json(
         {
           error: 'DATABASE_ERROR',
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Hearing request API error:', error);
+    logger.error('Hearing request API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',
@@ -188,7 +189,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (fetchError) {
-      console.error('Database fetch error:', fetchError);
+      logger.error('Database fetch error:', fetchError);
       return NextResponse.json(
         {
           error: 'DATABASE_ERROR',
@@ -203,7 +204,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Hearing request GET API error:', error);
+    logger.error('Hearing request GET API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',

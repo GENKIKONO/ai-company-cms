@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, ChevronDown, ChevronUp } from 'lucide-react';
 import type { QAEntry, QACategory } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface QAPublicDisplayProps {
   organizationSlug: string;
@@ -47,7 +48,7 @@ export default function QAPublicDisplay({ organizationSlug, className = '' }: QA
         setCategories(data.categories || []);
       }
     } catch (error) {
-      console.error('Error fetching Q&A data:', error);
+      logger.error('Error fetching Q&A data', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -78,7 +79,7 @@ export default function QAPublicDisplay({ organizationSlug, className = '' }: QA
       const hasAlreadyViewed = sessionStorage.getItem(sessionKey);
       
       if (hasAlreadyViewed) {
-        console.log(`Q&A ${qnaId} already viewed in this session, skipping duplicate log`);
+        logger.debug('Debug', `Q&A ${qnaId} already viewed in this session, skipping duplicate log`);
         return;
       }
 
@@ -102,7 +103,7 @@ export default function QAPublicDisplay({ organizationSlug, className = '' }: QA
       
     } catch (error) {
       // サイレントエラー：統計ログの失敗はユーザー体験に影響させない
-      console.warn('Failed to log Q&A view:', error);
+      logger.warn('Failed to log Q&A view', error);
     }
   };
 

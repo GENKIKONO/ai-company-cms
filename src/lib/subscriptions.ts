@@ -3,6 +3,7 @@
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { type Subscription, type Organization } from '@/types/database';
 import { SUBSCRIPTION_PLANS } from '@/lib/stripe';
+import { logger } from '@/lib/utils/logger';
 
 // ユーザーのサブスクリプション情報取得
 export async function getUserSubscription(userId: string) {
@@ -20,7 +21,7 @@ export async function getUserSubscription(userId: string) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error fetching user subscription:', error);
+    logger.error('Error fetching user subscription', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -38,7 +39,7 @@ export async function getOrganizationSubscription(organizationId: string) {
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
-    console.error('Error fetching organization subscription:', error);
+    logger.error('Error fetching organization subscription', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -72,7 +73,7 @@ export async function getSubscriptionStats(userId: string) {
 
     return { data: stats, error: null };
   } catch (error) {
-    console.error('Error fetching subscription stats:', error);
+    logger.error('Error fetching subscription stats', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -121,7 +122,7 @@ export async function checkPlanLimits(userId: string, resourceType: 'organizatio
       error: null
     };
   } catch (error) {
-    console.error('Error checking plan limits:', error);
+    logger.error('Error checking plan limits', error instanceof Error ? error : new Error(String(error)));
     return { allowed: false, error };
   }
 }
@@ -145,7 +146,7 @@ export async function createCustomerPortalSession(organizationId: string) {
 
     return { data, error: null };
   } catch (error) {
-    console.error('Error creating customer portal session:', error);
+    logger.error('Error creating customer portal session', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }
@@ -169,7 +170,7 @@ export async function createCheckoutSession(organizationId: string, planId: stri
 
     return { data, error: null };
   } catch (error) {
-    console.error('Error creating checkout session:', error);
+    logger.error('Error creating checkout session', error instanceof Error ? error : new Error(String(error)));
     return { data: null, error };
   }
 }

@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { productionMonitor } from '@/lib/monitoring/production-monitoring';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,13 +22,13 @@ export async function GET(request: NextRequest) {
     const timeframe = url.searchParams.get('timeframe') || '1h';
     const format = url.searchParams.get('format') || 'json';
 
-    console.log('📊 Starting system health check...');
+    logger.debug('Debug', '📊 Starting system health check...');
     const startTime = Date.now();
     
     const metrics = await productionMonitor.checkSystemHealth();
     
     const checkTime = Date.now() - startTime;
-    console.log(`✅ Health check completed in ${checkTime}ms`);
+    logger.debug('Debug', `✅ Health check completed in ${checkTime}ms`);
 
     if (format === 'markdown') {
       const markdownReport = generateMonitoringReport(metrics);
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('❌ Monitoring metrics error:', error);
+    logger.error('❌ Monitoring metrics error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       success: false,
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error: any) {
-    console.error('❌ Monitoring action error:', error);
+    logger.error('❌ Monitoring action error', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json({
       success: false,

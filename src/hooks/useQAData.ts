@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { QACategory, QAEntry } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export function useQAData() {
   const [categories, setCategories] = useState<QACategory[]>([]);
@@ -22,7 +23,7 @@ export function useQAData() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error fetching categories:', err);
+      logger.error('Error fetching categories:', err);
     } finally {
       setLoading(false);
     }
@@ -88,7 +89,7 @@ export function useQAEntries(filters?: {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error fetching entries:', err);
+      logger.error('Error fetching entries:', err);
     } finally {
       setLoading(false);
     }
@@ -148,7 +149,7 @@ export function useQASearch(query: string, options?: {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Search failed';
       setError(errorMessage);
-      console.error('Error searching:', err);
+      logger.error('Error searching:', err);
     } finally {
       setLoading(false);
     }

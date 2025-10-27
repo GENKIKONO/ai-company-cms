@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { isSystemMonitoringAllowed, getSystemMonitoringLimitMessage } from '@/config/plans';
+import { PrimaryCTA, HIGButton } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 interface MonitorData {
   timestamp: string;
@@ -45,7 +47,7 @@ export default function MonitorPage() {
           return;
         }
       } catch (error) {
-        console.error('Plan check error:', error);
+        logger.error('Plan check error', error instanceof Error ? error : new Error(String(error)));
         // Fallback to pricing page on error
         router.push('/pricing?feature=monitor');
       }
@@ -126,15 +128,14 @@ export default function MonitorPage() {
               <p className="text-gray-600 mt-2">AIoHub システム監視ダッシュボード</p>
             </div>
             <div className="text-right">
-              <button
+              <HIGButton
                 onClick={fetchMonitorData}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                variant="primary"
+                size="medium"
+                icon="refresh"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
                 更新
-              </button>
+              </HIGButton>
               {lastUpdate && (
                 <p className="text-sm text-gray-500 mt-1">最終更新: {lastUpdate}</p>
               )}

@@ -5,6 +5,7 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/utils/logger';
 import 'server-only';
 
 export interface ServerUser {
@@ -53,7 +54,7 @@ export async function getServerUser(): Promise<ServerUser | null> {
       appRole: user.app_metadata?.role || 'user'
     };
   } catch (error) {
-    console.error('getServerUser error:', error);
+    logger.error('getServerUser error', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

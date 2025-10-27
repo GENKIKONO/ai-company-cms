@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Organization } from '@/types/database';
 import { WidgetPreview } from './WidgetPreview';
+import { logger } from '@/lib/utils/logger';
 
 interface EmbedCodeGeneratorProps {
   organization: Organization;
@@ -124,7 +125,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
-      console.error('コピーに失敗しました:', err);
+      logger.error('コピーに失敗しました:', err);
       // フォールバック: テキストエリア使用
       const textArea = document.createElement('textarea');
       textArea.value = generatedCode;

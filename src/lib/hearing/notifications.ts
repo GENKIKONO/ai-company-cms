@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 // 通知タイプ定義
 export enum NotificationType {
@@ -173,12 +174,12 @@ export async function sendHearingNotification(notificationData: NotificationData
     const successCount = results.filter(r => r.status === 'fulfilled').length;
     const totalCount = results.length;
 
-    console.log(`Notification sent: ${successCount}/${totalCount} channels successful`);
+    logger.debug('Debug', `Notification sent: ${successCount}/${totalCount} channels successful`);
     
     return successCount > 0;
 
   } catch (error) {
-    console.error('Notification send error:', error);
+    logger.error('Notification send error', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -240,7 +241,7 @@ async function sendToChannel(channel: NotificationChannel, data: NotificationDat
 async function sendEmailNotification(data: NotificationData): Promise<void> {
   try {
     // 実際のメール送信実装（例：SendGrid、AWS SES等）
-    console.log('Sending email notification:', {
+    logger.debug('Sending email notification', {
       to: data.recipients,
       subject: data.title,
       body: data.message,
@@ -256,7 +257,7 @@ async function sendEmailNotification(data: NotificationData): Promise<void> {
     // });
 
   } catch (error) {
-    console.error('Email notification error:', error);
+    logger.error('Email notification error', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -278,7 +279,7 @@ async function sendSMSNotification(data: NotificationData): Promise<void> {
       // });
     }
   } catch (error) {
-    console.error('SMS notification error:', error);
+    logger.error('SMS notification error', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -289,7 +290,7 @@ async function sendSlackNotification(data: NotificationData): Promise<void> {
     const webhookUrl = process.env.SLACK_WEBHOOK_URL;
     
     if (!webhookUrl) {
-      console.warn('Slack webhook URL not configured');
+      logger.warn('Slack webhook URL not configured');
       return;
     }
 
@@ -314,10 +315,10 @@ async function sendSlackNotification(data: NotificationData): Promise<void> {
     //   body: JSON.stringify(payload)
     // });
 
-    console.log('Slack notification sent:', payload);
+    logger.debug('Slack notification sent', payload);
 
   } catch (error) {
-    console.error('Slack notification error:', error);
+    logger.error('Slack notification error', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -343,12 +344,12 @@ async function saveInAppNotifications(supabase: any, data: NotificationData): Pr
       .insert(notifications);
 
     if (error) {
-      console.error('In-app notification save error:', error);
+      logger.error('In-app notification save error', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
   } catch (error) {
-    console.error('In-app notification error:', error);
+    logger.error('In-app notification error', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -419,7 +420,7 @@ export async function sendExpirationNotifications(): Promise<void> {
       .lte('expires_at', tomorrow);
 
     if (error) {
-      console.error('Expiration check error:', error);
+      logger.error('Expiration check error', error instanceof Error ? error : new Error(String(error)));
       return;
     }
 
@@ -437,7 +438,7 @@ export async function sendExpirationNotifications(): Promise<void> {
     }
 
   } catch (error) {
-    console.error('Expiration notification batch error:', error);
+    logger.error('Expiration notification batch error', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -447,7 +448,7 @@ function getPriorityColor(priority: NotificationPriority): string {
     case NotificationPriority.URGENT: return 'danger';
     case NotificationPriority.HIGH: return 'warning';
     case NotificationPriority.NORMAL: return 'good';
-    case NotificationPriority.LOW: return '#cccccc';
+    case NotificationPriority.LOW: return 'var(--border-muted)';
     default: return 'good';
   }
 }
@@ -458,9 +459,9 @@ function formatEmailHTML(data: NotificationData): string {
       <body>
         <h2>${data.title}</h2>
         <p>${data.message.replace(/\n/g, '<br>')}</p>
-        ${data.actionUrl ? `<p><a href="${data.actionUrl}" style="background: #007cba; color: white; padding: 10px 20px; text-decoration: none;">アクション実行</a></p>` : ''}
+        ${data.actionUrl ? `<p><a href="${data.actionUrl}" style="background: var(--color-notification-action); color: white; padding: 10px 20px; text-decoration: none;">アクション実行</a></p>` : ''}
         <hr>
-        <p style="color: #666; font-size: 12px;">
+        <p style="color: var(--color-notification-text); font-size: 12px;">
           このメールはLuxuCareヒアリング代行サービスから自動送信されています。
         </p>
       </body>

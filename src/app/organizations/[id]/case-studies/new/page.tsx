@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { HIGButton } from '@/design-system';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
 import { createCaseStudy } from '@/lib/case-studies';
 import { type AppUser, type Organization, type CaseStudyFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export default function NewCaseStudyPage() {
   const router = useRouter();
@@ -49,7 +51,7 @@ export default function NewCaseStudyPage() {
           router.push('/dashboard');
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
+        logger.error('Failed to fetch data', error instanceof Error ? error : new Error(String(error)));
         router.push('/dashboard');
       } finally {
         setLoading(false);
@@ -118,7 +120,7 @@ export default function NewCaseStudyPage() {
         setErrors({ submit: 'ケーススタディの作成に失敗しました' });
       }
     } catch (error) {
-      console.error('Failed to create case study:', error);
+      logger.error('Failed to create case study', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: 'ケーススタディの作成に失敗しました' });
     } finally {
       setSubmitting(false);
@@ -306,13 +308,14 @@ export default function NewCaseStudyPage() {
                     placeholder="例: 業務効率化, AI導入, コスト削減"
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <button
+                  <HIGButton
                     type="button"
                     onClick={addTag}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    variant="primary"
+                    size="small"
                   >
                     追加
-                  </button>
+                  </HIGButton>
                 </div>
               </div>
 
@@ -356,13 +359,14 @@ export default function NewCaseStudyPage() {
               >
                 キャンセル
               </Link>
-              <button
+              <HIGButton
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="primary"
+                size="medium"
               >
                 {submitting ? '作成中...' : 'ケーススタディを作成'}
-              </button>
+              </HIGButton>
             </div>
           </div>
         </form>

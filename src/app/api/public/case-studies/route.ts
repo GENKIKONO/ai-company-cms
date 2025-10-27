@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
     const { data: caseStudies, error, count } = await query;
 
     if (error) {
-      console.error('Public case studies API error:', error);
+      logger.error('Public case studies API error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Public case studies API failed:', error);
+    logger.error('Public case studies API failed', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

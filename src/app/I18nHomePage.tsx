@@ -21,7 +21,7 @@ import {
 } from '@/components/icons/HIGIcons';
 import { LockIcon, SaveIcon, ShieldIcon, ChartUpIcon } from '@/components/icons/SecurityIcons';
 import SectionMedia, { HeroMedia, FeatureMedia, IconMedia } from '@/components/media/SectionMedia';
-import { PrimaryCTA, SecondaryCTA } from '@/components/ui/UnifiedCTA';
+import { PrimaryCTA, SecondaryCTA } from '@/design-system';
 
 interface SiteSettings {
   title: string;
@@ -89,48 +89,38 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     <div className="apple-page">
       {/* 1. Hero Section（白） */}
       <section className="sec-white">
-        <div className="site-container" style={{
-          backgroundImage: siteSettings.hero_background_image 
-            ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${siteSettings.hero_background_image})` 
-            : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          borderRadius: '16px',
-          padding: '80px clamp(16px, 4vw, 24px)'
-        }}>
-          <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+        <div className={`site-container hero-bg-overlay${siteSettings.hero_background_image ? ' hero-bg-gradient relative' : ''}`} 
+             style={{
+               backgroundImage: siteSettings.hero_background_image 
+                 ? `url(${siteSettings.hero_background_image})` 
+                 : undefined,
+               padding: '80px clamp(16px, 4vw, 24px)'
+             }}>
+          <div className="content-center-800">
             {/* Hero Typography */}
-            <h1 style={{ 
-              fontSize: 'clamp(32px, 5vw, 64px)', 
-              fontWeight: '700', 
-              lineHeight: '1.1', 
-              marginBottom: '24px',
-              color: siteSettings.hero_background_image ? '#FFFFFF' : 'var(--text-primary)'
+            <h1 className="hero-title" style={{ 
+              color: siteSettings.hero_background_image ? 'var(--bg-white)' : 'var(--text-primary)'
             }}>
               AIに"正しく理解"される
               <br />
               企業へ。
             </h1>
             
-            <p style={{ 
-              fontSize: '20px', 
-              lineHeight: '1.5', 
-              marginBottom: '32px',
+            <p className="hero-subtitle" style={{ 
               color: siteSettings.hero_background_image ? 'rgba(255,255,255,0.9)' : 'var(--text-secondary)'
             }}>
               企業情報を構造化し、検索やAI回答で見つかる状態をつくるCMS。
             </p>
             
             {/* チップ */}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '40px', flexWrap: 'wrap' }}>
-              <span style={{ padding: '8px 16px', backgroundColor: 'rgba(10, 132, 255, 0.1)', color: 'var(--bg-primary)', borderRadius: '20px', fontSize: '14px' }}>構造化データ</span>
-              <span style={{ padding: '8px 16px', backgroundColor: 'rgba(10, 132, 255, 0.1)', color: 'var(--bg-primary)', borderRadius: '20px', fontSize: '14px' }}>AI検索最適化</span>
-              <span style={{ padding: '8px 16px', backgroundColor: 'rgba(10, 132, 255, 0.1)', color: 'var(--bg-primary)', borderRadius: '20px', fontSize: '14px' }}>JSON-LD対応</span>
+            <div className="flex-center-gap-12 mb-40">
+              <span className="tag">構造化データ</span>
+              <span className="tag">AI検索最適化</span>
+              <span className="tag">JSON-LD対応</span>
             </div>
             
             {/* CTA */}
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div className="flex-center-gap-16">
               <PrimaryCTA
                 href="/auth/signup"
                 size="large"
@@ -152,63 +142,42 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
       {/* 2. キー便益・導線（薄灰） */}
       <section className="sec-alt">
-        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>大きな商談も、小さな問い合わせも、すべてに対応</h2>
+        <div className="site-container section-padding-y-80">
+          <div className="text-center mb-64">
+            <h2 className="text-h2-large">大きな商談も、小さな問い合わせも、すべてに対応</h2>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', marginBottom: '48px' }}>
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '40px 32px', 
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-              border: '1px solid rgba(0, 0, 0, 0.05)'
-            }}>
-              <div style={{ marginBottom: '24px' }}>
-                <div style={{ color: 'var(--bg-primary)' }}>
+          <div className="grid-auto-fit-300 mb-48">
+            <div className="card-feature">
+              <div className="mb-24">
+                <div className="color-primary">
                   <BuildingIcon className="w-12 h-12" />
                 </div>
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>営業資料として</h3>
-              <p style={{ fontSize: '17px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>構造化された企業情報で説得力アップ</p>
+              <h3 className="text-h3">営業資料として</h3>
+              <p className="text-body">構造化された企業情報で説得力アップ</p>
             </div>
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '40px 32px', 
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-              border: '1px solid rgba(0, 0, 0, 0.05)'
-            }}>
-              <div style={{ marginBottom: '24px' }}>
-                <div style={{ color: 'var(--bg-primary)' }}>
+            <div className="card-feature">
+              <div className="mb-24">
+                <div className="color-primary">
                   <UserIcon className="w-12 h-12" />
                 </div>
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>採用活動で</h3>
-              <p style={{ fontSize: '17px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>求職者がAI検索で企業を正確に理解</p>
+              <h3 className="text-h3">採用活動で</h3>
+              <p className="text-body">求職者がAI検索で企業を正確に理解</p>
             </div>
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '40px 32px', 
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-              border: '1px solid rgba(0, 0, 0, 0.05)'
-            }}>
-              <div style={{ marginBottom: '24px' }}>
-                <div style={{ color: 'var(--bg-primary)' }}>
+            <div className="card-feature">
+              <div className="mb-24">
+                <div className="color-primary">
                   <InfoIcon className="w-12 h-12" />
                 </div>
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>PR・広報で</h3>
-              <p style={{ fontSize: '17px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>メディアがAIで企業情報を取得・引用</p>
+              <h3 className="text-h3">PR・広報で</h3>
+              <p className="text-body">メディアがAIで企業情報を取得・引用</p>
             </div>
           </div>
           
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="flex-center-gap-16">
             <SecondaryCTA href="/contact" size="medium">
               今すぐヒアリング申込み
             </SecondaryCTA>
@@ -221,7 +190,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
       {/* 画像スロット1: キー便益後 */}
       <section className="sec-white">
-        <div className="site-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+        <div className="site-container section-padding-y-40">
           <FeatureMedia 
             caption="導入企業様の構造化された企業プロフィール例"
             align="center"
@@ -232,58 +201,33 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
       {/* 3. 仕組み/3ステップ（白） */}
       <section className="sec-white">
-        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>シンプルな3ステップでAI最適化を実現</h2>
-            <p style={{ fontSize: '20px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
+        <div className="site-container section-padding-y-80">
+          <div className="text-center mb-64">
+            <h2 className="text-h2-large">シンプルな3ステップでAI最適化を実現</h2>
+            <p className="text-body-large">
               簡単な手続きで、企業情報が構造化され、AIで検索される状態に
             </p>
           </div>
           
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-            gap: '32px',
-            maxWidth: '1200px',
-            margin: '0 auto'
-          }}>
-            <div style={{ 
-              textAlign: 'center',
-              padding: '40px 24px',
-              backgroundColor: '#F2F2F7',
-              borderRadius: '16px',
-              border: '1px solid rgba(0, 0, 0, 0.05)'
-            }}>
-              <div style={{ 
-                width: '80px', 
-                height: '80px', 
-                backgroundColor: 'var(--bg-primary)', 
-                borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                margin: '0 auto 24px',
-                fontSize: '36px',
-                fontWeight: '700',
-                color: 'white',
-                fontVariantNumeric: 'lining-nums tabular-nums'
-              }}>1</div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>申し込み</h3>
-              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px', color: 'var(--text-secondary)' }}>
-                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+          <div className="grid-steps">
+            <div className="card-step-grey">
+              <div className="step-number">1</div>
+              <h3 className="text-h3">申し込み</h3>
+              <ul className="list-feature">
+                <li className="list-item-with-icon">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-5 h-5" />
                   </div>
                   企業名・業界・规模を入力
                 </li>
-                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                <li className="list-item-with-icon">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-5 h-5" />
                   </div>
                   主要サービス・特徴を選択
                 </li>
-                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                <li className="list-item-with-icon">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-5 h-5" />
                   </div>
                   14日間無料トライアル開始
@@ -291,43 +235,24 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </ul>
             </div>
             
-            <div style={{ 
-              textAlign: 'center',
-              padding: '40px 24px',
-              backgroundColor: '#F2F2F7',
-              borderRadius: '16px',
-              border: '1px solid rgba(0, 0, 0, 0.05)'
-            }}>
-              <div style={{ 
-                width: '80px', 
-                height: '80px', 
-                backgroundColor: 'var(--bg-primary)', 
-                borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                margin: '0 auto 24px',
-                fontSize: '36px',
-                fontWeight: '700',
-                color: 'white',
-                fontVariantNumeric: 'lining-nums tabular-nums'
-              }}>2</div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>ヒアリング（60分）</h3>
-              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px', color: 'var(--text-secondary)' }}>
-                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+            <div className="card-step-grey">
+              <div className="step-number">2</div>
+              <h3 className="text-h3">ヒアリング（60分）</h3>
+              <ul className="list-feature">
+                <li className="list-item-with-icon">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-5 h-5" />
                   </div>
                   現在の情報発信状況を確認
                 </li>
-                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                <li className="list-item-with-icon">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-5 h-5" />
                   </div>
                   AI検索最適化の方向性を相談
                 </li>
-                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                <li className="list-item-with-icon">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-5 h-5" />
                   </div>
                   カスタマイズプランを提案
@@ -335,43 +260,24 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </ul>
             </div>
             
-            <div style={{ 
-              textAlign: 'center',
-              padding: '40px 24px',
-              backgroundColor: '#F2F2F7',
-              borderRadius: '16px',
-              border: '1px solid rgba(0, 0, 0, 0.05)'
-            }}>
-              <div style={{ 
-                width: '80px', 
-                height: '80px', 
-                backgroundColor: 'var(--bg-primary)', 
-                borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                margin: '0 auto 24px',
-                fontSize: '36px',
-                fontWeight: '700',
-                color: 'white',
-                fontVariantNumeric: 'lining-nums tabular-nums'
-              }}>3</div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>AI最適化・公開</h3>
-              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px', color: 'var(--text-secondary)' }}>
-                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+            <div className="card-step-grey">
+              <div className="step-number">3</div>
+              <h3 className="text-h3">AI最適化・公開</h3>
+              <ul className="list-feature">
+                <li className="list-item-with-icon">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-5 h-5" />
                   </div>
                   JSON-LD構造化データ生成
                 </li>
-                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                <li className="list-item-with-icon">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-5 h-5" />
                   </div>
                   AI検索エンジンに最適化
                 </li>
-                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                <li className="list-item-with-icon">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-5 h-5" />
                   </div>
                   企業情報ハブを即座公開
@@ -383,8 +289,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* 画像スロット2: 3ステップ後 - 削除予定 */}
-      <section className="sec-white" style={{display: 'none'}}>
-        <div className="site-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+      <section className="sec-white hidden">
+        <div className="site-container section-padding-y-40">
           <HeroMedia 
             caption="3ステップでAI最適化された企業情報管理画面"
             align="center"
@@ -395,53 +301,44 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
       {/* 4. 信頼・安心（青・強調帯） */}
       <section className="sec-primary">
-        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2 style={{ 
-              fontSize: 'clamp(28px, 4.2vw, 40px)', 
-              fontWeight: '700', 
-              marginBottom: '24px',
-              color: '#FFFFFF'
-            }}>
+        <div className="site-container section-padding-y-80">
+          <div className="text-center mb-48">
+            <h2 className="text-security-title">
               もっと信頼を。もっと安心を。もっと成果を。
             </h2>
-            <p style={{ 
-              fontSize: '20px', 
-              lineHeight: '1.5', 
-              color: 'rgba(255, 255, 255, 0.9)' 
-            }}>
+            <p className="text-security-description">
               AIO Hubは、企業の機密情報を最高レベルのセキュリティで保護します。
             </p>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '32px', textAlign: 'center' }}>
+          <div className="grid-auto-fit-250 text-center">
             <div>
-              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+              <div className="mb-16 flex justify-center">
                 <LockIcon className="w-12 h-12" />
               </div>
-              <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>SSL暗号化</h4>
-              <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>通信の完全暗号化</p>
+              <h4 className="text-feature-title">SSL暗号化</h4>
+              <p className="text-small text-feature-white">通信の完全暗号化</p>
             </div>
             <div>
-              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+              <div className="mb-16 flex justify-center">
                 <SaveIcon className="w-12 h-12" />
               </div>
-              <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>定期バックアップ</h4>
-              <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>データの安全な保管</p>
+              <h4 className="text-feature-title">定期バックアップ</h4>
+              <p className="text-small text-feature-white">データの安全な保管</p>
             </div>
             <div>
-              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+              <div className="mb-16 flex justify-center">
                 <ShieldIcon className="w-12 h-12" />
               </div>
-              <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>アクセス制御</h4>
-              <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>権限管理とログ監視</p>
+              <h4 className="text-feature-title">アクセス制御</h4>
+              <p className="text-small text-feature-white">権限管理とログ監視</p>
             </div>
             <div>
-              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+              <div className="mb-16 flex justify-center">
                 <ChartUpIcon className="w-12 h-12" />
               </div>
-              <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>監査ログ</h4>
-              <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>全操作の記録・追跡</p>
+              <h4 className="text-feature-title">監査ログ</h4>
+              <p className="text-small text-feature-white">全操作の記録・追跡</p>
             </div>
           </div>
         </div>
@@ -449,86 +346,66 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
       {/* 5. 活用シーン（白） */}
       <section className="sec-white">
-        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>AI時代の新しい課題を解決</h2>
-            <p style={{ fontSize: '20px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
+        <div className="site-container section-padding-y-80">
+          <div className="text-center mb-64">
+            <h2 className="text-h2-large">AI時代の新しい課題を解決</h2>
+            <p className="text-body-large">
               ChatGPTやGoogle AI検索が主流になる中、構造化されていない企業情報は正確に引用されません
             </p>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '48px' }}>
+          <div className="grid-auto-fit-400">
             {/* BEFORE */}
-            <div style={{ 
-              backgroundColor: '#FEF2F2', 
-              border: '1px solid #FECACA', 
-              borderRadius: '16px', 
-              padding: '32px',
-              textAlign: 'center'
-            }}>
-              <div style={{ marginBottom: '24px' }}>
-                <div style={{ color: '#EF4444' }}>
+            <div className="comparison-card-error">
+              <div className="mb-24">
+                <div className="color-error">
                   <AlertTriangleIcon className="w-12 h-12" />
                 </div>
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: '#DC2626' }}>見つけてもらえない企業</h3>
-              <div style={{ 
-                backgroundColor: '#FFFFFF', 
-                border: '1px solid #E5E7EB', 
-                borderRadius: '12px', 
-                padding: '16px', 
+              <h3 className="text-comparison-title text-comparison-error">見つけてもらえない企業</h3>
+              <div className="comparison-card" style={{ 
                 marginBottom: '24px',
                 textAlign: 'left'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ width: '24px', height: '24px', backgroundColor: '#EF4444', borderRadius: '50%', marginRight: '8px', fontSize: '12px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>AI</div>
-                  <strong style={{ color: '#EF4444' }}>エラー</strong>
+                <div className="flex-items-center-mb-8">
+                  <div className="icon-ai-badge icon-ai-error">AI</div>
+                  <strong className="text-error">エラー</strong>
                 </div>
-                <p style={{ fontSize: '15px', color: '#6B7280' }}>申し訳ございませんが、詳細な情報を見つけることができませんでした</p>
+                <p className="text-small">申し訳ございませんが、詳細な情報を見つけることができませんでした</p>
               </div>
-              <ul style={{ textAlign: 'left', fontSize: '15px', lineHeight: '1.6' }}>
-                <li style={{ marginBottom: '8px', color: '#EF4444' }}>• 企業情報が散在・非構造化</li>
-                <li style={{ marginBottom: '8px', color: '#EF4444' }}>• AIが理解・引用できない形式</li>
+              <ul className="text-small-list">
+                <li className="list-error-item">• 企業情報が散在・非構造化</li>
+                <li className="list-error-item">• AIが理解・引用できない形式</li>
               </ul>
             </div>
             
             {/* AFTER */}
-            <div style={{ 
-              backgroundColor: '#F0F9FF', 
-              border: '1px solid #BAE6FD', 
-              borderRadius: '16px', 
-              padding: '32px',
-              textAlign: 'center'
-            }}>
-              <div style={{ marginBottom: '24px' }}>
-                <div style={{ color: '#10B981' }}>
+            <div className="comparison-card-success">
+              <div className="mb-24">
+                <div className="color-success">
                   <CheckCircleIcon className="w-12 h-12" />
                 </div>
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--bg-primary)' }}>AIに理解される企業へ</h3>
-              <div style={{ 
-                backgroundColor: '#FFFFFF', 
-                border: '1px solid #E5E7EB', 
-                borderRadius: '12px', 
-                padding: '16px', 
+              <h3 className="text-comparison-title text-comparison-primary">AIに理解される企業へ</h3>
+              <div className="comparison-card" style={{ 
                 marginBottom: '24px',
                 textAlign: 'left'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ width: '24px', height: '24px', backgroundColor: 'var(--bg-primary)', borderRadius: '50%', marginRight: '8px', fontSize: '12px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>AI</div>
-                  <strong style={{ color: 'var(--bg-primary)' }}>成功</strong>
+                <div className="flex-items-center-mb-8">
+                  <div className="icon-ai-badge icon-ai-primary">AI</div>
+                  <strong className="color-primary">成功</strong>
                 </div>
-                <p style={{ fontSize: '15px', color: '#374151' }}><strong>[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。</p>
+                <p className="text-small" style={{ color: '#374151' }}><strong>[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。</p>
               </div>
-              <ul style={{ textAlign: 'left', fontSize: '15px', lineHeight: '1.6' }}>
-                <li style={{ marginBottom: '8px', color: '#10B981', display: 'flex', alignItems: 'center' }}>
-                  <div style={{ marginRight: '8px', display: 'inline-flex', color: '#10B981' }}>
+              <ul className="text-small-list">
+                <li className="list-success-item">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-4 h-4" />
                   </div>
                   構造化された企業情報
                 </li>
-                <li style={{ marginBottom: '8px', color: '#10B981', display: 'flex', alignItems: 'center' }}>
-                  <div style={{ marginRight: '8px', display: 'inline-flex', color: '#10B981' }}>
+                <li className="list-success-item">
+                  <div className="icon-check-green">
                     <CheckCircleIcon className="w-4 h-4" />
                   </div>
                   AI検索に最適化されたデータ
@@ -538,7 +415,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           {/* 画像スロット3: Before/After比較内 */}
-          <div style={{ textAlign: 'center', marginTop: '48px', marginBottom: '48px' }}>
+          <div className="text-center mt-48 mb-48">
             <FeatureMedia 
               caption="構造化前後での検索結果の違い（実際の比較画面）"
               align="center"
@@ -546,7 +423,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             />
           </div>
           
-          <div style={{ textAlign: 'center', marginTop: '48px' }}>
+          <div className="text-center mt-48">
             <PrimaryCTA
               href="/auth/signup"
               size="large"
@@ -560,7 +437,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
       {/* 画像スロット4: 料金プラン前 */}
       <section className="sec-white">
-        <div className="site-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+        <div className="site-container section-padding-y-40">
           <IconMedia 
             caption="料金体系の概要"
             align="center"
@@ -571,28 +448,22 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
       {/* 6. 料金（薄灰） */}
       <section className="sec-alt" id="pricing">
-        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+        <div className="site-container section-padding-y-80">
           <PricingTable />
         </div>
       </section>
 
       {/* 7. FAQ + 最終CTA（白） */}
       <section className="sec-white">
-        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+        <div className="site-container section-padding-y-80">
           {/* その他の質問セクション */}
-          <div style={{ 
-            textAlign: 'center', 
-            marginBottom: '80px',
-            padding: '48px 40px',
-            backgroundColor: '#FFFFFF',
-            borderRadius: '20px',
-            boxShadow: '0 6px 24px rgba(0, 0, 0, 0.08)',
-            border: '1px solid rgba(0, 0, 0, 0.05)'
+          <div className="cta-box" style={{ 
+            marginBottom: '80px'
           }}>
-            <h2 style={{ fontSize: '36px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-primary)' }}>
+            <h2 className="text-cta-title">
               その他のご質問がございましたら
             </h2>
-            <p style={{ fontSize: '18px', lineHeight: '1.5', marginBottom: '32px', color: 'var(--text-secondary)' }}>
+            <p className="text-description">
               AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
             </p>
             <PrimaryCTA
@@ -611,21 +482,15 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           />
           
           {/* 最終CTA */}
-          <div style={{ 
-            textAlign: 'center', 
-            marginTop: '80px', 
-            padding: '64px 40px', 
-            backgroundColor: '#FFFFFF', 
-            borderRadius: '24px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-            border: '1px solid rgba(0, 0, 0, 0.05)'
+          <div className="cta-box-large" style={{ 
+            marginTop: '80px'
           }}>
-            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px', color: 'var(--text-primary)' }}>まずは情報を"構造化"するところから。</h2>
-            <p style={{ fontSize: '20px', lineHeight: '1.5', marginBottom: '40px', color: 'var(--text-secondary)' }}>
+            <h2 className="text-cta-large">まずは情報を"構造化"するところから。</h2>
+            <p className="text-body-large" style={{ marginBottom: '40px' }}>
               14日間の無料体験で効果を実感
             </p>
             
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '32px' }}>
+            <div className="flex-center-gap-16 mb-32">
               <PrimaryCTA
                 href="/auth/signup"
                 size="large"
@@ -641,7 +506,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </SecondaryCTA>
             </div>
             
-            <p style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>
+            <p className="text-small" style={{ color: 'var(--text-secondary)' }}>
               クレジットカード不要・いつでも解約可能
             </p>
           </div>

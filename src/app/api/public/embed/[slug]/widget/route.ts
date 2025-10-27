@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateOrganizationJsonLd } from '@/lib/json-ld';
 import { generateEmbedWidget } from '@/lib/embed/generator';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +41,7 @@ async function getOrganizationData(slug: string) {
     const result = await response.json();
     return result.data;
   } catch (error) {
-    console.error('Failed to fetch organization data for embed:', error);
+    logger.error('Failed to fetch organization data for embed', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -93,7 +94,7 @@ export async function GET(
       // 404の場合もJavaScriptエラーハンドリングを返す
       const errorWidget = `
 (function() {
-  console.warn('LuxuCare Widget: Organization "${resolvedParams.slug}" not found');
+  logger.warn('LuxuCare Widget: Organization "${resolvedParams.slug}" not found');
   
   // エラー表示用の最小HTML
   const container = document.currentScript?.parentElement;
@@ -152,7 +153,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Widget generation error:', error);
+    logger.error('Widget generation error', error instanceof Error ? error : new Error(String(error)));
     
     // エラー時のフォールバックWidget
     const fallbackWidget = `
@@ -161,7 +162,7 @@ export async function GET(
   
   const container = document.currentScript?.parentElement;
   if (container) {
-    container.innerHTML = '<div style="padding: 10px; border: 1px solid #f44336; background: #ffebee; border-radius: 4px; font-family: Arial, sans-serif; color: #c62828;">Widget読み込みエラーが発生しました</div>';
+    container.innerHTML = '<div style="padding: 10px; border: 1px solid var(--color-error); background: var(--color-danger-bg); border-radius: 4px; font-family: Arial, sans-serif; color: var(--color-alert-danger-text);">Widget読み込みエラーが発生しました</div>';
   }
 })();`;
 

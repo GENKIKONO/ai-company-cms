@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useI18n } from '@/components/layout/I18nProvider';
-import OptimizedImage from '@/components/ui/OptimizedImage';
+import { LogoImage } from '@/components/ui/optimized-image';
 import { 
   Building2, 
   MapPin, 
@@ -19,6 +19,7 @@ import {
   Share2
 } from 'lucide-react';
 import { type Organization, type Service, type CaseStudy } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 // Claude改善: 柔軟性を保った型定義
 interface SearchResultCardProps {
@@ -39,7 +40,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
     try {
       onFavorite?.(id);
     } catch (error) {
-      console.error('Failed to toggle favorite:', error);
+      logger.error('Failed to toggle favorite', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -47,7 +48,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
     try {
       onShare?.(item);
     } catch (error) {
-      console.error('Failed to share item:', error);
+      logger.error('Failed to share item', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -61,7 +62,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
           {/* ロゴ */}
           <div className="flex-shrink-0">
             {org.logo_url && !imageError ? (
-              <OptimizedImage
+              <LogoImage
                 src={org.logo_url}
                 alt={`${org.name} logo`}
                 width={80}
@@ -375,7 +376,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
     case 'case_study':
       return renderCaseStudyCard(data as CaseStudy & { organization: Organization });
     default:
-      console.error('Unknown card type:', type);
+      logger.error('Unknown card type:', type);
       return null;
   }
 }

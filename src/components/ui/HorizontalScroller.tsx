@@ -3,6 +3,7 @@
 import { PropsWithChildren, useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
+import { logger } from '@/lib/utils/logger';
 
 export default function HorizontalScroller({
   children, 
@@ -51,7 +52,7 @@ export default function HorizontalScroller({
         });
         
         if (maxIntersectionRatio > 0) {
-          console.log('[HorizontalScroller] Setting index:', activeIndex, 'ratio:', maxIntersectionRatio);
+          logger.debug('HorizontalScroller setting index', { activeIndex, ratio: maxIntersectionRatio });
           setCurrentIndex(activeIndex);
         }
       },
@@ -91,7 +92,7 @@ export default function HorizontalScroller({
         }
       });
       
-      console.log('[HorizontalScroller] Scroll fallback setting index:', closestIndex);
+      logger.debug('HorizontalScroller scroll fallback setting index', { closestIndex });
       setCurrentIndex(closestIndex);
     };
 
@@ -131,8 +132,6 @@ export default function HorizontalScroller({
           'carousel-wrapper scroll-smooth snap-x snap-mandatory overflow-y-visible sm:overflow-visible [-webkit-overflow-scrolling:touch] px-6 -mx-6 sm:mx-0 sm:px-0 pb-4 sm:pb-0 pt-6 scrollbar-hide isolate'
         )}
         style={{
-          scrollSnapStop: 'normal',
-          WebkitOverflowScrolling: 'touch',
           scrollPaddingInlineStart,
           scrollPaddingInlineEnd,
         }}

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Mail, Phone, Calendar, User, MessageSquare, Eye, Archive, CheckCircle, Clock } from 'lucide-react';
+import { HIGButton } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 interface Contact {
   id: string;
@@ -33,7 +35,7 @@ export default function ContactsPage() {
         setContacts(data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching contacts:', error);
+      logger.error('Error fetching contacts', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -54,7 +56,7 @@ export default function ContactsPage() {
         }
       }
     } catch (error) {
-      console.error('Error updating contact status:', error);
+      logger.error('Error updating contact status', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -75,7 +77,7 @@ export default function ContactsPage() {
         await updateContactStatus(selectedContact.id, 'replied');
       }
     } catch (error) {
-      console.error('Error sending reply:', error);
+      logger.error('Error sending reply', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setReplying(false);
     }
@@ -142,12 +144,13 @@ export default function ContactsPage() {
                 お問合せ・サポート依頼の管理 {unreadCount > 0 && <span className="text-red-600 font-medium">({unreadCount}件未読)</span>}
               </p>
             </div>
-            <button 
+            <HIGButton 
               onClick={fetchContacts}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              variant="primary"
+              size="medium"
             >
               更新
-            </button>
+            </HIGButton>
           </div>
         </div>
 
@@ -300,13 +303,14 @@ export default function ContactsPage() {
                       placeholder="返信メッセージを入力してください..."
                     />
                     <div className="flex gap-2 mt-3">
-                      <button
+                      <HIGButton
                         onClick={sendReply}
                         disabled={!replyMessage.trim() || replying}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        variant="primary"
+                        size="medium"
                       >
                         {replying ? '送信中...' : '返信'}
-                      </button>
+                      </HIGButton>
                       <button
                         onClick={() => updateContactStatus(selectedContact.id, 'archived')}
                         className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"

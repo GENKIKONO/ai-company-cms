@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { monitoringIntegration } from '@/lib/utils/monitoring-integration';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Alert processing failed:', error);
+    logger.error('Alert processing failed', error instanceof Error ? error : new Error(String(error)));
     
     return NextResponse.json(
       { 

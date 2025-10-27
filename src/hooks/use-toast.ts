@@ -1,5 +1,6 @@
 // Simple toast hook for notifications
 import { useState, useCallback } from 'react';
+import { logger } from '@/lib/utils/logger';
 
 export interface ToastProps {
   title: string;
@@ -12,7 +13,7 @@ export function useToast() {
 
   const toast = useCallback((props: ToastProps) => {
     // Simple console-based toast for now
-    console.log(`[TOAST ${props.variant || 'default'}] ${props.title}`, props.description || '');
+    logger.debug('Debug', `[TOAST ${props.variant || 'default'}] ${props.title}`, props.description || '');
     
     // Add alert for immediate feedback
     if (props.variant === 'destructive') {

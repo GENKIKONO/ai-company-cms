@@ -99,8 +99,8 @@ export function generateImagePlaceholder(width: number, height: number): string 
   // Base64エンコードされた小さなプレースホルダー画像
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-      <rect width="100%" height="100%" fill="#f3f4f6"/>
-      <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#9ca3af" font-family="sans-serif" font-size="14">
+      <rect width="100%" height="100%" fill="var(--color-placeholder-bg)"/>
+      <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="var(--color-placeholder-text)" font-family="sans-serif" font-size="14">
         読み込み中...
       </text>
     </svg>

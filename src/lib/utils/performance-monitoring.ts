@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger';
+
 /**
  * パフォーマンス監視ユーティリティ (I2)
  * Web Vitals、リソース読み込み、ユーザー体験の測定
@@ -87,7 +89,7 @@ export class WebVitalsMonitor {
     try {
       observer.observe({ type: 'largest-contentful-paint', buffered: true });
     } catch (error) {
-      console.warn('LCP observation failed:', error);
+      logger.warn('LCP observation failed', error);
     }
   }
 
@@ -108,7 +110,7 @@ export class WebVitalsMonitor {
     try {
       observer.observe({ type: 'first-input', buffered: true });
     } catch (error) {
-      console.warn('FID observation failed:', error);
+      logger.warn('FID observation failed', error);
     }
   }
 
@@ -149,7 +151,7 @@ export class WebVitalsMonitor {
     try {
       observer.observe({ type: 'layout-shift', buffered: true });
     } catch (error) {
-      console.warn('CLS observation failed:', error);
+      logger.warn('CLS observation failed', error);
     }
   }
 
@@ -169,7 +171,7 @@ export class WebVitalsMonitor {
     try {
       observer.observe({ type: 'paint', buffered: true });
     } catch (error) {
-      console.warn('FCP observation failed:', error);
+      logger.warn('FCP observation failed', error);
     }
   }
 
@@ -219,7 +221,7 @@ export class WebVitalsMonitor {
       try {
         callback(this.metrics);
       } catch (error) {
-        console.error('Performance callback error:', error);
+        logger.error('Performance callback error', error instanceof Error ? error : new Error(String(error)));
       }
     });
   }
@@ -306,7 +308,7 @@ export class ResourceMonitor {
     try {
       observer.observe({ type: 'resource', buffered: true });
     } catch (error) {
-      console.warn('Resource observation failed:', error);
+      logger.warn('Resource observation failed', error);
     }
   }
 
@@ -455,7 +457,7 @@ export class MemoryMonitor {
     const intervalId = setInterval(() => {
       const usage = this.getMemoryUsage();
       if (usage && usage.percentage > 80) {
-        console.warn('High memory usage detected:', usage);
+        logger.warn('High memory usage detected', usage);
       }
     }, interval);
 
@@ -519,7 +521,7 @@ export class PerformanceMonitor {
           }
         });
       } catch (error) {
-        console.error('Failed to send performance data to Plausible:', error);
+        logger.error('Failed to send performance data to Plausible', error instanceof Error ? error : new Error(String(error)));
       }
     }
 

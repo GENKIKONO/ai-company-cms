@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getAiVisibilityStatus } from '@/lib/ai-visibility-config';
+import { logger } from '@/lib/utils/logger';
 
 // AI Visibility Guard Enhanced Robots.txt Generation
 export default async function robots(): Promise<MetadataRoute.Robots> {
@@ -15,7 +16,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       host: baseUrl,
     };
   } catch (error) {
-    console.error('Error generating robots.txt:', error);
+    logger.error('Error generating robots.txt', error instanceof Error ? error : new Error(String(error)));
     // Fallback to static configuration (AI monitoring enabled by default)
     return getStaticRobots(baseUrl);
   }

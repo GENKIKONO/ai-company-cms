@@ -1,0 +1,328 @@
+/* ============================================================
+   Components Module
+   Interactive elements, buttons, cards, and components
+   ============================================================ */
+
+/* 1. Apple Button System */
+.apple-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-family-system);
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+  position: relative;
+  overflow: hidden;
+  will-change: transform, background-color, box-shadow;
+}
+
+.apple-button:active {
+  transform: scale(0.96);
+  transition-duration: var(--duration-instant);
+}
+
+.apple-button-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.apple-button:hover .apple-button-icon {
+  transform: translateX(2px);
+}
+
+/* 2. Button Sizes */
+.apple-button-large {
+  padding: var(--space-3) var(--space-5);
+  font-size: 16px;
+  min-height: 48px;
+}
+
+.apple-button-medium {
+  padding: var(--space-3) var(--space-5);
+  font-size: 16px;
+  min-height: 48px;
+}
+
+/* 3. Button Variants */
+.apple-button-primary {
+  background: #007AFF;
+  color: white;
+  box-shadow: 
+    0 4px 12px rgba(0, 122, 255, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.apple-button-primary:hover {
+  background: #0056CC;
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 
+    0 8px 24px rgba(0, 122, 255, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.apple-button-secondary {
+  background: var(--bg-white);
+  color: var(--color-text-primary);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.apple-button-secondary:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 4. Force Button Visibility (High Specificity) */
+.apple-pricing-cta .apple-button-primary,
+a.apple-button.apple-button-primary {
+  background: #007AFF !important;
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-size: inherit !important;
+  display: inline-flex !important;
+}
+
+.apple-pricing-cta .apple-button-secondary,
+a.apple-button.apple-button-secondary {
+  background: var(--bg-white) !important;
+  color: #1f2937 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-size: inherit !important;
+  display: inline-flex !important;
+}
+
+/* 5. CTA Button System - PC/Mobile Unified Size */
+.cta-btn {
+  @apply inline-flex items-center justify-center leading-none rounded-xl whitespace-nowrap;
+  min-height: 3.25rem;       /* h-13 equivalent */
+  padding: .875rem 1.5rem;   /* py-3.5 px-6 */
+  word-break: keep-all;
+  text-wrap: nowrap;
+}
+
+@media (min-width: 768px) {
+  .cta-btn {
+    width: 18rem; /* Unified width on PC */
+  }
+}
+
+.cta-btn--primary {
+  @apply bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50;
+}
+
+.cta-btn--outline {
+  @apply border-2 border-white text-white font-medium hover:bg-white hover:text-gray-800 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50;
+}
+
+/* 6. HIG CTA Components */
+.hig-cta-primary {
+  background: var(--color-primary);
+  color: white;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: none;
+  font-weight: var(--font-weight-medium);
+  min-height: var(--tap-target-size);
+  transition: all var(--duration-fast) var(--easing-standard);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hig-cta-primary:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+/* 7. Apple Interactive Elements - 44px Compliant */
+.btn-apple {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-body);
+  font-weight: 500;
+  font-family: var(--font-family-system);
+  letter-spacing: var(--letter-spacing-body);
+  transition: all var(--duration-fast) var(--ease-standard);
+  will-change: transform, background-color, box-shadow;
+}
+
+/* 8. Focus States for Accessibility */
+.btn-apple:focus-visible {
+  outline: 2px solid #007AFF;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2);
+}
+
+/* Focus ring for keyboard navigation */
+.hit-44:focus-visible,
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #3B82F6 !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* Focus-visible only styling - hide outlines except for keyboard navigation */
+.focus-clean:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* 9. Apple Card System */
+.apple-card {
+  background: white;
+  border-radius: 16px;
+  padding: var(--space-6);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: translateZ(0);
+}
+
+.apple-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 12px 32px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.apple-card-problem {
+  border-left: 4px solid #ef4444;
+}
+
+.apple-card-solution {
+  border-left: 4px solid #007AFF;
+  background: linear-gradient(135deg, var(--bg-white) 0%, rgba(0, 122, 255, 0.02) 100%);
+}
+
+.apple-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+/* 10. HIG Card System */
+.hig-card {
+  background: var(--bg-white);
+  border: 1px solid #eef1f4;
+  border-radius: 16px;
+}
+
+/* HIG Cards Scroll */
+.hig-cards-scroll {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 85%;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+}
+
+.hig-cards-scroll > * {
+  scroll-snap-align: center;
+}
+
+@media (min-width: 1024px) {
+  .hig-cards-scroll {
+    grid-auto-flow: initial;
+    grid-auto-columns: initial;
+    overflow: visible;
+    scroll-snap-type: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+/* 11. Apple Feature Card */
+.apple-feature-card {
+  text-align: center;
+  padding: var(--space-6);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.apple-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* 12. Interactive State Overrides for Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .apple-card,
+  .section-fade-in {
+    transition: none;
+  }
+  
+  .apple-button:hover,
+  .apple-card:hover {
+    transform: none;
+  }
+}
+
+/* 13. Performance Optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.btn-apple,
+.card-apple,
+.section-apple-hero {
+  transform: translateZ(0); /* Force GPU layer */
+  backface-visibility: hidden; /* Hide back face */
+}
+
+/* 14. Lazy Loading States */
+.lazy-loading {
+  opacity: 0;
+  transition: opacity var(--duration-standard) var(--ease-standard);
+}
+
+.lazy-loaded {
+  opacity: 1;
+}
+
+/* 15. Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .apple-card {
+    padding: var(--space-4);
+  }
+  
+  .apple-feature-card {
+    padding: var(--space-4);
+  }
+}
+
+/* 16. Force Display for Components */
+/* Force display HIG card text */
+.hig-card .text-white,
+.hig-card div[class*="text-white"],
+.hig-card .font-semibold,
+.hig-card .hig-text-caption {
+  color: white !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}

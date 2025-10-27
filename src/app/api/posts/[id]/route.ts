@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 // Normalize empty strings to null for optional fields
 function normalizePostData(data: any) {
@@ -64,7 +65,7 @@ export async function GET(
           { status: 404 }
         );
       }
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Internal server error', message: error.message },
         { status: 500 }
@@ -74,7 +75,7 @@ export async function GET(
     return NextResponse.json({ data });
 
   } catch (error) {
-    console.error('API error:', error);
+    logger.error('API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -139,7 +140,7 @@ export async function PUT(
           { status: 404 }
         );
       }
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Failed to update post', message: error.message },
         { status: 500 }
@@ -149,7 +150,7 @@ export async function PUT(
     return NextResponse.json({ data });
 
   } catch (error) {
-    console.error('API error:', error);
+    logger.error('API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -187,7 +188,7 @@ export async function DELETE(
       .eq('id', postId);
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Failed to delete post', message: error.message },
         { status: 500 }
@@ -199,7 +200,7 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('API error:', error);
+    logger.error('API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

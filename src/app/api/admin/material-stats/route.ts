@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
+import { logger } from '@/lib/utils/logger';
 import {
   MaterialStatsResponse,
   MaterialStatsTotals,
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
     const { data: statsData, error: statsError } = await query;
 
     if (statsError) {
-      console.error('Stats query error:', statsError);
+      logger.error('Stats query error:', statsError);
       return createErrorResponse('Failed to fetch statistics', 500);
     }
 
@@ -107,7 +108,7 @@ export async function GET(request: NextRequest) {
     return createSuccessResponse(response);
 
   } catch (error) {
-    console.error('Material stats API error:', error);
+    logger.error('Material stats API error', error instanceof Error ? error : new Error(String(error)));
     return createErrorResponse('Internal server error', 500);
   }
 }

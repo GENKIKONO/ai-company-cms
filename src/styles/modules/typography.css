@@ -1,0 +1,394 @@
+/* ============================================================
+   Typography Module
+   Apple HIG Foundation - Typography First Design System
+   ============================================================ */
+
+/* 1. Font System and Base Typography */
+:root {
+  /* 8px Grid System - Strict Compliance */
+  --space-0: 0px;
+  --space-1: 8px;       /* Minimum spacing */
+  --space-2: 16px;      /* Element spacing */
+  --space-3: 24px;      /* Card inner padding */
+  --space-4: 32px;      /* Section inner spacing */
+  --space-5: 40px;      /* Small section spacing */
+  --space-6: 48px;      /* Card spacing */
+  --space-8: 64px;      /* Section spacing - fixed */
+  --space-10: 80px;     /* Large section spacing */
+  --space-12: 96px;     /* Hero exclusive */
+  
+  /* Apple Typography Scale - SF Pro Compliant */
+  --font-family-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  
+  /* Typography Scale */
+  --font-size-display: clamp(64px, 10vw, 96px);     /* Hero use - bold */
+  --font-size-title1: clamp(36px, 6vw, 48px);       /* Section headings */
+  --font-size-title2: clamp(28px, 5vw, 36px);       /* Sub headings */
+  --font-size-title3: clamp(22px, 4vw, 28px);       /* Card headings */
+  --font-size-body: 17px;                           /* Body text - Apple standard */
+  --font-size-body-large: 19px;                     /* Lead text */
+  --font-size-caption: 13px;                        /* Supplementary info */
+  
+  /* Line Heights - Apple Compliant */
+  --line-height-display: 1.05;      /* Ultra tight */
+  --line-height-title: 1.15;        /* Tight */
+  --line-height-body: 1.47;         /* Natural */
+  --line-height-caption: 1.38;      /* Caption */
+  
+  /* Letter Spacing - Apple Compliant */
+  --letter-spacing-display: -0.022em;   /* Negative letter spacing */
+  --letter-spacing-title: -0.016em;     /* Title letter spacing */
+  --letter-spacing-body: -0.011em;      /* Body letter spacing */
+  --letter-spacing-caption: -0.006em;   /* Caption letter spacing */
+}
+
+/* 2. Base Typography Settings (Numbers appearance unified) */
+html, body {
+  font-feature-settings: "lnum","tnum","liga","kern";
+  font-variant-numeric: lining-nums tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 3. Base Typography Setup */
+html {
+  font-family: var(--font-family-system);
+  font-feature-settings: 'kern' 1, 'liga' 1, 'frac' 1, 'nums' 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 4. Apple Typography Scale Classes */
+.text-display {
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
+  font-weight: 700;
+  font-family: var(--font-family-system);
+  color: var(--color-text-primary);
+}
+
+.text-title1 {
+  font-size: var(--font-size-title1);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-title);
+  font-weight: 700;
+  font-family: var(--font-family-system);
+  color: var(--color-text-primary);
+}
+
+.text-title2 {
+  font-size: var(--font-size-title2);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-title);
+  font-weight: 600;
+  font-family: var(--font-family-system);
+  color: var(--color-text-primary);
+}
+
+.text-title3 {
+  font-size: var(--font-size-title3);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-title);
+  font-weight: 600;
+  font-family: var(--font-family-system);
+  color: var(--color-text-primary);
+}
+
+.text-body {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  letter-spacing: var(--letter-spacing-body);
+  font-weight: 400;
+  font-family: var(--font-family-system);
+  color: var(--color-text-primary);
+}
+
+.text-body-large {
+  font-size: var(--font-size-body-large);
+  line-height: var(--line-height-body);
+  letter-spacing: var(--letter-spacing-body);
+  font-weight: 400;
+  font-family: var(--font-family-system);
+  color: var(--color-text-secondary);
+}
+
+.text-caption {
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  letter-spacing: var(--letter-spacing-caption);
+  font-weight: 500;
+  font-family: var(--font-family-system);
+  color: var(--color-text-secondary);
+}
+
+/* 5. Apple Typography Component Classes */
+.apple-title1 {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.apple-heading {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--color-text-primary);
+}
+
+.apple-body {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.47;
+  letter-spacing: -0.011em;
+  color: var(--color-text-primary);
+}
+
+.apple-caption {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.38;
+  letter-spacing: -0.006em;
+  color: var(--color-text-primary);
+}
+
+.apple-lead {
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.47;
+  letter-spacing: -0.011em;
+  color: var(--color-text-primary);
+}
+
+.apple-body-standard {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.47;
+  letter-spacing: -0.011em;
+  color: var(--color-text-primary);
+}
+
+.apple-small {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.38;
+  letter-spacing: -0.006em;
+}
+
+/* 6. Legacy Typography Classes */
+.apple-display {
+  font-size: var(--font-size-display);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.apple-title-1 {
+  font-size: var(--font-size-title1);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.apple-title-2 {
+  font-size: var(--font-size-title2);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0em;
+  color: var(--color-text-primary);
+}
+
+.apple-title-3 {
+  font-size: var(--font-size-title3);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0em;
+  color: var(--color-text-primary);
+}
+
+.apple-body-large {
+  font-size: var(--font-size-body-large);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0em;
+  color: var(--color-text-secondary);
+}
+
+.apple-body-standard {
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0em;
+  color: var(--color-text-secondary);
+}
+
+.apple-caption {
+  font-size: var(--font-size-caption);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0em;
+  color: var(--color-text-tertiary);
+}
+
+/* 7. Card Typography */
+.card-title{ 
+  @apply jp-heading text-xl sm:text-2xl font-semibold; 
+  color: #0f172a; 
+}
+
+.card-text{ 
+  @apply jp-body text-[15px] leading-7; 
+  color: #475569; 
+}
+
+/* 8. Japanese Typography Optimization */
+/* Natural Japanese line-wrapping defaults */
+:root {
+  --heading-balance: balance;
+  --body-wrap: pretty;
+}
+
+/* Japanese text optimization */
+.jp-text {
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
+  word-break: keep-all;         /* Don't break in middle of words */
+  overflow-wrap: anywhere;      /* Safe line wrapping at line end */
+}
+
+/* Japanese text utilities to prevent unnatural breaks */
+.jp-avoid-break {
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+/* Auto-phrase support for Japanese text */
+@supports (word-break: auto-phrase) {
+  .jp-phrase {
+    word-break: auto-phrase;
+  }
+}
+
+/* Japanese text utilities */
+.jp-heading {
+  text-wrap: balance;
+  text-align: left;
+  letter-spacing: 0.01em;
+}
+
+.jp-body {
+  text-wrap: pretty;
+  text-align: left;
+  line-height: var(--line-height-relaxed, 1.6);
+}
+
+.jp-nowrap {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+}
+
+/* 9. Responsive Typography Utilities */
+/* Clamp functions for responsive scaling */
+.text-clamp-sm {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.text-clamp-base {
+  font-size: clamp(1rem, 3vw, 1.125rem);
+}
+
+.text-clamp-lg {
+  font-size: clamp(1.125rem, 3.5vw, 1.25rem);
+}
+
+.text-clamp-xl {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+}
+
+.text-clamp-2xl {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+.text-clamp-3xl {
+  font-size: clamp(1.875rem, 6vw, 2.5rem);
+}
+
+.text-clamp-4xl {
+  font-size: clamp(2.25rem, 7vw, 3rem);
+}
+
+/* 10. Measure and Reading Width */
+.measure-card { 
+  max-width: 35ch; 
+}
+
+.measure-30 { 
+  max-width: 30ch; 
+}
+
+.measure-34 { 
+  max-width: 34ch; 
+}
+
+.measure-36 { 
+  max-width: 36ch; 
+}
+
+/* 11. Number and Data Display */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.lining-nums {
+  font-variant-numeric: lining-nums;
+}
+
+.tabular-lining {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* 12. Responsive Adjustments */
+@media (max-width: 768px) {
+  .text-mobile-lg {
+    font-size: clamp(28px, 6vw, 38px); 
+    line-height: 1.2; 
+  }
+  
+  .text-mobile-base {
+    font-size: clamp(15px, 1.6vw + .6rem, 18px); 
+    line-height: 1.75; 
+  }
+}
+
+/* 13. CTA and Button Text (Prevent breaking) */
+.cta-nowrap,
+.btn-nowrap { 
+  white-space: nowrap; 
+  word-break: keep-all; 
+}
+
+/* Button text optimization: lightweight no-wrap */
+.btn-text-safe {
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+/* 14. Typography Variable Overrides for Mobile */
+@media (max-width: 768px) {
+  :root {
+    --font-size-h1: clamp(32px, 7vw, 42px);
+    --font-size-h2: clamp(24px, 5vw, 32px);
+    --font-size-h3: clamp(20px, 4vw, 26px);
+    --font-size-body: 17px;
+    --font-size-small: 15px;
+    --line-height-tight: 1.2;
+    --line-height-body: 1.7;
+    --line-height-relaxed: 1.8;
+  }
+}

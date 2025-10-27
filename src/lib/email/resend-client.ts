@@ -138,21 +138,21 @@ export class AuthNotificationHelper {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIO Hubへようこそ</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: var(--color-background-subtle); }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(var(--shadow-black),0.1); }
+        .header { background: linear-gradient(135deg, var(--color-gradient-primary-start) 0%, var(--color-gradient-primary-end) 100%); padding: 40px 20px; text-align: center; }
         .logo { color: white; font-size: 32px; font-weight: bold; margin-bottom: 8px; }
-        .subtitle { color: #e2e8f0; font-size: 16px; }
+        .subtitle { color: var(--border-default); font-size: 16px; }
         .content { padding: 40px 30px; }
-        .greeting { font-size: 20px; color: #1a202c; margin-bottom: 20px; font-weight: 600; }
-        .message { font-size: 16px; color: #4a5568; line-height: 1.8; margin-bottom: 30px; }
-        .highlight { background: #f0fff4; border: 1px solid #9ae6b4; padding: 20px; border-radius: 8px; margin: 30px 0; }
-        .highlight-title { color: #2f855a; font-weight: 600; margin-bottom: 10px; }
-        .highlight-text { color: #276749; }
-        .cta { background: #667eea; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; transition: background 0.2s; }
-        .cta:hover { background: #5a67d8; }
-        .footer { background: #f7fafc; padding: 30px; text-align: center; font-size: 14px; color: #718096; border-top: 1px solid #e2e8f0; }
-        .divider { border-top: 1px solid #e2e8f0; margin: 30px 0; }
+        .greeting { font-size: 20px; color: var(--color-text-dark); margin-bottom: 20px; font-weight: 600; }
+        .message { font-size: 16px; color: var(--color-text-medium); line-height: 1.8; margin-bottom: 30px; }
+        .highlight { background: var(--color-success-bg); border: 1px solid var(--color-success-border); padding: 20px; border-radius: 8px; margin: 30px 0; }
+        .highlight-title { color: var(--color-success-green-dark); font-weight: 600; margin-bottom: 10px; }
+        .highlight-text { color: var(--color-success-green-darker); }
+        .cta { background: var(--color-gradient-primary-start); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; transition: background 0.2s; }
+        .cta:hover { background: var(--color-gradient-hover); }
+        .footer { background: var(--color-background-muted); padding: 30px; text-align: center; font-size: 14px; color: var(--color-text-light); border-top: 1px solid var(--border-default); }
+        .divider { border-top: 1px solid var(--border-default); margin: 30px 0; }
     </style>
 </head>
 <body>
@@ -184,7 +184,7 @@ export class AuthNotificationHelper {
             
             <div class="divider"></div>
             
-            <div style="font-size: 14px; color: #718096;">
+            <div style="font-size: 14px; color: var(--color-text-light);">
                 ご質問やサポートが必要でしたら、お気軽にお問い合わせください。<br>
                 今後ともAIO Hubをよろしくお願いいたします。
             </div>
@@ -193,7 +193,7 @@ export class AuthNotificationHelper {
         <div class="footer">
             <div><strong>AIO Hub チーム</strong></div>
             <div style="margin-top: 10px;">
-                <a href="https://aiohub.jp" style="color: #667eea; text-decoration: none;">https://aiohub.jp</a>
+                <a href="https://aiohub.jp" style="color: var(--color-gradient-primary-start); text-decoration: none;">https://aiohub.jp</a>
             </div>
         </div>
     </div>
@@ -220,23 +220,23 @@ export class AuthNotificationHelper {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>パスワードリセット - AIO Hub</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 40px 20px; text-align: center; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: var(--color-background-subtle); }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(var(--shadow-black),0.1); }
+        .header { background: linear-gradient(135deg, var(--color-gradient-secondary-start) 0%, var(--color-gradient-secondary-end) 100%); padding: 40px 20px; text-align: center; }
         .logo { color: white; font-size: 32px; font-weight: bold; margin-bottom: 8px; }
-        .subtitle { color: #fbb6ce; font-size: 16px; }
+        .subtitle { color: var(--color-pink-light); font-size: 16px; }
         .content { padding: 40px 30px; }
-        .alert { background: #fed7d7; border: 1px solid #feb2b2; border-radius: 8px; padding: 20px; margin-bottom: 30px; }
-        .alert-title { font-weight: 600; color: #c53030; margin-bottom: 10px; font-size: 16px; }
-        .alert-text { color: #9b2c2c; }
-        .message { font-size: 16px; color: #4a5568; line-height: 1.8; margin-bottom: 20px; }
-        .step-box { background: #f0fff4; border: 1px solid #9ae6b4; padding: 20px; border-radius: 8px; margin: 30px 0; }
-        .step-title { color: #2f855a; font-weight: 600; margin-bottom: 10px; }
-        .step-text { color: #276749; }
-        .warning { background: #fffbeb; border: 1px solid #f6e05e; border-radius: 8px; padding: 20px; margin: 30px 0; }
-        .warning-title { color: #d69e2e; font-weight: 600; margin-bottom: 10px; }
-        .warning-text { color: #b7791f; }
-        .footer { background: #f7fafc; padding: 30px; text-align: center; font-size: 14px; color: #718096; border-top: 1px solid #e2e8f0; }
+        .alert { background: var(--color-alert-danger-bg); border: 1px solid var(--color-alert-danger-border); border-radius: 8px; padding: 20px; margin-bottom: 30px; }
+        .alert-title { font-weight: 600; color: var(--color-alert-danger-text); margin-bottom: 10px; font-size: 16px; }
+        .alert-text { color: var(--color-alert-danger-text-dark); }
+        .message { font-size: 16px; color: var(--color-text-medium); line-height: 1.8; margin-bottom: 20px; }
+        .step-box { background: var(--color-success-bg); border: 1px solid var(--color-success-border); padding: 20px; border-radius: 8px; margin: 30px 0; }
+        .step-title { color: var(--color-success-green-dark); font-weight: 600; margin-bottom: 10px; }
+        .step-text { color: var(--color-success-green-darker); }
+        .warning { background: var(--color-warning-bg); border: 1px solid var(--color-warning-border); border-radius: 8px; padding: 20px; margin: 30px 0; }
+        .warning-title { color: var(--color-warning-text); font-weight: 600; margin-bottom: 10px; }
+        .warning-text { color: var(--color-warning-text-dark); }
+        .footer { background: var(--color-background-muted); padding: 30px; text-align: center; font-size: 14px; color: var(--color-text-light); border-top: 1px solid var(--border-default); }
     </style>
 </head>
 <body>
@@ -272,7 +272,7 @@ export class AuthNotificationHelper {
                 </div>
             </div>
             
-            <div class="message" style="font-size: 14px; color: #718096;">
+            <div class="message" style="font-size: 14px; color: var(--color-text-light);">
                 このリセット要求は24時間以内に自動的に無効になります。<br>
                 セキュリティを保つため、定期的にパスワードを変更することをお勧めします。
             </div>
@@ -281,7 +281,7 @@ export class AuthNotificationHelper {
         <div class="footer">
             <div><strong>AIO Hub セキュリティチーム</strong></div>
             <div style="margin-top: 10px;">
-                <a href="https://aiohub.jp" style="color: #667eea; text-decoration: none;">https://aiohub.jp</a>
+                <a href="https://aiohub.jp" style="color: var(--color-gradient-primary-start); text-decoration: none;">https://aiohub.jp</a>
             </div>
         </div>
     </div>

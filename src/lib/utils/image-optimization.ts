@@ -259,7 +259,7 @@ export function extractImageColors(
 ): Promise<{ dominant: string; palette: string[] }> {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined') {
-      resolve({ dominant: '#cccccc', palette: ['#cccccc'] });
+      resolve({ dominant: 'var(--border-muted)', palette: ['var(--border-muted)'] });
       return;
     }
 
@@ -272,7 +272,7 @@ export function extractImageColors(
         const ctx = canvas.getContext('2d');
         
         if (!ctx) {
-          resolve({ dominant: '#cccccc', palette: ['#cccccc'] });
+          resolve({ dominant: 'var(--border-muted)', palette: ['var(--border-muted)'] });
           return;
         }
 
@@ -303,12 +303,12 @@ export function extractImageColors(
           palette: [dominant] // 簡略化、実際の実装ではより詳細なパレット抽出が可能
         });
       } catch (error) {
-        resolve({ dominant: '#cccccc', palette: ['#cccccc'] });
+        resolve({ dominant: 'var(--border-muted)', palette: ['var(--border-muted)'] });
       }
     };
     
     img.onerror = () => {
-      resolve({ dominant: '#cccccc', palette: ['#cccccc'] });
+      resolve({ dominant: 'var(--border-muted)', palette: ['var(--border-muted)'] });
     };
     
     img.src = imageUrl;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: NextRequest) {
   const supabase = await supabaseServer();
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
       .limit(limit);
 
     if (error) {
-      console.error('Error searching entries:', error);
+      logger.error('Error searching entries', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json({ error: 'Search failed' }, { status: 500 });
     }
 
@@ -88,7 +89,7 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

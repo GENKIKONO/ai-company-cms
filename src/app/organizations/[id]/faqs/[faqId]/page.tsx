@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { HIGButton } from '@/design-system';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
 import { getFAQ, updateFAQ, deleteFAQ, getFAQCategories, getPopularFAQCategories } from '@/lib/faqs';
 import { type AppUser, type Organization, type FAQ, type FAQFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export default function EditFAQPage() {
   const router = useRouter();
@@ -74,7 +76,7 @@ export default function EditFAQPage() {
           setCategories(categoriesResult.data);
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
+        logger.error('Failed to fetch data', error instanceof Error ? error : new Error(String(error)));
         router.push('/dashboard');
       } finally {
         setLoading(false);
@@ -131,7 +133,7 @@ export default function EditFAQPage() {
         setErrors({ submit: 'FAQの更新に失敗しました' });
       }
     } catch (error) {
-      console.error('Failed to update FAQ:', error);
+      logger.error('Failed to update FAQ', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: 'FAQの更新に失敗しました' });
     } finally {
       setSubmitting(false);
@@ -143,7 +145,7 @@ export default function EditFAQPage() {
       await deleteFAQ(faqId);
       router.push(`/organizations/${organizationId}`);
     } catch (error) {
-      console.error('Failed to delete FAQ:', error);
+      logger.error('Failed to delete FAQ', error instanceof Error ? error : new Error(String(error)));
       setErrors({ submit: 'FAQの削除に失敗しました' });
     }
   };
@@ -402,13 +404,14 @@ export default function EditFAQPage() {
               >
                 戻る
               </Link>
-              <button
+              <HIGButton
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="primary"
+                size="medium"
               >
                 {submitting ? '保存中...' : '変更を保存'}
-              </button>
+              </HIGButton>
             </div>
           </div>
         </form>

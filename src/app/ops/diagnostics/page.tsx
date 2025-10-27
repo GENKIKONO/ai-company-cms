@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { HIGButton } from '@/design-system';
+import { logger } from '@/lib/utils/logger';
 
 interface Issue {
   component: string;
@@ -65,7 +67,7 @@ export default function DiagnosticsPage() {
       setDiagnosticResult(result);
       setLastRun(new Date());
     } catch (error) {
-      console.error('診断の実行に失敗しました:', error);
+      logger.error('診断の実行に失敗しました', error instanceof Error ? error : new Error(String(error)));
       setDiagnosticResult({
         success: false,
         overall: 'critical',
@@ -127,13 +129,14 @@ export default function DiagnosticsPage() {
                 </p>
               )}
             </div>
-            <button
+            <HIGButton
               onClick={runDiagnostics}
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="primary"
+              size="medium"
             >
               {loading ? '診断中...' : '診断実行'}
-            </button>
+            </HIGButton>
           </div>
         </div>
 
@@ -198,7 +201,7 @@ export default function DiagnosticsPage() {
                         </div>
                         <div className="w-16 bg-gray-200 rounded-full h-2 mt-1">
                           <div 
-                            className={`h-2 rounded-full ${
+                            className={`h-2 rounded-full progress-bar ${
                               component.score >= 85 ? 'bg-green-500' :
                               component.score >= 70 ? 'bg-yellow-500' :
                               'bg-red-500'

@@ -5,6 +5,7 @@
 
 import { createClient } from '@/lib/supabase-client';
 import type { Organization } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export interface TrialStatus {
   isTrialing: boolean;
@@ -34,7 +35,7 @@ export async function startTrial(organizationId: string): Promise<boolean> {
 
     return !error;
   } catch (error) {
-    console.error('Failed to start trial:', error);
+    logger.error('Failed to start trial', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -88,7 +89,7 @@ export async function transitionToStarter(organizationId: string): Promise<boole
 
     return !error;
   } catch (error) {
-    console.error('Failed to transition to starter:', error);
+    logger.error('Failed to transition to starter', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -110,7 +111,7 @@ export async function checkAndTransitionExpiredTrials(): Promise<number> {
       .lt('trial_end_date', now);
 
     if (error || !expiredTrials) {
-      console.error('Failed to fetch expired trials:', error);
+      logger.error('Failed to fetch expired trials', error instanceof Error ? error : new Error(String(error)));
       return 0;
     }
 
@@ -125,7 +126,7 @@ export async function checkAndTransitionExpiredTrials(): Promise<number> {
 
     return transitionedCount;
   } catch (error) {
-    console.error('Failed to check expired trials:', error);
+    logger.error('Failed to check expired trials', error instanceof Error ? error : new Error(String(error)));
     return 0;
   }
 }

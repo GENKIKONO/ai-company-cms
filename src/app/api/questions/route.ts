@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
+import { apiLogger } from '@/lib/utils/logger';
 import type { QuestionFormData, QuestionWithDetails } from '@/types/database';
 
 // GET: 管理者用 - 全質問の取得
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
     const { data: questions, error } = await query;
 
     if (error) {
-      console.error('Error fetching questions:', error);
+      apiLogger.error('GET', '/api/questions', error, { companyId, status, limit, offset });
       return NextResponse.json(
         { error: 'Failed to fetch questions' },
         { status: 500 }
@@ -80,7 +81,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Questions API GET error:', error);
+    apiLogger.error('GET', '/api/questions', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -161,7 +162,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error('Error creating question:', insertError);
+      apiLogger.error('POST', '/api/questions', insertError, { userId: user.id, companyId: company_id });
       return NextResponse.json(
         { error: 'Failed to create question' },
         { status: 500 }
@@ -191,7 +192,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error('Questions API POST error:', error);
+    apiLogger.error('POST', '/api/questions', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

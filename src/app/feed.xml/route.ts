@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { generateRss, PostWithOrg } from '@/lib/feed/rss-generator';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
         .limit(50);
 
       if (postsError) {
-        console.error('RSS_ERROR', { message: postsError.message });
+        logger.error('RSS_ERROR', { message: postsError.message });
         return generateEmptyRssFeed(baseUrl, request);
       }
 
@@ -90,7 +91,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('RSS_ERROR', { message: error?.message ?? 'Unknown error' });
+    logger.error('RSS_ERROR', { message: error?.message ?? 'Unknown error' });
     return generateEmptyRssFeed(
       process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.jp', 
       request

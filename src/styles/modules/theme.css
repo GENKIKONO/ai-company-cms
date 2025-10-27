@@ -1,0 +1,201 @@
+/* ============================================================
+   Theme and Color System Module
+   Light theme enforcement with Apple HIG color tokens
+   ============================================================ */
+
+/* 1. Light Theme Enforcement (Dark Mode Disabled) */
+:root { 
+  color-scheme: light !important; 
+}
+
+html, body { 
+  background: var(--bg-white) !important; 
+  color: #0f172a !important;
+  /* Performance optimization - BR-03 compliant */
+  font-display: swap; /* FOIT prevention */
+  contain: layout style paint; /* Containment API */
+}
+
+/* Tailwind dark variants and media queries disabled */
+@media (prefers-color-scheme: dark) {
+  :root { color-scheme: light !important; }
+  html, body { 
+    background: var(--bg-white) !important; 
+    color: #0f172a !important; 
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: "lnum", "tnum";
+  }
+}
+
+/* 2. iCloud-compliant Unified Color System */
+/* Color Tokens */
+:root {
+  --bg-white: var(--color-white);
+  --bg-alt: #F5F5F7;
+  --bg-primary: #0A84FF;
+  --text-primary: #1D1D1F;
+  --text-secondary: #636366;
+  --text-on-primary: var(--color-white);
+}
+
+/* 3. Apple HIG Foundation - Complete Color System */
+:root {
+  /* Apple System Colors - Strict Compliance */
+  --color-blue: #007AFF;            /* THE Apple Blue - unified */
+  --color-blue-hover: #0056CC;      /* Hover state */
+  --color-blue-pressed: #004499;    /* Active state */
+  
+  /* Apple Standard Text Colors */
+  --color-text-primary: #1D1D1F;    /* Apple standard black */
+  --color-text-secondary: #636366;  /* AA compliant gray (4.5:1) */
+  --color-text-tertiary: #8E8E93;   /* AA large text compliant gray (3.0:1) */
+  
+  /* Apple Standard Backgrounds */
+  --color-background: var(--color-white);      /* Pure white */
+  --color-surface: var(--color-gray-100);         /* Apple standard surface */
+  --color-surface-secondary: #FAFAFA; /* Subtle distinction */
+  
+  /* Apple Standard Shadows */
+  --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-large: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  /* Apple Border Radius */
+  --radius-small: 6px;
+  --radius-medium: 12px;
+  --radius-large: 16px;
+  --radius-xl: 24px;
+}
+
+/* 4. Background Skin System (Full Bleed Support) */
+.sec-white {
+  background: var(--bg-white);
+  color: var(--text-primary);
+  position: relative;
+}
+.sec-white::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: var(--bg-white);
+  z-index: -1;
+}
+
+.sec-alt {
+  background: var(--bg-alt);
+  color: var(--text-primary);
+  position: relative;
+}
+.sec-alt::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: var(--bg-alt);
+  z-index: -1;
+}
+
+.sec-primary {
+  background: var(--bg-primary);
+  color: var(--text-on-primary);
+  position: relative;
+}
+.sec-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: var(--bg-primary);
+  z-index: -1;
+}
+
+/* 5. Section Backgrounds (Direct specification, overlay prohibited) */
+.section {
+  position: relative;
+  z-index: 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+}
+
+.section--white {
+  background: var(--bg-white);
+  color: var(--text-primary);
+}
+
+.section--alt {
+  background: var(--bg-alt);
+  color: var(--text-primary);
+}
+
+.section--primary {
+  background: var(--bg-primary);
+  color: var(--text-on-primary);
+}
+
+/* 6. Text Color Enforcement in Sections */
+.sec-white *, .sec-alt * {
+  color: var(--text-primary) !important;
+}
+.sec-primary * {
+  color: var(--text-on-primary) !important;
+}
+
+/* Section element text color unification */
+.section--white *,
+.section--alt * {
+  color: var(--text-primary) !important;
+}
+.section--primary * {
+  color: var(--text-on-primary) !important;
+}
+
+/* 7. Secondary Text Adjustments */
+.sec-white .text-secondary, .sec-alt .text-secondary {
+  color: var(--text-secondary) !important;
+}
+.sec-primary .text-secondary {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Specific element text color adjustments */
+.section--white .text-secondary,
+.section--alt .text-secondary {
+  color: var(--text-secondary) !important;
+}
+.section--primary .text-secondary {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 8. Color Override Fixes */
+/* Force black background elements to white background */
+.bg-black, .bg-neutral-900, .bg-slate-900, .bg-gray-900,
+[class*="bg-black"], [class*="bg-neutral-900"], [class*="bg-slate-900"], [class*="bg-gray-900"] {
+  background: var(--bg-white) !important;
+  color: #0f172a !important;
+}
+
+/* Keep white text as white text */
+.text-white, [class*="text-white"] {
+  color: white !important;
+}
+
+/* Visibility improvement: make light text darker */
+.text-gray-100, .text-gray-200, .text-gray-300 {
+  color: #374151 !important; /* gray-700 */
+}
+
+/* Legacy reversal disabling */
+.force-text-white {
+  color: inherit !important;
+}

@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/utils/logger';
 
 interface SourceData {
   url: string;
@@ -57,7 +58,7 @@ export function EmbedTopSources({ organizationId, days = 30, limit = 20 }: TopSo
       setSources(result.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : '不明なエラー');
-      console.error('Failed to fetch top sources:', err);
+      logger.error('Failed to fetch top sources:', err);
     } finally {
       setLoading(false);
     }
@@ -264,7 +265,7 @@ export function EmbedTopSources({ organizationId, days = 30, limit = 20 }: TopSo
                 <div className="flex-shrink-0 w-16">
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-blue-500 h-2 rounded-full transition-all"
+                      className="bg-blue-500 h-2 rounded-full progress-bar"
                       style={{ width: `${source.percentage}%` }}
                     />
                   </div>

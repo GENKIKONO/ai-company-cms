@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: Request) {
   try {
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
         .eq('organization_id', orgId);
 
       if (totalError) {
-        console.error('Total count error:', totalError);
+        logger.error('Total count error:', totalError);
         // テーブルが存在しない場合は0を返す
         return NextResponse.json({ total: 0, published: 0 });
       }
@@ -36,7 +37,7 @@ export async function GET(req: Request) {
         .eq('is_published', true);
 
       if (publishedError) {
-        console.error('[VERIFY] Published count error for case studies:', {
+        logger.error('[VERIFY] Published count error for case studies:', {
           orgId,
           error: publishedError.message,
           code: publishedError.code
@@ -50,7 +51,7 @@ export async function GET(req: Request) {
         published: publishedCount ?? 0 
       });
     } catch (error: any) {
-      console.error('Case studies stats error:', error);
+      logger.error('Case studies stats error', error instanceof Error ? error : new Error(String(error)));
       
       // PostgreSQLエラーコード42P01は「テーブルが存在しない」
       if (error.code === '42P01' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
@@ -62,7 +63,7 @@ export async function GET(req: Request) {
       }, { status: 500 });
     }
   } catch (error: any) {
-    console.error('API route error:', error);
+    logger.error('API route error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 });

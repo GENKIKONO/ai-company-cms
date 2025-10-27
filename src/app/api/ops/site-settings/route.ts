@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { env } from '@/lib/env';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Database error:', error);
+      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { 
           code: 'DATABASE_ERROR',
@@ -90,7 +91,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[GET /api/ops/site-settings] Unexpected error:', error);
+    logger.error('[GET /api/ops/site-settings] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { 
         code: 'INTERNAL_ERROR',
@@ -167,7 +168,7 @@ export async function POST(request: NextRequest) {
         .single();
       
       if (error) {
-        console.error('Database update error:', error);
+        logger.error('Database update error', error instanceof Error ? error : new Error(String(error)));
         return NextResponse.json(
           { 
             code: 'DATABASE_ERROR',
@@ -188,7 +189,7 @@ export async function POST(request: NextRequest) {
         .single();
       
       if (error) {
-        console.error('Database insert error:', error);
+        logger.error('Database insert error', error instanceof Error ? error : new Error(String(error)));
         return NextResponse.json(
           { 
             code: 'DATABASE_ERROR',
@@ -205,7 +206,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result, { status: result.message === 'created' ? 201 : 200 });
 
   } catch (error) {
-    console.error('[POST /api/ops/site-settings] Unexpected error:', error);
+    logger.error('[POST /api/ops/site-settings] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { 
         code: 'INTERNAL_ERROR',
@@ -257,7 +258,7 @@ export async function DELETE(request: NextRequest) {
       .neq('id', '00000000-0000-0000-0000-000000000000'); // 全削除
 
     if (error) {
-      console.error('Database delete error:', error);
+      logger.error('Database delete error', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { 
           code: 'DATABASE_ERROR',
@@ -273,7 +274,7 @@ export async function DELETE(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[DELETE /api/ops/site-settings] Unexpected error:', error);
+    logger.error('[DELETE /api/ops/site-settings] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { 
         code: 'INTERNAL_ERROR',

@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { logger } from '@/lib/utils/logger';
 
 /**
  * 安全なベースURL取得（フォールバック付き）
@@ -23,7 +24,7 @@ export function getSafeBaseUrl(request?: NextRequest): string {
     const origin = `${proto}://${host}`;
     
     // フォールバック発動の警告ログ（機密情報なし）
-    console.warn('[SafeURL] Using request-derived URL fallback');
+    logger.warn('[SafeURL] Using request-derived URL fallback');
     
     return origin;
   }

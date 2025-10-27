@@ -6,14 +6,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { env } from '@/lib/env';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('[whoami] GET handler start');
-    
     const cookieStore = await cookies();
     const cookieNames = cookieStore.getAll().map(c => c.name);
-    console.log('[whoami] cookie names:', cookieNames);
     
     const supabase = createServerClient(
       env.SUPABASE_URL,
@@ -29,7 +27,7 @@ export async function GET(request: NextRequest) {
                 cookieStore.set(name, value, options)
               );
             } catch (error) {
-              console.warn('[whoami] Cookie set error:', error);
+              logger.warn('Debug whoami cookie set error', error);
             }
           },
         },
@@ -42,7 +40,8 @@ export async function GET(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
 
-    console.log('[whoami] user =', user?.id || null, 'error =', authError?.message || null);
+    // User info logged for debug purposes only in development
+    logger.debug('Whoami user check', { userId: user?.id, authError: authError?.message });
 
     // 組織の存在確認（RLS回避のため直接クエリ）
     let orgProbe = { found: false, id: null, created_by: null };
@@ -64,12 +63,11 @@ export async function GET(request: NextRequest) {
           };
         }
         
-        console.log('[whoami] orgProbe:', orgProbe);
         if (orgError) {
-          console.warn('[whoami] org query error:', orgError);
+          logger.warn('Whoami org query error', orgError);
         }
       } catch (error) {
-        console.error('[whoami] org probe failed:', error);
+        logger.error('Whoami org probe failed', error instanceof Error ? error : new Error(String(error)));
       }
     }
 
@@ -80,12 +78,12 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString()
     };
 
-    console.log('[whoami] result:', result);
+    logger.debug('Whoami result', result);
 
     return NextResponse.json(result);
 
   } catch (error) {
-    console.error('[whoami] error:', error);
+    logger.error('Whoami endpoint error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { 
         error: 'Internal server error',

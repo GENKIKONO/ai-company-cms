@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit2, Trash2, Save, X, Search, Eye, FileText } from 'lucide-react';
 import type { QAEntry, QAEntryWithCategory, QACategory, QAEntryFormData } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 interface QAEntryManagerProps {
   categories: QACategory[];
@@ -60,7 +61,7 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
         setTotalPages(data.pagination?.totalPages || 1);
       }
     } catch (error) {
-      console.error('Error fetching entries:', error);
+      logger.error('Error fetching entries', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -91,7 +92,7 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
         alert(error.error || 'Failed to create entry');
       }
     } catch (error) {
-      console.error('Error creating entry:', error);
+      logger.error('Error creating entry', error instanceof Error ? error : new Error(String(error)));
       alert('Failed to create entry');
     }
   };
@@ -116,7 +117,7 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
         alert(error.error || 'Failed to update entry');
       }
     } catch (error) {
-      console.error('Error updating entry:', error);
+      logger.error('Error updating entry', error instanceof Error ? error : new Error(String(error)));
       alert('Failed to update entry');
     }
   };
@@ -134,7 +135,7 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
         alert(error.error || 'Failed to delete entry');
       }
     } catch (error) {
-      console.error('Error deleting entry:', error);
+      logger.error('Error deleting entry', error instanceof Error ? error : new Error(String(error)));
       alert('Failed to delete entry');
     }
   };

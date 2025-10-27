@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { generateOrganizationPageJsonLd } from '@/lib/utils/jsonld';
+import { PrimaryCTA } from '@/design-system';
 import { LogoImage } from '@/components/ui/optimized-image';
 import ReportButton from '@/components/common/ReportButton';
 import AddressDisplay from '@/components/address/AddressDisplay';
@@ -23,6 +24,7 @@ interface OrganizationPageData {
 
 // ✅ キャッシュ対応: 公開組織データ取得
 import { unstable_cache } from 'next/cache';
+import { logger } from '@/lib/utils/logger';
 
 const getOrganizationDataCached = (slug: string) => {
   // slug正規化で大文字・空白・末尾文字問題を回避
@@ -30,7 +32,7 @@ const getOrganizationDataCached = (slug: string) => {
   
   return unstable_cache(
     async (): Promise<OrganizationPageData | null> => {
-      console.log(`[getOrganizationDataCached] Cache miss for slug: ${safeSlug}`);
+      logger.debug('Debug', `[getOrganizationDataCached] Cache miss for slug: ${safeSlug}`);
       
       // 🚫 匿名クライアントで公開データのみ取得（cookies/auth依存禁止）
       const { supabasePublic } = await import('@/lib/supabase-public');
@@ -151,7 +153,7 @@ const getOrganizationDataCached = (slug: string) => {
       ]);
 
       // Debug logging for content sections
-      console.log(`[DEBUG] Content sections for ${organization.name}:`, {
+      logger.debug('Debug', `[DEBUG] Content sections for ${organization.name}:`, {
         posts: postsResult.data?.length || 0,
         services: servicesResult.data?.length || 0,
         case_studies: caseStudiesResult.data?.length || 0,
@@ -189,7 +191,7 @@ async function getOrganizationData(slug: string): Promise<OrganizationPageData |
     // ✅ キャッシュ付きの取得を使用
     return await getOrganizationDataCached(slug);
   } catch (error) {
-    console.error('Failed to fetch organization data:', error);
+    logger.error('Failed to fetch organization data', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -247,14 +249,14 @@ export default async function OrganizationDetailPage({
   
   // ✅ slug未定義なら即座に404
   if (!resolvedParams.slug || resolvedParams.slug === 'undefined') {
-    console.error('[VERIFY] slug missing or undefined:', resolvedParams.slug);
+    logger.error('[VERIFY] slug missing or undefined:', resolvedParams.slug);
     notFound();
   }
   
   const data = await getOrganizationData(resolvedParams.slug);
 
   if (!data) {
-    console.error('[VERIFY] organization data not found for slug:', resolvedParams.slug);
+    logger.error('[VERIFY] organization data not found for slug:', resolvedParams.slug);
     notFound();
   }
 
@@ -375,14 +377,16 @@ export default async function OrganizationDetailPage({
                 
                 <div className="flex flex-col gap-3">
                   {organization.url && (
-                    <Link
+                    <PrimaryCTA
                       href={organization.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hit-44 cta-optimized px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center btn-nowrap"
+                      size="large"
+                      icon="external-link"
+                      className="text-center btn-nowrap"
                     >
                       公式サイトを開く
-                    </Link>
+                    </PrimaryCTA>
                   )}
                   
                   {/* 通報ボタン */}

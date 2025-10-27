@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { createClient } from '@supabase/supabase-js';
 import { QAStatsAction } from '@/types/database';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (error) {
       // 認証エラーは無視（匿名ユーザーも許可）
-      console.log('Authentication check failed, proceeding as anonymous user');
+      logger.debug('Debug', 'Authentication check failed, proceeding as anonymous user');
     }
 
     // 統計データの挿入
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Error inserting Q&A stats:', error);
+      logger.error('Error inserting Q&A stats', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Failed to log Q&A action' },
         { status: 500 }
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Q&A stats API error:', error);
+    logger.error('Q&A stats API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -169,7 +170,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching Q&A stats:', error);
+      logger.error('Error fetching Q&A stats', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Failed to fetch Q&A stats' },
         { status: 500 }
@@ -179,7 +180,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ data });
 
   } catch (error) {
-    console.error('Q&A stats fetch error:', error);
+    logger.error('Q&A stats fetch error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

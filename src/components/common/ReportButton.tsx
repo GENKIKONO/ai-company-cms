@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
+import { logger } from '@/lib/utils/logger';
 
 interface ReportButtonProps {
   organizationId: string;
@@ -59,7 +60,7 @@ export default function ReportButton({ organizationId, organizationName, classNa
         alert('通報の送信に失敗しました。しばらく後に再度お試しください。');
       }
     } catch (error) {
-      console.error('Report submission error:', error);
+      logger.error('Report submission error', error instanceof Error ? error : new Error(String(error)));
       alert('通報の送信中にエラーが発生しました。');
     } finally {
       setSubmitting(false);

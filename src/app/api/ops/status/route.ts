@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { cookies } from 'next/headers';
 import { env, getCookieDomain } from '@/lib/env';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[GET /api/ops/status] Unexpected error:', error);
+    logger.error('[GET /api/ops/status] Unexpected error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         code: 'INTERNAL_ERROR',
