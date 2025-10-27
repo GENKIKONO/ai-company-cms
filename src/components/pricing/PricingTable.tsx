@@ -8,7 +8,6 @@ import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
 import { formatJPY, PRICING_CONFIG } from '@/lib/pricing';
 import { HIGButton } from '@/components/ui/HIGButton';
 import { PLAN_LABELS, formatPriceLabel } from '@/config/planLabels';
-import { PrimaryCTA } from '@/design-system';
 
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
@@ -195,17 +194,14 @@ export default function PricingTable() {
               </ul>
 
               <div className="text-center">
-                <PrimaryCTA
-                  href={plan.ctaHref}
-                  size="large"
-                  className={`w-full justify-center ${
-                    plan.popular 
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold'
-                      : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-2xl font-semibold'
-                  }`}
+                <HIGButton
+                  variant={plan.popular ? "primary" : "secondary"}
+                  size="lg"
+                  fullWidth={true}
+                  onClick={() => window.location.href = plan.ctaHref}
                 >
                   {plan.ctaText}
-                </PrimaryCTA>
+                </HIGButton>
               </div>
 
               {plan.comingSoon && (
@@ -304,17 +300,14 @@ export default function PricingTable() {
                 </ul>
 
                 <div className="text-center mt-auto">
-                  <PrimaryCTA
-                    href={plan.ctaHref}
-                    size="large"
-                    className={`w-full justify-center ${
-                      plan.popular 
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold'
-                        : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-2xl font-semibold'
-                    }`}
+                  <HIGButton
+                    variant={plan.popular ? "primary" : "secondary"}
+                    size="lg"
+                    fullWidth={true}
+                    onClick={() => window.location.href = plan.ctaHref}
                   >
                     {plan.ctaText}
-                  </PrimaryCTA>
+                  </HIGButton>
                 </div>
 
                 {plan.comingSoon && (
@@ -340,13 +333,13 @@ export default function PricingTable() {
               詳細な機能や導入サポートについては、お気軽にお問い合わせください。
             </p>
             
-            <PrimaryCTA
-              href="/contact"
-              size="medium"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl font-semibold"
+            <HIGButton
+              variant="primary"
+              size="lg"
+              onClick={() => window.location.href = "/contact"}
             >
               お問い合わせ
-            </PrimaryCTA>
+            </HIGButton>
           </div>
 
           <div className="mt-12 text-sm text-gray-600 space-y-2">

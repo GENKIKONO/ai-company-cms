@@ -3,8 +3,8 @@
 :root {
   --bg-white: #FFFFFF;
   --bg-alt: #F5F5F7;
-  --bg-primary: #0A84FF;
-  --bg-primary-hover: #0056D2;
+  --bg-primary: #007AFF;
+  --bg-primary-hover: #0056CC;
   --bg-primary-light: #93C5FD;
   --text-primary: #1D1D1F;
   --text-secondary: #636366;
@@ -18,9 +18,9 @@
   --color-blue-600: #3B82F6;
   --color-blue-700: #2563EB;
   --color-blue-300: #93C5FD;
-  --color-primary-blue: #0A84FF;
-  --color-primary-blue-hover: #066CEB;
-  --color-primary-blue-focus: #1B6DFF;
+  --color-primary-blue: #007AFF;
+  --color-primary-blue-hover: #0056CC;
+  --color-primary-blue-focus: #007AFF;
   --color-success: #34C759;
   --color-success-light: #10B981;
   --color-success-bg: #F0FDF4;
@@ -118,8 +118,8 @@
   --color-export-info-bg: #EBF4FF;
   --color-export-info-text: #1E40AF;
   
-  /* Special Brand Colors */
-  --color-apple-blue: #007AFF;
+  /* Special Brand Colors - use existing primary color */
+  --color-apple-blue: var(--color-primary-blue);
   --color-brand-green: #0A5D3F;
   --color-brand-green-gradient: linear-gradient(135deg, #0A5D3F 0%, #0B5A3C 100%);
   

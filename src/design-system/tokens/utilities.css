@@ -358,7 +358,47 @@
   justify-content: center;
 }
 
-/* Section spacing */
+/* Section spacing - 統一規則 */
+/* 標準セクション余白 - Apple HIG準拠 */
+.section-spacing {
+  padding-top: 5rem;    /* py-20 = 80px */
+  padding-bottom: 5rem; /* py-20 = 80px */
+}
+
+@media (min-width: 1024px) {
+  .section-spacing {
+    padding-top: 6rem;    /* lg:py-24 = 96px */
+    padding-bottom: 6rem; /* lg:py-24 = 96px */
+  }
+}
+
+/* 大きいセクション余白 - ヒーロー・CTA用 */
+.section-spacing-large {
+  padding-top: 6rem;    /* py-24 = 96px */
+  padding-bottom: 6rem; /* py-24 = 96px */
+}
+
+@media (min-width: 1024px) {
+  .section-spacing-large {
+    padding-top: 8rem;    /* lg:py-32 = 128px */
+    padding-bottom: 8rem; /* lg:py-32 = 128px */
+  }
+}
+
+/* 小さいセクション余白 - コンパクトセクション用 */
+.section-spacing-small {
+  padding-top: 4rem;    /* py-16 = 64px */
+  padding-bottom: 4rem; /* py-16 = 64px */
+}
+
+@media (min-width: 1024px) {
+  .section-spacing-small {
+    padding-top: 5rem;    /* lg:py-20 = 80px */
+    padding-bottom: 5rem; /* lg:py-20 = 80px */
+  }
+}
+
+/* 既存の legacy クラス - 段階的置換用 */
 .section-padding-y-80 {
   padding-top: 80px;
   padding-bottom: 80px;

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { PrimaryCTA } from '@/design-system';
+import { HIGButton } from '@/components/ui/HIGButton';
 
 const faqData = [
   {
@@ -129,18 +129,20 @@ export default function FAQSection() {
             お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <PrimaryCTA
-              href="mailto:support@luxucare.jp"
-              size="large"
+            <HIGButton
+              variant="primary"
+              size="lg"
+              onClick={() => window.location.href = "mailto:support@luxucare.jp"}
             >
               メールで問い合わせ
-            </PrimaryCTA>
-            <a 
-              href="tel:03-1234-5678"
-              className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-blue-600 bg-white border-2 border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 shadow-lg hover:shadow-xl"
+            </HIGButton>
+            <HIGButton
+              variant="secondary"
+              size="lg"
+              onClick={() => window.location.href = "tel:03-1234-5678"}
             >
               電話で相談する
-            </a>
+            </HIGButton>
           </div>
         </div>
       </div>
