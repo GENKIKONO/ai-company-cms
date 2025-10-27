@@ -12,77 +12,87 @@ import {
 
 const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
   const plan = HEARING_SERVICE_PLANS[planId];
-  const colors = getHearingPlanColorClasses(plan.color);
   const IconComponent = plan.icon;
   
   return (
-    <>
+    <div
+      className={`relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ${
+        plan.popular
+          ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent scale-105'
+          : ''
+      }`}
+    >
       {/* 人気バッジ */}
       {plan.popular && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-          <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-600 text-white text-sm font-medium rounded-full">
-            <Zap className="w-4 h-4" />
-            <span className="jp-text">おすすめ</span>
-          </span>
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+            人気
+          </div>
         </div>
       )}
       
-      <div className={`card h-full ${plan.popular ? 'ring-2 ' + colors.ring + ' ring-offset-2' : ''}`}>
-        {/* プランヘッダー */}
-        <div className="text-center mb-6 sm:mb-8">
-          {/* バッジ */}
-          <div className="mb-4">
-            <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${colors.accent} bg-opacity-10`}>
-              {plan.badge}
-            </span>
-          </div>
-          
-          {/* アイコン */}
-          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <IconComponent className={`w-6 h-6 sm:w-8 sm:h-8 ${colors.accent}`} />
-          </div>
-          
-          {/* プラン名・説明 */}
-          <h3 className="text-h3 text-neutral-900 mb-2 jp-text">{plan.name}</h3>
-          <p className="text-body text-neutral-600 mb-4 jp-text text-pretty">{plan.description}</p>
-          
-          {/* 価格 */}
-          <div className="flex items-baseline justify-center gap-1 mb-2">
-            <span className="text-h1 text-neutral-900 tabular-nums">{formatHearingPrice(plan)}</span>
-            <span className="text-body text-neutral-600 jp-text">（税別）</span>
-          </div>
-          <div className="text-sm text-neutral-600 jp-text">
-            {plan.duration} / {plan.period}
-          </div>
+      <div className="text-center mb-8">
+        {/* アイコン */}
+        <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
+          plan.color === 'blue' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
+          plan.color === 'purple' ? 'bg-gradient-to-br from-purple-500 to-purple-600' :
+          plan.color === 'gold' ? 'bg-gradient-to-br from-amber-500 to-amber-600' :
+          'bg-gradient-to-br from-green-500 to-green-600'
+        }`}>
+          <IconComponent className="w-8 h-8 text-white" />
         </div>
-
-        {/* 機能リスト */}
-        <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 flex-grow">
-          {plan.features.map((feature, index) => (
-            <div key={index} className="flex items-start gap-3">
-              <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mt-0.5 flex-shrink-0" />
-              <span className="text-body text-neutral-700 jp-text text-pretty">{feature}</span>
+        
+        {/* プラン名・説明 */}
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+        <p className="text-gray-600 mb-6">{plan.description}</p>
+        
+        {/* 価格 */}
+        <div className="mb-6">
+          <span className="text-4xl font-bold text-gray-900">
+            {formatHearingPrice(plan)}
+          </span>
+          <span className="text-gray-600 ml-1">（税別）</span>
+          {plan.badge && (
+            <div className="mt-2">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                {plan.badge}
+              </span>
             </div>
-          ))}
-          
-          {plan.limitations.map((limitation, index) => (
-            <div key={index} className="flex items-start gap-3 opacity-70">
-              <div className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mt-0.5 flex-shrink-0 text-center text-sm">×</div>
-              <span className="text-body text-neutral-500 jp-text text-pretty">{limitation}</span>
-            </div>
-          ))}
+          )}
         </div>
+      </div>
 
-        {/* CTAボタン - Apple HIG 44px準拠 */}
+      {/* 機能リスト */}
+      <ul className="space-y-4 mb-8 flex-1">
+        {plan.features.map((feature, index) => (
+          <li key={index} className="flex items-start">
+            <Check className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-green-500" />
+            <span className="text-sm text-gray-900">{feature}</span>
+          </li>
+        ))}
+        
+        {plan.limitations.map((limitation, index) => (
+          <li key={index} className="flex items-start opacity-70">
+            <div className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-center text-sm text-gray-400">×</div>
+            <span className="text-sm text-gray-400">{limitation}</span>
+          </li>
+        ))}
+      </ul>
+
+      {/* CTAボタン */}
+      <div className="text-center mt-auto">
         <Link
           href={generateContactUrl(planId)}
-          className={`btn-apple ${colors.button} w-full text-center py-4 px-6 text-lg font-semibold transform hover:scale-105 transition-transform btn-lg`}
-          rel="noopener noreferrer"
+          className={`inline-flex items-center justify-center w-full px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 ${
+            plan.popular 
+              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1'
+              : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+          }`}
         >
-          <span className="jp-text">{plan.ctaText}</span>
+          {plan.ctaText}
         </Link>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -119,12 +129,14 @@ export default function PricingSection() {
           </div>
 
           {/* Desktop: Grid */}
-          <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            {planIds.map((planId) => (
-              <div key={planId} className="relative">
-                <PricingCard planId={planId} />
-              </div>
-            ))}
+          <div className="hidden lg:block">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+              {planIds.map((planId) => (
+                <div key={planId} className="relative">
+                  <PricingCard planId={planId} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

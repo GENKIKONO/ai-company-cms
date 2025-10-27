@@ -7,7 +7,7 @@ import { Metadata } from 'next';
 import HeroSection from '@/components/hearing-service/HeroSection';
 import ComparisonSection from '@/components/hearing-service/ComparisonSection';
 import FlowSection from '@/components/hearing-service/FlowSection';
-import ApplePricingPlans from '@/components/pricing/ApplePricingPlans';
+import PricingSection from '@/components/hearing-service/PricingSection';
 import FAQSection from '@/components/hearing-service/FAQSection';
 import CTASection from '@/components/hearing-service/CTASection';
 
@@ -123,46 +123,22 @@ export default function HearingServicePage() {
       
       <div className="min-h-screen">
         {/* ヒーローセクション */}
-        <section className="sec-white">
-          <div className="site-container section-padding-y-80">
-            <HeroSection />
-          </div>
-        </section>
+        <HeroSection />
         
         {/* 構造化前後の違い */}
-        <section className="sec-alt">
-          <div className="site-container section-padding-y-80">
-            <ComparisonSection />
-          </div>
-        </section>
+        <ComparisonSection />
         
         {/* サービス流れ説明 */}
-        <section className="sec-white">
-          <div className="site-container section-padding-y-80">
-            <FlowSection />
-          </div>
-        </section>
+        <FlowSection />
         
-        {/* 料金プラン - Apple HIG準拠 */}
-        <section className="sec-alt">
-          <div className="site-container section-padding-y-80">
-            <ApplePricingPlans />
-          </div>
-        </section>
+        {/* 料金プラン */}
+        <PricingSection />
         
         {/* よくある質問 */}
-        <section className="sec-white">
-          <div className="site-container section-padding-y-80">
-            <FAQSection />
-          </div>
-        </section>
+        <FAQSection />
         
         {/* CTA（申込導線） */}
-        <section className="sec-alt">
-          <div className="site-container section-padding-y-80">
-            <CTASection />
-          </div>
-        </section>
+        <CTASection />
       </div>
     </>
   );
