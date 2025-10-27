@@ -100,13 +100,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="apple-hero-content">
             {/* Hero Typography with Apple Scale */}
             <h1 className="apple-hero-title">
-              AIに選ばれる
+              AIに"正しく理解"される
               <br />
-              企業になる
+              企業へ。
             </h1>
             
             <p className="apple-hero-subtitle">
-              構造化データで、確実な検索露出
+              企業情報を構造化し、検索やAI回答で見つかる状態をつくるCMS。
             </p>
             
             {/* Hero CTA - Apple Sizing */}
@@ -204,7 +204,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 </div>
                 <div>
                   <div className="apple-text-caption apple-text-blue">AIO Hub導入後</div>
-                  <h3 className="apple-title3">AIに選ばれる企業へ</h3>
+                  <h3 className="apple-title3">AIに理解される企業へ</h3>
                 </div>
               </div>
               
@@ -245,13 +245,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </div>
       </section>
 
-      {/* Features Section - Apple 3-Column */}
-      <section className="apple-section apple-section-alt">
+      {/* 価値の柱 - 3つのカード */}
+      <section className="apple-section">
         <div className="apple-container">
           <div className="apple-section-header">
-            <h2 className="apple-title1">3つの価値</h2>
+            <h2 className="apple-title1">企業情報を構造化し、AIに理解される状態へ</h2>
             <p className="apple-body-large apple-text-secondary">
-              企業情報をAIが理解しやすい形に最適化
+              JSON-LD対応・Q&A管理・企業/サービス/FAQの一元発信
             </p>
           </div>
           
@@ -271,13 +271,59 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </div>
       </section>
 
-      {/* Flow Section */}
-      <FlowSection
-        title={aioCopy.flow.title}
-        description={aioCopy.flow.description}
-        steps={aioCopy.flow.steps}
-        beforeAfter={aioCopy.flow.beforeAfter}
-      />
+      {/* ユースケース - 3つの活用例 */}
+      <section className="apple-section apple-section-alt">
+        <div className="apple-container">
+          <div className="apple-section-header">
+            <h2 className="apple-title1">大きな商談も、小さな問い合わせも、すべてに対応</h2>
+          </div>
+          
+          <div className="apple-features-grid">
+            <div className="apple-feature-card">
+              <div className="apple-feature-icon">
+                <BuildingIcon />
+              </div>
+              <h3 className="apple-title3">営業資料として</h3>
+              <p className="apple-body apple-text-secondary">
+                構造化された企業情報で説得力アップ
+              </p>
+            </div>
+            <div className="apple-feature-card">
+              <div className="apple-feature-icon">
+                <UserIcon />
+              </div>
+              <h3 className="apple-title3">採用活動で</h3>
+              <p className="apple-body apple-text-secondary">
+                求職者がAI検索で企業を正確に理解
+              </p>
+            </div>
+            <div className="apple-feature-card">
+              <div className="apple-feature-icon">
+                <InfoIcon />
+              </div>
+              <h3 className="apple-title3">PR・広報で</h3>
+              <p className="apple-body apple-text-secondary">
+                メディアがAIで企業情報を取得・引用
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 信頼・セキュリティ */}
+      <section className="apple-section apple-section-primary">
+        <div className="apple-container">
+          <div className="apple-section-header">
+            <h2 className="apple-title1" style={{ color: 'white' }}>
+              もっと信頼を。もっと安心を。もっと成果を。
+            </h2>
+            <p className="apple-body-large" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+              AIO Hubは、企業の機密情報を最高レベルのセキュリティで保護します。
+              SSL暗号化、定期バックアップ、アクセス制御により、あなたのデータは完全に守られます。
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Pricing Section */}
       <PricingTable />
@@ -293,7 +339,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       <section className="apple-section apple-cta-section">
         <div className="apple-container">
           <div className="apple-cta-content">
-            <h2 className="apple-title1">AI時代に見つかる企業になる</h2>
+            <h2 className="apple-title1">まずは情報を"構造化"するところから。</h2>
             <p className="apple-body-large">
               14日間の無料体験で効果を実感
             </p>
@@ -303,14 +349,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 href="/auth/signup"
                 className="apple-button apple-button-primary apple-button-large"
               >
-                <span>今すぐ無料で始める</span>
+                <span>14日間無料で始める</span>
                 <ArrowRightIcon className="apple-button-icon" />
-              </Link>
-              <Link
-                href="/hearing-service"
-                className="apple-button apple-button-secondary apple-button-large"
-              >
-                専門ヒアリング相談
               </Link>
             </div>
             

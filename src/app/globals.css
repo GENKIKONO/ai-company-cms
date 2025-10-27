@@ -2915,13 +2915,30 @@ a.apple-button.apple-button-secondary {
   display: inline-flex !important;
 }
 
-/* Apple Section System */
+/* Apple Section System - Full Bleed Backgrounds */
 .apple-section {
   padding: var(--space-10) 0;
+  /* Full bleed background */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
 }
 
 .apple-section-alt {
-  background: #ffffff;
+  background: #f8fafc;
+  /* Full bleed background */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+}
+
+.apple-section-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  /* Full bleed background */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
 }
 
 .apple-container {
@@ -3377,6 +3394,7 @@ a.apple-button.apple-button-secondary {
   line-height: 1.1;
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
+  font-variant-numeric: lining-nums tabular-nums;
   font-variant-numeric: lining-nums tabular-nums;
   font-feature-settings: "lnum", "tnum";
 }
