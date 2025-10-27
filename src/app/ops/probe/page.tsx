@@ -169,7 +169,7 @@ export default async function OpsProbe() {
                 <div>
                   <a
                     href="/ops/verify"
-                    className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    className="inline-block bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white px-4 py-2 rounded-md text-sm font-medium"
                   >
                     Verify に戻る
                   </a>
@@ -257,7 +257,7 @@ export default async function OpsProbe() {
               </div>
               <div className="p-3 rounded border bg-blue-50 border-blue-200">
                 <div className="text-sm font-medium">Cookie Domain</div>
-                <div className="text-xs text-blue-600">
+                <div className="text-xs text-[var(--bg-primary)]">
                   {status.cookie.domainUsed}
                 </div>
               </div>

@@ -188,7 +188,7 @@ export default async function ServicesPage({
                   )}
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <span className="text-blue-600 text-sm font-medium">
+                    <span className="text-[var(--bg-primary)] text-sm font-medium">
                       詳細を見る →
                     </span>
                   </div>

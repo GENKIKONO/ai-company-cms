@@ -68,7 +68,7 @@ export default function MobileMenu({
               {/* ログイン済みユーザー情報 */}
               {auth.loggedIn && (
                 <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-[var(--bg-primary)] rounded-full flex items-center justify-center">
                     <span className="text-sm font-medium text-white">
                       U
                     </span>
@@ -88,7 +88,7 @@ export default function MobileMenu({
                     href={l.href}
                     ref={auth.loggedIn && i === 0 ? firstLinkRef : undefined}
                     onClick={handleLinkClick}
-                    className="focus-clean text-primary font-medium hover:text-blue-600 transition-colors duration-200 py-2 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none"
+                    className="focus-clean text-primary font-medium hover:text-[var(--bg-primary)] transition-colors duration-200 py-2 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none"
                   >
                     {l.label}
                   </Link>
@@ -99,7 +99,7 @@ export default function MobileMenu({
                     <Link
                       href={auth.dashboardHref}
                       onClick={handleLinkClick}
-                      className="focus-clean text-primary font-medium hover:text-blue-600 transition-colors duration-200 py-2 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none"
+                      className="focus-clean text-primary font-medium hover:text-[var(--bg-primary)] transition-colors duration-200 py-2 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none"
                     >
                       マイページ
                     </Link>

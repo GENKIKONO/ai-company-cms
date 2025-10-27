@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { BackLink } from '@/components/ui/back-link';
-import { PrimaryCTA, HIGButton } from '@/design-system';
+import { HIGButton } from '@/design-system';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -41,7 +41,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
         
-        <div className="relative z-10 max-w-2xl mx-auto px-6 py-12 lg:py-20">
+        <div className="relative z-10 max-w-2xl mx-auto px-6 section-spacing">
           <div className="mb-8">
             <BackLink fallbackUrl="/" />
           </div>
@@ -64,13 +64,14 @@ export default function ContactPage() {
               </p>
             </div>
             
-            <PrimaryCTA 
+            <HIGButton 
+              variant="primary"
               href="/help" 
               size="large"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl px-8 py-4 text-lg font-semibold"
+              className="bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl px-8 py-4 text-lg font-semibold"
             >
               ヘルプセンターへ戻る
-            </PrimaryCTA>
+            </HIGButton>
           </div>
         </div>
       </div>
@@ -82,7 +83,7 @@ export default function ContactPage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
       
-      <div className="relative z-10 max-w-3xl mx-auto px-6 py-12 lg:py-20">
+      <div className="relative z-10 max-w-3xl mx-auto px-6 section-spacing">
         <div className="mb-8">
           <BackLink fallbackUrl="/" />
         </div>
@@ -95,7 +96,7 @@ export default function ContactPage() {
           </div>
           
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
               ご質問・ご相談
             </span>
             <br />
@@ -121,7 +122,7 @@ export default function ContactPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
+                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
                 />
               </div>
               
@@ -136,7 +137,7 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
+                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
                 />
               </div>
             </div>
@@ -151,7 +152,7 @@ export default function ContactPage() {
                 name="company"
                 value={formData.company}
                 onChange={handleChange}
-                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
+                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
               />
             </div>
             
@@ -165,7 +166,7 @@ export default function ContactPage() {
                 required
                 value={formData.subject}
                 onChange={handleChange}
-                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
+                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
               >
                 <option value="">選択してください</option>
                 <option value="general">一般的なお問い合わせ</option>
@@ -188,7 +189,7 @@ export default function ContactPage() {
                 rows={6}
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md resize-none"
+                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md resize-none"
                 placeholder="お問い合わせ内容を詳しくお書きください"
               />
             </div>
@@ -197,7 +198,7 @@ export default function ContactPage() {
               <p className="text-sm text-gray-700 leading-relaxed">
                 <span className="font-semibold text-gray-900">個人情報の取り扱いについて：</span><br />
                 お客様からいただいた個人情報は、お問い合わせへの回答およびサービス向上のためにのみ使用いたします。
-                詳細は <Link href="/privacy" className="text-blue-600 hover:text-blue-500 underline font-medium transition-colors duration-200">プライバシーポリシー</Link> をご確認ください。
+                詳細は <Link href="/privacy" className="text-[var(--bg-primary)] hover:text-blue-500 underline font-medium transition-colors duration-200">プライバシーポリシー</Link> をご確認ください。
               </p>
             </div>
             
@@ -207,7 +208,7 @@ export default function ContactPage() {
                 disabled={isSubmitting}
                 variant="primary"
                 size="lg"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl py-5 text-lg font-semibold"
+                className="w-full bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl py-5 text-lg font-semibold"
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-3">

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { generateOrganizationPageJsonLd } from '@/lib/utils/jsonld';
-import { PrimaryCTA } from '@/design-system';
+import { HIGButton } from '@/design-system';
 import { LogoImage } from '@/components/ui/optimized-image';
 import ReportButton from '@/components/common/ReportButton';
 import AddressDisplay from '@/components/address/AddressDisplay';
@@ -384,7 +384,7 @@ export default async function OrganizationDetailPage({
                       href={organization.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-2xl px-8 py-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-2xl px-8 py-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

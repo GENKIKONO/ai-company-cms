@@ -130,7 +130,7 @@ export default function I18nSafeAuthHeader({
           <div className="flex items-center">
             <Link 
               href="/" 
-              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
+              className="text-2xl font-bold text-slate-900 hover:text-[var(--bg-primary)] transition-colors"
             >
               {t('ui.header.title')}
             </Link>
@@ -183,7 +183,7 @@ export default function I18nSafeAuthHeader({
                 </Link>
                 <Link
                   href={getCtaHref()}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   {getCtaText()}
                 </Link>

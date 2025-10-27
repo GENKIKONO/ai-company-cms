@@ -9,7 +9,7 @@ import { PLAN_LABELS } from '@/config/planLabels';
 
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
-  blue: "text-blue-600",
+  blue: "text-[var(--bg-primary)]",
   purple: "text-purple-600",
   indigo: "text-indigo-600",
   gray: "text-slate-600",

@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function CTASection() {
   return (
-    <section className="relative py-32 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900">
+    <section className="relative section-spacing-large overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900">
       {/* 背景装飾 - more subtle */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.3),transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.3),transparent_50%)]" />
@@ -50,7 +50,7 @@ export default function CTASection() {
             <Link
               href="/auth/signup"
               aria-label="今すぐヒアリングを申し込む"
-              className="inline-flex items-center justify-center font-semibold text-xl px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-2xl border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
+              className="inline-flex items-center justify-center font-semibold text-xl px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-[var(--bg-primary)] hover:to-purple-600 text-white rounded-2xl border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
             >
               14日間無料で始める
               <ArrowRight className="w-5 h-5 ml-2" />

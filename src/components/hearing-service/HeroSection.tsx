@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="relative py-20 lg:py-32 overflow-hidden bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/60">
+    <section className="relative section-spacing-large overflow-hidden bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/60">
       {/* Background decoration - more subtle */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.08),transparent_60%)]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(99,102,241,0.06),transparent_60%)]"></div>
@@ -15,7 +15,7 @@ export default function HeroSection() {
           {/* Main title */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
             AIに選ばれる
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--bg-primary)] to-purple-600">
               企業
             </span>
             になる
@@ -31,7 +31,7 @@ export default function HeroSection() {
           {/* Stats */}
           <div className="flex justify-center gap-8 mb-12 text-sm text-gray-600">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-1">1時間</div>
+              <div className="text-3xl font-bold text-[var(--bg-primary)] mb-1">1時間</div>
               <div className="text-gray-500">ヒアリング時間</div>
             </div>
             <div className="text-center">
@@ -48,7 +48,7 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
             <Link 
               href="#pricing"
-              className="inline-flex items-center justify-center font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-10 py-5 text-xl rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
+              className="inline-flex items-center justify-center font-semibold bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-10 py-5 text-xl rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
             >
               無料相談を申し込む
               <ArrowRight className="ml-2 h-5 w-5" />

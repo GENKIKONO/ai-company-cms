@@ -273,7 +273,7 @@ html {
 
 /* 15. Skip Link Animation */
 .skip-link {
-  @apply absolute -translate-y-full left-4 z-50 px-4 py-2 bg-blue-600 text-white rounded-md;
+  @apply absolute -translate-y-full left-4 z-50 px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md;
   @apply focus:translate-y-0 transition-transform duration-200;
 }
 

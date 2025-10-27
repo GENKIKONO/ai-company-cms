@@ -174,7 +174,7 @@ export default function EditServicePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
     );
@@ -185,7 +185,7 @@ export default function EditServicePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">サービスが見つかりません</h2>
-          <Link href="/dashboard" className="mt-4 text-blue-600 hover:text-blue-700">
+          <Link href="/dashboard" className="mt-4 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]">
 マイページに戻る
           </Link>
         </div>
@@ -261,7 +261,7 @@ export default function EditServicePage() {
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -277,7 +277,7 @@ export default function EditServicePage() {
                   rows={4}
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
                     errors.description ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -294,7 +294,7 @@ export default function EditServicePage() {
                   min="0"
                   value={formData.price || ''}
                   onChange={(e) => handleInputChange('price', e.target.value ? Number(e.target.value) : undefined)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
                     errors.price ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="例: 5000"
@@ -312,7 +312,7 @@ export default function EditServicePage() {
                   min="1"
                   value={formData.duration_months || ''}
                   onChange={(e) => handleInputChange('duration_months', e.target.value ? Number(e.target.value) : undefined)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
                     errors.duration_months ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="例: 12"
@@ -328,7 +328,7 @@ export default function EditServicePage() {
                   id="category"
                   value={formData.category || ''}
                   onChange={(e) => handleInputChange('category', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 >
                   <option value="">選択してください</option>
                   {categoryOptions.map(category => (
@@ -364,7 +364,7 @@ export default function EditServicePage() {
                 id="video_url"
                 value={formData.video_url || ''}
                 onChange={(e) => handleInputChange('video_url', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 placeholder="https://www.youtube.com/watch?v=..."
               />
               <p className="mt-1 text-xs text-gray-500">

@@ -144,7 +144,7 @@ export default function SiteSettingsForm({ initialData }: SiteSettingsFormProps)
           id="hero_title"
           value={formData.hero_title}
           onChange={(e) => handleInputChange('hero_title', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
           placeholder="サイトのメインタイトル"
           maxLength={255}
           disabled={loading}
@@ -164,7 +164,7 @@ export default function SiteSettingsForm({ initialData }: SiteSettingsFormProps)
           value={formData.hero_subtitle}
           onChange={(e) => handleInputChange('hero_subtitle', e.target.value)}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
           placeholder="サイトの説明文"
           maxLength={500}
           disabled={loading}
@@ -184,7 +184,7 @@ export default function SiteSettingsForm({ initialData }: SiteSettingsFormProps)
           value={formData.representative_message}
           onChange={(e) => handleInputChange('representative_message', e.target.value)}
           rows={6}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
           placeholder="代表者からのメッセージ"
           maxLength={2000}
           disabled={loading}
@@ -216,7 +216,7 @@ export default function SiteSettingsForm({ initialData }: SiteSettingsFormProps)
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm text-sm font-medium disabled:opacity-50"
+            className="px-4 py-2 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white rounded-md shadow-sm text-sm font-medium disabled:opacity-50"
             disabled={loading}
           >
             {loading ? '保存中...' : '保存'}

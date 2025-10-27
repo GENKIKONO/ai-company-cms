@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { PrimaryCTA } from '@/design-system';
 import { logger } from '@/lib/utils/logger';
 
 interface PublicPageLinksProps {

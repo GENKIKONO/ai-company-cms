@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateFAQJsonLd, generateOrganizationJsonLd } from '@/lib/utils/jsonld';
 import type { Organization, FAQ } from '@/types/database';
-import { PrimaryCTA } from '@/design-system';
+import { HIGButton } from '@/design-system';
 import { logger } from '@/lib/utils/logger';
 
 interface FAQPageData {
@@ -113,7 +113,7 @@ export default async function FAQPage({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <div className="flex items-center">
-                <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600">
+                <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-[var(--bg-primary)]">
                   AIO Hub AI企業CMS
                 </Link>
                 <nav className="ml-10 hidden md:flex space-x-8">
@@ -241,12 +241,12 @@ export default async function FAQPage({
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     {organization.email && (
-                      <PrimaryCTA 
+                      <HIGButton variant="primary" 
                         href={`mailto:${organization.email}?subject=${encodeURIComponent('お問い合わせ')}`}
                         size="small"
                       >
                         メールでお問い合わせ
-                      </PrimaryCTA>
+                      </HIGButton>
                     )}
                     {organization.telephone && (
                       <a 
@@ -277,12 +277,12 @@ export default async function FAQPage({
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   {organization.email && (
-                    <PrimaryCTA 
+                    <HIGButton variant="primary" 
                       href={`mailto:${organization.email}?subject=${encodeURIComponent('お問い合わせ')}`}
                       size="small"
                     >
                       メールでお問い合わせ
-                    </PrimaryCTA>
+                    </HIGButton>
                   )}
                   {organization.telephone && (
                     <a 

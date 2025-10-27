@@ -12,7 +12,7 @@ import { PLAN_LABELS, formatPriceLabel } from '@/config/planLabels';
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
   blue: "text-cyan-600",      // Starter - 水色系
-  green: "text-blue-600",     // Pro - 青系
+  green: "text-[var(--bg-primary)]",     // Pro - 青系
   purple: "text-slate-800",   // Business - 黒系
   indigo: "text-indigo-600",
   gray: "text-slate-600",

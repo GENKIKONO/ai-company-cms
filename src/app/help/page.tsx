@@ -1,5 +1,5 @@
 import { BackLink } from '@/components/ui/back-link';
-import { PrimaryCTA } from '@/design-system';
+import { HIGButton } from '@/design-system';
 
 export default function HelpPage() {
   return (
@@ -95,12 +95,12 @@ export default function HelpPage() {
                 <p className="text-blue-800 mb-4">
                   上記で解決しない場合は、お気軽にお問い合わせください。
                 </p>
-                <PrimaryCTA 
+                <HIGButton variant="primary" 
                   href="/contact"
                   size="medium"
                 >
                   お問い合わせフォームへ
-                </PrimaryCTA>
+                </HIGButton>
               </div>
             </section>
           </div>

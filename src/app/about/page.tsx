@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { PrimaryCTA } from '@/design-system';
+import { HIGButton } from '@/design-system';
 
 export const metadata: Metadata = {
   title: 'サービス概要 | AIO Hub AI企業CMS',
@@ -29,7 +29,7 @@ export default function AboutPage() {
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-24">
+        <section className="relative overflow-hidden section-spacing">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-indigo-50/60 to-purple-50/80" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.15),transparent_60%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(147,51,234,0.12),transparent_60%)]" />
@@ -41,7 +41,7 @@ export default function AboutPage() {
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 AI企業CMS
               </span>
               <br />
@@ -57,11 +57,11 @@ export default function AboutPage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-24 bg-gradient-to-b from-white via-gray-50/30 to-white">
+        <section className="section-spacing bg-gradient-to-b from-white via-gray-50/30 to-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-20">
               <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                   主な機能
                 </span>
               </h2>
@@ -135,7 +135,7 @@ export default function AboutPage() {
         </section>
 
         {/* Tech Stack Section */}
-        <section className="py-24 bg-gradient-to-br from-gray-50 to-slate-100">
+        <section className="section-spacing bg-gradient-to-br from-gray-50 to-slate-100">
           <div className="max-w-6xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -193,7 +193,7 @@ export default function AboutPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white">
+        <section className="section-spacing bg-gradient-to-br from-[var(--bg-primary)] via-indigo-600 to-purple-600 text-white">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
               今すぐ始めましょう
@@ -202,13 +202,14 @@ export default function AboutPage() {
               14日間の無料体験で、AI最適化の効果を実感してください
             </p>
             
-            <PrimaryCTA 
+            <HIGButton 
+              variant="primary"
               href="/auth/signup"
               size="large"
-              className="text-xl px-10 py-5 bg-white text-blue-600 hover:bg-gray-50 border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold"
+              className="text-xl px-10 py-5 bg-white text-[var(--bg-primary)] hover:bg-gray-50 border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold"
             >
               無料で始める
-            </PrimaryCTA>
+            </HIGButton>
           </div>
         </section>
       </div>

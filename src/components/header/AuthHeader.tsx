@@ -26,7 +26,7 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
           <div className="flex items-center">
             <Link 
               href="/" 
-              className="focus-clean text-2xl font-bold text-gray-900 hover:text-blue-600"
+              className="focus-clean text-2xl font-bold text-gray-900 hover:text-[var(--bg-primary)]"
             >
               AIO Hub AI企業CMS
             </Link>
@@ -34,13 +34,13 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
               <nav className="ml-10 hidden md:flex space-x-8">
                 <Link 
                   href="/dashboard" 
-                  className={`focus-clean ${isMyPageActive ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`focus-clean ${isMyPageActive ? 'text-[var(--bg-primary)] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                   マイページ
                 </Link>
                 <Link 
                   href="/dashboard/billing" 
-                  className={`focus-clean ${currentPage === 'billing' ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`focus-clean ${currentPage === 'billing' ? 'text-[var(--bg-primary)] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                   サブスクリプション
                 </Link>
@@ -97,7 +97,7 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="focus-clean bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="focus-clean bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white px-4 py-2 rounded-md text-sm font-medium"
                 >
                   新規登録
                 </Link>

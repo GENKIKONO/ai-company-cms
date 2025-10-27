@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { generateServiceJsonLd } from '@/lib/utils/jsonld';
-import { PrimaryCTA } from '@/design-system';
+import { HIGButton } from '@/design-system';
 import type { Organization, Service } from '@/types/database';
 import { LogoImage } from '@/components/ui/optimized-image';
 import { logger } from '@/lib/utils/logger';
@@ -283,12 +283,12 @@ export default async function ServiceDetailPage({
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               {organization.email && (
-                <PrimaryCTA 
+                <HIGButton variant="primary" 
                   href={`mailto:${organization.email}?subject=${encodeURIComponent(`${service.name}について`)}`}
                   size="large"
                 >
                   メールでお問い合わせ
-                </PrimaryCTA>
+                </HIGButton>
               )}
               {organization.telephone && (
                 <a 
@@ -316,12 +316,12 @@ export default async function ServiceDetailPage({
               サービス一覧に戻る
             </Link>
             
-            <PrimaryCTA 
+            <HIGButton variant="primary" 
               href={`/o/${organization.slug}`}
               size="medium"
             >
               {organization.name} トップページへ
-            </PrimaryCTA>
+            </HIGButton>
           </div>
         </main>
       </div>

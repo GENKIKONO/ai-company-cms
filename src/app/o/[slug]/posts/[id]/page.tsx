@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { CalendarIcon, UserIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { markdownToHtml, truncateMarkdown } from '@/lib/markdown';
-import { PrimaryCTA } from '@/design-system';
+import { HIGButton } from '@/design-system';
 import { JsonLdModal } from '@/components/ui/json-ld-modal';
 import { LogoImage } from '@/components/ui/optimized-image';
 import { logger } from '@/lib/utils/logger';
@@ -212,7 +212,7 @@ export default async function PostPage({
           <div className="mb-8">
             <Link 
               href={`/o/${post.organization.slug}`}
-              className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+              className="inline-flex items-center text-[var(--bg-primary)] hover:text-blue-800 transition-colors"
             >
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
               {post.organization.name} に戻る
@@ -278,7 +278,7 @@ export default async function PostPage({
             <div className="px-6 py-8">
               {post.body ? (
                 <div 
-                  className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline"
+                  className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-[var(--bg-primary)] prose-a:no-underline hover:prose-a:underline"
                   dangerouslySetInnerHTML={{ 
                     __html: markdownToHtml(post.body) 
                   }}
@@ -293,12 +293,12 @@ export default async function PostPage({
 
           {/* Footer */}
           <div className="mt-8 text-center">
-            <PrimaryCTA
+            <HIGButton variant="primary"
               href={`/o/${post.organization.slug}`}
               size="medium"
             >
               {post.organization.name} の他の記事を見る
-            </PrimaryCTA>
+            </HIGButton>
           </div>
         </div>
       </div>

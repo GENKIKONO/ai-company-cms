@@ -123,7 +123,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
           value={formData[field]}
           onChange={handleInputChange(field)}
           placeholder={placeholder}
-          className={`block w-full px-3 py-2 pr-10 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+          className={`block w-full px-3 py-2 pr-10 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)] ${
             errors[field] ? 'border-red-300' : 'border-gray-300'
           }`}
           disabled={isLoading}
@@ -193,7 +193,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--bg-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'パスワード変更中...' : 'パスワードを変更'}
           </button>

@@ -159,7 +159,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
         </div>
       </div>
     );
@@ -172,7 +172,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
           <h2 className="text-lg font-semibold text-gray-900">記事管理</h2>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="flex items-center px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)]"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             新しい記事
@@ -235,7 +235,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
                     )}
                     <button
                       onClick={() => handleEdit(post)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-[var(--bg-primary)] hover:text-blue-900"
                     >
                       <PencilIcon className="h-4 w-4" />
                     </button>
@@ -269,7 +269,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                     required
                   />
                 </div>
@@ -283,7 +283,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
                     value={formData.body}
                     onChange={(e) => setFormData(prev => ({ ...prev, body: e.target.value }))}
                     placeholder="Markdownで記事を書いてください..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] font-mono text-sm"
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Markdown記法が使用できます（見出し、リスト、リンク、画像など）
@@ -297,7 +297,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                   >
                     <option value="draft">下書き</option>
                     <option value="published">公開</option>
@@ -318,7 +318,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                    className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] disabled:opacity-50"
                   >
                     {submitting ? '保存中...' : '保存'}
                   </button>

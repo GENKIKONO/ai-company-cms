@@ -172,7 +172,7 @@ export default function ContactsPage() {
                     onClick={() => setFilter(key as any)}
                     className={`px-3 py-2 text-sm rounded-lg transition-colors ${
                       filter === key
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-[var(--bg-primary)] text-white'
                         : 'bg-white text-gray-700 hover:bg-gray-50 border'
                     }`}
                   >
@@ -299,7 +299,7 @@ export default function ContactsPage() {
                       value={replyMessage}
                       onChange={(e) => setReplyMessage(e.target.value)}
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                       placeholder="返信メッセージを入力してください..."
                     />
                     <div className="flex gap-2 mt-3">

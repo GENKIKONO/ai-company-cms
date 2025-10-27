@@ -59,7 +59,7 @@ export default function CallbackPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
           <p className="mt-4 text-gray-600">認証処理中...</p>
         </div>
       </div>
@@ -78,7 +78,7 @@ export default function CallbackPage() {
               {error}
             </div>
             <div className="mt-6">
-              <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/auth/login" className="font-medium text-[var(--bg-primary)] hover:text-blue-500">
                 ログインページに戻る
               </Link>
             </div>

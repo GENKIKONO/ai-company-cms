@@ -85,7 +85,7 @@ function ResetPasswordConfirmContent() {
               このパスワードリセットリンクは無効です。
             </p>
             <div className="mt-4">
-              <Link href="/auth/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/auth/forgot-password" className="font-medium text-[var(--bg-primary)] hover:text-blue-500">
                 新しいパスワードリセットリクエストを送信
               </Link>
             </div>
@@ -135,7 +135,7 @@ function ResetPasswordConfirmContent() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)] sm:text-sm"
                 placeholder="新しいパスワード（6文字以上）"
               />
             </div>
@@ -152,7 +152,7 @@ function ResetPasswordConfirmContent() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)] sm:text-sm"
                 placeholder="パスワード（確認）"
               />
             </div>
@@ -162,7 +162,7 @@ function ResetPasswordConfirmContent() {
             <button
               type="submit"
               disabled={isLoading || !!success}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--bg-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'パスワード更新中...' : 'パスワードを更新'}
             </button>
@@ -178,7 +178,7 @@ export default function ResetPasswordConfirmPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
           <p className="mt-4 text-gray-600">読み込み中...</p>
         </div>
       </div>

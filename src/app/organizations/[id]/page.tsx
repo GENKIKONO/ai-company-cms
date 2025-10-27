@@ -375,7 +375,7 @@ export default function EditOrganizationPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
     );
@@ -386,7 +386,7 @@ export default function EditOrganizationPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">企業が見つかりません</h2>
-          <Link href="/dashboard" className="mt-4 text-blue-600 hover:text-blue-700">
+          <Link href="/dashboard" className="mt-4 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]">
             ダッシュボードに戻る
           </Link>
         </div>
@@ -435,7 +435,7 @@ export default function EditOrganizationPage() {
               <select
                 value={organization.status}
                 onChange={(e) => handleStatusChange(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
               >
                 <option value="draft">下書き</option>
                 <option value="published">公開</option>
@@ -474,7 +474,7 @@ export default function EditOrganizationPage() {
                 onClick={() => setActiveTab('basic')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'basic'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--bg-primary)] text-[var(--bg-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -484,7 +484,7 @@ export default function EditOrganizationPage() {
                 onClick={() => setActiveTab('services')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'services'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--bg-primary)] text-[var(--bg-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -494,7 +494,7 @@ export default function EditOrganizationPage() {
                 onClick={() => setActiveTab('casestudies')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'casestudies'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--bg-primary)] text-[var(--bg-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -504,7 +504,7 @@ export default function EditOrganizationPage() {
                 onClick={() => setActiveTab('faqs')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'faqs'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--bg-primary)] text-[var(--bg-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -514,7 +514,7 @@ export default function EditOrganizationPage() {
                 onClick={() => setActiveTab('posts')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'posts'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--bg-primary)] text-[var(--bg-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -524,7 +524,7 @@ export default function EditOrganizationPage() {
                 onClick={() => setActiveTab('qa')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'qa'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--bg-primary)] text-[var(--bg-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -551,7 +551,7 @@ export default function EditOrganizationPage() {
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -567,7 +567,7 @@ export default function EditOrganizationPage() {
                   id="slug"
                   value={formData.slug}
                   onChange={(e) => handleInputChange('slug', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
                     errors.slug ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -587,7 +587,7 @@ export default function EditOrganizationPage() {
                 rows={4}
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
                   errors.description ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -603,7 +603,7 @@ export default function EditOrganizationPage() {
                   id="legal_form"
                   value={formData.legal_form}
                   onChange={(e) => handleInputChange('legal_form', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 >
                   <option value="">選択してください</option>
                   <option value="株式会社">株式会社</option>
@@ -626,7 +626,7 @@ export default function EditOrganizationPage() {
                   id="representative_name"
                   value={formData.representative_name}
                   onChange={(e) => handleInputChange('representative_name', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 />
               </div>
             </div>
@@ -643,7 +643,7 @@ export default function EditOrganizationPage() {
                   id="capital"
                   value={formData.capital || ''}
                   onChange={(e) => handleInputChange('capital', e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 />
               </div>
 
@@ -656,7 +656,7 @@ export default function EditOrganizationPage() {
                   id="employees"
                   value={formData.employees || ''}
                   onChange={(e) => handleInputChange('employees', e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 />
               </div>
             </div>
@@ -676,7 +676,7 @@ export default function EditOrganizationPage() {
                   id="telephone"
                   value={formData.telephone}
                   onChange={(e) => handleInputChange('telephone', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 />
               </div>
 
@@ -689,7 +689,7 @@ export default function EditOrganizationPage() {
                   id="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -703,7 +703,7 @@ export default function EditOrganizationPage() {
                   type="checkbox"
                   checked={formData.email_public}
                   onChange={(e) => handleInputChange('email_public', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <span className="ml-2 text-sm text-gray-700">メールアドレスを公開する</span>
               </label>
@@ -718,7 +718,7 @@ export default function EditOrganizationPage() {
                 id="url"
                 value={formData.url}
                 onChange={(e) => handleInputChange('url', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
                   errors.url ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -740,7 +740,7 @@ export default function EditOrganizationPage() {
                   id="address_postal_code"
                   value={formData.address_postal_code}
                   onChange={(e) => handleInputChange('address_postal_code', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 />
               </div>
 
@@ -752,7 +752,7 @@ export default function EditOrganizationPage() {
                   id="address_region"
                   value={formData.address_region}
                   onChange={(e) => handleInputChange('address_region', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 >
                   <option value="">選択してください</option>
                   <option value="北海道">北海道</option>
@@ -814,7 +814,7 @@ export default function EditOrganizationPage() {
                   id="address_locality"
                   value={formData.address_locality}
                   onChange={(e) => handleInputChange('address_locality', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 />
               </div>
             </div>
@@ -829,7 +829,7 @@ export default function EditOrganizationPage() {
                   id="address_street"
                   value={formData.address_street}
                   onChange={(e) => handleInputChange('address_street', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 />
                 <HIGButton
                   type="button"
@@ -877,7 +877,7 @@ export default function EditOrganizationPage() {
               <button
                 type="button"
                 onClick={() => setShowManualCoords(!showManualCoords)}
-                className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                className="flex items-center gap-2 text-sm text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]"
               >
                 <svg 
                   className={`w-4 h-4 transition-transform ${showManualCoords ? 'rotate-90' : ''}`} 
@@ -910,7 +910,7 @@ export default function EditOrganizationPage() {
                             setCoordinates({ lat, lng: coordinates?.lng || 0 });
                           }
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                         placeholder="例: 35.681236"
                       />
                     </div>
@@ -931,7 +931,7 @@ export default function EditOrganizationPage() {
                             setCoordinates({ lat: coordinates?.lat || 0, lng });
                           }
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                         placeholder="例: 139.767052"
                       />
                     </div>
@@ -950,7 +950,7 @@ export default function EditOrganizationPage() {
                       id="publish_coordinates"
                       checked={publishCoordinates}
                       onChange={(e) => setPublishCoordinates(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      className="w-4 h-4 text-[var(--bg-primary)] bg-gray-100 border-gray-300 rounded focus:ring-[var(--bg-primary)] focus:ring-2"
                     />
                     <label htmlFor="publish_coordinates" className="text-sm text-gray-700">
                       座標情報を公開する（検索エンジン向けJSON-LDに含める）
@@ -1010,7 +1010,7 @@ export default function EditOrganizationPage() {
                           handleArrayChange('industries', (formData.industries || []).filter(i => i !== industry));
                         }
                       }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                     />
                     <span className="ml-2 text-sm text-gray-700">{industry}</span>
                   </label>
@@ -1032,7 +1032,7 @@ export default function EditOrganizationPage() {
                   type="checkbox"
                   checked={formData.show_services !== false}
                   onChange={(e) => handleInputChange('show_services', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <span className="text-sm text-gray-700">サービス一覧を表示</span>
               </label>
@@ -1042,7 +1042,7 @@ export default function EditOrganizationPage() {
                   type="checkbox"
                   checked={formData.show_posts !== false}
                   onChange={(e) => handleInputChange('show_posts', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <span className="text-sm text-gray-700">記事一覧を表示</span>
               </label>
@@ -1052,7 +1052,7 @@ export default function EditOrganizationPage() {
                   type="checkbox"
                   checked={formData.show_case_studies !== false}
                   onChange={(e) => handleInputChange('show_case_studies', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <span className="text-sm text-gray-700">導入事例を表示</span>
               </label>
@@ -1062,7 +1062,7 @@ export default function EditOrganizationPage() {
                   type="checkbox"
                   checked={formData.show_faqs !== false}
                   onChange={(e) => handleInputChange('show_faqs', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <span className="text-sm text-gray-700">FAQを表示</span>
               </label>
@@ -1072,7 +1072,7 @@ export default function EditOrganizationPage() {
                   type="checkbox"
                   checked={formData.show_qa !== false}
                   onChange={(e) => handleInputChange('show_qa', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <span className="text-sm text-gray-700">ナレッジベースを表示</span>
               </label>
@@ -1082,7 +1082,7 @@ export default function EditOrganizationPage() {
                   type="checkbox"
                   checked={formData.show_contact !== false}
                   onChange={(e) => handleInputChange('show_contact', e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <span className="text-sm text-gray-700">連絡先を表示</span>
               </label>

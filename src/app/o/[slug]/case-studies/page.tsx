@@ -111,7 +111,7 @@ export default async function CaseStudiesPage({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <div className="flex items-center">
-                <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600">
+                <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-[var(--bg-primary)]">
                   AIO Hub AI企業CMS
                 </Link>
                 <nav className="ml-10 hidden md:flex space-x-8">
@@ -258,7 +258,7 @@ export default async function CaseStudiesPage({
                   )}
 
                   <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
-                    <span className="text-blue-600 text-sm font-medium">
+                    <span className="text-[var(--bg-primary)] text-sm font-medium">
                       詳細を見る →
                     </span>
                   </div>

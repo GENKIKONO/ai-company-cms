@@ -2,7 +2,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
-import { PrimaryCTA, SecondaryCTA } from '@/design-system';
+import { HIGButton, SecondaryCTA } from '@/design-system';
 
 export default function GlobalError({
   error,
@@ -36,13 +36,13 @@ export default function GlobalError({
             </div>
             
             <div className="space-y-3">
-              <PrimaryCTA
+              <HIGButton variant="primary"
                 onClick={reset}
                 size="medium"
                 className="w-full"
               >
                 再試行
-              </PrimaryCTA>
+              </HIGButton>
               
               <SecondaryCTA
                 onClick={() => window.location.href = '/'}

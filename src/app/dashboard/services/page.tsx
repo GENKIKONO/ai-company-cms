@@ -102,7 +102,7 @@ export default function ServicesManagementPage() {
         <div className="mb-6">
           <Link
             href="/dashboard"
-            className="text-blue-600 hover:text-blue-700 inline-flex items-center"
+            className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] inline-flex items-center"
           >
             <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />

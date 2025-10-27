@@ -154,7 +154,7 @@ export default function MaterialViewPage() {
             <p className="text-gray-600 mb-6">{error || '指定された営業資料が存在しないか、アクセス権限がありません。'}</p>
             <Link
               href="/dashboard/materials"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
+              className="bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white font-medium py-2 px-4 rounded-md"
             >
               営業資料一覧に戻る
             </Link>
@@ -171,7 +171,7 @@ export default function MaterialViewPage() {
         <div className="mb-6">
           <Link
             href="/dashboard/materials"
-            className="text-blue-600 hover:text-blue-700 inline-flex items-center"
+            className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] inline-flex items-center"
           >
             <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -226,7 +226,7 @@ export default function MaterialViewPage() {
                   <button
                     onClick={handleDownload}
                     disabled={downloading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-md inline-flex items-center justify-center"
+                    className="w-full bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-md inline-flex items-center justify-center"
                   >
                     {downloading ? (
                       <>

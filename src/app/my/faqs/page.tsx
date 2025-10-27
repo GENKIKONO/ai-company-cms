@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PrimaryCTA } from '@/design-system';
+import { HIGButton } from '@/design-system';
 import supabaseClient from '@/lib/supabase-client';
 import type { FAQ } from '@/types/database';
 import { logger } from '@/lib/utils/logger';
@@ -86,7 +86,7 @@ export default function MyFAQsPage() {
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
             <span className="ml-3 text-gray-600">読み込み中...</span>
           </div>
         </div>
@@ -116,12 +116,12 @@ export default function MyFAQsPage() {
           <div className="text-sm text-gray-600">
             {faqs.length}件のFAQが登録されています
           </div>
-          <PrimaryCTA
+          <HIGButton variant="primary"
             href="/my/faqs/new"
             size="medium"
           >
             新しいFAQを追加
-          </PrimaryCTA>
+          </HIGButton>
         </div>
 
         {/* FAQリスト */}
@@ -134,12 +134,12 @@ export default function MyFAQsPage() {
             <p className="text-gray-600 mb-6">
               最初のFAQを追加して、お客様からのよくある質問に対応しましょう
             </p>
-            <PrimaryCTA
+            <HIGButton variant="primary"
               href="/my/faqs/new"
               size="medium"
             >
               FAQを追加
-            </PrimaryCTA>
+            </HIGButton>
           </div>
         ) : (
           <div className="space-y-4">
@@ -169,7 +169,7 @@ export default function MyFAQsPage() {
                     <div className="flex items-center space-x-2 ml-4">
                       <Link
                         href={`/my/faqs/${faq.id}/edit`}
-                        className="inline-flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 border border-blue-200 rounded-md hover:bg-blue-50"
+                        className="inline-flex items-center px-3 py-1 text-sm text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] border border-blue-200 rounded-md hover:bg-blue-50"
                       >
                         編集
                       </Link>

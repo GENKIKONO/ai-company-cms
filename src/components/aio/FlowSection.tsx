@@ -43,9 +43,9 @@ const getColorClasses = (color: string) => {
     blue: {
       bg: 'bg-blue-50',
       border: 'border-blue-200',
-      icon: 'text-blue-600',
-      step: 'bg-blue-600',
-      accent: 'text-blue-600'
+      icon: 'text-[var(--bg-primary)]',
+      step: 'bg-[var(--bg-primary)]',
+      accent: 'text-[var(--bg-primary)]'
     },
     purple: {
       bg: 'bg-purple-50',

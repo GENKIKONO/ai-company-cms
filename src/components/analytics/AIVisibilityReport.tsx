@@ -72,7 +72,7 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-blue-600';
+    if (score >= 60) return 'text-[var(--bg-primary)]';
     if (score >= 40) return 'text-yellow-600';
     return 'text-red-600';
   };
@@ -145,7 +145,7 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
 
         <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100">
           <div className="flex items-center gap-3 mb-2">
-            <Search className="w-5 h-5 text-blue-600" />
+            <Search className="w-5 h-5 text-[var(--bg-primary)]" />
             <span className="text-sm font-medium text-blue-900">検索可視性</span>
           </div>
           <div className={`text-2xl font-bold ${getScoreColor(metrics.searchVisibilityScore)}`}>
@@ -210,7 +210,7 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
           {metrics.recommendations.map((rec, index) => (
             <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50">
               <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-medium text-blue-600">{index + 1}</span>
+                <span className="text-xs font-medium text-[var(--bg-primary)]">{index + 1}</span>
               </div>
               <span className="text-sm text-neutral-700">{rec}</span>
             </div>

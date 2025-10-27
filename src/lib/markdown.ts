@@ -36,7 +36,7 @@ export function configureMarked(options: MarkdownOptions = defaultMarkdownOption
 
   renderer.blockquote = function({ tokens }) {
     const text = this.parser.parse(tokens);
-    return `<blockquote class="border-l-4 border-blue-500 pl-4 my-4 italic text-gray-700">${text}</blockquote>`;
+    return `<blockquote class="border-l-4 border-[var(--bg-primary)] pl-4 my-4 italic text-gray-700">${text}</blockquote>`;
   };
 
   marked.use({ renderer });

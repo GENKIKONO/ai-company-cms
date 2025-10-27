@@ -393,7 +393,7 @@ export default function UsersManagementPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
           <span className="ml-3">読み込み中...</span>
         </div>
       </div>
@@ -421,7 +421,7 @@ export default function UsersManagementPage() {
       {/* ヘッダー */}
       <div className="mb-8">
         <nav className="flex mb-4">
-          <Link href="/management-console" className="text-blue-600 hover:text-blue-700">
+          <Link href="/management-console" className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]">
             管理コンソール
           </Link>
           <span className="mx-2 text-gray-500">/</span>
@@ -445,7 +445,7 @@ export default function UsersManagementPage() {
           <div className="text-sm text-gray-600">管理者</div>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-2xl font-bold text-blue-600">{userStats.user}</div>
+          <div className="text-2xl font-bold text-[var(--bg-primary)]">{userStats.user}</div>
           <div className="text-sm text-gray-600">一般ユーザー</div>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
@@ -465,7 +465,7 @@ export default function UsersManagementPage() {
                 placeholder="メールアドレスや組織名で検索..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full text-sm focus:ring-blue-500 focus:border-blue-500"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full text-sm focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
           </div>
@@ -583,7 +583,7 @@ export default function UsersManagementPage() {
                           setShowModal(true);
                           await fetchUserDetails(user.id);
                         }}
-                        className="text-blue-600 hover:text-blue-700 mr-3"
+                        className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] mr-3"
                       >
                         <Eye className="h-4 w-4 inline mr-1" />
                         詳細
@@ -619,7 +619,7 @@ export default function UsersManagementPage() {
 
               {loadingDetails ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
                   <span className="ml-3">詳細情報を読み込み中...</span>
                 </div>
               ) : userDetails ? (
@@ -660,7 +660,7 @@ export default function UsersManagementPage() {
                     <h4 className="text-md font-semibold text-gray-900 mb-3">コンテンツ統計</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600">{userDetails.stats.organizations}</div>
+                        <div className="text-2xl font-bold text-[var(--bg-primary)]">{userDetails.stats.organizations}</div>
                         <div className="text-xs text-gray-600">組織</div>
                       </div>
                       <div className="text-center">
@@ -780,7 +780,7 @@ export default function UsersManagementPage() {
                             </div>
                             <div className="flex items-center gap-2 ml-4">
                               {org.url && (
-                                <a href={org.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
+                                <a href={org.url} target="_blank" rel="noopener noreferrer" className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]">
                                   <ExternalLink className="h-4 w-4" />
                                 </a>
                               )}
@@ -831,7 +831,7 @@ export default function UsersManagementPage() {
                         </h4>
                         <button
                           onClick={() => openCreateModal('service')}
-                          className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                          className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] text-sm flex items-center"
                         >
                           <Plus className="h-3 w-3 mr-1" />
                           新規作成
@@ -862,7 +862,7 @@ export default function UsersManagementPage() {
                         </h4>
                         <button
                           onClick={() => openCreateModal('post')}
-                          className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                          className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] text-sm flex items-center"
                         >
                           <Plus className="h-3 w-3 mr-1" />
                           新規作成
@@ -893,7 +893,7 @@ export default function UsersManagementPage() {
                         </h4>
                         <button
                           onClick={() => openCreateModal('case_study')}
-                          className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                          className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] text-sm flex items-center"
                         >
                           <Plus className="h-3 w-3 mr-1" />
                           新規作成
@@ -924,7 +924,7 @@ export default function UsersManagementPage() {
                         </h4>
                         <button
                           onClick={() => openCreateModal('faq')}
-                          className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                          className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] text-sm flex items-center"
                         >
                           <Plus className="h-3 w-3 mr-1" />
                           新規作成
@@ -1127,7 +1127,7 @@ function PlanChangeForm({ onSubmit, onCancel, loading, currentPlan }: {
                   value={option.value}
                   checked={formData.plan === option.value}
                   onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
-                  className="mt-1 text-blue-600 focus:ring-blue-500"
+                  className="mt-1 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <div>
                   <div className="font-medium text-gray-900">{option.label}</div>
@@ -1149,7 +1149,7 @@ function PlanChangeForm({ onSubmit, onCancel, loading, currentPlan }: {
             value={formData.override_reason}
             onChange={(e) => setFormData({ ...formData, override_reason: e.target.value })}
             placeholder="プラン変更の理由を記録してください..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
           />
         </div>
 
@@ -1161,7 +1161,7 @@ function PlanChangeForm({ onSubmit, onCancel, loading, currentPlan }: {
             value={formData.admin_notes}
             onChange={(e) => setFormData({ ...formData, admin_notes: e.target.value })}
             placeholder="追加のメモや注意事項..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
           />
         </div>
 
@@ -1172,7 +1172,7 @@ function PlanChangeForm({ onSubmit, onCancel, loading, currentPlan }: {
             type="date"
             value={formData.trial_expires_at}
             onChange={(e) => setFormData({ ...formData, trial_expires_at: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
           />
           <p className="text-xs text-gray-500 mt-1">
             設定すると体験版として扱われ、期限後に元のプランに戻ります
@@ -1238,7 +1238,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 required
                 value={formData.name || ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="mb-4">
@@ -1247,7 +1247,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 rows={3}
                 value={formData.description || ''}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -1257,7 +1257,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                   type="number"
                   value={formData.price || ''}
                   onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || undefined })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
                 />
               </div>
               <div>
@@ -1266,7 +1266,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                   type="number"
                   value={formData.duration || ''}
                   onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || undefined })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
                 />
               </div>
             </div>
@@ -1285,7 +1285,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 required
                 value={formData.title || ''}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="mb-4">
@@ -1297,7 +1297,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 required
                 value={formData.slug || ''}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
                 placeholder="url-friendly-name"
               />
             </div>
@@ -1307,7 +1307,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 rows={6}
                 value={formData.content || ''}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="mb-4">
@@ -1316,7 +1316,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 rows={2}
                 value={formData.excerpt || ''}
                 onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
           </>
@@ -1334,7 +1334,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 required
                 value={formData.question || ''}
                 onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="mb-4">
@@ -1346,7 +1346,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 required
                 value={formData.answer || ''}
                 onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="mb-4">
@@ -1355,7 +1355,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 type="text"
                 value={formData.category || ''}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
           </>
@@ -1373,7 +1373,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 required
                 value={formData.title || ''}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="mb-4">
@@ -1382,7 +1382,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 type="text"
                 value={formData.client_name || ''}
                 onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="mb-4">
@@ -1391,7 +1391,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 rows={3}
                 value={formData.challenge || ''}
                 onChange={(e) => setFormData({ ...formData, challenge: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="mb-4">
@@ -1400,7 +1400,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 rows={3}
                 value={formData.solution || ''}
                 onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
             <div className="mb-4">
@@ -1409,7 +1409,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
                 rows={3}
                 value={formData.results || ''}
                 onChange={(e) => setFormData({ ...formData, results: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
               />
             </div>
           </>
@@ -1431,7 +1431,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
             type="checkbox"
             checked={formData.is_published || false}
             onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
-            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
           />
           <span className="ml-2 text-sm text-gray-700">すぐに公開する</span>
         </label>
@@ -1444,7 +1444,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
           value={formData.admin_notes || ''}
           onChange={(e) => setFormData({ ...formData, admin_notes: e.target.value })}
           placeholder="作成理由や注意事項などを記録..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)]"
         />
       </div>
 

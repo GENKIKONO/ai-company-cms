@@ -9,7 +9,7 @@ export default function FallbackHeader() {
           <div className="flex items-center">
             <Link 
               href="/" 
-              className="text-2xl font-bold text-gray-900 hover:text-blue-600"
+              className="text-2xl font-bold text-gray-900 hover:text-[var(--bg-primary)]"
             >
               AIO Hub AI企業CMS
             </Link>
@@ -24,7 +24,7 @@ export default function FallbackHeader() {
             </Link>
             <Link
               href="/auth/login"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+              className="bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white px-4 py-2 rounded-md text-sm font-medium"
             >
               無料で始める
             </Link>

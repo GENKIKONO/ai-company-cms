@@ -158,7 +158,7 @@ export function EmbedRealtimeStats() {
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={fetchRealtimeStats}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] transition-colors"
           >
             再試行
           </button>
@@ -193,7 +193,7 @@ export function EmbedRealtimeStats() {
             <h3 className="text-sm font-medium text-gray-600">アクティブWidget</h3>
             <span className="text-2xl">🎯</span>
           </div>
-          <div className="text-3xl font-bold text-blue-600 mb-1">
+          <div className="text-3xl font-bold text-[var(--bg-primary)] mb-1">
             {stats.totalActiveWidgets.toLocaleString()}
           </div>
           <div className="text-sm text-gray-500">

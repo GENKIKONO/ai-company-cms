@@ -32,7 +32,7 @@ html, body {
 :root {
   --bg-white: var(--color-white);
   --bg-alt: #F5F5F7;
-  --bg-primary: #0A84FF;
+  --bg-primary: var(--bg-primary);
   --text-primary: #1D1D1F;
   --text-secondary: #636366;
   --text-on-primary: var(--color-white);

@@ -79,7 +79,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
             {/* ロゴは常に / に遷移 */}
             <Link 
               href="/" 
-              className="focus-clean logo-no-select text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 hover:text-blue-600 min-h-[44px] flex items-center"
+              className="focus-clean logo-no-select text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 hover:text-[var(--bg-primary)] min-h-[44px] flex items-center"
             >
               AIO Hub AI企業CMS
             </Link>
@@ -110,7 +110,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                     aria-expanded={dropdownOpen}
                     aria-haspopup="true"
                   >
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-[var(--bg-primary)] rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-white">
                         {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
                       </span>
@@ -185,7 +185,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                 <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
                   <Link
                     href="/auth/login"
-                    className="focus-clean bg-blue-600 hover:bg-blue-700 text-white px-3 lg:px-4 py-2 rounded-md text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200 whitespace-nowrap"
+                    className="focus-clean bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white px-3 lg:px-4 py-2 rounded-md text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200 whitespace-nowrap"
                     aria-label="ログイン"
                   >
                     ログイン

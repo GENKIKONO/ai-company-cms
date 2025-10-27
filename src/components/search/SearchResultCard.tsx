@@ -71,7 +71,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
               />
             ) : (
               <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200  rounded-lg flex items-center justify-center">
-                <Building2 className="w-8 h-8 text-blue-600 " />
+                <Building2 className="w-8 h-8 text-[var(--bg-primary)] " />
               </div>
             )}
           </div>
@@ -84,7 +84,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
                   {org.slug && org.slug.trim() !== '' ? (
                     <Link 
                       href={`/o/${org.slug}`}
-                      className="hover:text-blue-600  transition-colors"
+                      className="hover:text-[var(--bg-primary)]  transition-colors"
                       aria-label={`${org.name}の詳細ページを見る`}
                     >
                       {org.name}
@@ -162,7 +162,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
                 {onShare && (
                   <button
                     onClick={() => handleShareClick(org)}
-                    className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50  rounded-full transition-colors"
+                    className="p-2 text-slate-600 hover:text-[var(--bg-primary)] hover:bg-blue-50  rounded-full transition-colors"
                     aria-label="共有する"
                   >
                     <Share2 className="w-5 h-5" />
@@ -178,7 +178,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
                   href={org.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-slate-600  hover:text-blue-600  transition-colors"
+                  className="flex items-center gap-2 text-sm text-slate-600  hover:text-[var(--bg-primary)]  transition-colors"
                   aria-label={`${org.name}のウェブサイトを開く（新しいタブ）`}
                 >
                   <Globe className="w-4 h-4" aria-hidden="true" />
@@ -202,7 +202,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
               {service.organization.slug && service.organization.slug.trim() !== '' ? (
                 <Link 
                   href={`/o/${service.organization.slug}/services/${service.id}`}
-                  className="hover:text-blue-600  transition-colors"
+                  className="hover:text-[var(--bg-primary)]  transition-colors"
                   aria-label={`サービス「${service.name}」の詳細を見る`}
                 >
                   {service.name}
@@ -215,7 +215,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
               {service.organization.slug && service.organization.slug.trim() !== '' ? (
                 <Link 
                   href={`/o/${service.organization.slug}`}
-                  className="hover:text-blue-600  transition-colors"
+                  className="hover:text-[var(--bg-primary)]  transition-colors"
                   aria-label={`${service.organization.name}の詳細ページを見る`}
                 >
                   {service.organization.name}
@@ -244,7 +244,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
             {onShare && (
               <button
                 onClick={() => handleShareClick(service)}
-                className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50  rounded-full transition-colors"
+                className="p-2 text-slate-600 hover:text-[var(--bg-primary)] hover:bg-blue-50  rounded-full transition-colors"
                 aria-label="共有する"
               >
                 <Share2 className="w-4 h-4" />
@@ -291,7 +291,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
               {caseStudy.organization.slug && caseStudy.organization.slug.trim() !== '' ? (
                 <Link 
                   href={`/o/${caseStudy.organization.slug}/case-studies/${caseStudy.id}`}
-                  className="hover:text-blue-600  transition-colors"
+                  className="hover:text-[var(--bg-primary)]  transition-colors"
                   aria-label={`事例「${caseStudy.title}」の詳細を見る`}
                 >
                   {caseStudy.title}
@@ -304,7 +304,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
               {caseStudy.organization.slug && caseStudy.organization.slug.trim() !== '' ? (
                 <Link 
                   href={`/o/${caseStudy.organization.slug}`}
-                  className="hover:text-blue-600  transition-colors"
+                  className="hover:text-[var(--bg-primary)]  transition-colors"
                   aria-label={`${caseStudy.organization.name}の詳細ページを見る`}
                 >
                   {caseStudy.organization.name}
@@ -333,7 +333,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
             {onShare && (
               <button
                 onClick={() => handleShareClick(caseStudy)}
-                className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50  rounded-full transition-colors"
+                className="p-2 text-slate-600 hover:text-[var(--bg-primary)] hover:bg-blue-50  rounded-full transition-colors"
                 aria-label="共有する"
               >
                 <Share2 className="w-4 h-4" />

@@ -118,12 +118,12 @@ export default function AdvancedSearchFilters({
             value={filters.query}
             onChange={(e) => updateFilters({ query: e.target.value })}
             onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-            className="w-full px-4 py-3 text-lg border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-slate-900"
+            className="w-full px-4 py-3 text-lg border border-slate-300 rounded-lg focus:ring-2 focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)] bg-white text-slate-900"
           />
         </div>
         <button
           onClick={onSearch}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-6 py-3 bg-[var(--bg-primary)] text-white rounded-lg hover:bg-[var(--bg-primary-hover)] transition-colors"
         >
           {t('search.search')}
         </button>
@@ -137,7 +137,7 @@ export default function AdvancedSearchFilters({
             onClick={() => updateFilters({ type })}
             className={`px-3 py-1 rounded-full text-sm transition-colors ${
               filters.type === type
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[var(--bg-primary)] text-white'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -192,7 +192,7 @@ export default function AdvancedSearchFilters({
                     type="checkbox"
                     checked={filters.industries.includes(industry)}
                     onChange={() => toggleArrayFilter('industries', industry)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                   />
                   <span className="text-sm text-slate-700">{industry}</span>
                 </label>
@@ -213,7 +213,7 @@ export default function AdvancedSearchFilters({
                     type="checkbox"
                     checked={filters.regions.includes(region)}
                     onChange={() => toggleArrayFilter('regions', region)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                   />
                   <span className="text-sm text-gray-700 dark:text-gray-300">{region}</span>
                 </label>
@@ -234,7 +234,7 @@ export default function AdvancedSearchFilters({
                     type="checkbox"
                     checked={filters.categories.includes(category)}
                     onChange={() => toggleArrayFilter('categories', category)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                   />
                   <span className="text-sm text-gray-700 dark:text-gray-300">{category}</span>
                 </label>
@@ -254,7 +254,7 @@ export default function AdvancedSearchFilters({
                     type="checkbox"
                     checked={filters.companySize?.includes(size) || false}
                     onChange={() => toggleArrayFilter('companySize', size)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                   />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
                     {t(`search.companySize.${size}`)}
@@ -313,7 +313,7 @@ export default function AdvancedSearchFilters({
                   type="checkbox"
                   checked={filters.hasAwards || false}
                   onChange={(e) => updateFilters({ hasAwards: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
                   {t('search.filters.hasAwards')}
@@ -324,7 +324,7 @@ export default function AdvancedSearchFilters({
                   type="checkbox"
                   checked={filters.hasCertifications || false}
                   onChange={(e) => updateFilters({ hasCertifications: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
                   {t('search.filters.hasCertifications')}

@@ -142,7 +142,7 @@ export default function DiagnosticsPage() {
 
         {loading && !diagnosticResult && (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
             <p className="mt-4 text-gray-600">システム診断を実行中...</p>
           </div>
         )}
@@ -275,7 +275,7 @@ export default function DiagnosticsPage() {
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">推奨事項</h2>
                 <div className="space-y-4">
                   {diagnosticResult.recommendations.slice(0, 8).map((rec, index) => (
-                    <div key={index} className="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <div key={index} className="border-l-4 border-[var(--bg-primary)] bg-blue-50 p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center mb-2">
@@ -323,7 +323,7 @@ export default function DiagnosticsPage() {
                     <div className="text-sm text-gray-600">危険な状態</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-2xl font-bold text-[var(--bg-primary)]">
                       {diagnosticResult.summary.highPriorityRecommendations}
                     </div>
                     <div className="text-sm text-gray-600">重要な推奨事項</div>

@@ -132,7 +132,7 @@ function SearchPageContent() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
       
-      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-20">
+      <main className="relative z-10 max-w-7xl mx-auto px-6 section-spacing">
         {/* ページタイトルと検索バー */}
         <div className="mb-12">
           <div className="text-center mb-10">
@@ -142,7 +142,7 @@ function SearchPageContent() {
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 あらゆる情報を
               </span>
               <br />
@@ -163,14 +163,14 @@ function SearchPageContent() {
                   placeholder="企業名、サービス名、事例などで検索..."
                   value={filters.query}
                   onChange={(e) => handleFilterChange('query', e.target.value)}
-                  className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 text-lg bg-gray-50/50 hover:bg-white hover:shadow-md"
+                  className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 text-lg bg-gray-50/50 hover:bg-white hover:shadow-md"
                 />
               </div>
               <div className="lg:w-52">
                 <select
                   value={filters.type}
                   onChange={(e) => handleFilterChange('type', e.target.value)}
-                  className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 text-lg bg-gray-50/50 hover:bg-white hover:shadow-md"
+                  className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 text-lg bg-gray-50/50 hover:bg-white hover:shadow-md"
                 >
                   <option value="all">すべて</option>
                   <option value="organizations">企業</option>
@@ -224,7 +224,7 @@ function SearchPageContent() {
                             type="checkbox"
                             checked={filters.industries.includes(industry)}
                             onChange={() => handleArrayFilterToggle('industries', industry)}
-                            className="rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500/30 focus:ring-2 transition-all duration-200"
+                            className="rounded-lg border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]/30 focus:ring-2 transition-all duration-200"
                           />
                           <span className="ml-3 text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-200">{industry}</span>
                         </label>
@@ -282,9 +282,9 @@ function SearchPageContent() {
         {/* 検索結果 */}
         <div className="space-y-10">
           {loading ? (
-            <div className="text-center py-20">
+            <div className="text-center section-spacing">
               <div className="inline-flex items-center gap-4">
-                <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+                <div className="w-8 h-8 border-2 border-[var(--bg-primary)]/30 border-t-blue-500 rounded-full animate-spin"></div>
                 <span className="text-lg text-gray-600 font-medium">検索中...</span>
               </div>
             </div>
@@ -294,7 +294,7 @@ function SearchPageContent() {
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 p-6 shadow-lg">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-900">
-                    <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 bg-clip-text text-transparent">
                       検索結果
                     </span>
                     <span className="ml-2 text-gray-700">({results.total}件)</span>
@@ -303,7 +303,7 @@ function SearchPageContent() {
                   {filters.query && (
                     <div className="text-right">
                       <p className="text-gray-600 text-lg">
-                        「<span className="font-semibold text-blue-600">{filters.query}</span>」の検索結果
+                        「<span className="font-semibold text-[var(--bg-primary)]">{filters.query}</span>」の検索結果
                       </p>
                     </div>
                   )}
@@ -311,7 +311,7 @@ function SearchPageContent() {
               </div>
 
               {results.total === 0 ? (
-                <div className="text-center py-20">
+                <div className="text-center section-spacing">
                   <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-gray-200/60 p-12 shadow-lg max-w-md mx-auto">
                     <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
                       <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -353,13 +353,13 @@ function SearchPageContent() {
                                 />
                               ) : (
                                 <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-md">
-                                  <span className="text-blue-600 font-bold text-xl">
+                                  <span className="text-[var(--bg-primary)] font-bold text-xl">
                                     {org.name.charAt(0)}
                                   </span>
                                 </div>
                               )}
                               <div className="ml-4 flex-1">
-                                <h4 className="text-lg font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors duration-200">
+                                <h4 className="text-lg font-bold text-gray-900 truncate group-hover:text-[var(--bg-primary)] transition-colors duration-200">
                                   {org.name}
                                 </h4>
                                 {org.industries && org.industries.length > 0 && (
@@ -414,7 +414,7 @@ function SearchPageContent() {
                                 <h4 className="text-lg font-bold text-gray-900 group-hover:text-emerald-600 transition-colors duration-200 mb-1">{service.name}</h4>
                                 <Link 
                                   href={`/o/${service.organization.slug}`}
-                                  className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
+                                  className="inline-flex items-center text-sm font-medium text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] transition-colors duration-200"
                                 >
                                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -460,7 +460,7 @@ function SearchPageContent() {
                               <h4 className="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors duration-200 mb-2">{caseStudy.title}</h4>
                               <Link 
                                 href={`/o/${caseStudy.organization.slug}`}
-                                className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
+                                className="inline-flex items-center text-sm font-medium text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] transition-colors duration-200"
                               >
                                 <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -510,7 +510,7 @@ export default function SearchPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
           <p className="mt-4 text-gray-600">検索ページを読み込み中...</p>
         </div>
       </div>

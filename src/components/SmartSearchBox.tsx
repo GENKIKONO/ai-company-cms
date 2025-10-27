@@ -129,7 +129,7 @@ export default function SmartSearchBox({
           onFocus={() => query.length > 1 && setShowSuggestions(true)}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className="w-full px-4 py-3 pl-12 pr-12 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 pl-12 pr-12 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] focus:border-transparent"
         />
         
         {/* 検索アイコン */}
@@ -142,11 +142,11 @@ export default function SmartSearchBox({
         {/* AIアイコン */}
         <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-blue-600 font-medium">AI</span>
+            <span className="text-xs text-[var(--bg-primary)] font-medium">AI</span>
             <button
               onClick={() => handleSearch(query)}
               disabled={!query.trim()}
-              className="p-1 text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+              className="p-1 text-[var(--bg-primary)] hover:text-blue-800 disabled:text-gray-400"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -182,7 +182,7 @@ export default function SmartSearchBox({
       {query.length > 3 && (
         <div className="absolute z-40 w-full mt-1 bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
           <div className="flex items-start space-x-2">
-            <svg className="w-4 h-4 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-[var(--bg-primary)] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>

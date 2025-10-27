@@ -85,7 +85,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
           href={generateContactUrl(planId)}
           className={`inline-flex items-center justify-center w-full px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 ${
             plan.popular 
-              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1'
+              ? 'bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1'
               : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
           }`}
         >
@@ -100,13 +100,13 @@ export default function PricingSection() {
   const planIds: HearingServicePlanId[] = ['light', 'advance', 'full', 'continuous'];
   
   return (
-    <section id="pricing" className="py-24 bg-gradient-to-br from-slate-50 to-gray-100">
+    <section id="pricing" className="section-spacing bg-gradient-to-br from-slate-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             シンプルで
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 bg-clip-text text-transparent">
               透明な料金
             </span>
           </h2>

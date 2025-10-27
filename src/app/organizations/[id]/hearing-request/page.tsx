@@ -5,7 +5,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar, Mail, Users, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
-import { PrimaryCTA, HIGButton } from '@/design-system';
+import { HIGButton } from '@/design-system';
 import { logger } from '@/lib/utils/logger';
 
 interface HearingRequestFormData {
@@ -110,12 +110,13 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
             ご依頼いただきありがとうございます。<br />
             担当者より3営業日以内にご連絡いたします。
           </p>
-          <PrimaryCTA
+          <HIGButton
+            variant="primary"
             href="/dashboard"
             size="large"
           >
             ダッシュボードに戻る
-          </PrimaryCTA>
+          </HIGButton>
         </div>
       </div>
     );
@@ -152,7 +153,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
                 value={formData.purpose}
                 onChange={(e) => setFormData(prev => ({ ...prev, purpose: e.target.value }))}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 placeholder="ヒアリングの目的や背景をご記入ください（例：新規事業パートナー検討、市場調査、競合分析など）"
                 required
                 maxLength={1000}
@@ -170,7 +171,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
                 type="date"
                 value={formData.preferred_date}
                 onChange={(e) => setFormData(prev => ({ ...prev, preferred_date: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
               />
               <p className="text-xs text-gray-500 mt-1">ご希望がある場合にご指定ください</p>
             </div>
@@ -185,7 +186,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
                 type="email"
                 value={formData.contact_email}
                 onChange={(e) => setFormData(prev => ({ ...prev, contact_email: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 placeholder="contact@example.com"
               />
             </div>
@@ -205,7 +206,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
                       type="checkbox"
                       checked={formData[category.key as keyof HearingRequestFormData] as boolean}
                       onChange={(e) => handleCategoryChange(category.key, e.target.checked)}
-                      className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="mt-1 h-4 w-4 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)] border-gray-300 rounded"
                     />
                     <div className="flex-1">
                       <div className="font-medium text-gray-900">{category.label}</div>

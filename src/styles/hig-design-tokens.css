@@ -43,7 +43,7 @@
   
   /* Primary Colors */
   --color-primary: #007AFF;
-  --color-primary-light: #0A84FF;
+  --color-primary-light: var(--bg-primary);
   --color-primary-dark: #0056CC;
   
   /* Border and Shadows */

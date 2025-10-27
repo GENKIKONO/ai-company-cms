@@ -135,7 +135,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
   const getRoleIcon = (role: UserRole) => {
     switch (role) {
       case 'admin': return <Crown className="w-4 h-4 text-yellow-600" />;
-      case 'editor': return <Edit3 className="w-4 h-4 text-blue-600" />;
+      case 'editor': return <Edit3 className="w-4 h-4 text-[var(--bg-primary)]" />;
       case 'viewer': return <Eye className="w-4 h-4 text-gray-600" />;
     }
   };
@@ -173,7 +173,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
     return (
       <div className={`card p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-6">
-          <Users className="w-6 h-6 text-blue-600" />
+          <Users className="w-6 h-6 text-[var(--bg-primary)]" />
           <h3 className="text-lg font-semibold text-neutral-900">チーム管理</h3>
         </div>
         <div className="text-center py-8">
@@ -188,7 +188,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
       {/* ヘッダー */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Users className="w-6 h-6 text-blue-600" />
+          <Users className="w-6 h-6 text-[var(--bg-primary)]" />
           <h3 className="text-lg font-semibold text-neutral-900">チーム管理</h3>
           <span className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
             {members.length}名
@@ -342,7 +342,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
             <span className="text-neutral-600">チーム管理、請求、全コンテンツの管理</span>
           </div>
           <div className="flex items-center gap-2">
-            <Edit3 className="w-4 h-4 text-blue-600" />
+            <Edit3 className="w-4 h-4 text-[var(--bg-primary)]" />
             <span className="font-medium">編集者:</span>
             <span className="text-neutral-600">コンテンツの作成・編集・公開</span>
           </div>

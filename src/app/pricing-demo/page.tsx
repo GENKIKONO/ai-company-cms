@@ -8,7 +8,7 @@ import PricingPlans from '@/components/pricing/PricingPlans';
 export default function PricingDemoPage() {
   return (
     <main className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 section-spacing-small">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             料金プラン（ヒアリング代行）デモ

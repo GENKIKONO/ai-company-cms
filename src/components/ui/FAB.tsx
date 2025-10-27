@@ -60,7 +60,7 @@ export default function FAB() {
       className="
         ui-fab fab-position
         w-14 h-14 
-        text-white bg-blue-600 hover:bg-blue-700 shadow-xl hover:shadow-2xl border-2 border-white
+        text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] shadow-xl hover:shadow-2xl border-2 border-white
         active:scale-95
         grid place-items-center 
         will-change-transform

@@ -21,7 +21,7 @@ import {
 } from '@/components/icons/HIGIcons';
 import { LockIcon, SaveIcon, ShieldIcon, ChartUpIcon } from '@/components/icons/SecurityIcons';
 import SectionMedia, { HeroMedia, FeatureMedia, IconMedia } from '@/components/media/SectionMedia';
-import { PrimaryCTA, SecondaryCTA } from '@/design-system';
+import { HIGButton } from '@/components/ui/HIGButton';
 
 interface SiteSettings {
   title: string;
@@ -105,7 +105,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             
             {/* Main headline */}
             <h1 className="text-5xl md:text-6xl lg:text-8xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 AIに"正しく理解"
               </span>
               <br />
@@ -137,28 +137,30 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row justify-center gap-6 mb-20">
-              <PrimaryCTA
-                href="/auth/signup"
-                size="large"
-                showArrow={true}
-                onClick={() => trackConversion()}
-                className="text-xl px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold"
+              <HIGButton
+                variant="primary"
+                size="xl"
+                onClick={() => {
+                  trackConversion();
+                  window.location.href = "/auth/signup";
+                }}
+                rightIcon={<ArrowRightIcon />}
               >
                 14日間無料で始める
-              </PrimaryCTA>
-              <SecondaryCTA
-                href="/contact"
-                size="large"
-                className="text-xl px-10 py-5 bg-white/95 backdrop-blur-xl border-2 border-gray-300/60 hover:border-gray-400 hover:bg-white shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl font-semibold text-gray-700"
+              </HIGButton>
+              <HIGButton
+                variant="secondary"
+                size="xl"
+                onClick={() => window.location.href = "/contact"}
               >
                 専門ヒアリング相談
-              </SecondaryCTA>
+              </HIGButton>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
-                <div className="text-4xl font-bold text-blue-600 mb-2">24/7</div>
+                <div className="text-4xl font-bold text-[var(--bg-primary)] mb-2">24/7</div>
                 <div className="text-sm font-medium text-gray-600">監視体制</div>
               </div>
               <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
@@ -179,13 +181,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* Features Section */}
-      <section className="py-32 bg-gradient-to-b from-white via-gray-50/30 to-white">
+      <section className="section-spacing-large bg-gradient-to-b from-white via-gray-50/30 to-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-24">
             <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-tight">
               大きな商談も、小さな問い合わせも、
               <br />
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 すべてに対応
               </span>
             </h2>
@@ -242,32 +244,32 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <SecondaryCTA 
-              href="/contact" 
-              size="large"
-              className="text-lg px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none hover:from-blue-700 hover:to-purple-700 shadow-xl hover:shadow-2xl rounded-2xl font-semibold transform hover:-translate-y-1 transition-all duration-300"
+            <HIGButton
+              variant="primary"
+              size="lg"
+              onClick={() => window.location.href = "/contact"}
             >
               今すぐヒアリング申込み
-            </SecondaryCTA>
-            <SecondaryCTA 
-              href="#pricing" 
-              size="large"
-              className="text-lg px-10 py-5 border-2 border-gray-300/60 hover:border-gray-400 bg-white/90 backdrop-blur-xl hover:bg-white shadow-xl hover:shadow-2xl rounded-2xl font-semibold transition-all duration-300 text-gray-700"
+            </HIGButton>
+            <HIGButton
+              variant="secondary"
+              size="lg"
+              onClick={() => window.location.href = "#pricing"}
             >
               料金プランを見る
-            </SecondaryCTA>
+            </HIGButton>
           </div>
         </div>
       </section>
 
 
       {/* How it Works Section */}
-      <section className="py-24 bg-gradient-to-br from-gray-50 to-blue-50">
+      <section className="section-spacing bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               シンプルな
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 bg-clip-text text-transparent">
                 3ステップ
               </span>
               で
@@ -390,21 +392,21 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
           {/* CTA */}
           <div className="text-center mt-16">
-            <PrimaryCTA
-              href="/auth/signup"
-              size="large"
-              showArrow={true}
-              className="text-lg px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            <HIGButton
+              variant="primary"
+              size="lg"
+              onClick={() => window.location.href = "/auth/signup"}
+              rightIcon={<ArrowRightIcon />}
             >
               今すぐ3ステップを始める
-            </PrimaryCTA>
+            </HIGButton>
           </div>
         </div>
       </section>
 
 
       {/* Before/After Comparison Section */}
-      <section className="py-24 bg-white">
+      <section className="section-spacing bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -503,25 +505,26 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
 
           <div className="text-center">
-            <PrimaryCTA
-              href="/auth/signup"
-              size="large"
-              showArrow={true}
+            <HIGButton
+              variant="primary"
+              size="lg"
+              onClick={() => window.location.href = "/auth/signup"}
+              rightIcon={<ArrowRightIcon />}
               className="text-lg px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             >
               14日間無料で体験する
-            </PrimaryCTA>
+            </HIGButton>
           </div>
         </div>
       </section>
 
       {/* Pricing Section */}
-      <section className="py-24 bg-gradient-to-br from-slate-50 to-gray-100" id="pricing">
+      <section className="section-spacing bg-gradient-to-br from-slate-50 to-gray-100" id="pricing">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               シンプルで
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 bg-clip-text text-transparent">
                 透明な料金
               </span>
             </h2>
@@ -534,24 +537,25 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 bg-gradient-to-br from-gray-50 to-slate-100">
+      <section className="section-spacing bg-gradient-to-br from-gray-50 to-slate-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           {/* Contact CTA */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 mb-20 text-center text-white">
+          <div className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 rounded-3xl p-12 mb-20 text-center text-white">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               その他のご質問がございましたら
             </h2>
             <p className="text-xl mb-8 opacity-90">
               AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
             </p>
-            <PrimaryCTA
-              href="/contact"
-              size="large"
-              showArrow={true}
-              className="bg-white text-blue-600 hover:bg-gray-50 border-none"
+            <HIGButton
+              variant="primary"
+              size="lg"
+              onClick={() => window.location.href = "/contact"}
+              rightIcon={<ArrowRightIcon />}
+              className="bg-white text-[var(--bg-primary)] hover:bg-gray-50 border-none"
             >
               お問い合わせフォーム
-            </PrimaryCTA>
+            </HIGButton>
           </div>
           
           <FAQSection
@@ -563,7 +567,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white relative overflow-hidden">
+      <section className="section-spacing-large bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white relative overflow-hidden">
         {/* Background effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.3),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.3),transparent_50%)]" />
@@ -583,21 +587,23 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
-            <PrimaryCTA
-              href="/auth/signup"
-              size="large"
-              showArrow={true}
-              className="text-xl px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
+            <HIGButton
+              variant="primary"
+              size="lg"
+              onClick={() => window.location.href = "/auth/signup"}
+              rightIcon={<ArrowRightIcon />}
+              className="text-xl px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-[var(--bg-primary)] hover:to-purple-600 border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
             >
               14日間無料で始める
-            </PrimaryCTA>
-            <SecondaryCTA
-              href="/contact"
-              size="large"
+            </HIGButton>
+            <HIGButton
+              variant="secondary"
+              size="lg"
+              onClick={() => window.location.href = "/contact"}
               className="text-xl px-10 py-5 bg-white/10 backdrop-blur-sm border-2 border-white/30 hover:bg-white/20 hover:border-white/50 transition-all duration-300"
             >
               専門ヒアリング相談
-            </SecondaryCTA>
+            </HIGButton>
           </div>
           
           <div className="flex flex-wrap justify-center gap-6 text-sm opacity-75">

@@ -129,10 +129,10 @@ export default function LayoutDebugger() {
           <div className="space-y-6 font-mono text-sm">
             {/* Viewport Info */}
             <div>
-              <h4 className="font-bold text-blue-600 mb-2">Viewport & Breakpoint</h4>
+              <h4 className="font-bold text-[var(--bg-primary)] mb-2">Viewport & Breakpoint</h4>
               <div className="bg-gray-50 p-3 rounded">
                 <p>Size: {metrics.viewport.width} × {metrics.viewport.height}</p>
-                <p>Breakpoint: <span className="font-bold text-blue-600">{metrics.breakpoint}</span></p>
+                <p>Breakpoint: <span className="font-bold text-[var(--bg-primary)]">{metrics.breakpoint}</span></p>
               </div>
             </div>
 
@@ -194,7 +194,7 @@ export default function LayoutDebugger() {
             <div className="pt-4 border-t">
               <button
                 onClick={measureLayout}
-                className="bg-blue-600 text-white px-4 py-2 rounded mr-2 hover:bg-blue-700"
+                className="bg-[var(--bg-primary)] text-white px-4 py-2 rounded mr-2 hover:bg-[var(--bg-primary-hover)]"
               >
                 Remeasure
               </button>

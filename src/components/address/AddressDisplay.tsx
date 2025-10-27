@@ -66,7 +66,7 @@ export default function AddressDisplay({
                   href={googleMapsSearchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-blue-300 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-[var(--bg-primary)] bg-white border border-blue-300 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] focus:ring-offset-2 transition-colors"
                   aria-label={`${organizationName || '所在地'}をGoogleマップで表示`}
                 >
                   <ExternalLink className="w-4 h-4" />
