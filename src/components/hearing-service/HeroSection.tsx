@@ -2,6 +2,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { PrimaryCTA } from '@/components/ui/UnifiedCTA';
 
 export default function HeroSection() {
   return (
@@ -20,13 +21,13 @@ export default function HeroSection() {
           
           {/* Apple式CTA - 単一のプライマリボタン */}
           <div className="apple-hero-cta">
-            <Link
+            <PrimaryCTA
               href="#pricing"
-              className="apple-button apple-button-primary apple-button-large"
+              size="large"
+              showArrow={true}
             >
-              <span>ヒアリングを申し込む</span>
-              <ArrowRight className="apple-button-icon" />
-            </Link>
+              ヒアリングを申し込む
+            </PrimaryCTA>
           </div>
         </div>
       </div>

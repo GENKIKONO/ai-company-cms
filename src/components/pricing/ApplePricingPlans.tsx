@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Check, MessageSquare, Target, Building2, Sparkles } from 'lucide-react';
+import { PrimaryCTA, SecondaryCTA } from '@/components/ui/UnifiedCTA';
 
 interface PlanFeature {
   text: string;
@@ -134,12 +135,21 @@ export default function ApplePricingPlans() {
               </div>
 
               <div className="apple-pricing-cta">
-                <Link
-                  href={plan.ctaHref}
-                  className={`apple-button ${plan.popular ? 'apple-button-primary' : 'apple-button-secondary'} apple-button-large`}
-                >
-                  {plan.ctaText}
-                </Link>
+                {plan.popular ? (
+                  <PrimaryCTA
+                    href={plan.ctaHref}
+                    size="large"
+                  >
+                    {plan.ctaText}
+                  </PrimaryCTA>
+                ) : (
+                  <SecondaryCTA
+                    href={plan.ctaHref}
+                    size="large"
+                  >
+                    {plan.ctaText}
+                  </SecondaryCTA>
+                )}
               </div>
             </div>
           ))}
@@ -185,12 +195,21 @@ export default function ApplePricingPlans() {
                 </div>
 
                 <div className="apple-pricing-cta">
-                  <Link
-                    href={plan.ctaHref}
-                    className={`apple-button ${plan.popular ? 'apple-button-primary' : 'apple-button-secondary'} apple-button-large`}
-                  >
-                    {plan.ctaText}
-                  </Link>
+                  {plan.popular ? (
+                    <PrimaryCTA
+                      href={plan.ctaHref}
+                      size="large"
+                    >
+                      {plan.ctaText}
+                    </PrimaryCTA>
+                  ) : (
+                    <SecondaryCTA
+                      href={plan.ctaHref}
+                      size="large"
+                    >
+                      {plan.ctaText}
+                    </SecondaryCTA>
+                  )}
                 </div>
               </div>
             ))}

@@ -5,7 +5,6 @@
 
 import { Metadata } from 'next';
 import HeroSection from '@/components/hearing-service/HeroSection';
-import GreenBandSection from '@/components/hearing-service/GreenBandSection';
 import ComparisonSection from '@/components/hearing-service/ComparisonSection';
 import FlowSection from '@/components/hearing-service/FlowSection';
 import ApplePricingPlans from '@/components/pricing/ApplePricingPlans';
@@ -124,32 +123,45 @@ export default function HearingServicePage() {
       
       <div className="min-h-screen">
         {/* ヒーローセクション */}
-        <section className="mt-0">
-          <HeroSection />
+        <section className="sec-white">
+          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+            <HeroSection />
+          </div>
         </section>
         
-        {/* 緑のフルブリードセクション */}
-        <GreenBandSection />
-        
         {/* 構造化前後の違い */}
-        <ComparisonSection />
+        <section className="sec-alt">
+          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+            <ComparisonSection />
+          </div>
+        </section>
         
         {/* サービス流れ説明 */}
-        <section className="mt-8 md:mt-16">
-          <FlowSection />
+        <section className="sec-white">
+          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+            <FlowSection />
+          </div>
         </section>
         
         {/* 料金プラン - Apple HIG準拠 */}
-        <ApplePricingPlans />
+        <section className="sec-alt">
+          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+            <ApplePricingPlans />
+          </div>
+        </section>
         
         {/* よくある質問 */}
-        <section className="mt-8 md:mt-16">
-          <FAQSection />
+        <section className="sec-white">
+          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+            <FAQSection />
+          </div>
         </section>
         
         {/* CTA（申込導線） */}
-        <section className="mt-8 md:mt-16">
-          <CTASection />
+        <section className="sec-alt">
+          <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+            <CTASection />
+          </div>
         </section>
       </div>
     </>

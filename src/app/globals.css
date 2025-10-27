@@ -47,6 +47,68 @@ html, body {
   --text-on-primary: #FFFFFF;
 }
 
+/* タイポグラフィ仕様（数字の見え方統一） */
+html, body {
+  font-feature-settings: "lnum","tnum","liga","kern";
+  font-variant-numeric: lining-nums tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 背景スキンシステム（簡潔版） */
+.sec-white {
+  background: var(--bg-white);
+  color: var(--text-primary);
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  position: relative;
+  z-index: 0;
+}
+
+.sec-alt {
+  background: var(--bg-alt);
+  color: var(--text-primary);
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  position: relative;
+  z-index: 0;
+}
+
+.sec-primary {
+  background: var(--bg-primary);
+  color: var(--text-on-primary);
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  position: relative;
+  z-index: 0;
+}
+
+/* セクション内要素の文字色強制 */
+.sec-white *, .sec-alt * {
+  color: var(--text-primary) !important;
+}
+
+.sec-primary * {
+  color: var(--text-on-primary) !important;
+}
+
+/* セカンダリテキストの調整 */
+.sec-white .text-secondary, .sec-alt .text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.sec-primary .text-secondary {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* レガシー反転の無効化 */
+.force-text-white {
+  color: inherit !important;
+}
+
 /* セクション背景（直接指定・オーバーレイ禁止） */
 .section {
   position: relative;

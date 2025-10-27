@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { PrimaryCTA } from '@/components/ui/UnifiedCTA';
 
 const faqData = [
   {
@@ -123,12 +124,12 @@ export default function FAQSection() {
               お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
             </p>
             <div>
-              <a
+              <PrimaryCTA
                 href="mailto:support@luxucare.jp"
-                className="apple-button apple-button-primary apple-button-large"
+                size="large"
               >
                 メールで問い合わせ
-              </a>
+              </PrimaryCTA>
             </div>
           </div>
         </div>

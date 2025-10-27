@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { PrimaryCTA } from '@/components/ui/UnifiedCTA';
 
 interface FAQItem {
   readonly question: string;
@@ -112,12 +113,12 @@ export default function FAQSection({ title, description, categories }: FAQSectio
             <p className="apple-body-large apple-text-secondary">
               AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
             </p>
-            <a
+            <PrimaryCTA
               href="/contact"
-              className="apple-button apple-button-primary apple-button-medium"
+              size="medium"
             >
               お問い合わせフォーム
-            </a>
+            </PrimaryCTA>
           </div>
         </div>
       </div>

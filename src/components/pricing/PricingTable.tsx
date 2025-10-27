@@ -8,6 +8,7 @@ import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
 import { formatJPY, PRICING_CONFIG } from '@/lib/pricing';
 import { HIGButton } from '@/components/ui/HIGButton';
 import { PLAN_LABELS, formatPriceLabel } from '@/config/planLabels';
+import { PrimaryCTA } from '@/components/ui/UnifiedCTA';
 
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
@@ -195,12 +196,12 @@ export default function PricingTable() {
                 </ul>
 
                 <div className="apple-pricing-cta">
-                  <Link
+                  <PrimaryCTA
                     href={plan.ctaHref}
-                    className="apple-button apple-button-primary apple-button-large"
+                    size="large"
                   >
                     {plan.ctaText}
-                  </Link>
+                  </PrimaryCTA>
                 </div>
 
                 {plan.comingSoon && (
@@ -291,12 +292,12 @@ export default function PricingTable() {
               </ul>
 
               <div className="apple-pricing-cta">
-                <Link
+                <PrimaryCTA
                   href={plan.ctaHref}
-                  className="apple-button apple-button-primary apple-button-large"
+                  size="large"
                 >
                   {plan.ctaText}
-                </Link>
+                </PrimaryCTA>
               </div>
 
               {plan.comingSoon && (

@@ -19,6 +19,9 @@ import {
   InfoIcon,
   AlertTriangleIcon 
 } from '@/components/icons/HIGIcons';
+import { LockIcon, SaveIcon, ShieldIcon, ChartUpIcon } from '@/components/icons/SecurityIcons';
+import SectionMedia, { HeroMedia, FeatureMedia, IconMedia } from '@/components/media/SectionMedia';
+import { PrimaryCTA, SecondaryCTA } from '@/components/ui/UnifiedCTA';
 
 interface SiteSettings {
   title: string;
@@ -128,20 +131,20 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             
             {/* CTA */}
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link
+              <PrimaryCTA
                 href="/auth/signup"
-                className="apple-button apple-button-primary apple-button-large"
+                size="large"
+                showArrow={true}
                 onClick={() => trackConversion()}
               >
-                <span>14日間無料で試す</span>
-                <ArrowRightIcon className="apple-button-icon" />
-              </Link>
-              <Link
+                14日間無料で試す
+              </PrimaryCTA>
+              <SecondaryCTA
                 href="/contact"
-                className="apple-button apple-button-secondary apple-button-large"
+                size="large"
               >
-                <span>専門ヒアリング相談</span>
-              </Link>
+                専門ヒアリング相談
+              </SecondaryCTA>
             </div>
           </div>
         </div>
@@ -185,13 +188,24 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/contact" className="apple-button apple-button-secondary apple-button-medium">
-              <span>今すぐヒアリング申込み</span>
-            </Link>
-            <Link href="#pricing" className="apple-button apple-button-secondary apple-button-medium">
-              <span>料金プランを見る</span>
-            </Link>
+            <SecondaryCTA href="/contact" size="medium">
+              今すぐヒアリング申込み
+            </SecondaryCTA>
+            <SecondaryCTA href="#pricing" size="medium">
+              料金プランを見る
+            </SecondaryCTA>
           </div>
+        </div>
+      </section>
+
+      {/* 画像スロット1: キー便益後 */}
+      <section className="section section--alt">
+        <div className="site-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+          <FeatureMedia 
+            caption="導入企業様の構造化された企業プロフィール例"
+            align="center"
+            className="shadow-lg"
+          />
         </div>
       </section>
 
@@ -323,6 +337,17 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </div>
       </section>
 
+      {/* 画像スロット2: 3ステップ後 */}
+      <section className="section section--white">
+        <div className="site-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+          <HeroMedia 
+            caption="3ステップでAI最適化された企業情報管理画面"
+            align="center"
+            className="shadow-xl"
+          />
+        </div>
+      </section>
+
       {/* 4. 信頼・安心（青・強調帯） */}
       <section className="section section--primary">
         <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
@@ -337,22 +362,30 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '32px', textAlign: 'center' }}>
             <div>
-              <div style={{ fontSize: '32px', marginBottom: '16px' }}>🔒</div>
+              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                <LockIcon className="w-12 h-12" />
+              </div>
               <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>SSL暗号化</h4>
               <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>通信の完全暗号化</p>
             </div>
             <div>
-              <div style={{ fontSize: '32px', marginBottom: '16px' }}>💾</div>
+              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                <SaveIcon className="w-12 h-12" />
+              </div>
               <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>定期バックアップ</h4>
               <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>データの安全な保管</p>
             </div>
             <div>
-              <div style={{ fontSize: '32px', marginBottom: '16px' }}>🚫</div>
+              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                <ShieldIcon className="w-12 h-12" />
+              </div>
               <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>アクセス制御</h4>
               <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>権限管理とログ監視</p>
             </div>
             <div>
-              <div style={{ fontSize: '32px', marginBottom: '16px' }}>📈</div>
+              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                <ChartUpIcon className="w-12 h-12" />
+              </div>
               <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>監査ログ</h4>
               <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>全操作の記録・追跡</p>
             </div>
@@ -450,15 +483,35 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </div>
           </div>
           
-          <div style={{ textAlign: 'center', marginTop: '48px' }}>
-            <Link
-              href="/auth/signup"
-              className="apple-button apple-button-primary apple-button-large"
-            >
-              <span>14日間無料で体験する</span>
-              <ArrowRightIcon className="apple-button-icon" />
-            </Link>
+          {/* 画像スロット3: Before/After比較内 */}
+          <div style={{ textAlign: 'center', marginTop: '48px', marginBottom: '48px' }}>
+            <FeatureMedia 
+              caption="構造化前後での検索結果の違い（実際の比較画面）"
+              align="center"
+              className="shadow-lg"
+            />
           </div>
+          
+          <div style={{ textAlign: 'center', marginTop: '48px' }}>
+            <PrimaryCTA
+              href="/auth/signup"
+              size="large"
+              showArrow={true}
+            >
+              14日間無料で体験する
+            </PrimaryCTA>
+          </div>
+        </div>
+      </section>
+
+      {/* 画像スロット4: 料金プラン前 */}
+      <section className="section section--alt">
+        <div className="site-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+          <IconMedia 
+            caption="料金体系の概要"
+            align="center"
+            className="shadow-md"
+          />
         </div>
       </section>
 
@@ -486,19 +539,19 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </p>
             
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '32px' }}>
-              <Link
+              <PrimaryCTA
                 href="/auth/signup"
-                className="apple-button apple-button-primary apple-button-large"
+                size="large"
+                showArrow={true}
               >
-                <span>14日間無料で始める</span>
-                <ArrowRightIcon className="apple-button-icon" />
-              </Link>
-              <Link
+                14日間無料で始める
+              </PrimaryCTA>
+              <SecondaryCTA
                 href="/contact"
-                className="apple-button apple-button-secondary apple-button-large"
+                size="large"
               >
-                <span>専門ヒアリング相談</span>
-              </Link>
+                専門ヒアリング相談
+              </SecondaryCTA>
             </div>
             
             <p style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>
