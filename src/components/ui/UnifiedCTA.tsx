@@ -38,7 +38,7 @@ export default function UnifiedCTA({
     letter-spacing: 0.01em
     -webkit-font-smoothing: antialiased
     text-rendering: optimizeLegibility
-    border-radius: 12px
+    border-radius: 980px
     min-height: 44px
   `.replace(/\s+/g, ' ').trim();
 
