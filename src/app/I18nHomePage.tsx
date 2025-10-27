@@ -110,8 +110,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </Link>
             </div>
             
-            {/* Trust Signal */}
-            <div className="apple-trust-signal">
+            {/* Trust Signal - Hidden for now */}
+            <div className="apple-trust-signal" style={{ display: 'none' }}>
               <p className="apple-text-caption">
                 {formatNumber(dynamicStats.organizations)}社以上が利用中
               </p>
@@ -125,14 +125,15 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <div className="apple-demo-content">
                   <div className="apple-demo-search">
                     <div className="apple-search-bar">
-                      <span>「[企業名]について教えて」</span>
+                      <span>「AIO Hubについて教えて」</span>
                     </div>
                     <div className="apple-search-result">
-                      <strong>[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
+                      <div className="ai-avatar">🤖 ChatGPT</div>
+                      <strong>AIO Hub</strong>は、企業情報をAIが理解しやすい形で構造化するCMSプラットフォームです。
                       <br /><br />
-                      <strong>主なサービス：</strong> 構造化データによる企業情報最適化
+                      <strong>主な機能：</strong> JSON-LD構造化、SEO最適化、AI検索対応
                       <br />
-                      <strong>導入実績：</strong> 300社以上
+                      <strong>対象：</strong> AI時代の企業ブランディングを重視する企業
                     </div>
                   </div>
                 </div>
