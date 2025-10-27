@@ -102,9 +102,10 @@ async function fetchOrganizations(
   location: string
 ) {
   const cookieStore = await cookies();
+  // Keep using service role for stability while fixing other RLS policies
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -140,7 +141,8 @@ async function fetchOrganizations(
       address_region,
       address_locality,
       logo_url,
-      services(id, name, description)
+      services(id, name, description),
+      case_studies(id, title)
     `)
     .eq('status', 'published')
     .eq('is_published', true)

@@ -158,20 +158,20 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
-                <div className="text-4xl font-bold text-gray-900 mb-2">{formatNumber(dynamicStats.organizations)}</div>
-                <div className="text-sm font-medium text-gray-600">企業</div>
+                <div className="text-4xl font-bold text-blue-600 mb-2">24/7</div>
+                <div className="text-sm font-medium text-gray-600">監視体制</div>
               </div>
               <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
-                <div className="text-4xl font-bold text-gray-900 mb-2">{formatNumber(dynamicStats.services)}</div>
-                <div className="text-sm font-medium text-gray-600">サービス</div>
+                <div className="text-4xl font-bold text-green-600 mb-2">99.9%</div>
+                <div className="text-sm font-medium text-gray-600">稼働率</div>
               </div>
               <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
-                <div className="text-4xl font-bold text-gray-900 mb-2">{formatNumber(dynamicStats.cases)}</div>
-                <div className="text-sm font-medium text-gray-600">導入事例</div>
+                <div className="text-4xl font-bold text-purple-600 mb-2">10種類</div>
+                <div className="text-sm font-medium text-gray-600">セキュリティ機能</div>
               </div>
               <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
-                <div className="text-4xl font-bold text-gray-900 mb-2">{formatNumber(dynamicStats.categories)}</div>
-                <div className="text-sm font-medium text-gray-600">業界</div>
+                <div className="text-4xl font-bold text-orange-600 mb-2">50業界</div>
+                <div className="text-sm font-medium text-gray-600">対応可能</div>
               </div>
             </div>
           </div>

@@ -77,6 +77,17 @@ export default function ComparisonSection() {
               <Check className="apple-comparison-status-icon apple-comparison-success" />
               <span className="apple-comparison-status-text">具体的でAIが理解しやすい</span>
             </div>
+            
+            {/* 期待できる成果 */}
+            <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+              <h4 className="font-bold text-green-800 mb-2">期待できる成果</h4>
+              <ul className="text-sm text-green-700 space-y-1">
+                <li>• ChatGPT検索で上位表示</li>
+                <li>• Google AI Overviewで引用</li>
+                <li>• 商談・採用の問い合わせ増加</li>
+                <li>• メディア取材の機会拡大</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

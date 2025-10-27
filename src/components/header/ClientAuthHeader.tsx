@@ -15,7 +15,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // クライアントサイドでのみレンダリング（ハイドレーション不整合回避）
+  // クライアントサイドでのマウント状態管理
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -45,10 +45,11 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
     };
   }, [dropdownOpen]);
 
-  const user = mounted ? initialUser : null;
-  const hasOrganization = mounted ? initialHasOrganization : false;
-  const isAuthenticated = mounted && !!user;
-  const isAdmin = mounted ? initialIsAdmin : false;
+  // SSR/CSRでの一貫性を保つため、initialの値をそのまま使用
+  const user = initialUser;
+  const hasOrganization = initialHasOrganization;
+  const isAuthenticated = !!user;
+  const isAdmin = initialIsAdmin;
 
   const links = useMemo(
     () => [
@@ -98,7 +99,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
           </div>
           
           <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
-            {mounted && isAuthenticated ? (
+            {isAuthenticated ? (
               <>
                 {/* デスクトップ: アバター + ドロップダウン */}
                 <div className="hidden md:block relative" ref={dropdownRef}>
