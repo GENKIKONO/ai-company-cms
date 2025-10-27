@@ -53,6 +53,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
   const links = useMemo(
     () => [
       { href: '/pricing', label: '料金プラン' },
+      { href: '/companies', label: '企業ディレクトリ' },
       { href: '/hearing-service', label: 'ヒアリング代行' },
     ],
     []
