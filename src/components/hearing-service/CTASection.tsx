@@ -5,28 +5,25 @@ import Link from 'next/link';
 
 export default function CTASection() {
   return (
-    <section className="relative py-24 overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
-      {/* 背景装飾 */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000"></div>
-      </div>
+    <section className="relative py-32 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900">
+      {/* 背景装飾 - more subtle */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.3),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.3),transparent_50%)]" />
       
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center">
           {/* メインメッセージ */}
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight">
-            今すぐAI時代に対応した
-            <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">
-              企業情報を手に入れよう
+          <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+            まずは情報を
+            <br />
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              "構造化"
             </span>
+            するところから。
           </h2>
           
-          <p className="text-xl text-white/90 mb-12 max-w-4xl mx-auto leading-relaxed">
-            複雑な作業は一切不要。専門スタッフがあなたの企業の魅力を
-            <br className="hidden md:block" />
-            AIが理解しやすい形で構造化し、競合他社との差別化を実現します。
+          <p className="text-2xl mb-12 opacity-90 leading-relaxed">
+            14日間の無料体験で効果を実感
           </p>
 
           {/* 特徴ポイント */}
@@ -49,22 +46,21 @@ export default function CTASection() {
           </div>
 
           {/* メインCTAボタン */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
-            <Link 
-              href="/dashboard"
+          <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
+            <Link
+              href="/auth/signup"
               aria-label="今すぐヒアリングを申し込む"
-              className="inline-flex items-center justify-center font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
+              className="inline-flex items-center justify-center font-semibold text-xl px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-2xl border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
             >
-              今すぐヒアリング申し込み
+              14日間無料で始める
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
-            
-            <Link 
-              href="#pricing"
-              aria-label="料金プランを確認"
-              className="inline-flex items-center justify-center font-medium bg-white/90 backdrop-blur-lg text-blue-900 hover:bg-white hover:text-purple-900 border-2 border-white/50 hover:border-white px-8 py-4 text-lg rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
+            <Link
+              href="/contact"
+              aria-label="専門ヒアリング相談"
+              className="inline-flex items-center justify-center font-semibold text-xl px-10 py-5 bg-white/10 backdrop-blur-sm border-2 border-white/30 hover:bg-white/20 hover:border-white/50 text-white rounded-2xl transition-all duration-300"
             >
-              料金プランを確認
+              専門ヒアリング相談
             </Link>
           </div>
 

@@ -5,11 +5,10 @@ import { ArrowRight } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="relative py-20 lg:py-32 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-      <div className="absolute bottom-20 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000"></div>
+    <section className="relative py-20 lg:py-32 overflow-hidden bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/60">
+      {/* Background decoration - more subtle */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.08),transparent_60%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(99,102,241,0.06),transparent_60%)]"></div>
       
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center">
@@ -46,17 +45,17 @@ export default function HeroSection() {
           </div>
           
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
             <Link 
               href="#pricing"
-              className="inline-flex items-center justify-center font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
+              className="inline-flex items-center justify-center font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-10 py-5 text-xl rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
             >
               無料相談を申し込む
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <Link 
               href="#comparison"
-              className="inline-flex items-center justify-center font-medium border-2 border-gray-300 hover:border-gray-400 bg-white/90 backdrop-blur-xl hover:bg-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="inline-flex items-center justify-center font-semibold border-2 border-gray-300/60 hover:border-gray-400 bg-white/90 backdrop-blur-xl hover:bg-white text-gray-700 px-10 py-5 text-xl rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300"
             >
               サービス詳細を見る
             </Link>

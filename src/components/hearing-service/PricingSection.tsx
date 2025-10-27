@@ -90,24 +90,26 @@ export default function PricingSection() {
   const planIds: HearingServicePlanId[] = ['light', 'advance', 'full', 'continuous'];
   
   return (
-    <section id="pricing" className="section bg-subtle">
-      <div className="site-container">
+    <section id="pricing" className="py-24 bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
-        <div className="mb-12 lg:mb-16">
-          <h2 className="text-h2 text-neutral-900 mb-6 text-center text-balance">
-            <span className="block jp-text">ヒアリング代行で"AIに選ばれる"企業情報を、短期間で。</span>
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            シンプルで
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              透明な料金
+            </span>
           </h2>
-          <p className="text-body-large text-center text-neutral-600 mx-auto max-w-3xl jp-text text-pretty">
-            AI時代の広報・採用・B2Bに効く情報を、ヒアリングで棚卸し→構造化。<br />
-            目的と深度で選べる4つのプランをご用意しました。
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            対話を通じて企業価値を第三者視点で整理し、AIに理解されやすい構造データとして言語化します。
           </p>
         </div>
 
         {/* 料金プラン */}
-        <div className="mb-12 lg:mb-16">
+        <div className="mb-20">
           {/* Mobile: Carousel */}
           <div className="lg:hidden">
-            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory">
+            <div className="flex gap-8 overflow-x-auto pb-6 snap-x snap-mandatory px-4">
               {planIds.map((planId) => (
                 <div key={planId} className="relative flex-shrink-0 w-80 snap-center">
                   <PricingCard planId={planId} />
@@ -117,7 +119,7 @@ export default function PricingSection() {
           </div>
 
           {/* Desktop: Grid */}
-          <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
+          <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
             {planIds.map((planId) => (
               <div key={planId} className="relative">
                 <PricingCard planId={planId} />
@@ -127,29 +129,15 @@ export default function PricingSection() {
         </div>
 
         {/* 追加情報 */}
-        <div className="mt-12 lg:mt-16 text-center">
-          <div className="card p-6 lg:p-8 max-w-4xl mx-auto">
-            <h3 className="text-h3 text-neutral-900 mb-6 jp-text text-balance">料金に関する補足</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-neutral-700">
-              <div className="space-y-4 text-left">
-                <h4 className="text-lg font-semibold text-neutral-900 jp-text">含まれるもの</h4>
-                <ul className="space-y-2">
-                  <li className="text-body jp-text">• 消費税別の価格表示</li>
-                  <li className="text-body jp-text">• 事前お見積もり無料</li>
-                  <li className="text-body jp-text">• オンライン・対面対応</li>
-                  <li className="text-body jp-text">• 成果物の著作権譲渡</li>
-                </ul>
-              </div>
-              <div className="space-y-4 text-left">
-                <h4 className="text-lg font-semibold text-neutral-900 jp-text">お支払い・契約</h4>
-                <ul className="space-y-2">
-                  <li className="text-body jp-text">• 銀行振込・クレジットカード対応</li>
-                  <li className="text-body jp-text">• 継続プランはいつでも解約可能</li>
-                  <li className="text-body jp-text">• 最低契約期間3ヶ月から（継続プランのみ）</li>
-                  <li className="text-body jp-text">• 追加作業は事前お見積もり</li>
-                </ul>
-              </div>
-            </div>
+        <div className="text-center">
+          <div className="bg-white rounded-3xl p-8 lg:p-12 max-w-4xl mx-auto shadow-xl border border-gray-100">
+            <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">すべてのプランに14日間の満足保証が含まれています</h3>
+            <p className="text-lg text-gray-600 mb-8">
+              お取り組み開始から約1年で、ChatGPT検索・AI要約での企業情報引用率を改善します。
+            </p>
+            <p className="text-sm text-gray-500">
+              ✓ お見積もりは無料です　✓ お気軽にお問い合わせください　✓ 全国対応
+            </p>
           </div>
         </div>
       </div>

@@ -63,13 +63,13 @@ export default function FAQSection() {
 
 
   return (
-    <section id="faq" className="py-24 bg-gradient-to-br from-gray-50 to-white">
+    <section id="faq" className="py-24 bg-gradient-to-br from-gray-50 to-slate-100">
       <div className="max-w-4xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             よくある
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               質問
             </span>
           </h2>
