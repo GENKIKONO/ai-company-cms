@@ -88,7 +88,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
   return (
     <div className="apple-page">
       {/* 1. Hero Section（白） */}
-      <section className="section section--white">
+      <section className="sec-white">
         <div className="site-container" style={{
           backgroundImage: siteSettings.hero_background_image 
             ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${siteSettings.hero_background_image})` 
@@ -151,7 +151,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* 2. キー便益・導線（薄灰） */}
-      <section className="section section--alt">
+      <section className="sec-alt">
         <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>大きな商談も、小さな問い合わせも、すべてに対応</h2>
@@ -199,7 +199,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* 画像スロット1: キー便益後 */}
-      <section className="section section--alt">
+      <section className="sec-white">
         <div className="site-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
           <FeatureMedia 
             caption="導入企業様の構造化された企業プロフィール例"
@@ -210,7 +210,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* 3. 仕組み/3ステップ（白） */}
-      <section className="section section--white">
+      <section className="sec-white">
         <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>シンプルな3ステップでAI最適化を実現</h2>
@@ -337,8 +337,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </div>
       </section>
 
-      {/* 画像スロット2: 3ステップ後 */}
-      <section className="section section--white">
+      {/* 画像スロット2: 3ステップ後 - 削除予定 */}
+      <section className="sec-white" style={{display: 'none'}}>
         <div className="site-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
           <HeroMedia 
             caption="3ステップでAI最適化された企業情報管理画面"
@@ -349,13 +349,22 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* 4. 信頼・安心（青・強調帯） */}
-      <section className="section section--primary">
+      <section className="sec-primary">
         <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>
+            <h2 style={{ 
+              fontSize: 'clamp(28px, 4.2vw, 40px)', 
+              fontWeight: '700', 
+              marginBottom: '24px',
+              color: '#FFFFFF'
+            }}>
               もっと信頼を。もっと安心を。もっと成果を。
             </h2>
-            <p style={{ fontSize: '20px', lineHeight: '1.5', color: 'rgba(255, 255, 255, 0.9)' }}>
+            <p style={{ 
+              fontSize: '20px', 
+              lineHeight: '1.5', 
+              color: 'rgba(255, 255, 255, 0.9)' 
+            }}>
               AIO Hubは、企業の機密情報を最高レベルのセキュリティで保護します。
             </p>
           </div>
@@ -394,7 +403,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* 5. 活用シーン（白） */}
-      <section className="section section--white">
+      <section className="sec-white">
         <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>AI時代の新しい課題を解決</h2>
@@ -505,7 +514,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* 画像スロット4: 料金プラン前 */}
-      <section className="section section--alt">
+      <section className="sec-white">
         <div className="site-container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
           <IconMedia 
             caption="料金体系の概要"
@@ -516,14 +525,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* 6. 料金（薄灰） */}
-      <section className="section section--alt" id="pricing">
+      <section className="sec-alt" id="pricing">
         <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
           <PricingTable />
         </div>
       </section>
 
       {/* 7. FAQ + 最終CTA（白） */}
-      <section className="section section--white">
+      <section className="sec-white">
         <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
           <FAQSection
             title={aioCopy.faq.title}

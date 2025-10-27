@@ -1,4 +1,5 @@
 import { serviceCopy } from '../copy';
+import { AlertTriangleIcon } from '@/components/icons/HIGIcons';
 
 export default function Conflict() {
   return (
@@ -32,7 +33,9 @@ export default function Conflict() {
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="aspect-video flex items-center justify-center p-12">
               <div className="text-center text-gray-600">
-                <div className="text-6xl mb-6">📄❌🤖</div>
+                <div className="flex justify-center gap-4 mb-6">
+                  <AlertTriangleIcon className="w-16 h-16 text-red-500" aria-label="構造化されていない情報" />
+                </div>
                 <p className="text-xl font-medium mb-2">構造化されていない情報がAIに無視される図</p>
                 <p className="text-gray-500">従来の企業情報の課題点</p>
               </div>
