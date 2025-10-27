@@ -345,8 +345,15 @@ img, video {
   border-radius: 16px;
 }
 
-/* 全体レイアウトの中央寄せ強制 - セクション背景は全幅適用 */
-main, .container {
+/* 全体レイアウト - フルブリード対応 */
+main {
+  /* mainのmax-widthを削除してフルブリードを可能にする */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
   max-width: 1280px;
   margin-left: auto !important;
   margin-right: auto !important;
