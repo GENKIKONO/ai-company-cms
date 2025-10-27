@@ -286,41 +286,44 @@ export default async function OrganizationDetailPage({
         />
       ))}
 
-      <div className="min-h-screen bg-gray-50">
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-blue-50">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* パンくずナビ */}
-          <nav className="flex mb-8" aria-label="Breadcrumb">
-            <ol className="flex items-center space-x-4">
+          <nav className="flex mb-12" aria-label="Breadcrumb">
+            <ol className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 border border-gray-200">
               <li>
-                <Link href="/" className="text-gray-500 hover:text-gray-700">
+                <Link href="/" className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
                   ホーム
                 </Link>
               </li>
               <li>
-                <svg className="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="flex-shrink-0 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
               </li>
               <li>
-                <Link href="/organizations" className="text-gray-500 hover:text-gray-700">
+                <Link href="/organizations" className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
                   企業ディレクトリ
                 </Link>
               </li>
               <li>
-                <svg className="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="flex-shrink-0 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
               </li>
               <li>
-                <span className="text-gray-900 font-medium">{organization.name}</span>
+                <span className="text-gray-900 font-semibold">{organization.name}</span>
               </li>
             </ol>
           </nav>
 
           {/* 企業情報 */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-200 overflow-hidden shadow-xl">
             {/* ヘッダー部分 */}
-            <div className="px-6 py-8 sm:p-8">
+            <div className="relative">
+              {/* Background gradient */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50" />
+              <div className="relative px-8 py-12 sm:p-12">
               <div className="flex items-start justify-between">
                 <div className="flex items-center">
                   {organization.logo_url ? (
@@ -331,41 +334,41 @@ export default async function OrganizationDetailPage({
                       organizationName={organization.name}
                     />
                   ) : (
-                    <div className="w-20 h-20 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <span className="text-blue-600 font-semibold text-2xl">
+                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                      <span className="text-white font-bold text-3xl">
                         {organization.name.charAt(0)}
                       </span>
                     </div>
                   )}
-                  <div className="ml-6">
-                    <div className="flex items-center gap-3">
-                      <h1 className="text-3xl font-bold text-gray-900">{organization.name}</h1>
+                  <div className="ml-8">
+                    <div className="flex items-center gap-4">
+                      <h1 className="text-4xl lg:text-5xl font-bold text-gray-900">{organization.name}</h1>
                       {organization.verified && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 rounded-2xl border border-green-200 shadow-sm">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
-                          <span>認証済み法人</span>
+                          <span className="font-semibold">認証済み法人</span>
                         </div>
                       )}
                       {organization.status === 'public_unverified' && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 rounded-2xl border border-yellow-200 shadow-sm">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                           </svg>
-                          <span>審査中</span>
+                          <span className="font-semibold">審査中</span>
                         </div>
                       )}
                     </div>
                     {organization.legal_form && (
-                      <p className="text-lg text-gray-600 mt-1">{organization.legal_form}</p>
+                      <p className="text-xl text-gray-600 mt-2">{organization.legal_form}</p>
                     )}
                     {organization.industries && organization.industries.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-3">
+                      <div className="flex flex-wrap gap-3 mt-4">
                         {organization.industries.map((industry, index) => (
                           <span 
                             key={index}
-                            className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                            className="px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 font-medium rounded-2xl border border-blue-200 shadow-sm"
                           >
                             {industry}
                           </span>
@@ -375,14 +378,17 @@ export default async function OrganizationDetailPage({
                   </div>
                 </div>
                 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4">
                   {organization.url && (
                     <a
                       href={organization.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center rounded-md text-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8 py-3 text-center btn-nowrap"
+                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-2xl px-8 py-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                     >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
                       公式サイトを開く
                     </a>
                   )}
@@ -398,45 +404,53 @@ export default async function OrganizationDetailPage({
               </div>
 
               {organization.description && (
-                <div className="mt-6">
-                  <p className="text-gray-700 text-lg leading-relaxed">
+                <div className="mt-8">
+                  <p className="text-gray-700 text-xl leading-relaxed">
                     {organization.description}
                   </p>
                 </div>
               )}
+              </div>
             </div>
 
             {/* 詳細情報 */}
-            <div className="border-t border-gray-200">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 sm:p-8">
+            <div className="border-t border-gray-100">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 p-8 sm:p-12">
                 {/* 基本情報 */}
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">基本情報</h2>
-                  <dl className="space-y-3">
+                <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-3xl p-8 border border-gray-200">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">基本情報</h2>
+                  </div>
+                  <dl className="space-y-6">
                     {organization.representative_name && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">代表者</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{organization.representative_name}</dd>
+                      <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                        <dt className="text-sm font-semibold text-gray-600 mb-1">代表者</dt>
+                        <dd className="text-base text-gray-900">{organization.representative_name}</dd>
                       </div>
                     )}
                     {organization.established_at && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">設立</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
+                      <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                        <dt className="text-sm font-semibold text-gray-600 mb-1">設立</dt>
+                        <dd className="text-base text-gray-900">
                           {new Date(organization.established_at).toLocaleDateString('ja-JP')}
                         </dd>
                       </div>
                     )}
                     {organization.capital && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">資本金</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{organization.capital.toLocaleString()}万円</dd>
+                      <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                        <dt className="text-sm font-semibold text-gray-600 mb-1">資本金</dt>
+                        <dd className="text-base text-gray-900">{organization.capital.toLocaleString()}万円</dd>
                       </div>
                     )}
                     {organization.employees && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">従業員数</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{organization.employees.toLocaleString()}名</dd>
+                      <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                        <dt className="text-sm font-semibold text-gray-600 mb-1">従業員数</dt>
+                        <dd className="text-base text-gray-900">{organization.employees.toLocaleString()}名</dd>
                       </div>
                     )}
                   </dl>
@@ -444,14 +458,21 @@ export default async function OrganizationDetailPage({
 
                 {/* 連絡先情報 */}
                 {organization.show_contact !== false && (
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">連絡先</h2>
-                  <dl className="space-y-3">
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-8 border border-emerald-200">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">連絡先</h2>
+                  </div>
+                  <dl className="space-y-6">
                     {/* 住所 */}
                     {(organization.address_region || organization.address_locality || organization.address_street) && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">所在地</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
+                      <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                        <dt className="text-sm font-semibold text-gray-600 mb-1">所在地</dt>
+                        <dd className="text-base text-gray-900">
                           {organization.address_postal_code && `〒${organization.address_postal_code} `}
                           {organization.address_region}
                           {organization.address_locality}
@@ -460,34 +481,34 @@ export default async function OrganizationDetailPage({
                       </div>
                     )}
                     {organization.telephone && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">電話番号</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                          <a href={`tel:${organization.telephone}`} className="hover:text-blue-600">
+                      <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                        <dt className="text-sm font-semibold text-gray-600 mb-1">電話番号</dt>
+                        <dd className="text-base text-gray-900">
+                          <a href={`tel:${organization.telephone}`} className="hover:text-emerald-600 transition-colors font-medium">
                             {organization.telephone}
                           </a>
                         </dd>
                       </div>
                     )}
                     {organization.email_public && organization.email && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">メールアドレス</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                          <a href={`mailto:${organization.email}`} className="hover:text-blue-600">
+                      <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                        <dt className="text-sm font-semibold text-gray-600 mb-1">メールアドレス</dt>
+                        <dd className="text-base text-gray-900">
+                          <a href={`mailto:${organization.email}`} className="hover:text-emerald-600 transition-colors font-medium">
                             {organization.email}
                           </a>
                         </dd>
                       </div>
                     )}
                     {organization.url && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500">ウェブサイト</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
+                      <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                        <dt className="text-sm font-semibold text-gray-600 mb-1">ウェブサイト</dt>
+                        <dd className="text-base text-gray-900">
                           <a 
                             href={organization.url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700"
+                            className="text-emerald-600 hover:text-emerald-700 transition-colors font-medium"
                           >
                             {organization.url}
                           </a>
@@ -502,8 +523,8 @@ export default async function OrganizationDetailPage({
 
             {/* 所在地表示 */}
             {createFullAddress(organization) && (
-              <div className="border-t border-gray-200">
-                <div className="p-6 sm:p-8">
+              <div className="border-t border-gray-100">
+                <div className="p-8 sm:p-12">
                   <AddressDisplay
                     postalCode={organization.address_postal_code}
                     fullAddress={createFullAddress(organization)}
@@ -517,24 +538,34 @@ export default async function OrganizationDetailPage({
 
             {/* 記事一覧 */}
             {organization.show_posts !== false && (
-              <div className="border-t border-gray-200">
-                <div className="p-6 sm:p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">最新記事</h2>
+              <div className="border-t border-gray-100">
+                <div className="p-8 sm:p-12">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 011 1.732l4 4a1 1 0 01.293.707V18a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900">最新記事</h2>
+                    </div>
                     <Link
                       href={`/o/${organization.slug}/posts`}
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:from-purple-200 hover:to-pink-200 font-semibold rounded-2xl px-6 py-3 transition-all duration-300 border border-purple-200"
                     >
-                      記事一覧を見る →
+                      記事一覧を見る
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </Link>
                   </div>
                   {posts && posts.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       {posts.slice(0, 6).map((post) => (
                       <Link
                         key={post.id}
                         href={`/o/${organization.slug}/posts/${post.id}`}
-                        className="block border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                        className="group block bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-6 hover:border-purple-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                       >
                         <h3 className="text-lg font-medium text-gray-900 mb-2">{post.title}</h3>
                         {post.content_markdown && (
@@ -564,16 +595,23 @@ export default async function OrganizationDetailPage({
 
             {/* サービス一覧 */}
             {organization.show_services !== false && (
-              <div className="border-t border-gray-200">
-                <div className="p-6 sm:p-8">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">提供サービス</h2>
+              <div className="border-t border-gray-100">
+                <div className="p-8 sm:p-12">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">提供サービス</h2>
+                  </div>
                   {services && services.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       {services.map((service) => (
                       <Link 
                         key={service.id} 
                         href={`/o/${organization.slug}/services/${service.id}`}
-                        className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 block"
+                        className="group bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block"
                       >
                         {/* サービス画像 */}
                         {service.image_url ? (
@@ -626,13 +664,20 @@ export default async function OrganizationDetailPage({
 
             {/* 事例一覧 */}
             {organization.show_case_studies !== false && (
-              <div className="border-t border-gray-200">
-                <div className="p-6 sm:p-8">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">導入事例</h2>
+              <div className="border-t border-gray-100">
+                <div className="p-8 sm:p-12">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">導入事例</h2>
+                  </div>
                   {case_studies && case_studies.length > 0 ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                       {case_studies.map((caseStudy) => (
-                      <div key={caseStudy.id} className="border border-gray-200 rounded-lg p-6">
+                      <div key={caseStudy.id} className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <h3 className="text-lg font-medium text-gray-900">{caseStudy.title}</h3>
@@ -686,8 +731,8 @@ export default async function OrganizationDetailPage({
 
             {/* Q&A Knowledge Base */}
             {qa_entries && qa_entries.length > 0 && organization.show_qa !== false && (
-              <div className="border-t border-gray-200">
-                <div className="p-6 sm:p-8">
+              <div className="border-t border-gray-100">
+                <div className="p-8 sm:p-12">
                   <QAPublicDisplay 
                     organizationSlug={organization.slug}
                     className="w-full"
@@ -698,13 +743,20 @@ export default async function OrganizationDetailPage({
 
             {/* Legacy FAQ */}
             {organization.show_faqs !== false && (
-              <div className="border-t border-gray-200">
-                <div className="p-6 sm:p-8">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">よくある質問</h2>
+              <div className="border-t border-gray-100">
+                <div className="p-8 sm:p-12">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">よくある質問</h2>
+                  </div>
                   {faqs && faqs.length > 0 ? (
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {faqs.map((faq) => (
-                        <div key={faq.id} className="border border-gray-200 rounded-lg">
+                        <div key={faq.id} className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all duration-300">
                           <details className="group">
                             <summary className="flex items-center justify-between p-4 cursor-pointer">
                               <h3 className="text-base font-medium text-gray-900">{faq.question}</h3>
@@ -735,10 +787,10 @@ export default async function OrganizationDetailPage({
           </div>
 
           {/* フッター */}
-          <div className="mt-12 text-center">
+          <div className="mt-16 text-center">
             <Link 
               href="/organizations"
-              className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-base font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-sm border border-gray-300 rounded-2xl px-8 py-4 text-lg font-semibold text-gray-700 hover:bg-white hover:shadow-lg transition-all duration-300"
             >
               <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />

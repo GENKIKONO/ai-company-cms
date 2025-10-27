@@ -27,8 +27,33 @@ export default function PricingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="min-h-screen bg-white">
-        <PricingTable />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-20">
+          {/* Hero Section */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-full px-6 py-3 mb-8 text-sm font-semibold text-gray-700 shadow-lg">
+              <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
+              料金プラン
+            </div>
+            
+            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                シンプルで明確な
+              </span>
+              <br />
+              料金体系
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              無料から始めて、必要になったら拡張。<br />
+              最小の入力で、Schema.org準拠の企業情報構造化を実現します。
+            </p>
+          </div>
+          
+          <PricingTable />
+        </div>
       </div>
     </>
   );

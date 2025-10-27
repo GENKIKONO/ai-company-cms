@@ -22,10 +22,13 @@ const nextConfig = {
   
   // セキュリティ & パフォーマンスヘッダー
   async headers() {
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     return [
       {
         source: '/(.*)',
         headers: [
+          // Basic security headers
           {
             key: 'X-Frame-Options',
             value: 'DENY',
@@ -35,12 +38,84 @@ const nextConfig = {
             value: 'nosniff',
           },
           {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
+            value: 'strict-origin-when-cross-origin',
           },
           {
             key: 'X-DNS-Prefetch-Control',
             value: 'on',
+          },
+          // Cross-Origin policies
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'same-origin',
+          },
+          // HSTS (production only)
+          ...(isProduction ? [{
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload',
+          }] : []),
+          // Content Security Policy
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              isProduction 
+                ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://vercel.live"
+                : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://vercel.live http://localhost:*",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https://*.supabase.co https://*.aiohub.jp https://vercel.com",
+              isProduction
+                ? "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live"
+                : "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live http://localhost:* ws://localhost:*",
+              "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://vercel.live",
+              "media-src 'self' https://*.supabase.co",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self' https://checkout.stripe.com",
+              "frame-ancestors 'none'",
+              ...(isProduction ? ["upgrade-insecure-requests"] : [])
+            ].join('; '),
+          },
+          // Permissions Policy
+          {
+            key: 'Permissions-Policy',
+            value: [
+              'accelerometer=()',
+              'ambient-light-sensor=()',
+              'autoplay=(self)',
+              'battery=()',
+              'camera=()',
+              'display-capture=()',
+              'document-domain=()',
+              'encrypted-media=()',
+              'execution-while-not-rendered=()',
+              'execution-while-out-of-viewport=()',
+              'fullscreen=(self)',
+              'geolocation=()',
+              'gyroscope=()',
+              'magnetometer=()',
+              'microphone=()',
+              'midi=()',
+              'navigation-override=()',
+              'payment=(self)',
+              'picture-in-picture=()',
+              'publickey-credentials-get=(self)',
+              'screen-wake-lock=()',
+              'sync-xhr=()',
+              'usb=()',
+              'web-share=(self)',
+              'xr-spatial-tracking=()'
+            ].join(', '),
           },
         ],
       },

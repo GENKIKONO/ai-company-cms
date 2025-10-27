@@ -37,23 +37,28 @@ export default function ContactPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-2xl mx-auto px-4 py-8">
-          <div className="mb-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
+        
+        <div className="relative z-10 max-w-2xl mx-auto px-6 py-12 lg:py-20">
+          <div className="mb-8">
             <BackLink fallbackUrl="/" />
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <div className="mb-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-12 text-center">
+            <div className="mb-8">
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                お問い合わせを受け付けました
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  お問い合わせを受け付けました
+                </span>
               </h1>
-              <p className="text-gray-600">
+              <p className="text-lg text-gray-600 leading-relaxed">
                 ご連絡いただきありがとうございます。<br />
                 3営業日以内にご返信いたします。
               </p>
@@ -61,7 +66,8 @@ export default function ContactPage() {
             
             <PrimaryCTA 
               href="/help" 
-              size="medium"
+              size="large"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl px-8 py-4 text-lg font-semibold"
             >
               ヘルプセンターへ戻る
             </PrimaryCTA>
@@ -72,24 +78,40 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
+      
+      <div className="relative z-10 max-w-3xl mx-auto px-6 py-12 lg:py-20">
+        <div className="mb-8">
           <BackLink fallbackUrl="/" />
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-full px-6 py-3 mb-8 text-sm font-semibold text-gray-700 shadow-lg">
+            <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
             お問い合わせ
-          </h1>
-          <p className="text-gray-600 mb-8">
-            ご質問やご要望がございましたら、下記フォームよりお気軽にお問い合わせください。
-          </p>
+          </div>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              ご質問・ご相談
+            </span>
+            <br />
+            お気軽にどうぞ
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            どんな些細なことでも構いません。<br />
+            お客様の成功をサポートするため、専門チームがお答えします。
+          </p>
+        </div>
+        
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 lg:p-12">
+          <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="group">
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-3">
                   お名前 <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -99,12 +121,12 @@ export default function ContactPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
                 />
               </div>
               
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="group">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-3">
                   メールアドレス <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -114,13 +136,13 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
                 />
               </div>
             </div>
             
-            <div>
-              <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="group">
+              <label htmlFor="company" className="block text-sm font-semibold text-gray-700 mb-3">
                 会社名・組織名
               </label>
               <input
@@ -129,12 +151,12 @@ export default function ContactPage() {
                 name="company"
                 value={formData.company}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
               />
             </div>
             
-            <div>
-              <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="group">
+              <label htmlFor="subject" className="block text-sm font-semibold text-gray-700 mb-3">
                 お問い合わせ種別 <span className="text-red-500">*</span>
               </label>
               <select
@@ -143,7 +165,7 @@ export default function ContactPage() {
                 required
                 value={formData.subject}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
               >
                 <option value="">選択してください</option>
                 <option value="general">一般的なお問い合わせ</option>
@@ -155,8 +177,8 @@ export default function ContactPage() {
               </select>
             </div>
             
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="group">
+              <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-3">
                 お問い合わせ内容 <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -166,28 +188,40 @@ export default function ContactPage() {
                 rows={6}
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md resize-none"
                 placeholder="お問い合わせ内容を詳しくお書きください"
               />
             </div>
             
-            <div className="bg-gray-50 p-4 rounded-md">
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">個人情報の取り扱いについて：</span><br />
+            <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/60 p-6 rounded-2xl">
+              <p className="text-sm text-gray-700 leading-relaxed">
+                <span className="font-semibold text-gray-900">個人情報の取り扱いについて：</span><br />
                 お客様からいただいた個人情報は、お問い合わせへの回答およびサービス向上のためにのみ使用いたします。
-                詳細は <Link href="/privacy" className="text-blue-600 hover:text-blue-500 underline">プライバシーポリシー</Link> をご確認ください。
+                詳細は <Link href="/privacy" className="text-blue-600 hover:text-blue-500 underline font-medium transition-colors duration-200">プライバシーポリシー</Link> をご確認ください。
               </p>
             </div>
             
-            <div>
+            <div className="pt-4">
               <HIGButton
                 type="submit"
                 disabled={isSubmitting}
                 variant="primary"
                 size="lg"
-                className="w-full"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl py-5 text-lg font-semibold"
               >
-                {isSubmitting ? '送信中...' : '送信する'}
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    送信中...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-3">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    送信する
+                  </div>
+                )}
               </HIGButton>
             </div>
           </form>

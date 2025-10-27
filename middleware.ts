@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
+// import { rateLimitMiddleware } from './src/middleware/rateLimit';
 
 // 公開ルート（常に素通し）
 const PUBLIC_PATHS = new Set([
@@ -55,8 +56,8 @@ export async function middleware(req: NextRequest) {
 
     console.log(`[Middleware] Processing: ${pathname}`);
 
-    // 🛡️ AI Visibility Guard - Rate limiting and bot protection
-    const guardResult = await aiVisibilityGuard(req, pathname, startTime);
+    // 🛡️ Enhanced Rate Limiting and Security - Use integrated system
+    const guardResult = await enhancedSecurityGuard(req, pathname, startTime);
     if (guardResult.blocked) {
       return guardResult.response;
     }
@@ -162,7 +163,310 @@ export async function middleware(req: NextRequest) {
   }
 }
 
-// 🛡️ AI Visibility Guard Functions
+// 🛡️ Enhanced Security Guard with comprehensive protection
+async function enhancedSecurityGuard(
+  req: NextRequest, 
+  pathname: string, 
+  startTime: number
+): Promise<{ blocked: boolean; response?: NextResponse }> {
+  try {
+    const ip = getClientIP(req);
+    const userAgent = req.headers.get('user-agent') || '';
+    const method = req.method;
+    
+    // Initialize Supabase client
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    
+    // 1. WAF-like protection - detect malicious patterns
+    const wafResult = await webApplicationFirewall(req, pathname);
+    if (wafResult.blocked) {
+      await logSecurityIncident(supabase, ip, userAgent, pathname, method, 'WAF_BLOCK', wafResult.reason || 'malicious_pattern');
+      return {
+        blocked: true,
+        response: new NextResponse('Forbidden', { status: 403 })
+      };
+    }
+    
+    // 2. Enhanced rate limiting with database integration
+    const rateLimitResult = await checkEnhancedRateLimit(supabase, ip, userAgent, pathname, method);
+    if (rateLimitResult.exceeded) {
+      await logSecurityIncident(supabase, ip, userAgent, pathname, method, 'RATE_LIMIT', 'rate_limit_exceeded');
+      return {
+        blocked: true,
+        response: new NextResponse('Too Many Requests', { 
+          status: 429,
+          headers: {
+            'Retry-After': '60',
+            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': (Date.now() + 60000).toString()
+          }
+        })
+      };
+    }
+    
+    // 3. CSRF protection for state-changing operations
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+      const csrfResult = await validateCSRF(req);
+      if (!csrfResult.valid) {
+        await logSecurityIncident(supabase, ip, userAgent, pathname, method, 'CSRF_VIOLATION', 'invalid_csrf_token');
+        return {
+          blocked: true,
+          response: new NextResponse('CSRF token invalid', { status: 403 })
+        };
+      }
+    }
+    
+    // 4. Log successful request
+    await logRateLimitRequest(supabase, ip, userAgent, pathname, method, false);
+    
+    return { blocked: false };
+    
+  } catch (error) {
+    console.error('Enhanced security guard error:', error);
+    return { blocked: false };
+  }
+}
+
+// WAF (Web Application Firewall) implementation
+async function webApplicationFirewall(req: NextRequest, pathname: string): Promise<{
+  blocked: boolean;
+  reason?: string;
+}> {
+  const url = req.nextUrl.toString();
+  const userAgent = req.headers.get('user-agent') || '';
+  
+  // SQL Injection patterns
+  const sqlPatterns = [
+    /(\%27)|(\')|(\-\-)|(\%23)|(#)/i,
+    /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i,
+    /union[^a-z]*select/i,
+    /drop[^a-z]*table/i,
+    /insert[^a-z]*into/i,
+    /delete[^a-z]*from/i,
+    /update[^a-z]*set/i,
+  ];
+  
+  // XSS patterns
+  const xssPatterns = [
+    /<script[\s\S]*?>[\s\S]*?<\/script>/gi,
+    /<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi,
+    /javascript:/i,
+    /on\w+\s*=/i,
+    /eval\s*\(/i,
+    /expression\s*\(/i,
+  ];
+  
+  // Path traversal patterns
+  const pathTraversalPatterns = [
+    /\.\.\/|\.\.\\|\.\.[\/\\]/i,
+    /%2e%2e%2f|%2e%2e%5c/i,
+    /etc\/passwd|boot\.ini|win\.ini/i,
+  ];
+  
+  // Check all patterns
+  const allPatterns = [...sqlPatterns, ...xssPatterns, ...pathTraversalPatterns];
+  
+  for (const pattern of allPatterns) {
+    if (pattern.test(url) || pattern.test(userAgent)) {
+      if (sqlPatterns.includes(pattern)) return { blocked: true, reason: 'sql_injection_attempt' };
+      if (xssPatterns.includes(pattern)) return { blocked: true, reason: 'xss_attempt' };
+      if (pathTraversalPatterns.includes(pattern)) return { blocked: true, reason: 'path_traversal_attempt' };
+    }
+  }
+  
+  // Check for suspicious user agents
+  const suspiciousAgents = [
+    /sqlmap/i,
+    /nikto/i,
+    /nessus/i,
+    /burp/i,
+    /w3af/i,
+    /dirbuster/i,
+  ];
+  
+  for (const agent of suspiciousAgents) {
+    if (agent.test(userAgent)) {
+      return { blocked: true, reason: 'malicious_user_agent' };
+    }
+  }
+  
+  return { blocked: false };
+}
+
+// Enhanced rate limiting with database integration
+async function checkEnhancedRateLimit(
+  supabase: any, 
+  ip: string, 
+  userAgent: string, 
+  pathname: string,
+  method: string
+): Promise<{
+  exceeded: boolean;
+  limit: number;
+  current: number;
+}> {
+  try {
+    // Get rate limit configuration from database
+    const { data: config } = await supabase
+      .from('rate_limit_configs')
+      .select('*')
+      .eq('is_active', true)
+      .or(`path_pattern.is.null,path_pattern.like.${pathname}%`)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    const windowMs = config?.window_ms || 900000; // 15 minutes default
+    const maxRequests = config?.max_requests || 100;
+    
+    const now = new Date();
+    const windowStart = new Date(now.getTime() - windowMs);
+    
+    // Count recent requests
+    const { data: recentRequests } = await supabase
+      .from('rate_limit_requests')
+      .select('id')
+      .eq('ip_address', ip)
+      .gte('created_at', windowStart.toISOString());
+    
+    const currentCount = recentRequests?.length || 0;
+    
+    return {
+      exceeded: currentCount >= maxRequests,
+      limit: maxRequests,
+      current: currentCount
+    };
+    
+  } catch (error) {
+    console.error('Enhanced rate limit check error:', error);
+    return { exceeded: false, limit: 100, current: 0 };
+  }
+}
+
+// CSRF protection
+async function validateCSRF(req: NextRequest): Promise<{ valid: boolean; reason?: string }> {
+  // Skip CSRF for API routes (they should use API keys/tokens)
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    return { valid: true };
+  }
+  
+  // Check for CSRF token in headers
+  const csrfToken = req.headers.get('x-csrf-token') || req.headers.get('x-requested-with');
+  const referer = req.headers.get('referer');
+  const origin = req.headers.get('origin');
+  
+  // Simple origin validation
+  if (origin) {
+    const allowedOrigins = [
+      process.env.NEXT_PUBLIC_APP_URL,
+      'http://localhost:3000',
+      'https://localhost:3000'
+    ].filter(Boolean);
+    
+    if (!allowedOrigins.some(allowed => origin.startsWith(allowed!))) {
+      return { valid: false, reason: 'invalid_origin' };
+    }
+  }
+  
+  // Check X-Requested-With header (AJAX requests)
+  if (csrfToken === 'XMLHttpRequest') {
+    return { valid: true };
+  }
+  
+  // For now, we'll be lenient but this should be strengthened
+  return { valid: true };
+}
+
+// Log security incidents
+async function logSecurityIncident(
+  supabase: any,
+  ip: string,
+  userAgent: string,
+  path: string,
+  method: string,
+  incidentType: string,
+  reason: string
+): Promise<void> {
+  try {
+    await supabase
+      .from('security_incidents')
+      .insert({
+        ip_address: ip,
+        user_agent: userAgent,
+        path,
+        method,
+        incident_type: incidentType,
+        risk_level: getRiskLevel(incidentType),
+        blocked: true,
+        details: { reason, timestamp: new Date().toISOString() }
+      });
+  } catch (error) {
+    console.error('Error logging security incident:', error);
+  }
+}
+
+// Log rate limit requests
+async function logRateLimitRequest(
+  supabase: any,
+  ip: string,
+  userAgent: string,
+  path: string,
+  method: string,
+  isBot: boolean
+): Promise<void> {
+  try {
+    await supabase
+      .from('rate_limit_requests')
+      .insert({
+        key: `${ip}:${path}`,
+        ip_address: ip,
+        user_agent: userAgent,
+        path,
+        method,
+        is_bot: isBot,
+        is_suspicious: detectSuspiciousActivity(userAgent, path),
+        risk_level: getRiskLevel(isBot ? 'bot_request' : 'normal_request')
+      });
+  } catch (error) {
+    console.error('Error logging rate limit request:', error);
+  }
+}
+
+// Helper functions
+function getRiskLevel(incidentType: string): string {
+  const riskMap: Record<string, string> = {
+    'sql_injection_attempt': 'critical',
+    'xss_attempt': 'critical',
+    'path_traversal_attempt': 'high',
+    'malicious_user_agent': 'high',
+    'CSRF_VIOLATION': 'medium',
+    'RATE_LIMIT': 'medium',
+    'bot_request': 'low',
+    'normal_request': 'low'
+  };
+  return riskMap[incidentType] || 'medium';
+}
+
+function detectSuspiciousActivity(userAgent: string, path: string): boolean {
+  // Check for suspicious patterns
+  const suspiciousPatterns = [
+    /bot/i,
+    /crawler/i,
+    /spider/i,
+    /scraper/i,
+  ];
+  
+  return suspiciousPatterns.some(pattern => pattern.test(userAgent)) ||
+         path.includes('admin') ||
+         path.includes('wp-admin') ||
+         path.includes('.env');
+}
+
+// 🛡️ AI Visibility Guard Functions (Legacy - keeping for compatibility)
 async function aiVisibilityGuard(
   req: NextRequest, 
   pathname: string, 

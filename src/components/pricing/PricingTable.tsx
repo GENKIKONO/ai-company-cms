@@ -111,178 +111,81 @@ const PLANS: PricingPlan[] = [
 export default function PricingTable() {
   return (
     <>
-        <div className="text-center mb-64">
-          <h2 className="text-h2-large">
-            シンプルで明確な料金体系
-          </h2>
-          <p className="text-body-large">
-            無料から始めて、必要になったら拡張。最小の入力で、Schema.org準拠の企業情報構造化を実現します。
-          </p>
-        </div>
-
         {/* Mobile: Vertical Stack */}
-        <div className="lg:hidden">
-          <div className="apple-pricing-mobile">
-            {PLANS.map((plan) => (
-              <div
-                key={plan.id}
-                className={`apple-pricing-card ${
-                  plan.popular
-                    ? 'apple-pricing-card-popular'
-                    : ''
-                }`}
-              >
-                {plan.popular && (
-                  <div className="apple-pricing-badge">
-                    <span className="apple-pricing-badge-text">
-                      人気
-                    </span>
-                  </div>
-                )}
-
-                <div className="apple-pricing-header">
-                  <div className="apple-pricing-icon">
-                    <plan.icon className={`${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
-                  </div>
-                  <h3 className="apple-title3">{plan.name}</h3>
-                  <p className="apple-body apple-text-secondary">{plan.description}</p>
-                  
-                  <div className="apple-pricing-price">
-                    {plan.originalPrice && (
-                      <span className="apple-pricing-original">
-                        {plan.originalPrice}
-                      </span>
-                    )}
-                    <span className="apple-pricing-current">
-                      {plan.price}
-                    </span>
-                    {plan.id !== 'free' && (
-                      <span className="apple-pricing-period">（税別）/月</span>
-                    )}
-                  </div>
-                </div>
-
-                <ul className="apple-pricing-features">
-                  {plan.inheritedFeatures && (
-                    <li className="apple-pricing-inherited">
-                      <span className="apple-pricing-inherited-text">
-                        {plan.inheritedFeatures}
-                      </span>
-                    </li>
-                  )}
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="apple-pricing-feature">
-                      <Check
-                        className={`apple-pricing-check ${
-                          feature.included ? 'apple-pricing-check-included' : 'apple-pricing-check-disabled'
-                        }`}
-                      />
-                      <div className="apple-pricing-feature-content">
-                        <span
-                          className={`apple-pricing-feature-text ${
-                            feature.included ? '' : 'apple-pricing-feature-disabled'
-                          }`}
-                        >
-                          {feature.text}
-                        </span>
-                        {feature.subtext && (
-                          <div className="apple-pricing-feature-subtext">
-                            {feature.subtext}
-                          </div>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="apple-pricing-cta">
-                  <PrimaryCTA
-                    href={plan.ctaHref}
-                    size="medium"
-                  >
-                    {plan.ctaText}
-                  </PrimaryCTA>
-                </div>
-
-                {plan.comingSoon && (
-                  <div className="apple-pricing-coming-soon">
-                    {plan.comingSoon.map((note, index) => (
-                      <p key={index} className="apple-text-caption apple-text-secondary">{note}</p>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Desktop: Grid Layout */}
-        <div className="apple-pricing-desktop">
-          <div className="apple-pricing-grid">
+        <div className="lg:hidden space-y-6">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`apple-pricing-card ${
+              className={`relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 ${
                 plan.popular
-                  ? 'apple-pricing-card-popular'
+                  ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent'
                   : ''
               }`}
             >
               {plan.popular && (
-                <div className="apple-pricing-badge">
-                  <span className="apple-pricing-badge-text">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
                     人気
-                  </span>
+                  </div>
                 </div>
               )}
 
-              <div className="apple-pricing-header">
-                <div className="apple-pricing-icon">
-                  <plan.icon className={`${ICON_COLOR_MAP[plan.color] || 'text-slate-600'}`} />
+              <div className="text-center mb-8">
+                <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
+                  plan.color === 'blue' ? 'bg-gradient-to-br from-cyan-500 to-cyan-600' :
+                  plan.color === 'green' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
+                  'bg-gradient-to-br from-slate-700 to-slate-800'
+                }`}>
+                  <plan.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="apple-title3">{plan.name}</h3>
-                <p className="apple-body apple-text-secondary">{plan.description}</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                <p className="text-gray-600 mb-6">{plan.description}</p>
                 
-                <div className="apple-pricing-price">
+                <div className="mb-6">
                   {plan.originalPrice && (
-                    <span className="apple-pricing-original">
+                    <span className="text-lg text-gray-400 line-through mr-2">
                       {plan.originalPrice}
                     </span>
                   )}
-                  <span className="apple-pricing-current">
+                  <span className="text-4xl font-bold text-gray-900">
                     {plan.price}
                   </span>
                   {plan.id !== 'free' && (
-                    <span className="apple-pricing-period">（税別）/月</span>
+                    <span className="text-gray-600 ml-1">（税別）/月</span>
+                  )}
+                  {plan.badge && (
+                    <div className="mt-2">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                        {plan.badge}
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>
 
-              <ul className="apple-pricing-features">
+              <ul className="space-y-4 mb-8">
                 {plan.inheritedFeatures && (
-                  <li className="apple-pricing-inherited">
-                    <span className="apple-pricing-inherited-text">
-                      {plan.inheritedFeatures}
-                    </span>
+                  <li className="text-sm text-gray-600 italic border-b border-gray-200 pb-3">
+                    {plan.inheritedFeatures}
                   </li>
                 )}
                 {plan.features.map((feature, index) => (
-                  <li key={index} className="apple-pricing-feature">
+                  <li key={index} className="flex items-start">
                     <Check
-                      className={`apple-pricing-check ${
-                        feature.included ? 'apple-pricing-check-included' : 'apple-pricing-check-disabled'
+                      className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${
+                        feature.included ? 'text-green-500' : 'text-gray-300'
                       }`}
                     />
-                    <div className="apple-pricing-feature-content">
+                    <div className="flex-1">
                       <span
-                        className={`apple-pricing-feature-text ${
-                          feature.included ? '' : 'apple-pricing-feature-disabled'
+                        className={`text-sm ${
+                          feature.included ? 'text-gray-900' : 'text-gray-400'
                         }`}
                       >
                         {feature.text}
                       </span>
                       {feature.subtext && (
-                        <div className="apple-pricing-feature-subtext">
+                        <div className="text-xs text-gray-500 mt-1">
                           {feature.subtext}
                         </div>
                       )}
@@ -291,37 +194,169 @@ export default function PricingTable() {
                 ))}
               </ul>
 
-              <div className="apple-pricing-cta">
+              <div className="text-center">
                 <PrimaryCTA
                   href={plan.ctaHref}
-                  size="medium"
+                  size="large"
+                  className={`w-full justify-center ${
+                    plan.popular 
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold'
+                      : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-2xl font-semibold'
+                  }`}
                 >
                   {plan.ctaText}
                 </PrimaryCTA>
               </div>
 
               {plan.comingSoon && (
-                <div className="apple-pricing-coming-soon">
+                <div className="mt-6 pt-6 border-t border-gray-200">
                   {plan.comingSoon.map((note, index) => (
-                    <p key={index} className="apple-text-caption apple-text-secondary">{note}</p>
+                    <p key={index} className="text-xs text-gray-500 text-center">{note}</p>
                   ))}
                 </div>
               )}
             </div>
           ))}
+        </div>
+
+        {/* Desktop: Grid Layout */}
+        <div className="hidden lg:block">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {PLANS.map((plan) => (
+              <div
+                key={plan.id}
+                className={`relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ${
+                  plan.popular
+                    ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent scale-105'
+                    : ''
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+                      人気
+                    </div>
+                  </div>
+                )}
+
+                <div className="text-center mb-8">
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
+                    plan.color === 'blue' ? 'bg-gradient-to-br from-cyan-500 to-cyan-600' :
+                    plan.color === 'green' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
+                    'bg-gradient-to-br from-slate-700 to-slate-800'
+                  }`}>
+                    <plan.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                  <p className="text-gray-600 mb-6">{plan.description}</p>
+                  
+                  <div className="mb-6">
+                    {plan.originalPrice && (
+                      <span className="text-lg text-gray-400 line-through mr-2">
+                        {plan.originalPrice}
+                      </span>
+                    )}
+                    <span className="text-4xl font-bold text-gray-900">
+                      {plan.price}
+                    </span>
+                    {plan.id !== 'free' && (
+                      <span className="text-gray-600 ml-1">（税別）/月</span>
+                    )}
+                    {plan.badge && (
+                      <div className="mt-2">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                          {plan.badge}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <ul className="space-y-4 mb-8 flex-1">
+                  {plan.inheritedFeatures && (
+                    <li className="text-sm text-gray-600 italic border-b border-gray-200 pb-3">
+                      {plan.inheritedFeatures}
+                    </li>
+                  )}
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <Check
+                        className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${
+                          feature.included ? 'text-green-500' : 'text-gray-300'
+                        }`}
+                      />
+                      <div className="flex-1">
+                        <span
+                          className={`text-sm ${
+                            feature.included ? 'text-gray-900' : 'text-gray-400'
+                          }`}
+                        >
+                          {feature.text}
+                        </span>
+                        {feature.subtext && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            {feature.subtext}
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="text-center mt-auto">
+                  <PrimaryCTA
+                    href={plan.ctaHref}
+                    size="large"
+                    className={`w-full justify-center ${
+                      plan.popular 
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold'
+                        : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-2xl font-semibold'
+                    }`}
+                  >
+                    {plan.ctaText}
+                  </PrimaryCTA>
+                </div>
+
+                {plan.comingSoon && (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    {plan.comingSoon.map((note, index) => (
+                      <p key={index} className="text-xs text-gray-500 text-center">{note}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
         
         {/* Enterprise consultation note */}
-        <div className="apple-pricing-footer">
-          <p className="apple-body apple-text-secondary">
-            Enterpriseプランの詳細な機能や導入サポートについては、お気軽にお問い合わせください
-          </p>
+        <div className="mt-16 text-center">
+          <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/60 rounded-3xl p-8 max-w-4xl mx-auto">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Enterpriseプランについて
+            </h3>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              より大規模な組織や特別な要件をお持ちの企業様には、カスタマイズされたEnterpriseプランをご用意いたします。
+              詳細な機能や導入サポートについては、お気軽にお問い合わせください。
+            </p>
+            
+            <PrimaryCTA
+              href="/contact"
+              size="medium"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl font-semibold"
+            >
+              お問い合わせ
+            </PrimaryCTA>
+          </div>
 
-          <p className="apple-text-caption apple-text-secondary">
-            ※価格は税別。詳細機能についてはお問い合わせください。<br/>
-            お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
-          </p>
+          <div className="mt-12 text-sm text-gray-600 space-y-2">
+            <p>
+              ※価格は税別表示です。詳細機能についてはお問い合わせください。
+            </p>
+            <p>
+              お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
+            </p>
+          </div>
         </div>
     </>
   );
