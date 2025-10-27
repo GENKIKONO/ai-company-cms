@@ -145,6 +145,14 @@ html, body {
   z-index: 1;
 }
 
+/* フルブリードセクション内のサイトコンテナ */
+.sec-white .site-container,
+.sec-alt .site-container,
+.sec-primary .site-container {
+  padding-left: clamp(16px, 4vw, 24px);
+  padding-right: clamp(16px, 4vw, 24px);
+}
+
 /* セクション内全要素の文字色統一 */
 .section--white *,
 .section--alt * {

@@ -38,7 +38,7 @@ export default function UnifiedCTA({
     letter-spacing: 0.01em
     -webkit-font-smoothing: antialiased
     text-rendering: optimizeLegibility
-    border-radius: 980px
+    border-radius: 980px !important
     min-height: 44px
   `.replace(/\s+/g, ' ').trim();
 
@@ -80,6 +80,7 @@ export default function UnifiedCTA({
 
   // インラインスタイル（重要度を確実にするため）
   const inlineStyle = {
+    borderRadius: '980px',
     ...(variant === 'primary' ? {
       backgroundColor: '#0A84FF',
       color: '#FFFFFF',
