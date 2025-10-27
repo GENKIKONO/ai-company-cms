@@ -240,8 +240,20 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </p>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '48px' }}>
-            <div style={{ textAlign: 'center' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+            gap: '32px',
+            maxWidth: '1200px',
+            margin: '0 auto'
+          }}>
+            <div style={{ 
+              textAlign: 'center',
+              padding: '40px 24px',
+              backgroundColor: '#F2F2F7',
+              borderRadius: '16px',
+              border: '1px solid rgba(0, 0, 0, 0.05)'
+            }}>
               <div style={{ 
                 width: '80px', 
                 height: '80px', 
@@ -256,8 +268,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 color: 'white',
                 fontVariantNumeric: 'lining-nums tabular-nums'
               }}>1</div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>申し込み</h3>
-              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px' }}>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>申し込み</h3>
+              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px', color: 'var(--text-secondary)' }}>
                 <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
                     <CheckCircleIcon className="w-5 h-5" />
@@ -279,7 +291,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </ul>
             </div>
             
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ 
+              textAlign: 'center',
+              padding: '40px 24px',
+              backgroundColor: '#F2F2F7',
+              borderRadius: '16px',
+              border: '1px solid rgba(0, 0, 0, 0.05)'
+            }}>
               <div style={{ 
                 width: '80px', 
                 height: '80px', 
@@ -294,8 +312,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 color: 'white',
                 fontVariantNumeric: 'lining-nums tabular-nums'
               }}>2</div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>ヒアリング（60分）</h3>
-              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px' }}>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>ヒアリング（60分）</h3>
+              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px', color: 'var(--text-secondary)' }}>
                 <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
                     <CheckCircleIcon className="w-5 h-5" />
@@ -317,7 +335,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </ul>
             </div>
             
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ 
+              textAlign: 'center',
+              padding: '40px 24px',
+              backgroundColor: '#F2F2F7',
+              borderRadius: '16px',
+              border: '1px solid rgba(0, 0, 0, 0.05)'
+            }}>
               <div style={{ 
                 width: '80px', 
                 height: '80px', 
@@ -332,8 +356,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 color: 'white',
                 fontVariantNumeric: 'lining-nums tabular-nums'
               }}>3</div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>AI最適化・公開</h3>
-              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px' }}>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>AI最適化・公開</h3>
+              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px', color: 'var(--text-secondary)' }}>
                 <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
                     <CheckCircleIcon className="w-5 h-5" />

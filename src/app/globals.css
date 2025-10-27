@@ -171,6 +171,18 @@ html, body {
   padding-right: clamp(16px, 4vw, 24px);
 }
 
+/* モバイルレスポンシブグリッドの中央配置 */
+@media (max-width: 768px) {
+  .sec-white [style*="display: grid"],
+  .sec-alt [style*="display: grid"],
+  .sec-primary [style*="display: grid"] {
+    grid-template-columns: 1fr !important;
+    justify-items: center;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
 /* セクション内全要素の文字色統一 */
 .section--white *,
 .section--alt * {
