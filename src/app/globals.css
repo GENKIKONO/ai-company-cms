@@ -3181,7 +3181,7 @@ a.apple-button.apple-button-secondary {
 
 /* CTA Section */
 .apple-cta-section {
-  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  background: #f7f8fa;
   text-align: center;
 }
 
