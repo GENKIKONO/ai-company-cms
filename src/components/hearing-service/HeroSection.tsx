@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
 export default function HeroSection() {
@@ -48,26 +47,19 @@ export default function HeroSection() {
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
-              asChild
+            <Link 
+              href="#pricing"
+              className="inline-flex items-center justify-center font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
             >
-              <Link href="#pricing">
-                無料相談を申し込む
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-2 border-gray-300 hover:border-gray-400 bg-white/90 backdrop-blur-xl hover:bg-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              asChild
+              無料相談を申し込む
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+            <Link 
+              href="#comparison"
+              className="inline-flex items-center justify-center font-medium border-2 border-gray-300 hover:border-gray-400 bg-white/90 backdrop-blur-xl hover:bg-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <Link href="#comparison">
-                サービス詳細を見る
-              </Link>
-            </Button>
+              サービス詳細を見る
+            </Link>
           </div>
 
           <p className="text-sm text-gray-500">

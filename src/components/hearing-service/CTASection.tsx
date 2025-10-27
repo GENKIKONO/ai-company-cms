@@ -2,7 +2,6 @@
 
 import { ArrowRight, Calendar, Clock, Star } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export default function CTASection() {
   return (
@@ -51,33 +50,22 @@ export default function CTASection() {
 
           {/* メインCTAボタン */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
-              asChild
+            <Link 
+              href="/dashboard"
+              aria-label="今すぐヒアリングを申し込む"
+              className="inline-flex items-center justify-center font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
             >
-              <Link 
-                href="/dashboard"
-                aria-label="今すぐヒアリングを申し込む"
-              >
-                今すぐヒアリング申し込み
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-            </Button>
+              今すぐヒアリング申し込み
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Link>
             
-            <Button
-              variant="outline"
-              size="lg"
-              className="bg-white/90 backdrop-blur-lg text-blue-900 hover:bg-white hover:text-purple-900 border-2 border-white/50 hover:border-white px-8 py-4 text-lg rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
-              asChild
+            <Link 
+              href="#pricing"
+              aria-label="料金プランを確認"
+              className="inline-flex items-center justify-center font-medium bg-white/90 backdrop-blur-lg text-blue-900 hover:bg-white hover:text-purple-900 border-2 border-white/50 hover:border-white px-8 py-4 text-lg rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
             >
-              <Link 
-                href="#pricing"
-                aria-label="料金プランを確認"
-              >
-                料金プランを確認
-              </Link>
-            </Button>
+              料金プランを確認
+            </Link>
           </div>
 
           {/* 申込みステップ */}
