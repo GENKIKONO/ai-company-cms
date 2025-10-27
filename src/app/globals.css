@@ -15,10 +15,7 @@ html, body {
   font-display: swap; /* FOIT防止 */
   contain: layout style paint; /* Containment API */
 }
-/* 全要素に対する強制的な背景・文字色設定 */
-* {
-  background-color: inherit !important;
-}
+/* 削除: 背景色強制継承は背景スキンシステムを破壊するため削除 */
 /* 黒背景を持つ要素を強制的に白背景に */
 .bg-black, .bg-neutral-900, .bg-slate-900, .bg-gray-900,
 [class*="bg-black"], [class*="bg-neutral-900"], [class*="bg-slate-900"], [class*="bg-gray-900"] {
