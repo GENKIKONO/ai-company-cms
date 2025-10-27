@@ -59,7 +59,7 @@ const PLANS: PricingPlan[] = [
       { text: 'SEO最適化・構造化データ自動生成', included: true },
       { text: 'メールサポート', included: true }
     ],
-    ctaText: '14日間無料で試す',
+    ctaText: '無料で試す',
     ctaHref: '/auth/signup',
     color: 'blue'
   },
@@ -80,7 +80,7 @@ const PLANS: PricingPlan[] = [
       { text: 'カテゴリタグ検索対応', included: true },
       { text: '優先サポート', included: true }
     ],
-    ctaText: '14日間無料で試す',
+    ctaText: '無料で試す',
     ctaHref: '/auth/signup',
     color: 'green'
   },
@@ -102,7 +102,7 @@ const PLANS: PricingPlan[] = [
       { text: 'カスタム機能開発相談', included: true },
       { text: '専任サポート・個別相談', included: true }
     ],
-    ctaText: '14日間無料で試す',
+    ctaText: '無料で試す',
     ctaHref: '/auth/signup',
     color: 'purple'
   }
@@ -198,7 +198,7 @@ export default function PricingTable() {
                 <div className="apple-pricing-cta">
                   <PrimaryCTA
                     href={plan.ctaHref}
-                    size="large"
+                    size="medium"
                   >
                     {plan.ctaText}
                   </PrimaryCTA>
@@ -294,7 +294,7 @@ export default function PricingTable() {
               <div className="apple-pricing-cta">
                 <PrimaryCTA
                   href={plan.ctaHref}
-                  size="large"
+                  size="medium"
                 >
                   {plan.ctaText}
                 </PrimaryCTA>
