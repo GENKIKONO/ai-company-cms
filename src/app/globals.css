@@ -3560,7 +3560,7 @@ a.apple-button.apple-button-secondary {
 }
 
 .apple-faq-support-card {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: #f7f8fa;
   border: 1px solid var(--apple-gray-200);
   border-radius: 16px;
   padding: 48px 32px;
