@@ -109,13 +109,12 @@ const PLANS: PricingPlan[] = [
 
 export default function PricingTable() {
   return (
-    <section className="apple-section">
-      <div className="apple-container">
-        <div className="apple-section-header">
-          <h2 className="apple-title1">
+    <>
+        <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+          <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>
             シンプルで明確な料金体系
           </h2>
-          <p className="apple-body-large apple-text-secondary">
+          <p style={{ fontSize: '20px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
             無料から始めて、必要になったら拡張。最小の入力で、Schema.org準拠の企業情報構造化を実現します。
           </p>
         </div>
@@ -323,7 +322,6 @@ export default function PricingTable() {
             お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
           </p>
         </div>
-      </div>
-    </section>
+    </>
   );
 }

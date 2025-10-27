@@ -84,159 +84,376 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
   return (
     <div className="apple-page">
-      {/* Hero Section - True Apple Scale */}
-      <section 
-        className="apple-hero"
-        style={{
+      {/* 1. Hero Section（白） */}
+      <section className="section section--white">
+        <div className="site-container" style={{
           backgroundImage: siteSettings.hero_background_image 
             ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${siteSettings.hero_background_image})` 
             : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <div className="apple-hero-container">
-          <div className="apple-hero-content">
-            {/* Hero Typography with Apple Scale */}
-            <h1 className="apple-hero-title">
+          backgroundRepeat: 'no-repeat',
+          borderRadius: '16px',
+          padding: '80px clamp(16px, 4vw, 24px)'
+        }}>
+          <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+            {/* Hero Typography */}
+            <h1 style={{ 
+              fontSize: 'clamp(32px, 5vw, 64px)', 
+              fontWeight: '700', 
+              lineHeight: '1.1', 
+              marginBottom: '24px',
+              color: siteSettings.hero_background_image ? '#FFFFFF' : 'var(--text-primary)'
+            }}>
               AIに"正しく理解"される
               <br />
               企業へ。
             </h1>
             
-            <p className="apple-hero-subtitle">
+            <p style={{ 
+              fontSize: '20px', 
+              lineHeight: '1.5', 
+              marginBottom: '32px',
+              color: siteSettings.hero_background_image ? 'rgba(255,255,255,0.9)' : 'var(--text-secondary)'
+            }}>
               企業情報を構造化し、検索やAI回答で見つかる状態をつくるCMS。
             </p>
             
-            {/* Hero CTA - Apple Sizing */}
-            <div className="apple-hero-cta">
+            {/* チップ */}
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '40px', flexWrap: 'wrap' }}>
+              <span style={{ padding: '8px 16px', backgroundColor: 'rgba(10, 132, 255, 0.1)', color: 'var(--bg-primary)', borderRadius: '20px', fontSize: '14px' }}>構造化データ</span>
+              <span style={{ padding: '8px 16px', backgroundColor: 'rgba(10, 132, 255, 0.1)', color: 'var(--bg-primary)', borderRadius: '20px', fontSize: '14px' }}>AI検索最適化</span>
+              <span style={{ padding: '8px 16px', backgroundColor: 'rgba(10, 132, 255, 0.1)', color: 'var(--bg-primary)', borderRadius: '20px', fontSize: '14px' }}>JSON-LD対応</span>
+            </div>
+            
+            {/* CTA */}
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link
                 href="/auth/signup"
                 className="apple-button apple-button-primary apple-button-large"
                 onClick={() => trackConversion()}
               >
-                <span>無料で体験する</span>
+                <span>14日間無料で試す</span>
                 <ArrowRightIcon className="apple-button-icon" />
               </Link>
-            </div>
-            
-            {/* Trust Signal - Hidden for now */}
-            <div className="apple-trust-signal" style={{ display: 'none' }}>
-              <p className="apple-text-caption">
-                {formatNumber(dynamicStats.organizations)}社以上が利用中
-              </p>
-            </div>
-          </div>
-          
-          {/* Hero Visual - Apple Style Mockup */}
-          <div className="apple-hero-visual">
-            <div className="apple-device-mockup">
-              <div className="apple-screen">
-                <div className="apple-demo-content">
-                  <div className="apple-demo-search">
-                    <div className="apple-search-bar">
-                      <span>「AIO Hubについて教えて」</span>
-                    </div>
-                    <div className="apple-search-result">
-                      <div className="ai-avatar">🤖 ChatGPT</div>
-                      <strong>AIO Hub</strong>は、企業情報をAIが理解しやすい形で構造化するCMSプラットフォームです。
-                      <br /><br />
-                      <strong>主な機能：</strong> JSON-LD構造化、SEO最適化、AI検索対応
-                      <br />
-                      <strong>対象：</strong> AI時代の企業ブランディングを重視する企業
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <Link
+                href="/contact"
+                className="apple-button apple-button-secondary apple-button-large"
+              >
+                <span>専門ヒアリング相談</span>
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Problem vs Solution - Apple Cards */}
-      <section className="apple-section">
-        <div className="apple-container">
-          <div className="apple-section-header">
-            <h2 className="apple-title1">AI時代の新しい課題</h2>
-            <p className="apple-body-large">
+      {/* 2. キー便益・導線（薄灰） */}
+      <section className="section section--alt">
+        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>大きな商談も、小さな問い合わせも、すべてに対応</h2>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', marginBottom: '48px' }}>
+            <div style={{ textAlign: 'center', padding: '32px' }}>
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ color: 'var(--bg-primary)' }}>
+                  <BuildingIcon className="w-12 h-12" />
+                </div>
+              </div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>営業資料として</h3>
+              <p style={{ fontSize: '17px', lineHeight: '1.5' }}>構造化された企業情報で説得力アップ</p>
+            </div>
+            <div style={{ textAlign: 'center', padding: '32px' }}>
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ color: 'var(--bg-primary)' }}>
+                  <UserIcon className="w-12 h-12" />
+                </div>
+              </div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>採用活動で</h3>
+              <p style={{ fontSize: '17px', lineHeight: '1.5' }}>求職者がAI検索で企業を正確に理解</p>
+            </div>
+            <div style={{ textAlign: 'center', padding: '32px' }}>
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ color: 'var(--bg-primary)' }}>
+                  <InfoIcon className="w-12 h-12" />
+                </div>
+              </div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>PR・広報で</h3>
+              <p style={{ fontSize: '17px', lineHeight: '1.5' }}>メディアがAIで企業情報を取得・引用</p>
+            </div>
+          </div>
+          
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/contact" className="apple-button apple-button-secondary apple-button-medium">
+              <span>今すぐヒアリング申込み</span>
+            </Link>
+            <Link href="#pricing" className="apple-button apple-button-secondary apple-button-medium">
+              <span>料金プランを見る</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. 仕組み/3ステップ（白） */}
+      <section className="section section--white">
+        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>シンプルな3ステップでAI最適化を実現</h2>
+            <p style={{ fontSize: '20px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
+              簡単な手続きで、企業情報が構造化され、AIで検索される状態に
+            </p>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '48px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ 
+                width: '80px', 
+                height: '80px', 
+                backgroundColor: 'var(--bg-primary)', 
+                borderRadius: '50%', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                margin: '0 auto 24px',
+                fontSize: '36px',
+                fontWeight: '700',
+                color: 'white',
+                fontVariantNumeric: 'lining-nums tabular-nums'
+              }}>1</div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>申し込み</h3>
+              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px' }}>
+                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                    <CheckCircleIcon className="w-5 h-5" />
+                  </div>
+                  企業名・業界・规模を入力
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                    <CheckCircleIcon className="w-5 h-5" />
+                  </div>
+                  主要サービス・特徴を選択
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                    <CheckCircleIcon className="w-5 h-5" />
+                  </div>
+                  14日間無料トライアル開始
+                </li>
+              </ul>
+            </div>
+            
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ 
+                width: '80px', 
+                height: '80px', 
+                backgroundColor: 'var(--bg-primary)', 
+                borderRadius: '50%', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                margin: '0 auto 24px',
+                fontSize: '36px',
+                fontWeight: '700',
+                color: 'white',
+                fontVariantNumeric: 'lining-nums tabular-nums'
+              }}>2</div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>ヒアリング（60分）</h3>
+              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px' }}>
+                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                    <CheckCircleIcon className="w-5 h-5" />
+                  </div>
+                  現在の情報発信状況を確認
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                    <CheckCircleIcon className="w-5 h-5" />
+                  </div>
+                  AI検索最適化の方向性を相談
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                    <CheckCircleIcon className="w-5 h-5" />
+                  </div>
+                  カスタマイズプランを提案
+                </li>
+              </ul>
+            </div>
+            
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ 
+                width: '80px', 
+                height: '80px', 
+                backgroundColor: 'var(--bg-primary)', 
+                borderRadius: '50%', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                margin: '0 auto 24px',
+                fontSize: '36px',
+                fontWeight: '700',
+                color: 'white',
+                fontVariantNumeric: 'lining-nums tabular-nums'
+              }}>3</div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>AI最適化・公開</h3>
+              <ul style={{ textAlign: 'left', lineHeight: '1.6', fontSize: '17px' }}>
+                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                    <CheckCircleIcon className="w-5 h-5" />
+                  </div>
+                  JSON-LD構造化データ生成
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                    <CheckCircleIcon className="w-5 h-5" />
+                  </div>
+                  AI検索エンジンに最適化
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ color: '#34C759', marginRight: '8px', display: 'inline-flex' }}>
+                    <CheckCircleIcon className="w-5 h-5" />
+                  </div>
+                  企業情報ハブを即座公開
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. 信頼・安心（青・強調帯） */}
+      <section className="section section--primary">
+        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>
+              もっと信頼を。もっと安心を。もっと成果を。
+            </h2>
+            <p style={{ fontSize: '20px', lineHeight: '1.5', color: 'rgba(255, 255, 255, 0.9)' }}>
+              AIO Hubは、企業の機密情報を最高レベルのセキュリティで保護します。
+            </p>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '32px', textAlign: 'center' }}>
+            <div>
+              <div style={{ fontSize: '32px', marginBottom: '16px' }}>🔒</div>
+              <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>SSL暗号化</h4>
+              <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>通信の完全暗号化</p>
+            </div>
+            <div>
+              <div style={{ fontSize: '32px', marginBottom: '16px' }}>💾</div>
+              <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>定期バックアップ</h4>
+              <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>データの安全な保管</p>
+            </div>
+            <div>
+              <div style={{ fontSize: '32px', marginBottom: '16px' }}>🚫</div>
+              <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>アクセス制御</h4>
+              <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>権限管理とログ監視</p>
+            </div>
+            <div>
+              <div style={{ fontSize: '32px', marginBottom: '16px' }}>📈</div>
+              <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>監査ログ</h4>
+              <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.8)' }}>全操作の記録・追跡</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. 活用シーン（白） */}
+      <section className="section section--white">
+        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>AI時代の新しい課題を解決</h2>
+            <p style={{ fontSize: '20px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
               ChatGPTやGoogle AI検索が主流になる中、構造化されていない企業情報は正確に引用されません
             </p>
           </div>
           
-          <div className="apple-comparison-grid">
-            {/* BEFORE Card */}
-            <div className="apple-card apple-card-problem">
-              <div className="apple-card-header">
-                <div className="apple-status-icon apple-status-error">
-                  <AlertTriangleIcon />
-                </div>
-                <div>
-                  <div className="apple-text-caption apple-text-secondary">現在の課題</div>
-                  <h3 className="apple-title3">見つけてもらえない企業</h3>
-                </div>
-              </div>
-              
-              <div className="apple-demo-response apple-demo-response-error">
-                <div className="apple-demo-avatar">AI</div>
-                <div className="apple-demo-text">
-                  申し訳ございませんが、詳細な情報を見つけることができませんでした
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '48px' }}>
+            {/* BEFORE */}
+            <div style={{ 
+              backgroundColor: '#FEF2F2', 
+              border: '1px solid #FECACA', 
+              borderRadius: '16px', 
+              padding: '32px',
+              textAlign: 'center'
+            }}>
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ color: '#EF4444' }}>
+                  <AlertTriangleIcon className="w-12 h-12" />
                 </div>
               </div>
-              
-              <ul className="apple-feature-list">
-                <li className="apple-feature-item apple-feature-error">
-                  <span className="apple-feature-indicator"></span>
-                  企業情報が散在・非構造化
-                </li>
-                <li className="apple-feature-item apple-feature-error">
-                  <span className="apple-feature-indicator"></span>
-                  AIが理解・引用できない形式
-                </li>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: '#DC2626' }}>見つけてもらえない企業</h3>
+              <div style={{ 
+                backgroundColor: '#FFFFFF', 
+                border: '1px solid #E5E7EB', 
+                borderRadius: '12px', 
+                padding: '16px', 
+                marginBottom: '24px',
+                textAlign: 'left'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ width: '24px', height: '24px', backgroundColor: '#EF4444', borderRadius: '50%', marginRight: '8px', fontSize: '12px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>AI</div>
+                  <strong style={{ color: '#EF4444' }}>エラー</strong>
+                </div>
+                <p style={{ fontSize: '15px', color: '#6B7280' }}>申し訳ございませんが、詳細な情報を見つけることができませんでした</p>
+              </div>
+              <ul style={{ textAlign: 'left', fontSize: '15px', lineHeight: '1.6' }}>
+                <li style={{ marginBottom: '8px', color: '#EF4444' }}>• 企業情報が散在・非構造化</li>
+                <li style={{ marginBottom: '8px', color: '#EF4444' }}>• AIが理解・引用できない形式</li>
               </ul>
             </div>
-
-            {/* AFTER Card */}
-            <div className="apple-card apple-card-solution">
-              <div className="apple-card-header">
-                <div className="apple-status-icon apple-status-success">
-                  <CheckCircleIcon />
-                </div>
-                <div>
-                  <div className="apple-text-caption apple-text-blue">AIO Hub導入後</div>
-                  <h3 className="apple-title3">AIに理解される企業へ</h3>
-                </div>
-              </div>
-              
-              <div className="apple-demo-response apple-demo-response-success">
-                <div className="apple-demo-avatar apple-demo-avatar-ai">AI</div>
-                <div className="apple-demo-text">
-                  <strong>[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
-                  <br /><br />
-                  <strong>主なサービス：</strong> 構造化データによる企業情報最適化
-                  <br />
-                  <strong>導入実績：</strong> 300社以上
+            
+            {/* AFTER */}
+            <div style={{ 
+              backgroundColor: '#F0F9FF', 
+              border: '1px solid #BAE6FD', 
+              borderRadius: '16px', 
+              padding: '32px',
+              textAlign: 'center'
+            }}>
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ color: '#10B981' }}>
+                  <CheckCircleIcon className="w-12 h-12" />
                 </div>
               </div>
-              
-              <ul className="apple-feature-list">
-                <li className="apple-feature-item apple-feature-success">
-                  <CheckCircleIcon className="apple-feature-check" />
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--bg-primary)' }}>AIに理解される企業へ</h3>
+              <div style={{ 
+                backgroundColor: '#FFFFFF', 
+                border: '1px solid #E5E7EB', 
+                borderRadius: '12px', 
+                padding: '16px', 
+                marginBottom: '24px',
+                textAlign: 'left'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ width: '24px', height: '24px', backgroundColor: 'var(--bg-primary)', borderRadius: '50%', marginRight: '8px', fontSize: '12px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>AI</div>
+                  <strong style={{ color: 'var(--bg-primary)' }}>成功</strong>
+                </div>
+                <p style={{ fontSize: '15px', color: '#374151' }}><strong>[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。</p>
+              </div>
+              <ul style={{ textAlign: 'left', fontSize: '15px', lineHeight: '1.6' }}>
+                <li style={{ marginBottom: '8px', color: '#10B981', display: 'flex', alignItems: 'center' }}>
+                  <div style={{ marginRight: '8px', display: 'inline-flex', color: '#10B981' }}>
+                    <CheckCircleIcon className="w-4 h-4" />
+                  </div>
                   構造化された企業情報
                 </li>
-                <li className="apple-feature-item apple-feature-success">
-                  <CheckCircleIcon className="apple-feature-check" />
+                <li style={{ marginBottom: '8px', color: '#10B981', display: 'flex', alignItems: 'center' }}>
+                  <div style={{ marginRight: '8px', display: 'inline-flex', color: '#10B981' }}>
+                    <CheckCircleIcon className="w-4 h-4" />
+                  </div>
                   AI検索に最適化されたデータ
                 </li>
               </ul>
             </div>
           </div>
           
-          {/* Section CTA */}
-          <div className="apple-section-cta">
+          <div style={{ textAlign: 'center', marginTop: '48px' }}>
             <Link
               href="/auth/signup"
-              className="apple-button apple-button-primary apple-button-medium"
+              className="apple-button apple-button-primary apple-button-large"
             >
               <span>14日間無料で体験する</span>
               <ArrowRightIcon className="apple-button-icon" />
@@ -245,106 +462,30 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </div>
       </section>
 
-      {/* 価値の柱 - 3つのカード */}
-      <section className="apple-section">
-        <div className="apple-container">
-          <div className="apple-section-header">
-            <h2 className="apple-title1">企業情報を構造化し、AIに理解される状態へ</h2>
-            <p className="apple-body-large apple-text-secondary">
-              JSON-LD対応・Q&A管理・企業/サービス/FAQの一元発信
-            </p>
-          </div>
+      {/* 6. 料金（薄灰） */}
+      <section className="section section--alt" id="pricing">
+        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <PricingTable />
+        </div>
+      </section>
+
+      {/* 7. FAQ + 最終CTA（白） */}
+      <section className="section section--white">
+        <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          <FAQSection
+            title={aioCopy.faq.title}
+            description={aioCopy.faq.description}
+            categories={aioCopy.faq.categories}
+          />
           
-          <div className="apple-features-grid">
-            {features.map((feature, index) => (
-              <div key={index} className="apple-feature-card">
-                <div className="apple-feature-icon">
-                  <feature.icon />
-                </div>
-                <h3 className="apple-title3">{feature.title}</h3>
-                <p className="apple-body apple-text-secondary">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ユースケース - 3つの活用例 */}
-      <section className="apple-section apple-section-alt">
-        <div className="apple-container">
-          <div className="apple-section-header">
-            <h2 className="apple-title1">大きな商談も、小さな問い合わせも、すべてに対応</h2>
-          </div>
-          
-          <div className="apple-features-grid">
-            <div className="apple-feature-card">
-              <div className="apple-feature-icon">
-                <BuildingIcon />
-              </div>
-              <h3 className="apple-title3">営業資料として</h3>
-              <p className="apple-body apple-text-secondary">
-                構造化された企業情報で説得力アップ
-              </p>
-            </div>
-            <div className="apple-feature-card">
-              <div className="apple-feature-icon">
-                <UserIcon />
-              </div>
-              <h3 className="apple-title3">採用活動で</h3>
-              <p className="apple-body apple-text-secondary">
-                求職者がAI検索で企業を正確に理解
-              </p>
-            </div>
-            <div className="apple-feature-card">
-              <div className="apple-feature-icon">
-                <InfoIcon />
-              </div>
-              <h3 className="apple-title3">PR・広報で</h3>
-              <p className="apple-body apple-text-secondary">
-                メディアがAIで企業情報を取得・引用
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 信頼・セキュリティ */}
-      <section className="apple-section apple-section-primary">
-        <div className="apple-container">
-          <div className="apple-section-header">
-            <h2 className="apple-title1" style={{ color: 'white' }}>
-              もっと信頼を。もっと安心を。もっと成果を。
-            </h2>
-            <p className="apple-body-large" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-              AIO Hubは、企業の機密情報を最高レベルのセキュリティで保護します。
-              SSL暗号化、定期バックアップ、アクセス制御により、あなたのデータは完全に守られます。
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <PricingTable />
-
-      {/* FAQ Section */}
-      <FAQSection
-        title={aioCopy.faq.title}
-        description={aioCopy.faq.description}
-        categories={aioCopy.faq.categories}
-      />
-
-      {/* Final CTA - Apple Scale */}
-      <section className="apple-section apple-cta-section">
-        <div className="apple-container">
-          <div className="apple-cta-content">
-            <h2 className="apple-title1">まずは情報を"構造化"するところから。</h2>
-            <p className="apple-body-large">
+          {/* 最終CTA */}
+          <div style={{ textAlign: 'center', marginTop: '80px', padding: '64px 32px', backgroundColor: '#F9FAFB', borderRadius: '24px' }}>
+            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>まずは情報を"構造化"するところから。</h2>
+            <p style={{ fontSize: '20px', lineHeight: '1.5', marginBottom: '40px', color: 'var(--text-secondary)' }}>
               14日間の無料体験で効果を実感
             </p>
             
-            <div className="apple-cta-buttons">
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '32px' }}>
               <Link
                 href="/auth/signup"
                 className="apple-button apple-button-primary apple-button-large"
@@ -352,13 +493,17 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 <span>14日間無料で始める</span>
                 <ArrowRightIcon className="apple-button-icon" />
               </Link>
+              <Link
+                href="/contact"
+                className="apple-button apple-button-secondary apple-button-large"
+              >
+                <span>専門ヒアリング相談</span>
+              </Link>
             </div>
             
-            <div className="apple-trust-final">
-              <p className="apple-text-caption">
-                クレジットカード不要・いつでも解約可能
-              </p>
-            </div>
+            <p style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>
+              クレジットカード不要・いつでも解約可能
+            </p>
           </div>
         </div>
       </section>

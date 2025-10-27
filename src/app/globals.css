@@ -35,13 +35,71 @@ html, body {
   color: #374151 !important; /* gray-700 */
 }
 
-/* 白背景での文字色確保 */
-.bg-white * {
-  color: inherit;
+/* ===== iCloud準拠 統一カラーシステム ===== */
+
+/* カラートークン */
+:root {
+  --bg-white: #FFFFFF;
+  --bg-alt: #F5F5F7;
+  --bg-primary: #0A84FF;
+  --text-primary: #1D1D1F;
+  --text-secondary: #636366;
+  --text-on-primary: #FFFFFF;
 }
-.bg-white .text-white {
-  color: white !important;
+
+/* セクション背景（直接指定・オーバーレイ禁止） */
+.section {
+  position: relative;
+  z-index: 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
 }
+
+.section--white {
+  background: var(--bg-white);
+  color: var(--text-primary);
+}
+
+.section--alt {
+  background: var(--bg-alt);
+  color: var(--text-primary);
+}
+
+.section--primary {
+  background: var(--bg-primary);
+  color: var(--text-on-primary);
+}
+
+/* サイトコンテナ */
+.site-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-inline: clamp(16px, 4vw, 24px);
+  position: relative;
+  z-index: 1;
+}
+
+/* セクション内全要素の文字色統一 */
+.section--white *,
+.section--alt * {
+  color: var(--text-primary) !important;
+}
+
+.section--primary * {
+  color: var(--text-on-primary) !important;
+}
+
+/* 特定要素の文字色調整 */
+.section--white .text-secondary,
+.section--alt .text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.section--primary .text-secondary {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+/* 削除: .bg-white .text-white 白地×白文字の原因 */
 /* Tailwind の dark 変種や媒体クエリを無効化 */
 @media (prefers-color-scheme: dark) {
   :root { color-scheme: light !important; }
@@ -2934,11 +2992,15 @@ a.apple-button.apple-button-secondary {
 
 .apple-section-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  color: white !important;
   /* Full bleed background */
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
+}
+
+.apple-section-primary * {
+  color: white !important;
 }
 
 .apple-container {
@@ -3316,6 +3378,7 @@ a.apple-button.apple-button-secondary {
   gap: 32px;
   max-width: 1200px;
   margin: 0 auto;
+  align-items: stretch;
 }
 
 .apple-pricing-card {
@@ -3328,6 +3391,7 @@ a.apple-button.apple-button-secondary {
   flex-direction: column;
   transition: all 0.3s ease;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  height: 100%;
 }
 
 .apple-pricing-card:hover {
