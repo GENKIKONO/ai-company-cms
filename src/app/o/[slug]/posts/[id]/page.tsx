@@ -293,12 +293,13 @@ export default async function PostPage({
 
           {/* Footer */}
           <div className="mt-8 text-center">
-            <HIGButton variant="primary"
-              href={`/o/${post.organization.slug}`}
-              size="medium"
-            >
-              {post.organization.name} の他の記事を見る
-            </HIGButton>
+            <Link href={`/o/${post.organization.slug}`}>
+              <HIGButton variant="primary"
+                size="md"
+              >
+                {post.organization.name} の他の記事を見る
+              </HIGButton>
+            </Link>
           </div>
         </div>
       </div>

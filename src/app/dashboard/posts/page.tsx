@@ -195,12 +195,13 @@ export default function PostsManagementPage() {
                     </div>
                     
                     <div className="flex items-center space-x-2 ml-4">
-                      <HIGButton variant="primary"
-                        href={`/dashboard/posts/${post.id}/edit`}
-                        size="small"
-                      >
-                        編集
-                      </HIGButton>
+                      <Link href={`/dashboard/posts/${post.id}/edit`}>
+                        <HIGButton variant="primary"
+                          size="sm"
+                        >
+                          編集
+                        </HIGButton>
+                      </Link>
                       <button
                         onClick={() => handleDelete(post.id)}
                         className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"

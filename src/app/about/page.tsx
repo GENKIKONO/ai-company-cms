@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { HIGButton } from '@/design-system';
 
 export const metadata: Metadata = {
@@ -202,14 +203,15 @@ export default function AboutPage() {
               14日間の無料体験で、AI最適化の効果を実感してください
             </p>
             
-            <HIGButton 
-              variant="primary"
-              href="/auth/signup"
-              size="large"
-              className="text-xl px-10 py-5 bg-white text-[var(--bg-primary)] hover:bg-gray-50 border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold"
-            >
-              無料で始める
-            </HIGButton>
+            <Link href="/auth/signup">
+              <HIGButton 
+                variant="primary"
+                size="lg"
+                className="text-xl px-10 py-5 bg-white text-[var(--bg-primary)] hover:bg-gray-50 border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold"
+              >
+                無料で始める
+              </HIGButton>
+            </Link>
           </div>
         </section>
       </div>

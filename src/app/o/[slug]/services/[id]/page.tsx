@@ -283,12 +283,13 @@ export default async function ServiceDetailPage({
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               {organization.email && (
-                <HIGButton variant="primary" 
-                  href={`mailto:${organization.email}?subject=${encodeURIComponent(`${service.name}について`)}`}
-                  size="large"
-                >
-                  メールでお問い合わせ
-                </HIGButton>
+                <a href={`mailto:${organization.email}?subject=${encodeURIComponent(`${service.name}について`)}`}>
+                  <HIGButton variant="primary" 
+                    size="lg"
+                  >
+                    メールでお問い合わせ
+                  </HIGButton>
+                </a>
               )}
               {organization.telephone && (
                 <a 
@@ -316,12 +317,13 @@ export default async function ServiceDetailPage({
               サービス一覧に戻る
             </Link>
             
-            <HIGButton variant="primary" 
-              href={`/o/${organization.slug}`}
-              size="medium"
-            >
-              {organization.name} トップページへ
-            </HIGButton>
+            <Link href={`/o/${organization.slug}`}>
+              <HIGButton variant="primary" 
+                size="md"
+              >
+                {organization.name} トップページへ
+              </HIGButton>
+            </Link>
           </div>
         </main>
       </div>

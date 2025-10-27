@@ -64,14 +64,15 @@ export default function ContactPage() {
               </p>
             </div>
             
-            <HIGButton 
-              variant="primary"
-              href="/help" 
-              size="large"
-              className="bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl px-8 py-4 text-lg font-semibold"
-            >
-              ヘルプセンターへ戻る
-            </HIGButton>
+            <Link href="/help">
+              <HIGButton 
+                variant="primary"
+                size="lg"
+                className="bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl px-8 py-4 text-lg font-semibold"
+              >
+                ヘルプセンターへ戻る
+              </HIGButton>
+            </Link>
           </div>
         </div>
       </div>

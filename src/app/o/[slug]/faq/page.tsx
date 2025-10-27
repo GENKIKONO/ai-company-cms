@@ -241,12 +241,13 @@ export default async function FAQPage({
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     {organization.email && (
-                      <HIGButton variant="primary" 
-                        href={`mailto:${organization.email}?subject=${encodeURIComponent('お問い合わせ')}`}
-                        size="small"
-                      >
-                        メールでお問い合わせ
-                      </HIGButton>
+                      <Link href={`mailto:${organization.email}?subject=${encodeURIComponent('お問い合わせ')}`}>
+                        <HIGButton variant="primary" 
+                          size="sm"
+                        >
+                          メールでお問い合わせ
+                        </HIGButton>
+                      </Link>
                     )}
                     {organization.telephone && (
                       <a 
@@ -277,12 +278,13 @@ export default async function FAQPage({
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   {organization.email && (
-                    <HIGButton variant="primary" 
-                      href={`mailto:${organization.email}?subject=${encodeURIComponent('お問い合わせ')}`}
-                      size="small"
-                    >
-                      メールでお問い合わせ
-                    </HIGButton>
+                    <Link href={`mailto:${organization.email}?subject=${encodeURIComponent('お問い合わせ')}`}>
+                      <HIGButton variant="primary" 
+                        size="sm"
+                      >
+                        メールでお問い合わせ
+                      </HIGButton>
+                    </Link>
                   )}
                   {organization.telephone && (
                     <a 

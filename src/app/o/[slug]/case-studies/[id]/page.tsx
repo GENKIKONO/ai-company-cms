@@ -302,12 +302,13 @@ export default async function CaseStudyDetailPage({
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               {organization.email && (
-                <HIGButton variant="primary" 
-                  href={`mailto:${organization.email}?subject=${encodeURIComponent(`「${caseStudy.title}」類似案件について`)}`}
-                  size="large"
-                >
-                  メールでお問い合わせ
-                </HIGButton>
+                <a href={`mailto:${organization.email}?subject=${encodeURIComponent(`「${caseStudy.title}」類似案件について`)}`}>
+                  <HIGButton variant="primary" 
+                    size="lg"
+                  >
+                    メールでお問い合わせ
+                  </HIGButton>
+                </a>
               )}
               {organization.telephone && (
                 <a 
@@ -335,12 +336,13 @@ export default async function CaseStudyDetailPage({
               導入事例一覧に戻る
             </Link>
             
-            <HIGButton variant="primary" 
-              href={`/o/${organization.slug}`}
-              size="medium"
-            >
-              {organization.name} トップページへ
-            </HIGButton>
+            <Link href={`/o/${organization.slug}`}>
+              <HIGButton variant="primary" 
+                size="md"
+              >
+                {organization.name} トップページへ
+              </HIGButton>
+            </Link>
           </div>
         </main>
       </div>

@@ -38,7 +38,7 @@ export default function GlobalError({
             <div className="space-y-3">
               <HIGButton variant="primary"
                 onClick={reset}
-                size="medium"
+                size="md"
                 className="w-full"
               >
                 再試行

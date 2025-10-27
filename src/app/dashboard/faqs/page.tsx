@@ -177,12 +177,13 @@ export default function FAQsManagementPage() {
                     </div>
                     
                     <div className="flex items-center space-x-2 ml-4">
-                      <HIGButton variant="primary"
-                        href={`/dashboard/faqs/${faq.id}/edit`}
-                        size="small"
-                      >
-                        編集
-                      </HIGButton>
+                      <Link href={`/dashboard/faqs/${faq.id}/edit`}>
+                        <HIGButton variant="primary"
+                          size="sm"
+                        >
+                          編集
+                        </HIGButton>
+                      </Link>
                       <button
                         onClick={() => handleDelete(faq.id)}
                         className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"

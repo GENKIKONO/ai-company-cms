@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { BackLink } from '@/components/ui/back-link';
 import { HIGButton } from '@/design-system';
 
@@ -95,12 +96,13 @@ export default function HelpPage() {
                 <p className="text-blue-800 mb-4">
                   上記で解決しない場合は、お気軽にお問い合わせください。
                 </p>
-                <HIGButton variant="primary" 
-                  href="/contact"
-                  size="medium"
-                >
-                  お問い合わせフォームへ
-                </HIGButton>
+                <Link href="/contact">
+                  <HIGButton variant="primary" 
+                    size="md"
+                  >
+                    お問い合わせフォームへ
+                  </HIGButton>
+                </Link>
               </div>
             </section>
           </div>

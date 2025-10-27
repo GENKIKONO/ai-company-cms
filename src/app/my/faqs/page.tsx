@@ -116,12 +116,13 @@ export default function MyFAQsPage() {
           <div className="text-sm text-gray-600">
             {faqs.length}件のFAQが登録されています
           </div>
-          <HIGButton variant="primary"
-            href="/my/faqs/new"
-            size="medium"
-          >
-            新しいFAQを追加
-          </HIGButton>
+          <Link href="/my/faqs/new">
+            <HIGButton variant="primary"
+              size="md"
+            >
+              新しいFAQを追加
+            </HIGButton>
+          </Link>
         </div>
 
         {/* FAQリスト */}
@@ -134,12 +135,13 @@ export default function MyFAQsPage() {
             <p className="text-gray-600 mb-6">
               最初のFAQを追加して、お客様からのよくある質問に対応しましょう
             </p>
-            <HIGButton variant="primary"
-              href="/my/faqs/new"
-              size="medium"
-            >
-              FAQを追加
-            </HIGButton>
+            <Link href="/my/faqs/new">
+              <HIGButton variant="primary"
+                size="md"
+              >
+                FAQを追加
+              </HIGButton>
+            </Link>
           </div>
         ) : (
           <div className="space-y-4">

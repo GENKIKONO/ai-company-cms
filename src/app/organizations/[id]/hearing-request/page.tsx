@@ -110,13 +110,14 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
             ご依頼いただきありがとうございます。<br />
             担当者より3営業日以内にご連絡いたします。
           </p>
-          <HIGButton
-            variant="primary"
-            href="/dashboard"
-            size="large"
-          >
-            ダッシュボードに戻る
-          </HIGButton>
+          <Link href="/dashboard">
+            <HIGButton
+              variant="primary"
+              size="lg"
+            >
+              ダッシュボードに戻る
+            </HIGButton>
+          </Link>
         </div>
       </div>
     );
