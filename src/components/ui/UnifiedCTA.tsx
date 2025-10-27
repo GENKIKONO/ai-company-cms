@@ -96,10 +96,13 @@ export default function UnifiedCTA({
 
   const content = (
     <>
-      <span style={{ color: 'inherit' }}>{children}</span>
+      <span style={{ 
+        color: variant === 'primary' ? '#FFFFFF !important' : 'inherit' 
+      }}>{children}</span>
       {showArrow && (
         <ArrowRightIcon 
           className="w-4 h-4 transition-transform group-hover:translate-x-1" 
+          style={{ color: variant === 'primary' ? '#FFFFFF' : 'inherit' }}
         />
       )}
     </>

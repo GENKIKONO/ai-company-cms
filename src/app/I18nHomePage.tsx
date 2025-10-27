@@ -579,6 +579,31 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       {/* 7. FAQ + 最終CTA（白） */}
       <section className="sec-white">
         <div className="site-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+          {/* その他の質問セクション */}
+          <div style={{ 
+            textAlign: 'center', 
+            marginBottom: '80px',
+            padding: '48px 40px',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '20px',
+            boxShadow: '0 6px 24px rgba(0, 0, 0, 0.08)',
+            border: '1px solid rgba(0, 0, 0, 0.05)'
+          }}>
+            <h2 style={{ fontSize: '36px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-primary)' }}>
+              その他のご質問がございましたら
+            </h2>
+            <p style={{ fontSize: '18px', lineHeight: '1.5', marginBottom: '32px', color: 'var(--text-secondary)' }}>
+              AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
+            </p>
+            <PrimaryCTA
+              href="/contact"
+              size="large"
+              showArrow={true}
+            >
+              お問い合わせフォーム
+            </PrimaryCTA>
+          </div>
+          
           <FAQSection
             title={aioCopy.faq.title}
             description={aioCopy.faq.description}
@@ -586,8 +611,16 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           />
           
           {/* 最終CTA */}
-          <div style={{ textAlign: 'center', marginTop: '80px', padding: '64px 32px', backgroundColor: '#F9FAFB', borderRadius: '24px' }}>
-            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px' }}>まずは情報を"構造化"するところから。</h2>
+          <div style={{ 
+            textAlign: 'center', 
+            marginTop: '80px', 
+            padding: '64px 40px', 
+            backgroundColor: '#FFFFFF', 
+            borderRadius: '24px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+            border: '1px solid rgba(0, 0, 0, 0.05)'
+          }}>
+            <h2 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '24px', color: 'var(--text-primary)' }}>まずは情報を"構造化"するところから。</h2>
             <p style={{ fontSize: '20px', lineHeight: '1.5', marginBottom: '40px', color: 'var(--text-secondary)' }}>
               14日間の無料体験で効果を実感
             </p>
