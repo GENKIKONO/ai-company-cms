@@ -158,32 +158,53 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', marginBottom: '48px' }}>
-            <div style={{ textAlign: 'center', padding: '32px' }}>
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '40px 32px', 
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+              border: '1px solid rgba(0, 0, 0, 0.05)'
+            }}>
               <div style={{ marginBottom: '24px' }}>
                 <div style={{ color: 'var(--bg-primary)' }}>
                   <BuildingIcon className="w-12 h-12" />
                 </div>
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>営業資料として</h3>
-              <p style={{ fontSize: '17px', lineHeight: '1.5' }}>構造化された企業情報で説得力アップ</p>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>営業資料として</h3>
+              <p style={{ fontSize: '17px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>構造化された企業情報で説得力アップ</p>
             </div>
-            <div style={{ textAlign: 'center', padding: '32px' }}>
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '40px 32px', 
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+              border: '1px solid rgba(0, 0, 0, 0.05)'
+            }}>
               <div style={{ marginBottom: '24px' }}>
                 <div style={{ color: 'var(--bg-primary)' }}>
                   <UserIcon className="w-12 h-12" />
                 </div>
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>採用活動で</h3>
-              <p style={{ fontSize: '17px', lineHeight: '1.5' }}>求職者がAI検索で企業を正確に理解</p>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>採用活動で</h3>
+              <p style={{ fontSize: '17px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>求職者がAI検索で企業を正確に理解</p>
             </div>
-            <div style={{ textAlign: 'center', padding: '32px' }}>
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '40px 32px', 
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+              border: '1px solid rgba(0, 0, 0, 0.05)'
+            }}>
               <div style={{ marginBottom: '24px' }}>
                 <div style={{ color: 'var(--bg-primary)' }}>
                   <InfoIcon className="w-12 h-12" />
                 </div>
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>PR・広報で</h3>
-              <p style={{ fontSize: '17px', lineHeight: '1.5' }}>メディアがAIで企業情報を取得・引用</p>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>PR・広報で</h3>
+              <p style={{ fontSize: '17px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>メディアがAIで企業情報を取得・引用</p>
             </div>
           </div>
           
