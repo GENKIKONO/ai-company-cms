@@ -2710,6 +2710,19 @@ html, body {
   margin-bottom: var(--space-6);
   color: var(--color-text-primary);
   font-family: var(--font-family-system);
+  /* Ensure text is visible over background images */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero with background image text styling */
+.apple-hero[style*="background-image"] .apple-hero-title {
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.apple-hero[style*="background-image"] .apple-hero-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .apple-hero-subtitle {

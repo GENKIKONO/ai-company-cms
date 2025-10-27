@@ -24,6 +24,7 @@ interface SiteSettings {
   title: string;
   tagline: string;
   representative_message: string;
+  hero_background_image?: string;
 }
 
 interface I18nHomePageProps {
@@ -84,7 +85,17 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
   return (
     <div className="apple-page">
       {/* Hero Section - True Apple Scale */}
-      <section className="apple-hero">
+      <section 
+        className="apple-hero"
+        style={{
+          backgroundImage: siteSettings.hero_background_image 
+            ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${siteSettings.hero_background_image})` 
+            : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
         <div className="apple-hero-container">
           <div className="apple-hero-content">
             {/* Hero Typography with Apple Scale */}
