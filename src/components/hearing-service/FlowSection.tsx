@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, MessageCircle, Sparkles, ArrowRight, CheckCircle } from 'lucide-react';
+import { FileText, MessageCircle, Sparkles, CheckCircle } from 'lucide-react';
 
 const flowSteps = [
   {
@@ -13,7 +13,8 @@ const flowSteps = [
       'ヒアリング希望日選択',
       '重点的に聞きたい内容の選択'
     ],
-    color: 'blue'
+    gradient: 'from-blue-500 to-blue-600',
+    bgGradient: 'from-blue-50 to-blue-100'
   },
   {
     step: 2,
@@ -25,7 +26,8 @@ const flowSteps = [
       '競合優位性・差別化ポイント',
       'ターゲット市場・顧客事例'
     ],
-    color: 'purple'
+    gradient: 'from-purple-500 to-purple-600',
+    bgGradient: 'from-purple-50 to-purple-100'
   },
   {
     step: 3,
@@ -37,62 +39,90 @@ const flowSteps = [
       'CMS登録・設定完了',
       '検索性向上・発見性改善'
     ],
-    color: 'indigo'
+    gradient: 'from-indigo-500 to-indigo-600',
+    bgGradient: 'from-indigo-50 to-indigo-100'
   }
 ];
 
-
 export default function FlowSection() {
   return (
-    <section className="apple-section apple-section-alt">
-      <div className="apple-container">
+    <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
-        <div className="apple-section-header">
-          <h2 className="apple-title1">シンプルな3ステップ</h2>
-          <p className="apple-body-large apple-text-secondary">
+        <div className="text-center mb-20">
+          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+            シンプルな
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              3ステップ
+            </span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
             複雑な作業は一切不要。専門スタッフがすべて代行し、あなたの企業情報をAI時代に最適な形でお届けします。
           </p>
         </div>
 
-        {/* フローステップ - Apple式3カードグリッド */}
-        <div className="apple-features-grid">
+        {/* フローステップ */}
+        <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
           {flowSteps.map((step, index) => {
             const IconComponent = step.icon;
             
             return (
-              <div key={step.step} className="apple-feature-card">
-                {/* ステップアイコン */}
-                <div className="apple-feature-icon">
-                  <IconComponent />
-                </div>
+              <div 
+                key={step.step} 
+                className="relative group"
+              >
+                {/* 接続線（デスクトップのみ） */}
+                {index < flowSteps.length - 1 && (
+                  <div className="hidden md:block absolute top-16 -right-6 lg:-right-12 w-6 lg:w-12 h-0.5 bg-gradient-to-r from-gray-300 to-gray-200 z-0"></div>
+                )}
                 
-                {/* ステップ番号とタイトル */}
-                <div className="text-center mb-4">
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white text-lg font-bold">
-                      {step.step}
-                    </span>
-                    <h3 className="apple-title3">{step.title}</h3>
+                <div className={`relative bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform group-hover:-translate-y-2 border border-gray-100 bg-gradient-to-br ${step.bgGradient} bg-opacity-30`}>
+                  {/* ステップ番号 */}
+                  <div className="text-center mb-6">
+                    <div className={`inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r ${step.gradient} text-white shadow-lg mb-4`}>
+                      <span className="text-2xl font-bold">{step.step}</span>
+                    </div>
+                    
+                    {/* アイコン */}
+                    <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r ${step.gradient} text-white shadow-md -mt-2 ml-4`}>
+                      <IconComponent className="h-6 w-6" />
+                    </div>
                   </div>
+                  
+                  {/* タイトル */}
+                  <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">
+                    {step.title}
+                  </h3>
+                  
+                  {/* 説明 */}
+                  <p className="text-gray-600 text-center mb-8 leading-relaxed">
+                    {step.description}
+                  </p>
+                  
+                  {/* 詳細リスト */}
+                  <ul className="space-y-3">
+                    {step.details.map((detail, detailIndex) => (
+                      <li key={detailIndex} className="flex items-start gap-3">
+                        <CheckCircle className={`h-5 w-5 text-green-500 mt-0.5 flex-shrink-0`} />
+                        <span className="text-gray-700 text-sm leading-relaxed">{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                
-                {/* 説明 */}
-                <p className="apple-body apple-text-secondary text-center mb-6">{step.description}</p>
-                
-                {/* 詳細リスト */}
-                <ul className="apple-feature-list">
-                  {step.details.map((detail, detailIndex) => (
-                    <li key={detailIndex} className="apple-feature-item">
-                      <CheckCircle className="apple-feature-check" />
-                      <span className="apple-body">{detail}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
             );
           })}
         </div>
 
+        {/* 追加情報 */}
+        <div className="mt-16 text-center">
+          <div className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-100 to-blue-100 rounded-full border border-green-200">
+            <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+            <span className="text-green-800 font-medium">
+              平均3日以内に構造化完了・即座にAI検索対応
+            </span>
+          </div>
+        </div>
       </div>
     </section>
   );

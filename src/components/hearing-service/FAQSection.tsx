@@ -63,74 +63,84 @@ export default function FAQSection() {
 
 
   return (
-    <section id="faq" className="apple-section">
-      <div className="apple-container">
+    <section id="faq" className="py-24 bg-gradient-to-br from-gray-50 to-white">
+      <div className="max-w-4xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
-        <div className="apple-section-header">
-          <h2 className="apple-title1">よくある質問</h2>
-          <p className="apple-body-large apple-text-secondary">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+            よくある
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              質問
+            </span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             ご不明な点がございましたら、お気軽にお問い合わせください。
           </p>
         </div>
 
-        {/* Apple FAQ Accordion */}
-        <div className="apple-faq-categories">
-          <div className="apple-faq-category">
-            <div className="apple-faq-items">
-              {faqData.map((faq, index) => {
-                const key = `faq-${index}`;
-                const isOpen = openItems.has(key);
-                return (
-                  <div key={index} className="apple-faq-item">
-                    <button
-                      onClick={() => toggleItem(key)}
-                      className="apple-faq-question"
-                      aria-expanded={isOpen}
-                      aria-controls={`faq-answer-${key}`}
-                    >
-                      <span className="apple-faq-question-text">
-                        {faq.question}
-                      </span>
-                      <div className="apple-faq-icon">
-                        <ChevronDown 
-                          className={`apple-faq-chevron ${isOpen ? 'rotate-180' : ''}`}
-                        />
-                      </div>
-                    </button>
-                    {isOpen && (
-                      <div 
-                        id={`faq-answer-${key}`}
-                        className="apple-faq-answer"
-                      >
-                        <div className="apple-faq-answer-content">
-                          <div className="apple-body whitespace-pre-line">
-                            {faq.answer}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+        {/* FAQ Accordion */}
+        <div className="space-y-4 mb-16">
+          {faqData.map((faq, index) => {
+            const key = `faq-${index}`;
+            const isOpen = openItems.has(key);
+            return (
+              <div 
+                key={index} 
+                className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+              >
+                <button
+                  onClick={() => toggleItem(key)}
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 rounded-2xl transition-colors duration-200"
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${key}`}
+                >
+                  <span className="text-lg font-semibold text-gray-900 pr-4">
+                    {faq.question}
+                  </span>
+                  <div className="flex-shrink-0">
+                    <ChevronDown 
+                      className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
+                        isOpen ? 'rotate-180' : ''
+                      }`}
+                    />
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                </button>
+                {isOpen && (
+                  <div 
+                    id={`faq-answer-${key}`}
+                    className="px-6 pb-6"
+                  >
+                    <div className="pt-4 border-t border-gray-100">
+                      <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                        {faq.answer}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Apple FAQ Support */}
-        <div className="apple-faq-support">
-          <div className="apple-faq-support-card">
-            <h3 className="apple-title3">他にもご質問がございますか？</h3>
-            <p className="apple-body apple-text-secondary">
-              お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
-            </p>
-            <div>
-              <PrimaryCTA
-                href="mailto:support@luxucare.jp"
-                size="large"
-              >
-                メールで問い合わせ
-              </PrimaryCTA>
-            </div>
+        {/* サポート案内 */}
+        <div className="text-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-8 border border-blue-100">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">他にもご質問がございますか？</h3>
+          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+            お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <PrimaryCTA
+              href="mailto:support@luxucare.jp"
+              size="large"
+            >
+              メールで問い合わせ
+            </PrimaryCTA>
+            <a 
+              href="tel:03-1234-5678"
+              className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-blue-600 bg-white border-2 border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              電話で相談する
+            </a>
           </div>
         </div>
       </div>

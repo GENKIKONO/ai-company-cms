@@ -1,91 +1,115 @@
 'use client';
 
-import { X, Check } from 'lucide-react';
+import { X, Check, AlertTriangle, Sparkles } from 'lucide-react';
 
 export default function ComparisonSection() {
   return (
-    <section className="apple-section">
-      <div className="apple-container">
-        <div className="apple-section-header">
-          <h2 className="apple-title1">構造化前後の違い</h2>
-          <p className="apple-body-large apple-text-secondary">
+    <section id="comparison" className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+            構造化前後の
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-green-500">
+              劇的な違い
+            </span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             ヒアリングによってあなたの企業情報がどのように変わるかをご覧ください
           </p>
         </div>
 
-        <div className="apple-comparison-grid">
+        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Before Card */}
-          <div className="apple-comparison-card apple-comparison-before">
-            <div className="apple-comparison-header">
-              <div className="apple-comparison-badge apple-comparison-badge-before">
-                <X className="apple-comparison-badge-icon" />
-                <span>構造化前</span>
+          <div className="relative bg-white rounded-3xl border-2 border-red-200 p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="absolute -top-4 left-8">
+              <div className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full border border-red-200">
+                <X className="h-4 w-4" />
+                <span className="font-semibold">構造化前</span>
               </div>
             </div>
             
-            <div className="apple-comparison-content">
-              <div className="apple-comparison-example">
-                <div className="apple-comparison-text">
+            <div className="mt-8 space-y-6">
+              <div className="p-4 bg-red-50 rounded-xl border border-red-100">
+                <p className="text-gray-700 italic">
                   "弊社は総合的なITソリューションを提供しています..."
-                </div>
+                </p>
               </div>
-              <div className="apple-comparison-example">
-                <div className="apple-comparison-text">
+              <div className="p-4 bg-red-50 rounded-xl border border-red-100">
+                <p className="text-gray-700 italic">
                   "様々な業界のお客様にご利用いただいております..."
-                </div>
+                </p>
               </div>
-              <div className="apple-comparison-example">
-                <div className="apple-comparison-text">
+              <div className="p-4 bg-red-50 rounded-xl border border-red-100">
+                <p className="text-gray-700 italic">
                   "高品質なサービスで満足度向上を実現..."
-                </div>
+                </p>
               </div>
             </div>
             
-            <div className="apple-comparison-footer">
-              <X className="apple-comparison-status-icon apple-comparison-error" />
-              <span className="apple-comparison-status-text">抽象的で検索されにくい</span>
+            <div className="mt-8 flex items-center gap-3 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              <span className="font-medium">抽象的で検索されにくい</span>
             </div>
           </div>
 
           {/* After Card */}
-          <div className="apple-comparison-card apple-comparison-after">
-            <div className="apple-comparison-header">
-              <div className="apple-comparison-badge apple-comparison-badge-after">
-                <Check className="apple-comparison-badge-icon" />
-                <span>構造化後</span>
+          <div className="relative bg-white rounded-3xl border-2 border-green-200 p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="absolute -top-4 left-8">
+              <div className="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full border border-green-200">
+                <Check className="h-4 w-4" />
+                <span className="font-semibold">構造化後</span>
               </div>
             </div>
             
-            <div className="apple-comparison-content">
-              <div className="apple-comparison-structured">
-                <div className="apple-comparison-structured-item apple-comparison-primary">
-                  <div><strong>対象業界:</strong> 製造業・小売業・サービス業</div>
-                  <div><strong>主力サービス:</strong> ECサイト構築・在庫管理システム</div>
+            <div className="mt-8 space-y-4">
+              <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+                <div className="space-y-2">
+                  <div><strong className="text-green-800">対象業界:</strong> 製造業・小売業・サービス業</div>
+                  <div><strong className="text-green-800">主力サービス:</strong> ECサイト構築・在庫管理システム</div>
                 </div>
-                <div className="apple-comparison-structured-item apple-comparison-secondary">
-                  <div><strong>導入実績:</strong> 中小企業への豊富な導入経験</div>
-                  <div><strong>特徴:</strong> 短期間での効果実現を重視</div>
+              </div>
+              <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+                <div className="space-y-2">
+                  <div><strong className="text-green-800">導入実績:</strong> 中小企業への豊富な導入経験</div>
+                  <div><strong className="text-green-800">特徴:</strong> 短期間での効果実現を重視</div>
                 </div>
-                <div className="apple-comparison-structured-item apple-comparison-tertiary">
-                  <div><strong>差別化:</strong> ノーコード対応・24時間サポート</div>
-                  <div><strong>価格:</strong> 月額5万円〜・初期費用無料</div>
+              </div>
+              <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+                <div className="space-y-2">
+                  <div><strong className="text-green-800">差別化:</strong> ノーコード対応・24時間サポート</div>
+                  <div><strong className="text-green-800">価格:</strong> 月額5万円〜・初期費用無料</div>
                 </div>
               </div>
             </div>
             
-            <div className="apple-comparison-footer">
-              <Check className="apple-comparison-status-icon apple-comparison-success" />
-              <span className="apple-comparison-status-text">具体的でAIが理解しやすい</span>
+            <div className="mt-8 flex items-center gap-3 text-green-600">
+              <Check className="h-5 w-5" />
+              <span className="font-medium">具体的でAIが理解しやすい</span>
             </div>
             
             {/* 期待できる成果 */}
-            <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-              <h4 className="font-bold text-green-800 mb-2">期待できる成果</h4>
-              <ul className="text-sm text-green-700 space-y-1">
-                <li>• ChatGPT検索で上位表示</li>
-                <li>• Google AI Overviewで引用</li>
-                <li>• 商談・採用の問い合わせ増加</li>
-                <li>• メディア取材の機会拡大</li>
+            <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="h-5 w-5 text-green-600" />
+                <h4 className="font-bold text-green-800">期待できる成果</h4>
+              </div>
+              <ul className="space-y-2 text-sm text-green-700">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  ChatGPT検索で上位表示
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  Google AI Overviewで引用
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  商談・採用の問い合わせ増加
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  メディア取材の機会拡大
+                </li>
               </ul>
             </div>
           </div>
