@@ -46,6 +46,7 @@ export default function SecurityDashboard() {
   const [loading, setLoading] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [activeTab, setActiveTab] = useState('incidents');
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -179,12 +180,12 @@ export default function SecurityDashboard() {
     return priorities[risk as keyof typeof priorities] || 0;
   };
 
-  const getRiskColor = (risk: string): string => {
+  const getRiskColor = (risk: string) => {
     const colors = {
-      critical: 'destructive',
-      high: 'destructive',
-      medium: 'secondary',
-      low: 'outline'
+      critical: 'destructive' as const,
+      high: 'destructive' as const,
+      medium: 'secondary' as const,
+      low: 'outline' as const
     };
     return colors[risk as keyof typeof colors] || 'outline';
   };
@@ -275,7 +276,7 @@ export default function SecurityDashboard() {
       </div>
 
       {/* Detailed Views */}
-      <Tabs defaultValue="incidents" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="incidents">Security Incidents</TabsTrigger>
           <TabsTrigger value="attackers">Top Attackers</TabsTrigger>
@@ -293,7 +294,7 @@ export default function SecurityDashboard() {
                 {metrics?.recentIncidents.map((incident) => (
                   <div key={incident.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <Badge variant={getRiskColor(incident.risk_level) as any}>
+                      <Badge variant={getRiskColor(incident.risk_level)}>
                         {incident.risk_level}
                       </Badge>
                       <div>
@@ -335,7 +336,7 @@ export default function SecurityDashboard() {
                         <p className="text-sm text-gray-600">{attacker.count} incidents</p>
                       </div>
                     </div>
-                    <Badge variant={getRiskColor(attacker.risk) as any}>
+                    <Badge variant={getRiskColor(attacker.risk)}>
                       {attacker.risk}
                     </Badge>
                   </div>
@@ -378,7 +379,7 @@ export default function SecurityDashboard() {
                     <div key={index} className="p-3 border rounded-lg">
                       <div className="flex items-center justify-between">
                         <p className="font-medium">{anomaly.type.replace(/_/g, ' ')}</p>
-                        <Badge variant={getRiskColor(anomaly.severity) as any}>
+                        <Badge variant={getRiskColor(anomaly.severity)}>
                           {anomaly.severity}
                         </Badge>
                       </div>
