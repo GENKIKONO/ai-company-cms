@@ -709,7 +709,7 @@ export default function UsersManagementPage() {
                         <HIGButton
                           onClick={() => setShowPlanModal(true)}
                           variant="primary"
-                          size="small"
+                          size="sm"
                           className="flex items-center"
                         >
                           <Edit className="h-3 w-3 mr-1" />
@@ -1193,7 +1193,7 @@ function PlanChangeForm({ onSubmit, onCancel, loading, currentPlan }: {
           type="submit"
           disabled={loading || !formData.override_reason.trim()}
           variant="primary"
-          size="medium"
+          size="md"
           className="flex-1 flex items-center justify-center"
         >
           {loading ? (
@@ -1461,7 +1461,7 @@ function ProxyCreateForm({ type, onSubmit, onCancel, loading }: {
           type="submit"
           disabled={loading}
           variant="primary"
-          size="medium"
+          size="md"
           className="flex-1 flex items-center justify-center"
         >
           {loading ? (

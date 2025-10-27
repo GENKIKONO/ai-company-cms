@@ -454,7 +454,7 @@ export default function NewServicePage() {
                 type="submit"
                 disabled={submitting}
                 variant="primary"
-                size="medium"
+                size="md"
               >
                 {submitting ? '作成中...' : 'サービスを作成'}
               </HIGButton>

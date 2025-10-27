@@ -312,7 +312,7 @@ export default function NewCaseStudyPage() {
                     type="button"
                     onClick={addTag}
                     variant="primary"
-                    size="small"
+                    size="sm"
                   >
                     追加
                   </HIGButton>
@@ -363,7 +363,7 @@ export default function NewCaseStudyPage() {
                 type="submit"
                 disabled={submitting}
                 variant="primary"
-                size="medium"
+                size="md"
               >
                 {submitting ? '作成中...' : 'ケーススタディを作成'}
               </HIGButton>

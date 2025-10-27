@@ -62,7 +62,7 @@ export default async function EmbedDashboardPage() {
             管理アクション
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <HIGButton variant="primary" size="medium">
+            <HIGButton variant="primary" size="md">
               埋め込み設定をエクスポート
             </HIGButton>
             <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">

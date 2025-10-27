@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
 
-    logger.debug('[my/organization] user =', user?.id || null, 'error =', authError?.message || null);
+    logger.debug(`[my/organization] user = ${user?.id || null}, error = ${authError?.message || null}`);
 
     if (authError || !user) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
 
-    logger.debug('[my/organization] user =', user?.id || null, 'error =', authError?.message || null);
+    logger.debug(`[my/organization] user = ${user?.id || null}, error = ${authError?.message || null}`);
     logger.debug('[my/organization] user details =', {
       id: user?.id,
       email: user?.email,

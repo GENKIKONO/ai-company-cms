@@ -13,7 +13,7 @@ export function useToast() {
 
   const toast = useCallback((props: ToastProps) => {
     // Simple console-based toast for now
-    logger.debug('Debug', `[TOAST ${props.variant || 'default'}] ${props.title}`, props.description || '');
+    logger.debug(`[TOAST ${props.variant || 'default'}] ${props.title}: ${props.description || ''}`);
     
     // Add alert for immediate feedback
     if (props.variant === 'destructive') {

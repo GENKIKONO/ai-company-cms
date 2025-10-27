@@ -4,7 +4,7 @@
  */
 
 import { WebVitalsData } from '../performance';
-import { logger } from '@/lib/utils/logger';
+import { logger as utilLogger } from '@/lib/utils/logger';
 
 // ログレベル定義
 export enum LogLevel {
@@ -113,8 +113,8 @@ export class ExternalLogTransport implements LogTransport {
       });
     } catch (error) {
       // フォールバック: コンソールに出力
-      logger.error('Failed to send log to external service', error instanceof Error ? error : new Error(String(error)));
-      logger.error('Original log entry:', entry);
+      utilLogger.error('Failed to send log to external service', error instanceof Error ? error : new Error(String(error)));
+      utilLogger.error('Original log entry:', entry);
     }
   }
 }

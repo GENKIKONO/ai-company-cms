@@ -301,7 +301,7 @@ export default function NewFAQPage() {
                 type="submit"
                 disabled={submitting}
                 variant="primary"
-                size="medium"
+                size="md"
               >
                 {submitting ? '作成中...' : 'FAQを作成'}
               </HIGButton>

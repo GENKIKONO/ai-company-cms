@@ -542,7 +542,7 @@ export default function AdminHearingsPage() {
                     <HIGButton
                       onClick={() => handleOpenModal(request)}
                       variant="primary"
-                      size="small"
+                      size="sm"
                     >
                       詳細・編集
                     </HIGButton>
@@ -708,7 +708,7 @@ export default function AdminHearingsPage() {
                           onClick={handleCreateContent}
                           disabled={isCreatingContent || !interviewSummary.trim()}
                           variant="primary"
-                          size="medium"
+                          size="md"
                           className="w-full"
                         >
                           {isCreatingContent ? (

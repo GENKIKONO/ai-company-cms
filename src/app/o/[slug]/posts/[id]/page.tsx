@@ -296,7 +296,6 @@ export default async function PostPage({
             <PrimaryCTA
               href={`/o/${post.organization.slug}`}
               size="medium"
-              icon="arrow-right"
             >
               {post.organization.name} の他の記事を見る
             </PrimaryCTA>

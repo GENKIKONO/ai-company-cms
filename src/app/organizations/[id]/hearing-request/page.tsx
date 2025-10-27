@@ -113,7 +113,6 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
           <PrimaryCTA
             href="/dashboard"
             size="large"
-            icon="arrow-left"
           >
             ダッシュボードに戻る
           </PrimaryCTA>
@@ -229,7 +228,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
                 type="submit"
                 disabled={isSubmitting}
                 variant="primary"
-                size="large"
+                size="lg"
                 className="flex-1"
               >
                 {isSubmitting ? '送信中...' : 'ヒアリング依頼を送信'}

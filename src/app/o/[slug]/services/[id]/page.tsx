@@ -246,15 +246,14 @@ export default async function ServiceDetailPage({
                   </div>
                 ) : (
                   <div className="text-center">
-                    <PrimaryCTA 
+                    <a
                       href={service.video_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      size="large"
-                      icon="play"
+                      className="inline-flex items-center justify-center rounded-md text-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8 py-3"
                     >
                       動画を見る
-                    </PrimaryCTA>
+                    </a>
                   </div>
                 )}
               </div>
@@ -287,7 +286,6 @@ export default async function ServiceDetailPage({
                 <PrimaryCTA 
                   href={`mailto:${organization.email}?subject=${encodeURIComponent(`${service.name}について`)}`}
                   size="large"
-                  icon="mail"
                 >
                   メールでお問い合わせ
                 </PrimaryCTA>
@@ -321,7 +319,6 @@ export default async function ServiceDetailPage({
             <PrimaryCTA 
               href={`/o/${organization.slug}`}
               size="medium"
-              icon="arrow-right"
             >
               {organization.name} トップページへ
             </PrimaryCTA>

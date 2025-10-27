@@ -131,8 +131,7 @@ export default function MonitorPage() {
               <HIGButton
                 onClick={fetchMonitorData}
                 variant="primary"
-                size="medium"
-                icon="refresh"
+                size="md"
               >
                 更新
               </HIGButton>

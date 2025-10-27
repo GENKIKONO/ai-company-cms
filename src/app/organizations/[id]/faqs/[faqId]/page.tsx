@@ -408,7 +408,7 @@ export default function EditFAQPage() {
                 type="submit"
                 disabled={submitting}
                 variant="primary"
-                size="medium"
+                size="md"
               >
                 {submitting ? '保存中...' : '変更を保存'}
               </HIGButton>

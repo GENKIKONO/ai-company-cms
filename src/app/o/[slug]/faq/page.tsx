@@ -244,7 +244,6 @@ export default async function FAQPage({
                       <PrimaryCTA 
                         href={`mailto:${organization.email}?subject=${encodeURIComponent('お問い合わせ')}`}
                         size="small"
-                        icon="mail"
                       >
                         メールでお問い合わせ
                       </PrimaryCTA>
@@ -281,7 +280,6 @@ export default async function FAQPage({
                     <PrimaryCTA 
                       href={`mailto:${organization.email}?subject=${encodeURIComponent('お問い合わせ')}`}
                       size="small"
-                      icon="mail"
                     >
                       メールでお問い合わせ
                     </PrimaryCTA>

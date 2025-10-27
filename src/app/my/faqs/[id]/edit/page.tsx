@@ -378,7 +378,7 @@ export default function EditFAQPage() {
                 type="submit"
                 disabled={submitting}
                 variant="primary"
-                size="medium"
+                size="md"
               >
                 {submitting ? '更新中...' : 'FAQを更新'}
               </HIGButton>

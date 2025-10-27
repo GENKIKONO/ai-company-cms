@@ -311,7 +311,7 @@ export default function EmbedPage() {
               <HIGButton
                 onClick={copyToClipboard}
                 variant="primary"
-                size="small"
+                size="sm"
               >
                 コードをコピー
               </HIGButton>

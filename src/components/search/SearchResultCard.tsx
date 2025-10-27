@@ -65,10 +65,9 @@ export default function SearchResultCard(props: SearchResultCardProps) {
               <LogoImage
                 src={org.logo_url}
                 alt={`${org.name} logo`}
-                width={80}
-                height={80}
+                size="lg"
+                organizationName={org.name}
                 className="w-20 h-20 object-contain bg-slate-50  rounded-lg border border-slate-200 "
-                onError={() => setImageError(true)}
               />
             ) : (
               <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200  rounded-lg flex items-center justify-center">

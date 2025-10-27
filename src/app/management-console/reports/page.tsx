@@ -312,7 +312,7 @@ export default function AdminReportsPage() {
                       onClick={() => updateReportStatus(selectedReport.id, 'reviewing')}
                       disabled={updating || selectedReport.status === 'reviewing'}
                       variant="primary"
-                      size="small"
+                      size="sm"
                     >
                       確認中にする
                     </HIGButton>

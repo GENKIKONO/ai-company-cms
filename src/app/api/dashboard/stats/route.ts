@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { hasEntitlement } from '@/lib/feature-flags/gate';
-import { vLog } from '@/lib/utils/logger';
+import { logger } from '@/lib/utils/logger';
 
 interface TableCount {
   count: number | null;
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
         if (error) {
           // Postgres error 42P01 = relation does not exist
           if (error.code === '42P01') {
-            vLog(`Table ${table} does not exist, marking as missing`);
+            logger.debug(`Table ${table} does not exist, marking as missing`);
             counts[table as keyof typeof counts] = { count: null, missing: true };
             missingTables.push(table);
           } else {
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
             throw error;
           }
         } else {
-          vLog(`Dashboard stats for ${table}: ${count} items`);
+          logger.debug(`Dashboard stats for ${table}: ${count} items`);
           counts[table as keyof typeof counts] = { count: count || 0, missing: false };
         }
       } catch (err) {
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
     const hasMonitoringAccess = await hasEntitlement(orgId, 'monitoring');
     
     if (!hasMonitoringAccess) {
-      vLog(`[Gate][API] monitoring disabled for org:${orgId}`);
+      logger.debug(`[Gate][API] monitoring disabled for org:${orgId}`);
       analytics = {
         pageViews: 0,
         avgDurationSec: 0,
@@ -170,7 +170,7 @@ export async function GET(request: NextRequest) {
         }
       } catch (analyticsError) {
         // 解析テーブルが存在しない場合も正常として扱う
-        vLog('Analytics table not found or no data, using defaults');
+        logger.debug('Analytics table not found or no data, using defaults');
       }
     }
 

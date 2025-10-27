@@ -133,7 +133,7 @@ export default function DiagnosticsPage() {
               onClick={runDiagnostics}
               disabled={loading}
               variant="primary"
-              size="medium"
+              size="md"
             >
               {loading ? '診断中...' : '診断実行'}
             </HIGButton>

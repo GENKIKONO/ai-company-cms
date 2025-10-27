@@ -93,7 +93,7 @@ export default function I18nSafeAuthHeader({
     
     // 認証状態変更のリスナー
     const { data: { subscription } } = supabaseBrowser.auth.onAuthStateChange((event, session) => {
-      logger.debug('[I18nSafeAuthHeader] Auth state changed', event, !!session);
+      logger.debug(`[I18nSafeAuthHeader] Auth state changed: ${event}, session: ${!!session}`);
       if (mounted) {
         setActualAuthState(!!session);
       }

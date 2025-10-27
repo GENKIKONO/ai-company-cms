@@ -380,7 +380,7 @@ export default function EditServicePage() {
             type="submit"
             disabled={saving}
             variant="primary"
-            size="medium"
+            size="md"
           >
             {saving ? '更新中...' : '更新'}
           </HIGButton>

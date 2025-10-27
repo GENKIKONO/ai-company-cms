@@ -267,7 +267,7 @@ export default function BillingPage() {
               onClick={handleSubscribe}
               disabled={actionLoading}
               variant="primary"
-              size="large"
+              size="lg"
             >
               {actionLoading ? '処理中...' : 'Starterプランで購読 (¥2,980/月)'}
             </HIGButton>

@@ -147,7 +147,7 @@ export default function ContactsPage() {
             <HIGButton 
               onClick={fetchContacts}
               variant="primary"
-              size="medium"
+              size="md"
             >
               更新
             </HIGButton>
@@ -307,7 +307,7 @@ export default function ContactsPage() {
                         onClick={sendReply}
                         disabled={!replyMessage.trim() || replying}
                         variant="primary"
-                        size="medium"
+                        size="md"
                       >
                         {replying ? '送信中...' : '返信'}
                       </HIGButton>

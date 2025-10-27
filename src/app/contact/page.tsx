@@ -184,7 +184,7 @@ export default function ContactPage() {
                 type="submit"
                 disabled={isSubmitting}
                 variant="primary"
-                size="large"
+                size="lg"
                 className="w-full"
               >
                 {isSubmitting ? '送信中...' : '送信する'}

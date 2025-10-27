@@ -836,7 +836,7 @@ export default function EditOrganizationPage() {
                   onClick={handleDetectLocation}
                   disabled={geocoding || !getFullAddress()}
                   variant="primary"
-                  size="medium"
+                  size="md"
                   aria-label="住所から位置を検出"
                   className="flex items-center gap-2 whitespace-nowrap"
                 >
@@ -1131,7 +1131,7 @@ export default function EditOrganizationPage() {
                   type="submit"
                   disabled={submitting}
                   variant="primary"
-                  size="medium"
+                  size="md"
                 >
                   {submitting ? '保存中...' : '変更を保存'}
                 </HIGButton>

@@ -3,7 +3,7 @@
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { User } from '@supabase/supabase-js';
 import { type AppUser, type UserRole } from '@/types/database';
-import { authLogger } from '@/lib/utils/logger';
+import { authLogger, logger } from '@/lib/utils/logger';
 
 // ユーザーの権限をチェック
 export function hasPermission(userRole: UserRole, requiredRole: UserRole): boolean {
@@ -105,7 +105,7 @@ export const auth = {
   // サインアウト - 完全なセッション クリア
   signOut: async () => {
     try {
-      authLogger.info('Starting complete sign out process');
+      logger.info('Starting complete sign out process');
       
       // 1. Supabase クライアント サインアウト
       const { error: signOutError } = await supabaseBrowser.auth.signOut();
@@ -140,7 +140,7 @@ export const auth = {
         });
       }
       
-      authLogger.info('Complete sign out finished');
+      logger.info('Complete sign out finished');
       
       if (signOutError) throw signOutError;
     } catch (error) {

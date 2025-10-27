@@ -162,7 +162,7 @@ export default function PricingPlans({
                 key={plan.id}
                 className={`
                   card relative max-h-[480px] overflow-hidden shadow-sm border border-slate-200 bg-white transition-all duration-200
-                  hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
+                  hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500 scroll-snap-center
                   ${plan.popular 
                     ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-indigo-50' 
                     : 'hover:border-gray-300'
@@ -171,7 +171,6 @@ export default function PricingPlans({
                 role="tabpanel"
                 aria-labelledby={`plan-${plan.id}-title`}
                 tabIndex={index}
-className="scroll-snap-center"
               >
                 {plan.badge && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
@@ -264,8 +263,7 @@ className="scroll-snap-center"
                 <div className="mt-auto">
                   <Link
                     href={plan.ctaHref}
-                    className="btn-apple btn-apple-primary w-full text-center py-4 px-6 text-lg font-semibold transform hover:scale-105 transition-transform"
-                    className="btn-lg"
+                    className="btn-apple btn-apple-primary btn-lg w-full text-center py-4 px-6 text-lg font-semibold transform hover:scale-105 transition-transform"
                     role="button"
                     aria-label={`${plan.name}プランを選択`}
                   >

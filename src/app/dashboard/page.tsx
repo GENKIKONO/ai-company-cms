@@ -92,7 +92,7 @@ export default async function DashboardPage() {
     }
 
     // 4. 組織あり → ダッシュボードUI
-    logger.debug('[Dashboard] Rendering dashboard UI for user', user.id, 'org:', org.id);
+    logger.debug(`[Dashboard] Rendering dashboard UI for user ${user.id}, org: ${org.id}`);
 
 
   return (

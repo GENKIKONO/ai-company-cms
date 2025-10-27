@@ -263,7 +263,7 @@ export default function NewServicePage() {
             type="submit"
             disabled={loading}
             variant="primary"
-            size="medium"
+            size="md"
           >
             {loading ? '作成中...' : '作成'}
           </HIGButton>

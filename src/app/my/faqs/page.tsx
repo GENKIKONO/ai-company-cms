@@ -119,7 +119,6 @@ export default function MyFAQsPage() {
           <PrimaryCTA
             href="/my/faqs/new"
             size="medium"
-            icon="plus"
           >
             新しいFAQを追加
           </PrimaryCTA>

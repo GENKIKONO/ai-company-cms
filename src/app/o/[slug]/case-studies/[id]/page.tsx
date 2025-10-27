@@ -305,7 +305,6 @@ export default async function CaseStudyDetailPage({
                 <PrimaryCTA 
                   href={`mailto:${organization.email}?subject=${encodeURIComponent(`「${caseStudy.title}」類似案件について`)}`}
                   size="large"
-                  icon="mail"
                 >
                   メールでお問い合わせ
                 </PrimaryCTA>
@@ -339,7 +338,6 @@ export default async function CaseStudyDetailPage({
             <PrimaryCTA 
               href={`/o/${organization.slug}`}
               size="medium"
-              icon="arrow-right"
             >
               {organization.name} トップページへ
             </PrimaryCTA>

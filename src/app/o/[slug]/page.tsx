@@ -377,16 +377,14 @@ export default async function OrganizationDetailPage({
                 
                 <div className="flex flex-col gap-3">
                   {organization.url && (
-                    <PrimaryCTA
+                    <a
                       href={organization.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      size="large"
-                      icon="external-link"
-                      className="text-center btn-nowrap"
+                      className="inline-flex items-center justify-center rounded-md text-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8 py-3 text-center btn-nowrap"
                     >
                       公式サイトを開く
-                    </PrimaryCTA>
+                    </a>
                   )}
                   
                   {/* 通報ボタン */}
