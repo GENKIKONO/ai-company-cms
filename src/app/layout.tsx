@@ -3,8 +3,7 @@ import '@/design-system' // 新しいデザインシステム読み込み
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 import Footer from '@/components/layout/Footer'
 import { ToastProvider } from '@/components/ui/toast'
-import { MenuProvider } from '@/components/ui/MenuProvider'
-import FAB from '@/components/ui/FAB'
+import { FloatingHamburger } from '@/components/ui/FloatingHamburger'
 import BuildBanner from '@/components/BuildBanner'
 import { env } from '@/lib/env'
 // WebVitalsReporter removed for production optimization
@@ -51,7 +50,6 @@ export default function RootLayout({
       <body>
         <I18nProvider initialLocale="ja">
           <ToastProvider>
-            <MenuProvider>
               {/* Skip to main content link for accessibility */}
               <a href="#main-content" className="skip-link">
                 メインコンテンツにスキップ
@@ -68,9 +66,8 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
-              <FAB />
+              <FloatingHamburger />
               {/* WebVitalsReporter removed for production optimization */}
-            </MenuProvider>
           </ToastProvider>
         </I18nProvider>
       </body>

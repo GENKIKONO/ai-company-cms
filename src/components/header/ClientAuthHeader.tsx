@@ -1,6 +1,5 @@
 'use client';
 import Link from 'next/link';
-import MobileMenu from './MobileMenu';
 import { useMemo, useEffect, useState, useRef } from 'react';
 import { User } from '@supabase/supabase-js';
 
@@ -194,16 +193,6 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
               </>
             )}
 
-            {/* モバイルメニュー */}
-            <MobileMenu 
-              links={links}
-              auth={{ 
-                loggedIn: isAuthenticated, 
-                loginHref: '/auth/login', 
-                logoutHref: '/auth/signout',
-                dashboardHref: '/dashboard'
-              }} 
-            />
           </div>
         </div>
       </div>

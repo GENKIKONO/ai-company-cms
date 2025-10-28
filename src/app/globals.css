@@ -185,3 +185,78 @@ To modify existing styles:
 - Avoid adding styles to this global file unless absolutely necessary
 
 */
+
+/* ============================================================
+   Floating Hamburger Menu - GPT Recommended Implementation
+   ============================================================ */
+
+:root {
+  --fh-size: 56px;
+  --fh-bg: var(--bg-primary, #2463ff);
+  --fh-fg: #fff;
+  --fh-shadow: 0 8px 24px rgba(0,0,0,.18);
+  --fh-bottom: calc(20px + env(safe-area-inset-bottom));
+  --fh-right: 18px; /* やや左上指定に合わせた内側オフセット */
+}
+
+.fh-btn{
+  position: fixed;
+  bottom: var(--fh-bottom);
+  right: var(--fh-right);
+  width: var(--fh-size);
+  height: var(--fh-size);
+  border: 0;
+  border-radius: 9999px;
+  background: var(--fh-bg);
+  color: var(--fh-fg);
+  box-shadow: var(--fh-shadow);
+  display: none;            /* PCで非表示 */
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.fh-btn:active { transform: scale(.96); }
+
+@media (max-width: 768px){
+  .fh-btn{ display: flex; }
+}
+
+/* ハンバーガーアイコン（純CSS） */
+.fh-icon, .fh-icon::before, .fh-icon::after{
+  display:block;
+  width: 22px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  position: relative;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.fh-icon::before, .fh-icon::after{
+  content:"";
+  position:absolute;
+  left:0;
+}
+.fh-icon::before{ top:-7px; }
+.fh-icon::after{ top:7px; }
+.fh-icon.is-open{ background: transparent; }
+.fh-icon.is-open::before{ transform: translateY(7px) rotate(45deg); }
+.fh-icon.is-open::after{ transform: translateY(-7px) rotate(-45deg); }
+
+/* ドロワー（右からスライド） */
+.fh-drawer{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.25);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 998;
+}
+.fh-drawer.open{ opacity: 1; pointer-events: auto; }
+.fh-panel{
+  position: absolute; top: 0; right: 0; height: 100%; width: min(84vw, 360px);
+  background: #fff; box-shadow: -8px 0 24px rgba(0,0,0,.12);
+  transform: translateX(100%); transition: transform .25s ease;
+  padding: 0;
+}
+.fh-drawer.open .fh-panel{ transform: translateX(0); }
