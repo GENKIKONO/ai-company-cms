@@ -45,17 +45,22 @@ export function MobileNav() {
       {/* Hamburger Button - Viewport based positioning */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'ナビゲーションを閉じる' : 'ナビゲーションを開く'}
+        aria-expanded={isOpen}
+        aria-controls="mobile-navigation"
+        role="button"
+        tabIndex={0}
         style={{
           position: 'fixed',
           bottom: '24px',
           right: '24px',
-          zIndex: 9999,
+          zIndex: 'var(--z-index-popover)',
           width: '56px',
           height: '56px',
-          backgroundColor: '#2563eb',
-          color: 'white',
+          backgroundColor: 'var(--bg-primary)',
+          color: 'var(--text-on-primary)',
           borderRadius: '50%',
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+          boxShadow: 'var(--shadow-lg)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -64,8 +69,8 @@ export function MobileNav() {
           cursor: 'pointer',
           transition: 'background-color 0.2s'
         }}
-        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#1d4ed8'}
-        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#2563eb'}
+        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'var(--bg-primary-hover)'}
+        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'var(--bg-primary)'}
       >
         {isOpen ? '×' : '☰'}
       </button>
@@ -83,21 +88,24 @@ export function MobileNav() {
               width: '100vw',
               height: '100vh',
               backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              zIndex: 9998
+              zIndex: 'var(--z-index-modal)'
             }}
           />
           
           {/* Side Navigation - Slides from viewport right */}
           <nav 
+            id="mobile-navigation"
+            role="navigation"
+            aria-label="モバイルナビゲーション"
             style={{
               position: 'fixed',
               top: 0,
               right: 0,
               width: '320px',
               height: '100vh',
-              backgroundColor: 'white',
-              boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)',
-              zIndex: 9998,
+              backgroundColor: 'var(--bg-white)',
+              boxShadow: 'var(--shadow-xl)',
+              zIndex: 'var(--z-index-modal)',
               transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
               transition: 'transform 300ms ease-in-out'
             }}

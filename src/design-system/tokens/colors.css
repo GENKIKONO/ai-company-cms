@@ -76,6 +76,19 @@
   --shadow-black: 0, 0, 0;
   --shadow-white: 255, 255, 255;
   
+  /* Shadow CSS values */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  /* Z-index scale */
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal: 9998;
+  --z-index-popover: 9999;
+  
   /* Additional utility colors found in codebase */
   --color-blue-500: #3b82f6;
   --color-purple-500: #8b5cf6;
