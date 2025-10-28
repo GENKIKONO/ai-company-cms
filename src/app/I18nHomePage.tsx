@@ -19,6 +19,7 @@ import {
   InfoIcon,
   AlertTriangleIcon 
 } from '@/components/icons/HIGIcons';
+import { MobileNav } from '@/features/navigation';
 import { LockIcon, SaveIcon, ShieldIcon, ChartUpIcon } from '@/components/icons/SecurityIcons';
 import SectionMedia, { HeroMedia, FeatureMedia, IconMedia } from '@/components/media/SectionMedia';
 
@@ -582,6 +583,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
         </div>
       </section>
+
+      {/* Mobile Navigation */}
+      <MobileNav />
     </div>
   );
 }
