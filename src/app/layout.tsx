@@ -7,6 +7,7 @@ import BuildBanner from '@/components/BuildBanner'
 import { env } from '@/lib/env'
 // WebVitalsReporter removed for production optimization
 import { I18nProvider } from '@/components/layout/I18nProvider'
+import { MobileNav } from '@/components/MobileNav'
 
 // SSRで常に正しい認証UIが出るように
 export const dynamic = 'force-dynamic';
@@ -68,6 +69,8 @@ export default function RootLayout({
             {/* WebVitalsReporter removed for production optimization */}
           </ToastProvider>
         </I18nProvider>
+        {/* Mobile Navigation - Outside containment context */}
+        <MobileNav />
       </body>
     </html>
   )
