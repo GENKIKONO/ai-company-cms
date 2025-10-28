@@ -5,22 +5,22 @@ import Link from 'next/link';
 
 export default function CTASection() {
   return (
-    <section className="relative section-spacing-large overflow-hidden bg-slate-900">
+    <section className="relative section-spacing-large overflow-hidden bg-white">
       {/* 背景装飾 - more subtle */}
       
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center">
           {/* メインメッセージ */}
-          <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+          <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             まずは情報を
             <br />
-            <span className="text-blue-200">
+            <span className="text-blue-600">
               "構造化"
             </span>
             するところから。
           </h2>
           
-          <p className="text-2xl mb-12 opacity-90 leading-relaxed">
+          <p className="text-2xl mb-12 text-gray-700 leading-relaxed">
             14日間の無料体験で効果を実感
           </p>
 
@@ -62,49 +62,49 @@ export default function CTASection() {
             <Link
               href="/contact"
               aria-label="専門ヒアリング相談"
-              className="inline-flex items-center justify-center font-bold text-xl px-10 py-5 bg-white/10 backdrop-blur-sm border-2 border-white/30 hover:bg-white/20 hover:border-white/50 text-white rounded-2xl transition-all duration-300"
+              className="inline-flex items-center justify-center font-bold text-xl px-10 py-5 bg-gray-100 border-2 border-gray-300 hover:bg-gray-200 hover:border-gray-400 text-gray-900 rounded-2xl transition-all duration-300"
             >
               専門ヒアリング相談
             </Link>
           </div>
 
           {/* 申込みステップ */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 max-w-5xl mx-auto">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-10 text-center">申し込みは3ステップで完了</h3>
+          <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200 max-w-5xl mx-auto">
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-10 text-center">申し込みは3ステップで完了</h3>
             
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <span className="text-white font-bold text-xl">1</span>
                 </div>
-                <h4 className="text-white font-bold text-lg mb-3">プラン選択</h4>
-                <p className="text-white/80 leading-relaxed">シングルまたは継続プランを選択</p>
+                <h4 className="text-gray-900 font-bold text-lg mb-3">プラン選択</h4>
+                <p className="text-gray-700 leading-relaxed">シングルまたは継続プランを選択</p>
               </div>
               
               <div className="text-center">
                 <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <span className="text-white font-bold text-xl">2</span>
                 </div>
-                <h4 className="text-white font-bold text-lg mb-3">基本情報入力</h4>
-                <p className="text-white/80 leading-relaxed">会社概要とヒアリング希望日程</p>
+                <h4 className="text-gray-900 font-bold text-lg mb-3">基本情報入力</h4>
+                <p className="text-gray-700 leading-relaxed">会社概要とヒアリング希望日程</p>
               </div>
               
               <div className="text-center">
                 <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <span className="text-white font-bold text-xl">3</span>
                 </div>
-                <h4 className="text-white font-bold text-lg mb-3">日程確定</h4>
-                <p className="text-white/80 leading-relaxed">担当者から連絡・ヒアリング実施</p>
+                <h4 className="text-gray-900 font-bold text-lg mb-3">日程確定</h4>
+                <p className="text-gray-700 leading-relaxed">担当者から連絡・ヒアリング実施</p>
               </div>
             </div>
           </div>
 
           {/* 追加情報 */}
           <div className="mt-12 text-center">
-            <p className="text-lg text-white/90 mb-4">
+            <p className="text-lg text-green-700 mb-4">
               ✓ 初回相談無料　✓ 契約前のお見積もり無料　✓ オンライン対応可能
             </p>
-            <p className="text-white/70">
+            <p className="text-gray-600">
               ※ お申し込み後、担当者より24時間以内にご連絡いたします
             </p>
           </div>
