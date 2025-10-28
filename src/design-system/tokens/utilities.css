@@ -554,15 +554,7 @@
   font-size: 18px;
 }
 
-/* FAB Positioning Utilities */
-.fab-position {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  z-index: 1000;
-  min-height: 56px;
-  min-width: 56px;
-}
+/* FAB Positioning Utilities - DEPRECATED: Use Tailwind classes directly */
 
 /* Layout Debug Utilities */
 .debug-overlay {

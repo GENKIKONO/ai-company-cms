@@ -58,9 +58,12 @@ export default function FAB() {
       onClick={toggle}
       onKeyDown={handleKeyDown}
       className="
-        fab-position rounded-full
-        w-14 h-14 
-        text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] shadow-xl hover:shadow-2xl border-2 border-white
+        fixed z-[1000]
+        top-4 left-4 md:top-6 md:left-6
+        w-12 h-12 md:w-14 md:h-14
+        text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] 
+        shadow-xl hover:shadow-2xl border-2 border-white
+        rounded-full
         active:scale-95
         grid place-items-center 
         will-change-transform
@@ -69,7 +72,7 @@ export default function FAB() {
         focus:ring-2 focus:ring-blue-300 focus:ring-offset-2
         leading-none
         select-none
-        block
+        lg:hidden
       "
     >
       <span className="sr-only">
