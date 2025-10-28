@@ -16,7 +16,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
   
   return (
     <div
-      className={`relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ${
+      className={`relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 min-h-[600px] flex flex-col ${
         plan.popular
           ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent scale-105'
           : ''
@@ -35,7 +35,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
         {/* アイコン */}
         <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
           plan.color === 'blue' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
-          plan.color === 'purple' ? 'bg-gradient-to-br from-purple-500 to-purple-600' :
+          plan.color === 'purple' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
           plan.color === 'gold' ? 'bg-gradient-to-br from-amber-500 to-amber-600' :
           'bg-gradient-to-br from-green-500 to-green-600'
         }`}>
@@ -83,11 +83,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
       <div className="text-center mt-auto">
         <Link
           href={generateContactUrl(planId)}
-          className={`inline-flex items-center justify-center w-full px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 ${
-            plan.popular 
-              ? 'bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1'
-              : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
-          }`}
+          className="inline-flex items-center justify-center w-full px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white border-none shadow-lg hover:shadow-xl transform hover:-translate-y-1"
         >
           {plan.ctaText}
         </Link>
@@ -106,7 +102,7 @@ export default function PricingSection() {
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             シンプルで
-            <span className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[var(--bg-primary)] to-blue-600 bg-clip-text text-transparent">
               透明な料金
             </span>
           </h2>

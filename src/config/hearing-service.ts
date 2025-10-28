@@ -41,7 +41,7 @@ export const HEARING_SERVICE_PLANS = {
     duration: '2.5〜3時間（分割可）',
     icon: Zap,
     popular: true,
-    color: 'purple',
+    color: 'blue',
     features: [
       'ライトヒアリングの全範囲を含む',
       '採用/PR/B2B向けQ&A拡充（テンプレ活用）',
@@ -65,7 +65,7 @@ export const HEARING_SERVICE_PLANS = {
     duration: '5〜6時間（複数回）',
     icon: Crown,
     popular: false,
-    color: 'gold',
+    color: 'blue',
     features: [
       'アドバンスヒアリングの全範囲を含む',
       '各カテゴリ（採用/B2B/CSR/ブランド）深掘りQ&A',
@@ -88,7 +88,7 @@ export const HEARING_SERVICE_PLANS = {
     duration: '月30〜60分',
     icon: RotateCcw,
     popular: false,
-    color: 'green',
+    color: 'blue',
     features: [
       '月30〜60分の定例ヒアリング',
       '情報更新代行（企業情報・サービス情報・Q&A等）',

@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function CTASection() {
   return (
-    <section className="relative section-spacing-large overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900">
+    <section className="relative section-spacing-large overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-blue-800">
       {/* 背景装飾 - more subtle */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.3),transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.3),transparent_50%)]" />
@@ -16,7 +16,7 @@ export default function CTASection() {
           <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
             まずは情報を
             <br />
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent">
               "構造化"
             </span>
             するところから。
@@ -50,7 +50,7 @@ export default function CTASection() {
             <Link
               href="/auth/signup"
               aria-label="今すぐヒアリングを申し込む"
-              className="inline-flex items-center justify-center font-semibold text-xl px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-[var(--bg-primary)] hover:to-purple-600 text-white rounded-2xl border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
+              className="inline-flex items-center justify-center font-semibold text-xl px-10 py-5 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white rounded-2xl border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
             >
               14日間無料で始める
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -70,7 +70,7 @@ export default function CTASection() {
             
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <span className="text-white font-bold text-xl">1</span>
                 </div>
                 <h4 className="text-white font-semibold text-lg mb-3">プラン選択</h4>
@@ -78,7 +78,7 @@ export default function CTASection() {
               </div>
               
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <span className="text-white font-bold text-xl">2</span>
                 </div>
                 <h4 className="text-white font-semibold text-lg mb-3">基本情報入力</h4>
