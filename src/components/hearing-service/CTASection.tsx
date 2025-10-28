@@ -14,7 +14,7 @@ export default function CTASection() {
           <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
             まずは情報を
             <br />
-            <span className="text-blue-400">
+            <span className="text-blue-200">
               "構造化"
             </span>
             するところから。
