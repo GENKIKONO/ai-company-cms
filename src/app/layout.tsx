@@ -7,6 +7,9 @@ import BuildBanner from '@/components/BuildBanner'
 import { env } from '@/lib/env'
 // WebVitalsReporter removed for production optimization
 import { I18nProvider } from '@/components/layout/I18nProvider'
+import { MobileNavProvider } from '@/components/mobile-nav/useMobileNav'
+import FloatingFab from '@/components/mobile-nav/FloatingFab'
+import SideOverlay from '@/components/mobile-nav/SideOverlay'
 
 // SSRで常に正しい認証UIが出るように
 export const dynamic = 'force-dynamic';
@@ -47,27 +50,32 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
-        <I18nProvider initialLocale="ja">
-          <ToastProvider>
-            {/* Skip to main content link for accessibility */}
-            <a href="#main-content" className="skip-link">
-              メインコンテンツにスキップ
-            </a>
-            {env.SHOW_BUILD_BANNER && (
-              <BuildBanner 
-                commit={process.env.VERCEL_GIT_COMMIT_SHA}
-                deployUrl={process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined}
-                environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
-              />
-            )}
-            <SafeAuthHeader />
-            <main id="main-content">
-              {children}
-            </main>
-            <Footer />
-            {/* WebVitalsReporter removed for production optimization */}
-          </ToastProvider>
-        </I18nProvider>
+        <MobileNavProvider>
+          <I18nProvider initialLocale="ja">
+            <ToastProvider>
+              {/* Skip to main content link for accessibility */}
+              <a href="#main-content" className="skip-link">
+                メインコンテンツにスキップ
+              </a>
+              {env.SHOW_BUILD_BANNER && (
+                <BuildBanner 
+                  commit={process.env.VERCEL_GIT_COMMIT_SHA}
+                  deployUrl={process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined}
+                  environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
+                />
+              )}
+              <SafeAuthHeader />
+              <main id="main-content">
+                {children}
+              </main>
+              <Footer />
+              {/* WebVitalsReporter removed for production optimization */}
+            </ToastProvider>
+          </I18nProvider>
+          {/* 全ページ共通で1回だけマウント */}
+          <FloatingFab />
+          <SideOverlay />
+        </MobileNavProvider>
       </body>
     </html>
   )
