@@ -136,7 +136,7 @@ export default function PricingSection() {
           <div className="bg-white rounded-3xl p-8 lg:p-12 max-w-4xl mx-auto shadow-xl border border-gray-100">
             <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">すべてのプランに14日間の満足保証が含まれています</h3>
             <p className="text-lg text-gray-600 mb-8">
-              お取り組み開始から約1年で、ChatGPT検索・AI要約での企業情報引用率を改善します。
+              お取り組みを通じて、ChatGPT検索・AI要約での企業情報の発見性向上を目指します。
             </p>
             <p className="text-sm text-gray-500">
               ✓ お見積もりは無料です　✓ お気軽にお問い合わせください　✓ 全国対応

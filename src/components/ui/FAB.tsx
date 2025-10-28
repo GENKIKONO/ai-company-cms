@@ -69,7 +69,7 @@ export default function FAB() {
         focus:ring-2 focus:ring-blue-300 focus:ring-offset-2
         leading-none
         select-none
-        md:hidden
+        block
       "
     >
       <span className="sr-only">

@@ -21,7 +21,7 @@ export default function CTASection() {
           </h2>
           
           <p className="text-2xl mb-12 text-gray-700 leading-relaxed">
-            14日間の無料体験で効果を実感
+            14日間の無料体験で機能をお試しください
           </p>
 
           {/* 特徴ポイント */}

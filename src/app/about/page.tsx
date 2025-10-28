@@ -198,7 +198,7 @@ export default function AboutPage() {
               今すぐ始めましょう
             </h2>
             <p className="text-xl mb-12 opacity-90">
-              14日間の無料体験で、AI最適化の効果を実感してください
+              14日間の無料体験で、AI最適化機能をお試しください
             </p>
             
             <Link href="/auth/signup">

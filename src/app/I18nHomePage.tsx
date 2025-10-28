@@ -75,7 +75,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     {
       icon: UserIcon,
       title: "AI検索対応",
-      description: "Google AI検索で確実に見つけられる企業プロフィール"
+      description: "Google AI検索での発見性を向上する企業プロフィール"
     },
     {
       icon: InfoIcon,
@@ -111,7 +111,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             {/* Subtitle */}
             <p className="text-xl lg:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto">
               企業情報を構造化し、検索やAI回答で
-              <span className="font-semibold text-gray-900">確実に見つかる</span>
+              <span className="font-semibold text-gray-900">発見性を向上</span>
               状態をつくるCMS。
             </p>
             
@@ -547,7 +547,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </h2>
           
           <p className="text-2xl mb-12 text-gray-700 leading-relaxed">
-            14日間の無料体験で効果を実感
+            14日間の無料体験でお試しください
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
