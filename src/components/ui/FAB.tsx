@@ -58,7 +58,7 @@ export default function FAB() {
       onClick={toggle}
       onKeyDown={handleKeyDown}
       className="
-        ui-fab fab-position
+        fab-position rounded-full
         w-14 h-14 
         text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] shadow-xl hover:shadow-2xl border-2 border-white
         active:scale-95

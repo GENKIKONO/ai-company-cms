@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { generateOrganizationPageJsonLd } from '@/lib/utils/jsonld';
-import { HIGButton } from '@/design-system';
 import { LogoImage } from '@/components/ui/optimized-image';
 import ReportButton from '@/components/common/ReportButton';
 import AddressDisplay from '@/components/address/AddressDisplay';

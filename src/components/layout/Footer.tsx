@@ -51,13 +51,13 @@ export default function Footer() {
                 <span className="apple-footer-brand-text">AIO Hub</span>
               </div>
               <p className="apple-footer-description">
-                AI時代の企業情報プラットフォーム
+                AI時代の<br className="sm:hidden" />企業情報プラットフォーム
               </p>
             </div>
 
             <div className="apple-footer-meta">
               <p className="apple-footer-copyright">
-                © 2024 LuxuCare株式会社. All rights reserved.
+                © 2024 LuxuCare株式会社.<br className="sm:hidden" />All rights reserved.
               </p>
               <div className="apple-footer-social">
                 <Link href="https://twitter.com/aiohub" className="apple-footer-social-link" aria-label="Twitter">
