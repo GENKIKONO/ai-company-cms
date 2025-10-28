@@ -394,21 +394,21 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="grid lg:grid-cols-2 gap-12 mb-20">
             {/* BEFORE */}
             <div className="group">
-              <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
+              <div className="bg-red-50 border-2 border-red-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center">
                     <AlertTriangleIcon className="w-8 h-8 text-white" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900">見つけてもらえない企業</h3>
-                    <p className="text-gray-600 font-medium">現在の状況</p>
+                    <p className="text-red-600 font-medium">現在の状況</p>
                   </div>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
+                <div className="bg-white border border-red-200 rounded-2xl p-6 mb-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">AI回答</div>
-                    <span className="text-gray-600 font-semibold">エラー</span>
+                    <div className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">AI回答</div>
+                    <span className="text-red-600 font-semibold">エラー</span>
                   </div>
                   <p className="text-gray-700 italic">
                     申し訳ございませんが、詳細な情報を見つけることができませんでした
@@ -417,11 +417,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-gray-600">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     企業情報が散在・非構造化
                   </div>
                   <div className="flex items-center gap-3 text-gray-600">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     AIが理解・引用できない形式
                   </div>
                 </div>
@@ -430,21 +430,21 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             {/* AFTER */}
             <div className="group">
-              <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
+              <div className="bg-green-50 border-2 border-green-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center">
                     <CheckCircleIcon className="w-8 h-8 text-white" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900">AIに理解される企業へ</h3>
-                    <p className="text-gray-600 font-medium">改善後</p>
+                    <p className="text-green-600 font-medium">改善後</p>
                   </div>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
+                <div className="bg-white border border-green-200 rounded-2xl p-6 mb-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">AI回答</div>
-                    <span className="text-gray-600 font-semibold">成功</span>
+                    <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">AI回答</div>
+                    <span className="text-green-600 font-semibold">成功</span>
                   </div>
                   <p className="text-gray-700">
                     <strong className="text-gray-900">[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
@@ -453,11 +453,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-gray-600">
-                    <CheckCircleIcon className="w-5 h-5 text-gray-500" />
+                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
                     構造化された企業情報
                   </div>
                   <div className="flex items-center gap-3 text-gray-600">
-                    <CheckCircleIcon className="w-5 h-5 text-gray-500" />
+                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
                     AI検索に最適化されたデータ
                   </div>
                 </div>

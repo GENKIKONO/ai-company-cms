@@ -17,7 +17,7 @@ export default function ClosingCTA() {
           </h2>
           
           <p className="text-xl text-blue-100 mb-12 max-w-3xl mx-auto leading-relaxed">
-            AI時代に対応した企業情報管理で、検索性・発見性を劇的に向上させましょう
+            AI時代に対応した企業情報管理で、検索性・発見性を大幅に向上させましょう
           </p>
 
           {/* メインCTAボタン */}
