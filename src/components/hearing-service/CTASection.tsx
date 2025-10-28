@@ -26,26 +26,26 @@ export default function CTASection() {
 
           {/* 特徴ポイント */}
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
-            <div className="bg-slate-800/90 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
               <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Clock className="w-6 h-6 text-white" />
               </div>
-              <div className="text-white font-bold text-lg mb-2">最短2週間</div>
-              <div className="text-gray-200">スピード対応</div>
+              <div className="text-gray-900 font-bold text-lg mb-2">最短2週間</div>
+              <div className="text-gray-800">スピード対応</div>
             </div>
-            <div className="bg-slate-800/90 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
               <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Calendar className="w-6 h-6 text-white" />
               </div>
-              <div className="text-white font-bold text-lg mb-2">予約制</div>
-              <div className="text-gray-200">確実な対応</div>
+              <div className="text-gray-900 font-bold text-lg mb-2">予約制</div>
+              <div className="text-gray-800">確実な対応</div>
             </div>
-            <div className="bg-slate-800/90 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
               <div className="w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Star className="w-6 h-6 text-white" />
               </div>
-              <div className="text-white font-bold text-lg mb-2">専門対応</div>
-              <div className="text-gray-200">AI最適化の専門家</div>
+              <div className="text-gray-900 font-bold text-lg mb-2">専門対応</div>
+              <div className="text-gray-800">AI最適化の専門家</div>
             </div>
           </div>
 
