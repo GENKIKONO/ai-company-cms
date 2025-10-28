@@ -21,7 +21,6 @@ import {
 } from '@/components/icons/HIGIcons';
 import { LockIcon, SaveIcon, ShieldIcon, ChartUpIcon } from '@/components/icons/SecurityIcons';
 import SectionMedia, { HeroMedia, FeatureMedia, IconMedia } from '@/components/media/SectionMedia';
-import { HIGButton } from '@/components/ui/HIGButton';
 
 interface SiteSettings {
   title: string;
@@ -134,24 +133,20 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row justify-center gap-6 mb-20">
-              <HIGButton
-                variant="primary"
-                size="xl"
-                onClick={() => {
-                  trackConversion();
-                  window.location.href = "/auth/signup";
-                }}
-                rightIcon={<ArrowRightIcon />}
+              <Link
+                href="/auth/signup"
+                onClick={() => trackConversion()}
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 14日間無料で始める
-              </HIGButton>
-              <HIGButton
-                variant="secondary"
-                size="xl"
-                onClick={() => window.location.href = "/contact"}
+                <ArrowRightIcon className="w-5 h-5" />
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center justify-center px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-xl border border-gray-300 transition-all duration-300"
               >
                 専門ヒアリング相談
-              </HIGButton>
+              </Link>
             </div>
 
           </div>
@@ -222,20 +217,18 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <HIGButton
-              variant="primary"
-              size="lg"
-              onClick={() => window.location.href = "/contact"}
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               今すぐヒアリング申込み
-            </HIGButton>
-            <HIGButton
-              variant="secondary"
-              size="lg"
-              onClick={() => window.location.href = "#pricing"}
+            </Link>
+            <Link
+              href="#pricing"
+              className="inline-flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-xl border border-gray-300 transition-all duration-300"
             >
               料金プランを見る
-            </HIGButton>
+            </Link>
           </div>
         </div>
       </section>
@@ -370,14 +363,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
           {/* CTA */}
           <div className="text-center mt-16">
-            <HIGButton
-              variant="primary"
-              size="lg"
-              onClick={() => window.location.href = "/auth/signup"}
-              rightIcon={<ArrowRightIcon />}
+            <Link
+              href="/auth/signup"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               今すぐ3ステップを始める
-            </HIGButton>
+              <ArrowRightIcon className="w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>
@@ -483,15 +475,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
 
           <div className="text-center">
-            <HIGButton
-              variant="primary"
-              size="lg"
-              onClick={() => window.location.href = "/auth/signup"}
-              rightIcon={<ArrowRightIcon />}
-              className="text-lg px-8 py-4 bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            <Link
+              href="/auth/signup"
+              className="inline-flex items-center justify-center gap-2 text-lg px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             >
               14日間無料で体験する
-            </HIGButton>
+              <ArrowRightIcon className="w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>
@@ -525,15 +515,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <p className="text-xl mb-8 opacity-90">
               AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
             </p>
-            <HIGButton
-              variant="primary"
-              size="lg"
-              onClick={() => window.location.href = "/contact"}
-              rightIcon={<ArrowRightIcon />}
-              className="bg-white text-[var(--bg-primary)] hover:bg-gray-50 border-none"
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-blue-600 hover:bg-gray-50 font-bold rounded-xl border-none shadow-lg hover:shadow-xl transition-all duration-300"
             >
               お問い合わせフォーム
-            </HIGButton>
+              <ArrowRightIcon className="w-5 h-5" />
+            </Link>
           </div>
           
           <FAQSection
@@ -563,23 +551,19 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
-            <HIGButton
-              variant="primary"
-              size="lg"
-              onClick={() => window.location.href = "/auth/signup"}
-              rightIcon={<ArrowRightIcon />}
-              className="text-xl px-10 py-5 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
+            <Link
+              href="/auth/signup"
+              className="inline-flex items-center justify-center gap-2 text-xl px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
             >
               14日間無料で始める
-            </HIGButton>
-            <HIGButton
-              variant="secondary"
-              size="lg"
-              onClick={() => window.location.href = "/contact"}
-              className="text-xl px-10 py-5 bg-white/10 backdrop-blur-sm border-2 border-white/30 hover:bg-white/20 hover:border-white/50 transition-all duration-300"
+              <ArrowRightIcon className="w-5 h-5" />
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center text-xl px-10 py-5 bg-white/10 backdrop-blur-sm border-2 border-white/30 hover:bg-white/20 hover:border-white/50 text-white font-bold rounded-xl transition-all duration-300"
             >
               専門ヒアリング相談
-            </HIGButton>
+            </Link>
           </div>
           
           <div className="flex flex-wrap justify-center gap-6 text-sm opacity-75">
