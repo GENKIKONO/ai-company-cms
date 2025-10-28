@@ -139,15 +139,15 @@ export default function AdminHearingsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-gray-100 text-gray-700';
       case 'in_progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-gray-100 text-gray-700';
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-gray-100 text-gray-700';
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
+        return 'bg-gray-100 text-gray-700';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-700';
     }
   };
 
@@ -424,7 +424,7 @@ export default function AdminHearingsPage() {
               className={`px-3 py-1 rounded-full text-sm ${
                 statusFilter === 'pending' 
                   ? 'bg-yellow-200 text-yellow-900' 
-                  : 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               待機中 ({statusCounts.pending})
@@ -434,7 +434,7 @@ export default function AdminHearingsPage() {
               className={`px-3 py-1 rounded-full text-sm ${
                 statusFilter === 'in_progress' 
                   ? 'bg-blue-200 text-blue-900' 
-                  : 'bg-blue-100 text-[var(--bg-primary)] hover:bg-blue-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               進行中 ({statusCounts.in_progress})
@@ -444,7 +444,7 @@ export default function AdminHearingsPage() {
               className={`px-3 py-1 rounded-full text-sm ${
                 statusFilter === 'completed' 
                   ? 'bg-green-200 text-green-900' 
-                  : 'bg-green-100 text-green-600 hover:bg-green-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               完了 ({statusCounts.completed})
@@ -454,7 +454,7 @@ export default function AdminHearingsPage() {
               className={`px-3 py-1 rounded-full text-sm ${
                 statusFilter === 'cancelled' 
                   ? 'bg-red-200 text-red-900' 
-                  : 'bg-red-100 text-red-600 hover:bg-red-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               キャンセル ({statusCounts.cancelled})
@@ -524,7 +524,7 @@ export default function AdminHearingsPage() {
                           {getSelectedCategories(request).map((category) => (
                             <span
                               key={category.key}
-                              className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                              className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
                             >
                               {category.label}
                             </span>
@@ -591,7 +591,7 @@ export default function AdminHearingsPage() {
                         {getSelectedCategories(selectedRequest).map((category) => (
                           <span
                             key={category.key}
-                            className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                            className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
                           >
                             {category.label}
                           </span>

@@ -330,7 +330,7 @@ export default async function OrganizationDetailPage({
             {/* ヘッダー部分 */}
             <div className="relative">
               {/* Background color */}
-              <div className="absolute inset-0 bg-blue-50" />
+              <div className="absolute inset-0 bg-gray-50" />
               <div className="relative px-6 py-8 sm:px-8 sm:py-10 lg:p-12">
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 lg:gap-8">
@@ -342,7 +342,7 @@ export default async function OrganizationDetailPage({
                       organizationName={organization.name}
                     />
                   ) : (
-                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-blue-500 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg mx-auto sm:mx-0">
+                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gray-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg mx-auto sm:mx-0">
                       <span className="text-white font-bold text-2xl lg:text-3xl">
                         {organization.name.charAt(0)}
                       </span>
@@ -352,7 +352,7 @@ export default async function OrganizationDetailPage({
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">{organization.name}</h1>
                       {organization.verified && (
-                        <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-2xl border border-green-200 shadow-sm">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-2xl border border-gray-200 shadow-sm">
                           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
@@ -360,7 +360,7 @@ export default async function OrganizationDetailPage({
                         </div>
                       )}
                       {organization.status === 'public_unverified' && (
-                        <div className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-2xl border border-yellow-200 shadow-sm">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-2xl border border-gray-200 shadow-sm">
                           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                           </svg>
@@ -376,7 +376,7 @@ export default async function OrganizationDetailPage({
                         {organization.industries.map((industry, index) => (
                           <span 
                             key={index}
-                            className="px-3 py-2 lg:px-4 bg-blue-100 text-blue-800 font-medium rounded-xl lg:rounded-2xl border border-blue-200 shadow-sm text-sm lg:text-base"
+                            className="px-3 py-2 lg:px-4 bg-gray-100 text-gray-700 font-medium rounded-xl lg:rounded-2xl border border-gray-200 shadow-sm text-sm lg:text-base"
                           >
                             {industry}
                           </span>
@@ -427,7 +427,7 @@ export default async function OrganizationDetailPage({
                 {/* 基本情報 */}
                 <div className="bg-gray-50 rounded-2xl lg:rounded-3xl p-6 lg:p-8 border border-gray-200">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-500 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gray-600 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
@@ -466,9 +466,9 @@ export default async function OrganizationDetailPage({
 
                 {/* 連絡先情報 */}
                 {organization.show_contact !== false && (
-                <div className="bg-emerald-50 rounded-2xl lg:rounded-3xl p-6 lg:p-8 border border-emerald-200">
+                <div className="bg-gray-50 rounded-2xl lg:rounded-3xl p-6 lg:p-8 border border-gray-200">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gray-600 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
@@ -550,7 +550,7 @@ export default async function OrganizationDetailPage({
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-purple-500 rounded-xl flex items-center justify-center">
+                      <div className="w-8 h-8 bg-gray-600 rounded-xl flex items-center justify-center">
                         <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 011 1.732l4 4a1 1 0 01.293.707V18a2 2 0 01-2 2z" />
                         </svg>
@@ -559,7 +559,7 @@ export default async function OrganizationDetailPage({
                     </div>
                     <Link
                       href={`/o/${organization.slug}/posts`}
-                      className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 hover:bg-purple-200 font-semibold rounded-2xl px-6 py-3 transition-all duration-300 border border-purple-200"
+                      className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold rounded-2xl px-6 py-3 transition-all duration-300 border border-gray-200"
                     >
                       記事一覧を見る
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -573,7 +573,7 @@ export default async function OrganizationDetailPage({
                       <Link
                         key={post.id}
                         href={`/o/${organization.slug}/posts/${post.id}`}
-                        className="group block bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-6 hover:border-purple-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                        className="group block bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-6 hover:border-gray-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                       >
                         <h3 className="text-lg font-medium text-gray-900 mb-2">{post.title}</h3>
                         {post.content_markdown && (
@@ -584,7 +584,7 @@ export default async function OrganizationDetailPage({
                         <div className="flex items-center justify-between text-xs text-gray-500">
                           <span>{new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
                           <span className={`px-2 py-1 rounded-full ${
-                            post.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                            post.status === 'published' ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-700'
                           }`}>
                             {post.status === 'published' ? '公開中' : '下書き'}
                           </span>
@@ -606,7 +606,7 @@ export default async function OrganizationDetailPage({
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-3 mb-8">
-                    <div className="w-8 h-8 bg-blue-500 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gray-600 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                       </svg>
@@ -675,7 +675,7 @@ export default async function OrganizationDetailPage({
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-3 mb-8">
-                    <div className="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gray-600 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                       </svg>
@@ -718,7 +718,7 @@ export default async function OrganizationDetailPage({
                             {caseStudy.tags.map((tag, index) => (
                               <span
                                 key={index}
-                                className="bg-orange-100 text-orange-800 px-2 py-1 text-xs rounded-full"
+                                className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded-full"
                               >
                                 {tag}
                               </span>
@@ -754,7 +754,7 @@ export default async function OrganizationDetailPage({
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-3 mb-8">
-                    <div className="w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gray-600 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>

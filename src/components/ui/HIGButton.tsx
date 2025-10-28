@@ -44,7 +44,7 @@ const buttonVariants = cva(
           'border-0',
           'hover:bg-[var(--bg-primary-hover)]',
           'focus-visible:ring-[var(--bg-primary)]',
-          'active:scale-[0.98]',
+          'active:opacity-90',
           'shadow-sm',
         ],
         secondary: [
@@ -55,7 +55,7 @@ const buttonVariants = cva(
           'hover:bg-[var(--color-gray-100)]',
           'hover:border-[var(--border-default)]',
           'focus-visible:ring-[var(--bg-primary)]',
-          'active:scale-[0.98]',
+          'active:opacity-90',
         ],
         tertiary: [
           'bg-transparent',
@@ -63,7 +63,7 @@ const buttonVariants = cva(
           'border-0',
           'hover:bg-[var(--bg-alt)]',
           'focus-visible:ring-[var(--bg-primary)]',
-          'active:scale-[0.98]',
+          'active:opacity-90',
         ],
         danger: [
           'bg-[var(--color-danger)]',
@@ -71,7 +71,7 @@ const buttonVariants = cva(
           'border-0',
           'hover:opacity-90',
           'focus-visible:ring-[var(--color-danger)]',
-          'active:scale-[0.98]',
+          'active:opacity-90',
           'shadow-sm',
         ],
         ghost: [
@@ -80,7 +80,7 @@ const buttonVariants = cva(
           'border-0',
           'hover:bg-[var(--bg-alt)]',
           'focus-visible:ring-[var(--bg-primary)]',
-          'active:scale-[0.98]',
+          'active:opacity-90',
         ],
       },
       size: {

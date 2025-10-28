@@ -35,25 +35,25 @@ export default async function AdminLayout({
               </span>
             </div>
             <nav className="flex space-x-2">
-              <a href="/management-console" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+              <a href="/management-console" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg text-sm">
                 ダッシュボード
               </a>
-              <a href="/management-console/settings" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+              <a href="/management-console/settings" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg text-sm">
                 設定
               </a>
-              <a href="/management-console/reports" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+              <a href="/management-console/reports" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg text-sm">
                 通報
               </a>
-              <a href="/management-console/hearings" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+              <a href="/management-console/hearings" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg text-sm">
                 ヒアリング
               </a>
-              <a href="/management-console/users" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+              <a href="/management-console/users" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg text-sm">
                 ユーザー管理
               </a>
-              <a href="/dashboard" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+              <a href="/dashboard" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg text-sm">
                 ユーザー画面
               </a>
-              <a href="/auth/signout" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm">
+              <a href="/auth/signout" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg text-sm">
                 ログアウト
               </a>
             </nav>

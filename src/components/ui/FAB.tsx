@@ -59,7 +59,7 @@ export default function FAB() {
       onKeyDown={handleKeyDown}
       className="
         fixed z-[1000]
-        top-4 left-4 md:top-6 md:left-6
+        bottom-4 right-4 md:bottom-6 md:right-6
         w-12 h-12 md:w-14 md:h-14
         text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] 
         shadow-xl hover:shadow-2xl border-2 border-white
