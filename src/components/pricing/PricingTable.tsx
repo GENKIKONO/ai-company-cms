@@ -8,7 +8,6 @@
 import Link from 'next/link';
 import { Check, Star, Crown, Building2, Zap } from 'lucide-react';
 import { formatJPY, PRICING_CONFIG } from '@/lib/pricing';
-import { HIGButton } from '@/components/ui/HIGButton';
 import { PLAN_LABELS, formatPriceLabel } from '@/config/planLabels';
 
 // Dynamic class mapping for Tailwind purge safety
@@ -196,14 +195,16 @@ export default function PricingTable() {
               </ul>
 
               <div className="text-center">
-                <HIGButton
-                  variant={plan.popular ? "primary" : "secondary"}
-                  size="lg"
-                  fullWidth={true}
-                  onClick={() => window.location.href = plan.ctaHref}
+                <Link
+                  href={plan.ctaHref}
+                  className={`inline-flex items-center justify-center w-full px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 ${
+                    plan.popular 
+                      ? 'bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white' 
+                      : 'bg-[var(--bg-alt)] hover:bg-[var(--color-gray-100)] text-[var(--text-primary)] border border-[var(--border-light)]'
+                  }`}
                 >
                   {plan.ctaText}
-                </HIGButton>
+                </Link>
               </div>
 
               {plan.comingSoon && (
@@ -302,14 +303,16 @@ export default function PricingTable() {
                 </ul>
 
                 <div className="text-center mt-auto">
-                  <HIGButton
-                    variant={plan.popular ? "primary" : "secondary"}
-                    size="lg"
-                    fullWidth={true}
-                    onClick={() => window.location.href = plan.ctaHref}
+                  <Link
+                    href={plan.ctaHref}
+                    className={`inline-flex items-center justify-center w-full px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 ${
+                      plan.popular 
+                        ? 'bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white' 
+                        : 'bg-[var(--bg-alt)] hover:bg-[var(--color-gray-100)] text-[var(--text-primary)] border border-[var(--border-light)]'
+                    }`}
                   >
                     {plan.ctaText}
-                  </HIGButton>
+                  </Link>
                 </div>
 
                 {plan.comingSoon && (
