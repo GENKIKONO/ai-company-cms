@@ -40,29 +40,51 @@ export function MobileNav() {
 
   return (
     <>
-      {/* Hamburger Button */}
+      {/* Hamburger Button - Viewport based positioning */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-blue-700 transition-colors"
-        style={{ zIndex: 9999 }}
+        className="w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-blue-700 transition-colors"
+        style={{ 
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 9999
+        }}
       >
         {isOpen ? '×' : '☰'}
       </button>
 
-      {/* Overlay and Menu */}
+      {/* Overlay and Menu - Viewport based */}
       {isOpen && (
         <>
-          {/* Dark Overlay */}
+          {/* Dark Overlay - Only covers viewport */}
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setIsOpen(false)}
-            style={{ zIndex: 9998 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 9998
+            }}
           />
           
-          {/* Side Navigation */}
+          {/* Side Navigation - Slides from viewport right */}
           <nav 
-            className="fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-40 transform transition-transform duration-300"
-            style={{ zIndex: 9998 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              width: '320px',
+              height: '100vh',
+              backgroundColor: 'white',
+              boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)',
+              zIndex: 9998,
+              transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+              transition: 'transform 300ms ease-in-out'
+            }}
           >
             <div className="p-6">
               <h2 className="text-xl font-bold mb-6 text-gray-800">AIO Hub</h2>
@@ -80,7 +102,15 @@ export function MobileNav() {
                 ))}
               </div>
               
-              <div className="absolute bottom-6 left-6 right-6 text-center text-sm text-gray-500">
+              <div style={{ 
+                position: 'absolute', 
+                bottom: '24px', 
+                left: '24px', 
+                right: '24px', 
+                textAlign: 'center',
+                fontSize: '14px',
+                color: '#6b7280'
+              }}>
                 © {new Date().getFullYear()} AIO Hub
               </div>
             </div>
