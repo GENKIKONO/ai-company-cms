@@ -16,7 +16,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
   
   return (
     <div
-      className={`relative bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 min-h-[680px] flex flex-col ${
+      className={`relative bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 h-full flex flex-col ${
         plan.popular
           ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent scale-105'
           : ''
@@ -46,7 +46,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
           <span className="text-4xl font-bold text-gray-900">
             {formatHearingPrice(plan)}
           </span>
-          <span className="text-gray-600 ml-1">（税込）</span>
+          <span className="text-gray-600 ml-1">（税別）</span>
           {plan.badge && (
             <div className="mt-2">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-[var(--bg-primary)]">
@@ -110,9 +110,9 @@ export default function PricingSection() {
         <div className="mb-20">
           {/* Mobile: Carousel */}
           <div className="lg:hidden">
-            <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory px-4">
+            <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory px-4 h-[750px]">
               {planIds.map((planId) => (
-                <div key={planId} className="relative flex-shrink-0 w-80 snap-center">
+                <div key={planId} className="relative flex-shrink-0 w-80 snap-center h-full">
                   <PricingCard planId={planId} />
                 </div>
               ))}

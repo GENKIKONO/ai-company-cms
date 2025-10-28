@@ -28,7 +28,7 @@ export const HEARING_SERVICE_PLANS = {
       'Q&A拡充は含まれません',
       '公開後のブラッシュアップは別途相談'
     ],
-    ctaText: 'ライトプランで依頼する',
+    ctaText: 'お問合せ',
     contactParam: 'hearing-light'
   },
   advance: {
@@ -52,7 +52,7 @@ export const HEARING_SERVICE_PLANS = {
     limitations: [
       '競合比較分析は含まれません',
     ],
-    ctaText: 'アドバンスプランで依頼する',
+    ctaText: 'お問合せ',
     contactParam: 'hearing-advance'
   },
   full: {
@@ -74,7 +74,7 @@ export const HEARING_SERVICE_PLANS = {
       'Schema.org準拠のプロフィール構造（JSON-LD）を出力'
     ],
     limitations: [],
-    ctaText: 'フルプランで依頼する',
+    ctaText: 'お問合せ',
     contactParam: 'hearing-full'
   },
   continuous: {
@@ -100,7 +100,7 @@ export const HEARING_SERVICE_PLANS = {
       '詳細な価格は個別見積もり',
       '最低契約期間3ヶ月から'
     ],
-    ctaText: '継続プランの見積依頼',
+    ctaText: 'お問合せ',
     contactParam: 'hearing-continuous'
   }
 } as const;
@@ -141,9 +141,9 @@ export const getHearingPlanColorClasses = (color: string) => {
  */
 export function formatHearingPrice(plan: typeof HEARING_SERVICE_PLANS[HearingServicePlanId]): string {
   if ('priceRange' in plan && plan.priceRange) {
-    return `¥${plan.priceRange}（税込）`;
+    return `¥${plan.priceRange}`;
   }
-  return `¥${plan.price.toLocaleString()}（税込）`;
+  return `¥${plan.price.toLocaleString()}`;
 }
 
 /**
