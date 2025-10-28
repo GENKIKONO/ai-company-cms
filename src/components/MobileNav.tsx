@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import styles from './MobileNav.module.css';
+import { createPortal } from 'react-dom';
 
 const menuItems = [
   { href: '/', label: 'トップ' },
@@ -39,12 +39,33 @@ export function MobileNav() {
 
   if (!isMobile) return null;
 
-  return (
+  // Use Portal to render outside containment context
+  return typeof window !== 'undefined' ? createPortal(
     <>
       {/* Hamburger Button - Viewport based positioning */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`${styles.hamburgerButton} w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-blue-700 transition-colors`}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 9999,
+          width: '56px',
+          height: '56px',
+          backgroundColor: '#2563eb',
+          color: 'white',
+          borderRadius: '50%',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.25rem',
+          border: 'none',
+          cursor: 'pointer',
+          transition: 'background-color 0.2s'
+        }}
+        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#1d4ed8'}
+        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#2563eb'}
       >
         {isOpen ? '×' : '☰'}
       </button>
@@ -112,6 +133,7 @@ export function MobileNav() {
           </nav>
         </>
       )}
-    </>
-  );
+    </>,
+    document.body
+  ) : null;
 }
