@@ -25,12 +25,11 @@ export default function MobileMenu({
   }, [open]);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Overlay click no longer closes menu - ESC key only
-    e.stopPropagation();
+    close();
   };
 
   const handleLinkClick = () => {
-    // Link click no longer closes menu - ESC key only
+    close();
   };
 
   if (!open) return null;
