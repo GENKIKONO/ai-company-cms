@@ -58,7 +58,7 @@ export default function FAB() {
       onClick={toggle}
       onKeyDown={handleKeyDown}
       className="
-        fixed z-[1000]
+        fixed z-[9999]
         bottom-4 right-4 md:bottom-6 md:right-6
         w-12 h-12 md:w-14 md:h-14
         text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] 
@@ -73,6 +73,7 @@ export default function FAB() {
         leading-none
         select-none
         lg:hidden
+        transform-gpu
       "
     >
       <span className="sr-only">

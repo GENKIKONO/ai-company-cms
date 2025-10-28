@@ -95,7 +95,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="max-w-6xl mx-auto text-center">
             {/* Trust indicators */}
             <div className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-full px-6 py-3 mb-10 text-sm font-semibold text-gray-700 shadow-lg">
-              <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
+              <div className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-pulse"></div>
               14日間無料・クレジットカード不要
             </div>
             
@@ -268,20 +268,20 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                      <CheckCircleIcon className="w-4 h-4 text-gray-600" />
                     </div>
                     <span className="text-gray-700">企業名・業界・規模を入力</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                      <CheckCircleIcon className="w-4 h-4 text-gray-600" />
                     </div>
                     <span className="text-gray-700">主要サービス・特徴を選択</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                      <CheckCircleIcon className="w-4 h-4 text-gray-600" />
                     </div>
                     <span className="text-gray-700">14日間無料トライアル開始</span>
                   </div>
@@ -304,20 +304,20 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                      <CheckCircleIcon className="w-4 h-4 text-gray-600" />
                     </div>
                     <span className="text-gray-700">現在の情報発信状況を確認</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                      <CheckCircleIcon className="w-4 h-4 text-gray-600" />
                     </div>
                     <span className="text-gray-700">AI検索最適化の方向性を相談</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                      <CheckCircleIcon className="w-4 h-4 text-gray-600" />
                     </div>
                     <span className="text-gray-700">カスタマイズプランを提案</span>
                   </div>
@@ -339,20 +339,20 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                      <CheckCircleIcon className="w-4 h-4 text-gray-600" />
                     </div>
                     <span className="text-gray-700">JSON-LD構造化データ生成</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                      <CheckCircleIcon className="w-4 h-4 text-gray-600" />
                     </div>
                     <span className="text-gray-700">AI検索エンジンに最適化</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                      <CheckCircleIcon className="w-4 h-4 text-gray-600" />
                     </div>
                     <span className="text-gray-700">企業情報ハブを即座公開</span>
                   </div>
@@ -381,7 +381,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               AI時代の
-              <span className="text-red-600">
+              <span className="text-gray-800">
                 新しい課題
               </span>
               を解決
@@ -394,21 +394,21 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="grid lg:grid-cols-2 gap-12 mb-20">
             {/* BEFORE */}
             <div className="group">
-              <div className="bg-red-50 border-2 border-red-100 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+              <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center">
                     <AlertTriangleIcon className="w-8 h-8 text-white" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900">見つけてもらえない企業</h3>
-                    <p className="text-red-600 font-medium">現在の状況</p>
+                    <p className="text-gray-600 font-medium">現在の状況</p>
                   </div>
                 </div>
 
-                <div className="bg-white border border-red-200 rounded-2xl p-6 mb-6">
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">AI回答</div>
-                    <span className="text-red-600 font-semibold">エラー</span>
+                    <div className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">AI回答</div>
+                    <span className="text-gray-600 font-semibold">エラー</span>
                   </div>
                   <p className="text-gray-700 italic">
                     申し訳ございませんが、詳細な情報を見つけることができませんでした
@@ -417,11 +417,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-gray-600">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                     企業情報が散在・非構造化
                   </div>
                   <div className="flex items-center gap-3 text-gray-600">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                     AIが理解・引用できない形式
                   </div>
                 </div>
@@ -430,21 +430,21 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             {/* AFTER */}
             <div className="group">
-              <div className="bg-green-50 border-2 border-green-100 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+              <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center">
                     <CheckCircleIcon className="w-8 h-8 text-white" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900">AIに理解される企業へ</h3>
-                    <p className="text-green-600 font-medium">改善後</p>
+                    <p className="text-gray-600 font-medium">改善後</p>
                   </div>
                 </div>
 
-                <div className="bg-white border border-green-200 rounded-2xl p-6 mb-6">
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">AI回答</div>
-                    <span className="text-green-600 font-semibold">成功</span>
+                    <div className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">AI回答</div>
+                    <span className="text-gray-600 font-semibold">成功</span>
                   </div>
                   <p className="text-gray-700">
                     <strong className="text-gray-900">[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
@@ -453,11 +453,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-gray-600">
-                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                    <CheckCircleIcon className="w-5 h-5 text-gray-500" />
                     構造化された企業情報
                   </div>
                   <div className="flex items-center gap-3 text-gray-600">
-                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                    <CheckCircleIcon className="w-5 h-5 text-gray-500" />
                     AI検索に最適化されたデータ
                   </div>
                 </div>
@@ -568,15 +568,15 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           
           <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-700">
             <div className="flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-green-600" />
+              <CheckCircleIcon className="w-5 h-5 text-gray-600" />
               クレジットカード不要
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-green-600" />
+              <CheckCircleIcon className="w-5 h-5 text-gray-600" />
               いつでも解約可能
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-green-600" />
+              <CheckCircleIcon className="w-5 h-5 text-gray-600" />
               専門サポート付き
             </div>
           </div>

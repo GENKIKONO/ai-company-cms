@@ -37,7 +37,7 @@ export default function AddressDisplay({
     <div className={`bg-white border border-gray-200 rounded-lg overflow-hidden ${className}`}>
       <div className="p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-6 h-6 text-red-500">
+          <div className="w-6 h-6 text-gray-600">
             <svg className="w-full h-full" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
             </svg>
@@ -60,13 +60,13 @@ export default function AddressDisplay({
           
           {/* Action Buttons */}
           {(showGoogleMapsLink || showDirectionsLink) && (
-            <div className={`flex ${compact ? 'flex-col gap-2' : 'flex-row gap-3'} ${compact ? 'items-stretch' : 'items-center'}`}>
+            <div className={`flex ${compact ? 'flex-col gap-2' : 'flex-row gap-3'} ${compact ? 'items-stretch' : 'items-center'} justify-center`}>
               {showGoogleMapsLink && (
                 <a
                   href={googleMapsSearchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-[var(--bg-primary)] bg-white border border-blue-300 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] focus:ring-offset-2 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors flex-1"
                   aria-label={`${organizationName || '所在地'}をGoogleマップで表示`}
                 >
                   <ExternalLink className="w-4 h-4" />
@@ -79,7 +79,7 @@ export default function AddressDisplay({
                   href={googleMapsDirectionsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-green-600 bg-white border border-green-300 rounded-md hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors flex-1"
                   aria-label={`${organizationName || '所在地'}へのルートを検索`}
                 >
                   <Navigation className="w-4 h-4" />
