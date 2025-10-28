@@ -177,7 +177,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="grid md:grid-cols-3 gap-12 mb-20">
             <div className="group relative bg-white rounded-3xl p-10 border border-gray-200/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
-                <div className="w-20 h-20 bg-[var(--bg-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <BuildingIcon className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">営業資料として</h3>
@@ -192,7 +192,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             <div className="group relative bg-white rounded-3xl p-10 border border-gray-200/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
-                <div className="w-20 h-20 bg-[var(--bg-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <UserIcon className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">採用活動で</h3>
@@ -207,7 +207,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             <div className="group relative bg-white rounded-3xl p-10 border border-gray-200/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
-                <div className="w-20 h-20 bg-[var(--bg-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <InfoIcon className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">PR・広報で</h3>
@@ -264,7 +264,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     1
                   </div>
                   <div className="hidden lg:block w-8 h-0.5 bg-blue-200 absolute -right-10 top-8"></div>
@@ -300,7 +300,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     2
                   </div>
                   <div className="hidden lg:block w-8 h-0.5 bg-blue-200 absolute -right-10 top-8"></div>
@@ -336,7 +336,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     3
                   </div>
                 </div>
