@@ -116,7 +116,7 @@ export default function PricingTable() {
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 ${
+              className={`relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 flex flex-col min-h-[600px] ${
                 plan.popular
                   ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent'
                   : ''
@@ -194,7 +194,7 @@ export default function PricingTable() {
                 ))}
               </ul>
 
-              <div className="text-center">
+              <div className="text-center mt-auto">
                 <Link
                   href={plan.ctaHref}
                   className={`inline-flex items-center justify-center w-full px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 ${
@@ -224,7 +224,7 @@ export default function PricingTable() {
             {PLANS.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ${
+                className={`relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full min-h-[700px] ${
                   plan.popular
                     ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent scale-105'
                     : ''
