@@ -533,20 +533,20 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* Final CTA Section */}
-      <section className="section-spacing-large bg-slate-900 text-white relative overflow-hidden">
+      <section className="section-spacing-large bg-white text-gray-900 relative overflow-hidden">
         {/* Background effects */}
         
         <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+          <h2 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight text-gray-900">
             まずは情報を
             <br />
-            <span className="text-blue-400">
+            <span className="text-blue-600">
               "構造化"
             </span>
             するところから。
           </h2>
           
-          <p className="text-2xl mb-12 opacity-90 leading-relaxed">
+          <p className="text-2xl mb-12 text-gray-700 leading-relaxed">
             14日間の無料体験で効果を実感
           </p>
           
@@ -560,23 +560,23 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center text-xl px-10 py-5 bg-white/10 backdrop-blur-sm border-2 border-white/30 hover:bg-white/20 hover:border-white/50 text-white font-bold rounded-xl transition-all duration-300"
+              className="inline-flex items-center justify-center text-xl px-10 py-5 bg-gray-100 border-2 border-gray-300 hover:bg-gray-200 hover:border-gray-400 text-gray-900 font-bold rounded-xl transition-all duration-300"
             >
               専門ヒアリング相談
             </Link>
           </div>
           
-          <div className="flex flex-wrap justify-center gap-6 text-sm opacity-75">
+          <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-700">
             <div className="flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-green-400" />
+              <CheckCircleIcon className="w-5 h-5 text-green-600" />
               クレジットカード不要
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-green-400" />
+              <CheckCircleIcon className="w-5 h-5 text-green-600" />
               いつでも解約可能
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-green-400" />
+              <CheckCircleIcon className="w-5 h-5 text-green-600" />
               専門サポート付き
             </div>
           </div>
