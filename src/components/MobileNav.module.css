@@ -3,4 +3,15 @@
   bottom: 24px !important;
   right: 24px !important;
   z-index: 2147483647 !important;
+  transform: none !important;
+  contain: none !important;
+  will-change: auto !important;
+}
+
+/* Fallback using viewport units */
+.hamburgerButton {
+  position: fixed !important;
+  bottom: 1.5rem !important;
+  right: 1.5rem !important;
+  transform: translate3d(0, 0, 0) !important;
 }

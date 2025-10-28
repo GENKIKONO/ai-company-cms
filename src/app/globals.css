@@ -48,7 +48,7 @@
 html, body {
   /* Performance optimization - BR-03 compliant */
   font-display: swap; /* FOIT prevention */
-  contain: layout style paint; /* Containment API */
+  /* contain: layout style paint; Temporarily disabled for mobile nav positioning */
 }
 
 /* Critical Force Display Overrides - Ensure text visibility */
