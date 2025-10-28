@@ -338,13 +338,12 @@ export default function PricingTable() {
               詳細な機能や導入サポートについては、お気軽にお問い合わせください。
             </p>
             
-            <HIGButton
-              variant="primary"
-              size="lg"
-              onClick={() => window.location.href = "/contact"}
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white"
             >
               お問い合わせ
-            </HIGButton>
+            </Link>
           </div>
 
           <div className="mt-12 text-sm text-gray-600 space-y-2">
