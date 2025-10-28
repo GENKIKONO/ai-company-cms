@@ -13,7 +13,6 @@ import { geocodeJP, isValidJapaneseCoordinates } from '@/lib/geocode';
 import { type Coordinates } from '@/types/geo';
 import ServicesTab from '@/components/ServicesTab';
 import CaseStudiesTab from '@/components/CaseStudiesTab';
-import { HIGButton } from '@/design-system';
 import FAQsTab from '@/components/FAQsTab';
 import PostsTab from '@/components/PostsTab';
 import OrgLogoUploader from '@/components/OrgLogoUploader';
@@ -831,14 +830,11 @@ export default function EditOrganizationPage() {
                   onChange={(e) => handleInputChange('address_street', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
                 />
-                <HIGButton
+                <button
                   type="button"
                   onClick={handleDetectLocation}
                   disabled={geocoding || !getFullAddress()}
-                  variant="primary"
-                  size="md"
-                  aria-label="住所から位置を検出"
-                  className="flex items-center gap-2 whitespace-nowrap"
+                  className="flex items-center gap-2 whitespace-nowrap px-4 py-2 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white rounded-md font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {geocoding ? (
                     <>
@@ -853,7 +849,7 @@ export default function EditOrganizationPage() {
                       位置を検出
                     </>
                   )}
-                </HIGButton>
+                </button>
               </div>
               
               {/* 住所入力ヒント */}
@@ -1127,14 +1123,13 @@ export default function EditOrganizationPage() {
                 >
                   戻る
                 </Link>
-                <HIGButton
+                <button
                   type="submit"
                   disabled={submitting}
-                  variant="primary"
-                  size="md"
+                  className="px-6 py-2 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white rounded-md font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? '保存中...' : '変更を保存'}
-                </HIGButton>
+                </button>
               </div>
             </div>
           </div>

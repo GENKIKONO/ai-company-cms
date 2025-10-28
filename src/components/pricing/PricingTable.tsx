@@ -173,7 +173,7 @@ export default function PricingTable() {
                   <li key={index} className="flex items-start">
                     <Check
                       className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${
-                        feature.included ? 'text-green-500' : 'text-gray-300'
+                        feature.included ? 'text-green-500' : 'text-gray-500'
                       }`}
                     />
                     <div className="flex-1">
@@ -281,7 +281,7 @@ export default function PricingTable() {
                     <li key={index} className="flex items-start">
                       <Check
                         className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${
-                          feature.included ? 'text-green-500' : 'text-gray-300'
+                          feature.included ? 'text-green-500' : 'text-gray-500'
                         }`}
                       />
                       <div className="flex-1">

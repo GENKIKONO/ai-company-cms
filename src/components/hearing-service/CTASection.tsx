@@ -27,17 +27,23 @@ export default function CTASection() {
           {/* 特徴ポイント */}
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-              <Clock className="w-8 h-8 text-blue-300 mx-auto mb-4" />
+              <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
               <div className="text-white font-bold text-lg mb-2">最短2週間</div>
               <div className="text-white/80">スピード対応</div>
             </div>
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-              <Calendar className="w-8 h-8 text-purple-300 mx-auto mb-4" />
+              <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
               <div className="text-white font-bold text-lg mb-2">予約制</div>
               <div className="text-white/80">確実な対応</div>
             </div>
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-              <Star className="w-8 h-8 text-yellow-300 mx-auto mb-4" />
+              <div className="w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Star className="w-6 h-6 text-white" />
+              </div>
               <div className="text-white font-bold text-lg mb-2">専門対応</div>
               <div className="text-white/80">AI最適化の専門家</div>
             </div>
