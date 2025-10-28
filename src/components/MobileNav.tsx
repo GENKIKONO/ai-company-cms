@@ -36,7 +36,8 @@ export function MobileNav() {
     };
   }, [isOpen]);
 
-  if (!isMobile) return null;
+  // Debug: Always show for testing
+  // if (!isMobile) return null;
 
   return (
     <>
