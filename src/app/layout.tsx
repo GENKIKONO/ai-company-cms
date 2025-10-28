@@ -3,8 +3,6 @@ import '@/design-system' // 新しいデザインシステム読み込み
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 import Footer from '@/components/layout/Footer'
 import { ToastProvider } from '@/components/ui/toast'
-import { MenuProvider } from '@/components/ui/MenuProvider'
-import FAB from '@/components/ui/FAB'
 import BuildBanner from '@/components/BuildBanner'
 import { env } from '@/lib/env'
 // WebVitalsReporter removed for production optimization
@@ -51,26 +49,23 @@ export default function RootLayout({
       <body>
         <I18nProvider initialLocale="ja">
           <ToastProvider>
-            <MenuProvider>
-              {/* Skip to main content link for accessibility */}
-              <a href="#main-content" className="skip-link">
-                メインコンテンツにスキップ
-              </a>
-              {env.SHOW_BUILD_BANNER && (
-                <BuildBanner 
-                  commit={process.env.VERCEL_GIT_COMMIT_SHA}
-                  deployUrl={process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined}
-                  environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
-                />
-              )}
-              <SafeAuthHeader />
-              <main id="main-content">
-                {children}
-              </main>
-              <Footer />
-              <FAB />
-              {/* WebVitalsReporter removed for production optimization */}
-            </MenuProvider>
+            {/* Skip to main content link for accessibility */}
+            <a href="#main-content" className="skip-link">
+              メインコンテンツにスキップ
+            </a>
+            {env.SHOW_BUILD_BANNER && (
+              <BuildBanner 
+                commit={process.env.VERCEL_GIT_COMMIT_SHA}
+                deployUrl={process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined}
+                environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
+              />
+            )}
+            <SafeAuthHeader />
+            <main id="main-content">
+              {children}
+            </main>
+            <Footer />
+            {/* WebVitalsReporter removed for production optimization */}
           </ToastProvider>
         </I18nProvider>
       </body>
