@@ -33,9 +33,18 @@ const getOrganizationDataCached = (slug: string) => {
     async (): Promise<OrganizationPageData | null> => {
       logger.debug('Debug', `[getOrganizationDataCached] Cache miss for slug: ${safeSlug}`);
       
-      // 🚫 匿名クライアントで公開データのみ取得（cookies/auth依存禁止）
-      const { supabasePublic } = await import('@/lib/supabase-public');
-      const supabase = supabasePublic();
+      // 🚫 Service roleクライアントでRLS無限再帰を回避
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
+      );
       
       // ✅ P0: published のみを公開対象とする（enum準拠）
       const { data: organization, error: orgError } = await supabase

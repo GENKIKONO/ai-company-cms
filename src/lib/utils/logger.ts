@@ -78,7 +78,7 @@ export const logger = {
     if (!isDev) return;
     
     const timestamp = new Date().toISOString();
-    logger.debug('Debug', `[${timestamp}] DEBUG: ${message}`, { data, context });
+    console.debug(`[${timestamp}] DEBUG: ${message}`, { data, context });
   }
 };
 
