@@ -902,7 +902,7 @@ export default function NewOrganizationPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex justify-center items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-[var(--bg-primary)] to-[var(--bg-primary-hover)] hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--bg-primary)] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100"
+                className="inline-flex justify-center items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--bg-primary)] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100"
               >
                 {submitting ? (
                   <>

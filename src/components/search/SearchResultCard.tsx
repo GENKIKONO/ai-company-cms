@@ -70,7 +70,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
                 className="w-20 h-20 object-contain bg-slate-50  rounded-lg border border-slate-200 "
               />
             ) : (
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200  rounded-lg flex items-center justify-center">
+              <div className="w-20 h-20 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Building2 className="w-8 h-8 text-[var(--bg-primary)] " />
               </div>
             )}

@@ -86,14 +86,11 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+    <div className="min-h-screen bg-gray-50">
       {/* Modern Hero Section */}
       <section className="relative overflow-hidden min-h-screen flex items-center">
-        {/* Enhanced Background gradient with geometric elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-indigo-50/60 to-purple-50/80" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.15),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(147,51,234,0.12),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.08),transparent_70%)]" />
+        {/* Simple background */}
+        <div className="absolute inset-0 bg-white" />
         
         <div className="relative z-10 w-full px-6 lg:px-8">
           <div className="max-w-6xl mx-auto text-center">
@@ -105,7 +102,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             
             {/* Main headline */}
             <h1 className="text-5xl md:text-6xl lg:text-8xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
-              <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-[var(--bg-primary)]">
                 AIに"正しく理解"
               </span>
               <br />
@@ -157,37 +154,18 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </HIGButton>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-              <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
-                <div className="text-4xl font-bold text-[var(--bg-primary)] mb-2">24/7</div>
-                <div className="text-sm font-medium text-gray-600">監視体制</div>
-              </div>
-              <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
-                <div className="text-4xl font-bold text-green-600 mb-2">99.9%</div>
-                <div className="text-sm font-medium text-gray-600">稼働率</div>
-              </div>
-              <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">10種類</div>
-                <div className="text-sm font-medium text-gray-600">セキュリティ機能</div>
-              </div>
-              <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-gray-200/40 shadow-lg text-center">
-                <div className="text-4xl font-bold text-orange-600 mb-2">50業界</div>
-                <div className="text-sm font-medium text-gray-600">対応可能</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="section-spacing-large bg-gradient-to-b from-white via-gray-50/30 to-white">
+      <section className="section-spacing-large bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-24">
             <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-tight">
               大きな商談も、小さな問い合わせも、
               <br />
-              <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-[var(--bg-primary)]">
                 すべてに対応
               </span>
             </h2>
@@ -199,7 +177,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="grid md:grid-cols-3 gap-12 mb-20">
             <div className="group relative bg-white rounded-3xl p-10 border border-gray-200/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-[var(--bg-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <BuildingIcon className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">営業資料として</h3>
@@ -209,12 +187,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   正確な情報で顧客の信頼を獲得
                 </p>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/30 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-blue-50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
 
             <div className="group relative bg-white rounded-3xl p-10 border border-gray-200/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-[var(--bg-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <UserIcon className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">採用活動で</h3>
@@ -224,12 +202,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   優秀な人材の獲得率向上
                 </p>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-pink-50/30 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-blue-50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
 
             <div className="group relative bg-white rounded-3xl p-10 border border-gray-200/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-[var(--bg-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <InfoIcon className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">PR・広報で</h3>
@@ -239,7 +217,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   露出機会の大幅拡大
                 </p>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-blue-50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
           </div>
           
@@ -264,12 +242,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
 
       {/* How it Works Section */}
-      <section className="section-spacing bg-gradient-to-br from-gray-50 to-blue-50">
+      <section className="section-spacing bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               シンプルな
-              <span className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 bg-clip-text text-transparent">
+              <span className="text-[var(--bg-primary)]">
                 3ステップ
               </span>
               で
@@ -286,10 +264,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     1
                   </div>
-                  <div className="hidden lg:block w-8 h-0.5 bg-gradient-to-r from-blue-200 to-purple-200 absolute -right-10 top-8"></div>
+                  <div className="hidden lg:block w-8 h-0.5 bg-blue-200 absolute -right-10 top-8"></div>
                 </div>
                 
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">申し込み</h3>
@@ -322,10 +300,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     2
                   </div>
-                  <div className="hidden lg:block w-8 h-0.5 bg-gradient-to-r from-purple-200 to-emerald-200 absolute -right-10 top-8"></div>
+                  <div className="hidden lg:block w-8 h-0.5 bg-blue-200 absolute -right-10 top-8"></div>
                 </div>
                 
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">ヒアリング（60分）</h3>
@@ -358,7 +336,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     3
                   </div>
                 </div>
@@ -411,7 +389,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               AI時代の
-              <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+              <span className="text-red-600">
                 新しい課題
               </span>
               を解決
@@ -424,9 +402,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="grid lg:grid-cols-2 gap-12 mb-20">
             {/* BEFORE */}
             <div className="group">
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-100 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+              <div className="bg-red-50 border-2 border-red-100 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center">
+                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center">
                     <AlertTriangleIcon className="w-8 h-8 text-white" />
                   </div>
                   <div>
@@ -460,9 +438,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             {/* AFTER */}
             <div className="group">
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-100 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+              <div className="bg-green-50 border-2 border-green-100 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center">
+                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center">
                     <CheckCircleIcon className="w-8 h-8 text-white" />
                   </div>
                   <div>
@@ -510,7 +488,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               size="lg"
               onClick={() => window.location.href = "/auth/signup"}
               rightIcon={<ArrowRightIcon />}
-              className="text-lg px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              className="text-lg px-8 py-4 bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             >
               14日間無料で体験する
             </HIGButton>
@@ -519,12 +497,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* Pricing Section */}
-      <section className="section-spacing bg-gradient-to-br from-slate-50 to-gray-100" id="pricing">
+      <section className="section-spacing bg-gray-50" id="pricing">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               シンプルで
-              <span className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 bg-clip-text text-transparent">
+              <span className="text-[var(--bg-primary)]">
                 透明な料金
               </span>
             </h2>
@@ -537,10 +515,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* FAQ Section */}
-      <section className="section-spacing bg-gradient-to-br from-gray-50 to-slate-100">
+      <section className="section-spacing bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           {/* Contact CTA */}
-          <div className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 rounded-3xl p-12 mb-20 text-center text-white">
+          <div className="bg-[var(--bg-primary)] rounded-3xl p-12 mb-20 text-center text-white">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               その他のご質問がございましたら
             </h2>
@@ -567,16 +545,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </section>
 
       {/* Final CTA Section */}
-      <section className="section-spacing-large bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white relative overflow-hidden">
+      <section className="section-spacing-large bg-slate-900 text-white relative overflow-hidden">
         {/* Background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.3),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.3),transparent_50%)]" />
         
         <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
             まずは情報を
             <br />
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="text-blue-400">
               "構造化"
             </span>
             するところから。
@@ -592,7 +568,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               size="lg"
               onClick={() => window.location.href = "/auth/signup"}
               rightIcon={<ArrowRightIcon />}
-              className="text-xl px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-[var(--bg-primary)] hover:to-purple-600 border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
+              className="text-xl px-10 py-5 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
             >
               14日間無料で始める
             </HIGButton>

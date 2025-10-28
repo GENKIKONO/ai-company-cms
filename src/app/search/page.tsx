@@ -128,9 +128,7 @@ function SearchPageContent() {
   }, [filters]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
+    <div className="min-h-screen bg-white">
       
       <main className="relative z-10 max-w-7xl mx-auto px-6 section-spacing">
         {/* ページタイトルと検索バー */}
@@ -142,7 +140,7 @@ function SearchPageContent() {
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-blue-600">
                 あらゆる情報を
               </span>
               <br />
@@ -191,7 +189,7 @@ function SearchPageContent() {
                 </svg>
                 フィルター
                 {activeFiltersCount > 0 && (
-                  <span className="ml-3 px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs rounded-full font-semibold">
+                  <span className="ml-3 px-3 py-1 bg-blue-600 text-white text-xs rounded-full font-semibold">
                     {activeFiltersCount}
                   </span>
                 )}
@@ -294,7 +292,7 @@ function SearchPageContent() {
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 p-6 shadow-lg">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-900">
-                    <span className="bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 bg-clip-text text-transparent">
+                    <span className="text-blue-600">
                       検索結果
                     </span>
                     <span className="ml-2 text-gray-700">({results.total}件)</span>
@@ -313,7 +311,7 @@ function SearchPageContent() {
               {results.total === 0 ? (
                 <div className="text-center section-spacing">
                   <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-gray-200/60 p-12 shadow-lg max-w-md mx-auto">
-                    <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                       <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
@@ -330,7 +328,7 @@ function SearchPageContent() {
                   {results.organizations.length > 0 && (
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                        <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
@@ -352,7 +350,7 @@ function SearchPageContent() {
                                   className="w-14 h-14 rounded-xl object-cover shadow-md"
                                 />
                               ) : (
-                                <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-md">
+                                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center shadow-md">
                                   <span className="text-[var(--bg-primary)] font-bold text-xl">
                                     {org.name.charAt(0)}
                                   </span>
@@ -394,7 +392,7 @@ function SearchPageContent() {
                   {results.services.length > 0 && (
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                        <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                           </svg>
@@ -405,7 +403,7 @@ function SearchPageContent() {
                         {results.services.map((service) => (
                           <div key={service.id} className="group bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/60 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                             <div className="flex items-start">
-                              <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-xl flex items-center justify-center shadow-md">
+                              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center shadow-md">
                                 <span className="text-emerald-600 font-bold text-xl">
                                   {service.name.charAt(0)}
                                 </span>
@@ -431,7 +429,7 @@ function SearchPageContent() {
                             
                             {service.category && (
                               <div className="mt-4 pt-4 border-t border-gray-100">
-                                <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700 text-xs font-semibold rounded-full">
+                                <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
                                   {service.category}
                                 </span>
                               </div>
@@ -446,7 +444,7 @@ function SearchPageContent() {
                   {results.case_studies.length > 0 && (
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                        <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
@@ -471,7 +469,7 @@ function SearchPageContent() {
                             
                             <div className="space-y-4">
                               {caseStudy.problem && (
-                                <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200/60 rounded-xl p-4">
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                                   <h5 className="text-sm font-semibold text-red-700 mb-2 flex items-center gap-2">
                                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                                     課題
@@ -481,7 +479,7 @@ function SearchPageContent() {
                               )}
                               
                               {caseStudy.solution && (
-                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 rounded-xl p-4">
+                                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                                   <h5 className="text-sm font-semibold text-green-700 mb-2 flex items-center gap-2">
                                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                                     解決策

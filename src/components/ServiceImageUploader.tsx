@@ -166,7 +166,7 @@ export default function ServiceImageUploader({
         </div>
       ) : (
         <div className="mb-4">
-          <div className="w-48 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-150 transition-colors">
+          <div className="w-48 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors">
             <div className="text-center">
               <div className="mx-auto w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mb-2">
                 <svg className="w-6 h-6 text-gray-500" stroke="currentColor" fill="none" viewBox="0 0 48 48">

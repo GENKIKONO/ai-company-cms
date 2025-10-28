@@ -59,7 +59,7 @@ export default function MobileMenu({
                   href={auth.loginHref}
                   ref={firstLinkRef}
                   onClick={handleLinkClick}
-                  className="focus-clean nav-link nav-item w-full block text-center bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-200"
+                  className="focus-clean nav-link nav-item w-full block text-center bg-indigo-500 text-white font-semibold py-3 rounded-lg hover:bg-indigo-600 transition-all duration-200"
                 >
                   ログイン
                 </Link>

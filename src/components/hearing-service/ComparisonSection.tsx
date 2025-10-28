@@ -9,7 +9,7 @@ export default function ComparisonSection() {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
             構造化前後の
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-green-500">
+            <span className="text-[var(--bg-primary)]">
               劇的な違い
             </span>
           </h2>
@@ -24,7 +24,7 @@ export default function ComparisonSection() {
             <div className="absolute -top-4 left-8">
               <div className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full border border-red-200">
                 <X className="h-4 w-4" />
-                <span className="font-semibold">構造化前</span>
+                <span className="font-bold">構造化前</span>
               </div>
             </div>
             
@@ -57,7 +57,7 @@ export default function ComparisonSection() {
             <div className="absolute -top-4 left-8">
               <div className="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full border border-green-200">
                 <Check className="h-4 w-4" />
-                <span className="font-semibold">構造化後</span>
+                <span className="font-bold">構造化後</span>
               </div>
             </div>
             
@@ -88,7 +88,7 @@ export default function ComparisonSection() {
             </div>
             
             {/* 期待できる成果 */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
+            <div className="mt-8 p-6 bg-green-50 rounded-xl border border-green-200">
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="h-5 w-5 text-green-600" />
                 <h4 className="font-bold text-green-800">期待できる成果</h4>

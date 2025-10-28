@@ -27,9 +27,7 @@ export default function PricingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
+      <div className="min-h-screen bg-white">
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 section-spacing">
           {/* Hero Section */}
@@ -40,7 +38,7 @@ export default function PricingPage() {
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-blue-600">
                 シンプルで明確な
               </span>
               <br />

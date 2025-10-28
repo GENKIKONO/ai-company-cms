@@ -63,13 +63,13 @@ export default function FAQSection() {
 
 
   return (
-    <section id="faq" className="section-spacing bg-gradient-to-br from-gray-50 to-slate-100">
+    <section id="faq" className="section-spacing bg-gray-50">
       <div className="max-w-4xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             よくある
-            <span className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 bg-clip-text text-transparent">
+            <span className="text-[var(--bg-primary)]">
               質問
             </span>
           </h2>
@@ -94,7 +94,7 @@ export default function FAQSection() {
                   aria-expanded={isOpen}
                   aria-controls={`faq-answer-${key}`}
                 >
-                  <span className="text-lg font-semibold text-gray-900 pr-4">
+                  <span className="text-lg font-bold text-gray-900 pr-4">
                     {faq.question}
                   </span>
                   <div className="flex-shrink-0">
@@ -123,7 +123,7 @@ export default function FAQSection() {
         </div>
 
         {/* サポート案内 */}
-        <div className="text-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-8 border border-blue-100">
+        <div className="text-center bg-white rounded-3xl p-8 border border-gray-200">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">他にもご質問がございますか？</h3>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
             お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。

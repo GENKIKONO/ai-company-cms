@@ -451,7 +451,7 @@ export default function MaterialStatsPage() {
                             <div className="flex items-center justify-center">
                               <div className="w-16 bg-[var(--color-background-secondary)] rounded-full h-2 overflow-hidden">
                                 <div 
-                                  className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] h-full rounded-full progress-bar"
+                                  className="bg-[var(--color-primary)] h-full rounded-full progress-bar"
                                   style={{ width: `${Math.min((summary.views + summary.downloads * 2) / Math.max(...stats.byMaterial.map(s => s.views + s.downloads * 2)) * 100, 100)}%` }}
                                 ></div>
                               </div>

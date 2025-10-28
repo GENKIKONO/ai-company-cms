@@ -12,9 +12,7 @@ const flowSteps = [
       '会社の基本情報入力',
       'ヒアリング希望日選択',
       '重点的に聞きたい内容の選択'
-    ],
-    gradient: 'from-blue-500 to-blue-600',
-    bgGradient: 'from-blue-50 to-blue-100'
+    ]
   },
   {
     step: 2,
@@ -25,9 +23,7 @@ const flowSteps = [
       '事業概要・サービス詳細',
       '競合優位性・差別化ポイント',
       'ターゲット市場・顧客事例'
-    ],
-    gradient: 'from-purple-500 to-purple-600',
-    bgGradient: 'from-purple-50 to-purple-100'
+    ]
   },
   {
     step: 3,
@@ -38,21 +34,19 @@ const flowSteps = [
       'AI理解最適化構造での整理',
       'CMS登録・設定完了',
       '検索性向上・発見性改善'
-    ],
-    gradient: 'from-indigo-500 to-indigo-600',
-    bgGradient: 'from-indigo-50 to-indigo-100'
+    ]
   }
 ];
 
 export default function FlowSection() {
   return (
-    <section className="section-spacing bg-gradient-to-b from-white via-gray-50/30 to-white">
+    <section className="section-spacing bg-gray-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
         <div className="text-center mb-20">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             シンプルな
-            <span className="bg-gradient-to-r from-[var(--bg-primary)] to-purple-600 bg-clip-text text-transparent">
+            <span className="text-[var(--bg-primary)]">
               3ステップ
             </span>
             で
@@ -74,18 +68,18 @@ export default function FlowSection() {
               >
                 {/* 接続線（デスクトップのみ） */}
                 {index < flowSteps.length - 1 && (
-                  <div className="hidden md:block absolute top-16 -right-6 lg:-right-12 w-6 lg:w-12 h-0.5 bg-gradient-to-r from-gray-300 to-gray-200 z-0"></div>
+                  <div className="hidden md:block absolute top-16 -right-6 lg:-right-12 w-6 lg:w-12 h-0.5 bg-gray-300 z-0"></div>
                 )}
                 
                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
                   {/* ステップ番号 */}
                   <div className="text-center mb-6">
-                    <div className={`inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r ${step.gradient} text-white shadow-lg mb-4`}>
+                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--bg-primary)] text-white shadow-lg mb-4">
                       <span className="text-2xl font-bold">{step.step}</span>
                     </div>
                     
                     {/* アイコン */}
-                    <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r ${step.gradient} text-white shadow-md -mt-2 ml-4`}>
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--bg-primary)] text-white shadow-md -mt-2 ml-4">
                       <IconComponent className="h-6 w-6" />
                     </div>
                   </div>
@@ -104,7 +98,7 @@ export default function FlowSection() {
                   <ul className="space-y-3">
                     {step.details.map((detail, detailIndex) => (
                       <li key={detailIndex} className="flex items-start gap-3">
-                        <CheckCircle className={`h-5 w-5 text-green-500 mt-0.5 flex-shrink-0`} />
+                        <CheckCircle className="h-5 w-5 text-[var(--bg-primary)] mt-0.5 flex-shrink-0" />
                         <span className="text-gray-700 text-sm leading-relaxed">{detail}</span>
                       </li>
                     ))}
@@ -117,9 +111,9 @@ export default function FlowSection() {
 
         {/* 追加情報 */}
         <div className="mt-16 text-center">
-          <div className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-100 to-blue-100 rounded-full border border-green-200">
-            <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-            <span className="text-green-800 font-medium">
+          <div className="inline-flex items-center justify-center px-6 py-3 bg-blue-50 rounded-full border border-blue-200">
+            <CheckCircle className="h-5 w-5 text-[var(--bg-primary)] mr-2" />
+            <span className="text-[var(--bg-primary)] font-medium">
               平均3日以内に構造化完了・即座にAI検索対応
             </span>
           </div>

@@ -96,13 +96,11 @@ export default async function DashboardPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Modern Hero Section */}
       <section className="relative section-spacing overflow-hidden">
         {/* Background effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.1),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(147,51,234,0.08),transparent_50%)]" />
+        <div className="absolute inset-0 bg-blue-50/30" />
         
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center">
@@ -117,7 +115,7 @@ export default async function DashboardPage() {
                   className="w-6 h-6 object-contain rounded"
                 />
               ) : (
-                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                   <span className="text-white font-semibold text-sm">
                     {org.name.charAt(0)}
                   </span>
@@ -159,7 +157,7 @@ export default async function DashboardPage() {
               
               <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                   <span className="text-gray-700 font-medium">
                     公開中: {stats.published || 0}件
                   </span>
@@ -175,7 +173,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -194,7 +192,7 @@ export default async function DashboardPage() {
                     className="w-8 h-8 object-contain bg-white rounded-lg border border-gray-200"
                   />
                 ) : (
-                  <div className="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
                     <span className="text-gray-600 font-semibold text-sm">
                       {org.name.charAt(0)}
                     </span>
@@ -210,8 +208,8 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 ${
                 org.is_published 
-                  ? 'bg-gradient-to-br from-green-500 to-green-600' 
-                  : 'bg-gradient-to-br from-gray-400 to-gray-500'
+                  ? 'bg-blue-500' 
+                  : 'bg-gray-400'
               }`}>
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -237,7 +235,7 @@ export default async function DashboardPage() {
 
           <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -248,14 +246,14 @@ export default async function DashboardPage() {
               <p className="text-sm font-medium text-gray-500 mb-2">サービス数</p>
               <h3 className="text-3xl font-bold text-gray-900 mb-2">{stats.total || 0}</h3>
               <p className="text-sm text-gray-500">
-                公開中: <span className="font-semibold text-purple-600">{stats.published || 0}</span>
+                公開中: <span className="font-semibold text-blue-600">{stats.published || 0}</span>
               </p>
             </div>
           </div>
 
           <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
@@ -266,7 +264,7 @@ export default async function DashboardPage() {
               <p className="text-sm font-medium text-gray-500 mb-2">導入事例</p>
               <h3 className="text-3xl font-bold text-gray-900 mb-2">{caseStudiesStats.total}</h3>
               <p className="text-sm text-gray-500">
-                公開中: <span className="font-semibold text-emerald-600">{caseStudiesStats.published}</span>
+                公開中: <span className="font-semibold text-blue-600">{caseStudiesStats.published}</span>
               </p>
             </div>
           </div>
@@ -283,7 +281,7 @@ export default async function DashboardPage() {
             <Link 
               href={`/organizations/${org.id}`}
               data-testid="qa-edit-org"
-              className="group relative bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
+              className="group relative bg-blue-50 rounded-2xl p-6 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -298,11 +296,11 @@ export default async function DashboardPage() {
 
             <Link 
               href={`/organizations/${org.id}/services/new`}
-              className="group relative bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300"
+              className="group relative bg-blue-50 rounded-2xl p-6 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
                 </div>
@@ -323,11 +321,11 @@ export default async function DashboardPage() {
                 href={`/o/${org.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200 hover:border-green-300 hover:shadow-lg transition-all duration-300"
+                className="group relative bg-blue-50 rounded-2xl p-6 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -337,7 +335,7 @@ export default async function DashboardPage() {
                 <p className="text-sm text-gray-600">外部からの見え方を確認</p>
               </Link>
             ) : (
-              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200 opacity-50">
+              <div className="relative bg-gray-50 rounded-2xl p-6 border border-gray-200 opacity-50">
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
                     <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -356,7 +354,7 @@ export default async function DashboardPage() {
             {hasEntitlementSync(org, 'monitoring') ? (
               <Link 
                 href="/monitor"
-                className="group relative bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-6 border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300"
+                className="group relative bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -371,27 +369,27 @@ export default async function DashboardPage() {
             ) : (
               <Link 
                 href="/pricing?feature=monitor"
-                className="group relative bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-200 hover:border-orange-300 hover:shadow-lg transition-all duration-300"
+                className="group relative bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                   </div>
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">システム監視</h3>
-                <p className="text-sm text-orange-600">スタンダード以上</p>
+                <p className="text-sm text-gray-600">スタンダード以上</p>
               </Link>
             )}
 
             <Link 
               href="/dashboard/embed"
-              className="group relative bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-200 hover:border-indigo-300 hover:shadow-lg transition-all duration-300"
+              className="group relative bg-blue-50 rounded-2xl p-6 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                   </svg>
                 </div>
@@ -402,11 +400,11 @@ export default async function DashboardPage() {
 
             <Link 
               href={`/organizations/${org.id}/hearing-request`}
-              className="group relative bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200 hover:border-cyan-300 hover:shadow-lg transition-all duration-300"
+              className="group relative bg-blue-50 rounded-2xl p-6 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h2m-4 9h10m-5-3L8 13l4-4-4-4" />
                   </svg>
                 </div>
@@ -427,7 +425,7 @@ export default async function DashboardPage() {
           <div className="lg:col-span-2 bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-200 p-8">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
@@ -443,16 +441,16 @@ export default async function DashboardPage() {
             
             <div className="mt-8 pt-8 border-t border-gray-100">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6">
+                <div className="bg-blue-50 rounded-2xl p-6">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                     <span className="font-semibold text-gray-900">トップページ</span>
                   </div>
                   <p className="text-gray-600">企業概要</p>
                 </div>
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6">
+                <div className="bg-blue-50 rounded-2xl p-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                     <span className="font-semibold text-gray-900">主要流入</span>
                   </div>
                   <p className="text-gray-600">Google検索</p>
@@ -464,7 +462,7 @@ export default async function DashboardPage() {
           {/* 最近のアクティビティ */}
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-200 p-8">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -496,7 +494,7 @@ export default async function DashboardPage() {
         {/* サービス紹介 */}
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-200 p-8">
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -509,12 +507,12 @@ export default async function DashboardPage() {
           
           <Link
             href="/dashboard/services-info"
-            className="group block bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-200 hover:border-emerald-300 hover:shadow-lg transition-all duration-300"
+            className="group block bg-blue-50 rounded-2xl p-6 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-100 rounded-xl group-hover:scale-110 transition-transform duration-300 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl group-hover:scale-110 transition-transform duration-300 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -523,7 +521,7 @@ export default async function DashboardPage() {
                   <p className="text-sm text-gray-600">機能詳細・プラン比較・料金案内</p>
                 </div>
               </div>
-              <svg className="w-5 h-5 text-gray-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>

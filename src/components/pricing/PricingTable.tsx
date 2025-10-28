@@ -123,7 +123,7 @@ export default function PricingTable() {
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+                  <div className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
                     人気
                   </div>
                 </div>
@@ -131,9 +131,9 @@ export default function PricingTable() {
 
               <div className="text-center mb-8">
                 <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
-                  plan.color === 'blue' ? 'bg-gradient-to-br from-cyan-500 to-cyan-600' :
-                  plan.color === 'green' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
-                  'bg-gradient-to-br from-slate-700 to-slate-800'
+                  plan.color === 'blue' ? 'bg-blue-600' :
+                  plan.color === 'green' ? 'bg-blue-600' :
+                  'bg-gray-600'
                 }`}>
                   <plan.icon className="w-8 h-8 text-white" />
                 </div>
@@ -229,7 +229,7 @@ export default function PricingTable() {
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+                    <div className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
                       人気
                     </div>
                   </div>
@@ -237,9 +237,9 @@ export default function PricingTable() {
 
                 <div className="text-center mb-8">
                   <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
-                    plan.color === 'blue' ? 'bg-gradient-to-br from-cyan-500 to-cyan-600' :
-                    plan.color === 'green' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
-                    'bg-gradient-to-br from-slate-700 to-slate-800'
+                    plan.color === 'blue' ? 'bg-blue-600' :
+                    plan.color === 'green' ? 'bg-blue-600' :
+                    'bg-gray-600'
                   }`}>
                     <plan.icon className="w-8 h-8 text-white" />
                   </div>
@@ -324,7 +324,7 @@ export default function PricingTable() {
         
         {/* Enterprise consultation note */}
         <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/60 rounded-3xl p-8 max-w-4xl mx-auto">
+          <div className="bg-blue-50 border border-blue-200 rounded-3xl p-8 max-w-4xl mx-auto">
             <h3 className="text-xl font-bold text-gray-900 mb-4">
               Enterpriseプランについて
             </h3>

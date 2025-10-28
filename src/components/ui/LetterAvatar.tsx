@@ -66,7 +66,7 @@ export const LetterAvatar: React.FC<LetterAvatarProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold shadow-sm',
+        'flex items-center justify-center bg-indigo-500 text-white font-semibold shadow-sm',
         sizeClass,
         roundedClasses[rounded],
         className

@@ -18,7 +18,7 @@ export default function BigIdea() {
 
         {/* ビジュアルカード */}
         <div className="max-w-5xl mx-auto">
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-100 p-[var(--space-xl)] shadow-sm">
+          <div className="bg-purple-50 rounded-2xl border border-purple-100 p-[var(--space-xl)] shadow-sm">
             <Image
               src="/illustrations/jsonld-automation.svg"
               alt="AIO Hub による企業データの AI 最適化プロセス - 情報を構造化してAI検索に最適化"

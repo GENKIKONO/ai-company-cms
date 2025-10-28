@@ -58,10 +58,10 @@ export default function SectionMedia({
         <div 
           className={`
             ${aspectRatios[aspect]} 
-            bg-gradient-to-br from-gray-50 to-gray-100
+            bg-gray-100
             border border-gray-200
             rounded-xl flex flex-col items-center justify-center
-            text-gray-500 transition-all duration-300 hover:from-gray-100 hover:to-gray-150
+            text-gray-500 transition-all duration-300 hover:bg-gray-200
             shadow-sm
           `}
         >

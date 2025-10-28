@@ -690,7 +690,7 @@ export default function UsersManagementPage() {
                       <CreditCard className="h-4 w-4 mr-2" />
                       プラン・機能設定
                     </h4>
-                    <div className="border rounded-lg p-4 bg-gradient-to-r from-blue-50 to-purple-50">
+                    <div className="border rounded-lg p-4 bg-blue-50">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-gray-900">

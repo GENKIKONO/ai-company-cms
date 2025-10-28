@@ -286,7 +286,7 @@ export default async function OrganizationDetailPage({
         />
       ))}
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-blue-50">
+      <div className="min-h-screen bg-gray-50">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* パンくずナビ */}
           <nav className="flex mb-12" aria-label="Breadcrumb">
@@ -321,8 +321,8 @@ export default async function OrganizationDetailPage({
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-200 overflow-hidden shadow-xl">
             {/* ヘッダー部分 */}
             <div className="relative">
-              {/* Background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50" />
+              {/* Background color */}
+              <div className="absolute inset-0 bg-blue-50" />
               <div className="relative px-8 py-12 sm:p-12">
               <div className="flex items-start justify-between">
                 <div className="flex items-center">
@@ -334,7 +334,7 @@ export default async function OrganizationDetailPage({
                       organizationName={organization.name}
                     />
                   ) : (
-                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <div className="w-24 h-24 bg-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
                       <span className="text-white font-bold text-3xl">
                         {organization.name.charAt(0)}
                       </span>
@@ -344,7 +344,7 @@ export default async function OrganizationDetailPage({
                     <div className="flex items-center gap-4">
                       <h1 className="text-4xl lg:text-5xl font-bold text-gray-900">{organization.name}</h1>
                       {organization.verified && (
-                        <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 rounded-2xl border border-green-200 shadow-sm">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-2xl border border-green-200 shadow-sm">
                           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
@@ -352,7 +352,7 @@ export default async function OrganizationDetailPage({
                         </div>
                       )}
                       {organization.status === 'public_unverified' && (
-                        <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 rounded-2xl border border-yellow-200 shadow-sm">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-2xl border border-yellow-200 shadow-sm">
                           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                           </svg>
@@ -368,7 +368,7 @@ export default async function OrganizationDetailPage({
                         {organization.industries.map((industry, index) => (
                           <span 
                             key={index}
-                            className="px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 font-medium rounded-2xl border border-blue-200 shadow-sm"
+                            className="px-4 py-2 bg-blue-100 text-blue-800 font-medium rounded-2xl border border-blue-200 shadow-sm"
                           >
                             {industry}
                           </span>
@@ -384,7 +384,7 @@ export default async function OrganizationDetailPage({
                       href={organization.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-2xl px-8 py-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                      className="inline-flex items-center justify-center gap-2 bg-[var(--bg-primary)] hover:bg-blue-700 text-white font-semibold rounded-2xl px-8 py-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -417,9 +417,9 @@ export default async function OrganizationDetailPage({
             <div className="border-t border-gray-100">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 p-8 sm:p-12">
                 {/* 基本情報 */}
-                <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-3xl p-8 border border-gray-200">
+                <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-500 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
@@ -458,9 +458,9 @@ export default async function OrganizationDetailPage({
 
                 {/* 連絡先情報 */}
                 {organization.show_contact !== false && (
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-8 border border-emerald-200">
+                <div className="bg-emerald-50 rounded-3xl p-8 border border-emerald-200">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
@@ -542,7 +542,7 @@ export default async function OrganizationDetailPage({
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                      <div className="w-8 h-8 bg-purple-500 rounded-xl flex items-center justify-center">
                         <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 011 1.732l4 4a1 1 0 01.293.707V18a2 2 0 01-2 2z" />
                         </svg>
@@ -551,7 +551,7 @@ export default async function OrganizationDetailPage({
                     </div>
                     <Link
                       href={`/o/${organization.slug}/posts`}
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:from-purple-200 hover:to-pink-200 font-semibold rounded-2xl px-6 py-3 transition-all duration-300 border border-purple-200"
+                      className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 hover:bg-purple-200 font-semibold rounded-2xl px-6 py-3 transition-all duration-300 border border-purple-200"
                     >
                       記事一覧を見る
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -598,7 +598,7 @@ export default async function OrganizationDetailPage({
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-3 mb-8">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-500 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                       </svg>
@@ -667,7 +667,7 @@ export default async function OrganizationDetailPage({
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-3 mb-8">
-                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                       </svg>
@@ -746,7 +746,7 @@ export default async function OrganizationDetailPage({
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-3 mb-8">
-                    <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                    <div className="w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>

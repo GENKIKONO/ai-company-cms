@@ -3,7 +3,7 @@ import { serviceCopy } from '../copy';
 
 export default function ClosingCTA() {
   return (
-    <section className="section-spacing-large bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
+    <section className="section-spacing-large bg-blue-900 relative overflow-hidden">
       {/* 背景装飾 */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
@@ -24,7 +24,7 @@ export default function ClosingCTA() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
             <Link
               href={serviceCopy.closingCTA.primaryHref}
-              className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-white to-blue-50 text-gray-900 rounded-xl font-bold text-lg hover:from-blue-50 hover:to-white transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl"
+              className="group inline-flex items-center gap-3 px-8 py-4 bg-white text-gray-900 rounded-xl font-bold text-lg hover:bg-blue-50 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl"
             >
               <span>{serviceCopy.closingCTA.primaryText}</span>
               <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -34,7 +34,7 @@ export default function ClosingCTA() {
             
             <Link
               href={serviceCopy.closingCTA.secondaryHref}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold border border-white/30 hover:bg-white/20 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white bg-opacity-10 text-white rounded-xl font-semibold border border-white border-opacity-30 hover:bg-white hover:bg-opacity-20 transition-all duration-300"
             >
               {serviceCopy.closingCTA.secondaryText}
             </Link>

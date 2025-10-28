@@ -216,7 +216,7 @@ export default async function ServiceDetailPage({
                     className="w-full h-64 md:h-72 object-cover rounded-md shadow-sm"
                   />
                 ) : (
-                  <div className="w-full h-64 md:h-72 bg-gradient-to-br from-gray-100 to-gray-200 rounded-md shadow-sm flex items-center justify-center">
+                  <div className="w-full h-64 md:h-72 bg-gray-100 rounded-md shadow-sm flex items-center justify-center">
                     <div className="text-center">
                       <div className="mx-auto w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mb-4">
                         <svg className="w-8 h-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

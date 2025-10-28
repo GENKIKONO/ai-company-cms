@@ -164,7 +164,7 @@ export default function PricingPlans({
                   card relative max-h-[480px] overflow-hidden shadow-sm border border-slate-200 bg-white transition-all duration-200
                   hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500 scroll-snap-center
                   ${plan.popular 
-                    ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-indigo-50' 
+                    ? 'border-blue-500 bg-blue-50' 
                     : 'hover:border-gray-300'
                   }
                 `}
@@ -285,7 +285,7 @@ export default function PricingPlans({
                 flex flex-col h-full p-8
                 hover:shadow-xl focus-within:shadow-xl focus-within:ring-2 focus-within:ring-blue-500
                 ${plan.popular 
-                  ? 'border-purple-500 relative' 
+                  ? 'border-blue-500 relative' 
                   : 'hover:border-gray-300'
                 }
               `}

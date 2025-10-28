@@ -7,7 +7,7 @@ export default function Recap() {
     <section className="hig-section bg-white">
       <div className="hig-container">
         {/* メインカード */}
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-100 p-[var(--space-xl)] mb-[var(--space-xl)] shadow-sm">
+        <div className="bg-green-50 rounded-2xl border border-green-100 p-[var(--space-xl)] mb-[var(--space-xl)] shadow-sm">
           <div className="text-center mb-[var(--space-xl)]">
             <h2 className="hig-text-h1 text-[var(--color-text-primary)] mb-[var(--space-lg)] hig-jp-heading">
               {serviceCopy.recap.title}

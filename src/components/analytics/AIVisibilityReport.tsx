@@ -133,7 +133,7 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
 
       {/* メトリクス概要 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 rounded-lg bg-gradient-to-r from-purple-50 to-purple-100">
+        <div className="p-4 rounded-lg bg-purple-50">
           <div className="flex items-center gap-3 mb-2">
             <Brain className="w-5 h-5 text-purple-600" />
             <span className="text-sm font-medium text-purple-900">AI発見可能性</span>
@@ -143,7 +143,7 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100">
+        <div className="p-4 rounded-lg bg-blue-50">
           <div className="flex items-center gap-3 mb-2">
             <Search className="w-5 h-5 text-[var(--bg-primary)]" />
             <span className="text-sm font-medium text-blue-900">検索可視性</span>
@@ -153,7 +153,7 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-gradient-to-r from-green-50 to-green-100">
+        <div className="p-4 rounded-lg bg-green-50">
           <div className="flex items-center gap-3 mb-2">
             <Eye className="w-5 h-5 text-green-600" />
             <span className="text-sm font-medium text-green-900">ブランド言及</span>

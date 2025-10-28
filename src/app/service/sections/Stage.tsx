@@ -34,7 +34,7 @@ export default function Stage() {
           </div>
 
           {/* ビジュアルカード */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-[var(--space-lg)] shadow-sm">
+          <div className="bg-blue-50 rounded-2xl border border-blue-100 p-[var(--space-lg)] shadow-sm">
             <Image
               src="/illustrations/zero-click-hero.svg"
               alt="検索からAI回答へのシフト図"

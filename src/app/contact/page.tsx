@@ -37,9 +37,7 @@ export default function ContactPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
+      <div className="min-h-screen bg-gray-50">
         
         <div className="relative z-10 max-w-2xl mx-auto px-6 section-spacing">
           <div className="mb-8">
@@ -48,13 +46,13 @@ export default function ContactPage() {
           
           <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/60 p-12 text-center">
             <div className="mb-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <span className="text-emerald-600">
                   お問い合わせを受け付けました
                 </span>
               </h1>
@@ -68,7 +66,7 @@ export default function ContactPage() {
               <HIGButton 
                 variant="primary"
                 size="lg"
-                className="bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl px-8 py-4 text-lg font-semibold"
+                className="bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl px-8 py-4 text-lg font-semibold"
               >
                 ヘルプセンターへ戻る
               </HIGButton>
@@ -80,9 +78,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.06),transparent_60%)]" />
+    <div className="min-h-screen bg-gray-50">
       
       <div className="relative z-10 max-w-3xl mx-auto px-6 section-spacing">
         <div className="mb-8">
@@ -97,7 +93,7 @@ export default function ContactPage() {
           </div>
           
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-[var(--bg-primary)] via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-[var(--bg-primary)]">
               ご質問・ご相談
             </span>
             <br />
@@ -195,7 +191,7 @@ export default function ContactPage() {
               />
             </div>
             
-            <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/60 p-6 rounded-2xl">
+            <div className="bg-blue-50 border border-blue-200/60 p-6 rounded-2xl">
               <p className="text-sm text-gray-700 leading-relaxed">
                 <span className="font-semibold text-gray-900">個人情報の取り扱いについて：</span><br />
                 お客様からいただいた個人情報は、お問い合わせへの回答およびサービス向上のためにのみ使用いたします。
@@ -209,7 +205,7 @@ export default function ContactPage() {
                 disabled={isSubmitting}
                 variant="primary"
                 size="lg"
-                className="w-full bg-gradient-to-r from-[var(--bg-primary)] to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl py-5 text-lg font-semibold"
+                className="w-full bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl py-5 text-lg font-semibold"
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-3">
