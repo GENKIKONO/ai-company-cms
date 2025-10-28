@@ -29,6 +29,7 @@ export default function FAB() {
       onClick={toggle}
       onKeyDown={handleKeyDown}
       className="
+        md:hidden
         fixed z-[9999]
         text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] 
         shadow-xl hover:shadow-2xl border-2 border-white

@@ -18,10 +18,13 @@ export default function MobileMenu({
   const panelRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
 
-  // Focus trap (very light)
+  // Focus management without scroll jump
   useEffect(() => {
     if (!open) return;
-    firstLinkRef.current?.focus();
+    // Focus without scrolling to element
+    if (firstLinkRef.current) {
+      firstLinkRef.current.focus({ preventScroll: true });
+    }
   }, [open]);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
