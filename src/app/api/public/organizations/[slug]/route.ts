@@ -1,8 +1,10 @@
 // Public API: /api/public/organizations/[slug]
 // 組織の公開情報とコンテンツを取得
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { supabaseServer, supabaseAdmin } from '@/lib/supabase-server';
 import { logger } from '@/lib/utils/logger';
+import { detectAIBot, extractBotInfoFromHeaders, shouldLogBot, extractClientIP } from '@/lib/utils/ai-bot-detector';
+import { logAIBotAccess } from '@/lib/utils/ai-bot-logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,13 +13,20 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  let orgId: string | null = null;
+  let headers: Headers | null = null;
+  let url: string | null = null;
+
   try {
     const { slug } = await params;
+    headers = request.headers;
+    url = request.url;
     
     // Claude改善: より詳細なログ記録でデバッグを支援
     logger.debug('Debug', `[API] Fetching organization data for slug: ${slug}`);
     
-    const supabase = await supabaseServer();
+    // 🔥 FIX: Public API should use admin client to bypass RLS for published content
+    const supabase = supabaseAdmin();
     
     // 組織情報を取得（is_published=true の企業のみ）
     const { data: organization, error: orgError } = await supabase
@@ -35,6 +44,8 @@ export async function GET(
       );
     }
 
+    // Store orgId for bot logging
+    orgId = organization.id;
     console.log(`[API] Found organization: ${organization.name} (ID: ${organization.id})`);
 
     // 公開されたコンテンツを並行取得
@@ -96,6 +107,17 @@ export async function GET(
       { error: 'Internal server error' },
       { status: 500 }
     );
+  } finally {
+    // 🤖 AI Bot Logging (non-blocking)
+    if (headers && url && orgId) {
+      try {
+        // 正しい引数でAI Bot Loggingを実行
+        await logAIBotAccess(headers, url, orgId, 200, 'GET');
+      } catch (logError) {
+        // Non-blocking: log error but don't affect response
+        logger.warn('AI bot logging failed:', logError);
+      }
+    }
   }
 }
 
@@ -106,7 +128,7 @@ export async function HEAD(
 ) {
   try {
     const { slug } = await params;
-    const supabase = await supabaseServer();
+    const supabase = supabaseAdmin();
     
     // 組織の存在確認のみ
     const { data, error } = await supabase

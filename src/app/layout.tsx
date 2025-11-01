@@ -3,6 +3,7 @@ import '@/design-system' // 新しいデザインシステム読み込み
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 import Footer from '@/components/layout/Footer'
 import { ToastProvider } from '@/components/ui/toast'
+import { Toaster } from 'sonner'
 import BuildBanner from '@/components/BuildBanner'
 import { env } from '@/lib/env'
 // WebVitalsReporter removed for production optimization
@@ -66,6 +67,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            <Toaster />
             {/* WebVitalsReporter removed for production optimization */}
           </ToastProvider>
         </I18nProvider>
