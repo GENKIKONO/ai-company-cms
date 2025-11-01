@@ -123,9 +123,9 @@ export async function GET(request: NextRequest) {
       user_agent: log.user_agent,
       ip_address: log.ip_address,
       response_status: log.response_status,
-      content_unit: log.ai_content_units ? {
-        title: log.ai_content_units.title,
-        content_type: log.ai_content_units.content_type,
+      content_unit: log.ai_content_units && Array.isArray(log.ai_content_units) && log.ai_content_units.length > 0 ? {
+        title: log.ai_content_units[0].title,
+        content_type: log.ai_content_units[0].content_type,
       } : null,
     }));
 

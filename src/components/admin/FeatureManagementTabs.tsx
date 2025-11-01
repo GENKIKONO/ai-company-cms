@@ -18,7 +18,7 @@ export function FeatureManagementTabs() {
         <TabsTrigger value="plan-features">
           プラン機能設定
         </TabsTrigger>
-        <TabsTrigger value="organization-overrides" disabled>
+        <TabsTrigger value="organization-overrides">
           組織別設定（準備中）
         </TabsTrigger>
       </TabsList>

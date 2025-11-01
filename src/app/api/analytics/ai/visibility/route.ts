@@ -121,9 +121,11 @@ export async function GET(request: NextRequest) {
 
     // 総合スコア計算
     const totalUrls = latestScoresList.length;
-    const averageScore = totalUrls > 0 
-      ? Math.round(latestScoresList.reduce((sum, score) => sum + score.total_visibility_score, 0) / totalUrls)
-      : 0;
+    let scoreSum = 0;
+    for (const score of latestScoresList) {
+      scoreSum += parseFloat(String((score as any).total_visibility_score || 0));
+    }
+    const averageScore = totalUrls > 0 ? Math.round(scoreSum / totalUrls) : 0;
 
     // トレンド集計（日別平均）
     const dailyTrends = (trendData || []).reduce((acc, score) => {
@@ -131,7 +133,7 @@ export async function GET(request: NextRequest) {
       if (!acc[date]) {
         acc[date] = { total: 0, count: 0 };
       }
-      acc[date].total += score.total_visibility_score;
+      acc[date].total += Number(score.total_visibility_score);
       acc[date].count += 1;
       return acc;
     }, {} as Record<string, { total: number; count: number }>);
@@ -146,11 +148,11 @@ export async function GET(request: NextRequest) {
 
     // コンテンツスコア詳細
     const contentScores = latestScoresList
-      .map(score => ({
+      .map((score: any) => ({
         url: score.url,
         title: score.ai_content_units?.title || null,
         content_type: score.ai_content_units?.content_type || null,
-        total_score: score.total_visibility_score,
+        total_score: Number(score.total_visibility_score),
         component_scores: {
           structured_data: score.structured_data_score,
           ai_access: score.ai_access_score,
@@ -165,12 +167,12 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.total_score - a.total_score); // スコア降順
 
     // サマリー統計
-    const topPerformingUrls = latestScoresList.filter(score => score.total_visibility_score >= 80).length;
-    const improvementNeededUrls = latestScoresList.filter(score => score.total_visibility_score <= 50).length;
+    const topPerformingUrls = latestScoresList.filter((score: any) => Number(score.total_visibility_score) >= 80).length;
+    const improvementNeededUrls = latestScoresList.filter((score: any) => Number(score.total_visibility_score) <= 50).length;
     const lastCalculation = latestScoresList.length > 0 
-      ? latestScoresList.reduce((latest, score) => 
+      ? latestScoresList.reduce((latest: string, score: any) => 
           new Date(score.calculated_at) > new Date(latest) ? score.calculated_at : latest, 
-          latestScoresList[0].calculated_at
+          (latestScoresList[0] as any).calculated_at
         )
       : null;
 
@@ -184,7 +186,7 @@ export async function GET(request: NextRequest) {
         average_score: averageScore,
         top_performing_urls: topPerformingUrls,
         improvement_needed_urls: improvementNeededUrls,
-        last_calculation: lastCalculation,
+        last_calculation: (lastCalculation as string) || '',
       },
     };
 

@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
       if (!acc[log.url]) {
         acc[log.url] = {
           url: log.url,
-          title: log.ai_content_units?.title || null,
+          title: (log.ai_content_units && Array.isArray(log.ai_content_units) && log.ai_content_units.length > 0) ? log.ai_content_units[0].title : null,
           hit_count: 0,
           bots: new Set<string>(),
         };

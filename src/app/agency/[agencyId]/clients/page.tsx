@@ -10,13 +10,12 @@ export const metadata: Metadata = {
   description: '代理店配下顧客一覧',
 };
 
-interface AgencyClientsPageProps {
-  params: {
-    agencyId: string;
-  };
-}
-
-export default function AgencyClientsPage({ params }: AgencyClientsPageProps) {
+export default async function AgencyClientsPage({ 
+  params 
+}: { 
+  params: Promise<{ agencyId: string }> 
+}) {
+  const resolvedParams = await params;
   // TODO: Phase 2で実装予定
   // - 代理店ID検証
   // - 配下顧客一覧取得
@@ -39,7 +38,7 @@ export default function AgencyClientsPage({ params }: AgencyClientsPageProps) {
               Agency Clients
             </h1>
             <p className="text-sm text-[var(--aio-text-muted)]">
-              代理店ID: {params.agencyId}
+              代理店ID: {resolvedParams.agencyId}
             </p>
           </div>
           

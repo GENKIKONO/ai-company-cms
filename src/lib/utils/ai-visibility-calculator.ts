@@ -190,22 +190,30 @@ export async function calculateAllVisibilityScores(
   const supabase = await supabaseServer();
 
   // 1. 対象URL一覧を取得（ai_content_units + ai_bot_logs から）
-  const { data: uniqueUrls, error } = await supabase
-    .from('ai_content_units')
-    .select('url')
-    .eq('org_id', orgId)
-    .union(
-      supabase
-        .from('ai_bot_logs')
-        .select('url')
-        .eq('org_id', orgId)
-    );
+  const [contentUnitsResult, botLogsResult] = await Promise.all([
+    supabase
+      .from('ai_content_units')
+      .select('url')
+      .eq('org_id', orgId),
+    supabase
+      .from('ai_bot_logs')
+      .select('url')
+      .eq('org_id', orgId)
+  ]);
 
-  if (error) {
-    throw error;
+  if (contentUnitsResult.error) {
+    throw contentUnitsResult.error;
+  }
+  if (botLogsResult.error) {
+    throw botLogsResult.error;
   }
 
-  const urls = [...new Set((uniqueUrls || []).map(item => item.url))];
+  // 両方のテーブルからのURLを結合して重複を除去
+  const allUrls = [
+    ...(contentUnitsResult.data || []).map(item => item.url),
+    ...(botLogsResult.data || []).map(item => item.url)
+  ];
+  const urls = [...new Set(allUrls)];
   
   // 2. 各URLに対してスコア計算
   const results: VisibilityScoreResult[] = [];
