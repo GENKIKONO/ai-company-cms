@@ -103,7 +103,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             
             {/* Main headline */}
             <h1 className="text-5xl md:text-6xl lg:text-8xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
-              <span className="text-[var(--bg-primary)]">
+              <span className="text-[var(--aio-primary)]">
                 AIに"正しく理解"
               </span>
               <br />
@@ -138,14 +138,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <Link
                 href="/auth/signup"
                 onClick={() => trackConversion()}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 14日間無料で始める
                 <ArrowRightIcon className="w-5 h-5" />
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-xl border border-gray-300 transition-all duration-300"
+                className="inline-flex items-center justify-center px-8 py-4 bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] font-bold rounded-xl border border-gray-300 transition-all duration-300"
               >
                 専門ヒアリング相談
               </Link>
@@ -164,7 +164,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-tight">
               大きな商談も、小さな問い合わせも、
               <br />
-              <span className="text-[var(--bg-primary)]">
+              <span className="text-[var(--aio-primary)]">
                 すべてに対応
               </span>
             </h2>
@@ -176,8 +176,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="grid md:grid-cols-3 gap-12 mb-20">
             <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
-                <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <BuildingIcon className="w-10 h-10 text-white" />
+                <div className="w-20 h-20 bg-[var(--aio-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <BuildingIcon className="w-10 h-10 text-[var(--text-on-primary)]" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">営業資料として</h3>
                 <p className="text-gray-600 text-lg leading-relaxed">
@@ -191,8 +191,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
-                <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <UserIcon className="w-10 h-10 text-white" />
+                <div className="w-20 h-20 bg-[var(--aio-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <UserIcon className="w-10 h-10 text-[var(--text-on-primary)]" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">採用活動で</h3>
                 <p className="text-gray-600 text-lg leading-relaxed">
@@ -206,8 +206,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
-                <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <InfoIcon className="w-10 h-10 text-white" />
+                <div className="w-20 h-20 bg-[var(--aio-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <InfoIcon className="w-10 h-10 text-[var(--text-on-primary)]" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">PR・広報で</h3>
                 <p className="text-gray-600 text-lg leading-relaxed">
@@ -223,13 +223,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="flex flex-col sm:flex-row justify-center gap-6">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="inline-flex items-center justify-center px-6 py-3 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               今すぐヒアリング申込み
             </Link>
             <Link
               href="#pricing"
-              className="inline-flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-xl border border-gray-300 transition-all duration-300"
+              className="inline-flex items-center justify-center px-6 py-3 bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] font-bold rounded-xl border border-gray-300 transition-all duration-300"
             >
               料金プランを見る
             </Link>
@@ -246,7 +246,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               シンプルな
-              <span className="text-[var(--bg-primary)]">
+              <span className="text-[var(--aio-primary)]">
                 3ステップ
               </span>
               で
@@ -263,7 +263,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative">
               <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center text-[var(--text-on-primary)] text-2xl font-bold shadow-lg">
                     1
                   </div>
                   <div className="hidden lg:block w-8 h-0.5 bg-blue-200 absolute -right-10 top-8"></div>
@@ -299,7 +299,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative">
               <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center text-[var(--text-on-primary)] text-2xl font-bold shadow-lg">
                     2
                   </div>
                   <div className="hidden lg:block w-8 h-0.5 bg-blue-200 absolute -right-10 top-8"></div>
@@ -335,7 +335,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative">
               <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center text-[var(--text-on-primary)] text-2xl font-bold shadow-lg">
                     3
                   </div>
                 </div>
@@ -371,7 +371,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="text-center mt-16">
             <Link
               href="/auth/signup"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               今すぐ3ステップを始める
               <ArrowRightIcon className="w-5 h-5" />
@@ -485,7 +485,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="text-center">
             <Link
               href="/auth/signup"
-              className="inline-flex items-center justify-center gap-2 text-lg px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 text-lg px-8 py-4 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             >
               14日間無料で体験する
               <ArrowRightIcon className="w-5 h-5" />
@@ -502,7 +502,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               シンプルで
-              <span className="text-[var(--bg-primary)]">
+              <span className="text-[var(--aio-primary)]">
                 透明な料金
               </span>
             </h2>
@@ -529,7 +529,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-blue-600 hover:bg-gray-50 font-bold rounded-xl border-none shadow-lg hover:shadow-xl transition-all duration-300"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--aio-surface)] text-[var(--aio-primary)] hover:bg-[var(--aio-muted)] font-bold rounded-xl border-none shadow-lg hover:shadow-xl transition-all duration-300"
             >
               お問い合わせフォーム
               <ArrowRightIcon className="w-5 h-5" />
@@ -554,7 +554,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <h2 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight text-gray-900">
             まずは情報を
             <br />
-            <span className="text-blue-600">
+            <span className="text-[var(--aio-primary)]">
               "構造化"
             </span>
             するところから。
@@ -567,14 +567,14 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
             <Link
               href="/auth/signup"
-              className="inline-flex items-center justify-center gap-2 text-xl px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
+              className="inline-flex items-center justify-center gap-2 text-xl px-10 py-5 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
             >
               14日間無料で始める
               <ArrowRightIcon className="w-5 h-5" />
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center text-xl px-10 py-5 bg-gray-100 border-2 border-gray-300 hover:bg-gray-200 hover:border-gray-400 text-gray-900 font-bold rounded-xl transition-all duration-300"
+              className="inline-flex items-center justify-center text-xl px-10 py-5 bg-[var(--aio-surface)] border-2 border-gray-300 hover:bg-[var(--aio-muted)] hover:border-gray-400 text-[var(--text-primary)] font-bold rounded-xl transition-all duration-300"
             >
               専門ヒアリング相談
             </Link>

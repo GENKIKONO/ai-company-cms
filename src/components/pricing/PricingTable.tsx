@@ -127,7 +127,7 @@ export default function PricingTable() {
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+                  <div className="bg-[var(--aio-primary)] text-[var(--text-on-primary)] px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
                     人気
                   </div>
                 </div>
@@ -135,11 +135,11 @@ export default function PricingTable() {
 
               <div className="text-center mb-8">
                 <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
-                  plan.color === 'blue' ? 'bg-blue-600' :
-                  plan.color === 'green' ? 'bg-blue-600' :
-                  'bg-gray-600'
+                  plan.color === 'blue' ? 'bg-[var(--aio-primary)]' :
+                  plan.color === 'green' ? 'bg-[var(--aio-primary)]' :
+                  'bg-[var(--aio-primary)]'
                 }`}>
-                  <plan.icon className="w-8 h-8 text-white" />
+                  <plan.icon className="w-8 h-8 text-[var(--text-on-primary)]" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                 <p className="text-gray-600 mb-6">{plan.description}</p>
@@ -235,7 +235,7 @@ export default function PricingTable() {
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+                    <div className="bg-[var(--aio-primary)] text-[var(--text-on-primary)] px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
                       人気
                     </div>
                   </div>
@@ -243,11 +243,11 @@ export default function PricingTable() {
 
                 <div className="text-center mb-8">
                   <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
-                    plan.color === 'blue' ? 'bg-blue-600' :
-                    plan.color === 'green' ? 'bg-blue-600' :
-                    'bg-gray-600'
+                    plan.color === 'blue' ? 'bg-[var(--aio-primary)]' :
+                    plan.color === 'green' ? 'bg-[var(--aio-primary)]' :
+                    'bg-[var(--aio-primary)]'
                   }`}>
-                    <plan.icon className="w-8 h-8 text-white" />
+                    <plan.icon className="w-8 h-8 text-[var(--text-on-primary)]" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                   <p className="text-gray-600 mb-6">{plan.description}</p>
@@ -310,8 +310,8 @@ export default function PricingTable() {
                     href={plan.ctaHref}
                     className={`inline-flex items-center justify-center w-full px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 ${
                       plan.popular 
-                        ? 'bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white' 
-                        : 'bg-[var(--bg-alt)] hover:bg-[var(--color-gray-100)] text-[var(--text-primary)] border border-[var(--border-light)]'
+                        ? 'bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)]' 
+                        : 'bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] border border-[var(--border-light)]'
                     }`}
                   >
                     {plan.ctaText}
@@ -343,7 +343,7 @@ export default function PricingTable() {
             
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)]"
             >
               お問い合わせ
             </Link>
