@@ -404,8 +404,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="group">
               <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center">
-                    <AlertTriangleIcon className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center">
+                    <AlertTriangleIcon className="w-8 h-8 text-[var(--text-on-primary)]" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900">見つけてもらえない企業</h3>
@@ -440,8 +440,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="group">
               <div className="bg-blue-50 border-2 border-blue-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-[var(--bg-primary)] rounded-2xl flex items-center justify-center">
-                    <CheckCircleIcon className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center">
+                    <CheckCircleIcon className="w-8 h-8 text-[var(--text-on-primary)]" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900">AIに理解される企業へ</h3>
@@ -520,7 +520,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         <section className="section-spacing">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           {/* Contact CTA */}
-          <div className="bg-[var(--bg-primary)] rounded-3xl p-12 mb-20 text-center text-white">
+          <div className="bg-[var(--aio-primary)] rounded-3xl p-12 mb-20 text-center text-[var(--text-on-primary)]">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               その他のご質問がございましたら
             </h2>

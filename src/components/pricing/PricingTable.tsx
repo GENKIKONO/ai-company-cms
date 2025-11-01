@@ -14,7 +14,7 @@ import { isPaidPlan, type PlanType } from '@/config/plans';
 // Dynamic class mapping for Tailwind purge safety
 const ICON_COLOR_MAP: Record<string, string> = {
   blue: "text-cyan-600",      // Starter - 水色系
-  green: "text-[var(--bg-primary)]",     // Pro - 青系
+  green: "text-[var(--aio-primary)]",     // Pro - 青系
   purple: "text-slate-800",   // Business - 黒系
   indigo: "text-indigo-600",
   gray: "text-slate-600",
@@ -202,8 +202,8 @@ export default function PricingTable() {
                   href={plan.ctaHref}
                   className={`inline-flex items-center justify-center w-full px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 ${
                     plan.popular 
-                      ? 'bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white' 
-                      : 'bg-[var(--bg-alt)] hover:bg-[var(--color-gray-100)] text-[var(--text-primary)] border border-[var(--border-light)]'
+                      ? 'bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)]' 
+                      : 'bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] border border-[var(--border-light)]'
                   }`}
                 >
                   {plan.ctaText}

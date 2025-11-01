@@ -392,7 +392,7 @@ export default async function OrganizationDetailPage({
                       href={organization.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 bg-[var(--bg-primary)] hover:bg-blue-700 text-white font-semibold rounded-xl lg:rounded-2xl px-4 py-3 lg:px-6 lg:py-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 min-h-[44px] text-sm lg:text-base"
+                      className="inline-flex items-center justify-center gap-2 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-semibold rounded-xl lg:rounded-2xl px-4 py-3 lg:px-6 lg:py-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 min-h-[44px] text-sm lg:text-base"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

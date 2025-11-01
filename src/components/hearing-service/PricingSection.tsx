@@ -25,7 +25,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
       {/* 人気バッジ */}
       {plan.popular && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-          <div className="bg-[var(--bg-primary)] text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+          <div className="bg-[var(--aio-primary)] text-[var(--text-on-primary)] px-6 py-2 rounded-full text-sm font-bold shadow-lg">
             人気
           </div>
         </div>
@@ -33,8 +33,8 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
       
       <div className="text-center mb-8">
         {/* アイコン */}
-        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg bg-[var(--bg-primary)]">
-          <IconComponent className="w-8 h-8 text-white" />
+        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg bg-[var(--aio-primary)]">
+          <IconComponent className="w-8 h-8 text-[var(--text-on-primary)]" />
         </div>
         
         {/* プラン名・説明 */}
@@ -49,7 +49,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
           <span className="text-gray-600 ml-1">（税別）</span>
           {plan.badge && (
             <div className="mt-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-[var(--bg-primary)]">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-[var(--aio-primary)]">
                 {plan.badge}
               </span>
             </div>
@@ -61,7 +61,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
       <ul className="space-y-4 mb-8 flex-1">
         {plan.features.map((feature, index) => (
           <li key={index} className="flex items-start">
-            <Check className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-[var(--bg-primary)]" />
+            <Check className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-[var(--aio-primary)]" />
             <span className="text-sm text-gray-900">{feature}</span>
           </li>
         ))}
@@ -78,7 +78,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
       <div className="text-center mt-auto">
         <Link
           href={generateContactUrl(planId)}
-          className="inline-flex items-center justify-center w-full px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white border-none shadow-lg hover:shadow-xl"
+          className="inline-flex items-center justify-center w-full px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] border-none shadow-lg hover:shadow-xl"
         >
           {plan.ctaText}
         </Link>
@@ -97,7 +97,7 @@ export default function PricingSection() {
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             シンプルで
-            <span className="text-[var(--bg-primary)]">
+            <span className="text-[var(--aio-primary)]">
               透明な料金
             </span>
           </h2>

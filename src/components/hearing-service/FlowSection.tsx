@@ -46,7 +46,7 @@ export default function FlowSection() {
         <div className="text-center mb-20">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             シンプルな
-            <span className="text-[var(--bg-primary)]">
+            <span className="text-[var(--aio-primary)]">
               3ステップ
             </span>
             で
@@ -74,12 +74,12 @@ export default function FlowSection() {
                 <div className="aio-surface relative p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                   {/* ステップ番号 */}
                   <div className="text-center mb-6">
-                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--bg-primary)] text-white shadow-lg mb-4">
+                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--aio-primary)] text-[var(--text-on-primary)] shadow-lg mb-4">
                       <span className="text-2xl font-bold">{step.step}</span>
                     </div>
                     
                     {/* アイコン */}
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--bg-primary)] text-white shadow-md -mt-2 ml-4">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--aio-primary)] text-[var(--text-on-primary)] shadow-md -mt-2 ml-4">
                       <IconComponent className="h-6 w-6" />
                     </div>
                   </div>

@@ -12,7 +12,7 @@ export default function HeroSection() {
           {/* Main title */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
             AIに選ばれる
-            <span className="text-[var(--bg-primary)]">
+            <span className="text-[var(--aio-primary)]">
               企業
             </span>
             になる
@@ -30,14 +30,14 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
             <Link 
               href="#pricing"
-              className="inline-flex items-center justify-center font-bold bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white px-10 py-5 text-xl rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="inline-flex items-center justify-center font-bold bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] px-10 py-5 text-xl rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               無料相談を申し込む
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <Link 
               href="#comparison"
-              className="inline-flex items-center justify-center font-bold border-2 border-[var(--bg-primary)] hover:border-[var(--bg-primary-hover)] bg-white hover:bg-gray-50 text-[var(--bg-primary)] px-10 py-5 text-xl rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="inline-flex items-center justify-center font-bold border-2 border-[var(--aio-primary)] hover:border-[var(--aio-primary-hover)] bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--aio-primary)] px-10 py-5 text-xl rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               サービス詳細を見る
             </Link>

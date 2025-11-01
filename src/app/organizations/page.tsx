@@ -19,6 +19,7 @@ interface SearchFilters {
 }
 
 export default function OrganizationsPage() {
+  const [mounted, setMounted] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [industries, setIndustries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +32,10 @@ export default function OrganizationsPage() {
     hasCaseStudies: false,
     sortBy: 'updated' // デフォルトを更新日順に変更
   });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 公開済み企業データの取得
   useEffect(() => {
@@ -190,6 +195,16 @@ export default function OrganizationsPage() {
       sortBy: 'updated' 
     });
   };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen">
+        <AioSection tone="white">
+          <div className="text-center py-8">Loading...</div>
+        </AioSection>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">

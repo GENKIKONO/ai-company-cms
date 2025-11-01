@@ -69,7 +69,7 @@ export default function FAQSection() {
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             よくある
-            <span className="text-[var(--bg-primary)]">
+            <span className="text-[var(--aio-primary)]">
               質問
             </span>
           </h2>
@@ -135,13 +135,6 @@ export default function FAQSection() {
               onClick={() => window.location.href = "mailto:support@luxucare.jp"}
             >
               メールで問い合わせ
-            </HIGButton>
-            <HIGButton
-              variant="secondary"
-              size="lg"
-              onClick={() => window.location.href = "tel:03-1234-5678"}
-            >
-              電話で相談する
             </HIGButton>
           </div>
         </div>
