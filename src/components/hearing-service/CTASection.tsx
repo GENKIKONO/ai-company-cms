@@ -11,16 +11,16 @@ export default function CTASection() {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center">
           {/* メインメッセージ */}
-          <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          <h2 className="text-5xl lg:text-6xl font-bold text-[var(--text-on-primary)] mb-6 leading-tight">
             まずは情報を
             <br />
-            <span className="text-[var(--aio-primary)]">
+            <span className="text-[var(--aio-surface)] bg-[var(--aio-primary)] px-2 py-1 rounded">
               "構造化"
             </span>
             するところから。
           </h2>
           
-          <p className="text-2xl mb-12 text-gray-700 leading-relaxed">
+          <p className="text-2xl mb-12 text-[var(--text-on-primary)] leading-relaxed">
             14日間の無料体験で機能をお試しください
           </p>
 
@@ -30,22 +30,22 @@ export default function CTASection() {
               <div className="w-12 h-12 bg-[var(--aio-primary)] rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Clock className="w-6 h-6 text-[var(--text-on-primary)]" />
               </div>
-              <div className="text-gray-900 font-bold text-lg mb-2">最短2週間</div>
-              <div className="text-gray-800">スピード対応</div>
+              <div className="text-[var(--text-on-primary)] font-bold text-lg mb-2">最短2週間</div>
+              <div className="text-[var(--text-on-primary)]">スピード対応</div>
             </div>
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
               <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Calendar className="w-6 h-6 text-[var(--text-on-primary)]" />
               </div>
-              <div className="text-gray-900 font-bold text-lg mb-2">予約制</div>
-              <div className="text-gray-800">確実な対応</div>
+              <div className="text-[var(--text-on-primary)] font-bold text-lg mb-2">予約制</div>
+              <div className="text-[var(--text-on-primary)]">確実な対応</div>
             </div>
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
               <div className="w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Star className="w-6 h-6 text-[var(--text-on-primary)]" />
               </div>
-              <div className="text-gray-900 font-bold text-lg mb-2">専門対応</div>
-              <div className="text-gray-800">AI最適化の専門家</div>
+              <div className="text-[var(--text-on-primary)] font-bold text-lg mb-2">専門対応</div>
+              <div className="text-[var(--text-on-primary)]">AI最適化の専門家</div>
             </div>
           </div>
 
@@ -101,10 +101,10 @@ export default function CTASection() {
 
           {/* 追加情報 */}
           <div className="mt-12 text-center">
-            <p className="text-lg text-green-700 mb-4">
+            <p className="text-lg text-[var(--text-on-primary)] mb-4">
               ✓ 初回相談無料　✓ 契約前のお見積もり無料　✓ オンライン対応可能
             </p>
-            <p className="text-gray-600">
+            <p className="text-[color:var(--text-on-primary-muted,_rgba(255,255,255,0.78))]">
               ※ お申し込み後、担当者より24時間以内にご連絡いたします
             </p>
           </div>
