@@ -10,6 +10,7 @@ import FlowSection from '@/components/aio/FlowSection';
 import PricingTable from '@/components/pricing/PricingTable';
 import FAQSection from '@/components/aio/FAQSection';
 import { aioCopy } from '@/app/aio/copy';
+import AioSection from '@/components/layout/AioSection';
 
 import { 
   CheckCircleIcon, 
@@ -87,7 +88,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Modern Hero Section */}
-      <section className="relative overflow-hidden min-h-screen flex items-center">
+      <AioSection tone="white">
+        <section className="relative overflow-hidden min-h-screen flex items-center">
         {/* Simple background */}
         <div className="absolute inset-0 bg-white" />
         
@@ -151,10 +153,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
           </div>
         </div>
-      </section>
+        </section>
+      </AioSection>
 
       {/* Features Section */}
-      <section className="section-spacing-large bg-gray-50">
+      <AioSection tone="muted">
+        <section className="section-spacing-large">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-24">
             <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-tight">
@@ -170,7 +174,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           <div className="grid md:grid-cols-3 gap-12 mb-20">
-            <div className="group relative bg-white rounded-3xl p-10 border border-gray-200/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
                 <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <BuildingIcon className="w-10 h-10 text-white" />
@@ -185,7 +189,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <div className="absolute inset-0 bg-blue-50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
 
-            <div className="group relative bg-white rounded-3xl p-10 border border-gray-200/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
                 <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <UserIcon className="w-10 h-10 text-white" />
@@ -200,7 +204,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               <div className="absolute inset-0 bg-blue-50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
 
-            <div className="group relative bg-white rounded-3xl p-10 border border-gray-200/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="mb-8">
                 <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <InfoIcon className="w-10 h-10 text-white" />
@@ -231,11 +235,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </Link>
           </div>
         </div>
-      </section>
+        </section>
+      </AioSection>
 
 
       {/* How it Works Section */}
-      <section className="section-spacing bg-white">
+      <AioSection tone="white">
+        <section className="section-spacing">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -255,7 +261,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Step 1 */}
             <div className="relative">
-              <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
+              <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     1
@@ -291,7 +297,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             {/* Step 2 */}
             <div className="relative">
-              <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
+              <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     2
@@ -327,7 +333,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
             {/* Step 3 */}
             <div className="relative">
-              <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
+              <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                     3
@@ -372,11 +378,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </Link>
           </div>
         </div>
-      </section>
+        </section>
+      </AioSection>
 
 
       {/* Before/After Comparison Section */}
-      <section className="section-spacing bg-white">
+      <AioSection tone="white">
+        <section className="section-spacing">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -405,7 +413,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   </div>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
+                <div className="aio-surface border border-gray-200 p-6 mb-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">AI回答</div>
                     <span className="text-gray-600 font-semibold">エラー</span>
@@ -441,7 +449,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   </div>
                 </div>
 
-                <div className="bg-white border border-blue-200 rounded-2xl p-6 mb-6">
+                <div className="aio-surface border border-blue-200 p-6 mb-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">AI回答</div>
                     <span className="text-blue-600 font-semibold">成功</span>
@@ -484,10 +492,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </Link>
           </div>
         </div>
-      </section>
+        </section>
+      </AioSection>
 
       {/* Pricing Section */}
-      <section className="section-spacing bg-gray-50" id="pricing">
+      <AioSection tone="muted">
+        <section className="section-spacing" id="pricing">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -502,10 +512,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           <PricingTable />
         </div>
-      </section>
+        </section>
+      </AioSection>
 
       {/* FAQ Section */}
-      <section className="section-spacing bg-gray-50">
+      <AioSection tone="muted">
+        <section className="section-spacing">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           {/* Contact CTA */}
           <div className="bg-[var(--bg-primary)] rounded-3xl p-12 mb-20 text-center text-white">
@@ -530,10 +542,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             categories={aioCopy.faq.categories}
           />
         </div>
-      </section>
+        </section>
+      </AioSection>
 
       {/* Final CTA Section */}
-      <section className="section-spacing-large bg-white text-gray-900 relative overflow-hidden">
+      <AioSection tone="white">
+        <section className="section-spacing-large text-gray-900 relative overflow-hidden">
         {/* Background effects */}
         
         <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center">
@@ -581,7 +595,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+      </AioSection>
 
     </div>
   );

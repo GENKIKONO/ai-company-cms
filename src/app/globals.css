@@ -35,7 +35,7 @@
 @import '../styles/hig-design-tokens.css';
 
 /* Existing Design System Components */
-@import '../design-system/tokens/colors.css';
+@import '../styles/design-tokens.css';
 @import '../design-system/tokens/typography.css';
 @import '../design-system/tokens/utilities.css';
 @import '../design-system/patterns/sections.css';

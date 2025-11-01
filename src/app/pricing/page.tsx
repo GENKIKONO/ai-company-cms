@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import PricingTable from '@/components/pricing/PricingTable';
+import AioSection from '@/components/layout/AioSection';
 
 export const metadata: Metadata = {
   title: '料金プラン - AI最適化CMSサービス | AIO Hub',
@@ -27,11 +28,11 @@ export default function PricingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="min-h-screen bg-white">
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-6 section-spacing">
-          {/* Hero Section */}
-          <div className="text-center mb-16">
+      <div className="min-h-screen">
+        <AioSection tone="white">
+          <div className="relative z-10 max-w-7xl mx-auto px-6 section-spacing">
+            {/* Hero Section */}
+            <div className="text-center mb-16">
             <div className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-full px-6 py-3 mb-8 text-sm font-semibold text-gray-700 shadow-lg">
               <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
               料金プラン
@@ -48,10 +49,11 @@ export default function PricingPage() {
               無料から始めて、必要になったら拡張。<br />
               最小の入力で、Schema.org準拠の企業情報構造化を実現します。
             </p>
+            </div>
+            
+            <PricingTable />
           </div>
-          
-          <PricingTable />
-        </div>
+        </AioSection>
       </div>
     </>
   );

@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function CTASection() {
   return (
-    <section className="relative section-spacing-large overflow-hidden bg-white">
+    <section className="relative section-spacing-large overflow-hidden">
       {/* 背景装飾 - more subtle */}
       
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">

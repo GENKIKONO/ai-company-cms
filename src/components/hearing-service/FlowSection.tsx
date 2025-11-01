@@ -40,7 +40,7 @@ const flowSteps = [
 
 export default function FlowSection() {
   return (
-    <section className="section-spacing bg-gray-50">
+    <section className="section-spacing">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
         <div className="text-center mb-20">
@@ -71,7 +71,7 @@ export default function FlowSection() {
                   <div className="hidden md:block absolute top-16 -right-6 lg:-right-12 w-6 lg:w-12 h-0.5 bg-gray-300 z-0"></div>
                 )}
                 
-                <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
+                <div className="aio-surface relative p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                   {/* ステップ番号 */}
                   <div className="text-center mb-6">
                     <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--bg-primary)] text-white shadow-lg mb-4">

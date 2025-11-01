@@ -9,6 +9,7 @@ import FlowSection from '@/components/aio/FlowSection';
 import PricingTable from '@/components/pricing/PricingTable';
 import FAQSection from '@/components/aio/FAQSection';
 import CTASection from '@/components/aio/CTASection';
+import AioSection from '@/components/layout/AioSection';
 import { aioCopy } from './copy';
 
 export const metadata: Metadata = {
@@ -120,7 +121,7 @@ export default function AIOPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aioJsonLd) }}
       />
       
-      <div className="min-h-screen bg-white">
+      <AioSection tone="white">
         {/* ヒーローセクション */}
         <HeroSection
           title={aioCopy.hero.title}
@@ -166,7 +167,7 @@ export default function AIOPage() {
           secondaryHref={aioCopy.cta.secondaryHref}
           features={aioCopy.cta.features}
         />
-      </div>
+      </AioSection>
     </>
   );
 }

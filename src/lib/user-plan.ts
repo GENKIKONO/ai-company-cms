@@ -65,7 +65,7 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
         .maybeSingle();
 
       const isActive = subscription?.status === 'active';
-      const plan = (organization.plan || 'free') as PlanType;
+      const plan = (organization.plan || 'trial') as PlanType;
 
       console.log(`[getUserPlan] Plan found: ${plan} (active: ${isActive})`);
       
@@ -79,7 +79,7 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
     }
 
     // Default to organization plan or free
-    const plan = (organization.plan || 'free') as PlanType;
+    const plan = (organization.plan || 'trial') as PlanType;
     console.log(`[getUserPlan] Plan found (no subscription): ${plan}`);
     
     return {

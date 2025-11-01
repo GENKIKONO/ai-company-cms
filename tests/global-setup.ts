@@ -191,7 +191,7 @@ async function seedTestData(supabase: any, users: any[]) {
         description: 'E2Eテスト用の組織です',
         created_by: adminUser.id,
         status: 'published',
-        plan: 'free',
+        plan: 'trial',
         // Single-org modeのため、owner_user_idではなくcreated_byを使用
         address_postal_code: '100-0001',
         address_region: '東京都',

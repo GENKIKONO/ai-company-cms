@@ -1,12 +1,9 @@
 /**
- * 価格フォーマッタと新価格体系管理
+ * 価格フォーマッタ - config/plans.ts のラッパー
+ * 旧コードとの互換性のために残存
  */
 
-// 新価格体系（環境変数から価格を取得、デフォルトあり）
-const BASIC_PRICE = Number(process.env.BASIC_PRICE) || 5000;
-const BUSINESS_PRICE = Number(process.env.BUSINESS_PRICE) || 15000;
-const ENTERPRISE_PRICE_FROM = Number(process.env.ENTERPRISE_PRICE_FROM) || 30000;
-const CURRENCY = process.env.CURRENCY || 'JPY';
+import { PLAN_PRICES, PLAN_NAMES } from '@/config/plans';
 
 /**
  * 日本円を税込み表記でフォーマット
@@ -16,42 +13,33 @@ export function formatJPY(n: number): string {
 }
 
 /**
- * プラン価格情報を取得
- */
-export function getBasicPrice(): number {
-  return BASIC_PRICE;
-}
-
-export function getBusinessPrice(): number {
-  return BUSINESS_PRICE;
-}
-
-export function getEnterprisePrice(): number {
-  return ENTERPRISE_PRICE_FROM;
-}
-
-/**
- * 全プランの価格情報
+ * 旧PRICING_CONFIG互換性用ラッパー
+ * 注意: 新規開発では @/config/plans の PLAN_PRICES を直接使用してください
  */
 export const PRICING_CONFIG = {
-  free: {
-    price: 0,
-    name: 'Free',
-    displayPrice: '¥0'
+  trial: {
+    price: PLAN_PRICES.trial,
+    name: PLAN_NAMES.trial,
+    displayPrice: PLAN_PRICES.trial === 0 ? '無料' : formatJPY(PLAN_PRICES.trial)
   },
-  basic: {
-    price: BASIC_PRICE,
-    name: 'Basic',
-    displayPrice: formatJPY(BASIC_PRICE)
+  starter: {
+    price: PLAN_PRICES.starter,
+    name: PLAN_NAMES.starter,
+    displayPrice: formatJPY(PLAN_PRICES.starter)
+  },
+  pro: {
+    price: PLAN_PRICES.pro,
+    name: PLAN_NAMES.pro,
+    displayPrice: formatJPY(PLAN_PRICES.pro)
   },
   business: {
-    price: BUSINESS_PRICE,
-    name: 'Business',
-    displayPrice: formatJPY(BUSINESS_PRICE)
+    price: PLAN_PRICES.business,
+    name: PLAN_NAMES.business,
+    displayPrice: formatJPY(PLAN_PRICES.business)
   },
   enterprise: {
-    priceFrom: ENTERPRISE_PRICE_FROM,
-    name: 'Enterprise',
-    displayPrice: `${formatJPY(ENTERPRISE_PRICE_FROM)}〜`
+    priceFrom: PLAN_PRICES.enterprise,
+    name: PLAN_NAMES.enterprise,
+    displayPrice: `${formatJPY(PLAN_PRICES.enterprise)}〜`
   }
 } as const;

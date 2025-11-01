@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
-import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { PLAN_LIMITS } from '@/config/plans';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

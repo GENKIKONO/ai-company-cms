@@ -187,7 +187,8 @@ export const EMBED_OEM = {
  * プランの埋め込み制限を取得
  */
 export function getEmbedLimits(plan: PlanType) {
-  // Map new plan names to existing embed limits
+  // 現行プラン名を埋め込み制限内部キーにマッピング
+  // 理由: 埋め込み制限は従来のfree/standard/enterpriseの3階層で管理
   const planMapping: Record<PlanType, keyof typeof EMBED_LIMITS> = {
     trial: 'free',
     starter: 'free', 

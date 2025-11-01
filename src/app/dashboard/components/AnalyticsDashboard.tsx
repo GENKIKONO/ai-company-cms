@@ -7,7 +7,8 @@ import AIVisibilityReport from '@/components/analytics/AIVisibilityReport';
 import TeamManagement from '@/components/team/TeamManagement';
 import { getTrialStatus, type TrialStatus } from '@/lib/trial-manager';
 import type { Organization } from '@/types/database';
-import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { PLAN_LIMITS } from '@/config/plans';
+import { getVisibleFeaturesForPlan } from '@/lib/features';
 import { logger } from '@/lib/utils/logger';
 
 interface AnalyticsDashboardProps {
@@ -74,9 +75,14 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
   }, [organization]);
 
   const planLimits = PLAN_LIMITS[organization.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.starter;
-  const hasStructuredScoreFeature = planLimits.structured_score;
-  const hasAIVisibilityFeature = planLimits.ai_visibility_reports;
-  const hasTeamManagement = planLimits.team_management;
+  
+  // 新しい機能レジストリから機能を取得
+  const features = getVisibleFeaturesForPlan(organization.plan as any || 'starter');
+  const hasStructuredScoreFeature = features.some(f => f.id === 'structuredData');
+  const hasAIVisibilityFeature = features.some(f => f.id === 'aiVisibilityScore');
+  
+  // チーム管理は機能レジストリにないため、プラン別判定を維持
+  const hasTeamManagement = organization.plan === 'business' || organization.plan === 'pro';
 
   if (loading) {
     return (

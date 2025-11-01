@@ -68,7 +68,6 @@ export async function POST(request: NextRequest) {
     // 許可されたパスの制限（オプション）
     const allowedPaths = [
       '/hearing-service',
-      '/pricing-demo',
       '/',
       '/aio',
       '/organizations',
@@ -138,7 +137,6 @@ export async function GET() {
       methods: ['POST'],
       allowedPaths: [
         '/hearing-service',
-        '/pricing-demo', 
         '/',
         '/aio',
         '/organizations',

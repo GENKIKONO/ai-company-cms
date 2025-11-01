@@ -16,7 +16,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
   
   return (
     <div
-      className={`relative bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 h-full flex flex-col ${
+      className={`aio-surface relative border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 h-full flex flex-col ${
         plan.popular
           ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent scale-105'
           : ''
@@ -91,7 +91,7 @@ export default function PricingSection() {
   const planIds: HearingServicePlanId[] = ['light', 'advance', 'full', 'continuous'];
   
   return (
-    <section id="pricing" className="section-spacing bg-gray-50">
+    <section id="pricing" className="section-spacing">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
         <div className="text-center mb-16">
@@ -133,7 +133,7 @@ export default function PricingSection() {
 
         {/* 追加情報 */}
         <div className="text-center">
-          <div className="bg-white rounded-3xl p-8 lg:p-12 max-w-4xl mx-auto shadow-xl border border-gray-100">
+          <div className="aio-surface p-8 lg:p-12 max-w-4xl mx-auto border border-gray-100">
             <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">すべてのプランに14日間の満足保証が含まれています</h3>
             <p className="text-lg text-gray-600 mb-8">
               お取り組みを通じて、ChatGPT検索・AI要約での企業情報の発見性向上を目指します。

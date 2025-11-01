@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { FAQ, FAQFormData } from '@/types/database';
 import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
-import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { PLAN_LIMITS } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
 
 async function logErrorToDiag(errorInfo: any) {

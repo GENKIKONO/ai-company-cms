@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import type { Post, PostFormData } from '@/types/database';
 import { normalizePostPayload, validateSlug, createAuthError, createNotFoundError, createConflictError, createValidationError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
-import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { PLAN_LIMITS } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
 
 // エラーログ送信関数（失敗しても無視）

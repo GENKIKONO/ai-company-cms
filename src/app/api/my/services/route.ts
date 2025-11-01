@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     }
 
     // プラン制限チェック
-    const currentPlan = (orgData.plan || 'free') as PlanType;
+    const currentPlan = (orgData.plan || 'trial') as PlanType;
     const serviceLimit = PLAN_LIMITS[currentPlan].services;
     
     // 無制限以外の場合は制限チェック

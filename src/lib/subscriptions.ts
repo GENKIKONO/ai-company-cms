@@ -83,7 +83,7 @@ export async function checkPlanLimits(userId: string, resourceType: 'organizatio
   try {
     // ユーザーのサブスクリプション取得
     const { data: subscription } = await getUserSubscription(userId);
-    const planId = subscription?.plan_id || 'free';
+    const planId = subscription?.plan_id || 'trial';
     const plan = SUBSCRIPTION_PLANS[planId as keyof typeof SUBSCRIPTION_PLANS] || SUBSCRIPTION_PLANS.FREE;
 
     // 現在の使用量取得

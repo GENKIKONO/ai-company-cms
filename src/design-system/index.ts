@@ -9,7 +9,7 @@ export { HIGCard } from './components/HIGCard';
 export { default as HeroSection } from './patterns/HeroSection';
 
 // CSS Imports - 順序重要（トークン → パターン）
-import './tokens/colors.css';
+// Unified color tokens are now in styles/design-tokens.css via globals.css
 import './tokens/typography.css';
 import './tokens/utilities.css';
 import './patterns/sections.css';

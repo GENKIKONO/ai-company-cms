@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { getOrganizations, getIndustries } from '@/lib/organizations';
 import { type Organization } from '@/types/database';
 import { logger } from '@/lib/utils/logger';
+import AioSection from '@/components/layout/AioSection';
 
 interface SearchFilters {
   search: string;
@@ -191,10 +192,11 @@ export default function OrganizationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* ページタイトル */}
-        <div className="mb-8">
+    <div className="min-h-screen">
+      <AioSection tone="white">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* ページタイトル */}
+          <div className="mb-8">
           <h1 className="jp-heading text-3xl font-bold text-gray-900 mb-2">企業ディレクトリ</h1>
           <p className="jp-body text-lg text-gray-600">
             AIO Hubに登録された<span className="jp-number-unit">{organizations.length}社</span>の企業情報を検索・閲覧できます
@@ -202,7 +204,7 @@ export default function OrganizationsPage() {
         </div>
 
         {/* 検索・フィルター */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
           {/* 検索ボックス */}
           <div className="mb-6">
             <div className="relative">
@@ -399,7 +401,7 @@ export default function OrganizationsPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+              <div key={i} className="rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
                   <div className="ml-3">
@@ -430,7 +432,7 @@ export default function OrganizationsPage() {
               <Link
                 key={org.id}
                 href={`/o/${org.slug}`}
-                className="group bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                className="aio-surface group border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
               >
                 <div className="flex items-center mb-4">
                   {org.logo_url ? (
@@ -439,7 +441,7 @@ export default function OrganizationsPage() {
                       alt={`${org.name}のロゴ`}
                       width={56}
                       height={56}
-                      className="w-14 h-14 object-contain bg-white rounded-md border border-gray-200 shadow-sm group-hover:scale-105 transition-transform duration-300"
+                      className="w-14 h-14 object-contain rounded-md border border-gray-200 shadow-sm group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
                     <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
@@ -534,7 +536,8 @@ export default function OrganizationsPage() {
             ))}
           </div>
         )}
-      </main>
+        </main>
+      </AioSection>
     </div>
   );
 }

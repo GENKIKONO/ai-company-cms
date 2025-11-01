@@ -4,7 +4,7 @@ import { X, Check, AlertTriangle, Sparkles } from 'lucide-react';
 
 export default function ComparisonSection() {
   return (
-    <section id="comparison" className="section-spacing bg-white">
+    <section id="comparison" className="section-spacing">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -20,7 +20,7 @@ export default function ComparisonSection() {
 
         <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Before Card */}
-          <div className="relative bg-white rounded-3xl border-2 border-gray-200 p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="aio-surface relative border-2 border-gray-200 p-8 hover:shadow-xl transition-all duration-300">
             <div className="absolute -top-4 left-8">
               <div className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full border border-gray-200">
                 <X className="h-4 w-4" />
@@ -53,7 +53,7 @@ export default function ComparisonSection() {
           </div>
 
           {/* After Card */}
-          <div className="relative bg-white rounded-3xl border-2 border-blue-200 p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="aio-surface relative border-2 border-blue-200 p-8 hover:shadow-xl transition-all duration-300">
             <div className="absolute -top-4 left-8">
               <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full border border-blue-200">
                 <Check className="h-4 w-4" />

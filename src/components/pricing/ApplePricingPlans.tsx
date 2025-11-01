@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Check, MessageSquare, Target, Building2, Sparkles } from 'lucide-react';
 import { PrimaryCTA, SecondaryCTA } from '@/design-system';
+import { PLAN_FEATURES, type PlanType } from '@/config/plans';
 
 interface PlanFeature {
   text: string;
@@ -24,7 +25,9 @@ interface PricingPlan {
   ctaHref: string;
 }
 
-const PRICING_PLANS: PricingPlan[] = [
+// ヒアリングサービス専用のプラン定義
+// 注意: これはCMSプランとは別のサービス（ヒアリング代行）の料金です
+const HEARING_SERVICE_PLANS: PricingPlan[] = [
   {
     id: 'starter',
     name: 'ライトヒアリング',
@@ -98,7 +101,7 @@ export default function ApplePricingPlans() {
 
         {/* Mobile: 縦積み */}
         <div className="apple-pricing-mobile">
-          {PRICING_PLANS.map((plan) => (
+          {HEARING_SERVICE_PLANS.map((plan) => (
             <div key={plan.id} className={`apple-pricing-card ${plan.popular ? 'apple-pricing-card-popular' : ''}`}>
               {plan.badge && (
                 <div className="apple-pricing-badge">
@@ -158,7 +161,7 @@ export default function ApplePricingPlans() {
         {/* Desktop: 3カラムグリッド */}
         <div className="apple-pricing-desktop">
           <div className="apple-pricing-grid">
-            {PRICING_PLANS.map((plan) => (
+            {HEARING_SERVICE_PLANS.map((plan) => (
               <div key={plan.id} className={`apple-pricing-card ${plan.popular ? 'apple-pricing-card-popular' : ''}`}>
                 {plan.badge && (
                   <div className="apple-pricing-badge">

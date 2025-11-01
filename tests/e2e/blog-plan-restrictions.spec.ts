@@ -6,9 +6,9 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Blog Plan Restrictions', () => {
-  test.describe('Free Plan - Blog Restrictions', () => {
-    test('should return 403 for blog creation on free plan', async ({ page }) => {
-      // NOTE: This test assumes user is logged in with free plan
+  test.describe('Trial Plan - Blog Restrictions', () => {
+    test('should return 403 for blog creation on trial plan', async ({ page }) => {
+      // NOTE: This test assumes user is logged in with trial plan
       // In real test, you would need to set up proper authentication
       
       const response = await page.goto('/dashboard/posts/new', { 
@@ -35,9 +35,9 @@ test.describe('Blog Plan Restrictions', () => {
     });
   });
 
-  test.describe('Basic+ Plan - Blog Access', () => {
-    test('should allow blog creation on basic+ plan', async ({ page }) => {
-      // NOTE: This test assumes user is logged in with basic+ plan
+  test.describe('Starter+ Plan - Blog Access', () => {
+    test('should allow blog creation on starter+ plan', async ({ page }) => {
+      // NOTE: This test assumes user is logged in with starter+ plan
       // In real implementation, you would need proper test data setup
       
       const response = await page.goto('/dashboard/posts/new', { 

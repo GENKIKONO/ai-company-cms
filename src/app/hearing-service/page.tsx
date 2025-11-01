@@ -10,6 +10,7 @@ import FlowSection from '@/components/hearing-service/FlowSection';
 import PricingSection from '@/components/hearing-service/PricingSection';
 import FAQSection from '@/components/hearing-service/FAQSection';
 import CTASection from '@/components/hearing-service/CTASection';
+import AioSection from '@/components/layout/AioSection';
 
 // ISR設定: 即時反映を優先（安定後は60などに調整可）
 export const revalidate = 0;
@@ -123,22 +124,34 @@ export default function HearingServicePage() {
       
       <div className="min-h-screen">
         {/* ヒーローセクション */}
-        <HeroSection />
+        <AioSection tone="white">
+          <HeroSection />
+        </AioSection>
         
         {/* 構造化前後の違い */}
-        <ComparisonSection />
+        <AioSection tone="muted">
+          <ComparisonSection />
+        </AioSection>
         
         {/* サービス流れ説明 */}
-        <FlowSection />
+        <AioSection tone="white">
+          <FlowSection />
+        </AioSection>
         
         {/* 料金プラン */}
-        <PricingSection />
+        <AioSection tone="muted">
+          <PricingSection />
+        </AioSection>
         
         {/* よくある質問 */}
-        <FAQSection />
+        <AioSection tone="white">
+          <FAQSection />
+        </AioSection>
         
         {/* CTA（申込導線） */}
-        <CTASection />
+        <AioSection tone="primary">
+          <CTASection />
+        </AioSection>
       </div>
     </>
   );

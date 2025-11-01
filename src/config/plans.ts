@@ -320,3 +320,43 @@ export function getPostLimitMessage(planType: PlanType): string {
   if (limit === Number.POSITIVE_INFINITY) return '';
   return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（記事上限: ${limit}件）。`;
 }
+
+/**
+ * 有料プランかどうかチェック
+ */
+export function isPaidPlan(planType: PlanType): boolean {
+  return PLAN_PRICES[planType] > 0;
+}
+
+/**
+ * プラン機能マッピング
+ */
+import { FEATURES } from './features';
+
+export const PLAN_FEATURE_MAP = {
+  trial: [
+    FEATURES.structuredData,
+    FEATURES.pricingModule,
+  ],
+  starter: [
+    FEATURES.structuredData,
+    FEATURES.pricingModule,
+    FEATURES.orgDirectory,
+  ],
+  pro: [
+    FEATURES.structuredData,
+    FEATURES.pricingModule,
+    FEATURES.orgDirectory,
+    FEATURES.faqModule,
+    FEATURES.hearingService,
+  ],
+  business: [
+    FEATURES.structuredData,
+    FEATURES.pricingModule,
+    FEATURES.orgDirectory,
+    FEATURES.faqModule,
+    FEATURES.hearingService,
+    FEATURES.aiCrawlCheck,
+    FEATURES.aiVisibilityScore,
+  ],
+} as const;

@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="relative section-spacing-large overflow-hidden bg-white">
+    <section className="relative section-spacing-large overflow-hidden">
       
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center">

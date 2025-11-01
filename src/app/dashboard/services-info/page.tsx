@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
-import { PLAN_LIMITS } from '@/lib/plan-limits';
+import { PLAN_LIMITS } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
 
 export default function ServicesInfoPage() {

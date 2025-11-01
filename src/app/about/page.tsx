@@ -31,30 +31,32 @@ export default function AboutPage() {
       />
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <section className="relative overflow-hidden section-spacing">
-          <div className="absolute inset-0 bg-blue-50" />
-          
-          <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-8 text-center">
-            <div className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-full px-6 py-3 mb-10 text-sm font-semibold text-gray-700 shadow-lg">
-              <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
-              サービス概要
+        <AioSection tone="muted">
+          <section className="relative overflow-hidden section-spacing">
+            <div className="absolute inset-0" style={{backgroundColor: 'var(--color-muted)'}} />
+            
+            <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-8 text-center">
+              <div className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-full px-6 py-3 mb-10 text-sm font-semibold text-gray-700 shadow-lg">
+                <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
+                サービス概要
+              </div>
+              
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
+                <span className="text-[var(--color-primary)]">
+                  AI企業CMS
+                </span>
+                <br />
+                プラットフォーム
+              </h1>
+              
+              <p className="text-xl lg:text-2xl text-gray-600 mb-16 leading-relaxed max-w-4xl mx-auto">
+                AI技術を活用した企業情報の統合管理プラットフォーム。
+                <br />
+                構造化データで検索性を飛躍的に向上させます。
+              </p>
             </div>
-            
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
-              <span className="text-[var(--bg-primary)]">
-                AI企業CMS
-              </span>
-              <br />
-              プラットフォーム
-            </h1>
-            
-            <p className="text-xl lg:text-2xl text-gray-600 mb-16 leading-relaxed max-w-4xl mx-auto">
-              AI技術を活用した企業情報の統合管理プラットフォーム。
-              <br />
-              構造化データで検索性を飛躍的に向上させます。
-            </p>
-          </div>
-        </section>
+          </section>
+        </AioSection>
 
         {/* Features Section */}
         <AioSection tone="white">
@@ -62,7 +64,7 @@ export default function AboutPage() {
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
               <div className="text-center mb-20">
                 <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                  <span className="text-[var(--bg-primary)]">
+                  <span className="text-[var(--color-primary)]">
                     主な機能
                   </span>
                 </h2>
@@ -197,26 +199,28 @@ export default function AboutPage() {
         </AioSection>
 
         {/* CTA Section */}
-        <section className="section-spacing bg-[var(--bg-primary)] text-white">
-          <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-              今すぐ始めましょう
-            </h2>
-            <p className="text-xl mb-12 opacity-90">
-              14日間の無料体験で、AI最適化機能をお試しください
-            </p>
-            
-            <Link href="/auth/signup">
-              <HIGButton 
-                variant="primary"
-                size="lg"
-                className="text-xl px-10 py-5 bg-white text-[var(--bg-primary)] hover:bg-gray-50 border-none shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold"
-              >
-                無料で始める
-              </HIGButton>
-            </Link>
-          </div>
-        </section>
+        <AioSection tone="primary">
+          <section className="section-spacing">
+            <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+              <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+                今すぐ始めましょう
+              </h2>
+              <p className="text-xl mb-12 opacity-90">
+                14日間の無料体験で、AI最適化機能をお試しください
+              </p>
+              
+              <Link href="/auth/signup">
+                <HIGButton 
+                  variant="secondary"
+                  size="lg"
+                  className="text-xl px-10 py-5 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl font-semibold"
+                >
+                  無料で始める
+                </HIGButton>
+              </Link>
+            </div>
+          </section>
+        </AioSection>
       </div>
     </>
   );

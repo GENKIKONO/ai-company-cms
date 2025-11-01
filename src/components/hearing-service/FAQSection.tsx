@@ -63,7 +63,7 @@ export default function FAQSection() {
 
 
   return (
-    <section id="faq" className="section-spacing bg-gray-50">
+    <section id="faq" className="section-spacing">
       <div className="max-w-4xl mx-auto px-6 lg:px-8">
         {/* セクションヘッダー */}
         <div className="text-center mb-16">
@@ -123,7 +123,7 @@ export default function FAQSection() {
         </div>
 
         {/* サポート案内 */}
-        <div className="text-center bg-white rounded-3xl p-8 border border-gray-200">
+        <div className="aio-surface text-center p-8 border border-gray-200">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">他にもご質問がございますか？</h3>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
             お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
