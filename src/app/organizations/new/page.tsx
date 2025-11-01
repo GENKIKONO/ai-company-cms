@@ -547,7 +547,7 @@ export default function NewOrganizationPage() {
             {(['株式会社', '有限会社', '合同会社', '合資会社', '合名会社', '一般社団法人', '一般財団法人'].includes(formData.legal_form)) && (
               <div className="mt-6">
                 <label htmlFor="corporate_number" className="block text-sm font-medium text-gray-700 mb-2">
-                  法人番号 <span className="text-[var(--bg-primary)] text-xs">（信頼性向上）</span>
+                  法人番号 <span className="text-[var(--aio-primary)] text-xs">（信頼性向上）</span>
                 </label>
                 <input
                   type="text"
@@ -902,7 +902,7 @@ export default function NewOrganizationPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex justify-center items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--bg-primary)] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100"
+                className="inline-flex justify-center items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--aio-primary)] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100"
               >
                 {submitting ? (
                   <>

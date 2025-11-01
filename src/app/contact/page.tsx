@@ -66,7 +66,7 @@ export default function ContactPage() {
               <HIGButton 
                 variant="primary"
                 size="lg"
-                className="bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl px-8 py-4 text-lg font-semibold"
+                className="bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl px-8 py-4 text-lg font-semibold"
               >
                 ヘルプセンターへ戻る
               </HIGButton>
@@ -93,7 +93,7 @@ export default function ContactPage() {
           </div>
           
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            <span className="text-[var(--bg-primary)]">
+            <span className="text-[var(--aio-primary)]">
               ご質問・ご相談
             </span>
             <br />
@@ -119,7 +119,7 @@ export default function ContactPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
+                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]/30 focus:border-[var(--aio-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
                 />
               </div>
               
@@ -134,7 +134,7 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
+                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]/30 focus:border-[var(--aio-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
                 />
               </div>
             </div>
@@ -149,7 +149,7 @@ export default function ContactPage() {
                 name="company"
                 value={formData.company}
                 onChange={handleChange}
-                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
+                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]/30 focus:border-[var(--aio-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
               />
             </div>
             
@@ -163,7 +163,7 @@ export default function ContactPage() {
                 required
                 value={formData.subject}
                 onChange={handleChange}
-                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
+                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]/30 focus:border-[var(--aio-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md"
               >
                 <option value="">選択してください</option>
                 <option value="general">一般的なお問い合わせ</option>
@@ -186,7 +186,7 @@ export default function ContactPage() {
                 rows={6}
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]/30 focus:border-[var(--bg-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md resize-none"
+                className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]/30 focus:border-[var(--aio-primary)] transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:shadow-md resize-none"
                 placeholder="お問い合わせ内容を詳しくお書きください"
               />
             </div>
@@ -195,7 +195,7 @@ export default function ContactPage() {
               <p className="text-sm text-gray-700 leading-relaxed">
                 <span className="font-semibold text-gray-900">個人情報の取り扱いについて：</span><br />
                 お客様からいただいた個人情報は、お問い合わせへの回答およびサービス向上のためにのみ使用いたします。
-                詳細は <Link href="/privacy" className="text-[var(--bg-primary)] hover:text-blue-500 underline font-medium transition-colors duration-200">プライバシーポリシー</Link> をご確認ください。
+                詳細は <Link href="/privacy" className="text-[var(--aio-primary)] hover:text-blue-500 underline font-medium transition-colors duration-200">プライバシーポリシー</Link> をご確認ください。
               </p>
             </div>
             
@@ -205,7 +205,7 @@ export default function ContactPage() {
                 disabled={isSubmitting}
                 variant="primary"
                 size="lg"
-                className="w-full bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl py-5 text-lg font-semibold"
+                className="w-full bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] border-none shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 rounded-2xl py-5 text-lg font-semibold"
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-3">

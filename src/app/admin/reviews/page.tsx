@@ -283,7 +283,7 @@ export default function AdminReviewsPage() {
                         href={`/o/${org.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[var(--bg-primary)] hover:underline text-sm"
+                        className="text-[var(--aio-primary)] hover:underline text-sm"
                       >
                         ページを確認 →
                       </a>

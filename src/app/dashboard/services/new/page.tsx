@@ -68,7 +68,7 @@ export default function NewServicePage() {
             id="name"
             name="name"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="サービス名を入力"
           />
         </div>
@@ -81,7 +81,7 @@ export default function NewServicePage() {
             id="summary"
             name="summary"
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="サービスの概要を入力"
           />
         </div>
@@ -94,7 +94,7 @@ export default function NewServicePage() {
             id="description"
             name="description"
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="サービスの詳細説明を入力"
           />
         </div>
@@ -109,7 +109,7 @@ export default function NewServicePage() {
               id="price"
               name="price"
               min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="10000"
             />
           </div>
@@ -123,7 +123,7 @@ export default function NewServicePage() {
               id="duration_months"
               name="duration_months"
               min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="12"
             />
           </div>
@@ -136,7 +136,7 @@ export default function NewServicePage() {
               type="text"
               id="category"
               name="category"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="コンサルティング"
             />
           </div>
@@ -157,7 +157,7 @@ export default function NewServicePage() {
             id="video_url"
             value={videoUrl}
             onChange={(e) => setVideoUrl(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="https://www.youtube.com/watch?v=..."
           />
           <p className="mt-1 text-xs text-gray-500">
@@ -180,7 +180,7 @@ export default function NewServicePage() {
                     newFeatures[index] = e.target.value;
                     setFeatures(newFeatures);
                   }}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   placeholder="例: 高度な分析機能"
                 />
                 <button
@@ -198,7 +198,7 @@ export default function NewServicePage() {
             <button
               type="button"
               onClick={() => setFeatures([...features, ''])}
-              className="px-4 py-2 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] border border-[var(--bg-primary)] rounded-md hover:bg-blue-50"
+              className="px-4 py-2 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] border border-[var(--aio-primary)] rounded-md hover:bg-blue-50"
             >
               + 機能を追加
             </button>
@@ -215,7 +215,7 @@ export default function NewServicePage() {
               id="cta_text"
               value={ctaText}
               onChange={(e) => setCtaText(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="例: 詳細を見る"
             />
           </div>
@@ -228,7 +228,7 @@ export default function NewServicePage() {
               id="cta_url"
               value={ctaUrl}
               onChange={(e) => setCtaUrl(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="https://example.com/service"
             />
           </div>
@@ -241,7 +241,7 @@ export default function NewServicePage() {
           <select
             value={publishStatus}
             onChange={(e) => setPublishStatus(e.target.value as 'draft' | 'published' | 'private')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
           >
             <option value="draft">下書き</option>
             <option value="published">公開</option>

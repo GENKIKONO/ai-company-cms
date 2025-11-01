@@ -252,7 +252,7 @@ export default function EnhancedSearchPage() {
               )}
             </span>
             {filters.query && (
-              <span className="flex items-center gap-1 text-sm text-[var(--bg-primary)]">
+              <span className="flex items-center gap-1 text-sm text-[var(--aio-primary)]">
                 <Zap className="w-4 h-4" />
                 {t('search.smartSearch')}
               </span>
@@ -264,7 +264,7 @@ export default function EnhancedSearchPage() {
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'list' 
-                  ? 'bg-blue-100 text-[var(--bg-primary)]' 
+                  ? 'bg-blue-100 text-[var(--aio-primary)]' 
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
@@ -274,7 +274,7 @@ export default function EnhancedSearchPage() {
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'grid' 
-                  ? 'bg-blue-100 text-[var(--bg-primary)]' 
+                  ? 'bg-blue-100 text-[var(--aio-primary)]' 
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
@@ -286,7 +286,7 @@ export default function EnhancedSearchPage() {
         {/* 読み込み状態 */}
         {loading && (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-[var(--bg-primary)]" />
+            <Loader2 className="w-8 h-8 animate-spin text-[var(--aio-primary)]" />
             <span className="ml-3 text-slate-600">
               {t('search.searching')}...
             </span>
@@ -334,7 +334,7 @@ export default function EnhancedSearchPage() {
                   companySize: []
                 }));
               }}
-              className="text-[var(--bg-primary)] hover:text-blue-800"
+              className="text-[var(--aio-primary)] hover:text-blue-800"
             >
               {t('search.clearFilters')}
             </button>

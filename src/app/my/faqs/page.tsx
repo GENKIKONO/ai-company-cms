@@ -86,7 +86,7 @@ export default function MyFAQsPage() {
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
             <span className="ml-3 text-gray-600">読み込み中...</span>
           </div>
         </div>
@@ -171,7 +171,7 @@ export default function MyFAQsPage() {
                     <div className="flex items-center space-x-2 ml-4">
                       <Link
                         href={`/my/faqs/${faq.id}/edit`}
-                        className="inline-flex items-center px-3 py-1 text-sm text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] border border-blue-200 rounded-md hover:bg-blue-50"
+                        className="inline-flex items-center px-3 py-1 text-sm text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] border border-blue-200 rounded-md hover:bg-blue-50"
                       >
                         編集
                       </Link>

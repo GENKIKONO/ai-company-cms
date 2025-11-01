@@ -105,7 +105,7 @@ export default function PostsManagementPage() {
               <PublicPageLinks contentType="posts" />
               <Link
                 href="/dashboard/posts/new"
-                className="bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
+                className="bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -120,7 +120,7 @@ export default function PostsManagementPage() {
         <div className="mb-6">
           <Link
             href="/dashboard"
-            className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] inline-flex items-center"
+            className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-flex items-center"
           >
             <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -159,7 +159,7 @@ export default function PostsManagementPage() {
               <div className="mt-6">
                 <Link
                   href="/dashboard/posts/new"
-                  className="bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
+                  className="bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

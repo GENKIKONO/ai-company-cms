@@ -74,7 +74,7 @@ export default async function OpsVerifyPage() {
                   <span className="text-sm text-gray-600">Signout (POST):</span>
                   <a
                     href="/auth/signout"
-                    className="text-xs text-[var(--bg-primary)] hover:text-blue-800"
+                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800"
                     onClick={(e) => {
                       e.preventDefault();
                       fetch('/auth/signout', { method: 'POST', credentials: 'include' })
@@ -91,7 +91,7 @@ export default async function OpsVerifyPage() {
                     href="/api/diag/session"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[var(--bg-primary)] hover:text-blue-800"
+                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800"
                   >
                     View Details
                   </a>
@@ -109,7 +109,7 @@ export default async function OpsVerifyPage() {
                     href="/api/my/organization?debug=1"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[var(--bg-primary)] hover:text-blue-800"
+                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800"
                   >
                     GET ?debug=1
                   </a>
@@ -120,7 +120,7 @@ export default async function OpsVerifyPage() {
                     href="/organizations/new"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[var(--bg-primary)] hover:text-blue-800"
+                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800"
                   >
                     Test UI
                   </a>
@@ -137,7 +137,7 @@ export default async function OpsVerifyPage() {
                         })
                         .catch(err => alert(`Error: ${err.message}`));
                     }}
-                    className="text-xs text-[var(--bg-primary)] hover:text-blue-800 underline"
+                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800 underline"
                   >
                     Test API
                   </button>

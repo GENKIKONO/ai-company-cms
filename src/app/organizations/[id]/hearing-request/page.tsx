@@ -154,7 +154,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
                 value={formData.purpose}
                 onChange={(e) => setFormData(prev => ({ ...prev, purpose: e.target.value }))}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                 placeholder="ヒアリングの目的や背景をご記入ください（例：新規事業パートナー検討、市場調査、競合分析など）"
                 required
                 maxLength={1000}
@@ -172,7 +172,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
                 type="date"
                 value={formData.preferred_date}
                 onChange={(e) => setFormData(prev => ({ ...prev, preferred_date: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               />
               <p className="text-xs text-gray-500 mt-1">ご希望がある場合にご指定ください</p>
             </div>
@@ -187,7 +187,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
                 type="email"
                 value={formData.contact_email}
                 onChange={(e) => setFormData(prev => ({ ...prev, contact_email: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                 placeholder="contact@example.com"
               />
             </div>
@@ -207,7 +207,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
                       type="checkbox"
                       checked={formData[category.key as keyof HearingRequestFormData] as boolean}
                       onChange={(e) => handleCategoryChange(category.key, e.target.checked)}
-                      className="mt-1 h-4 w-4 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)] border-gray-300 rounded"
+                      className="mt-1 h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded"
                     />
                     <div className="flex-1">
                       <div className="font-medium text-gray-900">{category.label}</div>

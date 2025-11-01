@@ -119,7 +119,7 @@ export function EmbedLimitCard() {
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={fetchLimitData}
-            className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] transition-colors"
+            className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] transition-colors"
           >
             再試行
           </button>
@@ -145,7 +145,7 @@ export function EmbedLimitCard() {
           <div className="text-sm text-gray-500">警告レベル</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-[var(--bg-primary)]">{stats.totalEmbeds.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-[var(--aio-primary)]">{stats.totalEmbeds.toLocaleString()}</div>
           <div className="text-sm text-gray-500">総埋め込み数</div>
         </div>
         <div className="text-center">
@@ -162,7 +162,7 @@ export function EmbedLimitCard() {
               type="checkbox"
               checked={showOnlyWarnings}
               onChange={(e) => setShowOnlyWarnings(e.target.checked)}
-              className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
+              className="rounded border-gray-300 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)]"
             />
             <span className="text-sm text-gray-700">警告のみ表示</span>
           </label>
@@ -240,7 +240,7 @@ export function EmbedLimitCard() {
                   <div className="ml-4 flex flex-col space-y-2">
                     <a
                       href={`/management-console/organizations/${org.id}`}
-                      className="px-3 py-1 text-xs bg-[var(--bg-primary)] text-white rounded hover:bg-[var(--bg-primary-hover)] transition-colors"
+                      className="px-3 py-1 text-xs bg-[var(--aio-primary)] text-white rounded hover:bg-[var(--aio-primary-hover)] transition-colors"
                     >
                       詳細
                     </a>
@@ -261,7 +261,7 @@ export function EmbedLimitCard() {
       <div className="mt-6 pt-4 border-t border-gray-200 flex space-x-3">
         <button 
           onClick={fetchLimitData}
-          className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] transition-colors"
+          className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] transition-colors"
         >
           更新
         </button>

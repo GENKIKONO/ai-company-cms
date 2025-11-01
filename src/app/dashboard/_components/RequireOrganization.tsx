@@ -59,7 +59,7 @@ export function RequireOrganization({
               <div className="space-y-3">
                 <button
                   onClick={() => window.location.reload()}
-                  className="w-full bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white font-medium py-2 px-4 rounded-md transition-colors"
+                  className="w-full bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white font-medium py-2 px-4 rounded-md transition-colors"
                 >
                   再読み込み
                 </button>
@@ -74,7 +74,7 @@ export function RequireOrganization({
               <div className="space-y-3">
                 <Link
                   href="/organizations/new"
-                  className="block w-full bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white font-medium py-2 px-4 rounded-md text-center transition-colors"
+                  className="block w-full bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white font-medium py-2 px-4 rounded-md text-center transition-colors"
                 >
                   企業を作成する
                 </Link>

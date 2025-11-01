@@ -57,7 +57,7 @@ export function MobileNav() {
           zIndex: 'var(--z-index-popover)',
           width: '56px',
           height: '56px',
-          backgroundColor: 'var(--bg-primary)',
+          backgroundColor: 'var(--aio-primary)',
           color: 'var(--text-on-primary)',
           borderRadius: '50%',
           boxShadow: 'var(--shadow-lg)',
@@ -69,8 +69,8 @@ export function MobileNav() {
           cursor: 'pointer',
           transition: 'background-color 0.2s'
         }}
-        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'var(--bg-primary-hover)'}
-        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'var(--bg-primary)'}
+        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'var(--aio-primary-hover)'}
+        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'var(--aio-primary)'}
       >
         {isOpen ? '×' : '☰'}
       </button>

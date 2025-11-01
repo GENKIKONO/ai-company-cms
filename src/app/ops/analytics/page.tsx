@@ -33,7 +33,7 @@ export default async function AnalyticsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900">総リクエスト数</h3>
-            <p className="text-3xl font-bold text-[var(--bg-primary)] mt-2">
+            <p className="text-3xl font-bold text-[var(--aio-primary)] mt-2">
               {apiStats.totalRequests.toLocaleString()}
             </p>
             <p className="text-sm text-gray-500 mt-1">過去30日間</p>
@@ -126,7 +126,7 @@ export default async function AnalyticsPage() {
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="text-center">
-                <p className="text-2xl font-bold text-[var(--bg-primary)]">
+                <p className="text-2xl font-bold text-[var(--aio-primary)]">
                   {businessMetrics.organizationsCreated}
                 </p>
                 <p className="text-sm text-gray-600">企業作成数</p>

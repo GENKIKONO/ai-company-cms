@@ -119,7 +119,7 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
                 ? 'text-red-600' 
                 : trialStatus.daysRemaining <= 3 
                   ? 'text-yellow-600' 
-                  : 'text-[var(--bg-primary)]'
+                  : 'text-[var(--aio-primary)]'
             }`} />
             <div>
               <div className="font-medium">
@@ -140,7 +140,7 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
       {/* Overview Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="card p-4 text-center">
-          <div className="text-2xl font-bold text-[var(--bg-primary)] mb-1">
+          <div className="text-2xl font-bold text-[var(--aio-primary)] mb-1">
             {stats?.contentCount.services || 0}
           </div>
           <div className="text-sm text-gray-600">サービス</div>
@@ -195,7 +195,7 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
         {/* Recent Activity */}
         <div className="card p-6">
           <div className="flex items-center gap-3 mb-4">
-            <TrendingUp className="w-5 h-5 text-[var(--bg-primary)]" />
+            <TrendingUp className="w-5 h-5 text-[var(--aio-primary)]" />
             <h3 className="text-lg font-semibold text-neutral-900">最近の更新</h3>
           </div>
           

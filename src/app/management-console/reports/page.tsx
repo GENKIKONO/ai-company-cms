@@ -106,7 +106,7 @@ export default function AdminReportsPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
           <span className="ml-3">読み込み中...</span>
         </div>
       </div>
@@ -128,7 +128,7 @@ export default function AdminReportsPage() {
       {/* ヘッダー */}
       <div className="mb-8">
         <nav className="flex mb-4">
-          <Link href="/management-console" className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]">
+          <Link href="/management-console" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
             管理コンソール
           </Link>
           <span className="mx-2 text-gray-500">/</span>
@@ -227,7 +227,7 @@ export default function AdminReportsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => setSelectedReport(report)}
-                        className="text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] mr-4"
+                        className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] mr-4"
                       >
                         <Eye className="h-4 w-4 inline mr-1" />
                         詳細
@@ -283,7 +283,7 @@ export default function AdminReportsPage() {
                       href={selectedReport.reported_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-1 text-sm text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]"
+                      className="mt-1 text-sm text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]"
                     >
                       {selectedReport.reported_url}
                     </a>

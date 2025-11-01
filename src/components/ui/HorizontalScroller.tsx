@@ -208,7 +208,7 @@ export default function HorizontalScroller({
                 'carousel-dot hit-44 rounded-full transition-all duration-300',
                 'w-2.5 h-2.5 flex items-center justify-center',
                 currentIndex === index
-                  ? 'bg-[var(--bg-primary)] scale-125'
+                  ? 'bg-[var(--aio-primary)] scale-125'
                   : 'bg-gray-300 hover:bg-gray-400'
               )}
             />

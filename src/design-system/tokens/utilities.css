@@ -188,7 +188,7 @@
 }
 
 .icon-ai-primary {
-  background-color: var(--bg-primary);
+  background-color: var(--aio-primary);
 }
 
 .icon-ai-error {
@@ -216,7 +216,7 @@
 .tag {
   padding: 8px 16px;
   background-color: rgba(var(--shadow-primary), 0.1);
-  color: var(--bg-primary);
+  color: var(--aio-primary);
   border-radius: 20px;
   font-size: 14px;
 }
@@ -275,7 +275,7 @@
 .step-number {
   width: 80px;
   height: 80px;
-  background-color: var(--bg-primary);
+  background-color: var(--aio-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -512,7 +512,7 @@
 }
 
 .text-comparison-primary {
-  color: var(--bg-primary);
+  color: var(--aio-primary);
 }
 
 /* CTA section styles */
@@ -532,7 +532,7 @@
 
 /* Color indicators */
 .color-primary {
-  color: var(--bg-primary);
+  color: var(--aio-primary);
 }
 
 .color-error {

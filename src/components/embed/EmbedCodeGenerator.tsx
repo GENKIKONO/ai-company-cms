@@ -160,7 +160,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
             onClick={() => handleOptionChange('type', type.value)}
             className={`p-3 text-sm rounded-md border transition-colors ${
               options.type === type.value
-                ? 'bg-blue-50 border-[var(--bg-primary)] text-blue-700'
+                ? 'bg-blue-50 border-[var(--aio-primary)] text-blue-700'
                 : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
             }`}
           >
@@ -180,7 +180,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
           <select
             value={options.theme}
             onChange={(e) => handleOptionChange('theme', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
           >
             <option value="light">ライト</option>
             <option value="dark">ダーク</option>
@@ -196,7 +196,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
           <select
             value={options.size}
             onChange={(e) => handleOptionChange('size', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
           >
             <option value="small">小 (280px)</option>
             <option value="medium">中 (360px)</option>
@@ -217,7 +217,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
                 onChange={(e) => handleOptionChange('width', e.target.value)}
                 min="200"
                 max="800"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               />
             </div>
             <div>
@@ -230,7 +230,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
                 onChange={(e) => handleOptionChange('height', e.target.value)}
                 min="200"
                 max="1000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               />
             </div>
           </>
@@ -250,7 +250,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
               type="checkbox"
               checked={options[option.key]}
               onChange={(e) => handleOptionChange(option.key, e.target.checked)}
-              className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
+              className="rounded border-gray-300 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)]"
             />
             <span className="text-sm text-gray-700">{option.label}</span>
           </label>
@@ -267,7 +267,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
           onChange={(e) => handleOptionChange('customCSS', e.target.value)}
           placeholder="例: border: 2px solid #000; background: #f0f0f0;"
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] font-mono text-sm"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] font-mono text-sm"
         />
         <p className="text-xs text-gray-500 mt-1">
           セキュリティ上、一部のCSS属性は制限されます

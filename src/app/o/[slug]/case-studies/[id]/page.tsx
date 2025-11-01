@@ -112,7 +112,7 @@ export default async function CaseStudyDetailPage({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <div className="flex items-center">
-                <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-[var(--bg-primary)]">
+                <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-[var(--aio-primary)]">
                   AIO Hub AI企業CMS
                 </Link>
                 <nav className="ml-10 hidden md:flex space-x-8">
@@ -240,7 +240,7 @@ export default async function CaseStudyDetailPage({
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                       <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                        <svg className="w-5 h-5 text-[var(--bg-primary)]" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-5 h-5 text-[var(--aio-primary)]" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                         </svg>
                       </div>

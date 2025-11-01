@@ -75,7 +75,7 @@ export default function SignInForm({ redirectUrl }: SignInFormProps) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)] sm:text-sm"
+            className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[var(--aio-primary)] focus:border-[var(--aio-primary)] sm:text-sm"
             placeholder="email@example.com"
           />
         </div>
@@ -92,7 +92,7 @@ export default function SignInForm({ redirectUrl }: SignInFormProps) {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[var(--bg-primary)] focus:border-[var(--bg-primary)] sm:text-sm"
+            className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-[var(--aio-primary)] focus:border-[var(--aio-primary)] sm:text-sm"
             placeholder="パスワード"
           />
         </div>
@@ -102,7 +102,7 @@ export default function SignInForm({ redirectUrl }: SignInFormProps) {
         <button
           type="submit"
           disabled={isLoading}
-          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--bg-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--aio-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'サインイン中...' : 'サインイン'}
         </button>

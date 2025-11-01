@@ -35,11 +35,11 @@ const iconComponents = {
 const getColorClasses = (color: string, popular: boolean = false) => {
   const colors = {
     blue: {
-      bg: popular ? 'bg-[var(--bg-primary)]' : 'bg-white',
+      bg: popular ? 'bg-[var(--aio-primary)]' : 'bg-white',
       border: 'border-blue-200',
       text: popular ? 'text-white' : 'text-gray-900',
-      accent: 'text-[var(--bg-primary)]',
-      button: 'bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white'
+      accent: 'text-[var(--aio-primary)]',
+      button: 'bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white'
     },
     purple: {
       bg: popular ? 'bg-purple-600' : 'bg-white',

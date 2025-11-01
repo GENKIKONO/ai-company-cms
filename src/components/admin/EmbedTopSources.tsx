@@ -121,7 +121,7 @@ export function EmbedTopSources({ organizationId, days = 30, limit = 20 }: TopSo
   const getTrustColor = (level: 'high' | 'medium' | 'low'): string => {
     switch (level) {
       case 'high': return 'text-green-600 bg-green-50';
-      case 'medium': return 'text-[var(--bg-primary)] bg-blue-50';
+      case 'medium': return 'text-[var(--aio-primary)] bg-blue-50';
       case 'low': return 'text-yellow-600 bg-yellow-50';
     }
   };
@@ -156,7 +156,7 @@ export function EmbedTopSources({ organizationId, days = 30, limit = 20 }: TopSo
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={fetchTopSources}
-            className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] transition-colors"
+            className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] transition-colors"
           >
             再試行
           </button>
@@ -229,7 +229,7 @@ export function EmbedTopSources({ organizationId, days = 30, limit = 20 }: TopSo
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium text-gray-900 hover:text-[var(--bg-primary)] transition-colors"
+                      className="font-medium text-gray-900 hover:text-[var(--aio-primary)] transition-colors"
                     >
                       {formatUrl(source.url)}
                     </a>
@@ -282,7 +282,7 @@ export function EmbedTopSources({ organizationId, days = 30, limit = 20 }: TopSo
           {
             label: 'ユニークサイト数',
             value: sources.length,
-            color: 'text-[var(--bg-primary)]'
+            color: 'text-[var(--aio-primary)]'
           },
           {
             label: '総埋め込み数',
@@ -313,7 +313,7 @@ export function EmbedTopSources({ organizationId, days = 30, limit = 20 }: TopSo
       <div className="mt-6 flex space-x-3">
         <button 
           onClick={fetchTopSources}
-          className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] transition-colors"
+          className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] transition-colors"
         >
           更新
         </button>

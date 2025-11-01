@@ -194,10 +194,10 @@ export default function SignupPage() {
               {error}
               {error.includes('すでに登録されています') && (
                 <div className="mt-3 text-sm">
-                  <Link href="/auth/login" className="text-[var(--bg-primary)] hover:text-blue-500 underline mr-4">
+                  <Link href="/auth/login" className="text-[var(--aio-primary)] hover:text-blue-500 underline mr-4">
                     ログインページへ
                   </Link>
-                  <Link href="/auth/forgot-password" className="text-[var(--bg-primary)] hover:text-blue-500 underline">
+                  <Link href="/auth/forgot-password" className="text-[var(--aio-primary)] hover:text-blue-500 underline">
                     パスワードリセット
                   </Link>
                 </div>
@@ -214,7 +214,7 @@ export default function SignupPage() {
                     type="button"
                     onClick={handleResendEmail}
                     disabled={resendLoading || retryAfter !== null}
-                    className="text-sm text-[var(--bg-primary)] hover:text-blue-500 underline disabled:opacity-50"
+                    className="text-sm text-[var(--aio-primary)] hover:text-blue-500 underline disabled:opacity-50"
                   >
                     {resendLoading 
                       ? '再送信中...' 

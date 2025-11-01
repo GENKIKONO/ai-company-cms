@@ -56,7 +56,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <div className="mt-8 text-center space-y-4">
             <Link 
               href="/auth/forgot-password" 
-              className="block text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] font-medium transition-colors"
+              className="block text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] font-medium transition-colors"
             >
               パスワードを忘れた方はこちら
             </Link>

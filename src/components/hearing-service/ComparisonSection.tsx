@@ -9,7 +9,7 @@ export default function ComparisonSection() {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
             構造化前後の
-            <span className="text-[var(--bg-primary)]">
+            <span className="text-[var(--aio-primary)]">
               大きな違い
             </span>
           </h2>

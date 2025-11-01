@@ -12,10 +12,10 @@ export default function CreateOrganizationButton() {
   return (
     <button
       onClick={handleCreateOrganization}
-      className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-[var(--bg-primary)] hover:bg-blue-50 transition-colors"
+      className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-[var(--aio-primary)] hover:bg-blue-50 transition-colors"
     >
       <div className="p-2 bg-blue-100 rounded-lg mr-3">
-        <svg className="w-6 h-6 text-[var(--bg-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-6 h-6 text-[var(--aio-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
       </div>

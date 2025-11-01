@@ -140,7 +140,7 @@ export default function EditServicePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
     );
@@ -153,7 +153,7 @@ export default function EditServicePage() {
           <h2 className="text-xl font-semibold text-gray-900">サービスが見つかりません</h2>
           <button
             onClick={() => router.push('/dashboard/services')}
-            className="mt-4 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]"
+            className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]"
           >
             サービス一覧に戻る
           </button>
@@ -190,7 +190,7 @@ export default function EditServicePage() {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="サービス名を入力"
           />
         </div>
@@ -204,7 +204,7 @@ export default function EditServicePage() {
             value={formData.summary}
             onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="サービスの概要を入力"
           />
         </div>
@@ -218,7 +218,7 @@ export default function EditServicePage() {
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="サービスの詳細説明を入力"
           />
         </div>
@@ -234,7 +234,7 @@ export default function EditServicePage() {
               value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
               min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="10000"
             />
           </div>
@@ -249,7 +249,7 @@ export default function EditServicePage() {
               value={formData.duration_months}
               onChange={(e) => setFormData({ ...formData, duration_months: e.target.value })}
               min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="12"
             />
           </div>
@@ -263,7 +263,7 @@ export default function EditServicePage() {
               id="category"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="コンサルティング"
             />
           </div>
@@ -285,7 +285,7 @@ export default function EditServicePage() {
             id="video_url"
             value={formData.video_url}
             onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="https://www.youtube.com/watch?v=..."
           />
         </div>
@@ -301,7 +301,7 @@ export default function EditServicePage() {
                   type="text"
                   value={feature}
                   onChange={(e) => updateFeature(index, e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   placeholder="例: 高度な分析機能"
                 />
                 <button
@@ -316,7 +316,7 @@ export default function EditServicePage() {
             <button
               type="button"
               onClick={addFeature}
-              className="px-4 py-2 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] border border-[var(--bg-primary)] rounded-md hover:bg-blue-50"
+              className="px-4 py-2 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] border border-[var(--aio-primary)] rounded-md hover:bg-blue-50"
             >
               + 機能を追加
             </button>
@@ -333,7 +333,7 @@ export default function EditServicePage() {
               id="cta_text"
               value={formData.cta_text}
               onChange={(e) => setFormData({ ...formData, cta_text: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="例: 詳細を見る"
             />
           </div>
@@ -346,7 +346,7 @@ export default function EditServicePage() {
               id="cta_url"
               value={formData.cta_url}
               onChange={(e) => setFormData({ ...formData, cta_url: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="https://example.com/service"
             />
           </div>
@@ -359,7 +359,7 @@ export default function EditServicePage() {
           <select
             value={formData.is_published ? 'published' : 'draft'}
             onChange={(e) => setFormData({ ...formData, is_published: e.target.value === 'published' })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
           >
             <option value="draft">下書き</option>
             <option value="published">公開</option>

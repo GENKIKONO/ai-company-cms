@@ -98,7 +98,7 @@ export default function FlowSection() {
                   <ul className="space-y-3">
                     {step.details.map((detail, detailIndex) => (
                       <li key={detailIndex} className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-[var(--bg-primary)] mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-5 w-5 text-[var(--aio-primary)] mt-0.5 flex-shrink-0" />
                         <span className="text-gray-700 text-sm leading-relaxed">{detail}</span>
                       </li>
                     ))}
@@ -112,8 +112,8 @@ export default function FlowSection() {
         {/* 追加情報 */}
         <div className="mt-16 text-center">
           <div className="inline-flex items-center justify-center px-6 py-3 bg-blue-50 rounded-full border border-blue-200">
-            <CheckCircle className="h-5 w-5 text-[var(--bg-primary)] mr-2" />
-            <span className="text-[var(--bg-primary)] font-medium">
+            <CheckCircle className="h-5 w-5 text-[var(--aio-primary)] mr-2" />
+            <span className="text-[var(--aio-primary)] font-medium">
               平均3日以内に構造化完了・即座にAI検索対応
             </span>
           </div>

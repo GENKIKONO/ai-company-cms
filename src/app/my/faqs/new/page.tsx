@@ -161,7 +161,7 @@ export default function NewFAQPage() {
                   id="question"
                   value={formData.question}
                   onChange={(e) => handleInputChange('question', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.question ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="例: サービスの利用料金はいくらですか？"
@@ -178,7 +178,7 @@ export default function NewFAQPage() {
                   rows={6}
                   value={formData.answer}
                   onChange={(e) => handleInputChange('answer', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.answer ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="質問に対する詳細な回答を記載してください。改行やリンクも含めることができます。"
@@ -195,7 +195,7 @@ export default function NewFAQPage() {
                     id="category"
                     value={formData.category}
                     onChange={(e) => handleInputChange('category', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   >
                     <option value="">選択してください（任意）</option>
                     {POPULAR_CATEGORIES.map(category => (
@@ -214,7 +214,7 @@ export default function NewFAQPage() {
                     min="1"
                     value={formData.sort_order}
                     onChange={(e) => handleInputChange('sort_order', parseInt(e.target.value) || 1)}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                       errors.sort_order ? 'border-red-500' : 'border-gray-300'
                     }`}
                   />
@@ -233,7 +233,7 @@ export default function NewFAQPage() {
                   type="text"
                   id="customCategory"
                   placeholder="独自のカテゴリ名を入力（上記で選択した場合は無視されます）"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   onChange={(e) => {
                     if (e.target.value.trim()) {
                       handleInputChange('category', e.target.value.trim());

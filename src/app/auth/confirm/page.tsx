@@ -186,7 +186,7 @@ function ConfirmPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--aio-primary)] mx-auto"></div>
           <p className="mt-4 text-gray-600">メール確認中...</p>
         </div>
       </div>
@@ -219,7 +219,7 @@ function ConfirmPageContent() {
               <button
                 onClick={handleResendConfirmation}
                 disabled={resendLoading || retryAfter !== null}
-                className="w-full flex justify-center py-2 px-4 border border-blue-300 rounded-md text-sm font-medium text-[var(--bg-primary)] bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--bg-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-2 px-4 border border-blue-300 rounded-md text-sm font-medium text-[var(--aio-primary)] bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--aio-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {resendLoading 
                   ? '再送信中...' 
@@ -230,7 +230,7 @@ function ConfirmPageContent() {
               </button>
               
               <div className="text-center">
-                <Link href="/auth/login" className="font-medium text-[var(--bg-primary)] hover:text-blue-500">
+                <Link href="/auth/login" className="font-medium text-[var(--aio-primary)] hover:text-blue-500">
                   ログインページに戻る
                 </Link>
               </div>
@@ -256,7 +256,7 @@ function ConfirmPageContent() {
               3秒後に企業情報登録ページにリダイレクトします...
             </p>
             <div className="mt-6">
-              <Link href="/organizations/new" className="font-medium text-[var(--bg-primary)] hover:text-blue-500">
+              <Link href="/organizations/new" className="font-medium text-[var(--aio-primary)] hover:text-blue-500">
                 今すぐ企業情報を登録
               </Link>
             </div>
@@ -274,7 +274,7 @@ export default function ConfirmPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--aio-primary)] mx-auto"></div>
           <p className="mt-4 text-gray-600">読み込み中...</p>
         </div>
       </div>

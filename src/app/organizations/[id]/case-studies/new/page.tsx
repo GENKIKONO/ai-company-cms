@@ -130,7 +130,7 @@ export default function NewCaseStudyPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
     );
@@ -141,7 +141,7 @@ export default function NewCaseStudyPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">企業が見つかりません</h2>
-          <Link href="/dashboard" className="mt-4 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]">
+          <Link href="/dashboard" className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
             ダッシュボードに戻る
           </Link>
         </div>
@@ -156,14 +156,14 @@ export default function NewCaseStudyPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-[var(--bg-primary)]">
+              <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-[var(--aio-primary)]">
                 AIO Hub AI企業CMS
               </Link>
               <nav className="ml-10 hidden md:flex space-x-8">
                 <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
                   ダッシュボード
                 </Link>
-                <Link href="/organizations" className="text-[var(--bg-primary)] font-medium">
+                <Link href="/organizations" className="text-[var(--aio-primary)] font-medium">
                   企業ディレクトリ
                 </Link>
               </nav>
@@ -231,7 +231,7 @@ export default function NewCaseStudyPage() {
                   id="title"
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.title ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="例: 業務効率化により月間工数を大幅削減"
@@ -255,7 +255,7 @@ export default function NewCaseStudyPage() {
                   rows={4}
                   value={formData.problem || ''}
                   onChange={(e) => handleInputChange('problem', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   placeholder="導入前に抱えていた課題や問題点を記載してください"
                 />
               </div>
@@ -269,7 +269,7 @@ export default function NewCaseStudyPage() {
                   rows={4}
                   value={formData.solution || ''}
                   onChange={(e) => handleInputChange('solution', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   placeholder="どのように課題を解決したかを記載してください"
                 />
               </div>
@@ -283,7 +283,7 @@ export default function NewCaseStudyPage() {
                   rows={4}
                   value={formData.result || ''}
                   onChange={(e) => handleInputChange('result', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   placeholder="導入後に得られた成果や効果を記載してください"
                 />
               </div>
@@ -306,7 +306,7 @@ export default function NewCaseStudyPage() {
                     onChange={(e) => setNewTag(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                     placeholder="例: 業務効率化, AI導入, コスト削減"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                   <HIGButton
                     type="button"
@@ -332,7 +332,7 @@ export default function NewCaseStudyPage() {
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
-                          className="ml-2 text-[var(--bg-primary)] hover:text-blue-800"
+                          className="ml-2 text-[var(--aio-primary)] hover:text-blue-800"
                         >
                           ×
                         </button>

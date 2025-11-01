@@ -140,7 +140,7 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={fetchUsageData}
-            className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] transition-colors"
+            className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] transition-colors"
           >
             再試行
           </button>
@@ -236,7 +236,7 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
           {
             label: '総読み込み数',
             value: data.reduce((sum, item) => sum + item.widgetLoads + item.iframeLoads, 0),
-            color: 'text-[var(--bg-primary)]'
+            color: 'text-[var(--aio-primary)]'
           },
           {
             label: '総クリック数',

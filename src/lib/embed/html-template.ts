@@ -45,7 +45,7 @@ function escapeHtml(unsafe: string): string {
 function generateCSSVariables(theme: IframeOptions['theme'] = 'light'): string {
   const themes = {
     light: {
-      '--bg-primary': 'var(--bg-white)',
+      '--aio-primary': 'var(--bg-white)',
       '--bg-secondary': 'var(--color-embed-hover)',
       '--text-primary': 'var(--color-embed-text)',
       '--text-secondary': 'var(--color-embed-secondary)',
@@ -55,7 +55,7 @@ function generateCSSVariables(theme: IframeOptions['theme'] = 'light'): string {
       '--shadow': '0 2px 4px rgba(0,0,0,0.1)'
     },
     dark: {
-      '--bg-primary': 'var(--color-embed-dark-bg)',
+      '--aio-primary': 'var(--color-embed-dark-bg)',
       '--bg-secondary': 'var(--color-embed-dark-hover)',
       '--text-primary': 'var(--color-embed-dark-text)',
       '--text-secondary': 'var(--color-embed-dark-secondary)',
@@ -65,7 +65,7 @@ function generateCSSVariables(theme: IframeOptions['theme'] = 'light'): string {
       '--shadow': '0 2px 4px rgba(0,0,0,0.3)'
     },
     auto: {
-      '--bg-primary': 'light-dark(var(--bg-white), var(--color-embed-dark-bg))',
+      '--aio-primary': 'light-dark(var(--bg-white), var(--color-embed-dark-bg))',
       '--bg-secondary': 'light-dark(var(--color-embed-hover), var(--color-embed-dark-hover))',
       '--text-primary': 'light-dark(var(--color-embed-text), var(--color-embed-dark-text))',
       '--text-secondary': 'light-dark(var(--color-embed-secondary), var(--color-embed-dark-secondary))',
@@ -133,7 +133,7 @@ function generateBaseCSS(options: IframeOptions): string {
       
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        background: var(--bg-primary);
+        background: var(--aio-primary);
         color: var(--text-primary);
         line-height: 1.5;
         font-size: 14px;

@@ -119,7 +119,7 @@ export default function QAPublicDisplay({ organizationSlug, className = '' }: QA
   if (loading) {
     return (
       <div className={`flex items-center justify-center py-8 ${className}`}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
     );
@@ -155,7 +155,7 @@ export default function QAPublicDisplay({ organizationSlug, className = '' }: QA
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] bg-white min-w-[150px]"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] bg-white min-w-[150px]"
               >
                 <option value="all">全カテゴリ</option>
                 {categories.map((category) => (

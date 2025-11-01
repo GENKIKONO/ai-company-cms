@@ -324,7 +324,7 @@ export default function AdminHearingsPage() {
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
           </div>
         </div>
       </div>
@@ -393,7 +393,7 @@ export default function AdminHearingsPage() {
             <div className="text-sm text-gray-600">待機中</div>
           </div>
           <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-2xl font-bold text-[var(--bg-primary)]">{statusCounts.in_progress}</div>
+            <div className="text-2xl font-bold text-[var(--aio-primary)]">{statusCounts.in_progress}</div>
             <div className="text-sm text-gray-600">進行中</div>
           </div>
           <div className="bg-white rounded-lg shadow p-4">
@@ -630,7 +630,7 @@ export default function AdminHearingsPage() {
                     
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <svg className="w-5 h-5 text-[var(--bg-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-[var(--aio-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span className="text-sm font-medium text-blue-800">自動コンテンツ生成</span>
@@ -652,7 +652,7 @@ export default function AdminHearingsPage() {
                                 ...prev,
                                 services: e.target.checked
                               }))}
-                              className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
+                              className="rounded border-gray-300 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)]"
                             />
                             <span className="ml-2 text-sm text-gray-700">📄 サービス紹介記事</span>
                           </label>
@@ -665,7 +665,7 @@ export default function AdminHearingsPage() {
                                 ...prev,
                                 faqs: e.target.checked
                               }))}
-                              className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
+                              className="rounded border-gray-300 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)]"
                             />
                             <span className="ml-2 text-sm text-gray-700">❓ FAQ</span>
                           </label>
@@ -678,7 +678,7 @@ export default function AdminHearingsPage() {
                                 ...prev,
                                 case_studies: e.target.checked
                               }))}
-                              className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
+                              className="rounded border-gray-300 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)]"
                             />
                             <span className="ml-2 text-sm text-gray-700">📈 導入事例</span>
                           </label>
@@ -691,7 +691,7 @@ export default function AdminHearingsPage() {
                                 ...prev,
                                 posts: e.target.checked
                               }))}
-                              className="rounded border-gray-300 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)]"
+                              className="rounded border-gray-300 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)]"
                             />
                             <span className="flex items-center gap-1 ml-2 text-sm text-gray-700">
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

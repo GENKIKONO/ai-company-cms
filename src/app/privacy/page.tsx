@@ -177,7 +177,7 @@ export default function PrivacyPage() {
                 <p className="text-gray-700">
                   <strong>LuxuCare株式会社</strong><br />
                   個人情報取扱責任者<br />
-                  <Link href="/contact" className="text-[var(--bg-primary)] hover:text-blue-500 underline">お問い合わせフォーム</Link>
+                  <Link href="/contact" className="text-[var(--aio-primary)] hover:text-blue-500 underline">お問い合わせフォーム</Link>
                 </p>
               </div>
             </section>

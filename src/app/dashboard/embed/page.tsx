@@ -102,7 +102,7 @@ export default function EmbedPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
     );
@@ -113,7 +113,7 @@ export default function EmbedPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">企業情報が見つかりません</h2>
-          <Link href="/dashboard" className="mt-4 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]">
+          <Link href="/dashboard" className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
             ダッシュボードに戻る
           </Link>
         </div>
@@ -161,7 +161,7 @@ export default function EmbedPage() {
                       ...widgetOptions, 
                       theme: e.target.value as 'light' | 'dark' | 'auto'
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   >
                     <option value="light">ライト</option>
                     <option value="dark">ダーク</option>
@@ -179,7 +179,7 @@ export default function EmbedPage() {
                       ...widgetOptions, 
                       size: e.target.value as 'small' | 'medium' | 'large'
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   >
                     <option value="small">小</option>
                     <option value="medium">中</option>
@@ -201,7 +201,7 @@ export default function EmbedPage() {
                         ...widgetOptions, 
                         showLogo: e.target.checked
                       })}
-                      className="h-4 w-4 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)] border-gray-300 rounded"
+                      className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded"
                     />
                     <label htmlFor="showLogo" className="ml-2 text-sm text-gray-700">
                       ロゴを表示
@@ -217,7 +217,7 @@ export default function EmbedPage() {
                         ...widgetOptions, 
                         showDescription: e.target.checked
                       })}
-                      className="h-4 w-4 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)] border-gray-300 rounded"
+                      className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded"
                     />
                     <label htmlFor="showDescription" className="ml-2 text-sm text-gray-700">
                       説明文を表示
@@ -233,7 +233,7 @@ export default function EmbedPage() {
                         ...widgetOptions, 
                         showServices: e.target.checked
                       })}
-                      className="h-4 w-4 text-[var(--bg-primary)] focus:ring-[var(--bg-primary)] border-gray-300 rounded"
+                      className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded"
                     />
                     <label htmlFor="showServices" className="ml-2 text-sm text-gray-700">
                       サービスリストを表示
@@ -253,7 +253,7 @@ export default function EmbedPage() {
                       ...widgetOptions, 
                       customCSS: e.target.value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     placeholder=".widget { border-radius: 12px; }"
                   />
                   <p className="mt-1 text-xs text-gray-500">

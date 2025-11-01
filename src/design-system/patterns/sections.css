@@ -16,7 +16,7 @@
   z-index: -1;
 }
 .sec-alt {
-  background: var(--bg-alt);
+  background: var(--aio-surface);
   color: var(--text-primary);
   position: relative;
 }
@@ -28,11 +28,11 @@
   transform: translateX(-50%);
   width: 100vw;
   height: 100%;
-  background: var(--bg-alt);
+  background: var(--aio-surface);
   z-index: -1;
 }
 .sec-primary {
-  background: var(--bg-primary);
+  background: var(--aio-primary);
   color: var(--text-on-primary);
   position: relative;
 }
@@ -44,7 +44,7 @@
   transform: translateX(-50%);
   width: 100vw;
   height: 100%;
-  background: var(--bg-primary);
+  background: var(--aio-primary);
   z-index: -1;
 }
 

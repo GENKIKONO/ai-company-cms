@@ -158,7 +158,7 @@ export default function NewServicePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
     );
@@ -169,7 +169,7 @@ export default function NewServicePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">企業が見つかりません</h2>
-          <Link href="/dashboard" className="mt-4 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]">
+          <Link href="/dashboard" className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
             ダッシュボードに戻る
           </Link>
         </div>
@@ -233,7 +233,7 @@ export default function NewServicePage() {
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="例: TaskFlow Pro"
@@ -250,7 +250,7 @@ export default function NewServicePage() {
                   rows={4}
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.description ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="サービスの概要、特徴、利用場面などを記載してください"
@@ -268,7 +268,7 @@ export default function NewServicePage() {
                   min="0"
                   value={formData.price || ''}
                   onChange={(e) => handleInputChange('price', e.target.value ? Number(e.target.value) : undefined)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.price ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="例: 5000"
@@ -286,7 +286,7 @@ export default function NewServicePage() {
                   min="1"
                   value={formData.duration_months || ''}
                   onChange={(e) => handleInputChange('duration_months', e.target.value ? Number(e.target.value) : undefined)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.duration_months ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="例: 12"
@@ -302,7 +302,7 @@ export default function NewServicePage() {
                   id="category"
                   value={formData.category || ''}
                   onChange={(e) => handleInputChange('category', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                 >
                   <option value="">選択してください</option>
                   {categoryOptions.map(category => (
@@ -338,7 +338,7 @@ export default function NewServicePage() {
                 id="video_url"
                 value={formData.video_url || ''}
                 onChange={(e) => handleInputChange('video_url', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                 placeholder="https://www.youtube.com/watch?v=..."
               />
               <p className="mt-1 text-xs text-gray-500">
@@ -367,7 +367,7 @@ export default function NewServicePage() {
                           newFeatures[index] = e.target.value;
                           handleInputChange('features', newFeatures);
                         }}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                         placeholder="例: 高度な分析機能"
                       />
                       <button
@@ -388,7 +388,7 @@ export default function NewServicePage() {
                       const newFeatures = [...(formData.features || []), ''];
                       handleInputChange('features', newFeatures);
                     }}
-                    className="px-4 py-2 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)] border border-[var(--bg-primary)] rounded-md hover:bg-blue-50"
+                    className="px-4 py-2 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] border border-[var(--aio-primary)] rounded-md hover:bg-blue-50"
                   >
                     + 機能を追加
                   </button>
@@ -411,7 +411,7 @@ export default function NewServicePage() {
                   id="cta_text"
                   value={formData.cta_text || ''}
                   onChange={(e) => handleInputChange('cta_text', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   placeholder="例: 詳細を見る"
                 />
               </div>
@@ -425,7 +425,7 @@ export default function NewServicePage() {
                   id="cta_url"
                   value={formData.cta_url || ''}
                   onChange={(e) => handleInputChange('cta_url', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.cta_url ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="https://example.com/service"

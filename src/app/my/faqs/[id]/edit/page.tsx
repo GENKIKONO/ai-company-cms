@@ -159,7 +159,7 @@ export default function EditFAQPage() {
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
             <span className="ml-3 text-gray-600">読み込み中...</span>
           </div>
         </div>
@@ -173,7 +173,7 @@ export default function EditFAQPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h2 className="text-xl font-semibold text-gray-900">FAQが見つかりません</h2>
-            <Link href="/my/faqs" className="mt-4 text-[var(--bg-primary)] hover:text-[var(--bg-primary-hover)]">
+            <Link href="/my/faqs" className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
               FAQ一覧に戻る
             </Link>
           </div>
@@ -238,7 +238,7 @@ export default function EditFAQPage() {
                   id="question"
                   value={formData.question}
                   onChange={(e) => handleInputChange('question', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.question ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="例: サービスの利用料金はいくらですか？"
@@ -255,7 +255,7 @@ export default function EditFAQPage() {
                   rows={6}
                   value={formData.answer}
                   onChange={(e) => handleInputChange('answer', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                     errors.answer ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="質問に対する詳細な回答を記載してください。改行やリンクも含めることができます。"
@@ -272,7 +272,7 @@ export default function EditFAQPage() {
                     id="category"
                     value={formData.category}
                     onChange={(e) => handleInputChange('category', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   >
                     <option value="">選択してください（任意）</option>
                     {POPULAR_CATEGORIES.map(category => (
@@ -291,7 +291,7 @@ export default function EditFAQPage() {
                     min="1"
                     value={formData.sort_order}
                     onChange={(e) => handleInputChange('sort_order', parseInt(e.target.value) || 1)}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] ${
                       errors.sort_order ? 'border-red-500' : 'border-gray-300'
                     }`}
                   />
@@ -310,7 +310,7 @@ export default function EditFAQPage() {
                   type="text"
                   id="customCategory"
                   placeholder="独自のカテゴリ名を入力（上記で選択した場合は無視されます）"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   onChange={(e) => {
                     if (e.target.value.trim()) {
                       handleInputChange('category', e.target.value.trim());

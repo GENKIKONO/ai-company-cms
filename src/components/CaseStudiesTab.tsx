@@ -161,7 +161,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)] mx-auto"></div>
         </div>
       </div>
     );
@@ -174,7 +174,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
           <h2 className="text-lg font-semibold text-gray-900">事例管理</h2>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)]"
+            className="flex items-center px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)]"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             新しい事例
@@ -218,7 +218,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                   <div className="flex space-x-2 ml-4">
                     <button
                       onClick={() => handleEdit(caseStudy)}
-                      className="text-[var(--bg-primary)] hover:text-blue-900"
+                      className="text-[var(--aio-primary)] hover:text-blue-900"
                     >
                       <PencilIcon className="h-4 w-4" />
                     </button>
@@ -252,7 +252,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     required
                   />
                 </div>
@@ -265,7 +265,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                     rows={3}
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                 </div>
 
@@ -278,7 +278,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                       type="text"
                       value={formData.client_name}
                       onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     />
                   </div>
 
@@ -290,7 +290,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                       type="text"
                       value={formData.industry}
                       onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     />
                   </div>
                 </div>
@@ -303,7 +303,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                     rows={3}
                     value={formData.challenge}
                     onChange={(e) => setFormData(prev => ({ ...prev, challenge: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                 </div>
 
@@ -315,7 +315,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                     rows={3}
                     value={formData.solution}
                     onChange={(e) => setFormData(prev => ({ ...prev, solution: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                 </div>
 
@@ -327,7 +327,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                     rows={3}
                     value={formData.results}
                     onChange={(e) => setFormData(prev => ({ ...prev, results: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                 </div>
 
@@ -342,7 +342,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] disabled:opacity-50"
+                    className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
                   >
                     {submitting ? '保存中...' : '保存'}
                   </button>

@@ -113,8 +113,8 @@ export type HearingServicePlanId = keyof typeof HEARING_SERVICE_PLANS;
 export const getHearingPlanColorClasses = (color: string) => {
   const colors = {
     blue: {
-      accent: 'text-[var(--bg-primary)]',
-      button: 'bg-[var(--bg-primary)] hover:bg-[var(--bg-primary-hover)] text-white',
+      accent: 'text-[var(--aio-primary)]',
+      button: 'bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white',
       ring: 'ring-blue-500'
     },
     purple: {

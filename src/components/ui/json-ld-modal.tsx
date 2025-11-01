@@ -46,7 +46,7 @@ export function JsonLdModal({ jsonLdData, trigger, organizationName }: JsonLdMod
                   </h3>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="rounded-md bg-white text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="rounded-md bg-white text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   >
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -62,7 +62,7 @@ export function JsonLdModal({ jsonLdData, trigger, organizationName }: JsonLdMod
                     <select
                       value={selectedSchema}
                       onChange={(e) => setSelectedSchema(Number(e.target.value))}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--bg-primary)] focus:ring-[var(--bg-primary)] sm:text-sm"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-primary)] focus:ring-[var(--aio-primary)] sm:text-sm"
                     >
                       {jsonLdData.map((schema, index) => (
                         <option key={index} value={index}>
@@ -121,7 +121,7 @@ export function JsonLdModal({ jsonLdData, trigger, organizationName }: JsonLdMod
               <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)] focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
                 >
                   閉じる
                 </button>

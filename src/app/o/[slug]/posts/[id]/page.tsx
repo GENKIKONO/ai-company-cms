@@ -212,7 +212,7 @@ export default async function PostPage({
           <div className="mb-8">
             <Link 
               href={`/o/${post.organization.slug}`}
-              className="inline-flex items-center text-[var(--bg-primary)] hover:text-blue-800 transition-colors"
+              className="inline-flex items-center text-[var(--aio-primary)] hover:text-blue-800 transition-colors"
             >
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
               {post.organization.name} に戻る
@@ -278,7 +278,7 @@ export default async function PostPage({
             <div className="px-6 py-8">
               {post.body ? (
                 <div 
-                  className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-[var(--bg-primary)] prose-a:no-underline hover:prose-a:underline"
+                  className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-[var(--aio-primary)] prose-a:no-underline hover:prose-a:underline"
                   dangerouslySetInnerHTML={{ 
                     __html: markdownToHtml(post.body) 
                   }}

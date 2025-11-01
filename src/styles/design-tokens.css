@@ -21,6 +21,7 @@
   
   /* Semantic layer - AIO specific tokens */
   --aio-primary: var(--color-primary);
+  --aio-primary-hover: #0052a3; /* Darker shade of primary for hover */
   --aio-muted: var(--color-muted);
   --aio-surface: #ffffff;
 }

@@ -197,7 +197,7 @@ export default function SecurityDashboard() {
   if (loading && !metrics) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
       </div>
     );
   }
@@ -233,7 +233,7 @@ export default function SecurityDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
-            <Users className="h-4 w-4 text-[var(--bg-primary)]" />
+            <Users className="h-4 w-4 text-[var(--aio-primary)]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics?.totalRequests || 0}</div>

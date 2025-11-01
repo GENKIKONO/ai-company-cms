@@ -141,7 +141,7 @@ export default function TermsPage() {
             <div className="bg-gray-50 p-6 rounded-lg mt-8">
               <h3 className="font-semibold text-gray-800 mb-2">お問い合わせ</h3>
               <p className="text-gray-600 text-sm">
-                本規約に関するお問い合わせは、<Link href="/contact" className="text-[var(--bg-primary)] hover:text-blue-500 underline">お問い合わせページ</Link>よりご連絡ください。
+                本規約に関するお問い合わせは、<Link href="/contact" className="text-[var(--aio-primary)] hover:text-blue-500 underline">お問い合わせページ</Link>よりご連絡ください。
               </p>
             </div>
           </div>

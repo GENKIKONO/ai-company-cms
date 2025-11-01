@@ -39,7 +39,7 @@ export default function Solution() {
             <div className="aspect-video flex items-center justify-center p-12">
               <div className="text-center text-gray-600">
                 <div className="flex justify-center gap-4 mb-6">
-                  <svg className="w-16 h-16 text-[var(--bg-primary)]" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-16 h-16 text-[var(--aio-primary)]" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                   <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">

@@ -78,7 +78,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
             {/* ロゴは常に / に遷移 */}
             <Link 
               href="/" 
-              className="focus-clean logo-no-select text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 hover:text-[var(--bg-primary)] min-h-[44px] flex items-center"
+              className="focus-clean logo-no-select text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 hover:text-[var(--aio-primary)] min-h-[44px] flex items-center"
             >
               AIO Hub AI企業CMS
             </Link>
@@ -109,7 +109,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                     aria-expanded={dropdownOpen}
                     aria-haspopup="true"
                   >
-                    <div className="w-8 h-8 bg-[var(--bg-primary)] rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-[var(--aio-primary)] rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-white">
                         {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
                       </span>

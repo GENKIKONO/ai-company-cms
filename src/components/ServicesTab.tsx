@@ -156,7 +156,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)] mx-auto"></div>
         </div>
       </div>
     );
@@ -169,7 +169,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
           <h2 className="text-lg font-semibold text-gray-900">サービス管理</h2>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)]"
+            className="flex items-center px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)]"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             新しいサービス
@@ -234,7 +234,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => handleEdit(service)}
-                        className="text-[var(--bg-primary)] hover:text-blue-900 mr-4"
+                        className="text-[var(--aio-primary)] hover:text-blue-900 mr-4"
                       >
                         <PencilIcon className="h-4 w-4" />
                       </button>
@@ -269,7 +269,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     required
                   />
                 </div>
@@ -282,7 +282,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
                     rows={3}
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                 </div>
 
@@ -294,7 +294,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
                     type="text"
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                 </div>
 
@@ -306,7 +306,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
                     type="number"
                     value={formData.price || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value ? Number(e.target.value) : null }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                 </div>
 
@@ -319,7 +319,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
                     value={formData.duration}
                     onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
                     placeholder="例: 1時間、3ヶ月など"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                 </div>
 
@@ -343,7 +343,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] disabled:opacity-50"
+                    className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
                   >
                     {submitting ? '保存中...' : '保存'}
                   </button>

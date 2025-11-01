@@ -151,7 +151,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--bg-primary)] mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)] mx-auto"></div>
         </div>
       </div>
     );
@@ -164,7 +164,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
           <h2 className="text-lg font-semibold text-gray-900">FAQ管理</h2>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)]"
+            className="flex items-center px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)]"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             新しいFAQ
@@ -208,7 +208,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
                   <div className="flex space-x-2 ml-4">
                     <button
                       onClick={() => handleEdit(faq)}
-                      className="text-[var(--bg-primary)] hover:text-blue-900"
+                      className="text-[var(--aio-primary)] hover:text-blue-900"
                     >
                       <PencilIcon className="h-4 w-4" />
                     </button>
@@ -242,7 +242,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
                     type="text"
                     value={formData.question}
                     onChange={(e) => setFormData(prev => ({ ...prev, question: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     required
                   />
                 </div>
@@ -255,7 +255,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
                     rows={4}
                     value={formData.answer}
                     onChange={(e) => setFormData(prev => ({ ...prev, answer: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     required
                   />
                 </div>
@@ -270,7 +270,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
                       value={formData.category}
                       onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                       placeholder="例: サービス、料金、使い方"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     />
                   </div>
 
@@ -283,7 +283,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
                       value={formData.sort_order || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, sort_order: e.target.value ? Number(e.target.value) : null }))}
                       placeholder="数字が小さいほど上に表示"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--bg-primary)]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     />
                   </div>
                 </div>
@@ -299,7 +299,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2 bg-[var(--bg-primary)] text-white rounded-md hover:bg-[var(--bg-primary-hover)] disabled:opacity-50"
+                    className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
                   >
                     {submitting ? '保存中...' : '保存'}
                   </button>
