@@ -26,24 +26,40 @@ export function MobileNav() {
     return () => document.removeEventListener('keydown', onKey);
   }, [isOpen]);
 
-  // 背景スクロールロック
+  // 背景スクロールロック（body + documentElement）
   useEffect(() => {
     if (!isOpen) return;
-    const prev = document.body.style.overflow;
+    const prevBody = document.body.style.overflow;
+    const prevHtml = document.documentElement.style.overflow;
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = prev;
+      document.body.style.overflow = prevBody;
+      document.documentElement.style.overflow = prevHtml;
     };
   }, [isOpen]);
 
-  // フォーカス初期位置
+  // フォーカス初期位置（スクロール抑止）
   useEffect(() => {
     if (isOpen && panelRef.current) {
-      panelRef.current.focus();
+      panelRef.current.focus({ preventScroll: true });
     }
   }, [isOpen]);
 
-  const toggle = () => setIsOpen((v) => !v);
+  // ローカル検証用ログ
+  useEffect(() => { 
+    console.log('[MobileNav] open=', isOpen);
+    if (typeof window !== 'undefined') {
+      console.log('[MobileNav] window.innerWidth=', window.innerWidth);
+      console.log('[MobileNav] mounted=', mounted);
+    }
+  }, [isOpen, mounted]);
+
+  const toggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsOpen((v) => !v);
+  };
   const close = () => setIsOpen(false);
 
   // ハンバーガーボタン（モバイルのみ表示）
