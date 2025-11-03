@@ -30,6 +30,9 @@
 /* Page-specific components - Hero, pricing, FAQ, footer sections */
 @import '../styles/modules/pages.css';
 
+/* Mobile navigation - Clean modular implementation */
+@import '../styles/modules/mobile-nav.css';
+
 /* 3. Existing Design System Integration */
 /* HIG Design System - Preserve existing design tokens */
 @import '../styles/hig-design-tokens.css';
@@ -149,11 +152,7 @@ section[class*="bg-[var(--color-primary-dark)]"] .hig-grid span {
   }
 }
 
-/* Force visibility of header text and elements */
-header * {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
+/* Header force visibility removed - incompatible with modular navigation */
 
 /* Clean mobile navigation - no overrides needed */
 

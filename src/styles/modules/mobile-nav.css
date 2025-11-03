@@ -1,0 +1,201 @@
+/* ============================================================
+   Mobile Navigation Module - HIG Design System Compliant
+   ============================================================ */
+
+/* Floating Action Button */
+.mobile-nav-fab {
+  /* Position and layout */
+  position: fixed;
+  bottom: var(--space-l);
+  right: var(--space-l);
+  z-index: var(--z-fixed);
+  
+  /* Responsive visibility - mobile only */
+  display: flex;
+  
+  /* HIG compliance - minimum tap target already in HIGButton */
+  /* Animation */
+  transition: all var(--transition-normal) var(--easing-ease);
+}
+
+.mobile-nav-fab:hover {
+  transform: scale(1.05);
+}
+
+.mobile-nav-fab:active {
+  transform: scale(0.95);
+}
+
+/* Hide FAB on desktop */
+@media (min-width: 1024px) {
+  .mobile-nav-fab {
+    display: none;
+  }
+}
+
+.mobile-nav-fab__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: 400;
+}
+
+/* Backdrop */
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: var(--z-modal-backdrop);
+  animation: fade-in var(--transition-normal) var(--easing-ease);
+}
+
+/* Navigation Panel */
+.mobile-nav-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 20rem; /* 320px */
+  max-width: 88vw;
+  background: var(--color-bg);
+  box-shadow: var(--shadow-large);
+  z-index: var(--z-modal);
+  
+  /* Animation */
+  animation: slide-in-right var(--transition-normal) var(--easing-ease);
+  
+  /* Focus management */
+  outline: none;
+}
+
+.mobile-nav-panel:focus {
+  outline: none;
+}
+
+/* Panel Content */
+.mobile-nav-content {
+  padding: var(--space-xl);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-nav-title {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xl);
+  line-height: var(--line-height-tight);
+}
+
+/* Navigation Links */
+.mobile-nav-links {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.mobile-nav-link {
+  display: block;
+  padding: var(--space-m) var(--space-l);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-medium);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body);
+  
+  /* Japanese text optimization */
+  word-break: var(--word-break);
+  line-break: var(--line-break);
+  
+  /* Transitions */
+  transition: all var(--transition-fast) var(--easing-ease);
+  
+  /* Focus ring */
+  outline: none;
+}
+
+.mobile-nav-link:hover {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-primary);
+}
+
+.mobile-nav-link:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Authentication Section */
+.mobile-nav-auth {
+  padding-top: var(--space-l);
+  border-top: 1px solid var(--color-border-primary);
+  margin-top: var(--space-m);
+}
+
+.mobile-nav-login-btn {
+  /* Additional styling handled by HIGButton component */
+}
+
+/* Footer */
+.mobile-nav-footer {
+  margin-top: auto;
+  padding-top: var(--space-l);
+  text-align: center;
+  font-size: var(--font-size-small);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-body);
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Accessibility: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-nav-fab,
+  .mobile-nav-panel,
+  .mobile-nav-backdrop,
+  .mobile-nav-link {
+    animation: none;
+    transition: none;
+  }
+  
+  .mobile-nav-fab:hover {
+    transform: none;
+  }
+  
+  .mobile-nav-fab:active {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .mobile-nav-link {
+    border: 1px solid transparent;
+  }
+  
+  .mobile-nav-link:hover,
+  .mobile-nav-link:focus-visible {
+    border-color: currentColor;
+  }
+}

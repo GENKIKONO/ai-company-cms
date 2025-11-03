@@ -2,13 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import clsx from 'clsx';
 import Link from 'next/link';
+import { HIGButton } from '@/design-system';
 
 export function MobileNav() {
-  // 開閉状態
   const [isOpen, setIsOpen] = useState(false);
-  // CSR後にのみ portal を使う
   const [mounted, setMounted] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -16,160 +14,139 @@ export function MobileNav() {
     setMounted(true);
   }, []);
 
-  // Escape で閉じる
+  // Escape キーでメニューを閉じる
   useEffect(() => {
     if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsOpen(false);
     };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
-  // 背景スクロールロック（body + documentElement）
+  // 背景スクロール防止
   useEffect(() => {
     if (!isOpen) return;
-    const prevBody = document.body.style.overflow;
-    const prevHtml = document.documentElement.style.overflow;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalDocumentOverflow = document.documentElement.style.overflow;
+    
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
+    
     return () => {
-      document.body.style.overflow = prevBody;
-      document.documentElement.style.overflow = prevHtml;
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalDocumentOverflow;
     };
   }, [isOpen]);
 
-  // フォーカス初期位置（スクロール抑止）
+  // フォーカス管理
   useEffect(() => {
     if (isOpen && panelRef.current) {
       panelRef.current.focus({ preventScroll: true });
     }
   }, [isOpen]);
 
-  // ローカル検証用ログ
-  useEffect(() => { 
-    console.log('[MobileNav] open=', isOpen);
-    if (typeof window !== 'undefined') {
-      console.log('[MobileNav] window.innerWidth=', window.innerWidth);
-      console.log('[MobileNav] mounted=', mounted);
-    }
-  }, [isOpen, mounted]);
+  const handleToggle = () => setIsOpen(!isOpen);
+  const handleClose = () => setIsOpen(false);
 
-  const toggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsOpen((v) => !v);
-  };
-  const close = () => setIsOpen(false);
-
-  // ハンバーガーボタン（モバイルのみ表示）
-  const Button = (
-    <button
-      type="button"
-      onClick={toggle}
+  // Floating Action Button - HIG準拠のデザイントークン使用
+  const FloatingButton = (
+    <HIGButton
+      variant="primary"
+      size="icon"
+      onClick={handleToggle}
       aria-controls="mobile-nav-panel"
       aria-expanded={isOpen}
       aria-label={isOpen ? 'ナビゲーションを閉じる' : 'ナビゲーションを開く'}
-      className={clsx(
-        // 右下固定。デザインシステムに沿って Tailwind で記述
-        'fixed bottom-6 right-6 block lg:hidden',
-        'z-50 h-14 w-14 rounded-full',
-        'bg-blue-600 text-white shadow-lg',
-        'flex items-center justify-center text-xl',
-        'hover:bg-blue-700 transition-colors'
-      )}
+      className="mobile-nav-fab"
     >
-      {/* シンプルなハンバーガーアイコン */}
-      <span className="sr-only">{isOpen ? 'ナビゲーションを閉じる' : 'ナビゲーションを開く'}</span>
-      {isOpen ? '×' : '☰'}
-    </button>
+      <span className="mobile-nav-fab__icon" aria-hidden="true">
+        {isOpen ? '×' : '☰'}
+      </span>
+    </HIGButton>
   );
 
-  // オーバーレイ＋パネル（Portalで body 直下）
-  const PortalLayer =
-    mounted && isOpen &&
-    createPortal(
-      <>
-        {/* オーバーレイ */}
-        <div
-          onClick={close}
-          aria-hidden="true"
-          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40"
-        />
-        {/* パネル */}
-        <nav
-          id="mobile-nav-panel"
-          role="navigation"
-          aria-label="モバイルナビゲーション"
-          ref={panelRef}
-          tabIndex={-1}
-          onClick={(e) => e.stopPropagation()}
-          className={clsx(
-            'fixed top-0 right-0 h-screen w-80 max-w-[88vw] bg-white shadow-xl z-50',
-            'transition-transform duration-300 ease-out',
-            isOpen ? 'translate-x-0' : 'translate-x-full',
-            'focus:outline-none'
-          )}
-        >
-          {/* メニュー内容 */}
-          <div className="p-6">
-            <h2 className="text-xl font-bold mb-6 text-gray-800">AIO Hub</h2>
-            
-            <div className="space-y-4">
-              <Link 
-                href="/" 
-                onClick={close} 
-                className="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
-              >
-                トップ
-              </Link>
-              <Link 
-                href="/pricing" 
-                onClick={close} 
-                className="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
-              >
-                料金プラン
-              </Link>
-              <Link 
-                href="/organizations" 
-                onClick={close} 
-                className="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
-              >
-                企業ディレクトリ
-              </Link>
-              <Link 
-                href="/hearing-service" 
-                onClick={close} 
-                className="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
-              >
-                ヒアリング代行
-              </Link>
+  // Navigation Panel - Portal経由でbody直下にマウント
+  const NavigationPanel = mounted && isOpen && createPortal(
+    <>
+      {/* Backdrop */}
+      <div
+        className="mobile-nav-backdrop"
+        onClick={handleClose}
+        aria-hidden="true"
+      />
+      
+      {/* Navigation Panel */}
+      <nav
+        id="mobile-nav-panel"
+        role="navigation"
+        aria-label="モバイルナビゲーション"
+        ref={panelRef}
+        tabIndex={-1}
+        className="mobile-nav-panel"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mobile-nav-content">
+          <h2 className="mobile-nav-title">AIO Hub</h2>
+          
+          <div className="mobile-nav-links">
+            <Link 
+              href="/" 
+              onClick={handleClose}
+              className="mobile-nav-link"
+            >
+              トップ
+            </Link>
+            <Link 
+              href="/pricing" 
+              onClick={handleClose}
+              className="mobile-nav-link"
+            >
+              料金プラン
+            </Link>
+            <Link 
+              href="/organizations" 
+              onClick={handleClose}
+              className="mobile-nav-link"
+            >
+              企業ディレクトリ
+            </Link>
+            <Link 
+              href="/hearing-service" 
+              onClick={handleClose}
+              className="mobile-nav-link"
+            >
+              ヒアリング代行
+            </Link>
 
-              {/* ログインボタン */}
-              <div className="pt-4 border-t border-gray-200">
-                <Link
-                  href="/auth/login"
-                  onClick={close}
-                  className="block w-full py-3 px-4 text-center text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-medium"
+            {/* Login Section */}
+            <div className="mobile-nav-auth">
+              <Link href="/auth/login" onClick={handleClose}>
+                <HIGButton 
+                  variant="primary" 
+                  size="lg" 
+                  fullWidth
+                  className="mobile-nav-login-btn"
                 >
                   ログイン
-                </Link>
-              </div>
-            </div>
-            
-            <div className="absolute bottom-6 left-6 right-6 text-center text-sm text-gray-500">
-              © {new Date().getFullYear()} AIO Hub
+                </HIGButton>
+              </Link>
             </div>
           </div>
-        </nav>
-      </>,
-      document.body
-    );
+          
+          <div className="mobile-nav-footer">
+            © {new Date().getFullYear()} AIO Hub
+          </div>
+        </div>
+      </nav>
+    </>,
+    document.body
+  );
 
   return (
     <>
-      {Button}
-      {PortalLayer}
+      {FloatingButton}
+      {NavigationPanel}
     </>
   );
 }
