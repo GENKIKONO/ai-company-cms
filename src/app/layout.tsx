@@ -9,7 +9,7 @@ import BuildBanner from '@/components/BuildBanner'
 import { env } from '@/lib/env'
 // WebVitalsReporter removed for production optimization
 import { I18nProvider } from '@/components/layout/I18nProvider'
-import { MobileNav } from '@/components/MobileNav'
+import MobileNavMinimal from '@/components/navigation/MobileNavMinimal'
 
 // SSRで常に正しい認証UIが出るように
 export const dynamic = 'force-dynamic';
@@ -64,7 +64,7 @@ export default function RootLayout({
               />
             )}
             {/* レスポンシブヘッダー - モバイル時は非表示 */}
-            <header className="bg-white shadow-sm hidden lg:block">
+            <header className="hidden lg:block w-full bg-white shadow-sm">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-6">
                   <div className="flex items-center">
@@ -93,8 +93,10 @@ export default function RootLayout({
             {/* WebVitalsReporter removed for production optimization */}
           </ToastProvider>
         </I18nProvider>
-        {/* Mobile Navigation - Outside containment context */}
-        <MobileNav />
+        {/* Mobile FAB & Drawer (minimal, lg未満のみ) */}
+        <div suppressHydrationWarning>
+          <MobileNavMinimal />
+        </div>
       </body>
     </html>
   )
