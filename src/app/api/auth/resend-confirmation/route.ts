@@ -24,9 +24,10 @@ export async function POST(req: NextRequest) {
   const redirectTo = `${APP_URL}/auth/confirm`;
 
   const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE, { auth: { persistSession: false } });
+  const cookieStore = await cookies();
   const anon = createClient(SUPABASE_URL, SUPABASE_ANON, {
     auth: { persistSession: false },
-    global: { headers: { cookie: cookies().toString() } },
+    global: { headers: { cookie: cookieStore.toString() } },
   });
 
   try {

@@ -14,7 +14,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   let orgId: string | null = null;
-  let headers: Headers | null = null;
+  let headers: any | null = null;
   let url: string | null = null;
 
   try {

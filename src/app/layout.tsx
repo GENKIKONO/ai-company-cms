@@ -1,5 +1,6 @@
 import './globals.css'
 import '@/design-system' // 新しいデザインシステム読み込み
+import Link from 'next/link'
 import SafeAuthHeader from '@/components/header/SafeAuthHeader'
 import Footer from '@/components/layout/Footer'
 import { ToastProvider } from '@/components/ui/toast'
@@ -62,7 +63,28 @@ export default function RootLayout({
                 environment={process.env.VERCEL_ENV || process.env.NODE_ENV}
               />
             )}
-            <SafeAuthHeader />
+            {/* レスポンシブヘッダー - モバイル時は非表示 */}
+            <header className="bg-white shadow-sm hidden lg:block">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center py-6">
+                  <div className="flex items-center">
+                    <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600">
+                      AIO Hub AI企業CMS
+                    </Link>
+                    <nav className="ml-6 hidden md:flex space-x-6">
+                      <Link href="/pricing" className="text-gray-500 hover:text-gray-700 text-sm">料金プラン</Link>
+                      <Link href="/organizations" className="text-gray-500 hover:text-gray-700 text-sm">企業ディレクトリ</Link>
+                      <Link href="/hearing-service" className="text-gray-500 hover:text-gray-700 text-sm">ヒアリング代行</Link>
+                    </nav>
+                  </div>
+                  <div className="hidden md:flex items-center space-x-4">
+                    <Link href="/auth/login" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                      ログイン
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </header>
             <main id="main-content">
               {children}
             </main>

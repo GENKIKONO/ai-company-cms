@@ -1,147 +1,159 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-
-const menuItems = [
-  { href: '/', label: 'トップ' },
-  { href: '/pricing', label: '料金プラン' },
-  { href: '/organizations', label: '企業ディレクトリ' },
-  { href: '/hearing-service', label: 'ヒアリング代行' },
-];
+import clsx from 'clsx';
+import Link from 'next/link';
 
 export function MobileNav() {
+  // 開閉状態
   const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  // CSR後にのみ portal を使う
+  const [mounted, setMounted] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    setMounted(true);
   }, []);
 
+  // Escape で閉じる
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isOpen]);
+
+  // 背景スクロールロック
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = prev;
     };
   }, [isOpen]);
 
-  if (!isMobile) return null;
+  // フォーカス初期位置
+  useEffect(() => {
+    if (isOpen && panelRef.current) {
+      panelRef.current.focus();
+    }
+  }, [isOpen]);
 
-  // Use Portal to render outside containment context
-  return typeof window !== 'undefined' ? createPortal(
-    <>
-      {/* Hamburger Button - Viewport based positioning */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label={isOpen ? 'ナビゲーションを閉じる' : 'ナビゲーションを開く'}
-        aria-expanded={isOpen}
-        aria-controls="mobile-navigation"
-        role="button"
-        tabIndex={0}
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: 'var(--z-index-popover)',
-          width: '56px',
-          height: '56px',
-          backgroundColor: 'var(--aio-primary)',
-          color: 'var(--text-on-primary)',
-          borderRadius: '50%',
-          boxShadow: 'var(--shadow-lg)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.25rem',
-          border: 'none',
-          cursor: 'pointer',
-          transition: 'background-color 0.2s'
-        }}
-        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'var(--aio-primary-hover)'}
-        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'var(--aio-primary)'}
-      >
-        {isOpen ? '×' : '☰'}
-      </button>
+  const toggle = () => setIsOpen((v) => !v);
+  const close = () => setIsOpen(false);
 
-      {/* Overlay and Menu - Viewport based */}
-      {isOpen && (
-        <>
-          {/* Dark Overlay - Only covers viewport */}
-          <div 
-            onClick={() => setIsOpen(false)}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100vw',
-              height: '100vh',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              zIndex: 'var(--z-index-modal)'
-            }}
-          />
-          
-          {/* Side Navigation - Slides from viewport right */}
-          <nav 
-            id="mobile-navigation"
-            role="navigation"
-            aria-label="モバイルナビゲーション"
-            style={{
-              position: 'fixed',
-              top: 0,
-              right: 0,
-              width: '320px',
-              height: '100vh',
-              backgroundColor: 'var(--bg-white)',
-              boxShadow: 'var(--shadow-xl)',
-              zIndex: 'var(--z-index-modal)',
-              transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-              transition: 'transform 300ms ease-in-out'
-            }}
-          >
-            <div className="p-6">
-              <h2 className="text-xl font-bold mb-6 text-gray-800">AIO Hub</h2>
-              
-              <div className="space-y-4">
-                {menuItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-              
-              <div style={{ 
-                position: 'absolute', 
-                bottom: '24px', 
-                left: '24px', 
-                right: '24px', 
-                textAlign: 'center',
-                fontSize: '14px',
-                color: '#6b7280'
-              }}>
-                © {new Date().getFullYear()} AIO Hub
+  // ハンバーガーボタン（モバイルのみ表示）
+  const Button = (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-controls="mobile-nav-panel"
+      aria-expanded={isOpen}
+      aria-label={isOpen ? 'ナビゲーションを閉じる' : 'ナビゲーションを開く'}
+      className={clsx(
+        // 右下固定。デザインシステムに沿って Tailwind で記述
+        'fixed bottom-6 right-6 block lg:hidden',
+        'z-50 h-14 w-14 rounded-full',
+        'bg-blue-600 text-white shadow-lg',
+        'flex items-center justify-center text-xl',
+        'hover:bg-blue-700 transition-colors'
+      )}
+    >
+      {/* シンプルなハンバーガーアイコン */}
+      <span className="sr-only">{isOpen ? 'ナビゲーションを閉じる' : 'ナビゲーションを開く'}</span>
+      {isOpen ? '×' : '☰'}
+    </button>
+  );
+
+  // オーバーレイ＋パネル（Portalで body 直下）
+  const PortalLayer =
+    mounted && isOpen &&
+    createPortal(
+      <>
+        {/* オーバーレイ */}
+        <div
+          onClick={close}
+          aria-hidden="true"
+          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40"
+        />
+        {/* パネル */}
+        <nav
+          id="mobile-nav-panel"
+          role="navigation"
+          aria-label="モバイルナビゲーション"
+          ref={panelRef}
+          tabIndex={-1}
+          onClick={(e) => e.stopPropagation()}
+          className={clsx(
+            'fixed top-0 right-0 h-screen w-80 max-w-[88vw] bg-white shadow-xl z-50',
+            'transition-transform duration-300 ease-out',
+            isOpen ? 'translate-x-0' : 'translate-x-full',
+            'focus:outline-none'
+          )}
+        >
+          {/* メニュー内容 */}
+          <div className="p-6">
+            <h2 className="text-xl font-bold mb-6 text-gray-800">AIO Hub</h2>
+            
+            <div className="space-y-4">
+              <Link 
+                href="/" 
+                onClick={close} 
+                className="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+              >
+                トップ
+              </Link>
+              <Link 
+                href="/pricing" 
+                onClick={close} 
+                className="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+              >
+                料金プラン
+              </Link>
+              <Link 
+                href="/organizations" 
+                onClick={close} 
+                className="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+              >
+                企業ディレクトリ
+              </Link>
+              <Link 
+                href="/hearing-service" 
+                onClick={close} 
+                className="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+              >
+                ヒアリング代行
+              </Link>
+
+              {/* ログインボタン */}
+              <div className="pt-4 border-t border-gray-200">
+                <Link
+                  href="/auth/login"
+                  onClick={close}
+                  className="block w-full py-3 px-4 text-center text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-medium"
+                >
+                  ログイン
+                </Link>
               </div>
             </div>
-          </nav>
-        </>
-      )}
-    </>,
-    document.body
-  ) : null;
+            
+            <div className="absolute bottom-6 left-6 right-6 text-center text-sm text-gray-500">
+              © {new Date().getFullYear()} AIO Hub
+            </div>
+          </div>
+        </nav>
+      </>,
+      document.body
+    );
+
+  return (
+    <>
+      {Button}
+      {PortalLayer}
+    </>
+  );
 }

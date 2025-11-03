@@ -42,7 +42,7 @@ export async function logAIBotAccess(
     
     console.log('✅ [AI Bot Logger] Bot should be logged, proceeding...');
 
-    const userAgent = headers.get('user-agent') || '';
+    const userAgent = (typeof headers.get === 'function' ? headers.get('user-agent') : '') || '';
     const ipAddress = extractClientIP(headers);
 
     const logEntry: BotLogEntry = {

@@ -48,7 +48,6 @@
 html, body {
   /* Performance optimization - BR-03 compliant */
   font-display: swap; /* FOIT prevention */
-  contain: layout style paint; /* Containment API */
 }
 
 /* Critical Force Display Overrides - Ensure text visibility */
@@ -149,6 +148,14 @@ section[class*="bg-[var(--color-primary-dark)]"] .hig-grid span {
     font-size: 14px;
   }
 }
+
+/* Force visibility of header text and elements */
+header * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Clean mobile navigation - no overrides needed */
 
 /* ============================================================
    Notes for Developers

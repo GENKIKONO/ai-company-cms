@@ -73,23 +73,23 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
   return (
     <header className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-3 sm:py-4 lg:py-6">
+        <div className="flex justify-between items-center py-6">
           <div className="flex items-center">
             {/* ロゴは常に / に遷移 */}
             <Link 
               href="/" 
-              className="focus-clean logo-no-select text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 hover:text-[var(--aio-primary)] min-h-[44px] flex items-center"
+              className="text-2xl font-bold text-gray-900 hover:text-blue-600"
             >
               AIO Hub AI企業CMS
             </Link>
             
             {/* デスクトップナビゲーション */}
-            <nav className="ml-6 sm:ml-8 lg:ml-10 hidden md:flex space-x-4 lg:space-x-6 xl:space-x-8">
+            <nav className="ml-10 hidden md:flex space-x-8">
               {links.map((link) => (
                 <Link 
                   key={link.href}
                   href={link.href} 
-                  className="nav-link text-gray-500 hover:text-gray-700 whitespace-nowrap min-h-[44px] flex items-center px-2 py-2 rounded-md transition-colors duration-200"
+                  className="text-gray-500 hover:text-gray-700"
                 >
                   {link.label}
                 </Link>
@@ -97,7 +97,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
             </nav>
           </div>
           
-          <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
+          <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <>
                 {/* デスクトップ: アバター + ドロップダウン */}
@@ -181,11 +181,10 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
             ) : (
               <>
                 {/* 未認証時のデスクトップリンク */}
-                <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
+                <div className="hidden md:flex items-center space-x-4">
                   <Link
                     href="/auth/login"
-                    className="focus-clean bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] px-3 lg:px-4 py-2 rounded-md text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200 whitespace-nowrap"
-                    aria-label="ログイン"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
                   >
                     ログイン
                   </Link>
