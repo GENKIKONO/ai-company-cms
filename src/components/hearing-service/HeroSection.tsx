@@ -5,10 +5,15 @@ import { ArrowRight } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="relative section-spacing-large overflow-hidden">
-      
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="text-center">
+    <div className="relative overflow-hidden py-24 lg:py-32 flex items-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto text-center">
+          {/* Trust indicators */}
+          <div className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-full px-6 py-3 mb-10 text-sm font-semibold text-gray-700 shadow-lg">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            専門ヒアリング代行サービス
+          </div>
+
           {/* Main title */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
             AIに選ばれる
@@ -25,19 +30,18 @@ export default function HeroSection() {
             ビジネス機会を拡大する企業プロフィールを構築。
           </p>
 
-          
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 lg:mb-16">
             <Link 
               href="#pricing"
-              className="inline-flex items-center justify-center font-bold bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] px-10 py-5 text-xl rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="inline-flex items-center justify-center gap-2 text-lg px-8 py-4 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             >
               無料相談を申し込む
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="w-5 h-5" />
             </Link>
             <Link 
               href="#comparison"
-              className="inline-flex items-center justify-center font-bold border-2 border-[var(--aio-primary)] hover:border-[var(--aio-primary-hover)] bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--aio-primary)] px-10 py-5 text-xl rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="inline-flex items-center justify-center px-6 py-3 bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] font-bold rounded-xl border border-gray-300 transition-all duration-300"
             >
               サービス詳細を見る
             </Link>
@@ -48,6 +52,6 @@ export default function HeroSection() {
           </p>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

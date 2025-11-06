@@ -1,18 +1,20 @@
 import React from 'react';
 import '../../styles/design-tokens.css';
 
-interface AioSectionProps {
+type AioSectionProps = {
   tone?: 'white' | 'muted' | 'primary';
   children: React.ReactNode;
   className?: string;
-}
+  noSectionSpacing?: boolean;
+};
 
-const AioSection: React.FC<AioSectionProps> = ({ 
-  tone = 'white', 
-  children, 
-  className = '' 
+const AioSection: React.FC<AioSectionProps> = ({
+  tone = 'white',
+  children,
+  className = '',
+  noSectionSpacing = false,
 }) => {
-  const getToneStyles = () => {
+  const getToneStyles = (tone: 'white' | 'muted' | 'primary') => {
     switch (tone) {
       case 'muted':
         return {
@@ -33,10 +35,12 @@ const AioSection: React.FC<AioSectionProps> = ({
     }
   };
 
+  const styles = getToneStyles(tone);
+
   return (
-    <section 
-      style={getToneStyles()}
-      className={className}
+    <section
+      style={styles}
+      className={`${noSectionSpacing ? '' : 'section-y'} ${className}`.trim()}
     >
       {children}
     </section>

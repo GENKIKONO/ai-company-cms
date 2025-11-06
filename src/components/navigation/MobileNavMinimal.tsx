@@ -2,30 +2,41 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-export default function MobileNavMinimal() {
+// モバイル判定カスタムHook
+function useIsMobile(lg = 1024) {
+  const [mobile, setMobile] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width:${lg - 1}px)`);
+    const onChange = () => setMobile(mq.matches);
+    onChange();
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, [lg]);
+  return mobile;
+}
+
+// 内部実装コンポーネント（Hook順序固定）
+function MobileNavMinimalInner() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // マウント状態管理
   useEffect(() => setMounted(true), []);
 
   // 背景スクロールロック
   useEffect(() => {
     if (!mounted) return;
-    const html = document.documentElement;
-    const body = document.body;
+    const root = document.documentElement;
     if (open) {
-      const prevHtml = html.style.overflow;
-      const prevBody = body.style.overflow;
-      html.style.overflow = "hidden";
-      body.style.overflow = "hidden";
+      const prevOverflow = root.style.overflow;
+      root.style.overflow = "hidden";
       return () => {
-        html.style.overflow = prevHtml;
-        body.style.overflow = prevBody;
+        root.style.overflow = prevOverflow;
       };
     }
   }, [open, mounted]);
 
-  // Escで閉じる
+  // Escキーで閉じる
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -33,7 +44,7 @@ export default function MobileNavMinimal() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // 右下固定FAB（lg以上では非表示）
+  // 右下固定FAB
   const Fab = (
     <button
       type="button"
@@ -41,7 +52,7 @@ export default function MobileNavMinimal() {
       aria-expanded={open}
       aria-controls="mobile-drawer"
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); }}
-      className="fixed bottom-4 right-4 z-50 inline-flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg lg:hidden hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400"
+      className="fixed bottom-4 right-4 z-[9999] inline-flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400"
     >
       {/* アイコンはDSに依存せず生のSVG */}
       {open ? (
@@ -56,50 +67,65 @@ export default function MobileNavMinimal() {
     </button>
   );
 
-  // オーバーレイ＋ドロワー（Portalでbody直下）
-  const OverlayAndDrawer = open && mounted ? createPortal(
-    <>
-      <div
-        className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-        aria-hidden="true"
-        onClick={() => setOpen(false)}
-      />
-      <nav
-        id="mobile-drawer"
-        role="navigation"
-        aria-label="モバイルメニュー"
-        className={`fixed top-0 right-0 z-50 h-screen w-72 max-w-[85vw] bg-white shadow-xl transition-transform duration-300 ease-out lg:hidden
-        ${open ? "translate-x-0" : "translate-x-full"}`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-4 h-14 border-b">
-          <span className="font-semibold">メニュー</span>
-          <button
-            className="p-2 rounded hover:bg-gray-100"
-            onClick={() => setOpen(false)}
-            aria-label="閉じる"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-        </div>
-        <ul className="p-2">
-          <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/">トップ</a></li>
-          <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/pricing">料金プラン</a></li>
-          <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/organizations">企業ディレクトリ</a></li>
-          <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/hearing-service">ヒアリング代行</a></li>
-          <li className="mt-2 border-t"><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/auth/login">ログイン</a></li>
-        </ul>
-      </nav>
-    </>,
+  // Portal(A): オーバーレイ（opened時のみ）
+  const Overlay = mounted && open ? createPortal(
+    <div
+      className="fixed inset-0 z-40 bg-black/40 opacity-100 pointer-events-auto"
+      aria-hidden="true"
+      onClick={() => setOpen(false)}
+    />,
+    document.body
+  ) : null;
+
+  // Portal(B): ドロワー（常時、transform制御）
+  const Drawer = mounted ? createPortal(
+    <nav
+      id="mobile-drawer"
+      role="navigation"
+      aria-label="モバイルメニュー"
+      className={`fixed top-0 right-0 z-50 h-screen w-72 max-w-[85vw] bg-white shadow-xl transition-transform duration-300 ease-out ${
+        open ? "translate-x-0" : "translate-x-full"
+      }`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="flex items-center justify-between px-4 h-14 border-b">
+        <span className="font-semibold">メニュー</span>
+        <button
+          className="p-2 rounded hover:bg-gray-100"
+          onClick={() => setOpen(false)}
+          aria-label="閉じる"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <ul className="p-2">
+        <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/">トップ</a></li>
+        <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/pricing">料金プラン</a></li>
+        <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/organizations">企業ディレクトリ</a></li>
+        <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/hearing-service">ヒアリング代行</a></li>
+        <li className="mt-2 border-t"><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/auth/login">ログイン</a></li>
+      </ul>
+    </nav>,
     document.body
   ) : null;
 
   return (
     <>
-      {Fab}
-      {OverlayAndDrawer}
+      {Overlay}
+      {Drawer}
+      {mounted ? createPortal(Fab, document.body) : null}
     </>
   );
+}
+
+// ラッパーコンポーネント（モバイル判定・早期return）
+export default function MobileNavMinimal() {
+  const isMobile = useIsMobile(1024);
+
+  if (isMobile === null) return null; // 初回マウントまで待つ
+  if (!isMobile) return null;         // PCでは一切描画しない
+
+  return <MobileNavMinimalInner />;
 }

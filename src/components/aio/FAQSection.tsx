@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { PrimaryCTA } from '@/design-system';
+import Link from 'next/link';
 
 interface FAQItem {
   readonly question: string;
@@ -37,29 +37,29 @@ export default function FAQSection({ title, description, categories }: FAQSectio
   };
 
   return (
-    <section id="faq" className="apple-section">
-      <div className="apple-container">
+    <section id="faq" className="mb-20">
+      <div className="max-w-4xl mx-auto">
         {/* セクションヘッダー */}
-        <div className="apple-section-header">
-          <h2 className="apple-title1">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             {title}
           </h2>
-          <p className="apple-body-large apple-text-secondary">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             {description}
           </p>
         </div>
 
         {/* FAQ カテゴリー */}
-        <div className="apple-faq-categories">
+        <div className="space-y-12">
           {categories.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="apple-faq-category">
+            <div key={categoryIndex} className="space-y-6">
               {/* カテゴリータイトル */}
-              <h3 className="apple-faq-category-title">
+              <h3 className="text-2xl font-bold text-gray-900 border-b border-gray-200 pb-4">
                 {category.title}
               </h3>
               
               {/* FAQ アイテム */}
-              <div className="apple-faq-items">
+              <div className="space-y-4">
                 {category.items.map((item, itemIndex) => {
                   const key = `${categoryIndex}-${itemIndex}`;
                   const isOpen = openItems.has(key);
@@ -67,30 +67,30 @@ export default function FAQSection({ title, description, categories }: FAQSectio
                   return (
                     <div
                       key={itemIndex}
-                      className="apple-faq-item"
+                      className="aio-surface border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300"
                     >
                       {/* 質問部分 */}
                       <button
                         onClick={() => toggleItem(categoryIndex, itemIndex)}
-                        className="apple-faq-question"
+                        className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
                       >
-                        <span className="apple-faq-question-text">
+                        <span className="text-lg font-semibold text-gray-900 pr-4">
                           {item.question}
                         </span>
-                        <div className="apple-faq-icon">
+                        <div className="flex-shrink-0 w-6 h-6 text-[var(--aio-primary)]">
                           {isOpen ? (
-                            <ChevronUp className="apple-faq-chevron" />
+                            <ChevronUp className="w-6 h-6" />
                           ) : (
-                            <ChevronDown className="apple-faq-chevron" />
+                            <ChevronDown className="w-6 h-6" />
                           )}
                         </div>
                       </button>
                       
                       {/* 回答部分 */}
                       {isOpen && (
-                        <div className="apple-faq-answer">
-                          <div className="apple-faq-answer-content">
-                            <p className="apple-body apple-text-secondary">
+                        <div className="border-t border-gray-200 bg-gray-50">
+                          <div className="p-6">
+                            <p className="text-gray-700 leading-relaxed">
                               {item.answer}
                             </p>
                           </div>
@@ -105,20 +105,20 @@ export default function FAQSection({ title, description, categories }: FAQSectio
         </div>
         
         {/* 追加サポート */}
-        <div className="apple-faq-support">
-          <div className="apple-faq-support-card">
-            <h3 className="apple-title3">
+        <div className="mt-12 lg:mt-16">
+          <div className="aio-surface p-8 lg:p-12 text-center border border-gray-200 rounded-2xl">
+            <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
               その他のご質問がございましたら
             </h3>
-            <p className="apple-body-large apple-text-secondary">
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
               AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
             </p>
-            <PrimaryCTA
+            <Link
               href="/contact"
-              size="medium"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               お問い合わせフォーム
-            </PrimaryCTA>
+            </Link>
           </div>
         </div>
       </div>

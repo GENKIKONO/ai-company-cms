@@ -1,194 +1,96 @@
-/* ============================================================
-   LuxuCare Global Styles - Modularized Design System
-   Clean architecture with logical separation of concerns
-   ============================================================ */
-
-/* 1. Tailwind CSS Base */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 2. Core Design System Modules */
-/* Theme and color system - Light theme enforcement with Apple HIG colors */
-@import '../styles/modules/theme.css';
+/* 一旦、広域ハックは止める（バグ源） */
+/* header * { opacity:1 !important; visibility:visible !important; } */
 
-/* Typography system - Apple HIG typography scale and Japanese text optimization */
-@import '../styles/modules/typography.css';
-
-/* Layout system - Containers, sections, and grid systems */
-@import '../styles/modules/layout.css';
-
-/* Interactive components - Buttons, cards, and form elements */
-@import '../styles/modules/components.css';
-
-/* Animation system - Keyframes, transitions, and motion preferences */
-@import '../styles/modules/animations.css';
-
-/* Utility classes - Helper classes and responsive utilities */
-@import '../styles/modules/utilities.css';
-
-/* Page-specific components - Hero, pricing, FAQ, footer sections */
-@import '../styles/modules/pages.css';
-
-/* Mobile navigation - Clean modular implementation */
-@import '../styles/modules/mobile-nav.css';
-
-/* 3. Existing Design System Integration */
-/* HIG Design System - Preserve existing design tokens */
-@import '../styles/hig-design-tokens.css';
-
-/* Existing Design System Components */
-@import '../styles/design-tokens.css';
-@import '../design-system/tokens/typography.css';
-@import '../design-system/tokens/utilities.css';
-@import '../design-system/patterns/sections.css';
-
-/* ============================================================
-   Global Overrides and Critical Fixes
-   ============================================================ */
-
-/* Performance Optimization - Core Web Vitals */
-html, body {
-  /* Performance optimization - BR-03 compliant */
-  font-display: swap; /* FOIT prevention */
-}
-
-/* Critical Force Display Overrides - Ensure text visibility */
-/* These overrides ensure critical UI text remains visible */
-
-/* Force display GreenBandSection text */
-.apple-green-band h2,
-.apple-green-band p,
-.apple-green-band span {
-  color: white !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-/* Force display CTASection text */
-.section--cta h1,
-.section--cta h2,
-.section--cta h3,
-.section--cta p,
-.section--cta span,
-section[class*="bg-[var(--color-primary-dark)]"] h1,
-section[class*="bg-[var(--color-primary-dark)]"] h2,
-section[class*="bg-[var(--color-primary-dark)]"] h3,
-section[class*="bg-[var(--color-primary-dark)]"] p,
-section[class*="bg-[var(--color-primary-dark)]"] span {
-  color: white !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-/* Force display feature cards text */
-.hig-grid .hig-grid--3-cols > div span,
-.hig-grid .hig-grid--3-cols > div h4,
-.hig-grid .hig-grid--3-cols > div p,
-div[class*="hig-grid"] div[class*="text-center"] span,
-div[class*="hig-grid"] div[class*="text-center"] h4,
-div[class*="hig-grid"] div[class*="text-center"] p {
-  color: white !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-/* Force display all CTASection button text */
-section[class*="bg-[var(--color-primary-dark)]"] button,
-section[class*="bg-[var(--color-primary-dark)]"] .apple-button,
-section[class*="bg-[var(--color-primary-dark)]"] .hig-cta-primary {
-  color: white !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* Force display step numbers and text in application steps */
-.hig-section .hig-grid h4,
-.hig-section .hig-grid p,
-.hig-section .hig-grid span,
-section[class*="bg-[var(--color-primary-dark)]"] .hig-grid h4,
-section[class*="bg-[var(--color-primary-dark)]"] .hig-grid p,
-section[class*="bg-[var(--color-primary-dark)]"] .hig-grid span {
-  color: white !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-section[class*="bg-[var(--color-primary-dark)]"] .hig-grid span {
-  display: inline !important;
-}
-
-/* Force display main CTA message */
-.main-cta-heading,
-.main-cta-text,
-.step-card-number,
-.step-card-title,
-.step-card-description {
-  opacity: 1 !important;
-  visibility: visible !important;
-  color: inherit !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-}
-
-/* Force display step cards text content specifically */
-.hig-section p.hig-text-body,
-.hig-section h4.hig-text-h3,
-.hig-section span {
-  opacity: 1 !important;
-  visibility: visible !important;
-  color: white !important;
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-  /* Critical mobile optimizations preserved */
-  .apple-hero-title {
-    font-size: 14px;
+/* CSS詳細度修正: hidden lg:block の競合解決 */
+@media (min-width: 1024px) {
+  /* ヘッダー表示 */
+  header.hidden.lg\:block {
+    display: block;
+  }
+  
+  /* ヘッダー内ナビゲーション表示 */
+  header nav.hidden.lg\:flex {
+    display: flex;
+  }
+  
+  /* 料金表のPC版表示（PricingTable.tsx） */
+  .hidden.lg\:block:has(.grid.grid-cols-1.md\:grid-cols-3) {
+    display: block;
+  }
+  
+  /* ヒアリングサービス料金のPC版表示（PricingSection.tsx） */
+  .hidden.lg\:block:has(.grid.grid-cols-1.md\:grid-cols-2.xl\:grid-cols-4) {
+    display: block;
+  }
+  
+  /* 料金表PC版のピンポイント表示（PricingTable.tsx） */
+  [data-section="pricing-desktop"].hidden.lg\:block {
+    display: block !important;
   }
 }
 
-/* Header force visibility removed - incompatible with modular navigation */
+/* ページ共通の縦余白 */
+.section-y {
+  margin-top: 4rem;   /* 16px * 4 = 64px */
+  margin-bottom: 4rem;
+}
+@media (min-width: 1024px) {
+  .section-y {
+    margin-top: 5rem;   /* 80px */
+    margin-bottom: 5rem;
+  }
+}
 
-/* Clean mobile navigation - no overrides needed */
+/* セクション見出しの上余白統一 */
+.section-heading-top {
+  padding-top: 4rem;   /* 64px - AioSectionの上padding分を補完 */
+}
+@media (min-width: 1024px) {
+  .section-heading-top {
+    padding-top: 5rem;   /* 80px - PC時の上padding分を補完 */
+  }
+}
 
-/* ============================================================
-   Notes for Developers
-   ============================================================ */
+/* CTAボタン下の背景余白（軽め） */
+.section-bottom-extend {
+  padding-bottom: 2.5rem; /* 40px 相当 */
+}
+@media (min-width: 1024px) {
+  .section-bottom-extend {
+    padding-bottom: 3.5rem; /* 56px 相当 */
+  }
+}
 
-/*
-This modular CSS architecture provides:
+/* モバイル横スクロール */
+.mobile-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 4.25rem;
+  padding-bottom: 2rem;
+}
+@media (min-width: 1024px) {
+  .mobile-scroll {
+    display: grid;
+    overflow-x: visible;
+    overflow-y: visible;
+    scroll-snap-type: none;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
 
-1. **Separation of Concerns**: Each module handles specific functionality
-   - theme.css: Colors, light theme enforcement
-   - typography.css: Font systems, text utilities  
-   - layout.css: Containers, grids, spacing
-   - components.css: Interactive elements
-   - animations.css: Motion and transitions
-   - utilities.css: Helper classes
-   - pages.css: Page-specific components
-
-2. **Maintainability**: Easy to locate and modify specific features
-
-3. **Performance**: Only load what's needed, better caching
-
-4. **Scalability**: Add new modules as needed
-
-5. **Team Collaboration**: Developers can work on different modules simultaneously
-
-To add new styles:
-- Add to appropriate module based on functionality
-- Create new module if it doesn't fit existing categories
-- Import new modules in this file
-
-To modify existing styles:
-- Locate the appropriate module
-- Make changes in the specific module file
-- Avoid adding styles to this global file unless absolutely necessary
-
-*/
-
+.pricing-scroll {
+  gap: 1.5rem;
+}

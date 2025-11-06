@@ -11,15 +11,6 @@ import { formatJPY, PRICING_CONFIG } from '@/lib/pricing';
 import { PLAN_LABELS, formatPriceLabel } from '@/config/planLabels';
 import { isPaidPlan, type PlanType } from '@/config/plans';
 
-// Dynamic class mapping for Tailwind purge safety
-const ICON_COLOR_MAP: Record<string, string> = {
-  blue: "text-cyan-600",      // Starter - 水色系
-  green: "text-[var(--aio-primary)]",     // Pro - 青系
-  purple: "text-slate-800",   // Business - 黒系
-  indigo: "text-indigo-600",
-  gray: "text-slate-600",
-};
-
 interface PlanFeature {
   text: string;
   included: boolean;
@@ -114,27 +105,149 @@ const PLANS: PricingPlan[] = [
 export default function PricingTable() {
   return (
     <>
-        {/* Mobile: Vertical Stack */}
-        <div className="lg:hidden space-y-6">
+      {/* Mobile: Horizontal Scroll */}
+      <div className="lg:hidden mobile-scroll">
+        {PLANS.map((plan) => (
+          <div
+            key={plan.id}
+            className={`aio-surface relative border p-8 pt-10 lg:pt-8 flex flex-col min-h-[600px] min-w-[80%] snap-center lg:min-w-0 ${
+              plan.popular
+                ? 'border-[5px] border-blue-400 shadow-lg'
+                : 'border border-gray-200/60'
+            }`}
+          >
+            {plan.popular && (
+              // 意図:
+              // 「おすすめ」ラベルをProプランと完全に一体化させ、
+              // まるでカードの一部（ヘッダータグ）のように見せる。
+              // - 面積を増やして"選ばれている感"を強調
+              // - 枠線を太く・濃くしてヒエラルキーを明確化
+              // - バッジを3分の1かぶせて、カードと視覚的に連続させる
+              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
+                <div className="bg-white border-[5px] border-blue-400 px-7 py-3 rounded-full shadow-lg flex items-center gap-3">
+                  <Crown className="w-6 h-6 text-blue-700" strokeWidth={2.2} />
+                  <span className="text-lg font-bold text-blue-800">おすすめ</span>
+                </div>
+              </div>
+            )}
+
+            <div className="text-center mb-8">
+              <div className={`w-16 h-16 mx-auto mb-4 ${plan.popular ? 'mt-6' : 'mt-1'} rounded-2xl flex items-center justify-center shadow-lg ${
+                plan.color === 'blue' ? 'bg-[var(--aio-primary)]' :
+                plan.color === 'green' ? 'bg-[var(--aio-primary)]' :
+                'bg-[var(--aio-primary)]'
+              }`}>
+                <plan.icon className="w-8 h-8 text-[var(--text-on-primary)]" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+              <p className="text-gray-600 mb-6">{plan.description}</p>
+              
+              <div className="mb-6">
+                {plan.originalPrice && (
+                  <span className="text-lg text-gray-400 line-through mr-2">
+                    {plan.originalPrice}
+                  </span>
+                )}
+                <span className="text-4xl font-bold text-gray-900">
+                  {plan.price}
+                </span>
+                {isPaidPlan(plan.id as PlanType) && (
+                  <span className="text-gray-600 ml-1">（税別）/月</span>
+                )}
+                {plan.badge && (
+                  <div className="mt-2">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                      {plan.badge}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <ul className="space-y-4 mb-8">
+              {plan.inheritedFeatures && (
+                <li className="text-sm text-gray-600 italic border-b border-gray-200 pb-3">
+                  {plan.inheritedFeatures}
+                </li>
+              )}
+              {plan.features.map((feature, index) => (
+                <li key={index} className="flex items-start">
+                  <Check
+                    className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${
+                      feature.included ? 'text-green-500' : 'text-gray-500'
+                    }`}
+                  />
+                  <div className="flex-1">
+                    <span
+                      className={`text-sm ${
+                        feature.included ? 'text-gray-900' : 'text-gray-400'
+                      }`}
+                    >
+                      {feature.text}
+                    </span>
+                    {feature.subtext && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        {feature.subtext}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="text-center mt-auto">
+              <Link
+                href={plan.ctaHref}
+                className={`inline-flex items-center justify-center w-full px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 ${
+                  plan.popular 
+                    ? 'bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)]' 
+                    : 'bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] border border-[var(--border-light)]'
+                }`}
+              >
+                {plan.ctaText}
+              </Link>
+            </div>
+
+            {plan.comingSoon && (
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                {plan.comingSoon.map((note, index) => (
+                  <p key={index} className="text-xs text-gray-500 text-center">{note}</p>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: Grid Layout */}
+      <div className="hidden lg:block mt-10" data-section="pricing-desktop">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`aio-surface relative border border-gray-200/60 p-8 flex flex-col min-h-[600px] ${
+              className={`aio-surface relative border p-8 pt-10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full min-h-[700px] ${
                 plan.popular
-                  ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent'
-                  : ''
+                  ? 'border-[5px] border-blue-400 shadow-lg scale-105'
+                  : 'border border-gray-200/60'
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-[var(--aio-primary)] text-[var(--text-on-primary)] px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
-                    人気
+                // 意図:
+                // 「おすすめ」ラベルをProプランと完全に一体化させ、
+                // まるでカードの一部（ヘッダータグ）のように見せる。
+                // - 面積を増やして"選ばれている感"を強調
+                // - 枠線を太く・濃くしてヒエラルキーを明確化
+                // - バッジを3分の1かぶせて、カードと視覚的に連続させる
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
+                  <div className="bg-white border-[5px] border-blue-400 px-7 py-3 rounded-full shadow-lg flex items-center gap-3">
+                    <Crown className="w-6 h-6 text-blue-700" strokeWidth={2.2} />
+                    <span className="text-lg font-bold text-blue-800">おすすめ</span>
                   </div>
                 </div>
               )}
 
               <div className="text-center mb-8">
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
+                <div className={`w-16 h-16 mx-auto mb-4 ${plan.popular ? 'mt-6' : 'mt-1'} rounded-2xl flex items-center justify-center shadow-lg ${
                   plan.color === 'blue' ? 'bg-[var(--aio-primary)]' :
                   plan.color === 'green' ? 'bg-[var(--aio-primary)]' :
                   'bg-[var(--aio-primary)]'
@@ -166,7 +279,7 @@ export default function PricingTable() {
                 </div>
               </div>
 
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-4 mb-8 flex-1">
                 {plan.inheritedFeatures && (
                   <li className="text-sm text-gray-600 italic border-b border-gray-200 pb-3">
                     {plan.inheritedFeatures}
@@ -220,144 +333,36 @@ export default function PricingTable() {
             </div>
           ))}
         </div>
-
-        {/* Desktop: Grid Layout */}
-        <div className="hidden lg:block">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {PLANS.map((plan) => (
-              <div
-                key={plan.id}
-                className={`aio-surface relative border border-gray-200/60 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full min-h-[700px] ${
-                  plan.popular
-                    ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent scale-105'
-                    : ''
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-[var(--aio-primary)] text-[var(--text-on-primary)] px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
-                      人気
-                    </div>
-                  </div>
-                )}
-
-                <div className="text-center mb-8">
-                  <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
-                    plan.color === 'blue' ? 'bg-[var(--aio-primary)]' :
-                    plan.color === 'green' ? 'bg-[var(--aio-primary)]' :
-                    'bg-[var(--aio-primary)]'
-                  }`}>
-                    <plan.icon className="w-8 h-8 text-[var(--text-on-primary)]" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                  <p className="text-gray-600 mb-6">{plan.description}</p>
-                  
-                  <div className="mb-6">
-                    {plan.originalPrice && (
-                      <span className="text-lg text-gray-400 line-through mr-2">
-                        {plan.originalPrice}
-                      </span>
-                    )}
-                    <span className="text-4xl font-bold text-gray-900">
-                      {plan.price}
-                    </span>
-                    {isPaidPlan(plan.id as PlanType) && (
-                      <span className="text-gray-600 ml-1">（税別）/月</span>
-                    )}
-                    {plan.badge && (
-                      <div className="mt-2">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
-                          {plan.badge}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <ul className="space-y-4 mb-8 flex-1">
-                  {plan.inheritedFeatures && (
-                    <li className="text-sm text-gray-600 italic border-b border-gray-200 pb-3">
-                      {plan.inheritedFeatures}
-                    </li>
-                  )}
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <Check
-                        className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${
-                          feature.included ? 'text-green-500' : 'text-gray-500'
-                        }`}
-                      />
-                      <div className="flex-1">
-                        <span
-                          className={`text-sm ${
-                            feature.included ? 'text-gray-900' : 'text-gray-400'
-                          }`}
-                        >
-                          {feature.text}
-                        </span>
-                        {feature.subtext && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            {feature.subtext}
-                          </div>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="text-center mt-auto">
-                  <Link
-                    href={plan.ctaHref}
-                    className={`inline-flex items-center justify-center w-full px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 ${
-                      plan.popular 
-                        ? 'bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)]' 
-                        : 'bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] border border-[var(--border-light)]'
-                    }`}
-                  >
-                    {plan.ctaText}
-                  </Link>
-                </div>
-
-                {plan.comingSoon && (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    {plan.comingSoon.map((note, index) => (
-                      <p key={index} className="text-xs text-gray-500 text-center">{note}</p>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+      </div>
+      
+      {/* Enterprise consultation note */}
+      <div className="mt-16 text-center">
+        <div className="bg-blue-50 border border-blue-200 rounded-3xl p-8 max-w-4xl mx-auto">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">
+            Enterpriseプランについて
+          </h3>
+          <p className="text-gray-700 mb-6 leading-relaxed">
+            より大規模な組織や特別な要件をお持ちの企業様には、カスタマイズされたEnterpriseプランをご用意いたします。
+            詳細な機能や導入サポートについては、お気軽にお問い合わせください。
+          </p>
+          
+          <Link
+            href="/contact"
+            className="inline-flex items-center justify-center px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)]"
+          >
+            お問い合わせ
+          </Link>
         </div>
-        
-        {/* Enterprise consultation note */}
-        <div className="mt-16 text-center">
-          <div className="bg-blue-50 border border-blue-200 rounded-3xl p-8 max-w-4xl mx-auto">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
-              Enterpriseプランについて
-            </h3>
-            <p className="text-gray-700 mb-6 leading-relaxed">
-              より大規模な組織や特別な要件をお持ちの企業様には、カスタマイズされたEnterpriseプランをご用意いたします。
-              詳細な機能や導入サポートについては、お気軽にお問い合わせください。
-            </p>
-            
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 text-base font-bold rounded-xl transition-all duration-300 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)]"
-            >
-              お問い合わせ
-            </Link>
-          </div>
 
-          <div className="mt-12 text-sm text-gray-600 space-y-2">
-            <p>
-              ※価格は税別表示です。詳細機能についてはお問い合わせください。
-            </p>
-            <p>
-              お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
-            </p>
-          </div>
+        <div className="mt-12 text-sm text-gray-600 space-y-2">
+          <p>
+            ※価格は税別表示です。詳細機能についてはお問い合わせください。
+          </p>
+          <p>
+            お支払いはクレジットカード・銀行振込に対応。いつでもプラン変更・解約可能です。
+          </p>
         </div>
+      </div>
     </>
   );
 }

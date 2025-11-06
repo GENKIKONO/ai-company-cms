@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Zap } from 'lucide-react';
+import { Check, Zap, Crown } from 'lucide-react';
 import Link from 'next/link';
 import { 
   HEARING_SERVICE_PLANS, 
@@ -16,17 +16,18 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
   
   return (
     <div
-      className={`aio-surface relative border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 h-full flex flex-col ${
+      className={`aio-surface relative border hover:shadow-xl transition-all duration-300 h-full flex flex-col ${
         plan.popular
-          ? 'ring-2 ring-blue-500/30 ring-offset-2 ring-offset-transparent scale-105'
-          : ''
+          ? 'border-[5px] border-blue-400 pt-10 pb-8 px-6'
+          : 'border border-gray-200/70 p-6'
       }`}
     >
       {/* 人気バッジ */}
       {plan.popular && (
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-          <div className="bg-[var(--aio-primary)] text-[var(--text-on-primary)] px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-            人気
+        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="bg-white border-[5px] border-blue-400 px-7 py-3 rounded-full shadow-lg flex items-center gap-3">
+            <Crown className="w-6 h-6 text-blue-700" strokeWidth={2.2} />
+            <span className="text-sm font-bold text-blue-800">人気</span>
           </div>
         </div>
       )}
@@ -91,59 +92,55 @@ export default function PricingSection() {
   const planIds: HearingServicePlanId[] = ['light', 'advance', 'full', 'continuous'];
   
   return (
-    <section id="pricing" className="section-spacing">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* セクションヘッダー */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            シンプルで
-            <span className="text-[var(--aio-primary)]">
-              透明な料金
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            対話を通じて企業価値を第三者視点で整理し、AIに理解されやすい構造データとして言語化します。
-          </p>
-        </div>
-
-        {/* 料金プラン */}
-        <div className="mb-20">
-          {/* Mobile: Carousel */}
-          <div className="lg:hidden">
-            <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory px-4 h-[750px]">
-              {planIds.map((planId) => (
-                <div key={planId} className="relative flex-shrink-0 w-80 snap-center h-full">
-                  <PricingCard planId={planId} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Desktop: Grid */}
-          <div className="hidden lg:block">
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-              {planIds.map((planId) => (
-                <div key={planId} className="relative">
-                  <PricingCard planId={planId} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* 追加情報 */}
-        <div className="text-center">
-          <div className="aio-surface p-8 lg:p-12 max-w-4xl mx-auto border border-gray-100">
-            <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">すべてのプランに14日間の満足保証が含まれています</h3>
-            <p className="text-lg text-gray-600 mb-8">
-              お取り組みを通じて、ChatGPT検索・AI要約での企業情報の発見性向上を目指します。
-            </p>
-            <p className="text-sm text-gray-500">
-              ✓ お見積もりは無料です　✓ お気軽にお問い合わせください　✓ 全国対応
-            </p>
-          </div>
-        </div>
+    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      {/* セクションヘッダー */}
+      <div className="text-center mb-16 section-heading-top">
+        <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          シンプルで
+          <span className="text-[var(--aio-primary)]">
+            透明な料金
+          </span>
+        </h2>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          対話を通じて企業価値を第三者視点で整理し、AIに理解されやすい構造データとして言語化します。
+        </p>
       </div>
-    </section>
+
+      {/* 料金プラン */}
+      <>
+        {/* Mobile: Horizontal Scroll */}
+        <div className="lg:hidden mobile-scroll pricing-scroll">
+          {planIds.map((planId) => (
+            <div key={planId} className="min-w-[78%] snap-center lg:min-w-0">
+              <PricingCard planId={planId} />
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: Grid Layout */}
+        <div className="hidden lg:block mt-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+            {planIds.map((planId) => (
+              <div key={planId} className="relative">
+                <PricingCard planId={planId} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
+
+      {/* 追加情報 */}
+      <div className="text-center mt-16 max-w-4xl mx-auto space-y-2">
+        <p className="text-xl font-bold text-gray-900 mb-4">
+          すべてのプランに14日間の無料体験が含まれています
+        </p>
+        <p className="text-gray-600 mb-6 leading-relaxed">
+          お取り組みを通じて、ChatGPT検索・AI要約での企業情報の発見性向上を目指します。
+        </p>
+        <p className="text-sm text-gray-500">
+          ✓ お見積もりは無料です　✓ お気軽にお問い合わせください　✓ 全国対応
+        </p>
+      </div>
+    </div>
   );
 }

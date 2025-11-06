@@ -88,8 +88,8 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Modern Hero Section */}
-      <AioSection tone="white">
-        <section className="relative overflow-hidden min-h-screen flex items-center">
+      <AioSection tone="white" className="!m-0">
+        <section className="relative overflow-hidden py-24 lg:py-32 flex items-center">
         {/* Simple background */}
         <div className="absolute inset-0 bg-white" />
         
@@ -118,7 +118,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </p>
             
             {/* Feature badges */}
-            <div className="flex flex-wrap justify-center gap-4 mb-14">
+            <div className="flex flex-wrap justify-center gap-4 mb-10">
               <span className="inline-flex items-center gap-3 bg-white/95 backdrop-blur-xl border border-blue-200/60 rounded-2xl px-6 py-3 text-sm font-semibold text-blue-700 shadow-lg">
                 <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
                 構造化データ
@@ -134,7 +134,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </div>
             
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row justify-center gap-6 mb-20">
+            <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
               <Link
                 href="/auth/signup"
                 onClick={() => trackConversion()}
@@ -157,8 +157,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
       </AioSection>
 
       {/* Features Section */}
-      <AioSection tone="muted">
-        <section className="section-spacing-large">
+      <AioSection tone="muted" className="lg:mt-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-24">
             <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-tight">
@@ -174,8 +173,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           
           <div className="grid md:grid-cols-3 gap-12 mb-20">
-            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-              <div className="mb-8">
+            {/* Before: absolute overlayでテキストが隠れる問題 */}
+            {/* After: background-color直接変更でz-index問題を根本回避 */}
+            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl hover:bg-blue-50 transition-all duration-500 hover:-translate-y-2">
+              <div className="relative z-10 mb-8">
                 <div className="w-20 h-20 bg-[var(--aio-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <BuildingIcon className="w-10 h-10 text-[var(--text-on-primary)]" />
                 </div>
@@ -186,11 +187,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   正確な情報で顧客の信頼を獲得
                 </p>
               </div>
-              <div className="absolute inset-0 bg-blue-50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
 
-            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-              <div className="mb-8">
+            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl hover:bg-blue-50 transition-all duration-500 hover:-translate-y-2">
+              <div className="relative z-10 mb-8">
                 <div className="w-20 h-20 bg-[var(--aio-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <UserIcon className="w-10 h-10 text-[var(--text-on-primary)]" />
                 </div>
@@ -201,11 +201,10 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   優秀な人材の獲得率向上
                 </p>
               </div>
-              <div className="absolute inset-0 bg-blue-50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
 
-            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-              <div className="mb-8">
+            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl hover:bg-blue-50 transition-all duration-500 hover:-translate-y-2">
+              <div className="relative z-10 mb-8">
                 <div className="w-20 h-20 bg-[var(--aio-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <InfoIcon className="w-10 h-10 text-[var(--text-on-primary)]" />
                 </div>
@@ -216,7 +215,6 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                   露出機会の大幅拡大
                 </p>
               </div>
-              <div className="absolute inset-0 bg-blue-50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
           </div>
           
@@ -235,15 +233,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </Link>
           </div>
         </div>
-        </section>
       </AioSection>
 
 
       {/* How it Works Section */}
-      <AioSection tone="white">
-        <section className="section-spacing">
+      <AioSection tone="white" className="section-bottom-extend">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-20">
+          <div className="text-center mb-20 section-heading-top">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               シンプルな
               <span className="text-[var(--aio-primary)]">
@@ -258,9 +254,9 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </p>
           </div>
           
-          <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+          <div className="mobile-scroll lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Step 1 */}
-            <div className="relative">
+            <div className="relative min-w-[85%] snap-center lg:min-w-0">
               <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center text-[var(--text-on-primary)] text-2xl font-bold shadow-lg">
@@ -296,7 +292,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </div>
 
             {/* Step 2 */}
-            <div className="relative">
+            <div className="relative min-w-[85%] snap-center lg:min-w-0">
               <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center text-[var(--text-on-primary)] text-2xl font-bold shadow-lg">
@@ -332,7 +328,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </div>
 
             {/* Step 3 */}
-            <div className="relative">
+            <div className="relative min-w-[85%] snap-center lg:min-w-0">
               <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center text-[var(--text-on-primary)] text-2xl font-bold shadow-lg">
@@ -368,7 +364,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
 
           {/* CTA */}
-          <div className="text-center mt-16">
+          <div className="text-center mt-16 mb-12 lg:mb-16">
             <Link
               href="/auth/signup"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
@@ -378,15 +374,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </Link>
           </div>
         </div>
-        </section>
       </AioSection>
 
 
       {/* Before/After Comparison Section */}
-      <AioSection tone="white">
-        <section className="section-spacing">
+      <AioSection tone="white" className="section-bottom-extend">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-20">
+          <div className="text-center mb-20 section-heading-top">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               AI時代の
               <span className="text-gray-800">
@@ -399,7 +393,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 mb-20">
+          <div className="grid lg:grid-cols-2 gap-12 mb-20 mb-12 lg:mb-16">
             {/* BEFORE */}
             <div className="group">
               <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
@@ -418,17 +412,17 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <div className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">AI回答</div>
                     <span className="text-gray-600 font-semibold">エラー</span>
                   </div>
-                  <p className="text-gray-700 italic">
+                  <p className="text-base lg:text-base text-gray-700 italic">
                     申し訳ございませんが、詳細な情報を見つけることができませんでした
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-gray-600">
+                  <div className="flex items-center gap-3 text-base lg:text-base text-gray-600">
                     <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
                     企業情報が散在・非構造化
                   </div>
-                  <div className="flex items-center gap-3 text-gray-600">
+                  <div className="flex items-center gap-3 text-base lg:text-base text-gray-600">
                     <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
                     AIが理解・引用できない形式
                   </div>
@@ -454,17 +448,17 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
                     <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">AI回答</div>
                     <span className="text-blue-600 font-semibold">成功</span>
                   </div>
-                  <p className="text-gray-700">
+                  <p className="text-base lg:text-base text-gray-700">
                     <strong className="text-gray-900">[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-gray-600">
+                  <div className="flex items-center gap-3 text-base lg:text-base text-gray-600">
                     <CheckCircleIcon className="w-5 h-5 text-blue-500" />
                     構造化された企業情報
                   </div>
-                  <div className="flex items-center gap-3 text-gray-600">
+                  <div className="flex items-center gap-3 text-base lg:text-base text-gray-600">
                     <CheckCircleIcon className="w-5 h-5 text-blue-500" />
                     AI検索に最適化されたデータ
                   </div>
@@ -482,7 +476,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             />
           </div>
 
-          <div className="text-center">
+          <div className="text-center mb-12 lg:mb-16">
             <Link
               href="/auth/signup"
               className="inline-flex items-center justify-center gap-2 text-lg px-8 py-4 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
@@ -492,14 +486,12 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </Link>
           </div>
         </div>
-        </section>
       </AioSection>
 
       {/* Pricing Section */}
-      <AioSection tone="muted">
-        <section className="section-spacing" id="pricing">
+      <AioSection tone="muted" id="pricing" className="pt-6 lg:pt-0">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 section-heading-top">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               シンプルで
               <span className="text-[var(--aio-primary)]">
@@ -512,15 +504,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
           </div>
           <PricingTable />
         </div>
-        </section>
       </AioSection>
 
       {/* FAQ Section */}
       <AioSection tone="muted">
-        <section className="section-spacing">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           {/* Contact CTA */}
-          <div className="bg-[var(--aio-primary)] rounded-3xl p-12 mb-20 text-center text-[var(--text-on-primary)]">
+          <div className="bg-[var(--aio-primary)] rounded-3xl p-12 mb-20 mb-12 lg:mb-16 text-center text-[var(--text-on-primary)]">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               その他のご質問がございましたら
             </h2>
@@ -542,15 +532,13 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             categories={aioCopy.faq.categories}
           />
         </div>
-        </section>
       </AioSection>
 
       {/* Final CTA Section */}
-      <AioSection tone="white">
-        <section className="section-spacing-large text-gray-900 relative overflow-hidden">
+      <AioSection tone="white" className="text-gray-900 relative overflow-hidden">
         {/* Background effects */}
         
-        <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center">
+        <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center section-heading-top">
           <h2 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight text-gray-900">
             まずは情報を
             <br />
@@ -580,7 +568,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </Link>
           </div>
           
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-700">
+          <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-700 mb-12 lg:mb-16">
             <div className="flex items-center gap-2">
               <CheckCircleIcon className="w-5 h-5 text-gray-600" />
               クレジットカード不要
@@ -595,7 +583,6 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             </div>
           </div>
         </div>
-        </section>
       </AioSection>
 
     </div>

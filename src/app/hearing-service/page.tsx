@@ -122,34 +122,34 @@ export default function HearingServicePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
       />
       
-      <div className="min-h-screen">
+      <div className="min-h-screen -mb-12">
         {/* ヒーローセクション */}
-        <AioSection tone="white">
+        <AioSection tone="white" className="!m-0" noSectionSpacing>
           <HeroSection />
         </AioSection>
         
         {/* 構造化前後の違い */}
-        <AioSection tone="muted">
+        <AioSection tone="muted" noSectionSpacing>
           <ComparisonSection />
         </AioSection>
         
         {/* サービス流れ説明 */}
-        <AioSection tone="white">
+        <AioSection tone="white" noSectionSpacing>
           <FlowSection />
         </AioSection>
         
         {/* 料金プラン */}
-        <AioSection tone="muted">
+        <AioSection tone="muted" id="pricing" className="pt-6 lg:pt-0 pb-16 lg:pb-20" noSectionSpacing>
           <PricingSection />
         </AioSection>
         
         {/* よくある質問 */}
-        <AioSection tone="white">
+        <AioSection tone="white" className="pt-12 lg:pt-14" noSectionSpacing>
           <FAQSection />
         </AioSection>
         
         {/* CTA（申込導線） */}
-        <AioSection tone="primary">
+        <AioSection tone="primary" noSectionSpacing className="pt-20">
           <CTASection />
         </AioSection>
       </div>

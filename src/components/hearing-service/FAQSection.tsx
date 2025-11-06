@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { HIGButton } from '@/components/ui/HIGButton';
 
 const faqData = [
   {
@@ -47,7 +46,6 @@ const faqData = [
   }
 ];
 
-
 export default function FAQSection() {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
@@ -61,84 +59,62 @@ export default function FAQSection() {
     setOpenItems(newOpenItems);
   };
 
-
   return (
-    <section id="faq" className="section-spacing">
-      <div className="max-w-4xl mx-auto px-6 lg:px-8">
-        {/* セクションヘッダー */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            よくある
-            <span className="text-[var(--aio-primary)]">
-              質問
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            ご不明な点がございましたら、お気軽にお問い合わせください。
-          </p>
-        </div>
+    <div className="max-w-4xl mx-auto px-6 lg:px-8">
+      <div className="text-center mb-16 section-heading-top">
+        <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          よくある
+          <span className="text-[var(--aio-primary)]">
+            質問
+          </span>
+        </h2>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          ご不明な点がございましたら、お気軽にお問い合わせください。
+        </p>
+      </div>
 
-        {/* FAQ Accordion */}
-        <div className="space-y-4 mb-16">
-          {faqData.map((faq, index) => {
-            const key = `faq-${index}`;
-            const isOpen = openItems.has(key);
-            return (
-              <div 
-                key={index} 
-                className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+      <div className="space-y-4 mb-16">
+        {faqData.map((faq, index) => {
+          const key = `faq-${index}`;
+          const isOpen = openItems.has(key);
+          return (
+            <div 
+              key={index} 
+              className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <button
+                onClick={() => toggleItem(key)}
+                className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 rounded-2xl transition-colors duration-200"
+                aria-expanded={isOpen}
+                aria-controls={`faq-answer-${key}`}
               >
-                <button
-                  onClick={() => toggleItem(key)}
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 rounded-2xl transition-colors duration-200"
-                  aria-expanded={isOpen}
-                  aria-controls={`faq-answer-${key}`}
+                <span className="text-lg font-bold text-gray-900 pr-4">
+                  {faq.question}
+                </span>
+                <div className="flex-shrink-0">
+                  <ChevronDown 
+                    className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
+                      isOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </div>
+              </button>
+              {isOpen && (
+                <div 
+                  id={`faq-answer-${key}`}
+                  className="px-6 pb-6"
                 >
-                  <span className="text-lg font-bold text-gray-900 pr-4">
-                    {faq.question}
-                  </span>
-                  <div className="flex-shrink-0">
-                    <ChevronDown 
-                      className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </div>
-                </button>
-                {isOpen && (
-                  <div 
-                    id={`faq-answer-${key}`}
-                    className="px-6 pb-6"
-                  >
-                    <div className="pt-4 border-t border-gray-100">
-                      <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                        {faq.answer}
-                      </div>
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                      {faq.answer}
                     </div>
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* サポート案内 */}
-        <div className="aio-surface text-center p-8 border border-gray-200">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">他にもご質問がございますか？</h3>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <HIGButton
-              variant="primary"
-              size="lg"
-              onClick={() => window.location.href = "mailto:support@luxucare.jp"}
-            >
-              メールで問い合わせ
-            </HIGButton>
-          </div>
-        </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
-    </section>
+    </div>
   );
 }
