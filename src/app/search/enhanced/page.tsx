@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useI18n } from '@/components/layout/I18nProvider';
+import { useI18n, I18nProvider } from '@/components/layout/I18nProvider';
 import { useSEO } from '@/hooks/useSEO';
 import AdvancedSearchFilters, { type AdvancedFilters } from '@/components/search/AdvancedSearchFilters';
 import SearchResultCard from '@/components/search/SearchResultCard';
@@ -13,7 +13,7 @@ import { logger } from '@/lib/utils/logger';
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-export default function EnhancedSearchPage() {
+function EnhancedSearchForm() {
   const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -393,4 +393,12 @@ function calculateRelevanceScore(item: any, query: string): number {
   if (industry.includes(lowerQuery)) score += 30;
 
   return score;
+}
+
+export default function EnhancedSearchPage() {
+  return (
+    <I18nProvider>
+      <EnhancedSearchForm />
+    </I18nProvider>
+  );
 }
