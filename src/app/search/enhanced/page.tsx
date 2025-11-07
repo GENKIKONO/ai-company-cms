@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useI18n, I18nProvider } from '@/components/layout/I18nProvider';
 import { useSEO } from '@/hooks/useSEO';
@@ -398,7 +398,9 @@ function calculateRelevanceScore(item: any, query: string): number {
 export default function EnhancedSearchPage() {
   return (
     <I18nProvider>
-      <EnhancedSearchForm />
+      <Suspense fallback={null}>
+        <EnhancedSearchForm />
+      </Suspense>
     </I18nProvider>
   );
 }
