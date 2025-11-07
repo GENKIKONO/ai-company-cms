@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   HIGCard,
@@ -26,7 +26,7 @@ interface Organization {
   slug: string;
 }
 
-export default function AskQuestionPage() {
+function AskQuestionForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const companySlug = searchParams.get('company');
@@ -350,5 +350,13 @@ export default function AskQuestionPage() {
         </HIGCard>
       </div>
     </div>
+  );
+}
+
+export default function AskQuestionPage() {
+  return (
+    <Suspense fallback={null}>
+      <AskQuestionForm />
+    </Suspense>
   );
 }
