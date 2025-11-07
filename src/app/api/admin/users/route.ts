@@ -12,18 +12,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 管理者チェック
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (userError || userData?.role !== 'admin') {
+    // 管理者チェック - check app_metadata instead of profiles/app_users
+    const isAdmin = user.app_metadata?.role === 'admin';
+    
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // ユーザー一覧を取得
+    // 管理者用途のため auth.users をそのまま使用（profiles には email/role がないため）
+    // Admin purpose: keep using auth.users since profiles doesn't have email/role
     const { data: users, error } = await supabase
       .from('app_users')
       .select(`

@@ -13,18 +13,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 管理者チェック
-    const { data: userData, error: userError } = await supabase
-      .from('app_users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (userError || userData?.role !== 'admin') {
+    // 管理者チェック - check app_metadata instead of app_users
+    const isAdmin = user.app_metadata?.role === 'admin';
+    
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // 対象ユーザーの詳細情報を取得
+    // 管理者用途のため app_users をそのまま使用（profiles には email/role がないため）
+    // Admin purpose: keep using app_users since profiles doesn't have email/role
     const { data: targetUser, error: fetchError } = await supabase
       .from('app_users')
       .select('*')

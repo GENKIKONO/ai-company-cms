@@ -23,10 +23,10 @@ export async function getCurrentUser(): Promise<AppUser | null> {
     
     if (!user) return null
 
-    // migrated from users → app_users
+    // migrated from users → app_users → profiles
     const { data: profile, error } = await supabaseBrowser
-      .from('app_users')
-      .select('id, email, name, role, created_at, updated_at')
+      .from('profiles')
+      .select('id, full_name, avatar_url, created_at')
       .eq('id', user.id)
       .single()
 
@@ -35,7 +35,16 @@ export async function getCurrentUser(): Promise<AppUser | null> {
       return null
     }
 
-    return profile
+    // Combine profile data with auth.users data for complete AppUser
+    return {
+      id: profile.id,
+      email: user.email || '',
+      full_name: profile.full_name,
+      avatar_url: profile.avatar_url,
+      role: (user.app_metadata?.role as UserRole) || 'viewer',
+      created_at: profile.created_at,
+      updated_at: profile.created_at // profiles doesn't have updated_at
+    }
   } catch (error) {
     authLogger.error('get current user', error instanceof Error ? error : new Error(String(error)));
     return null
@@ -58,22 +67,8 @@ export const auth = {
 
     if (error) throw error;
 
-    // プロフィール情報を作成
-    if (data.user) {
-      // migrated from users → app_users
-      const { error: profileError } = await supabaseBrowser
-        .from('app_users')
-        .insert({
-          id: data.user.id,
-          email: data.user.email!,
-          name: fullName,
-          role: 'user'
-        })
-
-      if (profileError) {
-        authLogger.error('create user profile', profileError);
-      }
-    }
+    // プロフィール情報は handle_new_user() トリガーで自動作成される
+    // manual profile creation is no longer needed
 
     return data;
   },
@@ -171,10 +166,15 @@ export const auth = {
     
     if (!user) throw new Error('Not authenticated')
 
-    // migrated from users → app_users
+    // migrated from users → app_users → profiles
+    // Only update fields that exist in profiles table
+    const profileUpdates: any = {};
+    if (updates.full_name !== undefined) profileUpdates.full_name = updates.full_name;
+    if (updates.avatar_url !== undefined) profileUpdates.avatar_url = updates.avatar_url;
+
     const { error } = await supabaseBrowser
-      .from('app_users')
-      .update(updates)
+      .from('profiles')
+      .update(profileUpdates)
       .eq('id', user.id)
 
     if (error) throw error
@@ -190,10 +190,10 @@ export const auth = {
 export const profile = {
   // プロフィール取得
   get: async (userId: string): Promise<AppUser | null> => {
-    // migrated from users → app_users
-    const { data, error } = await supabaseBrowser
-      .from('app_users')
-      .select('id, email, name, role, created_at, updated_at')
+    // migrated from users → app_users → profiles
+    const { data: profile, error } = await supabaseBrowser
+      .from('profiles')
+      .select('id, full_name, avatar_url, created_at')
       .eq('id', userId)
       .single();
 
@@ -202,18 +202,32 @@ export const profile = {
       throw error;
     }
 
-    return data;
+    // Get email from auth.users since it's not in profiles
+    const { data: { user } } = await supabaseBrowser.auth.getUser();
+    const email = user?.id === userId ? user.email || '' : ''; // Only return email if it's current user
+    
+    return {
+      id: profile.id,
+      email: email,
+      full_name: profile.full_name,
+      avatar_url: profile.avatar_url,
+      role: 'viewer', // Default role since profiles doesn't store role
+      created_at: profile.created_at,
+      updated_at: profile.created_at // profiles doesn't have updated_at
+    };
   },
 
   // プロフィール更新
   update: async (userId: string, updates: Partial<AppUser>) => {
-    // migrated from users → app_users
+    // migrated from users → app_users → profiles
+    // Only update fields that exist in profiles table
+    const profileUpdates: any = {};
+    if (updates.full_name !== undefined) profileUpdates.full_name = updates.full_name;
+    if (updates.avatar_url !== undefined) profileUpdates.avatar_url = updates.avatar_url;
+
     const { data, error } = await supabaseBrowser
-      .from('app_users')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
+      .from('profiles')
+      .update(profileUpdates)
       .eq('id', userId)
       .select()
       .single();
