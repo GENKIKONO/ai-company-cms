@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-browser';
-import { useErrorToast } from '@/components/ui/toast';
+import { useErrorToast, ToastProvider } from '@/components/ui/toast';
 import { logger } from '@/lib/utils/logger';
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -118,5 +118,13 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <ToastProvider>
+      <AdminLoginForm />
+    </ToastProvider>
   );
 }
