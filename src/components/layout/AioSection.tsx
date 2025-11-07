@@ -6,6 +6,7 @@ type AioSectionProps = {
   children: React.ReactNode;
   className?: string;
   noSectionSpacing?: boolean;
+  id?: string;
 };
 
 const AioSection: React.FC<AioSectionProps> = ({
@@ -13,6 +14,7 @@ const AioSection: React.FC<AioSectionProps> = ({
   children,
   className = '',
   noSectionSpacing = false,
+  id,
 }) => {
   const getToneStyles = (tone: 'white' | 'muted' | 'primary') => {
     switch (tone) {
@@ -39,6 +41,7 @@ const AioSection: React.FC<AioSectionProps> = ({
 
   return (
     <section
+      id={id}
       style={styles}
       className={`${noSectionSpacing ? '' : 'section-y'} ${className}`.trim()}
     >

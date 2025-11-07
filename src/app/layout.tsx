@@ -24,12 +24,12 @@ export default function RootLayout({
                 <Link href="/" className="text-xl font-semibold text-gray-900 hover:text-gray-700 transition-colors">AIO Hub</Link>
               </div>
               <nav className="hidden lg:flex space-x-8">
-                <a href="/pricing" className="text-gray-700 hover:text-gray-900">料金プラン</a>
-                <a href="/organizations" className="text-gray-700 hover:text-gray-900">企業ディレクトリ</a>
-                <a href="/hearing-service" className="text-gray-700 hover:text-gray-900">ヒアリング代行</a>
+                <Link href="/pricing" className="text-gray-700 hover:text-gray-900">料金プラン</Link>
+                <Link href="/organizations" className="text-gray-700 hover:text-gray-900">企業ディレクトリ</Link>
+                <Link href="/hearing-service" className="text-gray-700 hover:text-gray-900">ヒアリング代行</Link>
               </nav>
               <div className="flex items-center">
-                <a href="/auth/login" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">ログイン</a>
+                <Link href="/auth/login" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">ログイン</Link>
               </div>
             </div>
           </div>

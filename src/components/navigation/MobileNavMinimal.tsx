@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 
 // モバイル判定カスタムHook
 function useIsMobile(lg = 1024) {
@@ -101,11 +102,11 @@ function MobileNavMinimalInner() {
         </button>
       </div>
       <ul className="p-2">
-        <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/">トップ</a></li>
-        <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/pricing">料金プラン</a></li>
-        <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/organizations">企業ディレクトリ</a></li>
-        <li><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/hearing-service">ヒアリング代行</a></li>
-        <li className="mt-2 border-t"><a className="block px-4 py-3 hover:bg-gray-50 rounded" href="/auth/login">ログイン</a></li>
+        <li><Link className="block px-4 py-3 hover:bg-gray-50 rounded" href="/">トップ</Link></li>
+        <li><Link className="block px-4 py-3 hover:bg-gray-50 rounded" href="/pricing">料金プラン</Link></li>
+        <li><Link className="block px-4 py-3 hover:bg-gray-50 rounded" href="/organizations">企業ディレクトリ</Link></li>
+        <li><Link className="block px-4 py-3 hover:bg-gray-50 rounded" href="/hearing-service">ヒアリング代行</Link></li>
+        <li className="mt-2 border-t"><Link className="block px-4 py-3 hover:bg-gray-50 rounded" href="/auth/login">ログイン</Link></li>
       </ul>
     </nav>,
     document.body
