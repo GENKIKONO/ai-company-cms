@@ -209,14 +209,14 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   ) : null;
 
   // 改善2: メインドロワー（統一CSS変数使用）
-  const Drawer = createPortal(
+  const Drawer = isOpen ? createPortal(
     <nav
       id="unified-mobile-drawer"
       role="navigation"
       aria-label={isDashboard ? "ダッシュボードメニュー" : "メインメニュー"}
       className={classNames(
         "fixed top-0 right-0 z-50 h-screen w-80 max-w-[85vw] glass-card backdrop-blur-xl border border-gray-200/60 shadow-xl mobile-nav-drawer",
-        isOpen ? "translate-x-0" : "translate-x-full"
+        "translate-x-0"
       )}
       style={{
         background: 'rgba(255, 255, 255, 0.95)',
@@ -308,7 +308,7 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
       </div>
     </nav>,
     document.body
-  );
+  ) : null;
 
   return (
     <>
