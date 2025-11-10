@@ -64,6 +64,9 @@ function useIsMobile(lg = 1024) {
 export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnToggle }: UnifiedMobileNavProps) {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  // アニメーション制御用state
+  const [isClosing, setIsClosing] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
   const pathname = usePathname();
   const isMobile = useIsMobile(1024);
   
@@ -84,6 +87,25 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
 
   // マウント状態管理
   useEffect(() => setMounted(true), []);
+
+  // アニメーション制御: 開く処理
+  useEffect(() => {
+    if (isOpen && !isClosing) {
+      setShouldRender(true);
+    }
+  }, [isOpen, isClosing]);
+
+  // アニメーション制御: 閉じる処理
+  useEffect(() => {
+    if (!isOpen && shouldRender) {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setIsClosing(false);
+        setShouldRender(false);
+      }, 300); // CSS transitionの時間に合わせる
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, shouldRender]);
 
   // 改善1: 即座スクロールロック機能
   const handleImmediateScrollLock = useCallback((shouldLock: boolean) => {
@@ -199,9 +221,12 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   );
 
   // オーバーレイ
-  const Overlay = isOpen ? createPortal(
+  const Overlay = shouldRender ? createPortal(
     <div
-      className="fixed inset-0 z-40 bg-black/40 opacity-100 pointer-events-auto"
+      className={classNames(
+        "fixed inset-0 z-40 bg-black/40 pointer-events-auto transition-opacity duration-300",
+        isClosing ? "opacity-0" : "opacity-100"
+      )}
       aria-hidden="true"
       onClick={handleToggle}
     />,
@@ -209,14 +234,15 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   ) : null;
 
   // 改善2: メインドロワー（統一CSS変数使用）
-  const Drawer = isOpen ? createPortal(
+  const Drawer = shouldRender ? createPortal(
     <nav
       id="unified-mobile-drawer"
       role="navigation"
       aria-label={isDashboard ? "ダッシュボードメニュー" : "メインメニュー"}
       className={classNames(
-        "fixed top-0 right-0 z-50 h-screen w-80 max-w-[85vw] glass-card backdrop-blur-xl border border-gray-200/60 shadow-xl mobile-nav-drawer",
-        "translate-x-0"
+        "fixed top-0 right-0 z-50 h-screen w-80 max-w-[85vw] glass-card backdrop-blur-xl border border-gray-200/60 shadow-xl",
+        "mobile-nav-drawer",
+        isClosing ? "mobile-nav-drawer--exit" : "mobile-nav-drawer--enter"
       )}
       style={{
         background: 'rgba(255, 255, 255, 0.95)',

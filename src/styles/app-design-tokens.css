@@ -286,3 +286,12 @@ a:focus-visible,
 .mobile-nav-drawer {
   transition: transform var(--nav-transition-duration) var(--nav-transition-easing);
 }
+
+/* Mobile Navigation Drawer Animation States */
+.mobile-nav-drawer--enter {
+  transform: translateX(0);
+}
+
+.mobile-nav-drawer--exit {
+  transform: translateX(100%);
+}

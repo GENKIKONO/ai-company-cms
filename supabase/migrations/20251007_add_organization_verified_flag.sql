@@ -6,7 +6,8 @@
 ALTER TABLE public.organizations 
 ADD COLUMN verified BOOLEAN DEFAULT FALSE;
 
--- 法人番号が登録されている場合は認証済みとして扱う（一時的処理）
+-- finalized: organization_verified flag now official under RLS
+-- 法人番号が登録されている場合は認証済みとして扱う（正式化）
 UPDATE public.organizations 
 SET verified = TRUE 
 WHERE corporate_number IS NOT NULL 

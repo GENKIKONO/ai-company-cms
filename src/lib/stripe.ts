@@ -173,8 +173,7 @@ export const createAIOHubProducts = async () => {
     return createMockStripeProducts();
   }
 
-  // 🚨 本番モード: 実際のStripe API呼び出し（コメントアウト状態）
-  /*
+  // ✅ Production mode: Actual Stripe API calls (restored)
   try {
     const products = [];
     
@@ -209,11 +208,6 @@ export const createAIOHubProducts = async () => {
     logger.error('Error creating AIO Hub products', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
-  */
-  
-  // 安全モードでない場合の一時的な処理
-  logger.warn('本番Stripe API機能は一時的にコメントアウト中');
-  return createMockStripeProducts();
 };
 
 /**
