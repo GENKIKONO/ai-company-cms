@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   HIGCard,
   HIGCardHeader,
@@ -47,12 +47,7 @@ export default function MaterialStatsPage() {
   // 期間プリセット
   const [selectedPreset, setSelectedPreset] = useState<'7d' | '30d' | '90d' | 'custom'>('30d');
 
-  // データ取得
-  useEffect(() => {
-    loadStats();
-  }, [filters]);
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -78,7 +73,12 @@ export default function MaterialStatsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  // データ取得
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
   // プリセット期間変更
   const handlePresetChange = (preset: '7d' | '30d' | '90d') => {

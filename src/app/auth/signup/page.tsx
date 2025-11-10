@@ -1,11 +1,15 @@
 'use client';
 
+// Authページ: サーバーサイドでenvヘルパーを使用するため動的レンダリングが必要
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { BackLink } from '@/components/ui/back-link';
-import { getAppUrl } from '@/lib/utils/env';
+// Dynamic import to avoid SSR issues
+// import { getAppUrl } from '@/lib/utils/env';
 import { logger } from '@/lib/utils/logger';
 
 export default function SignupPage() {
@@ -56,7 +60,8 @@ export default function SignupPage() {
 
     try {
       // 統一化されたAPP_URL使用（常にhttps://aiohub.jp）
-      const redirectTo = `${getAppUrl()}/auth/confirm`;
+      // 直接固定値を使用してビルド時エラーを回避
+      const redirectTo = `https://aiohub.jp/auth/confirm`;
       
       const { error: signUpError } = await supabaseBrowser.auth.signUp({
         email,

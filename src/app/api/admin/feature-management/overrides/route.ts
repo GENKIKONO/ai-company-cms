@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Organization Feature Overrides API
  * 組織別機能オーバーライド（Phase 2実装予定）

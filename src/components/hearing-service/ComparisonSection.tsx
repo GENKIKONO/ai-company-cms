@@ -1,25 +1,20 @@
 'use client';
 
 import { X, Check, AlertTriangle, Sparkles } from 'lucide-react';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 export default function ComparisonSection() {
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6 lg:py-10">
-      <div className="text-center mb-16">
-        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-          構造化前後の
-          <span className="text-[var(--aio-primary)]">
-            大きな違い
-          </span>
-        </h2>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          ヒアリングによってあなたの企業情報がどのように変わるかをご覧ください
-        </p>
-      </div>
+      <SectionHeader 
+        title="構造化前後の大きな違い"
+        subtitle="ヒアリングによってあなたの企業情報がどのように変わるかをご覧ください"
+        className="mb-16"
+      />
 
-      <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+      <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto mt-8">
         {/* Before Card */}
-        <div className="aio-surface relative border-2 border-gray-200 p-8 hover:shadow-xl transition-all duration-300">
+        <div className="aio-surface relative border-2 border-gray-200 p-8 hover:shadow-xl transition-all duration-300" aria-label="構造化前">
           <div className="absolute -top-4 left-8">
             <div className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full border border-gray-200">
               <X className="h-4 w-4" />
@@ -52,61 +47,61 @@ export default function ComparisonSection() {
         </div>
 
         {/* After Card */}
-        <div className="aio-surface relative border-2 border-blue-200 p-8 hover:shadow-xl transition-all duration-300">
+        <div className="aio-surface relative border-2 border-[var(--aio-primary)] p-8 hover:shadow-xl transition-all duration-300" aria-label="構造化後">
           <div className="absolute -top-4 left-8">
-            <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full border border-blue-200">
+            <div className="flex items-center gap-2 hig-bg-surface hig-text-primary px-4 py-2 rounded-full border border-[var(--aio-primary)]">
               <Check className="h-4 w-4" />
               <span className="font-bold">構造化後</span>
             </div>
           </div>
           
           <div className="mt-8 space-y-4">
-            <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <div className="p-4 hig-bg-surface rounded-xl border border-[var(--border-light)]">
               <div className="space-y-2">
-                <div><strong className="text-blue-800">対象業界:</strong> 製造業・小売業・サービス業</div>
-                <div><strong className="text-blue-800">主力サービス:</strong> ECサイト構築・在庫管理システム</div>
+                <div><strong className="hig-text-primary">対象業界:</strong> 製造業・小売業・サービス業</div>
+                <div><strong className="hig-text-primary">主力サービス:</strong> ECサイト構築・在庫管理システム</div>
               </div>
             </div>
-            <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <div className="p-4 hig-bg-surface rounded-xl border border-[var(--border-light)]">
               <div className="space-y-2">
-                <div><strong className="text-blue-800">導入実績:</strong> 中小企業への豊富な導入経験</div>
-                <div><strong className="text-blue-800">特徴:</strong> 短期間での効果実現を重視</div>
+                <div><strong className="hig-text-primary">導入実績:</strong> 中小企業への豊富な導入経験</div>
+                <div><strong className="hig-text-primary">特徴:</strong> 短期間での効果実現を重視</div>
               </div>
             </div>
-            <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <div className="p-4 hig-bg-surface rounded-xl border border-[var(--border-light)]">
               <div className="space-y-2">
-                <div><strong className="text-blue-800">差別化:</strong> ノーコード対応・24時間サポート</div>
-                <div><strong className="text-blue-800">価格:</strong> 月額5万円〜・初期費用無料</div>
+                <div><strong className="hig-text-primary">差別化:</strong> ノーコード対応・24時間サポート</div>
+                <div><strong className="hig-text-primary">価格:</strong> 月額5万円〜・初期費用無料</div>
               </div>
             </div>
           </div>
           
-          <div className="mt-8 flex items-center gap-3 text-blue-600">
+          <div className="mt-8 flex items-center gap-3 hig-text-primary">
             <Check className="h-5 w-5" />
             <span className="font-medium">具体的でAIが理解しやすい</span>
           </div>
           
           {/* 期待できる成果 */}
-          <div className="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-200">
+          <div className="mt-8 p-6 hig-bg-surface rounded-xl border border-[var(--aio-primary)]">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-5 w-5 text-blue-600" />
-              <h4 className="font-bold text-blue-800">期待できる成果</h4>
+              <Sparkles className="h-5 w-5 hig-text-primary" />
+              <h4 className="font-bold hig-text-primary">期待できる成果</h4>
             </div>
-            <ul className="space-y-2 text-sm text-blue-700">
+            <ul className="space-y-2 text-sm hig-text-primary">
               <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-blue-600" />
+                <Check className="h-4 w-4 hig-text-primary" />
                 ChatGPT検索で上位表示
               </li>
               <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-blue-600" />
+                <Check className="h-4 w-4 hig-text-primary" />
                 Google AI Overviewで引用
               </li>
               <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-blue-600" />
+                <Check className="h-4 w-4 hig-text-primary" />
                 商談・採用の問い合わせ増加
               </li>
               <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-blue-600" />
+                <Check className="h-4 w-4 hig-text-primary" />
                 メディア取材の機会拡大
               </li>
             </ul>

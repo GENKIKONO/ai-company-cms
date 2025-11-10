@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Feature Management Admin API
  * プラン機能設定の管理

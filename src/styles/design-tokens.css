@@ -1,34 +1,15 @@
-:root {
-  /* Colors */
-  --color-white: #ffffff;
-  --color-muted: #f8f9fa;
-  --color-primary: #0066cc;
-  
-  /* Text Colors */
-  --text-primary: #333333;
-  --text-secondary: #666666;
-  --text-on-primary: #ffffff;
-  
-  /* Border Radius */
-  --radius-small: 4px;
-  --radius-medium: 8px;
-  --radius-large: 12px;
-  
-  /* Shadows */
-  --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-large: 0 10px 25px rgba(0, 0, 0, 0.15);
-  
-  /* Semantic layer - AIO specific tokens */
-  --aio-primary: var(--color-primary);
-  --aio-primary-hover: #0052a3; /* Darker shade of primary for hover */
-  --aio-muted: var(--color-muted);
-  --aio-surface: #ffffff;
-}
+/**
+ * Legacy compatibility shim for old imports
+ * Real design tokens live in src/styles/app-design-tokens.css
+ * This file exists solely to prevent build errors from legacy import paths
+ */
 
-/* Card Surface */
-.aio-surface {
-  background-color: var(--color-white);
-  border-radius: var(--radius-large);
-  box-shadow: var(--shadow-small);
+:root {
+  /* Minimal fallback tokens to prevent CSS errors */
+  --aio-primary: #007aff;
+  --aio-surface: #ffffff;
+  --aio-text: #000000;
+  
+  /* Note: Actual design system tokens are loaded via app-design-tokens.css */
+  /* This file should not be used for new development */
 }

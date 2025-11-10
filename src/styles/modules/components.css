@@ -1,6 +1,10 @@
 /* ============================================================
-   Components Module
-   Interactive elements, buttons, cards, and components
+   ⚠️ DEPRECATED: Components Module
+   
+   このファイルは非推奨です。新しい統合トークンファイルを使用してください：
+   → src/styles/app-design-tokens.css
+   
+   互換性のため一時的に残されています。
    ============================================================ */
 
 /* 1. Apple Button System */

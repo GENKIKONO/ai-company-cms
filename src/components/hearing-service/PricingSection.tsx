@@ -2,6 +2,7 @@
 
 import { Check, Zap, Crown } from 'lucide-react';
 import Link from 'next/link';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { 
   HEARING_SERVICE_PLANS, 
   getHearingPlanColorClasses, 
@@ -18,16 +19,18 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
     <div
       className={`aio-surface relative border hover:shadow-xl transition-all duration-300 h-full flex flex-col ${
         plan.popular
-          ? 'border-[5px] border-blue-400 pt-10 pb-8 px-6'
+          ? 'border-[5px] border-[var(--aio-primary)] pt-10 pb-8 px-6'
           : 'border border-gray-200/70 p-6'
       }`}
+      role="article"
+      aria-label={`${plan.name}プラン`}
     >
       {/* 人気バッジ */}
       {plan.popular && (
         <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="bg-white border-[5px] border-blue-400 px-7 py-3 rounded-full shadow-lg flex items-center gap-3">
-            <Crown className="w-6 h-6 text-blue-700" strokeWidth={2.2} />
-            <span className="text-sm font-bold text-blue-800">人気</span>
+          <div className="bg-white border-[5px] border-[var(--aio-primary)] px-7 py-3 rounded-full shadow-lg flex items-center gap-3" aria-label="推奨プラン">
+            <Crown className="w-6 h-6 hig-text-primary" strokeWidth={2.2} />
+            <span className="text-sm font-bold hig-text-primary">人気</span>
           </div>
         </div>
       )}
@@ -50,7 +53,7 @@ const PricingCard = ({ planId }: { planId: HearingServicePlanId }) => {
           <span className="text-gray-600 ml-1">（税別）</span>
           {plan.badge && (
             <div className="mt-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-[var(--aio-primary)]">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium hig-bg-surface hig-text-primary">
                 {plan.badge}
               </span>
             </div>
@@ -92,24 +95,18 @@ export default function PricingSection() {
   const planIds: HearingServicePlanId[] = ['light', 'advance', 'full', 'continuous'];
   
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-12 lg:pt-16">
       {/* セクションヘッダー */}
-      <div className="text-center mb-16 section-heading-top">
-        <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-          シンプルで
-          <span className="text-[var(--aio-primary)]">
-            透明な料金
-          </span>
-        </h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          対話を通じて企業価値を第三者視点で整理し、AIに理解されやすい構造データとして言語化します。
-        </p>
-      </div>
+      <SectionHeader 
+        title="シンプルで透明な料金"
+        subtitle="対話を通じて企業価値を第三者視点で整理し、AIに理解されやすい構造データとして言語化します。"
+        className="mb-20 lg:mb-24"
+      />
 
       {/* 料金プラン */}
       <>
         {/* Mobile: Horizontal Scroll */}
-        <div className="lg:hidden mobile-scroll pricing-scroll">
+        <div className="lg:hidden mobile-scroll pricing-scroll mt-8">
           {planIds.map((planId) => (
             <div key={planId} className="min-w-[78%] snap-center lg:min-w-0">
               <PricingCard planId={planId} />
@@ -118,7 +115,7 @@ export default function PricingSection() {
         </div>
 
         {/* Desktop: Grid Layout */}
-        <div className="hidden lg:block mt-10">
+        <div className="hidden lg:block mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
             {planIds.map((planId) => (
               <div key={planId} className="relative">

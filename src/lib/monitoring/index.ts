@@ -2,6 +2,7 @@
  * システム監視・ログ体制
  * 要件定義準拠: 本番運用監視、エラートラッキング、パフォーマンス計測
  */
+/* eslint-disable no-console */
 
 import { WebVitalsData } from '../performance';
 import { logger as utilLogger } from '@/lib/utils/logger';

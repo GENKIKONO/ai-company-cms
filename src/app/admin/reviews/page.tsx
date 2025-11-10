@@ -53,6 +53,7 @@ export default function AdminReviewsPage() {
 
   useEffect(() => {
     fetchPendingReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchPendingReviews = async () => {

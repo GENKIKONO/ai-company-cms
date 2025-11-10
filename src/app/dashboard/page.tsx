@@ -7,6 +7,7 @@ import PublishToggle from './components/PublishToggle';
 import TabbedDashboard from './components/TabbedDashboard';
 import PerformanceMetrics from './components/PerformanceMetrics';
 import DashboardActions from './components/DashboardActions';
+import AIVisibilityCard from './components/AIVisibilityCard';
 import { hasEntitlementSync } from '@/lib/feature-flags/gate';
 import { logger } from '@/lib/utils/logger';
 
@@ -96,7 +97,7 @@ export default async function DashboardPage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--aio-page-bg, #f3f4f6)]">
       {/* Modern Hero Section */}
       <section className="relative section-spacing overflow-hidden">
         {/* Background effects */}
@@ -105,7 +106,7 @@ export default async function DashboardPage() {
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center">
             {/* Organization badge */}
-            <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 mb-8">
+            <div className="inline-flex items-center gap-3 glass-card backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 mb-8 spring-bounce">
               {org.logo_url ? (
                 <Image
                   src={org.logo_url}
@@ -137,7 +138,7 @@ export default async function DashboardPage() {
             
             {/* Status indicators */}
             <div className="flex flex-wrap justify-center gap-6 mb-12">
-              <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl px-6 py-4">
+              <div className="glass-card backdrop-blur-sm border border-gray-200 rounded-2xl px-6 py-4 spring-bounce">
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${org.is_published ? 'bg-green-500' : 'bg-gray-400'}`}></div>
                   <span className="text-gray-700 font-medium">
@@ -146,7 +147,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
               
-              <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl px-6 py-4">
+              <div className="glass-card backdrop-blur-sm border border-gray-200 rounded-2xl px-6 py-4 spring-bounce">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                   <span className="text-gray-700 font-medium">
@@ -155,7 +156,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
               
-              <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl px-6 py-4">
+              <div className="glass-card backdrop-blur-sm border border-gray-200 rounded-2xl px-6 py-4 spring-bounce">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                   <span className="text-gray-700 font-medium">
@@ -170,8 +171,8 @@ export default async function DashboardPage() {
       
       <main className="max-w-7xl mx-auto px-6 lg:px-8 -mt-16 relative z-10">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
+          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce">
             <div className="flex items-center justify-between mb-6">
               <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -204,7 +205,7 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
+          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce">
             <div className="flex items-center justify-between mb-6">
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 ${
                 org.is_published 
@@ -233,7 +234,7 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
+          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce">
             <div className="flex items-center justify-between mb-6">
               <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -251,7 +252,7 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
+          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce">
             <div className="flex items-center justify-between mb-6">
               <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -268,10 +269,15 @@ export default async function DashboardPage() {
               </p>
             </div>
           </div>
+
+          {/* AI Visibility Card */}
+          <AIVisibilityCard
+            organizationId={org.id}
+          />
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-200 p-8 mb-12">
+        <div className="glass-card backdrop-blur-sm rounded-3xl border border-gray-200 p-8 mb-12 spring-bounce">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">クイックアクション</h2>
             <p className="text-gray-600 text-lg">よく使用される機能に素早くアクセス</p>
@@ -422,7 +428,7 @@ export default async function DashboardPage() {
         {/* パフォーマンス概要とアクティビティ */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
           {/* パフォーマンス概要 */}
-          <div className="lg:col-span-2 bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-200 p-8">
+          <div className="lg:col-span-2 glass-card backdrop-blur-sm rounded-3xl border border-gray-200 p-8 spring-bounce">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
@@ -460,7 +466,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* 最近のアクティビティ */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-200 p-8">
+          <div className="glass-card backdrop-blur-sm rounded-3xl border border-gray-200 p-8 spring-bounce">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">

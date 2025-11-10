@@ -1,9 +1,46 @@
 'use client';
 
 import { supabaseBrowser } from '@/lib/supabase-client';
-import { User } from '@supabase/supabase-js';
+import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { type AppUser, type UserRole } from '@/types/database';
+import type { DatabaseResult, TableRow, TableUpdate } from '@/types/database.types';
+import type { ApiResponse, createApiResponse, createErrorResponse } from '@/types/api.types';
 import { authLogger, logger } from '@/lib/utils/logger';
+
+// Profile update interface
+interface ProfileUpdates {
+  full_name?: string;
+  avatar_url?: string;
+}
+
+// Auth callback type
+type AuthCallback = (event: AuthChangeEvent, session: Session | null) => void;
+
+// Search params interface
+interface SearchParams {
+  query?: string;
+  category?: string;
+  location?: string;
+  [key: string]: string | undefined;
+}
+
+// Saved search updates interface
+interface SavedSearchUpdates {
+  name?: string;
+  search_params?: SearchParams;
+}
+
+// User preferences interface - type-safe version
+interface UserPreferences {
+  theme?: 'light' | 'dark' | 'auto';
+  language?: string; // ISO language codes
+  notifications?: boolean;
+  email_notifications?: boolean;
+  dashboard_view?: 'grid' | 'list';
+  items_per_page?: number;
+  timezone?: string;
+  [key: string]: string | number | boolean | undefined;
+}
 
 // ユーザーの権限をチェック
 export function hasPermission(userRole: UserRole, requiredRole: UserRole): boolean {
@@ -168,7 +205,7 @@ export const auth = {
 
     // migrated from users → app_users → profiles
     // Only update fields that exist in profiles table
-    const profileUpdates: any = {};
+    const profileUpdates: ProfileUpdates = {};
     if (updates.full_name !== undefined) profileUpdates.full_name = updates.full_name;
     if (updates.avatar_url !== undefined) profileUpdates.avatar_url = updates.avatar_url;
 
@@ -181,7 +218,7 @@ export const auth = {
   },
 
   // 認証状態の監視
-  onAuthStateChange: (callback: (event: string, session: any) => void) => {
+  onAuthStateChange: (callback: AuthCallback) => {
     return supabaseBrowser.auth.onAuthStateChange(callback);
   },
 };
@@ -221,7 +258,7 @@ export const profile = {
   update: async (userId: string, updates: Partial<AppUser>) => {
     // migrated from users → app_users → profiles
     // Only update fields that exist in profiles table
-    const profileUpdates: any = {};
+    const profileUpdates: ProfileUpdates = {};
     if (updates.full_name !== undefined) profileUpdates.full_name = updates.full_name;
     if (updates.avatar_url !== undefined) profileUpdates.avatar_url = updates.avatar_url;
 
@@ -252,7 +289,7 @@ export const savedSearches = {
   },
 
   // 検索条件保存
-  save: async (userId: string, name: string, searchParams: Record<string, any>) => {
+  save: async (userId: string, name: string, searchParams: SearchParams) => {
     const { data, error } = await supabaseBrowser
       .from('user_saved_searches')
       .insert({
@@ -268,7 +305,7 @@ export const savedSearches = {
   },
 
   // 検索条件更新
-  update: async (id: string, updates: any) => {
+  update: async (id: string, updates: SavedSearchUpdates) => {
     const { data, error } = await supabaseBrowser
       .from('user_saved_searches')
       .update({
@@ -366,7 +403,7 @@ export const preferences = {
   },
 
   // 設定更新
-  update: async (userId: string, preferences: Record<string, any>) => {
+  update: async (userId: string, preferences: UserPreferences) => {
     const { data, error } = await supabaseBrowser
       .from('user_preferences')
       .upsert({

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { HIGLinkButton } from '@/components/ui/HIGButton';
 
 export default function HeroSection() {
   return (
@@ -32,19 +33,21 @@ export default function HeroSection() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 lg:mb-16">
-            <Link 
+            <HIGLinkButton 
               href="#pricing"
-              className="inline-flex items-center justify-center gap-2 text-lg px-8 py-4 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              variant="primary"
+              size="lg"
+              rightIcon={<ArrowRight className="w-5 h-5" />}
             >
               無料相談を申し込む
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link 
+            </HIGLinkButton>
+            <HIGLinkButton 
               href="#comparison"
-              className="inline-flex items-center justify-center px-6 py-3 bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] font-bold rounded-xl border border-gray-300 transition-all duration-300"
+              variant="secondary"
+              size="lg"
             >
               サービス詳細を見る
-            </Link>
+            </HIGLinkButton>
           </div>
 
           <p className="text-sm text-gray-500">

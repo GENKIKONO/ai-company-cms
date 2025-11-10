@@ -4,6 +4,9 @@ import { supabaseServer } from '@/lib/supabase-server';
 import { requireOpsAdminPage } from '@/lib/ops-guard';
 import { logger } from '@/lib/utils/logger';
 
+// 管理系ページ: cookiesを使用するためリクエスト時実行が必要
+export const dynamic = 'force-dynamic';
+
 interface StatusData {
   hasSession: boolean;
   userEmail: string;

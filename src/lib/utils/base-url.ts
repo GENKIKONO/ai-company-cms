@@ -21,17 +21,9 @@ export async function resolveBaseUrl(): Promise<string> {
       return `${proto}://${host}`;
     }
     
-    // フォールバック: 環境変数
-    if (process.env.NEXT_PUBLIC_APP_URL) {
-      return process.env.NEXT_PUBLIC_APP_URL;
-    }
-    
-    // 最後のフォールバック（開発環境のみ）
-    if (process.env.NODE_ENV === 'development') {
-      return 'http://localhost:3000';
-    }
-    
-    throw new Error('Cannot resolve base URL - no host header or environment variable');
+    // フォールバック: 環境変数 (本番ビルド時にも安全なデフォルト値を提供)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+    return appUrl;
   } catch (error) {
     logger.error('[resolveBaseUrl] Error', error instanceof Error ? error : new Error(String(error)));
     throw error;

@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* === AIO Hub Unified Design System === */
+@import '../styles/app-design-tokens.css';
+
 /* 一旦、広域ハックは止める（バグ源） */
 /* header * { opacity:1 !important; visibility:visible !important; } */
 
@@ -31,6 +34,35 @@
   [data-section="pricing-desktop"].hidden.lg\:block {
     display: block !important;
   }
+}
+
+/* HIG Design System Classes */
+.hig-text-primary {
+  color: var(--aio-primary);
+}
+
+.hig-text-on-primary {
+  color: var(--text-on-primary);
+}
+
+.hig-bg-primary {
+  background-color: var(--aio-primary);
+}
+
+.hig-bg-surface {
+  background-color: var(--aio-surface);
+}
+
+.hig-bg-muted {
+  background-color: var(--aio-muted);
+}
+
+.hig-text-primary:hover {
+  color: var(--aio-primary-hover);
+}
+
+.hig-bg-primary:hover {
+  background-color: var(--aio-primary-hover);
 }
 
 /* ページ共通の縦余白 */

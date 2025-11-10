@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const faqData = [
   {
@@ -61,19 +62,13 @@ export default function FAQSection() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 lg:px-8">
-      <div className="text-center mb-16 section-heading-top">
-        <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-          よくある
-          <span className="text-[var(--aio-primary)]">
-            質問
-          </span>
-        </h2>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          ご不明な点がございましたら、お気軽にお問い合わせください。
-        </p>
-      </div>
+      <SectionHeader 
+        title="よくある質問"
+        subtitle="ご不明な点がございましたら、お気軽にお問い合わせください。"
+        className="mb-16"
+      />
 
-      <div className="space-y-4 mb-16">
+      <div className="space-y-4 mb-16 mt-8">
         {faqData.map((faq, index) => {
           const key = `faq-${index}`;
           const isOpen = openItems.has(key);
@@ -84,7 +79,7 @@ export default function FAQSection() {
             >
               <button
                 onClick={() => toggleItem(key)}
-                className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 rounded-2xl transition-colors duration-200"
+                className="w-full flex items-center justify-between p-6 text-left hover:hig-bg-surface rounded-2xl transition-colors duration-200"
                 aria-expanded={isOpen}
                 aria-controls={`faq-answer-${key}`}
               >

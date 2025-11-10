@@ -1,6 +1,7 @@
 'use client';
 
 import { FileText, MessageCircle, Sparkles, CheckCircle } from 'lucide-react';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const flowSteps = [
   {
@@ -40,21 +41,14 @@ const flowSteps = [
 
 export default function FlowSection() {
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8">
-      <div className="text-center mb-20 section-heading-top">
-        <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-          シンプルな
-          <span className="text-[var(--aio-primary)]">
-            3ステップ
-          </span>
-          で
-        </h2>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          複雑な作業は一切不要。専門スタッフがすべて代行し、あなたの企業情報をAI時代に最適な形でお届けします。
-        </p>
-      </div>
+    <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-12 lg:pt-16">
+      <SectionHeader 
+        title="シンプルな3ステップで"
+        subtitle="複雑な作業は一切不要。専門スタッフがすべて代行し、あなたの企業情報をAI時代に最適な形でお届けします。"
+        className="mb-14 lg:mb-16"
+      />
 
-      <div className="mobile-scroll lg:grid lg:grid-cols-3 lg:gap-12">
+      <div className="mobile-scroll lg:grid lg:grid-cols-3 lg:gap-12 mt-8" role="list" aria-label="サービス申し込みフロー">
         {flowSteps.map((step, index) => {
           const IconComponent = step.icon;
           
@@ -62,6 +56,8 @@ export default function FlowSection() {
             <div 
               key={step.step} 
               className="min-w-[85%] snap-center lg:min-w-0 relative group"
+              role="listitem"
+              aria-label={`ステップ${step.step}`}
             >
               {/* 接続線（デスクトップのみ） */}
               {index < flowSteps.length - 1 && (
@@ -102,7 +98,7 @@ export default function FlowSection() {
       </div>
 
       <div className="mt-16 pb-12 lg:pb-16 text-center">
-        <div className="inline-flex items-center justify-center px-6 py-3 bg-blue-50 rounded-full border border-blue-200">
+        <div className="inline-flex items-center justify-center px-6 py-3 hig-bg-surface rounded-full border border-[var(--aio-primary)]">
           <CheckCircle className="h-5 w-5 text-[var(--aio-primary)] mr-2" />
           <span className="text-[var(--aio-primary)] font-medium">
             平均3日以内に構造化完了・即座にAI検索対応

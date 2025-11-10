@@ -8,6 +8,9 @@ import { EmbedUsageChart } from '@/components/admin/EmbedUsageChart';
 import { EmbedLimitCard } from '@/components/admin/EmbedLimitCard';
 import { EmbedTopSources } from '@/components/admin/EmbedTopSources';
 import { EmbedRealtimeStats } from '@/components/admin/EmbedRealtimeStats';
+
+// 管理系ページ: cookiesを使用するためリクエスト時実行が必要
+export const dynamic = 'force-dynamic';
 import { HIGButton } from '@/design-system';
 
 export default async function EmbedDashboardPage() {

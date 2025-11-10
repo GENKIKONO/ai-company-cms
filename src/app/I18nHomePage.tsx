@@ -1,3 +1,4 @@
+// src/app/I18nHomePage.tsx - Main landing page (590 lines → target 150 lines with HIG design system)
 'use client';
 
 import Link from 'next/link';
@@ -20,6 +21,7 @@ import {
   InfoIcon,
   AlertTriangleIcon 
 } from '@/components/icons/HIGIcons';
+import { HIGButton, HIGLinkButton } from '@/components/ui/HIGButton';
 import { LockIcon, SaveIcon, ShieldIcon, ChartUpIcon } from '@/components/icons/SecurityIcons';
 import SectionMedia, { HeroMedia, FeatureMedia, IconMedia } from '@/components/media/SectionMedia';
 
@@ -85,8 +87,83 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
     }
   ];
 
+  // Simplified section headers without intersection observers
+  function FeaturesHeader() {
+    return (
+      <div className="text-center mb-24">
+        <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-tight">
+          <span className="hig-text-primary">AIに理解される企業</span>
+          <br />
+          への変革
+        </h2>
+        <p className="text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          構造化されていない企業情報では、もはや正確にAI引用されません
+        </p>
+      </div>
+    );
+  }
+
+  // Simplified feature card component without intersection observer
+  function FeatureCard({ icon: Icon, title, description, index }: { 
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; 
+    title: string; 
+    description: string; 
+    index: number 
+  }) {
+    return (
+      <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl hover:bg-blue-50 transition-all duration-500 hover:-translate-y-2">
+        <div className="relative z-10 mb-8">
+          <div className="w-20 h-20 hig-bg-primary rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <Icon className="w-10 h-10 hig-text-on-primary" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">{title}</h3>
+          <p className="text-gray-600 text-lg leading-relaxed">
+            {description}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Simplified How it Works header
+  function HowItWorksHeader() {
+    return (
+      <div className="text-center mb-20 section-heading-top">
+        <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          シンプルな
+          <span className="hig-text-primary">
+            3ステップ
+          </span>
+          で
+          <br />
+          AI最適化を実現
+        </h2>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          簡単な手続きで、企業情報が構造化され、AIで検索される状態に
+        </p>
+      </div>
+    );
+  }
+
+  // Simplified pricing section header
+  function PricingHeader() {
+    return (
+      <div className="text-center mb-16 section-heading-top">
+        <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          シンプルで
+          <span className="hig-text-primary">
+            透明な料金
+          </span>
+        </h2>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          企業規模に応じた最適なプランをご用意しています
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Modern Hero Section */}
       <AioSection tone="white" className="!m-0">
         <section className="relative overflow-hidden py-24 lg:py-32 flex items-center">
@@ -103,7 +180,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             
             {/* Main headline */}
             <h1 className="text-5xl md:text-6xl lg:text-8xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
-              <span className="text-[var(--aio-primary)]">
+              <span className="hig-text-primary">
                 AIに"正しく理解"
               </span>
               <br />
@@ -133,22 +210,24 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
               </span>
             </div>
             
-            {/* CTAs */}
+            {/* CTAs - Replaced with HIG design system */}
             <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
-              <Link
+              <HIGLinkButton 
                 href="/auth/signup"
                 onClick={() => trackConversion()}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                variant="primary" 
+                size="lg" 
+                rightIcon={<ArrowRightIcon className="w-5 h-5" />}
               >
                 14日間無料で始める
-                <ArrowRightIcon className="w-5 h-5" />
-              </Link>
-              <Link
+              </HIGLinkButton>
+              <HIGLinkButton 
                 href="/contact"
-                className="inline-flex items-center justify-center px-8 py-4 bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] font-bold rounded-xl border border-gray-300 transition-all duration-300"
+                variant="secondary" 
+                size="lg"
               >
                 専門ヒアリング相談
-              </Link>
+              </HIGLinkButton>
             </div>
 
           </div>
@@ -156,110 +235,63 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
         </section>
       </AioSection>
 
-      {/* Features Section */}
-      <AioSection tone="muted" className="lg:mt-20">
+      {/* Features & Benefits Section - Consolidated */}
+      <AioSection tone="muted" className="pt-24 pb-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-24">
-            <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-tight">
-              大きな商談も、小さな問い合わせも、
-              <br />
-              <span className="text-[var(--aio-primary)]">
-                すべてに対応
-              </span>
-            </h2>
-            <p className="text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              企業情報を一元化し、あらゆるビジネスシーンで活用できます
-            </p>
-          </div>
+          <FeaturesHeader />
           
           <div className="grid md:grid-cols-3 gap-12 mb-20">
-            {/* Before: absolute overlayでテキストが隠れる問題 */}
-            {/* After: background-color直接変更でz-index問題を根本回避 */}
-            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl hover:bg-blue-50 transition-all duration-500 hover:-translate-y-2">
-              <div className="relative z-10 mb-8">
-                <div className="w-20 h-20 bg-[var(--aio-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <BuildingIcon className="w-10 h-10 text-[var(--text-on-primary)]" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">営業資料として</h3>
-                <p className="text-gray-600 text-lg leading-relaxed">
-                  構造化された企業情報で説得力アップ。
-                  <br />
-                  正確な情報で顧客の信頼を獲得
-                </p>
-              </div>
-            </div>
-
-            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl hover:bg-blue-50 transition-all duration-500 hover:-translate-y-2">
-              <div className="relative z-10 mb-8">
-                <div className="w-20 h-20 bg-[var(--aio-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <UserIcon className="w-10 h-10 text-[var(--text-on-primary)]" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">採用活動で</h3>
-                <p className="text-gray-600 text-lg leading-relaxed">
-                  求職者がAI検索で企業を正確に理解。
-                  <br />
-                  優秀な人材の獲得率向上
-                </p>
-              </div>
-            </div>
-
-            <div className="aio-surface group relative p-10 border border-gray-200/60 hover:shadow-2xl hover:bg-blue-50 transition-all duration-500 hover:-translate-y-2">
-              <div className="relative z-10 mb-8">
-                <div className="w-20 h-20 bg-[var(--aio-primary)] rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <InfoIcon className="w-10 h-10 text-[var(--text-on-primary)]" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">PR・広報で</h3>
-                <p className="text-gray-600 text-lg leading-relaxed">
-                  メディアがAIで企業情報を取得・引用。
-                  <br />
-                  露出機会の大幅拡大
-                </p>
-              </div>
-            </div>
+            <FeatureCard
+              icon={BuildingIcon}
+              title="営業資料として"
+              description="構造化された企業情報で説得力アップ。正確な情報で顧客の信頼を獲得"
+              index={0}
+            />
+            <FeatureCard
+              icon={UserIcon}
+              title="採用活動で"
+              description="求職者がAI検索で企業を正確に理解。優秀な人材の獲得率向上"
+              index={1}
+            />
+            <FeatureCard
+              icon={InfoIcon}
+              title="PR・広報で"
+              description="メディアがAIで企業情報を取得・引用。露出機会の大幅拡大"
+              index={2}
+            />
           </div>
           
           <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <Link
+            <HIGLinkButton 
               href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              variant="primary" 
+              size="md"
             >
               今すぐヒアリング申込み
-            </Link>
-            <Link
+            </HIGLinkButton>
+            <HIGLinkButton 
               href="#pricing"
-              className="inline-flex items-center justify-center px-6 py-3 bg-[var(--aio-surface)] hover:bg-[var(--aio-muted)] text-[var(--text-primary)] font-bold rounded-xl border border-gray-300 transition-all duration-300"
+              variant="secondary" 
+              size="md"
             >
               料金プランを見る
-            </Link>
+            </HIGLinkButton>
           </div>
         </div>
       </AioSection>
 
 
       {/* How it Works Section */}
-      <AioSection tone="white" className="section-bottom-extend">
+      <AioSection tone="white" className="pt-16 pb-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-20 section-heading-top">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              シンプルな
-              <span className="text-[var(--aio-primary)]">
-                3ステップ
-              </span>
-              で
-              <br />
-              AI最適化を実現
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              簡単な手続きで、企業情報が構造化され、AIで検索される状態に
-            </p>
-          </div>
+          <HowItWorksHeader />
           
           <div className="mobile-scroll lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Step 1 */}
             <div className="relative min-w-[85%] snap-center lg:min-w-0">
               <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center text-[var(--text-on-primary)] text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 hig-bg-primary rounded-2xl flex items-center justify-center hig-text-on-primary text-2xl font-bold shadow-lg">
                     1
                   </div>
                   <div className="hidden lg:block w-8 h-0.5 bg-blue-200 absolute -right-10 top-8"></div>
@@ -295,7 +327,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative min-w-[85%] snap-center lg:min-w-0">
               <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center text-[var(--text-on-primary)] text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 hig-bg-primary rounded-2xl flex items-center justify-center hig-text-on-primary text-2xl font-bold shadow-lg">
                     2
                   </div>
                   <div className="hidden lg:block w-8 h-0.5 bg-blue-200 absolute -right-10 top-8"></div>
@@ -331,7 +363,7 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
             <div className="relative min-w-[85%] snap-center lg:min-w-0">
               <div className="aio-surface p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center text-[var(--text-on-primary)] text-2xl font-bold shadow-lg">
+                  <div className="w-16 h-16 hig-bg-primary rounded-2xl flex items-center justify-center hig-text-on-primary text-2xl font-bold shadow-lg">
                     3
                   </div>
                 </div>
@@ -365,221 +397,77 @@ export default function I18nHomePage({ siteSettings }: I18nHomePageProps) {
 
           {/* CTA */}
           <div className="text-center mt-16 mb-12 lg:mb-16">
-            <Link
+            <HIGLinkButton 
               href="/auth/signup"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              variant="primary" 
+              size="md"
+              rightIcon={<ArrowRightIcon className="w-5 h-5" />}
             >
               今すぐ3ステップを始める
-              <ArrowRightIcon className="w-5 h-5" />
-            </Link>
+            </HIGLinkButton>
           </div>
         </div>
       </AioSection>
 
 
-      {/* Before/After Comparison Section */}
-      <AioSection tone="white" className="section-bottom-extend">
+
+      {/* Pricing, FAQ & CTA Section - Consolidated */}
+      <AioSection tone="muted" id="pricing" className="bg-gray-100 pt-24 pb-24" noSectionSpacing={true}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-20 section-heading-top">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              AI時代の
-              <span className="text-gray-800">
-                新しい課題
-              </span>
-              を解決
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              ChatGPTやGoogle AI検索が主流になる中、構造化されていない企業情報は正確に引用されません
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12 mb-20 mb-12 lg:mb-16">
-            {/* BEFORE */}
-            <div className="group">
-              <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center">
-                    <AlertTriangleIcon className="w-8 h-8 text-[var(--text-on-primary)]" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900">見つけてもらえない企業</h3>
-                    <p className="text-gray-600 font-medium">現在の状況</p>
-                  </div>
-                </div>
-
-                <div className="aio-surface border border-gray-200 p-6 mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">AI回答</div>
-                    <span className="text-gray-600 font-semibold">エラー</span>
-                  </div>
-                  <p className="text-base lg:text-base text-gray-700 italic">
-                    申し訳ございませんが、詳細な情報を見つけることができませんでした
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-base lg:text-base text-gray-600">
-                    <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                    企業情報が散在・非構造化
-                  </div>
-                  <div className="flex items-center gap-3 text-base lg:text-base text-gray-600">
-                    <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                    AIが理解・引用できない形式
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* AFTER */}
-            <div className="group">
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 min-h-[520px] flex flex-col">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-[var(--aio-primary)] rounded-2xl flex items-center justify-center">
-                    <CheckCircleIcon className="w-8 h-8 text-[var(--text-on-primary)]" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900">AIに理解される企業へ</h3>
-                    <p className="text-blue-600 font-medium">改善後</p>
-                  </div>
-                </div>
-
-                <div className="aio-surface border border-blue-200 p-6 mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">AI回答</div>
-                    <span className="text-blue-600 font-semibold">成功</span>
-                  </div>
-                  <p className="text-base lg:text-base text-gray-700">
-                    <strong className="text-gray-900">[企業名]</strong>は、AI技術を活用した企業情報統合プラットフォームを提供する企業です。
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-base lg:text-base text-gray-600">
-                    <CheckCircleIcon className="w-5 h-5 text-blue-500" />
-                    構造化された企業情報
-                  </div>
-                  <div className="flex items-center gap-3 text-base lg:text-base text-gray-600">
-                    <CheckCircleIcon className="w-5 h-5 text-blue-500" />
-                    AI検索に最適化されたデータ
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Demo Image */}
-          <div className="text-center mb-16">
-            <FeatureMedia 
-              caption="構造化前後での検索結果の違い（実際の比較画面）"
-              align="center"
-              className="shadow-2xl rounded-2xl"
+          <PricingHeader />
+          <PricingTable />
+          
+          {/* FAQ Integration */}
+          <div className="mt-20">
+            <FAQSection
+              title={aioCopy.faq.title}
+              description={aioCopy.faq.description}
+              categories={aioCopy.faq.categories}
             />
           </div>
-
-          <div className="text-center mb-12 lg:mb-16">
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center justify-center gap-2 text-lg px-8 py-4 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-            >
-              14日間無料で体験する
-              <ArrowRightIcon className="w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-      </AioSection>
-
-      {/* Pricing Section */}
-      <AioSection tone="muted" id="pricing" className="pt-6 lg:pt-0">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16 section-heading-top">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              シンプルで
-              <span className="text-[var(--aio-primary)]">
-                透明な料金
-              </span>
+          
+          {/* Final CTA - Integrated */}
+          <div className="text-center mt-20 mb-0">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight text-gray-900">
+              まずは情報を
+              <span className="hig-text-primary">"構造化"</span>
+              するところから。
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              企業規模に応じた最適なプランをご用意しています
+            <p className="text-xl mb-8 text-gray-600 leading-relaxed">
+              14日間の無料体験でお試しください
             </p>
-          </div>
-          <PricingTable />
-        </div>
-      </AioSection>
-
-      {/* FAQ Section */}
-      <AioSection tone="muted">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          {/* Contact CTA */}
-          <div className="bg-[var(--aio-primary)] rounded-3xl p-12 mb-20 mb-12 lg:mb-16 text-center text-[var(--text-on-primary)]">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-              その他のご質問がございましたら
-            </h2>
-            <p className="text-xl mb-8 opacity-90">
-              AIO・JSON-LD・構造化データに関する技術的なご質問も承ります
-            </p>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--aio-surface)] text-[var(--aio-primary)] hover:bg-[var(--aio-muted)] font-bold rounded-xl border-none shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              お問い合わせフォーム
-              <ArrowRightIcon className="w-5 h-5" />
-            </Link>
-          </div>
-          
-          <FAQSection
-            title={aioCopy.faq.title}
-            description={aioCopy.faq.description}
-            categories={aioCopy.faq.categories}
-          />
-        </div>
-      </AioSection>
-
-      {/* Final CTA Section */}
-      <AioSection tone="white" className="text-gray-900 relative overflow-hidden">
-        {/* Background effects */}
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center section-heading-top">
-          <h2 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight text-gray-900">
-            まずは情報を
-            <br />
-            <span className="text-[var(--aio-primary)]">
-              "構造化"
-            </span>
-            するところから。
-          </h2>
-          
-          <p className="text-2xl mb-12 text-gray-700 leading-relaxed">
-            14日間の無料体験でお試しください
-          </p>
-          
-          <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center justify-center gap-2 text-xl px-10 py-5 bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-[var(--text-on-primary)] font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
-            >
-              14日間無料で始める
-              <ArrowRightIcon className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center text-xl px-10 py-5 bg-[var(--aio-surface)] border-2 border-gray-300 hover:bg-[var(--aio-muted)] hover:border-gray-400 text-[var(--text-primary)] font-bold rounded-xl transition-all duration-300"
-            >
-              専門ヒアリング相談
-            </Link>
-          </div>
-          
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-700 mb-12 lg:mb-16">
-            <div className="flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-gray-600" />
-              クレジットカード不要
+            
+            <div className="flex flex-col sm:flex-row justify-center gap-6 mb-8">
+              <HIGLinkButton 
+                href="/auth/signup"
+                variant="primary" 
+                size="lg"
+                rightIcon={<ArrowRightIcon className="w-5 h-5" />}
+              >
+                14日間無料で始める
+              </HIGLinkButton>
+              <HIGLinkButton 
+                href="/contact"
+                variant="secondary" 
+                size="lg"
+              >
+                専門ヒアリング相談
+              </HIGLinkButton>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-gray-600" />
-              いつでも解約可能
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-gray-600" />
-              専門サポート付き
+            
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-700">
+              <div className="flex items-center gap-2">
+                <CheckCircleIcon className="w-5 h-5 text-gray-600" />
+                クレジットカード不要
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircleIcon className="w-5 h-5 text-gray-600" />
+                いつでも解約可能
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircleIcon className="w-5 h-5 text-gray-600" />
+                専門サポート付き
+              </div>
             </div>
           </div>
         </div>

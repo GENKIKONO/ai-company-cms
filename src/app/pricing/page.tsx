@@ -29,17 +29,17 @@ export default function PricingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="min-h-screen">
-        <AioSection tone="white">
-          <div className="relative z-10 max-w-7xl mx-auto px-6 section-spacing">
-            {/* Hero Section */}
+        <AioSection tone="white" className="pt-16 pb-16">
+          <div className="relative z-10 max-w-7xl mx-auto px-6">
+            {/* Hero Section with glass morphism */}
             <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-full px-6 py-3 mb-8 text-sm font-semibold text-gray-700 shadow-lg">
+            <div className="inline-flex items-center gap-3 glass-card backdrop-blur-xl border border-gray-200/60 rounded-full px-6 py-3 mb-8 text-sm font-semibold text-gray-700 spring-bounce">
               <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
               料金プラン
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              <span className="text-blue-600">
+              <span className="hig-text-primary">
                 シンプルで明確な
               </span>
               <br />

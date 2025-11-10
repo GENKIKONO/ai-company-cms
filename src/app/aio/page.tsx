@@ -11,6 +11,8 @@ import FAQSection from '@/components/aio/FAQSection';
 import CTASection from '@/components/aio/CTASection';
 import AioSection from '@/components/layout/AioSection';
 import { aioCopy } from './copy';
+import { UNIFIED_PRICES } from '@/config/unified-plans';
+import { generateAIOPricingJsonLD } from '@/lib/generatePricingJsonLD';
 
 export const metadata: Metadata = {
   title: aioCopy.metadata.title,
@@ -40,77 +42,38 @@ export const metadata: Metadata = {
   },
 };
 
-// JSON-LD構造化データ
-const aioJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": aioCopy.metadata.title,
-  "description": aioCopy.metadata.description,
-  "url": "https://aiohub.jp/aio",
-  "mainEntity": {
-    "@type": "Service",
-    "name": "AIO（AI Information Optimization）",
-    "description": "AIが理解・引用しやすい形に情報を最適化するサービス",
-    "provider": {
-      "@type": "Organization",
-      "name": "AIO Hub",
-      "url": "https://aiohub.jp"
-    },
-    "serviceType": "AI最適化・構造化データサービス",
-    "areaServed": "JP",
-    "availableLanguage": "ja",
-    "offers": [
-      {
-        "@type": "Offer",
-        "name": "Free",
-        "description": "AIOの基本機能を永続無料で体験",
-        "price": "0",
-        "priceCurrency": "JPY"
-      },
-      {
-        "@type": "Offer", 
-        "name": "Basic",
-        "description": "基本的なAI最適化運用",
-        "price": "5000",
-        "priceCurrency": "JPY",
-        "billingIncrement": "P1M"
-      },
-      {
-        "@type": "Offer", 
-        "name": "Business",
-        "description": "本格的なAI最適化運用",
-        "price": "15000",
-        "priceCurrency": "JPY",
-        "billingIncrement": "P1M"
-      },
-      {
-        "@type": "Offer", 
-        "name": "Enterprise",
-        "description": "エンタープライズ向け完全運用",
-        "price": "30000",
-        "priceCurrency": "JPY",
-        "billingIncrement": "P1M"
-      }
-    ]
-  },
-  "breadcrumb": {
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "ホーム",
-        "item": "https://aiohub.jp"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "AIOとは",
-        "item": "https://aiohub.jp/aio"
-      }
-    ]
-  }
-};
+// JSON-LD構造化データ（動的生成版）
+function generateStaticJsonLD() {
+  const dynamicPricingData = generateAIOPricingJsonLD(); // ✅ 統一価格から動的生成
+  
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage", 
+    "name": aioCopy.metadata.title,
+    "description": aioCopy.metadata.description,
+    "url": "https://aiohub.jp/aio",
+    "mainEntity": dynamicPricingData, // ✅ 動的価格データを使用
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "ホーム",
+          "item": "https://aiohub.jp"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "AIOとは",
+          "item": "https://aiohub.jp/aio"
+        }
+      ]
+    }
+  };
+}
+
+const aioJsonLd = generateStaticJsonLD();
 
 export default function AIOPage() {
   return (

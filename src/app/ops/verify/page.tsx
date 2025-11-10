@@ -3,6 +3,9 @@ import { supabaseServer } from '@/lib/supabase-server';
 import { requireOpsAdminPage, getOpsAdminStatus } from '@/lib/ops-guard';
 import { logger } from '@/lib/utils/logger';
 
+// 管理系ページ: cookiesを使用するためリクエスト時実行が必要
+export const dynamic = 'force-dynamic';
+
 export default async function OpsVerifyPage() {
   // 管理者運用認証ガード
   await requireOpsAdminPage();

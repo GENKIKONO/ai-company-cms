@@ -23,6 +23,33 @@ const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/profile'];
 // 管理者専用パス（admin判定が必要）
 const ADMIN_PATHS = ['/management-console'];
 
+// 🔒 Phase 4.5 - HTTP Basic認証の保護対象パス定義
+// 
+// ✅ 絶対に守らない・誰でも見れていいパス（Basic認証除外）
+const PUBLIC_PATHS_BASIC_AUTH = [
+  '/',
+  '/pricing', 
+  '/hearing-service'
+];
+
+const PUBLIC_PATH_PREFIXES_BASIC_AUTH = [
+  '/api/public/'
+];
+
+// 🔒 Basic認証で守るパス（本番環境でアクセス制御）
+const BASIC_AUTH_PROTECTED_PATHS = [
+  /^\/dashboard/,    // 管理ダッシュボード
+  /^\/admin/,        // 管理者機能
+  /^\/api\/admin/    // 管理者API
+  // 将来の拡張用（現在無効）:
+  // /^\/internal/   // 内部システム用ページ
+];
+
+// 🎛️ Basic認証制御：3段階チェック
+// 1. DISABLE_APP_BASIC_AUTH='true' → 完全無効化
+// 2. DASHBOARD_BASIC_USER & DASHBOARD_BASIC_PASS 両方存在 → Basic認証有効
+// 3. どちらかが未設定 → Basic認証スキップ（事故防止）
+
 // 半公開ルート（ディレクトリ表示は公開、編集は要ログイン）
 const SEMI_PUBLIC_PREFIXES = ['/organizations'];
 
@@ -55,6 +82,12 @@ export async function middleware(req: NextRequest) {
     }
 
     console.log(`[Middleware] Processing: ${pathname}`);
+
+    // 🔒 HTTP Basic Authentication for admin paths (Phase 4.5 - Production Guard)
+    const basicAuthResult = await checkBasicAuthentication(req, pathname);
+    if (basicAuthResult.blocked) {
+      return basicAuthResult.response;
+    }
 
     // 🛡️ Enhanced Rate Limiting and Security - Use integrated system
     const guardResult = await enhancedSecurityGuard(req, pathname, startTime);
@@ -839,6 +872,133 @@ function addSecurityHeaders(response: NextResponse, isProduction: boolean) {
   ];
   
   response.headers.set('Permissions-Policy', permissionsPolicy.join(', '));
+}
+
+// 🔒 HTTP Basic Authentication Guard (Phase 4.5 - Production Security)
+// 
+// 認証アプローチ説明：
+// 
+// A案（現在採用）: アプリ側Basic認証
+//   - middleware.tsで認証チェック
+//   - DASHBOARD_BASIC_USER/DASHBOARD_BASIC_PASS で制御
+//   - 開発環境では環境変数なしで認証スキップ
+// 
+// B案（インフラ側認証）: Vercel/Cloudflare/Nginxでの認証
+//   - インフラ側でBasic認証設定時はDISABLE_APP_BASIC_AUTH=true
+//   - アプリ側認証を無効化して二重認証を回避
+//   - 例：Vercel Basic Auth, Cloudflare Access, Nginx auth_basic
+// 
+// C案（将来移行用）: NextAuth/Supabase Authベースの認証
+//   - 本関数をNextAuth/Supabase認証チェックに置き換え
+//   - 保護対象パスリスト（BASIC_AUTH_PROTECTED_PATHS）は再利用可能
+//   - 公開パスリスト（PUBLIC_PATHS_BASIC_AUTH）も移行時活用
+//   - 認証ロジックのみ入れ替えで移行可能な設計
+
+async function checkBasicAuthentication(
+  req: NextRequest, 
+  pathname: string
+): Promise<{ blocked: boolean; response?: NextResponse }> {
+  try {
+    // 🎛️ ステップ1: 明示的無効化チェック（最優先）
+    if (process.env.DISABLE_APP_BASIC_AUTH === 'true') {
+      console.log(`[BasicAuth] App-side Basic Auth explicitly disabled by DISABLE_APP_BASIC_AUTH=true`);
+      return { blocked: false };
+    }
+
+    // 📋 ステップ2: 公開パスチェック - Basic認証除外対象
+    if (PUBLIC_PATHS_BASIC_AUTH.includes(pathname)) {
+      return { blocked: false };
+    }
+
+    // 📋 ステップ3: 公開プレフィックスチェック - /api/public/* など
+    if (PUBLIC_PATH_PREFIXES_BASIC_AUTH.some(prefix => pathname.startsWith(prefix))) {
+      return { blocked: false };
+    }
+
+    // 🔒 ステップ4: 保護対象パスチェック
+    const requiresBasicAuth = BASIC_AUTH_PROTECTED_PATHS.some((pattern) => pattern.test(pathname));
+    if (!requiresBasicAuth) {
+      return { blocked: false };
+    }
+
+    // 🔑 ステップ5: Basic認証資格情報チェック
+    const basicUser = process.env.DASHBOARD_BASIC_USER;
+    const basicPass = process.env.DASHBOARD_BASIC_PASS;
+
+    // 📝 事故防止: 両方の環境変数が設定されている場合のみ認証実行
+    if (!basicUser || !basicPass) {
+      console.log(`[BasicAuth] Credentials not fully configured (user: ${!!basicUser}, pass: ${!!basicPass}), allowing access to: ${pathname}`);
+      return { blocked: false };
+    }
+
+    // C案: トークンベース認証 - 将来の拡張用（コメントで実装例を残す）
+    /*
+    // Alternative: Token-based authentication
+    const adminToken = req.headers.get('x-admin-token') || req.nextUrl.searchParams.get('token');
+    const validToken = process.env.NEXT_PUBLIC_ADMIN_PREVIEW_TOKEN;
+    if (validToken && adminToken === validToken) {
+      console.log(`[BasicAuth] Valid preview token provided for: ${pathname}`);
+      return { blocked: false };
+    }
+    */
+
+    // Check Authorization header
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Basic ')) {
+      console.log(`[BasicAuth] Missing or invalid auth header for: ${pathname}`);
+      return {
+        blocked: true,
+        response: NextResponse.json(
+          { error: 'Authentication Required' }, 
+          { 
+            status: 401,
+            headers: { 'WWW-Authenticate': 'Basic realm="AIOHub Admin Dashboard"' },
+          }
+        )
+      };
+    }
+
+    // Decode and validate credentials
+    try {
+      const base64Credentials = authHeader.split(' ')[1] ?? '';
+      const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+      const [username, password] = credentials.split(':', 2);
+
+      if (username === basicUser && password === basicPass) {
+        console.log(`[BasicAuth] Valid credentials provided for: ${pathname}`);
+        return { blocked: false };
+      } else {
+        console.log(`[BasicAuth] Invalid credentials provided for: ${pathname}`);
+        return {
+          blocked: true,
+          response: NextResponse.json(
+            { error: 'Invalid Credentials' }, 
+            { 
+              status: 401,
+              headers: { 'WWW-Authenticate': 'Basic realm="AIOHub Admin Dashboard"' },
+            }
+          )
+        };
+      }
+    } catch (decodeError) {
+      console.error(`[BasicAuth] Error decoding credentials:`, decodeError);
+      return {
+        blocked: true,
+        response: NextResponse.json(
+          { error: 'Invalid Authorization Header' }, 
+          { 
+            status: 401,
+            headers: { 'WWW-Authenticate': 'Basic realm="AIOHub Admin Dashboard"' },
+          }
+        )
+      };
+    }
+
+  } catch (error) {
+    console.error('[BasicAuth] Unexpected error:', error);
+    // On error, allow access to prevent service disruption
+    return { blocked: false };
+  }
 }
 
 // API と静的は除外（包括的マッチャー）

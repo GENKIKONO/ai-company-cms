@@ -3,6 +3,9 @@ import { headers } from 'next/headers';
 import { checkOpsAdmin } from '@/lib/ops-guard';
 import OpsLoginForm from './OpsLoginForm';
 
+// 管理系ページ: cookiesを使用するためリクエスト時実行が必要
+export const dynamic = 'force-dynamic';
+
 interface OpsLoginPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }

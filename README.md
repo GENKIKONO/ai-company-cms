@@ -63,6 +63,88 @@ node scripts/verify-env.mjs
 npm run validate:production
 ```
 
+## 🧩 本番確認手順
+
+AIO Hub を本番環境に安全にデプロイするための確認手順：
+
+### 1. 環境変数設定
+
+**本番環境（Vercel Dashboard > Settings > Environment Variables）:**
+
+```bash
+# Basic認証設定（管理画面保護）
+DASHBOARD_BASIC_USER=admin
+DASHBOARD_BASIC_PASS=your_secure_password
+
+# Basic認証制御（インフラ側認証使用時にtrue）
+DISABLE_APP_BASIC_AUTH=false
+```
+
+### 2. デプロイ前検証
+
+```bash
+# 1. ローカルで本番ビルドテスト
+npm run build && npm run start
+
+# 2. デプロイ前設定確認
+node scripts/verify-production-readiness.js
+
+# ✅ 全項目クリアでデプロイ実行
+```
+
+### 3. デプロイ実行
+
+```bash
+# main ブランチへ push（自動デプロイ）
+git push origin main
+
+# または手動デプロイ
+npm run deploy:production
+```
+
+### 4. デプロイ後確認
+
+```bash
+# 本番環境動作確認（URL自動検出）
+node scripts/check-live-status.js
+
+# または特定URL指定
+node scripts/check-live-status.js https://your-domain.com
+```
+
+### 5. 確認項目
+
+**公開ページ（Basic認証なし）:**
+- ✅ `/` → トップページ正常表示
+- ✅ `/pricing` → 料金 ¥2,980/¥8,000/¥15,000 表示
+- ✅ `/hearing-service` → 青背景CTA・レイアウト保持
+
+**管理ページ（Basic認証あり）:**
+- 🔒 `/dashboard` → ブラウザ認証ダイアログ表示
+- 🔒 `/admin` → Basic認証必須
+- 🔒 `/api/admin/*` → 401 Unauthorized
+
+### 6. トラブルシューティング
+
+**緊急時のBasic認証無効化:**
+```bash
+# Vercel Dashboard で即座に無効化
+DISABLE_APP_BASIC_AUTH=true
+```
+
+**スクリプト出力例:**
+```
+🔍 環境変数読み込み
+✅ [SUCCESS] Basic認証設定確認済み (ユーザー: admin)
+
+🔍 必須ページファイル確認
+✅ [SUCCESS] トップページ: src/app/page.tsx
+✅ [SUCCESS] 料金ページ: src/app/pricing/page.tsx
+✅ [SUCCESS] hearing-serviceページ: src/app/hearing-service/page.tsx
+
+✅ Production ready - 本番環境正常動作確認完了
+```
+
 ## 運用
 
 ### AI可視性監視

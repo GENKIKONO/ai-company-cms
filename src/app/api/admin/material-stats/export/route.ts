@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';

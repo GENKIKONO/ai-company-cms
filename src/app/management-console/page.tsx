@@ -6,6 +6,9 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
+// 管理系ページ: cookiesを使用するためリクエスト時実行が必要
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: '管理コンソール | AIO Hub',
   description: 'システム管理・ユーザー管理・セキュリティ監視',

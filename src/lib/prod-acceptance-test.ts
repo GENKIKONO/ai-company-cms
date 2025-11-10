@@ -2,6 +2,7 @@
  * 本番用受け入れテスト
  * ビルド後に実行してHTTPSエンドポイントの疎通確認
  */
+/* eslint-disable no-console */
 
 export async function runProdAcceptanceTest(): Promise<void> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aiohub.jp';

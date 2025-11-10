@@ -344,7 +344,7 @@ export const PartnershipIcon = createIcon(
 export const Icon = React.forwardRef<SVGSVGElement, IconProps & { name: string }>(
   ({ name, ...props }, ref) => {
     // Icon mapping
-    const icons: Record<string, React.ComponentType<any>> = {
+    const icons: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
       check: CheckIcon,
       'check-circle': CheckCircleIcon,
       x: XIcon,

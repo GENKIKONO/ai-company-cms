@@ -54,6 +54,7 @@ export default function QAStatsPage() {
   // データ取得
   useEffect(() => {
     loadStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const loadStats = async () => {

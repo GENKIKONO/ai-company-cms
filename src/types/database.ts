@@ -443,6 +443,34 @@ export interface QAQuestionTemplate {
   updated_at: string;
 }
 
+// Monthly Reports Types
+export type ReportStatus = 'generating' | 'completed' | 'failed';
+export type ReportFormat = 'html' | 'pdf';
+
+export interface MonthlyReport {
+  id: string;
+  organization_id: string;
+  year: number;
+  month: number; // 1-12
+  status: ReportStatus;
+  format: ReportFormat;
+  file_url?: string; // Supabase Storage URL
+  file_size?: number; // bytes
+  data_summary: {
+    ai_visibility_score: number;
+    total_bot_hits: number;
+    unique_bots: number;
+    analyzed_urls: number;
+    top_performing_urls: number;
+    improvement_needed_urls: number;
+  };
+  generated_at?: string;
+  sent_at?: string;
+  error_message?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // Q&A Extended Types (with joined data)
 export interface QAEntryWithCategory extends QAEntry {
   qa_categories?: {

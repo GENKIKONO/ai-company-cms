@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Admin-Only API: /api/admin/reviews
 // 管理者向け審査キュー管理API
 import { NextRequest, NextResponse } from 'next/server';

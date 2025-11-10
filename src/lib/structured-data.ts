@@ -1,6 +1,13 @@
 import { Organization } from '@/types';
 
-interface OrganizationStructuredData {
+// JSON-LD base type
+interface JsonLdObject {
+  '@context'?: string;
+  '@type'?: string;
+  [key: string]: unknown;
+}
+
+interface OrganizationStructuredData extends JsonLdObject {
   '@context': string;
   '@type': string;
   name: string;
@@ -26,7 +33,7 @@ interface OrganizationStructuredData {
   sameAs?: string[];
 }
 
-interface WebSiteStructuredData {
+interface WebSiteStructuredData extends JsonLdObject {
   '@context': string;
   '@type': string;
   name: string;
@@ -42,7 +49,7 @@ interface WebSiteStructuredData {
   };
 }
 
-interface BreadcrumbStructuredData {
+interface BreadcrumbStructuredData extends JsonLdObject {
   '@context': string;
   '@type': string;
   itemListElement: Array<{
@@ -53,7 +60,7 @@ interface BreadcrumbStructuredData {
   }>;
 }
 
-interface DirectoryStructuredData {
+interface DirectoryStructuredData extends JsonLdObject {
   '@context': string;
   '@type': string;
   name: string;
@@ -281,12 +288,12 @@ export class StructuredDataGenerator {
   }
 
   // Helper method to generate JSON-LD script tag
-  generateJsonLdScript(data: any): string {
+  generateJsonLdScript(data: JsonLdObject | JsonLdObject[]): string {
     return JSON.stringify(data, null, 2);
   }
 
   // Method to combine multiple structured data objects
-  combineStructuredData(dataObjects: any[]): string {
+  combineStructuredData(dataObjects: JsonLdObject[]): string {
     if (dataObjects.length === 1) {
       return this.generateJsonLdScript(dataObjects[0]);
     }

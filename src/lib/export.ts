@@ -9,11 +9,14 @@ export interface ExportOptions {
   customFilename?: string;
 }
 
+// Filter value types for export
+type FilterValue = string | number | boolean | string[] | number[];
+
 export interface ReportOptions {
   type: 'summary' | 'detailed' | 'comparison';
   includeCharts?: boolean;
   timeframe?: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, FilterValue>;
 }
 
 export class ExportService {
@@ -100,11 +103,11 @@ export class ExportService {
   }
 
   // 空の値を再帰的に除去
-  private removeEmptyValues(obj: any): any {
+  private removeEmptyValues(obj: unknown): unknown {
     if (Array.isArray(obj)) {
       return obj.filter(item => item !== null && item !== undefined && item !== '').map(item => this.removeEmptyValues(item));
     } else if (obj !== null && typeof obj === 'object') {
-      const cleaned: any = {};
+      const cleaned: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(obj)) {
         if (value !== null && value !== undefined && value !== '') {
           const cleanedValue = this.removeEmptyValues(value);

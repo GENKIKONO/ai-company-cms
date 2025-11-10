@@ -20,6 +20,56 @@ interface FAQSectionProps {
   categories: readonly FAQCategory[];
 }
 
+// Individual FAQ item with surface card styling
+function FAQItem({ 
+  item, 
+  categoryIndex, 
+  itemIndex, 
+  isOpen, 
+  onToggle 
+}: { 
+  item: FAQItem;
+  categoryIndex: number;
+  itemIndex: number;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="faq-surface-card overflow-hidden spring-bounce">
+      {/* 質問部分 */}
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 rounded-2xl transition-colors duration-200"
+        aria-expanded={isOpen}
+        aria-controls={`faq-answer-${categoryIndex}-${itemIndex}`}
+      >
+        <span className="text-lg font-bold text-gray-900 pr-4">
+          {item.question}
+        </span>
+        <div className="flex-shrink-0">
+          {isOpen ? (
+            <ChevronUp className="h-5 w-5 text-gray-500" />
+          ) : (
+            <ChevronDown className="h-5 w-5 text-gray-500" />
+          )}
+        </div>
+      </button>
+      {isOpen && (
+        <div 
+          id={`faq-answer-${categoryIndex}-${itemIndex}`}
+          className="px-6 pb-6"
+        >
+          <div className="pt-4 border-t border-gray-200">
+            <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+              {item.answer}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function FAQSection({ title, description, categories }: FAQSectionProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
@@ -65,38 +115,14 @@ export default function FAQSection({ title, description, categories }: FAQSectio
                   const isOpen = openItems.has(key);
                   
                   return (
-                    <div
+                    <FAQItem
                       key={itemIndex}
-                      className="aio-surface border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300"
-                    >
-                      {/* 質問部分 */}
-                      <button
-                        onClick={() => toggleItem(categoryIndex, itemIndex)}
-                        className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
-                      >
-                        <span className="text-lg font-semibold text-gray-900 pr-4">
-                          {item.question}
-                        </span>
-                        <div className="flex-shrink-0 w-6 h-6 text-[var(--aio-primary)]">
-                          {isOpen ? (
-                            <ChevronUp className="w-6 h-6" />
-                          ) : (
-                            <ChevronDown className="w-6 h-6" />
-                          )}
-                        </div>
-                      </button>
-                      
-                      {/* 回答部分 */}
-                      {isOpen && (
-                        <div className="border-t border-gray-200 bg-gray-50">
-                          <div className="p-6">
-                            <p className="text-gray-700 leading-relaxed">
-                              {item.answer}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                      item={item}
+                      categoryIndex={categoryIndex}
+                      itemIndex={itemIndex}
+                      isOpen={isOpen}
+                      onToggle={() => toggleItem(categoryIndex, itemIndex)}
+                    />
                   );
                 })}
               </div>

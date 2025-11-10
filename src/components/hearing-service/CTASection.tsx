@@ -3,16 +3,25 @@
 import { ArrowRight, Calendar, Clock, Star } from 'lucide-react';
 import Link from 'next/link';
 import AioSection from '@/components/layout/AioSection';
+import { HIGLinkButton } from '@/components/ui/HIGButton';
+import { useRevealOnScroll } from '@/lib/useRevealOnScroll';
 
 export default function CTASection() {
+  const { ref: mainRef, isVisible: mainVisible } = useRevealOnScroll();
+  const { ref: stepsRef, isVisible: stepsVisible } = useRevealOnScroll();
+  
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-8">
       <div className="text-center">
         {/* メインメッセージ */}
-        <h2 className="text-5xl lg:text-6xl font-bold text-[var(--text-on-primary)] mb-6 leading-tight">
+        <div 
+          ref={mainRef as React.RefObject<HTMLDivElement>}
+          className={`reveal-base reveal-fade ${mainVisible ? 'is-visible' : ''}`}
+        >
+        <h2 className="text-5xl lg:text-6xl font-bold text-[var(--text-on-primary)] mb-6 leading-[1.3] max-w-3xl mx-auto">
           まずは情報を
           <br />
-          <span className="text-[var(--aio-surface)] bg-[var(--aio-primary)] px-2 py-1 rounded">
+          <span className="inline-block text-[var(--aio-surface)] bg-[var(--aio-primary)] px-2 rounded">
             "構造化"
           </span>
           するところから。
@@ -32,14 +41,14 @@ export default function CTASection() {
             <div className="text-[var(--text-on-primary)]">スピード対応</div>
           </div>
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-            <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 hig-bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
               <Calendar className="w-6 h-6 text-[var(--text-on-primary)]" />
             </div>
             <div className="text-[var(--text-on-primary)] font-bold text-lg mb-2">予約制</div>
             <div className="text-[var(--text-on-primary)]">確実な対応</div>
           </div>
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-            <div className="w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 hig-bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
               <Star className="w-6 h-6 text-[var(--text-on-primary)]" />
             </div>
             <div className="text-[var(--text-on-primary)] font-bold text-lg mb-2">専門対応</div>
@@ -49,25 +58,33 @@ export default function CTASection() {
 
         {/* メインCTAボタン */}
         <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12 mt-10">
-          <Link
+          <HIGLinkButton
             href="/auth/signup"
+            variant="primary"
+            size="xl"
+            rightIcon={<ArrowRight className="w-5 h-5" />}
             aria-label="今すぐヒアリングを申し込む"
-            className="inline-flex items-center justify-center font-bold text-xl px-10 py-5 bg-blue-600 text-white hover:bg-blue-700 rounded-2xl border-none shadow-xl hover:shadow-2xl transition-all duration-300"
+            className="bg-white text-[var(--aio-primary)] hover:bg-gray-50 font-bold shadow-lg hover:shadow-xl border-2 border-white"
           >
             14日間無料で始める
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Link>
-          <Link
+          </HIGLinkButton>
+          <HIGLinkButton
             href="/contact"
+            variant="ghost"
+            size="xl"
             aria-label="専門ヒアリング相談"
-            className="inline-flex items-center justify-center font-bold text-xl px-10 py-5 bg-gray-100 border-2 border-gray-300 hover:bg-gray-200 hover:border-gray-400 text-gray-900 rounded-2xl transition-all duration-300"
+            className="border-2 border-white/70 text-white hover:bg-white/10 font-medium"
           >
             専門ヒアリング相談
-          </Link>
+          </HIGLinkButton>
+        </div>
         </div>
 
         {/* 申込みステップ */}
-        <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200 max-w-5xl mx-auto">
+        <div 
+          ref={stepsRef as React.RefObject<HTMLDivElement>}
+          className={`bg-gray-50 rounded-3xl p-8 border border-gray-200 max-w-5xl mx-auto reveal-base reveal-fade ${stepsVisible ? 'is-visible' : ''}`}
+        >
           <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-10 text-center">申し込みは3ステップで完了</h3>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -98,7 +115,7 @@ export default function CTASection() {
         </div>
 
         {/* 追加情報 */}
-        <div className="mt-12 pb-12 text-center">
+        <div className="mt-12 pb-16 lg:pb-20 text-center">
           <p className="text-lg text-[var(--text-on-primary)] mb-4">
             ✓ 初回相談無料　✓ 契約前のお見積もり無料　✓ オンライン対応可能
           </p>

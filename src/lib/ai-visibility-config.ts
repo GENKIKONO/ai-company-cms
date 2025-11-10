@@ -27,10 +27,10 @@ export async function getAiVisibilityStatus(): Promise<AiVisibilityStatus> {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Simple singleton query: SELECT enabled, last_check FROM ai_visibility_config LIMIT 1
+    // Simple singleton query: SELECT enabled FROM ai_visibility_config LIMIT 1 (DBカラム防御)
     const { data, error } = await supabase
       .from('ai_visibility_config')
-      .select('enabled, last_check')
+      .select('enabled')
       .limit(1)
       .single();
 
@@ -48,7 +48,7 @@ export async function getAiVisibilityStatus(): Promise<AiVisibilityStatus> {
 
     const status: AiVisibilityStatus = {
       enabled: Boolean(data.enabled),
-      last_check: data.last_check || undefined
+      // last_check カラムを使わない (DBスキーマ防御)
     };
 
     // Cache the status
@@ -65,31 +65,11 @@ export async function getAiVisibilityStatus(): Promise<AiVisibilityStatus> {
   }
 }
 
-// Update last_check timestamp (enabled-only DB schema)
+// Update last_check timestamp (スキップ: DBカラムが存在しない場合はログのみ)
 export async function updateLastCheck(): Promise<void> {
-  try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
-    const { error } = await supabase
-      .from('ai_visibility_config')
-      .update({ 
-        last_check: new Date().toISOString() 
-      })
-      .limit(1); // Update first record only (singleton)
-
-    if (error) {
-      logger.warn('[AI Visibility] Failed to update last_check', error.message);
-    } else {
-      // Clear cache to force refresh on next read
-      clearStatusCache();
-      logger.debug('Debug', '[AI Visibility] Last check timestamp updated successfully');
-    }
-  } catch (error) {
-    logger.warn('[AI Visibility] Error updating last_check', error);
-  }
+  // DBカラムが存在しない場合はスキップして継続
+  logger.debug('[AI Visibility] Skipping last_check update (column may not exist)');
+  return;
 }
 
 export function getStaticRobots(): string {

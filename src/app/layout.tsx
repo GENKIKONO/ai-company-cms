@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import MobileNavMinimal from "@/components/navigation/MobileNavMinimal";
+import { UnifiedMobileNav } from "@/components/navigation/UnifiedMobileNav";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 
@@ -34,9 +34,9 @@ export default function RootLayout({
             </div>
           </div>
         </header>
-        <main className="min-h-dvh pb-12">{children}</main>
+        <main className="min-h-dvh pb-0">{children}</main>
         <Footer />
-        <MobileNavMinimal />
+        <UnifiedMobileNav />
       </body>
     </html>
   );

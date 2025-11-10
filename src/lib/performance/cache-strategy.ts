@@ -196,12 +196,12 @@ export class CacheManager {
 /**
  * 条件付きキャッシュデコレータ
  */
-export function withCache<T extends any[], R>(
+export function withCache<T extends unknown[], R>(
   keyBuilder: (...args: T) => string,
   strategy: CacheStrategy
 ) {
   return function(
-    target: any,
+    target: object,
     propertyName: string,
     descriptor: TypedPropertyDescriptor<(...args: T) => Promise<R>>
   ) {

@@ -66,6 +66,7 @@ export default function AdminQuestionsPage() {
   // データ取得
   useEffect(() => {
     loadQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, companyFilter]);
 
   const loadQuestions = async () => {

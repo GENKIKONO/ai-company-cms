@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { NextRequest } from 'next/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { logger } from '@/lib/utils/logger';

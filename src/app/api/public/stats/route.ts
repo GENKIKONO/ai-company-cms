@@ -40,13 +40,12 @@ export async function GET(request: NextRequest) {
           }
         );
 
-        // 並列で統計情報を取得
-        const [
-          organizationsResult,
-          servicesResult,
-          casesResult,
-          categoriesResult
-        ] = await Promise.allSettled([
+        // タイムアウト付きで統計情報を取得 (3秒制限)
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Stats query timeout')), 3000)
+        );
+
+        const statsPromise = Promise.allSettled([
           // 公開企業数
           supabase
             .from('organizations')
@@ -73,6 +72,13 @@ export async function GET(request: NextRequest) {
             .eq('is_published', true)
             .not('industries', 'is', null)
         ]);
+
+        const [
+          organizationsResult,
+          servicesResult,
+          casesResult,
+          categoriesResult
+        ] = await Promise.race([statsPromise, timeoutPromise]) as any;
 
         // 結果を処理
         const organizations = organizationsResult.status === 'fulfilled' 

@@ -356,4 +356,5 @@ ${recommendations.map(rec => `- ${rec}`).join('\n')}
 `;
 }
 
-export default { runSecurityAudit, generateSecurityReport };
+const securityAudit = { runSecurityAudit, generateSecurityReport };
+export default securityAudit;

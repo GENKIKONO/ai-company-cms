@@ -5,6 +5,9 @@
 
 'use client';
 
+// 管理系ページ: cookiesを使用するためリクエスト時実行が必要
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { Metadata } from 'next';
 import { Calendar, Clock, User, Building, Phone, Mail, MessageSquare, CheckCircle, XCircle, AlertCircle } from 'lucide-react';

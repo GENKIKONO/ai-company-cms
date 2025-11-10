@@ -10,6 +10,95 @@ import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
+// Type definitions for analytics data
+interface AIScoreData {
+  url: string;
+  visibility_score: number;
+  bot_hits: number;
+  unique_bots: number;
+  analyzed_at: string;
+}
+
+interface SEOMetricData {
+  url: string;
+  average_position: number;
+  impressions: number;
+  clicks: number;
+  ctr: number;
+  date: string;
+}
+
+interface BotLogData {
+  url: string;
+  accessed_at?: string;
+  bot_name?: string;
+  last_access?: string;
+  access_count?: number;
+}
+
+interface UrlMetrics {
+  url?: string;
+  title?: string;
+  content_type?: string;
+  ai_metrics: {
+    visibility_score: number;
+    bot_hits: number;
+    unique_bots: number;
+    last_ai_access?: string | null;
+  };
+  seo_metrics: {
+    average_position: number;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+  };
+  last_ai_access?: string | null;
+}
+
+interface CorrelationData {
+  correlation_score: number;
+  correlation_strength: 'strong' | 'moderate' | 'weak' | 'none';
+  sample_size: number;
+}
+
+interface InsightData {
+  ai_outperforming_seo: {
+    count: number;
+    urls: string[];
+  };
+  seo_outperforming_ai: {
+    count: number;
+    urls: string[];
+  };
+  balanced_performance: {
+    count: number;
+    urls: string[];
+  };
+  optimization_opportunities: {
+    ai_underperforming: string[];
+    seo_underperforming: string[];
+  };
+}
+
+interface TrendPoint {
+  date: string;
+  ai_avg_score: number;
+  seo_avg_position: number;
+  correlation: number;
+}
+
+interface PerformanceSummary {
+  total_urls: number;
+  avg_ai_score: number;
+  avg_seo_position: number;
+  overall_correlation: number;
+  performance_distribution: {
+    high_performers: number;
+    medium_performers: number;
+    low_performers: number;
+  };
+}
+
 // Response types
 interface CombinedAnalyticsResponse {
   org_id: string;
@@ -23,14 +112,14 @@ interface CombinedAnalyticsResponse {
     sample_size: number;
   };
   performance_matrix: {
-    url: string;
+    url?: string;
     title?: string;
     content_type?: string;
     ai_metrics: {
       visibility_score: number;
       bot_hits: number;
       unique_bots: number;
-      last_ai_access: string | null;
+      last_ai_access?: string | null;
     };
     seo_metrics: {
       average_position: number;
@@ -39,7 +128,7 @@ interface CombinedAnalyticsResponse {
       ctr: number;
     };
     combined_score: number; // 0-100 AI×SEO統合スコア
-    performance_category: 'ai_strong_seo_strong' | 'ai_strong_seo_weak' | 'ai_weak_seo_strong' | 'ai_weak_seo_weak';
+    performance_category: string;
   }[];
   insights: {
     ai_outperforming_seo: {
@@ -186,15 +275,15 @@ export async function GET(request: NextRequest) {
  * AI × SEO 統合分析実行
  */
 async function performCombinedAnalysis(
-  aiScores: any[],
-  seoMetrics: any[],
-  botLogs: any[],
+  aiScores: AIScoreData[],
+  seoMetrics: SEOMetricData[],
+  botLogs: BotLogData[],
   startDate: Date,
   endDate: Date,
   minDataPoints: number
 ) {
   // URL別にデータを統合
-  const urlDataMap = new Map<string, any>();
+  const urlDataMap = new Map<string, UrlMetrics>();
 
   // AI データを URL 別にマッピング
   const latestAIScores = getLatestScoresByUrl(aiScores);
