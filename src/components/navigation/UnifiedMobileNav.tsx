@@ -70,6 +70,8 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   // スクロール位置保存用
   const scrollYRef = useRef(0);
   const prevPathnameRef = useRef(pathname);
+  // 二重クローズ防止フラグ
+  const navigationTriggeredRef = useRef(false);
 
   // 外部制御 vs 内部制御
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
@@ -122,13 +124,19 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   // 改善3: パスが変わったら自動でメニューを閉じる
   useEffect(() => {
     if (prevPathnameRef.current !== pathname && isOpen) {
-      // ページが実際に変わったらメニューを閉じる
-      handleImmediateScrollLock(false); // スクロールロック解除
-      if (externalOnToggle) {
-        externalOnToggle();
-      } else {
-        setInternalIsOpen(false);
+      // handleNavigationで既に閉じた場合はスキップ（二重クローズ防止）
+      if (!navigationTriggeredRef.current) {
+        // ページが実際に変わったらメニューを閉じる（直接URL変更・ブラウザバック等）
+        handleImmediateScrollLock(false); // スクロールロック解除
+        if (externalOnToggle) {
+          externalOnToggle();
+        } else {
+          setInternalIsOpen(false);
+        }
       }
+
+      // フラグをリセット（次の遷移に備える）
+      navigationTriggeredRef.current = false;
     }
     prevPathnameRef.current = pathname;
   }, [pathname, isOpen, externalOnToggle, handleImmediateScrollLock]);
@@ -143,14 +151,20 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
 
   // ナビゲーションハンドラー（リンククリック用）
   const handleNavigation = useCallback((href: string) => {
-    // ハッシュリンクや同じページの場合は即座に閉じる
-    if (href.startsWith('#') || href === pathname) {
-      handleToggle();
-      return;
+    // すべてのリンククリック時に即座にメニューを閉じる
+    handleImmediateScrollLock(false);
+
+    if (externalOnToggle) {
+      externalOnToggle();
+    } else {
+      setInternalIsOpen(false);
     }
-    
-    // 通常のページ遷移の場合は pathname 変更で自動クローズされるため何もしない
-  }, [handleToggle, pathname]);
+
+    // クローズ処理を記録（useEffectでの二重処理防止）
+    navigationTriggeredRef.current = true;
+
+    // Linkコンポーネントが遷移処理を行うため、ここではメニューを閉じるだけ
+  }, [externalOnToggle, handleImmediateScrollLock]);
 
   // モバイル以外では表示しない
   if (isMobile === null || !isMobile || !mounted) return null;
