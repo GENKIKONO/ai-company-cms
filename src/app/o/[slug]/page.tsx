@@ -34,11 +34,11 @@ const getOrganizationDataCached = (slug: string) => {
     async (): Promise<OrganizationPageData | null> => {
       logger.debug('Debug', `[getOrganizationDataCached] Cache miss for slug: ${safeSlug}`);
       
-      // 🚫 Service roleクライアントでRLS無限再帰を回避
+      // ✅ Using anon key now that RLS infinite recursion is fixed
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
           auth: {
             autoRefreshToken: false,
@@ -543,8 +543,8 @@ export default async function OrganizationDetailPage({
               </div>
             )}
 
-            {/* 記事一覧 */}
-            {organization.show_posts !== false && (
+            {/* 記事一覧 - 条件：show_posts が false でなく、かつ posts が存在して length > 0 */}
+            {organization.show_posts !== false && posts && posts.length > 0 && (
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center justify-between mb-8">
@@ -556,52 +556,46 @@ export default async function OrganizationDetailPage({
                       </div>
                       <h2 className="text-2xl font-bold text-gray-900">最新記事</h2>
                     </div>
-                    <Link
-                      href={`/o/${organization.slug}/posts`}
-                      className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold rounded-2xl px-6 py-3 transition-all duration-300 border border-gray-200"
-                    >
-                      記事一覧を見る
+                    {/* TODO: Re-enable posts list page when implemented:
+                             href={`/o/${organization.slug}/posts`} */}
+                    <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 font-semibold rounded-2xl px-6 py-3 border border-gray-200 opacity-60">
+                      記事一覧を見る（準備中）
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                    </Link>
+                    </div>
                   </div>
-                  {posts && posts.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {posts.slice(0, 6).map((post) => (
-                      <Link
-                        key={post.id}
-                        href={`/o/${organization.slug}/posts/${post.id}`}
-                        className="group block bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-6 hover:border-gray-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                      >
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">{post.title}</h3>
-                        {post.content_markdown && (
-                          <p className="text-sm text-gray-600 line-clamp-3 mb-3">
-                            {post.content_markdown.substring(0, 150)}...
-                          </p>
-                        )}
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span>{new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
-                          <span className={`px-2 py-1 rounded-full ${
-                            post.status === 'published' ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-700'
-                          }`}>
-                            {post.status === 'published' ? '公開中' : '下書き'}
-                          </span>
-                        </div>
-                      </Link>
-                      ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {posts.slice(0, 6).map((post) => (
+                    <div
+                      key={post.id}
+                      className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-6 shadow-lg transition-all duration-300"
+                    >
+                      {/* TODO: Re-enable link when post detail page is implemented:
+                           href={`/o/${organization.slug}/posts/${post.id}`} */}
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">{post.title}</h3>
+                      {post.content_markdown && (
+                        <p className="text-sm text-gray-600 line-clamp-3 mb-3">
+                          {post.content_markdown.substring(0, 150)}...
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>{new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
+                        <span className={`px-2 py-1 rounded-full ${
+                          post.status === 'published' ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {post.status === 'published' ? '公開中' : '下書き'}
+                        </span>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">まだ記事が投稿されていません</p>
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* サービス一覧 */}
-            {organization.show_services !== false && (
+            {/* サービス一覧 - 条件：show_services が false でなく、かつ services が存在して length > 0 */}
+            {organization.show_services !== false && services && services.length > 0 && (
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-3 mb-8">
@@ -612,65 +606,60 @@ export default async function OrganizationDetailPage({
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">提供サービス</h2>
                   </div>
-                  {services && services.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {services.map((service) => (
-                      <Link 
-                        key={service.id} 
-                        href={`/o/${organization.slug}/services/${service.id}`}
-                        className="group bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block"
-                      >
-                        {/* サービス画像 */}
-                        {service.image_url ? (
-                          <div className="relative w-full h-48 bg-gray-100">
-                            <Image
-                              src={service.image_url}
-                              alt={`${service.name}のサービス画像`}
-                              width={400}
-                              height={192}
-                              className="w-full h-48 object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-                            <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                          </div>
-                        )}
-                        
-                        <div className="p-4">
-                          <h3 className="text-lg font-medium text-gray-900 mb-2">{service.name}</h3>
-                          {service.description && (
-                            <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                              {service.description}
-                            </p>
-                          )}
-                          <div className="flex items-center justify-between text-sm text-gray-500">
-                            {service.category && (
-                              <span className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
-                                {service.category}
-                              </span>
-                            )}
-                            {service.price && (
-                              <span className="font-medium">¥{service.price.toLocaleString()}</span>
-                            )}
-                          </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {services.map((service) => (
+                    <div 
+                      key={service.id} 
+                      className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl overflow-hidden shadow-lg transition-all duration-300"
+                    >
+                      {/* TODO: Re-enable link when service detail page is implemented:
+                           href={`/o/${organization.slug}/services/${service.id}`} */}
+                      {/* サービス画像 */}
+                      {service.image_url ? (
+                        <div className="relative w-full h-48 bg-gray-100">
+                          <Image
+                            src={service.image_url}
+                            alt={`${service.name}のサービス画像`}
+                            width={400}
+                            height={192}
+                            className="w-full h-48 object-cover"
+                          />
                         </div>
-                      </Link>
-                      ))}
+                      ) : (
+                        <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                          <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </div>
+                      )}
+                      
+                      <div className="p-4">
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">{service.name}</h3>
+                        {service.description && (
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                            {service.description}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          {service.category && (
+                            <span className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
+                              {service.category}
+                            </span>
+                          )}
+                          {service.price && (
+                            <span className="font-medium">¥{service.price.toLocaleString()}</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">まだサービスが登録されていません</p>
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* 事例一覧 */}
-            {organization.show_case_studies !== false && (
+            {/* 導入事例一覧 - 条件：show_case_studies が false でなく、かつ case_studies が存在して length > 0 */}
+            {organization.show_case_studies !== false && case_studies && case_studies.length > 0 && (
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-3 mb-8">
@@ -681,62 +670,56 @@ export default async function OrganizationDetailPage({
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">導入事例</h2>
                   </div>
-                  {case_studies && case_studies.length > 0 ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {case_studies.map((caseStudy) => (
-                      <div key={caseStudy.id} className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-medium text-gray-900">{caseStudy.title}</h3>
-                          </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {case_studies.map((caseStudy) => (
+                    <div key={caseStudy.id} className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-medium text-gray-900">{caseStudy.title}</h3>
                         </div>
-                        
-                        {caseStudy.problem && (
-                          <div className="mt-4">
-                            <h4 className="text-sm font-medium text-gray-700">課題</h4>
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{caseStudy.problem}</p>
-                          </div>
-                        )}
-                        
-                        {caseStudy.solution && (
-                          <div className="mt-3">
-                            <h4 className="text-sm font-medium text-gray-700">解決策</h4>
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{caseStudy.solution}</p>
-                          </div>
-                        )}
-                        
-                        {caseStudy.result && (
-                          <div className="mt-3">
-                            <h4 className="text-sm font-medium text-gray-700">成果</h4>
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{caseStudy.result}</p>
-                          </div>
-                        )}
-
-                        {caseStudy.tags && caseStudy.tags.length > 0 && (
-                          <div className="mt-3 flex flex-wrap gap-1">
-                            {caseStudy.tags.map((tag, index) => (
-                              <span
-                                key={index}
-                                className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded-full"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
                       </div>
-                      ))}
+                      
+                      {caseStudy.problem && (
+                        <div className="mt-4">
+                          <h4 className="text-sm font-medium text-gray-700">課題</h4>
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{caseStudy.problem}</p>
+                        </div>
+                      )}
+                      
+                      {caseStudy.solution && (
+                        <div className="mt-3">
+                          <h4 className="text-sm font-medium text-gray-700">解決策</h4>
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{caseStudy.solution}</p>
+                        </div>
+                      )}
+                      
+                      {caseStudy.result && (
+                        <div className="mt-3">
+                          <h4 className="text-sm font-medium text-gray-700">成果</h4>
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{caseStudy.result}</p>
+                        </div>
+                      )}
+
+                      {caseStudy.tags && caseStudy.tags.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1">
+                          {caseStudy.tags.map((tag, index) => (
+                            <span
+                              key={index}
+                              className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">まだ導入事例が登録されていません</p>
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Q&A Knowledge Base */}
+            {/* Q&A Knowledge Base - 条件：qa_entries が存在して length > 0 かつ show_qa が false でない */}
             {qa_entries && qa_entries.length > 0 && organization.show_qa !== false && (
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
@@ -748,8 +731,8 @@ export default async function OrganizationDetailPage({
               </div>
             )}
 
-            {/* Legacy FAQ */}
-            {organization.show_faqs !== false && (
+            {/* Legacy FAQ - 条件：show_faqs が false でなく、かつ faqs が存在して length > 0 */}
+            {organization.show_faqs !== false && faqs && faqs.length > 0 && (
               <div className="border-t border-gray-100">
                 <div className="p-8 sm:p-12">
                   <div className="flex items-center gap-3 mb-8">
@@ -760,34 +743,28 @@ export default async function OrganizationDetailPage({
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">よくある質問</h2>
                   </div>
-                  {faqs && faqs.length > 0 ? (
-                    <div className="space-y-6">
-                      {faqs.map((faq) => (
-                        <div key={faq.id} className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all duration-300">
-                          <details className="group">
-                            <summary className="flex items-center justify-between p-4 cursor-pointer">
-                              <h3 className="text-base font-medium text-gray-900">{faq.question}</h3>
-                              <svg 
-                                className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform"
-                                fill="none" 
-                                viewBox="0 0 24 24" 
-                                stroke="currentColor"
-                              >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </summary>
-                            <div className="px-4 pb-4">
-                              <p className="text-gray-600 whitespace-pre-wrap">{faq.answer}</p>
-                            </div>
-                          </details>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">まだFAQが登録されていません</p>
-                    </div>
-                  )}
+                  <div className="space-y-6">
+                    {faqs.map((faq) => (
+                      <div key={faq.id} className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all duration-300">
+                        <details className="group">
+                          <summary className="flex items-center justify-between p-4 cursor-pointer">
+                            <h3 className="text-base font-medium text-gray-900">{faq.question}</h3>
+                            <svg 
+                              className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform"
+                              fill="none" 
+                              viewBox="0 0 24 24" 
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </summary>
+                          <div className="px-4 pb-4">
+                            <p className="text-gray-600 whitespace-pre-wrap">{faq.answer}</p>
+                          </div>
+                        </details>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

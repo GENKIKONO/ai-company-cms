@@ -1,27 +1,21 @@
 /**
- * Public Organizations API
- * 公開組織一覧API（キャッシュ・パフォーマンス最適化付き）
+ * Public Organizations API - RLS対応版
+ * 公開組織一覧API（count取得不可対応・フォールバック付き）
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { cacheHelpers } from '@/lib/cache/memory-cache';
-import { logger } from '@/lib/utils/logger';
-import { 
-  withPerformanceMonitoring, 
-  conditionalResponse,
-  rateLimit 
-} from '@/lib/middleware/performance';
+import { createClient } from '@supabase/supabase-js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// レート制限: 1分間に60リクエスト
-const RATE_LIMIT = { requests: 60, windowMs: 60000 };
-
-async function handler(request: NextRequest): Promise<NextResponse> {
+/**
+ * GET /api/public/organizations
+ * 公開組織一覧を取得（RLS環境対応）
+ */
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
+    // パラメータ取得
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '24')));
@@ -29,182 +23,133 @@ async function handler(request: NextRequest): Promise<NextResponse> {
     const industry = searchParams.get('industry') || '';
     const location = searchParams.get('location') || '';
 
-    // レート制限チェック（IPベース）
-    const clientIP = request.headers.get('x-forwarded-for') || 
-                     request.headers.get('x-real-ip') || 
-                     'anonymous';
-    
-    const rateLimitResult = rateLimit(
-      `public-orgs:${clientIP}`, 
-      RATE_LIMIT.requests, 
-      RATE_LIMIT.windowMs
+    // Supabase Public Client（anon key使用）
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     );
 
-    if (!rateLimitResult.allowed) {
-      return NextResponse.json(
-        { error: 'Rate limit exceeded' },
-        { 
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': RATE_LIMIT.requests.toString(),
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime).toISOString(),
-            'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString()
-          }
-        }
-      );
+    // 🔧 Step 1: count要求の明示
+    let query = supabase
+      .from('organizations')
+      .select(`
+        id,
+        name,
+        slug,
+        description,
+        website_url,
+        email,
+        email_public,
+        telephone,
+        industries,
+        established_at,
+        employees,
+        address_region,
+        address_locality,
+        logo_url,
+        services(id, name, description),
+        case_studies(id, title)
+      `, { count: 'exact' })
+      .eq('status', 'published')
+      .eq('is_published', true)
+      .order('created_at', { ascending: false });
+
+    // 検索フィルター適用
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
     }
 
-    // キャッシュキー生成
-    const cacheKey = `public-orgs:${page}:${limit}:${search}:${industry}:${location}`;
-    
-    // キャッシュからデータ取得を試行
-    const cachedData = await cacheHelpers.organizations(async () => {
-      return await fetchOrganizations(page, limit, search, industry, location);
-    }, page, limit);
+    if (industry) {
+      query = query.contains('industries', [industry]);
+    }
 
-    // 条件付きレスポンス（ETag対応）
-    const response = conditionalResponse(cachedData, request, 300); // 5分キャッシュ
-    
-    // レート制限ヘッダー追加
-    response.headers.set('X-RateLimit-Limit', RATE_LIMIT.requests.toString());
-    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
-    response.headers.set('X-RateLimit-Reset', new Date(rateLimitResult.resetTime).toISOString());
-    
-    // CORS ヘッダー
-    response.headers.set('Access-Control-Allow-Origin', '*');
-    response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (location) {
+      query = query.or(`address_region.ilike.%${location}%,address_locality.ilike.%${location}%`);
+    }
 
-    return response;
+    // ページネーション
+    const offset = (page - 1) * limit;
+    query = query.range(offset, offset + limit - 1);
+
+    // クエリ実行
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw new Error(`Database query failed: ${error.message}`);
+    }
+
+    // データ変換
+    const transformedData = data?.map(org => ({
+      ...org,
+      industries: Array.isArray(org.industries) ? org.industries : [],
+      services: Array.isArray(org.services) ? org.services : []
+    })) || [];
+
+    // 🔧 Step 2: RLSフォールバック処理
+    const actualTotal = 
+      count !== null && count !== undefined
+        ? count
+        : Array.isArray(transformedData)
+          ? transformedData.length
+          : 0;
+
+    // 🔧 Step 3: meta構築
+    const meta = {
+      total: actualTotal,
+      page,
+      limit,
+      totalPages: Math.max(1, Math.ceil(actualTotal / limit)),
+      hasMore: actualTotal > limit * page,
+      filters: { 
+        search: search || null, 
+        industry: industry || null, 
+        location: location || null 
+      },
+    };
+
+    // 🔧 Step 4: JSON出力
+    return NextResponse.json({
+      data: transformedData,
+      meta,
+      cached: false,
+      timestamp: new Date().toISOString(),
+    }, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    });
 
   } catch (error) {
-    logger.error('❌ Public Organizations API Error', error instanceof Error ? error : new Error(String(error)));
+    console.error('Public Organizations API Error:', error);
     
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    // 🔧 Step 5: エラー時は500で error.message を返す
+    return NextResponse.json({
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    }, { 
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   }
 }
 
 /**
- * 組織データ取得（キャッシュ対応）
+ * OPTIONS /api/public/organizations
+ * CORS プリフライトリクエスト対応
  */
-async function fetchOrganizations(
-  page: number,
-  limit: number,
-  search: string,
-  industry: string,
-  location: string
-) {
-  const cookieStore = await cookies();
-  // Keep using service role for stability while fixing other RLS policies
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Server Component での cookie 設定エラーをハンドル
-          }
-        },
-      },
-    }
-  );
-
-  let query = supabase
-    .from('organizations')
-    .select(`
-      id,
-      name,
-      slug,
-      description,
-      website_url,
-      email,
-      email_public,
-      telephone,
-      industries,
-      established_at,
-      employees,
-      address_region,
-      address_locality,
-      logo_url,
-      services(id, name, description),
-      case_studies(id, title)
-    `)
-    .eq('status', 'published')
-    .eq('is_published', true)
-    .order('created_at', { ascending: false });
-
-  // 検索フィルター
-  if (search) {
-    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
-  }
-
-  // 業界フィルター
-  if (industry) {
-    query = query.contains('industries', [industry]);
-  }
-
-  // 所在地フィルター
-  if (location) {
-    query = query.or(`address_region.ilike.%${location}%,address_locality.ilike.%${location}%`);
-  }
-
-  // ページネーション
-  const offset = (page - 1) * limit;
-  query = query.range(offset, offset + limit - 1);
-
-  const { data: organizations, error, count } = await query;
-
-  if (error) {
-    throw new Error(`Database query failed: ${error.message}`);
-  }
-
-  // データ変換
-  const transformedData = organizations?.map(org => ({
-    ...org,
-    industries: Array.isArray(org.industries) ? org.industries : [],
-    services: Array.isArray(org.services) ? org.services : []
-  })) || [];
-
-  // ページネーション情報計算
-  const totalPages = Math.ceil((count || 0) / limit);
-  const hasMore = page < totalPages;
-
-  return {
-    data: transformedData,
-    meta: {
-      total: count || 0,
-      page,
-      limit,
-      totalPages,
-      hasMore,
-      filters: {
-        search: search || null,
-        industry: industry || null,
-        location: location || null
-      }
-    },
-    cached: true,
-    timestamp: new Date().toISOString()
-  };
-}
-
-// OPTIONS ハンドラー（CORS プリフライト）
-export async function OPTIONS() {
+export async function OPTIONS(): Promise<NextResponse> {
   return new NextResponse(null, {
     status: 200,
     headers: {
@@ -215,6 +160,3 @@ export async function OPTIONS() {
     },
   });
 }
-
-// パフォーマンス監視付きハンドラーをエクスポート
-export const GET = withPerformanceMonitoring(handler);
