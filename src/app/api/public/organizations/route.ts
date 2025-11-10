@@ -1,6 +1,6 @@
 /**
  * Public Organizations API - RLS対応版
- * 公開組織一覧API（count取得不可対応・フォールバック付き）
+ * 公開組織一覧API（count取得不可対応・フォールバック付き・RLS再帰回避）
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/public/organizations
- * 公開組織一覧を取得（RLS環境対応）
+ * 公開組織一覧を取得（RLS環境対応・2クエリ構成）
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
@@ -35,8 +35,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
     );
 
-    // 🔧 Step 1: count要求の明示
-    let query = supabase
+    // 🔧 Query 1: Organizations のみを取得（JOINなしでRLS再帰回避）
+    let orgQuery = supabase
       .from('organizations')
       .select(`
         id,
@@ -52,9 +52,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         employees,
         address_region,
         address_locality,
-        logo_url,
-        services(id, name, description),
-        case_studies(id, title)
+        logo_url
       `, { count: 'exact' })
       .eq('status', 'published')
       .eq('is_published', true)
@@ -62,34 +60,111 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // 検索フィルター適用
     if (search) {
-      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+      orgQuery = orgQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
     }
 
     if (industry) {
-      query = query.contains('industries', [industry]);
+      orgQuery = orgQuery.contains('industries', [industry]);
     }
 
     if (location) {
-      query = query.or(`address_region.ilike.%${location}%,address_locality.ilike.%${location}%`);
+      orgQuery = orgQuery.or(`address_region.ilike.%${location}%,address_locality.ilike.%${location}%`);
     }
 
     // ページネーション
     const offset = (page - 1) * limit;
-    query = query.range(offset, offset + limit - 1);
+    orgQuery = orgQuery.range(offset, offset + limit - 1);
 
-    // クエリ実行
-    const { data, error, count } = await query;
+    // Organizations クエリ実行
+    const { data: orgData, error: orgError, count } = await orgQuery;
 
-    if (error) {
-      throw new Error(`Database query failed: ${error.message}`);
+    if (orgError) {
+      throw new Error(`Organizations query failed: ${orgError.message}`);
     }
 
-    // データ変換
-    const transformedData = data?.map(org => ({
+    if (!orgData || orgData.length === 0) {
+      // データが空の場合
+      const meta = {
+        total: count || 0,
+        page,
+        limit,
+        totalPages: Math.max(1, Math.ceil((count || 0) / limit)),
+        hasMore: (count || 0) > limit * page,
+        filters: { 
+          search: search || null, 
+          industry: industry || null, 
+          location: location || null 
+        },
+      };
+
+      return NextResponse.json({
+        data: [],
+        meta,
+        cached: false,
+        timestamp: new Date().toISOString(),
+      }, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      });
+    }
+
+    // Organization IDsを抽出
+    const organizationIds = orgData.map(org => org.id);
+
+    // 🔧 Query 2: Services と Case Studies を別々に取得
+    const [servicesResult, caseStudiesResult] = await Promise.all([
+      // Services取得
+      supabase
+        .from('services')
+        .select('id, name, description, organization_id')
+        .in('organization_id', organizationIds),
+
+      // Case Studies取得  
+      supabase
+        .from('case_studies')
+        .select('id, title, organization_id')
+        .in('organization_id', organizationIds)
+    ]);
+
+    if (servicesResult.error) {
+      console.warn('Services query failed, proceeding without services:', servicesResult.error.message);
+    }
+
+    if (caseStudiesResult.error) {
+      console.warn('Case studies query failed, proceeding without case studies:', caseStudiesResult.error.message);
+    }
+
+    // 🔧 メモリ上でデータを結合
+    const servicesData = servicesResult.data || [];
+    const caseStudiesData = caseStudiesResult.data || [];
+
+    // Organization別にサービスと事例をグループ化
+    const servicesByOrg = servicesData.reduce((acc, service) => {
+      const orgId = service.organization_id;
+      if (!acc[orgId]) acc[orgId] = [];
+      acc[orgId].push(service);
+      return acc;
+    }, {} as Record<string, any[]>);
+
+    const caseStudiesByOrg = caseStudiesData.reduce((acc, caseStudy) => {
+      const orgId = caseStudy.organization_id;
+      if (!acc[orgId]) acc[orgId] = [];
+      acc[orgId].push(caseStudy);
+      return acc;
+    }, {} as Record<string, any[]>);
+
+    // データ変換（services, case_studiesを追加）
+    const transformedData = orgData.map(org => ({
       ...org,
       industries: Array.isArray(org.industries) ? org.industries : [],
-      services: Array.isArray(org.services) ? org.services : []
-    })) || [];
+      services: servicesByOrg[org.id] || [],
+      case_studies: caseStudiesByOrg[org.id] || []
+    }));
 
     // 🔧 Step 2: RLSフォールバック処理
     const actualTotal = 
