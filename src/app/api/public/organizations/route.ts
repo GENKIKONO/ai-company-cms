@@ -1,6 +1,6 @@
 /**
- * Public Organizations API - RLS対応版
- * 公開組織一覧API（count取得不可対応・フォールバック付き・RLS再帰回避）
+ * Public Organizations API - RLS対応・JOINなし版
+ * 公開組織一覧API（RLS無限再帰回避・2段階取得・エラー耐性あり）
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,18 +11,12 @@ export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/public/organizations
- * 公開組織一覧を取得（RLS環境対応・2クエリ構成）
+ * 公開組織一覧を取得（JOINなし・2段階取得版）
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  try {
-    // パラメータ取得
-    const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
-    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '24')));
-    const search = searchParams.get('search') || '';
-    const industry = searchParams.get('industry') || '';
-    const location = searchParams.get('location') || '';
+  console.log('[public/organizations] called');
 
+  try {
     // Supabase Public Client（anon key使用）
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,8 +29,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
     );
 
-    // 🔧 Query 1: Organizations のみを取得（JOINなしでRLS再帰回避）
-    let orgQuery = supabase
+    // Step 1: Organizations のみを取得（JOINなしでRLS対応）
+    const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select(`
         id,
@@ -44,64 +38,36 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         slug,
         description,
         website_url,
-        email,
         email_public,
-        telephone,
+        email,
         industries,
-        established_at,
-        employees,
         address_region,
         address_locality,
         logo_url
-      `, { count: 'exact' })
+      `)
       .eq('status', 'published')
       .eq('is_published', true)
       .order('created_at', { ascending: false });
 
-    // 検索フィルター適用
-    if (search) {
-      orgQuery = orgQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
-    }
-
-    if (industry) {
-      orgQuery = orgQuery.contains('industries', [industry]);
-    }
-
-    if (location) {
-      orgQuery = orgQuery.or(`address_region.ilike.%${location}%,address_locality.ilike.%${location}%`);
-    }
-
-    // ページネーション
-    const offset = (page - 1) * limit;
-    orgQuery = orgQuery.range(offset, offset + limit - 1);
-
-    // Organizations クエリ実行
-    const { data: orgData, error: orgError, count } = await orgQuery;
+    console.log('[public/organizations] orgs:', orgData?.length || 0);
 
     if (orgError) {
+      console.error('[public/organizations] organizations query error:', orgError);
       throw new Error(`Organizations query failed: ${orgError.message}`);
     }
 
+    // 0件でも200を返す
     if (!orgData || orgData.length === 0) {
-      // データが空の場合
-      const meta = {
-        total: count || 0,
-        page,
-        limit,
-        totalPages: Math.max(1, Math.ceil((count || 0) / limit)),
-        hasMore: (count || 0) > limit * page,
-        filters: { 
-          search: search || null, 
-          industry: industry || null, 
-          location: location || null 
-        },
-      };
-
+      console.log('[public/organizations] no organizations found, returning empty result');
       return NextResponse.json({
         data: [],
-        meta,
-        cached: false,
-        timestamp: new Date().toISOString(),
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 0,
+          totalPages: 1,
+          hasMore: false
+        }
       }, {
         status: 200,
         headers: {
@@ -113,40 +79,56 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       });
     }
 
-    // STEP 3: LuxuCare が本当に返るかをAPI内で一度だけログする
+    // LuxuCare検出ログ
     const hasLuxuCare = orgData.some(o => o.id === 'c53b7fae-1ae3-48f4-98c1-5c3217f9fbb3');
-    console.log('[public/organizations] hasLuxuCare:', hasLuxuCare);
-    
-    // Organization IDsを抽出
+    if (hasLuxuCare) {
+      console.log('[public/organizations] has LuxuCare: true');
+    }
+
+    // Step 2: Organization IDsを抽出
     const organizationIds = orgData.map(org => org.id);
 
-    // 🔧 Query 2: Services と Case Studies を別々に取得
-    const [servicesResult, caseStudiesResult] = await Promise.all([
-      // Services取得
-      supabase
+    // Step 3: Services と Case Studies を別々に取得（エラー耐性あり）
+    let servicesData: any[] = [];
+    let caseStudiesData: any[] = [];
+
+    // Services取得
+    try {
+      const { data: services, error: servicesError } = await supabase
         .from('services')
         .select('id, name, description, organization_id')
-        .in('organization_id', organizationIds),
+        .in('organization_id', organizationIds);
 
-      // Case Studies取得  
-      supabase
+      if (servicesError) {
+        console.warn('[public/organizations] services query failed:', servicesError.message);
+        servicesData = [];
+      } else {
+        servicesData = services || [];
+      }
+    } catch (error) {
+      console.warn('[public/organizations] services query error:', error);
+      servicesData = [];
+    }
+
+    // Case Studies取得
+    try {
+      const { data: caseStudies, error: caseStudiesError } = await supabase
         .from('case_studies')
         .select('id, title, organization_id')
-        .in('organization_id', organizationIds)
-    ]);
+        .in('organization_id', organizationIds);
 
-    if (servicesResult.error) {
-      console.warn('Services query failed, proceeding without services:', servicesResult.error.message);
+      if (caseStudiesError) {
+        console.warn('[public/organizations] case studies query failed:', caseStudiesError.message);
+        caseStudiesData = [];
+      } else {
+        caseStudiesData = caseStudies || [];
+      }
+    } catch (error) {
+      console.warn('[public/organizations] case studies query error:', error);
+      caseStudiesData = [];
     }
 
-    if (caseStudiesResult.error) {
-      console.warn('Case studies query failed, proceeding without case studies:', caseStudiesResult.error.message);
-    }
-
-    // 🔧 メモリ上でデータを結合
-    const servicesData = servicesResult.data || [];
-    const caseStudiesData = caseStudiesResult.data || [];
-
+    // Step 4: メモリ上でデータを結合
     // Organization別にサービスと事例をグループ化
     const servicesByOrg = servicesData.reduce((acc, service) => {
       const orgId = service.organization_id;
@@ -170,34 +152,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       case_studies: caseStudiesByOrg[org.id] || []
     }));
 
-    // 🔧 Step 2: RLSフォールバック処理
-    const actualTotal = 
-      count !== null && count !== undefined
-        ? count
-        : Array.isArray(transformedData)
-          ? transformedData.length
-          : 0;
-
-    // 🔧 Step 3: meta構築
-    const meta = {
-      total: actualTotal,
-      page,
-      limit,
-      totalPages: Math.max(1, Math.ceil(actualTotal / limit)),
-      hasMore: actualTotal > limit * page,
-      filters: { 
-        search: search || null, 
-        industry: industry || null, 
-        location: location || null 
-      },
-    };
-
-    // 🔧 Step 4: JSON出力
+    // Step 5: レスポンス返却
     return NextResponse.json({
       data: transformedData,
-      meta,
-      cached: false,
-      timestamp: new Date().toISOString(),
+      meta: {
+        total: transformedData.length,
+        page: 1,
+        limit: transformedData.length,
+        totalPages: 1,
+        hasMore: false
+      }
     }, {
       status: 200,
       headers: {
@@ -209,9 +173,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
 
   } catch (error) {
-    console.error('Public Organizations API Error:', error);
+    console.error('[public/organizations] API Error:', error);
     
-    // 🔧 Step 5: エラー時は500で error.message を返す
     return NextResponse.json({
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -235,7 +198,7 @@ export async function OPTIONS(): Promise<NextResponse> {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400', // 24時間
+      'Access-Control-Max-Age': '86400',
     },
   });
 }
