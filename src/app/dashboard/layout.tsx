@@ -1,8 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { UnifiedMobileNav } from '@/components/navigation/UnifiedMobileNav';
 import { AppErrorBoundary } from '@/components/common/AppErrorBoundary';
 
 export default function DashboardLayout({
@@ -10,20 +8,6 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  
-  // モバイルナビが開いているときはスクロールを無効化
-  useEffect(() => {
-    if (isMobileNavOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMobileNavOpen]);
 
   return (
     <div className="min-h-screen bg-[var(--aio-page-bg, #f3f4f6)]">
@@ -43,11 +27,6 @@ export default function DashboardLayout({
         </main>
       </div>
 
-      {/* 統合モバイルナビゲーション */}
-      <UnifiedMobileNav
-        isOpen={isMobileNavOpen}
-        onToggle={() => setIsMobileNavOpen(!isMobileNavOpen)}
-      />
     </div>
   );
 }
