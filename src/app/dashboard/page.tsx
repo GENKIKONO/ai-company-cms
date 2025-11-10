@@ -4,7 +4,7 @@ import { getCurrentUserOrganization } from '@/lib/organizations-server';
 import { getOrganizationStatsSafe, getCaseStudiesStatsSafe } from '@/lib/safeData';
 import { supabaseServer } from '@/lib/supabase-server';
 import PublishToggle from './components/PublishToggle';
-import TabbedDashboard from './components/TabbedDashboard';
+import DashboardClient from '@/components/dashboard/DashboardClient';
 import PerformanceMetrics from './components/PerformanceMetrics';
 import DashboardActions from './components/DashboardActions';
 import AIVisibilityCard from './components/AIVisibilityCard';
@@ -490,7 +490,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* 統合コンテンツ管理 - タブ式ダッシュボード */}
-        <TabbedDashboard 
+        <DashboardClient 
           organizationId={org.id}
           organizationSlug={org.slug}
           organizationName={org.name}
