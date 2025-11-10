@@ -23,6 +23,7 @@ export default function OrganizationsPage() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [industries, setIndustries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [filters, setFilters] = useState<SearchFilters>({
     search: '',
     industry: '',
@@ -41,6 +42,7 @@ export default function OrganizationsPage() {
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+      setApiError(null);
       try {
         // パブリックAPIから公開済み企業を取得
         const [orgsResponse, industriesResult] = await Promise.all([
@@ -48,11 +50,29 @@ export default function OrganizationsPage() {
           getIndustries()
         ]);
 
-        if (orgsResponse.ok) {
-          const orgsData = await orgsResponse.json();
-          if (orgsData.data) {
-            setOrganizations(orgsData.data);
-          }
+        // APIレスポンスの詳細チェック
+        if (!orgsResponse.ok) {
+          throw new Error(`API responded with ${orgsResponse.status}: ${orgsResponse.statusText}`);
+        }
+
+        const orgsData = await orgsResponse.json();
+        
+        // APIレスポンス構造の検証
+        if (!orgsData) {
+          throw new Error('API returned empty response');
+        }
+        
+        if (orgsData.error) {
+          throw new Error(`API returned error: ${orgsData.message || orgsData.error}`);
+        }
+
+        // データの存在確認と設定
+        if (orgsData.data && Array.isArray(orgsData.data)) {
+          setOrganizations(orgsData.data);
+        } else {
+          // データがない場合は空配列として処理（エラーではない）
+          setOrganizations([]);
+          console.warn('Organizations API returned no data array:', orgsData);
         }
         
         if (industriesResult.data) {
@@ -60,6 +80,8 @@ export default function OrganizationsPage() {
         }
       } catch (error) {
         logger.error('Failed to fetch organizations', error instanceof Error ? error : new Error(String(error)));
+        setApiError('現在企業リストを取得できませんでした。時間をおいて再度お試しください。');
+        setOrganizations([]); // エラー時は空配列
       } finally {
         setLoading(false);
       }
@@ -431,6 +453,22 @@ export default function OrganizationsPage() {
               </div>
             ))}
           </div>
+        ) : apiError ? (
+          <div className="text-center py-12">
+            <svg className="mx-auto h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <h3 className="jp-heading mt-4 text-lg font-medium text-gray-900">読み込みエラー</h3>
+            <p className="jp-body mt-2 text-gray-600 max-w-md mx-auto">
+              {apiError}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              再読み込み
+            </button>
+          </div>
         ) : filteredOrganizations.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -443,7 +481,7 @@ export default function OrganizationsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredOrganizations.map((org) => (
+            {(filteredOrganizations ?? []).map((org) => (
               <Link
                 key={org.id}
                 href={`/o/${org.slug}`}

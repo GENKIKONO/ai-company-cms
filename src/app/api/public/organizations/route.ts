@@ -113,6 +113,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       });
     }
 
+    // STEP 3: LuxuCare が本当に返るかをAPI内で一度だけログする
+    const hasLuxuCare = orgData.some(o => o.id === 'c53b7fae-1ae3-48f4-98c1-5c3217f9fbb3');
+    console.log('[public/organizations] hasLuxuCare:', hasLuxuCare);
+    
     // Organization IDsを抽出
     const organizationIds = orgData.map(org => org.id);
 
