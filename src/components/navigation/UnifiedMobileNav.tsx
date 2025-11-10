@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createPortal } from 'react-dom';
@@ -66,10 +66,13 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const isMobile = useIsMobile(1024);
+  
+  // スクロール位置保存用
+  const scrollYRef = useRef(0);
+  const prevPathnameRef = useRef(pathname);
 
   // 外部制御 vs 内部制御
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onToggle = externalOnToggle || (() => setInternalIsOpen(!internalIsOpen));
 
   // ダッシュボードページ判定
   const isDashboard = pathname.startsWith('/dashboard');
@@ -80,31 +83,79 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   // マウント状態管理
   useEffect(() => setMounted(true), []);
 
-  // 背景スクロールロック（Apple HIG準拠）
+  // 改善1: 即座スクロールロック機能
+  const handleImmediateScrollLock = useCallback((shouldLock: boolean) => {
+    if (shouldLock) {
+      // 開くとき: iOS Safari対応の即座スクロールロック
+      scrollYRef.current = window.scrollY;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollYRef.current}px`;
+      document.body.style.width = '100%';
+    } else {
+      // 閉じるとき: スクロール復元
+      document.documentElement.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      if (scrollYRef.current > 0) {
+        window.scrollTo(0, scrollYRef.current);
+      }
+    }
+  }, []);
+
+  // 改善1+4: 統合されたトグル関数
+  const handleToggle = useCallback(() => {
+    const newIsOpen = !isOpen;
+    
+    // 即座にスクロールロック適用
+    handleImmediateScrollLock(newIsOpen);
+    
+    // State 更新
+    if (externalOnToggle) {
+      externalOnToggle();
+    } else {
+      setInternalIsOpen(newIsOpen);
+    }
+  }, [isOpen, externalOnToggle, handleImmediateScrollLock]);
+
+  // 改善3: パスが変わったら自動でメニューを閉じる
   useEffect(() => {
-    if (!mounted || !isOpen) return;
-    
-    const root = document.documentElement;
-    const prevOverflow = root.style.overflow;
-    root.style.overflow = "hidden";
-    
-    return () => {
-      root.style.overflow = prevOverflow;
-    };
-  }, [isOpen, mounted]);
+    if (prevPathnameRef.current !== pathname && isOpen) {
+      // ページが実際に変わったらメニューを閉じる
+      handleImmediateScrollLock(false); // スクロールロック解除
+      if (externalOnToggle) {
+        externalOnToggle();
+      } else {
+        setInternalIsOpen(false);
+      }
+    }
+    prevPathnameRef.current = pathname;
+  }, [pathname, isOpen, externalOnToggle, handleImmediateScrollLock]);
 
   // Escキーで閉じる
   useEffect(() => {
     if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onToggle();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && handleToggle();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, onToggle]);
+  }, [isOpen, handleToggle]);
+
+  // ナビゲーションハンドラー（リンククリック用）
+  const handleNavigation = useCallback((href: string) => {
+    // ハッシュリンクや同じページの場合は即座に閉じる
+    if (href.startsWith('#') || href === pathname) {
+      handleToggle();
+      return;
+    }
+    
+    // 通常のページ遷移の場合は pathname 変更で自動クローズされるため何もしない
+  }, [handleToggle, pathname]);
 
   // モバイル以外では表示しない
   if (isMobile === null || !isMobile || !mounted) return null;
 
-  // FAB (Floating Action Button)
+  // 改善4: FAB (Floating Action Button) - クラスベース制御
   const Fab = (
     <button
       type="button"
@@ -114,12 +165,12 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
       onClick={(e) => { 
         e.preventDefault(); 
         e.stopPropagation(); 
-        onToggle(); 
+        handleToggle(); 
       }}
-      className="fixed bottom-4 right-4 z-[9999] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--aio-primary)] text-[var(--text-on-primary)] shadow-lg hover:bg-[var(--aio-primary-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aio-primary)] spring-bounce transition-all duration-300"
-      style={{
-        transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-      }}
+      className={classNames(
+        "fixed bottom-4 right-4 z-[9999] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--aio-primary)] text-[var(--text-on-primary)] shadow-lg hover:bg-[var(--aio-primary-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aio-primary)] spring-bounce",
+        isOpen ? "nav-fab-open" : "nav-fab-closed"
+      )}
     >
       {isOpen ? (
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -138,24 +189,23 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
     <div
       className="fixed inset-0 z-40 bg-black/40 opacity-100 pointer-events-auto"
       aria-hidden="true"
-      onClick={onToggle}
+      onClick={handleToggle}
     />,
     document.body
   ) : null;
 
-  // メインドロワー
+  // 改善2: メインドロワー（統一CSS変数使用）
   const Drawer = createPortal(
     <nav
       id="unified-mobile-drawer"
       role="navigation"
       aria-label={isDashboard ? "ダッシュボードメニュー" : "メインメニュー"}
       className={classNames(
-        "fixed top-0 right-0 z-50 h-screen w-80 max-w-[85vw] glass-card backdrop-blur-xl border border-gray-200/60 shadow-xl transition-transform duration-300",
+        "fixed top-0 right-0 z-50 h-screen w-80 max-w-[85vw] glass-card backdrop-blur-xl border border-gray-200/60 shadow-xl mobile-nav-drawer",
         isOpen ? "translate-x-0" : "translate-x-full"
       )}
       style={{
         background: 'rgba(255, 255, 255, 0.95)',
-        transition: 'transform 280ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1))',
       }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -167,7 +217,7 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
           </h2>
           <button
             className="p-2 rounded-lg hover:bg-gray-100/60 transition-colors duration-200"
-            onClick={onToggle}
+            onClick={handleToggle}
             aria-label="閉じる"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -195,7 +245,7 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
                           : "hover:bg-gray-50/60 text-gray-700"
                       )}
                       href={item.href}
-                      onClick={onToggle}
+                      onClick={() => handleNavigation(item.href)}
                     >
                       {item.name}
                     </Link>
@@ -211,7 +261,7 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      onClick={onToggle}
+                      onClick={() => handleNavigation(item.href)}
                       className={classNames(
                         isActive
                           ? 'bg-[var(--aio-primary)] text-[var(--text-on-primary)]'

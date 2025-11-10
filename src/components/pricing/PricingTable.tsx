@@ -70,7 +70,7 @@ const PLANS: PricingPlan[] = [
       { text: '導入事例・実績：10件まで', included: true },
       { text: 'アクセス解析・効果測定', included: true },
       { text: 'カスタムドメイン対応', included: true },
-      { text: '優先サポート・電話対応', included: true }
+      { text: 'メールサポート（平日対応）', included: true }
     ],
     ctaText: 'プロで始める',
     ctaHref: '/auth/signup',
