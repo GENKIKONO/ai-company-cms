@@ -119,10 +119,10 @@ export default function AIVisibilityDashboard() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                 <Shield className="h-8 w-8 text-[var(--aio-primary)]" />
-                AI Visibility Guard
+                AI可視性ガード
               </h1>
               <p className="text-gray-600 mt-2">
-                Monitoring AI crawler access and content protection
+                AIクローラーアクセスとコンテンツ保護の監視
               </p>
             </div>
             <div className="flex gap-3">
@@ -132,20 +132,20 @@ export default function AIVisibilityDashboard() {
                 variant="outline"
               >
                 <Activity className="h-4 w-4 mr-2" />
-                Dry Run
+                テスト実行
               </Button>
               <Button 
                 onClick={() => runCheck(false)} 
                 disabled={loading}
               >
                 <Refresh className="h-4 w-4 mr-2" />
-                {loading ? 'Running...' : 'Run Check'}
+                {loading ? '実行中...' : 'チェック実行'}
               </Button>
             </div>
           </div>
           {lastCheck && (
             <p className="text-sm text-gray-500 mt-2">
-              Last check: {new Date(lastCheck).toLocaleString()}
+              最終チェック: {new Date(lastCheck).toLocaleString('ja-JP')}
             </p>
           )}
         </div>
@@ -155,45 +155,45 @@ export default function AIVisibilityDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Critical Issues</CardTitle>
+                <CardTitle className="text-sm font-medium">致命的な問題</CardTitle>
                 <AlertTriangle className="h-4 w-4 text-red-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-red-600">{metrics.p0Issues}</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">P0 - Immediate attention</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">P0 - 即座に対応が必要</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Important Issues</CardTitle>
+                <CardTitle className="text-sm font-medium">重要な問題</CardTitle>
                 <AlertTriangle className="h-4 w-4 text-orange-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-orange-600">{metrics.p1Issues}</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">P1 - Should fix soon</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">P1 - 早めに修正すべき</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Minor Issues</CardTitle>
+                <CardTitle className="text-sm font-medium">軽微な問題</CardTitle>
                 <Clock className="h-4 w-4 text-yellow-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-yellow-600">{metrics.p2Issues}</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">P2 - Optimize when possible</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">P2 - 可能な時に最適化</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Healthy Checks</CardTitle>
+                <CardTitle className="text-sm font-medium">正常チェック</CardTitle>
                 <CheckCircle className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">{metrics.okChecks}</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">No issues detected</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">問題は検出されませんでした</p>
               </CardContent>
             </Card>
           </div>
@@ -204,31 +204,31 @@ export default function AIVisibilityDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">Response Time</CardTitle>
+                <CardTitle className="text-sm font-medium">応答時間</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.avgResponseTime}ms</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">Average across all checks</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">全チェックの平均値</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">URLs Monitored</CardTitle>
+                <CardTitle className="text-sm font-medium">監視URL数</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.uniqueUrls}</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">Unique endpoints checked</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">チェックした固有エンドポイント</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">User Agents</CardTitle>
+                <CardTitle className="text-sm font-medium">ユーザーエージェント</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.uniqueUserAgents}</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">Different crawlers tested</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">テストした異なるクローラー</p>
               </CardContent>
             </Card>
           </div>
@@ -238,7 +238,7 @@ export default function AIVisibilityDashboard() {
         {metrics && metrics.topIssues.length > 0 && (
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>Most Common Issues</CardTitle>
+              <CardTitle>よくある問題</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -258,7 +258,7 @@ export default function AIVisibilityDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5" />
-              Detailed Check Results
+              詳細チェック結果
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -280,7 +280,7 @@ export default function AIVisibilityDashboard() {
                           </span>
                         </div>
                         <div className="text-sm text-gray-600 mb-2">
-                          Status: {result.statusCode} | Response: {result.responseTime}ms
+                          ステータス: {result.statusCode} | 応答: {result.responseTime}ms
                         </div>
                         {result.issues && result.issues.length > 0 && (
                           <div className="space-y-1">
@@ -302,7 +302,7 @@ export default function AIVisibilityDashboard() {
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                {loading ? 'Loading results...' : 'No results available. Run a check to see data.'}
+                {loading ? '結果を読み込み中...' : '結果がありません。チェックを実行してデータを確認してください。'}
               </div>
             )}
           </CardContent>

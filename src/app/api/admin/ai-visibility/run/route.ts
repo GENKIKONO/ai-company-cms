@@ -5,6 +5,29 @@ import crypto from 'crypto';
 import { updateLastCheck } from '@/lib/ai-visibility-config';
 import { logger } from '@/lib/utils/logger';
 
+// Error message translation mapping
+function translateIssue(issue: string): string {
+  const translations: Record<string, string> = {
+    'Missing canonical URL': 'カノニカルURLが設定されていません',
+    'Missing page title': 'ページタイトルがありません',
+    'Missing meta description': 'meta descriptionがありません',
+    'Access forbidden - check robots.txt or middleware blocking': 'アクセスが禁止されています - robots.txtまたはミドルウェアを確認してください',
+    'Page not found': 'ページが見つかりません',
+    'Rate limited - reduce request frequency': 'レート制限に達しました - リクエスト頻度を下げてください',
+    'Meta robots contains noindex': 'meta robotsにnoindexが含まれています',
+    'Missing JSON-LD structured data': 'JSON-LD構造化データがありません',
+    'Insufficient text content for AI understanding': 'AIが理解するためのテキストコンテンツが不足しています'
+  };
+
+  // Check for status code patterns
+  const statusCodeMatch = issue.match(/^Unexpected status code: (\d+)$/);
+  if (statusCodeMatch) {
+    return `予期しないステータスコード: ${statusCodeMatch[1]}`;
+  }
+
+  return translations[issue] || issue;
+}
+
 // AI Visibility Monitoring System
 export async function POST(request: NextRequest) {
   try {
@@ -337,7 +360,7 @@ function generateIssues(statusCode: number, analysis: any, userAgent: string, ur
     issues.push('Missing meta description');
   }
   
-  return issues;
+  return issues.map(translateIssue);
 }
 
 function generateContentSignature(html: string): string {
