@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 async function count(supabase: any, table: string, orgId: string, where?: Record<string, any>) {
   try {
@@ -26,7 +26,7 @@ async function count(supabase: any, table: string, orgId: string, where?: Record
       latest: data?.[0]?.updated_at ?? '' 
     };
   } catch (error) {
-    console.error(`Error counting ${table}:`, error);
+    logger.error(`Error counting ${table}:`, error);
     // テーブルが存在しない場合は0を返す
     return { count: 0, latest: '' };
   }
@@ -59,7 +59,7 @@ export async function GET(req: Request) {
           latest: result.latest
         });
       } catch (error) {
-        console.error(`Failed to count ${table}:`, error);
+        logger.error(`Failed to count ${table}:`, error);
         // エラーの場合は0として記録
         results.push({
           type: table,

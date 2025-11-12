@@ -8,7 +8,7 @@ import { LoadingSkeleton, EmptyState } from '@/components/ui/loading-skeleton';
 import { OrganizationPreview } from '@/components/ui/organization-preview';
 import { useApiList } from '@/hooks/useApiClient';
 import { useSuccessToast, useErrorToast } from '@/components/ui/toast';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 interface TabbedDashboardProps {
   organizationId: string;
@@ -117,7 +117,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
         }
       }
     } catch (error) {
-      console.error(`Failed to load ${tab}:`, error);
+      logger.error(`Failed to load ${tab}:`, error);
     } finally {
       setLoading(prev => ({ ...prev, [tab]: false }));
     }
@@ -155,7 +155,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
       }
       showSuccessToast('削除完了', `${getContentTypeLabel(type)}を削除しました`);
     } catch (error) {
-      console.error(`Failed to delete ${type}:`, error);
+      logger.error(`Failed to delete ${type}:`, error);
       showErrorToast('削除失敗', 'ネットワークエラーが発生しました');
     }
   };

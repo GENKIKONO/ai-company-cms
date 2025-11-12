@@ -13,6 +13,7 @@
 
 import { PLAN_LIMITS, PLAN_FEATURES, PLAN_NAMES, type PlanType } from './plans';
 
+import { logger } from '@/lib/log';
 /**
  * 統一価格定義 - 全システムの価格参照元
  */
@@ -140,12 +141,12 @@ export function validatePriceConsistency(): boolean {
   for (const [planType, expectedPrice] of Object.entries(expectedPrices)) {
     const actualPrice = UNIFIED_PRICES[planType as PlanType];
     if (actualPrice !== expectedPrice) {
-      console.error(`価格不整合検出: ${planType} expected:${expectedPrice} actual:${actualPrice}`);
+      logger.error(`価格不整合検出: ${planType} expected:${expectedPrice} actual:${actualPrice}`);
       return false;
     }
   }
 
-  console.log('価格整合性チェック: OK');
+  logger.info('価格整合性チェック: OK');
   return true;
 }
 

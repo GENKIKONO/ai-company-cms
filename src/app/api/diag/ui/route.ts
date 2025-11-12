@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logger } from '@/lib/log';
 export const dynamic = 'force-dynamic';
 
 // メモリ内エラーログストア（本番では外部ストレージ推奨）
@@ -123,7 +124,7 @@ export async function POST(request: NextRequest) {
     }
 
     // コンソールにも出力
-    console.log('[DIAG] Error logged:', {
+    logger.info('[DIAG] Error logged:', {
       id: logEntry.id,
       type: logEntry.type,
       errorId: logEntry.errorId,
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
 
   } catch (error: any) {
-    console.error('[DIAG] Failed to log error:', error);
+    logger.error('[DIAG] Failed to log error:', error);
     
     return NextResponse.json({
       success: false,

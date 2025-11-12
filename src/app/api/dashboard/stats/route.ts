@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { hasEntitlement } from '@/lib/feature-flags/gate';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 interface TableCount {
   count: number | null;
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
             counts[table as keyof typeof counts] = { count: null, missing: true };
             missingTables.push(table);
           } else {
-            console.error(`Dashboard stats error for ${table}:`, {
+            logger.error(`Dashboard stats error for ${table}:`, {
               orgId,
               table,
               error: error.message,
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
           counts[table as keyof typeof counts] = { count: count || 0, missing: false };
         }
       } catch (err) {
-        console.error(`Unexpected error checking table ${table}:`, {
+        logger.error(`Unexpected error checking table ${table}:`, {
           orgId,
           table,
           error: err instanceof Error ? err.message : 'Unknown error'

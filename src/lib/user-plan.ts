@@ -6,7 +6,7 @@
 
 import { supabaseServer } from '@/lib/supabase-server';
 import type { PlanType } from '@/config/plans';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export interface UserPlanInfo {
   plan: PlanType;
@@ -67,7 +67,7 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
       const isActive = subscription?.status === 'active';
       const plan = (organization.plan || 'trial') as PlanType;
 
-      console.log(`[getUserPlan] Plan found: ${plan} (active: ${isActive})`);
+      logger.info(`[getUserPlan] Plan found: ${plan} (active: ${isActive})`);
       
       return {
         plan,
@@ -80,7 +80,7 @@ export async function getUserPlan(): Promise<UserPlanInfo> {
 
     // Default to organization plan or free
     const plan = (organization.plan || 'trial') as PlanType;
-    console.log(`[getUserPlan] Plan found (no subscription): ${plan}`);
+    logger.info(`[getUserPlan] Plan found (no subscription): ${plan}`);
     
     return {
       plan,

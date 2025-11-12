@@ -4,7 +4,7 @@
  */
 
 import { QueryCacheManager } from './database-optimization';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 // キャッシュ戦略設定
 export interface CacheStrategy {
@@ -250,7 +250,7 @@ export class CacheWarmer {
         await builder.getOrganizationOptimized(slug, true);
         logger.debug('Debug', `🔥 Warmed cache for organization: ${slug}`);
       } catch (error) {
-        console.error(`Cache warming failed for organization ${slug}:`, error);
+        logger.error(`Cache warming failed for organization ${slug}:`, error);
       }
     });
     
@@ -269,7 +269,7 @@ export class CacheWarmer {
         await builder.searchOptimized(query);
         logger.debug('Debug', `🔥 Warmed cache for search: ${query}`);
       } catch (error) {
-        console.error(`Cache warming failed for search "${query}":`, error);
+        logger.error(`Cache warming failed for search "${query}":`, error);
       }
     });
     

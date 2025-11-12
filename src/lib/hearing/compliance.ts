@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 // リスクレベル定義
 export enum RiskLevel {
@@ -159,7 +159,7 @@ export async function performComplianceCheck(
       if (check.status === 'fulfilled') {
         results.push(check.value);
       } else {
-        console.error(`Compliance check ${index} failed:`, check.reason);
+        logger.error(`Compliance check ${index} failed:`, check.reason);
       }
     });
 

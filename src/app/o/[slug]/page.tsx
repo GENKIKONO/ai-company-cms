@@ -24,7 +24,7 @@ interface OrganizationPageData {
 
 // ✅ キャッシュ対応: 公開組織データ取得
 import { unstable_cache } from 'next/cache';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 const getOrganizationDataCached = (slug: string) => {
   // slug正規化で大文字・空白・末尾文字問題を回避
@@ -58,7 +58,7 @@ const getOrganizationDataCached = (slug: string) => {
 
       // ✅ VERIFY: Enhanced debugging for 404 issues with fallback diagnosis
       if (orgError || !organization) {
-        console.error(`[VERIFY] Public page failed for slug: ${safeSlug}`, {
+        logger.error(`[VERIFY] Public page failed for slug: ${safeSlug}`, {
           error: orgError?.message,
           requiredConditions: 'status = published AND is_published=true',
           client: 'anonymous'
@@ -92,7 +92,7 @@ const getOrganizationDataCached = (slug: string) => {
         
         if (generalCheck.data) {
           const org = generalCheck.data;
-          console.error(`[VERIFY] 404 ROOT CAUSE IDENTIFIED for ${safeSlug}:`, {
+          logger.error(`[VERIFY] 404 ROOT CAUSE IDENTIFIED for ${safeSlug}:`, {
             exists: true,
             status: org.status,
             is_published: org.is_published,
@@ -107,18 +107,18 @@ const getOrganizationDataCached = (slug: string) => {
           
           // 🚨 Data inconsistency detected - log for fixing
           if (org.status === 'published' && org.is_published === false) {
-            console.error(`[VERIFY] DATA INCONSISTENCY: ${safeSlug} has status=published but is_published=false`);
+            logger.error(`[VERIFY] DATA INCONSISTENCY: ${safeSlug} has status=published but is_published=false`);
           } else if (org.status === 'draft' && org.is_published === true) {
-            console.error(`[VERIFY] DATA INCONSISTENCY: ${safeSlug} has status=draft but is_published=true`);
+            logger.error(`[VERIFY] DATA INCONSISTENCY: ${safeSlug} has status=draft but is_published=true`);
           }
         } else {
-          console.warn(`[VERIFY] Organization not found at all: ${safeSlug}`);
+          logger.warn(`[VERIFY] Organization not found at all: ${safeSlug}`);
         }
         
         return null;
       }
 
-      console.log(`[VERIFY] Public organization loaded successfully: ${organization.name} (${slug})`);
+      logger.info(`[VERIFY] Public organization loaded successfully: ${organization.name} (${slug})`);
 
       // 公開されたコンテンツを並行取得
       const [postsResult, servicesResult, caseStudiesResult, faqsResult, qaEntriesResult] = await Promise.all([

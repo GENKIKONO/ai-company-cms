@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 // 通知タイプ定義
 export enum NotificationType {
@@ -194,7 +194,7 @@ export async function sendTemplateNotification(
   const template = NOTIFICATION_TEMPLATES[type];
   
   if (!template) {
-    console.error(`Unknown notification type: ${type}`);
+    logger.error(`Unknown notification type: ${type}`);
     return false;
   }
 
@@ -233,7 +233,7 @@ async function sendToChannel(channel: NotificationChannel, data: NotificationDat
       break;
       
     default:
-      console.warn(`Unsupported notification channel: ${channel}`);
+      logger.warn(`Unsupported notification channel: ${channel}`);
   }
 }
 
@@ -267,7 +267,7 @@ async function sendSMSNotification(data: NotificationData): Promise<void> {
   try {
     // 緊急度が高い場合のみSMS送信
     if (data.priority === NotificationPriority.URGENT) {
-      console.log('Sending SMS notification:', {
+      logger.info('Sending SMS notification:', {
         to: data.recipients,
         message: data.message.substring(0, 160) // SMS制限
       });

@@ -1,4 +1,4 @@
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 /**
  * Japanese address geocoding utility
@@ -131,7 +131,7 @@ async function queryNominatim(address: string): Promise<GeocodeResult | null> {
       
       return null;
     } catch (error) {
-      console.error(`Geocoding attempt ${attempt + 1} failed:`, error);
+      logger.error(`Geocoding attempt ${attempt + 1} failed:`, error);
       
       if (attempt < maxRetries - 1) {
         await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
@@ -216,7 +216,7 @@ export async function geocodeJP(address: string): Promise<GeocodeResult> {
         };
       }
     } catch (error) {
-      console.warn(`Failed to geocode variation "${variation}":`, error);
+      logger.warn(`Failed to geocode variation "${variation}":`, error);
       // Continue to next variation
     }
   }

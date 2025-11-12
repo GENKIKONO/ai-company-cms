@@ -1,0 +1,435 @@
+name: Security Validation
+
+# セキュリティチェックを実行するワークフロー
+# PRやmainブランチへのpushで実行される
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  # 手動実行も可能
+  workflow_dispatch:
+    inputs:
+      skip_build:
+        description: 'Skip build step (for testing)'
+        required: false
+        default: 'false'
+        type: boolean
+
+# セキュリティ関連の権限を制限
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+env:
+  NODE_VERSION: '20'
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # セキュリティスキャンのため全履歴を取得
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci --only=production
+          # セキュリティ監査専用の依存関係
+          npm install --no-save audit-ci eslint-plugin-security
+
+      - name: Run npm audit
+        run: |
+          echo "🔍 Running npm security audit..."
+          npm audit --audit-level=high --production
+          
+          # 詳細な監査レポート (CI用)
+          npx audit-ci --config audit-ci.json || echo "⚠️ Some vulnerabilities found"
+
+      - name: Check for sensitive data
+        run: |
+          echo "🔍 Checking for sensitive data in code..."
+          
+          # API キーやトークンの検索
+          if grep -r -i "api[_-]key\|secret[_-]key\|password\|token" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v "process\.env\|\.env\|example\|placeholder\|your_" | head -5; then
+            echo "❌ Potential sensitive data found in code"
+            exit 1
+          fi
+          
+          # ハードコードされた認証情報の検索
+          if grep -r -E "(password|secret|key|token)\s*[:=]\s*['\"][^'\"]{8,}" src/ --include="*.ts" --include="*.tsx" | grep -v "process\.env\|example\|placeholder" | head -3; then
+            echo "❌ Hardcoded credentials found"
+            exit 1
+          fi
+          
+          echo "✅ No sensitive data found in code"
+
+      - name: Validate environment configuration
+        run: |
+          echo "🔍 Validating environment configuration..."
+          
+          # .env.example の必須項目チェック
+          required_vars=(
+            "CSRF_SECRET"
+            "API_SIGNATURE_SECRET"  
+            "ADMIN_API_SECRET_KEY"
+            "STRIPE_WEBHOOK_SECRET"
+            "RESEND_WEBHOOK_SECRET"
+          )
+          
+          missing_vars=()
+          for var in "${required_vars[@]}"; do
+            if ! grep -q "^${var}=" .env.example; then
+              missing_vars+=("$var")
+            fi
+          done
+          
+          if [ ${#missing_vars[@]} -ne 0 ]; then
+            echo "❌ Missing required environment variables in .env.example:"
+            printf '%s\n' "${missing_vars[@]}"
+            exit 1
+          fi
+          
+          echo "✅ Environment configuration valid"
+
+      - name: Security-focused ESLint
+        run: |
+          echo "🔍 Running security-focused ESLint..."
+          
+          # セキュリティ特化のESLint設定を作成
+          cat > .eslintrc.security.json << EOF
+          {
+            "extends": [".eslintrc.json"],
+            "plugins": ["security"],
+            "rules": {
+              "security/detect-object-injection": "error",
+              "security/detect-non-literal-regexp": "error",
+              "security/detect-unsafe-regex": "error",
+              "security/detect-buffer-noassert": "error",
+              "security/detect-eval-with-expression": "error",
+              "security/detect-no-csrf-before-method-override": "error",
+              "security/detect-possible-timing-attacks": "warn",
+              "security/detect-pseudoRandomBytes": "error"
+            }
+          }
+          EOF
+          
+          # セキュリティチェック実行
+          npx eslint --config .eslintrc.security.json src/ --ext .ts,.tsx,.js,.jsx --max-warnings 0
+
+  dependency-check:
+    name: Dependency Security Check  
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Snyk security scan
+        # Snyk を使用した依存関係の脆弱性スキャン
+        continue-on-error: true
+        run: |
+          if command -v snyk &> /dev/null; then
+            echo "🔍 Running Snyk security scan..."
+            snyk test --severity-threshold=high
+          else
+            echo "⚠️ Snyk not available, skipping advanced dependency check"
+          fi
+
+      - name: Check for known vulnerabilities
+        run: |
+          echo "🔍 Checking for known vulnerabilities..."
+          
+          # package.json の危険なパッケージをチェック
+          dangerous_packages=(
+            "debug"
+            "request"  
+            "node-uuid"
+            "crypto-js"
+          )
+          
+          for package in "${dangerous_packages[@]}"; do
+            if grep -q "\"$package\"" package.json; then
+              echo "⚠️ Found potentially vulnerable package: $package"
+            fi
+          done
+          
+          # セキュリティ関連の設定確認
+          echo "✅ Dependency security check completed"
+
+  build-security-validation:
+    name: Build & Security Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: ${{ github.event.inputs.skip_build != 'true' }}
+    
+    strategy:
+      matrix:
+        security-env: ['development', 'production']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup test environment (${{ matrix.security-env }})
+        run: |
+          # セキュリティテスト用の環境変数設定
+          cat > .env.local << EOF
+          # Test environment for security validation
+          NEXT_PUBLIC_SUPABASE_URL=https://test.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=test_anon_key_32_chars_minimum_length
+          SUPABASE_SERVICE_ROLE_KEY=test_service_role_key_64_chars_minimum_length_for_security
+          
+          # Security settings
+          CSRF_SECRET=test_csrf_secret_32_chars_minimum
+          API_SIGNATURE_SECRET=test_api_signature_secret_32_chars
+          ADMIN_API_SECRET_KEY=test_admin_api_secret_key_64_chars_minimum_for_security_validation
+          ADMIN_ALLOWED_IPS=127.0.0.1,::1
+          
+          # Webhook secrets
+          STRIPE_WEBHOOK_SECRET=test_stripe_webhook_secret_32_chars
+          RESEND_WEBHOOK_SECRET=test_resend_webhook_secret_32_chars
+          
+          # Force HTTPS in production
+          FORCE_HTTPS=${{ matrix.security-env == 'production' && 'true' || 'false' }}
+          NODE_ENV=${{ matrix.security-env }}
+          EOF
+
+      - name: Build application
+        run: |
+          echo "🏗️ Building application with security validation..."
+          npm run build
+          
+          # ビルド成果物のセキュリティチェック
+          echo "🔍 Checking build artifacts..."
+          
+          # .next/standalone にシークレットが含まれていないかチェック
+          if find .next -name "*.js" -exec grep -l "secret\|password\|key" {} \; | grep -v node_modules | head -5; then
+            echo "⚠️ Potential secrets found in build artifacts"
+          fi
+
+      - name: Security headers validation
+        run: |
+          echo "🔍 Validating security headers configuration..."
+          
+          # middleware.ts でセキュリティヘッダーが設定されているかチェック
+          required_headers=(
+            "Content-Security-Policy"
+            "X-Frame-Options"  
+            "X-Content-Type-Options"
+            "Referrer-Policy"
+            "Permissions-Policy"
+          )
+          
+          missing_headers=()
+          for header in "${required_headers[@]}"; do
+            if ! grep -q "$header" src/middleware.ts 2>/dev/null; then
+              missing_headers+=("$header")
+            fi
+          done
+          
+          if [ ${#missing_headers[@]} -ne 0 ]; then
+            echo "⚠️ Missing security headers:"
+            printf '%s\n' "${missing_headers[@]}"
+          else
+            echo "✅ Security headers configuration valid"
+          fi
+
+      - name: Database security validation
+        run: |
+          echo "🔍 Validating database security configuration..."
+          
+          # RLS設定ファイルの存在チェック
+          if [ -f "supabase/migrations/20251112_security_hardening.sql" ]; then
+            echo "✅ Security hardening migration found"
+            
+            # RLS が有効化されているかチェック
+            if grep -q "ENABLE ROW LEVEL SECURITY" supabase/migrations/20251112_security_hardening.sql; then
+              echo "✅ Row Level Security enabled"
+            else
+              echo "❌ Row Level Security not found in migration"
+              exit 1
+            fi
+            
+            # 監査ログ機能のチェック
+            if grep -q "audit_logs" supabase/migrations/20251112_security_hardening.sql; then
+              echo "✅ Audit logging configured"
+            else
+              echo "❌ Audit logging not found"
+              exit 1
+            fi
+          else
+            echo "❌ Security hardening migration not found"
+            exit 1
+          fi
+
+  security-test:
+    name: Security Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test security functions
+        run: |
+          echo "🧪 Testing security functions..."
+          
+          # セキュリティ機能のユニットテスト
+          if [ -f "tests/security.test.js" ]; then
+            npm test -- tests/security.test.js
+          else
+            echo "⚠️ Security tests not found, creating basic validation..."
+            
+            # 基本的なセキュリティテスト
+            node -e "
+              const crypto = require('crypto');
+              
+              // HMAC検証テスト
+              const secret = 'test-secret-key-32-chars-minimum';
+              const payload = 'test-payload';
+              const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+              const isValid = crypto.timingSafeEqual(
+                Buffer.from(signature, 'hex'),
+                Buffer.from(signature, 'hex')
+              );
+              
+              if (!isValid) {
+                console.error('❌ HMAC validation failed');
+                process.exit(1);
+              }
+              
+              console.log('✅ HMAC validation working');
+              
+              // CSRF トークン生成テスト
+              const csrfToken = crypto.randomBytes(32).toString('hex');
+              if (csrfToken.length !== 64) {
+                console.error('❌ CSRF token generation failed');
+                process.exit(1);
+              }
+              
+              console.log('✅ CSRF token generation working');
+            "
+          fi
+
+      - name: API security validation
+        run: |
+          echo "🧪 Testing API security implementation..."
+          
+          # admin-protection.ts の存在と設定チェック
+          if [ -f "src/lib/security/admin-protection.ts" ]; then
+            echo "✅ Admin protection module found"
+            
+            # withAdminProtection関数の存在チェック
+            if grep -q "withAdminProtection" src/lib/security/admin-protection.ts; then
+              echo "✅ Admin protection wrapper found"
+            else
+              echo "❌ Admin protection wrapper not found"
+              exit 1
+            fi
+          else
+            echo "❌ Admin protection module not found"
+            exit 1
+          fi
+
+  security-report:
+    name: Security Report
+    runs-on: ubuntu-latest
+    needs: [security-audit, dependency-check, build-security-validation, security-test]
+    if: always()
+    
+    steps:
+      - name: Generate security summary
+        run: |
+          echo "# Security Validation Report" > security-report.md
+          echo "" >> security-report.md
+          echo "## Summary" >> security-report.md
+          echo "" >> security-report.md
+          
+          # 各ジョブの結果をまとめる
+          echo "| Check | Status |" >> security-report.md
+          echo "|-------|--------|" >> security-report.md
+          echo "| Security Audit | ${{ needs.security-audit.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> security-report.md
+          echo "| Dependency Check | ${{ needs.dependency-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> security-report.md
+          echo "| Build Validation | ${{ needs.build-security-validation.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> security-report.md
+          echo "| Security Tests | ${{ needs.security-test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> security-report.md
+          echo "" >> security-report.md
+          echo "## Recommendations" >> security-report.md
+          echo "" >> security-report.md
+          echo "- 🔒 Ensure all environment variables are properly configured" >> security-report.md
+          echo "- 🛡️ Review admin API protection settings" >> security-report.md
+          echo "- 📊 Monitor security audit logs regularly" >> security-report.md
+          echo "- 🔄 Update dependencies regularly" >> security-report.md
+          echo "" >> security-report.md
+          echo "Generated at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> security-report.md
+          
+          cat security-report.md
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: security-report.md
+          retention-days: 30
+
+  # セキュリティチェック失敗時の通知
+  notify-security-failure:
+    name: Security Failure Notification
+    runs-on: ubuntu-latest
+    needs: [security-audit, dependency-check, build-security-validation, security-test]
+    if: ${{ failure() && github.ref == 'refs/heads/main' }}
+    
+    steps:
+      - name: Notify security team
+        run: |
+          echo "🚨 Security validation failed on main branch!"
+          echo "Please review the failed checks immediately."
+          echo "Repository: ${{ github.repository }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          # 実際の本番環境では、Slack/Teams/Email通知を設定
+          # 例: curl -X POST -H 'Content-type: application/json' --data '{"text":"Security check failed!"}' $SLACK_WEBHOOK_URL

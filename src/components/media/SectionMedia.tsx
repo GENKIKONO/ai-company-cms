@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 interface SectionMediaProps {
   image?: string;
   alt?: string;
@@ -102,11 +104,13 @@ export default function SectionMedia({
   // 実際の画像表示
   return (
     <div className={containerClasses}>
-      <div className={`${aspectRatios[aspect]} overflow-hidden rounded-xl`}>
-        <img
-          src={image}
+      <div className={`${aspectRatios[aspect]} overflow-hidden rounded-xl relative`}>
+        <Image
+          src={image || '/placeholder-image.jpg'}
           alt={alt}
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          fill
+          className="object-cover transition-transform duration-300 hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
       

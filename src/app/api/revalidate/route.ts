@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     ];
     
     if (!allowedPaths.some(allowed => pathToRevalidate!.startsWith(allowed))) {
-      console.warn(`[Revalidate API] Attempted to revalidate unauthorized path: ${pathToRevalidate}`);
+      logger.warn(`[Revalidate API] Attempted to revalidate unauthorized path: ${pathToRevalidate}`);
       return NextResponse.json(
         { 
           error: 'Forbidden',

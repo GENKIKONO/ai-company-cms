@@ -6,6 +6,7 @@
 import useSWR from 'swr';
 import { fetcher } from '@/lib/utils/fetcher';
 
+import { logger } from '@/lib/log';
 export interface Organization {
   id: string;
   name: string;
@@ -37,7 +38,7 @@ export function useOrganization() {
       if (error?.status === 404 || error?.status === 401) {
         return null;
       }
-      console.error('useOrganization error:', error);
+      logger.error('useOrganization error:', error);
     }
   });
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { env } from '@/lib/env';
 
+import { logger } from '@/lib/log';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -225,7 +226,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Security diagnostic failed:', error);
+    logger.error('Security diagnostic failed:', error);
     
     return NextResponse.json({
       success: false,

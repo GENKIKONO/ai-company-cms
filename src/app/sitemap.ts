@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { supabaseServer } from '@/lib/supabase-server'
 
+import { logger } from '@/lib/log';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabaseBrowser = await supabaseServer()
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001'
@@ -61,7 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [...staticPages, ...organizationPages]
   } catch (error) {
-    console.error('Failed to generate sitemap:', error)
+    logger.error('Failed to generate sitemap:', error)
     return staticPages
   }
 }

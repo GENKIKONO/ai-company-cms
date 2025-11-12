@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 
+import { logger } from '@/lib/log';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     if (userError) {
       // ユーザーレコードが存在しない場合でも基本情報は返す
-      console.warn('User record not found in users table:', userError);
+      logger.warn('User record not found in users table:', userError);
       return NextResponse.json({
         user: {
           id: authUser.id,
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
           feature_flags: orgData.feature_flags || {}
         };
       } else {
-        console.warn('Organization not found:', orgError);
+        logger.warn('Organization not found:', orgError);
       }
     }
 
@@ -76,7 +77,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('API /me error:', error);
+    logger.error('API /me error:', error);
     
     // エラーが発生してもダッシュボードを壊さないよう、できるだけ情報を返す
     return NextResponse.json({

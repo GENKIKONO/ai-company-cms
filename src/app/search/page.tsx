@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { globalSearch, getIndustries, getServiceCategories } from '@/lib/organizations';
 import { type Organization, type Service, type CaseStudy } from '@/types/database';
 import { logger } from '@/lib/utils/logger';
@@ -344,11 +345,15 @@ function SearchPageContent() {
                           >
                             <div className="flex items-center mb-4">
                               {org.logo_url ? (
-                                <img
-                                  src={org.logo_url}
-                                  alt={`${org.name}のロゴ`}
-                                  className="w-14 h-14 rounded-xl object-cover shadow-md"
-                                />
+                                <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md relative">
+                                  <Image
+                                    src={org.logo_url}
+                                    alt={`${org.name}のロゴ`}
+                                    fill
+                                    className="object-cover"
+                                    sizes="56px"
+                                  />
+                                </div>
                               ) : (
                                 <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center shadow-md">
                                   <span className="text-[var(--aio-primary)] font-bold text-xl">

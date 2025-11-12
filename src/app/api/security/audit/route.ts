@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { runSecurityAudit, generateSecurityReport } from '@/lib/security/audit';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export async function GET(request: NextRequest) {
   try {
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         auditResult.checks
           .filter(c => c.severity === 'critical' && !c.passed)
           .forEach(check => {
-            console.error(`  - ${check.name}: ${check.message}`);
+            logger.error(`  - ${check.name}: ${check.message}`);
           });
       }
 

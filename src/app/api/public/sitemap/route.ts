@@ -1,7 +1,7 @@
 // サイトマップAPI: /api/public/sitemap
 // 最低限のサイトマップJSON（将来XML化対応）
 import { NextResponse } from 'next/server';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export const dynamic = 'force-dynamic';
 
@@ -152,7 +152,7 @@ export async function GET() {
           }
         }
       } catch (error) {
-        console.error(`Failed to fetch data for organization ${org.slug}:`, error);
+        logger.error(`Failed to fetch data for organization ${org.slug}:`, error);
         // 企業データ取得に失敗しても他の企業は処理を続行
       }
     }

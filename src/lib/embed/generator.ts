@@ -4,7 +4,7 @@
  */
 
 import type { Organization } from '@/types/database';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export interface WidgetOptions {
   theme?: 'light' | 'dark' | 'auto';
@@ -307,7 +307,7 @@ export function generateEmbedWidget(config: EmbedGeneratorOptions): string {
       });
       window.dispatchEvent(loadEvent);
       
-      console.log('LuxuCare Widget loaded successfully:', '${escapeHtml(organization.name)}');
+      logger.info('LuxuCare Widget loaded successfully:', '${escapeHtml(organization.name)}');
     }
 
   } catch (error) {

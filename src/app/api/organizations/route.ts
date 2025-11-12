@@ -22,7 +22,7 @@ import { buildOrgInsert } from '@/lib/utils/org-whitelist';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Organization, OrganizationFormData } from '@/types/database';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 import {
   organizationCreateSchema,
   organizationUpdateSchema,
@@ -261,7 +261,10 @@ export async function POST(request: NextRequest) {
       dateFields: ['established_at'], // DBにある日付カラムを列挙
     });
 
-    console.log('🔍 [/api/organizations] Normalized organization data for INSERT:', JSON.stringify(organizationData, null, 2));
+    logger.info('Normalized organization data for INSERT', { 
+      component: '/api/organizations',
+      organizationData: JSON.stringify(organizationData, null, 2)
+    });
 
     // ✅ 最終ガード：日付は空文字の可能性が少しでもあれば null を明示して送る
     const finalGuardDateFields = ['established_at']; // 必要に応じて他のDATE型も追記
@@ -269,7 +272,11 @@ export async function POST(request: NextRequest) {
       const v = (organizationData as any)[f];
       if (v === '' || v === undefined) {
         (organizationData as any)[f] = null;   // ← キーを削除せず null を明示
-        console.log(`🔧 [FINAL GUARD] Set ${f} to null (was: ${JSON.stringify(v)})`);
+        logger.debug('Final guard set field to null', { 
+          component: '/api/organizations',
+          field: f,
+          previousValue: JSON.stringify(v)
+        });
       }
     }
 

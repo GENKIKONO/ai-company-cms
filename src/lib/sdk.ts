@@ -239,6 +239,7 @@ export type { Organization, SearchFilters, SearchResult };
 /*
 import { AIOHubSDK } from '@aiohub/sdk';
 
+import { logger } from '@/lib/log';
 const client = new AIOHubSDK({
   apiKey: 'your-api-key',
   baseURL: 'https://api.aiohub.jp' // optional
@@ -268,7 +269,7 @@ try {
   const org = await client.organizations.get('invalid-id');
 } catch (error) {
   if (error instanceof AIOHubSDKError) {
-    console.error(`API Error ${error.status}: ${error.message}`);
+    logger.error(`API Error ${error.status}: ${error.message}`);
   }
 }
 */

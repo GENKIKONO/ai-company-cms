@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { AuthContext } from './auth-middleware';
 
+import { logger } from '@/lib/log';
 // ログレベル定義
 export enum LogLevel {
   DEBUG = 'debug',
@@ -132,9 +133,9 @@ export function logStructured(level: LogLevel, message: string, data?: Record<st
   // 開発環境ではコンソール出力
   if (process.env.NODE_ENV === 'production') {
     // TODO: 外部ログサービス連携
-    console.log(JSON.stringify(logEntry));
+    logger.info(JSON.stringify(logEntry));
   } else {
-    console.log(`[${level.toUpperCase()}] ${message}`, data || '');
+    logger.info(`[${level.toUpperCase()}] ${message}`, data || '');
   }
 }
 

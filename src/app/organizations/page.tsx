@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getOrganizations, getIndustries } from '@/lib/organizations';
 import { type Organization } from '@/types/database';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 import AioSection from '@/components/layout/AioSection';
 
 interface SearchFilters {
@@ -72,7 +72,7 @@ export default function OrganizationsPage() {
         } else {
           // データがない場合は空配列として処理（エラーではない）
           setOrganizations([]);
-          console.warn('Organizations API returned no data array:', orgsData);
+          logger.warn('Organizations API returned no data array:', orgsData);
         }
         
         if (industriesResult.data) {

@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { APP_URL } from '@/lib/utils/env';
 
+import { logger } from '@/lib/log';
 interface GenerateLinkParams {
   email: string;
   type: 'signup' | 'magiclink' | 'recovery';
@@ -25,7 +26,7 @@ export async function generateAuthLink({
     : `${APP_URL}/auth/confirm`;
   
   try {
-    console.info({
+    logger.info({
       event: 'auth_link_generating',
       type,
       email,
@@ -72,7 +73,7 @@ export async function generateAuthLink({
     }
 
     if (error) {
-      console.error({
+      logger.error({
         event: 'auth_link_error',
         type,
         email,
@@ -88,7 +89,7 @@ export async function generateAuthLink({
       };
     }
 
-    console.info({
+    logger.info({
       event: 'auth_link_generated',
       type,
       email,
@@ -106,7 +107,7 @@ export async function generateAuthLink({
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     
-    console.error({
+    logger.error({
       event: 'auth_link_error',
       type,
       email,

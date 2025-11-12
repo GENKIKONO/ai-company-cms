@@ -9,6 +9,7 @@ import { env } from '@/lib/env';
 import { logPerformanceMetrics } from '@/lib/api/audit-logger';
 import { CacheManager, CacheKeyBuilder, CACHE_STRATEGIES } from './cache-strategy';
 
+import { logger } from '@/lib/log';
 // クエリパフォーマンス監視用の型
 export interface QueryPerformanceMetrics {
   query: string;
@@ -350,7 +351,7 @@ export class OptimizedQueryBuilder {
 
     // パフォーマンス警告
     if (duration > 500) {
-      console.warn(`🐌 Slow query detected: ${queryType} took ${duration}ms`);
+      logger.warn(`🐌 Slow query detected: ${queryType} took ${duration}ms`);
     }
   }
 }

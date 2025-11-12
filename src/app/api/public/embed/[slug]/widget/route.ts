@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateOrganizationJsonLd } from '@/lib/json-ld';
 import { generateEmbedWidget } from '@/lib/embed/generator';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export const dynamic = 'force-dynamic';
 
@@ -158,7 +158,7 @@ export async function GET(
     // エラー時のフォールバックWidget
     const fallbackWidget = `
 (function() {
-  console.error('LuxuCare Widget: Generation failed', ${JSON.stringify(error.message)});
+  logger.error('LuxuCare Widget: Generation failed', ${JSON.stringify(error.message)});
   
   const container = document.currentScript?.parentElement;
   if (container) {

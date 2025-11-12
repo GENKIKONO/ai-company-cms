@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertTriangle, Shield, Activity, Users, Ban, Eye } from 'lucide-react';
 
+import { logger } from '@/lib/log';
 // Types
 interface SecurityMetrics {
   totalRequests: number;
@@ -121,7 +122,7 @@ export default function SecurityDashboard() {
       });
 
     } catch (error) {
-      console.error('Error fetching security metrics:', error);
+      logger.error('Error fetching security metrics:', error);
     }
   };
 
@@ -131,7 +132,7 @@ export default function SecurityDashboard() {
       const { data: stats, error } = await supabase.rpc('get_service_role_usage_stats');
       
       if (error) {
-        console.error('Error fetching service role stats:', error);
+        logger.error('Error fetching service role stats:', error);
         return;
       }
 
@@ -139,7 +140,7 @@ export default function SecurityDashboard() {
       const { data: anomalies, error: anomalyError } = await supabase.rpc('detect_service_role_anomalies');
       
       if (anomalyError) {
-        console.error('Error fetching anomalies:', anomalyError);
+        logger.error('Error fetching anomalies:', anomalyError);
         return;
       }
 
@@ -150,7 +151,7 @@ export default function SecurityDashboard() {
       });
 
     } catch (error) {
-      console.error('Error fetching service role stats:', error);
+      logger.error('Error fetching service role stats:', error);
     }
   };
 

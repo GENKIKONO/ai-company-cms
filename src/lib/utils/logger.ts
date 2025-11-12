@@ -1,3 +1,5 @@
+import { logger } from '@/lib/log';
+
 /* eslint-disable no-console */
 // 本番環境でのログ制御
 const isProd = process.env.NODE_ENV === 'production';
@@ -39,9 +41,9 @@ export const logger = {
     
     if (isProd) {
       // In production, use structured logging (could be sent to external service)
-      console.error(JSON.stringify(logData));
+      logger.error(JSON.stringify(logData));
     } else {
-      console.error(`[${timestamp}] ERROR: ${message}`, { error, context });
+      logger.error(`[${timestamp}] ERROR: ${message}`, { error, context });
     }
   },
 
@@ -57,9 +59,9 @@ export const logger = {
     };
 
     if (isProd) {
-      console.warn(JSON.stringify(logData));
+      logger.warn(JSON.stringify(logData));
     } else {
-      console.warn(`[${timestamp}] WARN: ${message}`, { data, context });
+      logger.warn(`[${timestamp}] WARN: ${message}`, { data, context });
     }
   },
 
@@ -71,7 +73,7 @@ export const logger = {
     }
     
     const timestamp = new Date().toISOString();
-    console.info(`[${timestamp}] INFO: ${message}`, { data, context });
+    logger.info(`[${timestamp}] INFO: ${message}`, { data, context });
   },
 
   debug: (message: string, data?: any, context?: LogContext) => {
@@ -79,7 +81,7 @@ export const logger = {
     if (!isDev) return;
     
     const timestamp = new Date().toISOString();
-    console.debug(`[${timestamp}] DEBUG: ${message}`, { data, context });
+    logger.debug(`[${timestamp}] DEBUG: ${message}`, { data, context });
   }
 };
 

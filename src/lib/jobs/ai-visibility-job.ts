@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getAiVisibilityStatus } from '@/lib/ai-visibility-config';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export interface AiVisibilityJobResult {
   success: boolean;
@@ -52,7 +52,7 @@ export async function runAiVisibilityJob(): Promise<AiVisibilityJobResult> {
     
     const result = await response.json();
     
-    console.log('[AI Visibility Job] Check completed successfully:', {
+    logger.info('[AI Visibility Job] Check completed successfully:', {
       summary: result.summary,
       timestamp: new Date().toISOString()
     });

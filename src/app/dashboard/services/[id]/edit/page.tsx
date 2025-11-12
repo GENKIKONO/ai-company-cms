@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
 import { HIGButton } from '@/design-system';
 
+import { logger } from '@/lib/log';
 interface Service {
   id: string;
   name: string;
@@ -75,7 +76,7 @@ export default function EditServicePage() {
       });
     } catch (err) {
       setError('サービスの読み込みに失敗しました');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }

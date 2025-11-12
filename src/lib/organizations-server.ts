@@ -1,7 +1,7 @@
 // src/lib/organizations-server.ts
 import { supabaseServer } from '@/lib/supabase-server';
 import { unstable_cache } from 'next/cache';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export type OrgLite = {
   id: string;
@@ -56,7 +56,7 @@ export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
     .select('id,name,slug,status,is_published,logo_url,created_by')
     .order('created_at', { ascending: false });
 
-  console.log('[getCurrentUserOrganization] All organizations:', {
+  logger.info('[getCurrentUserOrganization] All organizations:', {
     count: allOrgs?.length || 0,
     organizations: allOrgs?.map(org => ({
       id: org.id,

@@ -31,7 +31,7 @@ import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
 import { normalizePayload, normalizeDateFields, normalizeForInsert, findEmptyDateFields } from '@/lib/utils/payload-normalizer';
 import { buildOrgInsert } from '@/lib/utils/org-whitelist';
 import { supabaseServer } from '@/lib/supabase-server';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 // デバッグモード判定関数
 function isDebugMode(request: NextRequest): boolean {
@@ -268,7 +268,7 @@ export async function POST(request: NextRequest) {
     logger.debug('[ORG/CREATE] AFTER NORMALIZE', normalizedRawBody);
     
     // サニタイズ前後ログ（PIIマスク）
-    console.info('📥 受信JSON (正規化後):', {
+    logger.info('📥 受信JSON (正規化後):', {
       keys: Object.keys(normalizedRawBody),
       name: normalizedRawBody.name ? `${normalizedRawBody.name.substring(0,2)}***` : normalizedRawBody.name,
       email: normalizedRawBody.email ? normalizedRawBody.email?.replace(/(.{2}).*(@.*)/, '$1***$2') : 'undefined',
@@ -286,7 +286,7 @@ export async function POST(request: NextRequest) {
       
       // サニタイズ後ログ
       const bodyAny = body as any;
-      console.info('📤 バリデーション後 (サニタイズ後):', {
+      logger.info('📤 バリデーション後 (サニタイズ後):', {
         keys: Object.keys(body),
         name: body.name ? `${body.name.substring(0,2)}***` : body.name,
         slug: body.slug || 'UNDEFINED',
@@ -431,7 +431,7 @@ export async function POST(request: NextRequest) {
       }
     });
     
-    console.log('🔍 Final insert data (cleaned):', {
+    logger.info('🔍 Final insert data (cleaned):', {
       keys: Object.keys(organizationData),
       hasEmptyStrings: Object.values(organizationData).some(v => v === ''),
       hasFoundedField: 'founded' in organizationData ? 'PRESENT' : 'ABSENT',
@@ -439,7 +439,7 @@ export async function POST(request: NextRequest) {
       // foundedフィールドはUIに存在しないため処理対象外
     });
 
-    console.log('🔍 Complete organization data for INSERT:', JSON.stringify(organizationData, null, 2));
+    logger.info('🔍 Complete organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
     // 🚀 GPT恒久対策: 空文字の日付フィールドを検出（デバッグ用）
     const emptyDates = findEmptyDateFields(organizationData, ['established_at']);
@@ -452,20 +452,20 @@ export async function POST(request: NextRequest) {
       dateFields: ['established_at'], // DBにある日付カラムを列挙
     });
 
-    console.log('🔍 Normalized organization data for INSERT:', JSON.stringify(organizationData, null, 2));
+    logger.info('🔍 Normalized organization data for INSERT:', JSON.stringify(organizationData, null, 2));
 
     // 🚨 最終ガード: normalizeForInsert後でも空文字が残っている場合の緊急対応
     const dateFieldsToCheck = ['established_at'];
     dateFieldsToCheck.forEach(field => {
       if (organizationData[field] === '') {
-        console.error(`🚨 EMERGENCY: ${field} still contains empty string after normalization!`);
+        logger.error(`🚨 EMERGENCY: ${field} still contains empty string after normalization!`);
         organizationData[field] = null; // 強制的にnullに変換
         logger.debug('Debug', `🔧 FIXED: ${field} forced to null`);
       }
     });
 
     // 最終データ確認ログ
-    console.log('🔍 FINAL organization data for INSERT (after emergency guard):', JSON.stringify(organizationData, null, 2));
+    logger.info('🔍 FINAL organization data for INSERT (after emergency guard):', JSON.stringify(organizationData, null, 2));
 
     // ✅ 最終ガード：日付は空文字の可能性が少しでもあれば null を明示して送る
     const finalGuardDateFields = ['established_at']; // 必要に応じて他のDATE型も追記
@@ -473,7 +473,7 @@ export async function POST(request: NextRequest) {
       const v = (organizationData as any)[f];
       if (v === '' || v === undefined) {
         (organizationData as any)[f] = null;   // ← キーを削除せず null を明示
-        console.log(`🔧 [FINAL GUARD] Set ${f} to null (was: ${JSON.stringify(v)})`);
+        logger.info(`🔧 [FINAL GUARD] Set ${f} to null (was: ${JSON.stringify(v)})`);
       }
     }
 
@@ -717,20 +717,20 @@ export async function PUT(request: NextRequest) {
       dateFields: ['established_at'], // DBにある日付カラムを列挙
     });
 
-    console.log('🔍 Normalized update data:', JSON.stringify(updateData, null, 2));
+    logger.info('🔍 Normalized update data:', JSON.stringify(updateData, null, 2));
 
     // 🚨 最終ガード: UPDATE時も空文字が残っている場合の緊急対応
     const updateDateFieldsToCheck = ['established_at'];
     updateDateFieldsToCheck.forEach(field => {
       if (updateData[field] === '') {
-        console.error(`🚨 UPDATE EMERGENCY: ${field} still contains empty string after normalization!`);
+        logger.error(`🚨 UPDATE EMERGENCY: ${field} still contains empty string after normalization!`);
         updateData[field] = null; // 強制的にnullに変換
         logger.debug('Debug', `🔧 UPDATE FIXED: ${field} forced to null`);
       }
     });
 
     // 最終データ確認ログ
-    console.log('🔍 FINAL update data (after emergency guard):', JSON.stringify(updateData, null, 2));
+    logger.info('🔍 FINAL update data (after emergency guard):', JSON.stringify(updateData, null, 2));
 
     // 機能フラグ: 保存=公開の強制適用
     if (PUBLISH_ON_SAVE) {
@@ -818,7 +818,7 @@ export async function PUT(request: NextRequest) {
       revalidateTag(`org:${existingOrg.id}`);
       revalidateTag(`org:${user.id}`); // ユーザーベースも保持
       
-      console.log('[VERIFY] org-save', { 
+      logger.info('[VERIFY] org-save', { 
         payload: updatePayload, 
         saved: data, 
         fresh: finalData, 

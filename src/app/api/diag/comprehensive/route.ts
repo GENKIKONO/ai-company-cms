@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logger } from '@/lib/log';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -212,7 +213,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Comprehensive diagnostic failed:', error);
+    logger.error('Comprehensive diagnostic failed:', error);
     
     return NextResponse.json({
       success: false,

@@ -12,6 +12,7 @@ import { FeatureMatrixRow } from './FeatureMatrixRow';
 import { FeatureMatrixActions } from './FeatureMatrixActions';
 import { HIGButton } from '@/components/ui/HIGButton';
 
+import { logger } from '@/lib/log';
 const PLAN_COLUMNS: { key: PlanType; label: string }[] = [
   { key: 'starter', label: 'Starter' },
   { key: 'pro', label: 'Pro' },
@@ -39,7 +40,7 @@ export function PlanFeatureMatrix() {
         setMatrixData(formattedData);
         setOriginalData(JSON.parse(JSON.stringify(formattedData))); // deep copy
       } catch (error) {
-        console.error('Error fetching feature data:', error);
+        logger.error('Error fetching feature data:', error);
         toast.error('データの取得に失敗しました');
       } finally {
         setIsLoading(false);
@@ -139,7 +140,7 @@ export function PlanFeatureMatrix() {
       setOriginalData(JSON.parse(JSON.stringify(matrixData))); // deep copy
       
     } catch (error) {
-      console.error('Error saving data:', error);
+      logger.error('Error saving data:', error);
       toast.error('保存に失敗しました');
     } finally {
       setIsSaving(false);

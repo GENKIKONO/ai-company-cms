@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateOrganizationJsonLd } from '@/lib/json-ld';
 import { generateIframeHtml } from '@/lib/embed/html-template';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export const dynamic = 'force-dynamic';
 
@@ -189,7 +189,7 @@ export async function GET(
         <p>企業情報の読み込み中にエラーが発生しました。しばらく後に再度お試しください。</p>
     </div>
     <script>
-        console.error('LuxuCare Iframe Error:', ${JSON.stringify(error.message)});
+        logger.error('LuxuCare Iframe Error:', ${JSON.stringify(error.message)});
     </script>
 </body>
 </html>`;

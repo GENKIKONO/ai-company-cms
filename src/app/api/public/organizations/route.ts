@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+import { logger } from '@/lib/log';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,7 @@ export const dynamic = 'force-dynamic';
  * 公開組織一覧を取得（JOINなし・2段階取得版）
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  console.log('[public/organizations] called');
+  logger.info('[public/organizations] called');
 
   try {
     // Supabase Public Client（anon key使用）
@@ -49,16 +50,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .eq('is_published', true)
       .order('created_at', { ascending: false });
 
-    console.log('[public/organizations] orgs:', orgData?.length || 0);
+    logger.info('[public/organizations] orgs:', orgData?.length || 0);
 
     if (orgError) {
-      console.error('[public/organizations] organizations query error:', orgError);
+      logger.error('[public/organizations] organizations query error:', orgError);
       throw new Error(`Organizations query failed: ${orgError.message}`);
     }
 
     // 0件でも200を返す
     if (!orgData || orgData.length === 0) {
-      console.log('[public/organizations] no organizations found, returning empty result');
+      logger.info('[public/organizations] no organizations found, returning empty result');
       return NextResponse.json({
         data: [],
         meta: {
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // LuxuCare検出ログ
     const hasLuxuCare = orgData.some(o => o.id === 'c53b7fae-1ae3-48f4-98c1-5c3217f9fbb3');
     if (hasLuxuCare) {
-      console.log('[public/organizations] has LuxuCare: true');
+      logger.info('[public/organizations] has LuxuCare: true');
     }
 
     // Step 2: Organization IDsを抽出
@@ -100,13 +101,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .in('organization_id', organizationIds);
 
       if (servicesError) {
-        console.warn('[public/organizations] services query failed:', servicesError.message);
+        logger.warn('[public/organizations] services query failed:', servicesError.message);
         servicesData = [];
       } else {
         servicesData = services || [];
       }
     } catch (error) {
-      console.warn('[public/organizations] services query error:', error);
+      logger.warn('[public/organizations] services query error:', error);
       servicesData = [];
     }
 
@@ -118,13 +119,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .in('organization_id', organizationIds);
 
       if (caseStudiesError) {
-        console.warn('[public/organizations] case studies query failed:', caseStudiesError.message);
+        logger.warn('[public/organizations] case studies query failed:', caseStudiesError.message);
         caseStudiesData = [];
       } else {
         caseStudiesData = caseStudies || [];
       }
     } catch (error) {
-      console.warn('[public/organizations] case studies query error:', error);
+      logger.warn('[public/organizations] case studies query error:', error);
       caseStudiesData = [];
     }
 
@@ -173,7 +174,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
 
   } catch (error) {
-    console.error('[public/organizations] API Error:', error);
+    logger.error('[public/organizations] API Error:', error);
     
     return NextResponse.json({
       error: 'Internal server error',

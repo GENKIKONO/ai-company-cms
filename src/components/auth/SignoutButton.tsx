@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 interface SignoutButtonProps {
   className?: string;
@@ -32,7 +32,7 @@ export default function SignoutButton({ className, children, onClick }: SignoutB
         router.push('/');
         router.refresh(); // Server Componentを更新
       } else {
-        console.error('Signout failed:', await response.text());
+        logger.error('Signout failed:', await response.text());
         alert('ログアウトに失敗しました');
       }
     } catch (error) {

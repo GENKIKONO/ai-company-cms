@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logger } from '@/lib/log';
 interface PerformanceMetrics {
   path: string;
   method: string;
@@ -78,7 +79,7 @@ function recordMetrics(metrics: PerformanceMetrics): void {
 
   // 遅いリクエストの警告
   if (metrics.responseTime > 1000) {
-    console.warn(`🐌 Slow request: ${metrics.method} ${metrics.path} - ${metrics.responseTime}ms`);
+    logger.warn(`🐌 Slow request: ${metrics.method} ${metrics.path} - ${metrics.responseTime}ms`);
   }
 }
 

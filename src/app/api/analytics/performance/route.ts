@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 // 認証は動的インポートで処理
 
 interface PerformanceData {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     // ログ出力（本番環境では構造化ログに送信）
     if (issues.length > 0) {
-      console.warn('Performance issues detected:', {
+      logger.warn('Performance issues detected:', {
         page,
         userId,
         score: webVitalsScore.score,
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         timestamp: new Date(data.timestamp).toISOString()
       });
     } else {
-      console.info('Performance data received:', {
+      logger.info('Performance data received:', {
         page,
         userId,
         score: webVitalsScore.score,

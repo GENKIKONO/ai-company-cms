@@ -65,9 +65,9 @@ export async function POST(request: NextRequest) {
     };
 
     if (event === 'ab_test_assignment') {
-      console.info('A/B Test Assignment:', logData);
+      logger.info('A/B Test Assignment', { component: 'ab-test', data: logData });
     } else if (event === 'ab_test_conversion') {
-      console.info('A/B Test Conversion:', logData);
+      logger.info('A/B Test Conversion', { component: 'ab-test', data: logData });
     }
 
     // 分析データの保存（実際の実装では外部ストレージに保存）
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('A/B Test API error:', error);
+    logger.error('A/B Test API error', { component: 'ab-test', error: error.message });
     
     return NextResponse.json(
       { 
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('A/B Test stats API error:', error);
+    logger.error('A/B Test stats API error', { component: 'ab-test', error: error.message });
     
     return NextResponse.json(
       { 
@@ -154,12 +154,13 @@ async function saveABTestEvent(eventData: any): Promise<void> {
   
   try {
     // 将来的にはSupabaseやBigQueryなどに保存
-    console.log('A/B Test Event Saved:', {
+    logger.info('A/B Test Event Saved', { 
+      component: 'ab-test',
       timestamp: new Date().toISOString(),
       ...eventData
     });
   } catch (error) {
-    console.error('Failed to save A/B test event:', error);
+    logger.error('Failed to save A/B test event', { component: 'ab-test', error: error.message });
   }
 }
 
@@ -185,7 +186,7 @@ async function notifyHighValueConversion(data: {
       currency: 'JPY'
     });
   } catch (error) {
-    console.error('Failed to send Slack notification:', error);
+    logger.error('Failed to send Slack notification', { component: 'ab-test', error: error.message });
   }
 }
 

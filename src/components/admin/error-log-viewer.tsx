@@ -15,6 +15,7 @@
 import { useState, useEffect } from 'react';
 import { ErrorType, ErrorSeverity } from '@/lib/error-handling';
 
+import { logger } from '@/lib/log';
 // エラーログエントリの型定義
 interface ErrorLogEntry {
   id: string;
@@ -132,7 +133,7 @@ export default function ErrorLogViewer() {
 
       setErrorLogs(filteredLogs);
     } catch (error) {
-      console.error('Failed to load error logs:', error);
+      logger.error('Failed to load error logs:', error);
     } finally {
       setIsLoading(false);
     }

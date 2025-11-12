@@ -12,7 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 import { AppError, ErrorType, ErrorSeverity } from '@/lib/error-handling';
 
 // エラーログエントリの型定義
@@ -67,7 +67,7 @@ async function persistErrorLog(errorEntry: ErrorLogEntry): Promise<void> {
       });
 
       // 将来的なアラート通知（Slack, Discord, メール等）の実装ポイント
-      console.error('🚨 CRITICAL FRONTEND ERROR DETECTED:', {
+      logger.error('🚨 CRITICAL FRONTEND ERROR DETECTED:', {
         message: errorEntry.error.message,
         component: errorEntry.context.component,
         url: errorEntry.context.url

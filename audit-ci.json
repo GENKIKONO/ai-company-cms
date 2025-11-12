@@ -1,0 +1,23 @@
+{
+  "low": true,
+  "moderate": true,
+  "high": true,
+  "critical": true,
+  "report-type": "summary",
+  "allowlist": [
+  ],
+  "advisories": [
+  ],
+  "whitelist": [
+  ],
+  "path-whitelist": [
+    "dev"
+  ],
+  "show-found": true,
+  "show-not-found": false,
+  "retry": {
+    "count": 2,
+    "delay": 5000
+  },
+  "output-format": "table"
+}

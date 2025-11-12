@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import type { MonthlyReport } from '@/types/database';
 
+import { logger } from '@/lib/log';
 interface ReportsResponse {
   success: boolean;
   data: MonthlyReport[];
@@ -45,7 +46,7 @@ export default function ReportsPage() {
       setReports(data.data || []);
       setPagination(data.pagination);
     } catch (error) {
-      console.error('Error fetching reports:', error);
+      logger.error('Error fetching reports:', error);
       toast.error('レポートの取得に失敗しました');
     } finally {
       setLoading(false);
@@ -77,7 +78,7 @@ export default function ReportsPage() {
       await fetchReports();
       
     } catch (error) {
-      console.error('Error generating report:', error);
+      logger.error('Error generating report:', error);
       if (error instanceof Error) {
         toast.error(error.message);
       } else {

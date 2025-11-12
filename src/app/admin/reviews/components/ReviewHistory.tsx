@@ -14,6 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 import type { ReviewAuditWithDetails, ReviewAction, ReviewStatus } from '@/lib/types/review';
 
+import { logger } from '@/lib/log';
 interface ReviewHistoryProps {
   organizationId: string;
   organizationName: string;
@@ -42,7 +43,7 @@ export default function ReviewHistory({
       const data = await response.json();
       setHistory(data.data || []);
     } catch (err) {
-      console.error('Error fetching review history:', err);
+      logger.error('Error fetching review history:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       toast.error('審査履歴の取得に失敗しました');
     } finally {

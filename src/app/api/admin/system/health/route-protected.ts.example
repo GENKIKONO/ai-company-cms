@@ -1,0 +1,281 @@
+/* eslint-disable no-console */
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
+import { withAdminProtection } from '@/lib/security/admin-protection';
+import type { SystemHealth, ComponentHealth, ExternalServiceHealth } from '@/lib/monitoring/types';
+
+// 元のハンドラー関数
+async function systemHealthHandler(request: NextRequest): Promise<NextResponse> {
+  try {
+    const supabase = await supabaseServer();
+    
+    // 管理者権限チェックは withAdminProtection で実行済み
+    // 直接ヘルスチェックを実行
+    const healthData = await performSystemHealthCheck();
+
+    logger.info('[System Health] Health check requested', {
+      adminUser: 'authenticated',
+      timestamp: new Date().toISOString()
+    });
+
+    return NextResponse.json({
+      status: 'success',
+      data: healthData,
+      timestamp: new Date().toISOString(),
+      protectionLevel: 'admin'
+    });
+
+  } catch (error) {
+    logger.error('[System Health] Health check failed', error);
+    return NextResponse.json(
+      { error: 'Health check failed' },
+      { status: 500 }
+    );
+  }
+}
+
+// システムヘルスチェック実行
+async function performSystemHealthCheck(): Promise<SystemHealth> {
+  const startTime = Date.now();
+  
+  try {
+    // 1. データベース接続チェック
+    const dbHealth = await checkDatabaseHealth();
+    
+    // 2. 外部サービス接続チェック
+    const externalServices = await checkExternalServices();
+    
+    // 3. システムリソースチェック
+    const systemResources = await checkSystemResources();
+    
+    // 4. セキュリティチェック
+    const securityStatus = await checkSecurityStatus();
+
+    const endTime = Date.now();
+    const responseTime = endTime - startTime;
+
+    const overallStatus = determineOverallStatus([
+      dbHealth,
+      ...externalServices,
+      systemResources,
+      securityStatus
+    ]);
+
+    return {
+      status: overallStatus.status,
+      timestamp: new Date().toISOString(),
+      responseTime,
+      components: {
+        database: dbHealth,
+        externalServices,
+        systemResources,
+        security: securityStatus
+      },
+      summary: {
+        total: 4 + externalServices.length,
+        healthy: [dbHealth, ...externalServices, systemResources, securityStatus]
+          .filter(c => c.status === 'healthy').length,
+        degraded: [dbHealth, ...externalServices, systemResources, securityStatus]
+          .filter(c => c.status === 'degraded').length,
+        unhealthy: [dbHealth, ...externalServices, systemResources, securityStatus]
+          .filter(c => c.status === 'unhealthy').length
+      }
+    };
+  } catch (error) {
+    logger.error('[System Health] Health check error', error);
+    return {
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      responseTime: Date.now() - startTime,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      components: {},
+      summary: { total: 0, healthy: 0, degraded: 0, unhealthy: 1 }
+    };
+  }
+}
+
+async function checkDatabaseHealth(): Promise<ComponentHealth> {
+  try {
+    const supabase = await supabaseServer();
+    const start = Date.now();
+    
+    // 簡単なクエリでデータベース接続テスト
+    await supabase.from('profiles').select('count').limit(1);
+    
+    const responseTime = Date.now() - start;
+    
+    return {
+      name: 'Database',
+      status: responseTime < 1000 ? 'healthy' : 'degraded',
+      responseTime,
+      details: {
+        connectionStatus: 'connected',
+        responseTime
+      }
+    };
+  } catch (error) {
+    return {
+      name: 'Database',
+      status: 'unhealthy',
+      responseTime: 0,
+      error: error instanceof Error ? error.message : 'Database connection failed',
+      details: {
+        connectionStatus: 'failed'
+      }
+    };
+  }
+}
+
+async function checkExternalServices(): Promise<ExternalServiceHealth[]> {
+  const services = [
+    { name: 'Stripe', url: 'https://api.stripe.com/healthcheck' },
+    { name: 'Resend', url: 'https://api.resend.com/health' }
+  ];
+
+  const results = await Promise.allSettled(
+    services.map(async (service) => {
+      try {
+        const start = Date.now();
+        const response = await fetch(service.url, {
+          method: 'GET',
+          headers: { 'User-Agent': 'AIOHub-HealthCheck/1.0' },
+          signal: AbortSignal.timeout(5000) // 5秒タイムアウト
+        });
+        
+        const responseTime = Date.now() - start;
+        
+        return {
+          name: service.name,
+          status: response.ok ? 'healthy' : 'degraded' as const,
+          responseTime,
+          details: {
+            httpStatus: response.status,
+            url: service.url
+          }
+        };
+      } catch (error) {
+        return {
+          name: service.name,
+          status: 'unhealthy' as const,
+          responseTime: 0,
+          error: error instanceof Error ? error.message : 'Service unreachable',
+          details: {
+            url: service.url
+          }
+        };
+      }
+    })
+  );
+
+  return results.map((result, index) => 
+    result.status === 'fulfilled' 
+      ? result.value 
+      : {
+          name: services[index].name,
+          status: 'unhealthy' as const,
+          responseTime: 0,
+          error: 'Health check failed',
+          details: { url: services[index].url }
+        }
+  );
+}
+
+async function checkSystemResources(): Promise<ComponentHealth> {
+  try {
+    // Node.jsプロセスのメモリ使用量チェック
+    const memUsage = process.memoryUsage();
+    const memUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
+    const memTotalMB = Math.round(memUsage.heapTotal / 1024 / 1024);
+    
+    // 簡易的な評価（80%以上で degraded）
+    const memUsagePercent = (memUsedMB / memTotalMB) * 100;
+    const status = memUsagePercent > 80 ? 'degraded' : 'healthy';
+    
+    return {
+      name: 'System Resources',
+      status,
+      responseTime: 0,
+      details: {
+        memory: {
+          used: `${memUsedMB}MB`,
+          total: `${memTotalMB}MB`,
+          percentage: `${memUsagePercent.toFixed(1)}%`
+        },
+        uptime: `${Math.floor(process.uptime())}s`
+      }
+    };
+  } catch (error) {
+    return {
+      name: 'System Resources',
+      status: 'unhealthy',
+      responseTime: 0,
+      error: error instanceof Error ? error.message : 'Resource check failed'
+    };
+  }
+}
+
+async function checkSecurityStatus(): Promise<ComponentHealth> {
+  try {
+    const checks = [];
+    
+    // 環境変数の設定チェック
+    const requiredEnvVars = [
+      'NEXT_PUBLIC_SUPABASE_URL',
+      'SUPABASE_SERVICE_ROLE_KEY',
+      'ADMIN_API_SECRET_KEY'
+    ];
+    
+    const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+    
+    // HTTPS強制チェック（本番環境）
+    const httpsEnforced = process.env.NODE_ENV === 'production' 
+      ? process.env.FORCE_HTTPS === 'true'
+      : true;
+    
+    const securityScore = 100 - (missingEnvVars.length * 20) - (httpsEnforced ? 0 : 30);
+    const status = securityScore >= 80 ? 'healthy' : securityScore >= 60 ? 'degraded' : 'unhealthy';
+    
+    return {
+      name: 'Security',
+      status,
+      responseTime: 0,
+      details: {
+        securityScore: `${securityScore}/100`,
+        httpsEnforced,
+        missingEnvVars: missingEnvVars.length,
+        lastSecurityUpdate: new Date().toISOString()
+      }
+    };
+  } catch (error) {
+    return {
+      name: 'Security',
+      status: 'unhealthy',
+      responseTime: 0,
+      error: error instanceof Error ? error.message : 'Security check failed'
+    };
+  }
+}
+
+function determineOverallStatus(components: ComponentHealth[]): ComponentHealth {
+  const unhealthyCount = components.filter(c => c.status === 'unhealthy').length;
+  const degradedCount = components.filter(c => c.status === 'degraded').length;
+  
+  if (unhealthyCount > 0) {
+    return { name: 'Overall', status: 'unhealthy', responseTime: 0 };
+  } else if (degradedCount > 0) {
+    return { name: 'Overall', status: 'degraded', responseTime: 0 };
+  } else {
+    return { name: 'Overall', status: 'healthy', responseTime: 0 };
+  }
+}
+
+// 保護された管理者API（署名検証、レート制限、IP制限）
+export const GET = withAdminProtection(systemHealthHandler, {
+  requireSignature: true,
+  maxRequestsPerHour: 60,  // システムヘルスは頻繁にチェックされる可能性
+  maxRequestsPerDay: 1000,
+  allowedIPs: process.env.ADMIN_ALLOWED_IPS?.split(',') || [],
+  logSensitiveData: false,
+  requireDoubleAuth: false  // ヘルスチェックには不要
+});

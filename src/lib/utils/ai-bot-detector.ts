@@ -1,3 +1,5 @@
+import { logger } from '@/lib/log';
+
 /**
  * AI Bot Detection Utility
  * AI/検索クローラのUser-Agentを判定してボット種別を返す
@@ -27,16 +29,16 @@ const AI_BOT_PATTERNS = [
  * User-AgentからAI Botを検知
  */
 export function detectAIBot(userAgent: string): BotDetectionResult {
-  console.log('🔍 [AI Bot Detection] Analyzing User-Agent:', userAgent);
+  logger.info('🔍 [AI Bot Detection] Analyzing User-Agent:', userAgent);
   
   if (!userAgent) {
-    console.log('❌ [AI Bot Detection] No User-Agent provided');
+    logger.info('❌ [AI Bot Detection] No User-Agent provided');
     return { isBot: false, botName: null, category: null };
   }
 
   for (const bot of AI_BOT_PATTERNS) {
     if (bot.pattern.test(userAgent)) {
-      console.log('✅ [AI Bot Detection] Bot detected:', { 
+      logger.info('✅ [AI Bot Detection] Bot detected:', { 
         name: bot.name, 
         category: bot.category, 
         pattern: bot.pattern.toString(),
@@ -50,7 +52,7 @@ export function detectAIBot(userAgent: string): BotDetectionResult {
     }
   }
 
-  console.log('❌ [AI Bot Detection] No bot pattern matched for:', userAgent);
+  logger.info('❌ [AI Bot Detection] No bot pattern matched for:', userAgent);
   return { isBot: false, botName: null, category: null };
 }
 
@@ -73,7 +75,7 @@ export function extractBotInfoFromHeaders(headers: any): BotDetectionResult {
     }
   } catch (error) {
     // ヘッダー取得に失敗した場合はデフォルトを返す
-    console.warn('Failed to extract user-agent from headers:', error);
+    logger.warn('Failed to extract user-agent from headers:', error);
   }
   
   return detectAIBot(userAgent);
@@ -109,7 +111,7 @@ export function extractClientIP(headers: any): string | null {
     }
   } catch (error) {
     // ヘッダー取得に失敗した場合はnullを返す
-    console.warn('Failed to extract IP from headers:', error);
+    logger.warn('Failed to extract IP from headers:', error);
     return null;
   }
 

@@ -7,6 +7,11 @@ import { PLAN_LIMITS } from '@/config/plans';
 import type { Organization } from '@/types/database';
 import { HIGButton } from '@/design-system';
 import { logger } from '@/lib/utils/logger';
+import { 
+  fetchActiveCheckoutForOrg, 
+  calculateDiscountedPrice,
+  getCampaignDescription
+} from '@/lib/utils/checkout-helpers';
 
 interface BillingData {
   organization: Organization;
@@ -16,6 +21,13 @@ interface BillingData {
     case_studies: number;
     faqs: number;
   };
+  checkoutInfo?: {
+    stripe_price_id: string;
+    stripe_checkout_url: string | null;
+    discount_rate: number;
+    campaign_type: string;
+    is_fallback?: boolean;
+  } | null;
 }
 
 export default function BillingPage() {
@@ -63,6 +75,9 @@ export default function BillingPage() {
         supabase.from('faqs').select('id', { count: 'exact' }).eq('organization_id', org.id),
       ]);
 
+      // キャンペーン情報を取得
+      const checkoutInfo = await fetchActiveCheckoutForOrg('starter', org);
+
       setData({
         organization: org,
         currentCounts: {
@@ -71,6 +86,7 @@ export default function BillingPage() {
           case_studies: caseStudiesRes.count || 0,
           faqs: faqsRes.count || 0,
         },
+        checkoutInfo,
       });
     } catch (error) {
       logger.error('Failed to fetch billing data', error instanceof Error ? error : new Error(String(error)));
@@ -87,6 +103,14 @@ export default function BillingPage() {
   async function handleSubscribe() {
     try {
       setActionLoading(true);
+      
+      // アクティブなチェックアウトリンクがある場合はそれを使用
+      if (data?.checkoutInfo?.stripe_checkout_url) {
+        window.location.href = data.checkoutInfo.stripe_checkout_url;
+        return;
+      }
+      
+      // フォールバック：従来のAPI経由でチェックアウト作成
       const response = await fetch('/api/billing/checkout', {
         method: 'POST',
       });
@@ -174,11 +198,17 @@ export default function BillingPage() {
     );
   }
 
-  const { organization, currentCounts } = data;
+  const { organization, currentCounts, checkoutInfo } = data;
   const currentPlan = organization.plan || 'trial';
   const limits = getPlanLimits(currentPlan);
   const isActive = organization.subscription_status === 'active' || organization.subscription_status === 'trialing';
   const canUpgrade = !isActive || currentPlan === 'trial';
+  
+  // キャンペーン情報表示用
+  const originalPrice = 2980; // Starterプラン基本価格（税別）
+  const discountedPrice = checkoutInfo ? calculateDiscountedPrice(originalPrice, checkoutInfo.discount_rate) : originalPrice;
+  const campaignDescription = checkoutInfo ? getCampaignDescription(checkoutInfo.campaign_type) : '';
+  const hasDiscount = checkoutInfo && checkoutInfo.discount_rate > 0;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -263,14 +293,38 @@ export default function BillingPage() {
         {/* Action Buttons */}
         <div className="mt-6 pt-6 border-t border-gray-200 flex gap-4">
           {canUpgrade ? (
-            <HIGButton
-              onClick={handleSubscribe}
-              disabled={actionLoading}
-              variant="primary"
-              size="lg"
-            >
-              {actionLoading ? '処理中...' : 'Starterプランで購読 (¥2,980/月)'}
-            </HIGButton>
+            <div className="flex flex-col gap-3">
+              {hasDiscount && (
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                  <div className="text-sm font-medium text-blue-800 mb-1">🎉 特別キャンペーン適用</div>
+                  <div className="text-sm text-blue-700">{campaignDescription}</div>
+                  {checkoutInfo?.is_fallback && (
+                    <div className="text-xs text-blue-600 mt-1">※ 通常価格でのご案内となります</div>
+                  )}
+                </div>
+              )}
+              <HIGButton
+                onClick={handleSubscribe}
+                disabled={actionLoading}
+                variant="primary"
+                size="lg"
+              >
+                {actionLoading ? '処理中...' : (
+                  hasDiscount ? 
+                    `Starterプランで購読 (¥${discountedPrice.toLocaleString()}/月)` :
+                    'Starterプランで購読 (¥2,980/月)'
+                )}
+              </HIGButton>
+              {hasDiscount && !checkoutInfo?.is_fallback && (
+                <div className="text-sm text-gray-500">
+                  <span className="line-through">¥{originalPrice.toLocaleString()}/月</span>
+                  <span className="ml-2 text-green-600 font-medium">¥{discountedPrice.toLocaleString()}/月</span>
+                  <span className="ml-2 bg-red-100 text-red-800 px-2 py-1 rounded text-xs">
+                    {checkoutInfo?.discount_rate}%OFF
+                  </span>
+                </div>
+              )}
+            </div>
           ) : (
             <button
               onClick={handleManageBilling}

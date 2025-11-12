@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { createError, errorToResponse } from '@/lib/error-handler';
 import crypto from 'crypto';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export async function GET(
   request: NextRequest,
@@ -13,7 +13,7 @@ export async function GET(
   const resolvedParams = await params;
   
   try {
-    console.log('[Public Post API Request Started]', {
+    logger.info('[Public Post API Request Started]', {
       requestId,
       slug: resolvedParams.slug,
       postId: resolvedParams.postId,
@@ -101,7 +101,7 @@ export async function GET(
 
     const queryDuration = Date.now() - queryStart;
     if (queryDuration > 1000) {
-      console.warn(`[Slow Query] Database query took ${queryDuration}ms for post ${postId}`);
+      logger.warn(`[Slow Query] Database query took ${queryDuration}ms for post ${postId}`);
     }
 
     if (error) {
@@ -128,7 +128,7 @@ export async function GET(
         const userAgent = request.headers.get('user-agent') || '';
         const referer = request.headers.get('referer') || '';
         
-        console.log(`Post view: ${post.title} (${postId}) - Org: ${post.organization?.name} - UA: ${userAgent} - Ref: ${referer}`);
+        logger.info(`Post view: ${post.title} (${postId}) - Org: ${post.organization?.name} - UA: ${userAgent} - Ref: ${referer}`);
         
         // TODO: Add view tracking to posts table if needed
         // await supabase

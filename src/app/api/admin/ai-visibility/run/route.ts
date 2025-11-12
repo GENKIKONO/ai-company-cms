@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { updateLastCheck } from '@/lib/ai-visibility-config';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 // Error message translation mapping
 function translateIssue(issue: string): string {
@@ -136,7 +136,7 @@ async function runAIVisibilityCheck(urls: string[], isDryRun: boolean) {
         // Rate limiting to avoid overwhelming the server
         await new Promise(resolve => setTimeout(resolve, 100));
       } catch (error) {
-        console.error(`Error checking ${url} with ${userAgent}:`, error);
+        logger.error(`Error checking ${url} with ${userAgent}:`, error);
         results.push({
           url,
           userAgent,

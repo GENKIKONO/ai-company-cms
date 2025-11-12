@@ -6,6 +6,7 @@
 
 import React from 'react';
 
+import { logger } from '@/lib/log';
 export interface IconProps {
   size?: number;
   className?: string;
@@ -386,7 +387,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps & { name: string }
     const IconComponent = icons[name];
     
     if (!IconComponent) {
-      console.warn(`Icon "${name}" not found`);
+      logger.warn(`Icon "${name}" not found`);
       return null;
     }
     

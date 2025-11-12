@@ -29,8 +29,9 @@ export default async function SafeAuthHeader() {
     }
 
     // Client Componentにデータを渡してレンダリング
+    // Note: ClientAuthHeader will use Supabase hooks to get the full user object
     return <ClientAuthHeader 
-      initialUser={user} 
+      initialUser={null} 
       initialHasOrganization={hasOrganization} 
       initialIsAdmin={isAdmin}
     />;

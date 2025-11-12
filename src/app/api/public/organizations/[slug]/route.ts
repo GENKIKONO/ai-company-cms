@@ -2,7 +2,7 @@
 // 組織の公開情報とコンテンツを取得
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer, supabaseAdmin } from '@/lib/supabase-server';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 import { detectAIBot, extractBotInfoFromHeaders, shouldLogBot, extractClientIP } from '@/lib/utils/ai-bot-detector';
 import { logAIBotAccess } from '@/lib/utils/ai-bot-logger';
 
@@ -37,7 +37,7 @@ export async function GET(
       .single();
 
     if (orgError || !organization) {
-      console.warn(`[API] Organization not found for slug: ${slug}`, orgError);
+      logger.warn(`[API] Organization not found for slug: ${slug}`, orgError);
       return NextResponse.json(
         { error: 'Organization not found' },
         { status: 404 }
@@ -46,7 +46,7 @@ export async function GET(
 
     // Store orgId for bot logging
     orgId = organization.id;
-    console.log(`[API] Found organization: ${organization.name} (ID: ${organization.id})`);
+    logger.info(`[API] Found organization: ${organization.name} (ID: ${organization.id})`);
 
     // 公開されたコンテンツを並行取得
     const [postsResult, servicesResult, caseStudiesResult, faqsResult] = await Promise.all([

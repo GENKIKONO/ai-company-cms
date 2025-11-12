@@ -14,6 +14,7 @@ import {
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/utils/logger';
+import { fetchActiveCheckoutLink } from '@/lib/billing/campaign';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -65,8 +66,35 @@ export async function POST(request: NextRequest) {
       return notFoundError('Organization');
     }
 
+    // キャンペーン対応のチェックアウトリンクを取得
+    const checkoutInfo = await fetchActiveCheckoutLink('starter', organization);
+    
+    if (checkoutInfo?.stripe_checkout_url) {
+      // アクティブなチェックアウトリンクがある場合はそれを返す
+      logger.info('Using active campaign checkout link', {
+        orgId: organization.id,
+        campaignType: checkoutInfo.campaign_type,
+        discountRate: checkoutInfo.discount_rate,
+        isFallback: checkoutInfo.is_fallback
+      });
+      
+      return NextResponse.json(
+        { url: checkoutInfo.stripe_checkout_url },
+        {
+          headers: {
+            'Cache-Control': 'no-store, must-revalidate'
+          }
+        }
+      );
+    }
+
+    // フォールバック：従来のチェックアウト作成プロセス
+    logger.warn('No active checkout link found, falling back to dynamic creation', {
+      orgId: organization.id
+    });
+
     // Check if required environment variables are set - use unified basic price ID
-    const priceId = env.STRIPE_BASIC_PRICE_ID;
+    const priceId = checkoutInfo?.stripe_price_id || env.STRIPE_BASIC_PRICE_ID;
     if (!priceId) {
       return createErrorResponse('MISSING_CONFIG', 'Subscription plan not configured', 400);
     }

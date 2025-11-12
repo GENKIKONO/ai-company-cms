@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logger } from '@/lib/log';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
         images: ImageOptimizationStats.getStats()
       };
     } catch (error) {
-      console.warn('Failed to get performance stats:', error);
+      logger.warn('Failed to get performance stats:', error);
     }
 
     // ヘルスチェック
@@ -208,7 +209,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Monitoring API failed:', error);
+    logger.error('Monitoring API failed:', error);
     
     return NextResponse.json({
       success: false,

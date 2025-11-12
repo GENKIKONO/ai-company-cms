@@ -13,7 +13,7 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 interface Props {
   children: ReactNode;
@@ -49,8 +49,8 @@ export class AppErrorBoundary extends Component<Props, State> {
 
     // 開発環境ではコンソールにも出力
     if (process.env.NODE_ENV === 'development') {
-      console.error('AppErrorBoundary Error:', error);
-      console.error('Component Stack:', errorInfo.componentStack);
+      logger.error('AppErrorBoundary Error:', error);
+      logger.error('Component Stack:', errorInfo.componentStack);
     }
   }
 
@@ -85,13 +85,13 @@ export class AppErrorBoundary extends Component<Props, State> {
           body: JSON.stringify(errorData),
         }).catch(fetchError => {
           // 監視システムへの送信失敗はサイレントに処理
-          console.warn('Failed to send error to monitoring system:', fetchError);
+          logger.warn('Failed to send error to monitoring system:', fetchError);
         });
       }
 
     } catch (monitoringError) {
       // 監視システム自体でエラーが発生してもメインエラーハンドリングに影響させない
-      console.warn('Error monitoring system failed:', monitoringError);
+      logger.warn('Error monitoring system failed:', monitoringError);
     }
   }
 

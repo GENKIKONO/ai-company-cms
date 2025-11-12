@@ -1,3 +1,5 @@
+import { logger } from '@/lib/log';
+
 /**
  * JSON-LD 構造化データの動的生成
  * 
@@ -118,7 +120,7 @@ function getOfferDescription(planType: UnifiedPlanType): string {
  * 汎用的な価格整合性チェック（開発時デバッグ用）
  */
 export function validateJsonLDPricing(): boolean {
-  console.log('🔍 JSON-LD 価格整合性チェック開始');
+  logger.info('🔍 JSON-LD 価格整合性チェック開始');
   
   const aioJsonLD = generateAIOPricingJsonLD();
   const offers = aioJsonLD.offers;
@@ -136,15 +138,15 @@ export function validateJsonLDPricing(): boolean {
     if (planEntry) {
       const [planType, config] = planEntry;
       if (config.price !== offerPrice) {
-        console.error(`❌ 価格不整合: ${offerName} JSON-LD:${offerPrice} 統一設定:${config.price}`);
+        logger.error(`❌ 価格不整合: ${offerName} JSON-LD:${offerPrice} 統一設定:${config.price}`);
         isValid = false;
       } else {
-        console.log(`✅ 価格整合性OK: ${offerName} = ¥${offerPrice}`);
+        logger.info(`✅ 価格整合性OK: ${offerName} = ¥${offerPrice}`);
       }
     }
   });
   
-  console.log(`🔍 チェック結果: ${isValid ? '✅ 全て整合' : '❌ 不整合あり'}`);
+  logger.info(`🔍 チェック結果: ${isValid ? '✅ 全て整合' : '❌ 不整合あり'}`);
   return isValid;
 }
 

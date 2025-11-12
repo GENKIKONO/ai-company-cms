@@ -6,6 +6,7 @@
 import 'server-only';
 import { Resend } from 'resend';
 
+import { logger } from '@/lib/log';
 // Initialize Resend client with fallback for build time
 const resend = new Resend(process.env.RESEND_API_KEY || 'dummy-key-for-build');
 
@@ -33,7 +34,7 @@ export async function sendHtmlEmail({
   
   // Check if API key is available (for runtime)
   if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'dummy-key-for-build') {
-    console.warn({
+    logger.warn({
       event: 'auth_email_warning',
       provider: 'resend',
       message: 'RESEND_API_KEY not configured, skipping Resend email',
@@ -49,7 +50,7 @@ export async function sendHtmlEmail({
   }
   
   try {
-    console.info({
+    logger.info({
       event: 'auth_email_sending',
       provider: 'resend',
       to,
@@ -66,7 +67,7 @@ export async function sendHtmlEmail({
     });
 
     if (error) {
-      console.error({
+      logger.error({
         event: 'auth_email_error',
         provider: 'resend',
         to,
@@ -83,7 +84,7 @@ export async function sendHtmlEmail({
       };
     }
 
-    console.info({
+    logger.info({
       event: 'auth_email_sent',
       provider: 'resend',
       to,
@@ -102,7 +103,7 @@ export async function sendHtmlEmail({
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     
-    console.error({
+    logger.error({
       event: 'auth_email_error',
       provider: 'resend',
       to,

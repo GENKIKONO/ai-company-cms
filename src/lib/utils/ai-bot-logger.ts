@@ -5,7 +5,7 @@
 
 import { supabaseServer } from '@/lib/supabase-server';
 import { extractBotInfoFromHeaders, extractClientIP, shouldLogBot } from './ai-bot-detector';
-import { logger } from './logger';
+import { logger } from '@/lib/log';
 
 export interface BotLogEntry {
   orgId: string;
@@ -29,18 +29,18 @@ export async function logAIBotAccess(
   requestMethod: string = 'GET'
 ): Promise<void> {
   try {
-    console.log('🤖 [AI Bot Logger] Starting bot access logging', { url, orgId, responseStatus, requestMethod });
+    logger.info('🤖 [AI Bot Logger] Starting bot access logging', { url, orgId, responseStatus, requestMethod });
     
     const botInfo = extractBotInfoFromHeaders(headers);
-    console.log('🤖 [AI Bot Logger] Bot detection result:', botInfo);
+    logger.info('🤖 [AI Bot Logger] Bot detection result:', botInfo);
     
     // AI Botでない場合はログしない
     if (!shouldLogBot(botInfo)) {
-      console.log('❌ [AI Bot Logger] Bot should not be logged (not AI category or not a bot)');
+      logger.info('❌ [AI Bot Logger] Bot should not be logged (not AI category or not a bot)');
       return;
     }
     
-    console.log('✅ [AI Bot Logger] Bot should be logged, proceeding...');
+    logger.info('✅ [AI Bot Logger] Bot should be logged, proceeding...');
 
     const userAgent = (typeof headers.get === 'function' ? headers.get('user-agent') : '') || '';
     const ipAddress = extractClientIP(headers);
@@ -73,7 +73,7 @@ export async function logAIBotAccess(
  * Bot Log をDBに挿入
  */
 async function insertBotLog(entry: BotLogEntry): Promise<void> {
-  console.log('💾 [AI Bot Logger] Inserting bot log entry:', entry);
+  logger.info('💾 [AI Bot Logger] Inserting bot log entry:', entry);
   
   const supabase = await supabaseServer();
 
@@ -91,11 +91,11 @@ async function insertBotLog(entry: BotLogEntry): Promise<void> {
     });
 
   if (error) {
-    console.error('❌ [AI Bot Logger] Database insert failed:', error);
+    logger.error('❌ [AI Bot Logger] Database insert failed:', error);
     throw new Error(`Failed to insert bot log: ${error.message}`);
   }
   
-  console.log('✅ [AI Bot Logger] Successfully inserted bot log:', data);
+  logger.info('✅ [AI Bot Logger] Successfully inserted bot log:', data);
 }
 
 /**

@@ -5,7 +5,7 @@
 
 import { createClient } from '@/lib/supabase-client';
 import type { Organization } from '@/types/database';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 export interface TrialStatus {
   isTrialing: boolean;
@@ -120,7 +120,7 @@ export async function checkAndTransitionExpiredTrials(): Promise<number> {
       const success = await transitionToStarter(org.id);
       if (success) {
         transitionedCount++;
-        console.log(`Transitioned organization ${org.name} (${org.id}) to Starter plan`);
+        logger.info(`Transitioned organization ${org.name} (${org.id}) to Starter plan`);
       }
     }
 

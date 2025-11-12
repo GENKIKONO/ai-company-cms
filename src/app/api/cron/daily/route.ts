@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runAiVisibilityJob } from '@/lib/jobs/ai-visibility-job';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '@/lib/log';
 
 // Unified Daily Maintenance Cron
 // Schedule: Daily at 3:00 AM JST (18:00 UTC)
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     const successCount = [results.aiVisibility, results.cleanup, results.healthCheck].filter(r => r?.success).length;
     const totalJobs = 3;
     
-    console.log('[Daily Cron] Daily maintenance completed:', {
+    logger.info('[Daily Cron] Daily maintenance completed:', {
       duration: `${duration}ms`,
       success: `${successCount}/${totalJobs}`,
       errors: results.errors.length,
