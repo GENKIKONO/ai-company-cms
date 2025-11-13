@@ -1,0 +1,332 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { requireAdminPermission } from '@/lib/auth/server';
+import { logger } from '@/lib/log';
+import { isUserAdminOfOrg } from '@/lib/utils/org-permissions';
+import { z } from 'zod';
+
+// Validation schemas
+const updateGroupSchema = z.object({
+  name: z.string().min(2).max(100).optional(),
+  description: z.string().max(500).optional()
+});
+
+// Helper function to check if user can manage this group
+async function canManageGroup(groupId: string, userId: string): Promise<boolean> {
+  try {
+    // Get all organizations in this group
+    const { data: members, error } = await supabaseAdmin
+      .from('org_group_members')
+      .select('org_id')
+      .eq('group_id', groupId);
+
+    if (error || !members) {
+      return false;
+    }
+
+    // Check if user is admin of any organization in this group
+    for (const member of members) {
+      const isAdmin = await isUserAdminOfOrg(member.org_id, userId);
+      if (isAdmin) {
+        return true;
+      }
+    }
+
+    return false;
+  } catch (error: any) {
+    logger.error('Error checking group management permission', {
+      component: 'org-groups-detail-api',
+      groupId,
+      userId,
+      error: error.message
+    });
+    return false;
+  }
+}
+
+// Helper function to check if user is owner of the group
+async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
+  try {
+    const { data: group, error } = await supabaseAdmin
+      .from('organization_groups')
+      .select('owner_org_id')
+      .eq('id', groupId)
+      .single();
+
+    if (error || !group) {
+      return false;
+    }
+
+    return await isUserAdminOfOrg(group.owner_org_id, userId);
+  } catch (error: any) {
+    logger.error('Error checking group ownership', {
+      component: 'org-groups-detail-api',
+      groupId,
+      userId,
+      error: error.message
+    });
+    return false;
+  }
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { groupId: string } }
+) {
+  try {
+    // Admin permission check
+    await requireAdminPermission();
+
+    const { groupId } = params;
+
+    // Get group with full details
+    const { data: group, error } = await supabaseAdmin
+      .from('organization_groups')
+      .select(`
+        id,
+        name,
+        description,
+        created_at,
+        updated_at,
+        owner_organization:organizations!organization_groups_owner_org_id_fkey(
+          id,
+          name,
+          company_name
+        ),
+        members:org_group_members(
+          id,
+          role,
+          added_at,
+          organization:organizations!org_group_members_org_id_fkey(
+            id,
+            name,
+            company_name
+          ),
+          added_by_org:organizations!org_group_members_added_by_fkey(
+            id,
+            name,
+            company_name
+          )
+        )
+      `)
+      .eq('id', groupId)
+      .single();
+
+    if (error || !group) {
+      logger.warn('Organization group not found', {
+        component: 'org-groups-detail-api',
+        operation: 'get',
+        groupId,
+        error: error?.message
+      });
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 });
+    }
+
+    logger.info('Organization group details retrieved', {
+      component: 'org-groups-detail-api',
+      operation: 'get',
+      groupId,
+      groupName: group.name,
+      memberCount: group.members?.length || 0
+    });
+
+    return NextResponse.json({ data: group });
+
+  } catch (error: any) {
+    logger.error('Unexpected error in GET org-group details', {
+      component: 'org-groups-detail-api',
+      operation: 'get',
+      groupId: params.groupId,
+      error: error.message
+    });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { groupId: string } }
+) {
+  try {
+    // Admin permission check
+    await requireAdminPermission();
+
+    const { groupId } = params;
+    const body = await request.json();
+
+    // Validate request body
+    const validation = updateGroupSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json({ 
+        error: 'Validation failed',
+        details: validation.error.flatten()
+      }, { status: 400 });
+    }
+
+    const updateData = validation.data;
+
+    // Get current user
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    // Check if user can manage this group
+    const canManage = await canManageGroup(groupId, user.id);
+    if (!canManage) {
+      logger.warn('User attempted to update group without permission', {
+        component: 'org-groups-detail-api',
+        operation: 'update',
+        groupId,
+        userId: user.id
+      });
+      return NextResponse.json({ 
+        error: 'You must be an admin of an organization in this group to update it' 
+      }, { status: 403 });
+    }
+
+    // Update the group
+    const { data: group, error } = await supabaseAdmin
+      .from('organization_groups')
+      .update({
+        ...updateData,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', groupId)
+      .select(`
+        id,
+        name,
+        description,
+        created_at,
+        updated_at,
+        owner_organization:organizations!organization_groups_owner_org_id_fkey(
+          id,
+          name,
+          company_name
+        )
+      `)
+      .single();
+
+    if (error) {
+      logger.error('Error updating organization group', {
+        component: 'org-groups-detail-api',
+        operation: 'update',
+        groupId,
+        error: error.message
+      });
+      
+      if (error.code === '23505') { // Unique constraint violation
+        return NextResponse.json({ 
+          error: 'Group name already exists for this organization' 
+        }, { status: 409 });
+      }
+      
+      return NextResponse.json({ error: 'Failed to update group' }, { status: 500 });
+    }
+
+    if (!group) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 });
+    }
+
+    logger.info('Organization group updated successfully', {
+      component: 'org-groups-detail-api',
+      operation: 'update',
+      groupId,
+      groupName: group.name,
+      userId: user.id
+    });
+
+    return NextResponse.json({ data: group });
+
+  } catch (error: any) {
+    logger.error('Unexpected error in PATCH org-group', {
+      component: 'org-groups-detail-api',
+      operation: 'update',
+      groupId: params.groupId,
+      error: error.message
+    });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { groupId: string } }
+) {
+  try {
+    // Admin permission check
+    await requireAdminPermission();
+
+    const { groupId } = params;
+
+    // Get current user
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    // Check if user is owner of the group (only owner can delete)
+    const isOwner = await isGroupOwner(groupId, user.id);
+    if (!isOwner) {
+      logger.warn('User attempted to delete group without ownership', {
+        component: 'org-groups-detail-api',
+        operation: 'delete',
+        groupId,
+        userId: user.id
+      });
+      return NextResponse.json({ 
+        error: 'Only the owner organization admin can delete the group' 
+      }, { status: 403 });
+    }
+
+    // Get group info for logging
+    const { data: group } = await supabaseAdmin
+      .from('organization_groups')
+      .select('name, owner_org_id')
+      .eq('id', groupId)
+      .single();
+
+    if (!group) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 });
+    }
+
+    // Delete the group (cascades to org_group_members)
+    const { error } = await supabaseAdmin
+      .from('organization_groups')
+      .delete()
+      .eq('id', groupId);
+
+    if (error) {
+      logger.error('Error deleting organization group', {
+        component: 'org-groups-detail-api',
+        operation: 'delete',
+        groupId,
+        error: error.message
+      });
+      return NextResponse.json({ error: 'Failed to delete group' }, { status: 500 });
+    }
+
+    logger.info('Organization group deleted successfully', {
+      component: 'org-groups-detail-api',
+      operation: 'delete',
+      groupId,
+      groupName: group.name,
+      ownerOrgId: group.owner_org_id,
+      userId: user.id
+    });
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Group deleted successfully' 
+    });
+
+  } catch (error: any) {
+    logger.error('Unexpected error in DELETE org-group', {
+      component: 'org-groups-detail-api',
+      operation: 'delete',
+      groupId: params.groupId,
+      error: error.message
+    });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
