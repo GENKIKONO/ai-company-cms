@@ -13,6 +13,7 @@ import {
   Cog6ToothIcon,
   UserGroupIcon,
   ChatBubbleLeftRightIcon,
+  BuildingOfficeIcon,
 } from '@heroicons/react/24/outline';
 
 // 公開ページナビゲーション
@@ -33,6 +34,7 @@ const dashboardNavigation = [
   { name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },
   { name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },
   { name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },
+  { name: 'グループ会社管理', href: '/admin/org-groups', icon: BuildingOfficeIcon },
   { name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },
   { name: '設定', href: '/dashboard/settings', icon: Cog6ToothIcon },
 ];
