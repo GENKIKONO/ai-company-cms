@@ -1,0 +1,123 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { collectMonthlyData, generateHTMLReport } from '@/lib/report-generator';
+import { logger } from '@/lib/utils/logger';
+
+// Test Demo for Monthly Report Generation (without database dependency)
+export async function GET(request: NextRequest) {
+  try {
+    // Verify authorization for testing
+    const authHeader = request.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+    
+    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    logger.info('[Test Demo] Starting monthly report demo...');
+    const startTime = Date.now();
+    
+    // Get query parameters for testing
+    const url = new URL(request.url);
+    const orgId = url.searchParams.get('orgId') || 'test-org-id';
+    const year = parseInt(url.searchParams.get('year') || '2024');
+    const month = parseInt(url.searchParams.get('month') || '10');
+    
+    const results = {
+      demo: true,
+      organization: orgId,
+      year,
+      month,
+      dataCollection: null as any,
+      reportGeneration: null as any,
+      errors: [] as string[]
+    };
+
+    try {
+      // Get organizations to verify connection
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      const { data: organizations, error: orgsError } = await supabase
+        .from('organizations')
+        .select('id, name, plan')
+        .eq('is_published', true)
+        .limit(1);
+
+      if (orgsError) {
+        throw new Error(`Failed to fetch organizations: ${orgsError.message}`);
+      }
+
+      const testOrg = organizations?.[0];
+      if (!testOrg) {
+        throw new Error('No published organizations found for testing');
+      }
+
+      logger.info(`[Test Demo] Using organization: ${testOrg.name} (${testOrg.id})`);
+
+      // Try to collect data
+      try {
+        const reportData = await collectMonthlyData(testOrg.id, year, month);
+        
+        if (reportData) {
+          results.dataCollection = {
+            success: true,
+            organization: reportData.organization,
+            period: reportData.period,
+            aiVisibilityScore: reportData.aiVisibilityData.overall_score,
+            analyzedUrls: reportData.aiVisibilityData.summary.total_analyzed_urls,
+            botHits: reportData.botLogsData.total_count,
+            uniqueBots: reportData.botLogsData.unique_bots
+          };
+
+          // Try to generate HTML report
+          try {
+            const htmlReport = generateHTMLReport(reportData);
+            results.reportGeneration = {
+              success: true,
+              htmlSize: htmlReport.length,
+              previewSnippet: htmlReport.substring(0, 200) + '...'
+            };
+          } catch (reportError) {
+            results.errors.push(`Report generation failed: ${reportError instanceof Error ? reportError.message : 'Unknown error'}`);
+            results.reportGeneration = { success: false, error: reportError instanceof Error ? reportError.message : 'Unknown error' };
+          }
+
+        } else {
+          results.errors.push('Data collection returned null');
+          results.dataCollection = { success: false, error: 'No data collected' };
+        }
+
+      } catch (dataError) {
+        results.errors.push(`Data collection failed: ${dataError instanceof Error ? dataError.message : 'Unknown error'}`);
+        results.dataCollection = { success: false, error: dataError instanceof Error ? dataError.message : 'Unknown error' };
+      }
+
+    } catch (error) {
+      results.errors.push(`Demo setup failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    const duration = Date.now() - startTime;
+    
+    return NextResponse.json({
+      success: results.errors.length === 0,
+      message: `Monthly report demo completed`,
+      results,
+      duration: `${duration}ms`,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    logger.error('[Test Demo] Fatal error', error instanceof Error ? error : new Error(String(error)));
+    
+    return NextResponse.json(
+      { 
+        error: 'Demo failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      },
+      { status: 500 }
+    );
+  }
+}

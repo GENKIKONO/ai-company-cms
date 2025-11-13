@@ -50,15 +50,15 @@ async function getPost(slug: string, postId: string, isPreview: boolean = false)
     const result = await response.json();
     return result.data;
   } catch (error) {
-    logger.error('Failed to fetch post', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Failed to fetch post', { data: error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
 
 export async function generateMetadata(
-  { params }: { params: { slug: string; id: string } }
+  { params }: { params: Promise<{ slug: string; id: string }> }
 ): Promise<Metadata> {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const post = await getPost(resolvedParams.slug, resolvedParams.id);
 
   if (!post || !post.organization) {
@@ -144,11 +144,11 @@ export default async function PostPage({
   params,
   searchParams
 }: {
-  params: { slug: string; id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ slug: string; id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const resolvedParams = params;
-  const resolvedSearchParams = searchParams;
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
   const isPreview = resolvedSearchParams.preview === 'true';
   
   const post = await getPost(resolvedParams.slug, resolvedParams.id, isPreview);

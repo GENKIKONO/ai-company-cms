@@ -39,7 +39,7 @@ export async function PUT(
       .eq('campaign_type', targetLink.campaign_type);
 
     if (deactivateError) {
-      logger.error('Failed to deactivate existing links', deactivateError instanceof Error ? deactivateError : new Error(String(deactivateError)));
+      logger.error('Failed to deactivate existing links', { data: deactivateError instanceof Error ? deactivateError : new Error(String(deactivateError)) });
       return NextResponse.json(
         { error: 'Failed to update links' },
         { status: 500 }
@@ -55,7 +55,7 @@ export async function PUT(
       .single();
 
     if (activateError) {
-      logger.error('Failed to activate target link', activateError instanceof Error ? activateError : new Error(String(activateError)));
+      logger.error('Failed to activate target link', { data: activateError instanceof Error ? activateError : new Error(String(activateError)) });
       return NextResponse.json(
         { error: 'Failed to activate link' },
         { status: 500 }
@@ -77,7 +77,7 @@ export async function PUT(
       }
     }
 
-    logger.error('PUT /api/admin/billing-links/[id]/activate error', error instanceof Error ? error : new Error(String(error)));
+    logger.error('PUT /api/admin/billing-links/[id]/activate error', { data: error instanceof Error ? error : new Error(String(error)) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

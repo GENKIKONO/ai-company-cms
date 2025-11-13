@@ -1,0 +1,198 @@
+/**
+ * Unified Logging Infrastructure
+ * 
+ * Provides structured logging with level control for both server and client environments.
+ * Replaces console.* usage throughout the application.
+ */
+
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogContext = Record<string, any>;
+
+interface LogEntry {
+  timestamp: string;
+  level: LogLevel;
+  message: string;
+  context?: LogContext;
+  component?: string;
+  userId?: string;
+  requestId?: string;
+}
+
+class Logger {
+  private isServer: boolean;
+  private logLevel: LogLevel;
+  private enabledLevels: Set<LogLevel>;
+
+  constructor() {
+    this.isServer = typeof window === 'undefined';
+    this.logLevel = this.getConfiguredLogLevel();
+    this.enabledLevels = this.getEnabledLevels();
+  }
+
+  private getConfiguredLogLevel(): LogLevel {
+    if (this.isServer) {
+      // Server: Use environment variable
+      const envLevel = process.env.LOG_LEVEL?.toLowerCase() as LogLevel;
+      return ['debug', 'info', 'warn', 'error'].includes(envLevel) ? envLevel : 'info';
+    } else {
+      // Client: Use production/development mode
+      return process.env.NODE_ENV === 'production' ? 'info' : 'debug';
+    }
+  }
+
+  private getEnabledLevels(): Set<LogLevel> {
+    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
+    const currentIndex = levels.indexOf(this.logLevel);
+    return new Set(levels.slice(currentIndex));
+  }
+
+  private shouldLog(level: LogLevel): boolean {
+    return this.enabledLevels.has(level);
+  }
+
+  private formatMessage(level: LogLevel, message: string, context?: LogContext): LogEntry {
+    return {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      context: this.sanitizeContext(context),
+      component: context?.component,
+      userId: context?.userId,
+      requestId: context?.requestId
+    };
+  }
+
+  private sanitizeContext(context?: LogContext): LogContext | undefined {
+    if (!context) return undefined;
+
+    // Remove sensitive information
+    const sanitized = { ...context };
+    const sensitiveKeys = ['password', 'token', 'secret', 'key', 'authorization'];
+    
+    for (const key of Object.keys(sanitized)) {
+      if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
+        sanitized[key] = '[REDACTED]';
+      }
+    }
+
+    return sanitized;
+  }
+
+  private writeLog(entry: LogEntry): void {
+    if (this.isServer) {
+      // Server: Structured JSON logging
+      console.log(JSON.stringify(entry));
+    } else {
+      // Client: Delegate to console with formatting
+      const { timestamp, level, message, context } = entry;
+      const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
+      
+      switch (level) {
+        case 'debug':
+          console.debug(prefix, message, context || '');
+          break;
+        case 'info':
+          console.info(prefix, message, context || '');
+          break;
+        case 'warn':
+          console.warn(prefix, message, context || '');
+          break;
+        case 'error':
+          console.error(prefix, message, context || '');
+          break;
+      }
+    }
+  }
+
+  debug(message: string, context?: LogContext): void {
+    if (this.shouldLog('debug')) {
+      this.writeLog(this.formatMessage('debug', message, context));
+    }
+  }
+
+  info(message: string, context?: LogContext): void {
+    if (this.shouldLog('info')) {
+      this.writeLog(this.formatMessage('info', message, context));
+    }
+  }
+
+  warn(message: string, context?: LogContext): void {
+    if (this.shouldLog('warn')) {
+      this.writeLog(this.formatMessage('warn', message, context));
+    }
+  }
+
+  error(message: string, context?: LogContext): void {
+    if (this.shouldLog('error')) {
+      this.writeLog(this.formatMessage('error', message, context));
+    }
+  }
+
+  /**
+   * Log an error with stack trace
+   */
+  errorWithStack(message: string, error: Error, context?: LogContext): void {
+    this.error(message, {
+      ...context,
+      error: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+  }
+
+  /**
+   * Create a child logger with additional context
+   */
+  child(additionalContext: LogContext): Logger {
+    const childLogger = new Logger();
+    const originalWriteLog = childLogger.writeLog.bind(childLogger);
+    
+    childLogger.writeLog = (entry: LogEntry) => {
+      originalWriteLog({
+        ...entry,
+        context: { ...additionalContext, ...entry.context }
+      });
+    };
+    
+    return childLogger;
+  }
+
+  /**
+   * Middleware helper to add request context
+   */
+  withRequestContext(requestId: string, userId?: string): Logger {
+    return this.child({ requestId, userId });
+  }
+}
+
+// Export singleton instance
+export const logger = new Logger();
+
+// Export type definitions for consumers
+export type { LogLevel, LogContext, LogEntry };
+
+// Export factory function for component-specific loggers
+export const createComponentLogger = (component: string) => 
+  logger.child({ component });
+
+// Export utility functions
+export const logAPIRequest = (method: string, path: string, context?: LogContext) => {
+  logger.info(`API ${method} ${path}`, { ...context, type: 'api_request' });
+};
+
+export const logAPIResponse = (method: string, path: string, status: number, duration?: number, context?: LogContext) => {
+  logger.info(`API ${method} ${path} -> ${status}`, { 
+    ...context, 
+    type: 'api_response',
+    status,
+    duration
+  });
+};
+
+export const logSecurityEvent = (event: string, context?: LogContext) => {
+  logger.warn(`Security event: ${event}`, { ...context, type: 'security' });
+};
+
+export const logPerformanceMetric = (metric: string, value: number, context?: LogContext) => {
+  logger.info(`Performance: ${metric}=${value}`, { ...context, type: 'performance', metric, value });
+};

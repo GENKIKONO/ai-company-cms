@@ -1,0 +1,87 @@
+import { logger } from '@/lib/utils/logger';
+
+export interface CheckoutInfo {
+  stripe_price_id: string;
+  stripe_checkout_url: string | null;
+  discount_rate: number;
+  campaign_type: string;
+  is_fallback?: boolean;
+}
+
+export interface Organization {
+  id: string;
+  discount_group?: string | null;
+  original_signup_campaign?: string | null;
+}
+
+/**
+ * 組織の割引グループから適切なキャンペーンタイプを決定
+ */
+export function getCampaignTypeFromOrg(org: Organization): string {
+  if (org.discount_group === 'test_user_30off') {
+    return 'test_user';
+  }
+  if (org.discount_group === 'early_user_20off') {
+    return 'early_user';
+  }
+  return 'regular';
+}
+
+/**
+ * 組織用のアクティブCheckoutリンクを取得
+ */
+export async function fetchActiveCheckoutForOrg(
+  plan: string,
+  org: Organization
+): Promise<CheckoutInfo | null> {
+  try {
+    const campaignType = getCampaignTypeFromOrg(org);
+    
+    const response = await fetch(
+      `/api/public/active-checkout?plan=${plan}&campaign=${campaignType}`,
+      { cache: 'no-store' }
+    );
+
+    if (!response.ok) {
+      logger.error(`Failed to fetch checkout info: ${response.status}`, {
+        plan,
+        campaignType,
+        orgId: org.id
+      });
+      return null;
+    }
+
+    const result = await response.json();
+    return result.data;
+
+  } catch (error) {
+    logger.error('fetchActiveCheckoutForOrg error:', { data: error instanceof Error ? error : new Error(String(error)));
+    return null;
+  }
+}
+
+/**
+ * 割引適用後の表示価格を計算
+ */
+export function calculateDiscountedPrice(
+  originalPrice: number,
+  discountRate: number
+): number {
+  return Math.floor(originalPrice * (100 - discountRate) / 100);
+}
+
+/**
+ * キャンペーンタイプの説明文を取得
+ */
+export function getCampaignDescription(campaignType: string): string {
+  switch (campaignType) {
+    case 'test_user':
+      return '6ヶ月無料 + その後ずっと30%OFF';
+    case 'early_user':
+      return 'ずっと20%OFF';
+    case 'regular':
+      return '通常価格';
+    default:
+      return '';
+  }
+}

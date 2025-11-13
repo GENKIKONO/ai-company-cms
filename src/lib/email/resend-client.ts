@@ -34,12 +34,12 @@ export async function sendHtmlEmail({
   
   // Check if API key is available (for runtime)
   if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'dummy-key-for-build') {
-    logger.warn({
-      event: 'auth_email_warning',
-      provider: 'resend',
-      message: 'RESEND_API_KEY not configured, skipping Resend email',
-      requestId,
-      timestamp: new Date().toISOString()
+    logger.warn('RESEND_API_KEY not configured, skipping Resend email', {
+      data: {
+        provider: 'resend',
+        requestId,
+        timestamp: new Date().toISOString()
+      }
     });
     
     return {
@@ -50,7 +50,7 @@ export async function sendHtmlEmail({
   }
   
   try {
-    logger.info({
+    logger.info('resend: sending email', {
       event: 'auth_email_sending',
       provider: 'resend',
       to,
@@ -84,7 +84,7 @@ export async function sendHtmlEmail({
       };
     }
 
-    logger.info({
+    logger.info('resend: email sent successfully', {
       event: 'auth_email_sent',
       provider: 'resend',
       to,

@@ -27,15 +27,15 @@ async function getPostsData(slug: string): Promise<PostsPageData | null> {
       posts: result.data.posts || []
     };
   } catch (error) {
-    logger.error('Failed to fetch posts data', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Failed to fetch posts data', { data: error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
 
 export async function generateMetadata(
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const data = await getPostsData(resolvedParams.slug);
 
   if (!data) {
@@ -72,9 +72,9 @@ export async function generateMetadata(
 export default async function PostsPage({
   params
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const data = await getPostsData(resolvedParams.slug);
 
   if (!data) {

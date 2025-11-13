@@ -32,11 +32,11 @@ export default function SignoutButton({ className, children, onClick }: SignoutB
         router.push('/');
         router.refresh(); // Server Componentを更新
       } else {
-        logger.error('Signout failed:', await response.text());
+        logger.error('Signout failed:', { data: await response.text() });
         alert('ログアウトに失敗しました');
       }
     } catch (error) {
-      logger.error('Signout error', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Signout error', { data: error instanceof Error ? error : new Error(String(error)) });
       alert('ログアウトに失敗しました');
     } finally {
       setIsLoading(false);

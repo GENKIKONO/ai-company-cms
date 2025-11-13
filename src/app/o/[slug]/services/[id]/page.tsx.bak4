@@ -42,15 +42,15 @@ async function getServiceData(slug: string, serviceId: string): Promise<ServiceD
       organization
     };
   } catch (error) {
-    logger.error('Failed to fetch service data', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Failed to fetch service data', { data: error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
 
 export async function generateMetadata(
-  { params }: { params: { slug: string; id: string } }
+  { params }: { params: Promise<{ slug: string; id: string }> }
 ): Promise<Metadata> {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const data = await getServiceData(resolvedParams.slug, resolvedParams.id);
 
   if (!data) {
@@ -87,9 +87,9 @@ export async function generateMetadata(
 export default async function ServiceDetailPage({
   params
 }: {
-  params: { slug: string; id: string }
+  params: Promise<{ slug: string; id: string }>
 }) {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const data = await getServiceData(resolvedParams.slug, resolvedParams.id);
 
   if (!data) {

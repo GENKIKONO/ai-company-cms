@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     activeLink = data;
 
     if (error && error.code !== 'PGRST116') {
-      logger.error('Failed to fetch active checkout link with period', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Failed to fetch active checkout link with period', { data: error instanceof Error ? error : new Error(String(error)) });
       return NextResponse.json(
         { error: 'Database error' },
         { status: 500 }
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
         .maybeSingle();
 
       if (defaultError && defaultError.code !== 'PGRST116') {
-        logger.error('Failed to fetch default active checkout link', defaultError instanceof Error ? defaultError : new Error(String(defaultError)));
+        logger.error('Failed to fetch default active checkout link', { data: defaultError instanceof Error ? defaultError : new Error(String(defaultError)) });
         return NextResponse.json(
           { error: 'Database error' },
           { status: 500 }
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('GET /api/public/active-checkout error', error instanceof Error ? error : new Error(String(error)));
+    logger.error('GET /api/public/active-checkout error', { data: error instanceof Error ? error : new Error(String(error)) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

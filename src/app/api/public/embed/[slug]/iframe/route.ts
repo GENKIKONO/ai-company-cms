@@ -41,7 +41,7 @@ async function getOrganizationData(slug: string) {
     const result = await response.json();
     return result.data;
   } catch (error) {
-    logger.error('Failed to fetch organization data for iframe', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Failed to fetch organization data for iframe', { data: error instanceof Error ? error : new Error(String(error)) });
     return null;
   }
 }
@@ -167,7 +167,7 @@ export async function GET(
     });
 
   } catch (error) {
-    logger.error('Iframe generation error', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Iframe generation error', { data: error instanceof Error ? error : new Error(String(error)) });
     
     const errorHtml = `
 <!DOCTYPE html>
@@ -189,7 +189,7 @@ export async function GET(
         <p>企業情報の読み込み中にエラーが発生しました。しばらく後に再度お試しください。</p>
     </div>
     <script>
-        logger.error('LuxuCare Iframe Error:', ${JSON.stringify(error.message)});
+        console.error('LuxuCare Iframe Error:', ${JSON.stringify(error.message)});
     </script>
 </body>
 </html>`;

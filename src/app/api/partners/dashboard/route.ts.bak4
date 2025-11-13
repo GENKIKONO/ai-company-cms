@@ -1,0 +1,258 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/utils/logger';
+import type { PartnerDashboardData, Partner, PartnerMetrics } from '@/lib/types/partner';
+
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await supabaseServer();
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const url = new URL(request.url);
+    const partnerId = url.searchParams.get('partner_id');
+
+    if (!partnerId) {
+      // Try to find partner by user_id if no partner_id provided
+      // TODO: Query partners table by user_id
+      return NextResponse.json(
+        { error: 'Partner not found for this user' },
+        { status: 404 }
+      );
+    }
+
+    // TODO: Implement actual database queries
+    // This would involve multiple table joins:
+    // - partners table for basic partner info
+    // - partner_referrals for referral data
+    // - commissions for commission data
+    // - payouts for payout history
+    // - partner_activity for activity feed
+
+    // TODO: Replace with real data from database in production
+    const dashboardData: PartnerDashboardData = {
+      partner: {
+        id: partnerId,
+        user_id: user.id,
+        business_name: '',
+        business_type: 'agency',
+        status: 'active',
+        tier: 'gold',
+        contact_email: 'contact@agency.com',
+        website: 'https://agency.com',
+        description: 'Leading digital marketing agency',
+        business_address: {
+          street: '1-1-1 Shibuya',
+          city: 'Shibuya',
+          state: 'Tokyo',
+          postal_code: '150-0002',
+          country: 'JP'
+        },
+        referral_code: 'AGE2024',
+        commission_config: {
+          type: 'percentage',
+          base_rate: 15,
+          minimum_payout: 10000,
+          performance_bonus: []
+        },
+        payment_config: {
+          frequency: 'monthly',
+          method: 'bank_transfer',
+          account_details: {},
+          payment_day: 25
+        },
+        contract_start_date: '2024-01-01',
+        metrics: {
+          total_referrals: 47,
+          active_clients: 23,
+          total_revenue_generated: 4750000,
+          total_commission_earned: 712500,
+          pending_commission: 89250,
+          last_30_days: {
+            new_referrals: 8,
+            revenue_generated: 680000,
+            commission_earned: 102000
+          },
+          conversion_rate: 68.2,
+          average_client_value: 206522,
+          client_retention_rate: 89.1,
+          performance_score: 92
+        },
+        created_at: '2024-01-01',
+        updated_at: new Date().toISOString()
+      },
+      recent_referrals: [
+        {
+          id: 'ref-1',
+          partner_id: partnerId,
+          organization_id: 'org-1',
+          referral_code: 'AGE2024',
+          status: 'converted',
+          conversion_date: '2024-11-05',
+          initial_plan: 'business',
+          current_plan: 'business',
+          lifetime_value: 120000,
+          created_at: '2024-11-01',
+          updated_at: '2024-11-05'
+        },
+        {
+          id: 'ref-2',
+          partner_id: partnerId,
+          organization_id: 'org-2',
+          referral_code: 'AGE2024',
+          status: 'pending',
+          initial_plan: 'pro',
+          lifetime_value: 0,
+          created_at: '2024-11-08',
+          updated_at: '2024-11-08'
+        }
+      ],
+      pending_commissions: [
+        {
+          id: 'comm-1',
+          partner_id: partnerId,
+          referral_id: 'ref-1',
+          organization_id: 'org-1',
+          amount: 18000,
+          currency: 'JPY',
+          commission_rate: 15,
+          revenue_amount: 120000,
+          period_start: '2024-11-01',
+          period_end: '2024-11-30',
+          status: 'pending',
+          created_at: '2024-11-05',
+          updated_at: '2024-11-05'
+        }
+      ],
+      recent_payouts: [
+        {
+          id: 'payout-1',
+          partner_id: partnerId,
+          total_amount: 85000,
+          currency: 'JPY',
+          commission_count: 5,
+          period_start: '2024-10-01',
+          period_end: '2024-10-31',
+          status: 'completed',
+          method: 'bank_transfer',
+          transaction_id: 'TXN-202410-001',
+          processed_at: '2024-11-01',
+          created_at: '2024-10-31',
+          updated_at: '2024-11-01'
+        }
+      ],
+      activity_feed: [
+        {
+          id: 'act-1',
+          partner_id: partnerId,
+          type: 'referral_converted',
+          description: 'Referral "Sample Corp" converted to Business plan',
+          metadata: { organization_name: 'Sample Corp', plan: 'business' },
+          created_at: '2024-11-05',
+          created_by: user.id
+        },
+        {
+          id: 'act-2',
+          partner_id: partnerId,
+          type: 'referral_created',
+          description: 'New referral "Tech Startup" registered',
+          metadata: { organization_name: 'Tech Startup' },
+          created_at: '2024-11-08'
+        }
+      ],
+      performance_chart_data: [
+        {
+          period: '2024-07',
+          referrals: 6,
+          revenue: 420000,
+          commission: 63000
+        },
+        {
+          period: '2024-08',
+          referrals: 8,
+          revenue: 560000,
+          commission: 84000
+        },
+        {
+          period: '2024-09',
+          referrals: 9,
+          revenue: 630000,
+          commission: 94500
+        },
+        {
+          period: '2024-10',
+          referrals: 11,
+          revenue: 770000,
+          commission: 115500
+        },
+        {
+          period: '2024-11',
+          referrals: 8,
+          revenue: 680000,
+          commission: 102000
+        }
+      ]
+    };
+
+    logger.info('[Partners Dashboard] Dashboard data requested', {
+      partner_id: partnerId,
+      user_id: user.id,
+      active_referrals: dashboardData.partner.metrics.active_clients
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: dashboardData
+    });
+
+  } catch (error) {
+    logger.error('[Partners Dashboard] Unexpected error', { data: error instanceof Error ? error : new Error(String(error)));
+    
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST endpoint for updating partner dashboard preferences
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await supabaseServer();
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { preferences, notifications } = body;
+
+    // TODO: Update partner dashboard preferences
+    // This would update the partner record with new preferences
+
+    logger.info('[Partners Dashboard] Preferences updated', {
+      user_id: user.id,
+      preferences,
+      notifications
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Preferences updated successfully'
+    });
+
+  } catch (error) {
+    logger.error('[Partners Dashboard] Error updating preferences', { data: error instanceof Error ? error : new Error(String(error)));
+    
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

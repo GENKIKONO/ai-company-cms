@@ -137,7 +137,7 @@ AI対応企業情報CMS
     });
 
   } catch (error) {
-    logger.error('Email sending failed', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Email sending failed', { data: error instanceof Error ? error : new Error(String(error)) });
     throw new Error('承認メールの送信に失敗しました');
   }
 }

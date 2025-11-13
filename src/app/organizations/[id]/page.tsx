@@ -131,7 +131,7 @@ export default function EditOrganizationPage() {
           setIndustries(industriesResult.data);
         }
       } catch (error) {
-        logger.error('Failed to fetch data', error instanceof Error ? error : new Error(String(error)));
+        logger.error('Failed to fetch data', { data: error instanceof Error ? error : new Error(String(error)) });
         router.push('/dashboard');
       } finally {
         setLoading(false);
@@ -264,7 +264,7 @@ export default function EditOrganizationPage() {
         setFormData(freshFormData);
         setTimeout(() => {
           setFormData(fromOrg(result.data));
-          logger.debug('Debug', '[FORCED_SYNC] Double-sync completed');
+          logger.debug('[FORCED_SYNC] Double-sync completed');
         }, 0);
         
         setErrors({ success: '企業情報を更新しました' });
@@ -279,7 +279,7 @@ export default function EditOrganizationPage() {
         setErrors({ submit: '企業情報の更新に失敗しました' });
       }
     } catch (error) {
-      logger.error('Failed to update organization', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Failed to update organization', { data: error instanceof Error ? error : new Error(String(error)) });
       setErrors({ submit: '企業情報の更新に失敗しました' });
     } finally {
       setSubmitting(false);
@@ -293,7 +293,7 @@ export default function EditOrganizationPage() {
         setOrganization(prev => prev ? { ...prev, status: newStatus } : null);
       }
     } catch (error) {
-      logger.error('Failed to update status', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Failed to update status', { data: error instanceof Error ? error : new Error(String(error)) });
     }
   };
 
@@ -326,7 +326,7 @@ export default function EditOrganizationPage() {
         }, 3000);
       }
     } catch (error) {
-      logger.error('Geocoding failed', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Geocoding failed', { data: error instanceof Error ? error : new Error(String(error)) });
       setErrors({ 
         ...errors, 
         address: error instanceof Error ? error.message : '位置の特定に失敗しました' 

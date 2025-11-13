@@ -35,7 +35,7 @@ export async function getAiVisibilityStatus(): Promise<AiVisibilityStatus> {
       .single();
 
     if (error) {
-      logger.warn('[AI Visibility] Database error, using fallback enabled=true', error.message);
+      logger.warn('[AI Visibility] Database error, using fallback enabled=true', { data: error });
       await sendStatusErrorNotification(error);
       return DEFAULT_STATUS;
     }
@@ -59,7 +59,7 @@ export async function getAiVisibilityStatus(): Promise<AiVisibilityStatus> {
     return status;
 
   } catch (error) {
-    logger.warn('[AI Visibility] Fatal error loading status, using fallback enabled=true', error);
+    logger.warn('[AI Visibility] Fatal error loading status, using fallback enabled=true', { data: error });
     await sendStatusErrorNotification(error);
     return DEFAULT_STATUS;
   }
@@ -167,7 +167,7 @@ async function sendStatusErrorNotification(error: any) {
     });
 
   } catch (slackError) {
-    logger.error('[AI Visibility] Failed to send error notification:', slackError);
+    logger.error('[AI Visibility] Failed to send error notification:', { data: slackError });
   }
 }
 

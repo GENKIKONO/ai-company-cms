@@ -29,10 +29,10 @@ export async function logAIBotAccess(
   requestMethod: string = 'GET'
 ): Promise<void> {
   try {
-    logger.info('🤖 [AI Bot Logger] Starting bot access logging', { url, orgId, responseStatus, requestMethod });
+    logger.info('🤖 [AI Bot Logger] Starting bot access logging', { data: { url, orgId, responseStatus, requestMethod } });
     
     const botInfo = extractBotInfoFromHeaders(headers);
-    logger.info('🤖 [AI Bot Logger] Bot detection result:', botInfo);
+    logger.info('🤖 [AI Bot Logger] Bot detection result:', { data: botInfo });
     
     // AI Botでない場合はログしない
     if (!shouldLogBot(botInfo)) {
@@ -65,7 +65,7 @@ export async function logAIBotAccess(
 
   } catch (error) {
     // ログ失敗は警告として扱い、メイン処理は継続
-    logger.warn('Failed to log AI bot access', { error, url, orgId });
+    logger.warn('Failed to log AI bot access', { data: { error, url, orgId } });
   }
 }
 
@@ -73,7 +73,7 @@ export async function logAIBotAccess(
  * Bot Log をDBに挿入
  */
 async function insertBotLog(entry: BotLogEntry): Promise<void> {
-  logger.info('💾 [AI Bot Logger] Inserting bot log entry:', entry);
+  logger.info('💾 [AI Bot Logger] Inserting bot log entry:', { data: entry });
   
   const supabase = await supabaseServer();
 
@@ -91,11 +91,11 @@ async function insertBotLog(entry: BotLogEntry): Promise<void> {
     });
 
   if (error) {
-    logger.error('❌ [AI Bot Logger] Database insert failed:', error);
+    logger.error('❌ [AI Bot Logger] Database insert failed:', { data: error });
     throw new Error(`Failed to insert bot log: ${error.message}`);
   }
   
-  logger.info('✅ [AI Bot Logger] Successfully inserted bot log:', data);
+  logger.info('✅ [AI Bot Logger] Successfully inserted bot log:', { data: data });
 }
 
 /**
@@ -152,7 +152,7 @@ export async function ensureContentUnit(
     return created.id;
 
   } catch (error) {
-    logger.warn('Failed to ensure content unit', { error, orgId, url });
+    logger.warn('Failed to ensure content unit', { data: { error, orgId, url } });
     return null;
   }
 }

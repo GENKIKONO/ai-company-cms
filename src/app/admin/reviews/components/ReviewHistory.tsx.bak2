@@ -1,0 +1,237 @@
+'use client';
+/* eslint-disable no-console */
+
+import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+import { 
+  ClockIcon,
+  UserIcon,
+  DocumentTextIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ArrowPathIcon
+} from '@heroicons/react/24/outline';
+import type { ReviewAuditWithDetails, ReviewAction, ReviewStatus } from '@/lib/types/review';
+
+import { logger } from '@/lib/log';
+interface ReviewHistoryProps {
+  organizationId: string;
+  organizationName: string;
+  className?: string;
+}
+
+export default function ReviewHistory({ 
+  organizationId, 
+  organizationName,
+  className = ''
+}: ReviewHistoryProps) {
+  const [history, setHistory] = useState<ReviewAuditWithDetails[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchHistory = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(`/api/admin/reviews/history?organization_id=${organizationId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch review history');
+      }
+      
+      const data = await response.json();
+      setHistory(data.data || []);
+    } catch (err) {
+      logger.error('Error fetching review history:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      toast.error('審査履歴の取得に失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (organizationId) {
+      fetchHistory();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organizationId]);
+
+  const getActionIcon = (action: ReviewAction) => {
+    switch (action) {
+      case 'approve':
+        return <CheckCircleIcon className="h-5 w-5 text-green-600" />;
+      case 'reject':
+        return <XCircleIcon className="h-5 w-5 text-red-600" />;
+      case 'request_changes':
+        return <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600" />;
+      case 'reopen':
+        return <ArrowPathIcon className="h-5 w-5 text-blue-600" />;
+      default:
+        return <ClockIcon className="h-5 w-5 text-gray-600" />;
+    }
+  };
+
+  const getActionText = (action: ReviewAction) => {
+    switch (action) {
+      case 'approve':
+        return '承認';
+      case 'reject':
+        return '却下';
+      case 'request_changes':
+        return '修正要求';
+      case 'reopen':
+        return '再審査';
+      default:
+        return action;
+    }
+  };
+
+  const getStatusText = (status: ReviewStatus) => {
+    switch (status) {
+      case 'approved':
+        return '承認済み';
+      case 'rejected':
+        return '却下';
+      case 'pending':
+        return '審査待ち';
+      case 'under_review':
+        return '審査中';
+      default:
+        return status;
+    }
+  };
+
+  const getStatusColor = (status: ReviewStatus) => {
+    switch (status) {
+      case 'approved':
+        return 'text-green-600 bg-green-50';
+      case 'rejected':
+        return 'text-red-600 bg-red-50';
+      case 'pending':
+        return 'text-yellow-600 bg-yellow-50';
+      case 'under_review':
+        return 'text-blue-600 bg-blue-50';
+      default:
+        return 'text-gray-600 bg-gray-50';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className={`bg-white rounded-lg shadow p-6 ${className}`}>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">審査履歴</h3>
+        <div className="flex justify-center items-center py-8">
+          <ArrowPathIcon className="h-6 w-6 animate-spin text-gray-400" />
+          <span className="ml-2 text-gray-500">読み込み中...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`bg-white rounded-lg shadow p-6 ${className}`}>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">審査履歴</h3>
+        <div className="text-center py-8">
+          <ExclamationTriangleIcon className="h-8 w-8 text-red-400 mx-auto mb-2" />
+          <p className="text-red-600 text-sm">{error}</p>
+          <button
+            onClick={fetchHistory}
+            className="mt-2 text-blue-600 hover:text-blue-500 text-sm font-medium"
+          >
+            再試行
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`bg-white rounded-lg shadow ${className}`}>
+      <div className="px-6 py-4 border-b border-gray-200">
+        <h3 className="text-lg font-medium text-gray-900">
+          審査履歴 - {organizationName}
+        </h3>
+        <p className="text-sm text-gray-500 mt-1">
+          最新10件の審査活動を表示
+        </p>
+      </div>
+
+      <div className="p-6">
+        {history.length === 0 ? (
+          <div className="text-center py-8">
+            <DocumentTextIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-gray-500 text-sm">審査履歴がありません</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {history.map((entry) => (
+              <div
+                key={entry.id}
+                className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg"
+              >
+                <div className="flex-shrink-0 mt-0.5">
+                  {getActionIcon(entry.action)}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium text-gray-900">
+                        {getActionText(entry.action)}
+                      </span>
+                      {entry.new_status && (
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(entry.new_status)}`}>
+                          {getStatusText(entry.new_status)}
+                        </span>
+                      )}
+                    </div>
+                    <time className="text-xs text-gray-500">
+                      {new Date(entry.created_at).toLocaleString('ja-JP')}
+                    </time>
+                  </div>
+                  
+                  <div className="mt-1 flex items-center space-x-1 text-sm text-gray-600">
+                    <UserIcon className="h-4 w-4" />
+                    <span>{entry.reviewer_name}</span>
+                    <span className="text-gray-400">({entry.reviewer_email})</span>
+                  </div>
+                  
+                  {entry.reason && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium">理由:</span> {entry.reason}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {entry.category && (
+                    <div className="mt-1">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                        {entry.category}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {entry.notes && (
+                    <div className="mt-2 p-2 bg-white rounded border-l-4 border-gray-200">
+                      <p className="text-sm text-gray-600">{entry.notes}</p>
+                    </div>
+                  )}
+                  
+                  {entry.previous_status && entry.new_status && entry.previous_status !== entry.new_status && (
+                    <div className="mt-2 text-xs text-gray-500">
+                      {getStatusText(entry.previous_status)} → {getStatusText(entry.new_status)}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

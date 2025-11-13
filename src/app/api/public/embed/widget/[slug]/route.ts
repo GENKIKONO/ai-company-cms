@@ -41,7 +41,7 @@ async function getOrganizationData(slug: string) {
     const result = await response.json();
     return result.data;
   } catch (error) {
-    logger.error('Failed to fetch organization data for embed', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Failed to fetch organization data for embed', { data: error instanceof Error ? error : new Error(String(error)) });
     return null;
   }
 }
@@ -153,12 +153,12 @@ export async function GET(
     });
 
   } catch (error) {
-    logger.error('Widget generation error', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Widget generation error', { data: error instanceof Error ? error : new Error(String(error)) });
     
     // エラー時のフォールバックWidget
     const fallbackWidget = `
 (function() {
-  logger.error('LuxuCare Widget: Generation failed', ${JSON.stringify(error.message)});
+  console.error('LuxuCare Widget: Generation failed', ${JSON.stringify(error.message)});
   
   const container = document.currentScript?.parentElement;
   if (container) {

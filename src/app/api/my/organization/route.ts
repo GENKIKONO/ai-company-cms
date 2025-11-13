@@ -97,7 +97,7 @@ export const fetchCache = 'force-no-store';
 // GET - ユーザーの企業情報を取得
 export async function GET(request: NextRequest) {
   try {
-    logger.debug('Debug', '[my/organization] GET handler start');
+    logger.debug('[my/organization] GET handler start');
     
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await supabaseServer();
@@ -122,12 +122,12 @@ export async function GET(request: NextRequest) {
       .maybeSingle();
 
     if (error) {
-      logger.error('[my/organization] org query error', error instanceof Error ? error : new Error(String(error)));
+      logger.error('[my/organization] org query error', { data: error instanceof Error ? error : new Error(String(error)) });
       return NextResponse.json({ data: null, message: 'Query error' }, { status: 500 });
     }
     
     if (!data) {
-      logger.debug('[my/organization] No organization found for user', user.id);
+      logger.debug(`[my/organization] No organization found for user: ${user.id}`);
       return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
     }
 
@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     const errorId = `get-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    logger.error('[GET /api/my/organization] Unexpected error:', { errorId, error });
+    logger.error('[GET /api/my/organization] Unexpected error:', { data: { errorId, error } });
     
     // エラーログを診断APIに送信
     logErrorToDiag({
@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   let body: OrganizationFormData | null = null;
   try {
-    logger.debug('Debug', '[my/organization] POST handler start');
+    logger.debug('[my/organization] POST handler start');
     
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await supabaseServer();
@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
     });
 
     // ユーザーIDをログに出力して確認
-    logger.debug('[my/organization] Current user ID', user.id);
+    logger.debug(`[my/organization] Current user ID: ${user.id}`);
 
     if (authError || !user) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
 
       // public.users にユーザーが存在しない場合は作成
       if (publicUserError && publicUserError.code === 'PGRST116') { // No rows found
-        logger.debug('Debug', '[my/organization] Creating user in public.users table...');
+        logger.debug('[my/organization] Creating user in public.users table...');
         
         // Service Role 権限で users テーブルを操作
         const { createClient } = await import('@supabase/supabase-js');
@@ -228,13 +228,13 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (createUserError) {
-          logger.error('[my/organization] Failed to create user:', createUserError);
+          logger.error('[my/organization] Failed to create user:', { data: createUserError });
         } else {
-          logger.debug('[my/organization] User created successfully', newUser.id);
+          logger.debug(`[my/organization] User created successfully: ${newUser.id}`);
         }
       }
     } catch (checkError) {
-      logger.warn('[my/organization] User existence check failed', checkError);
+      logger.warn('[my/organization] User existence check failed', { data: checkError });
     }
 
     // ✅ 外部キー制約違反の診断: auth.users に該当ユーザーが存在するかチェック
@@ -248,24 +248,24 @@ export async function POST(request: NextRequest) {
         checkError: authUserError?.message
       });
     } catch (checkError) {
-      logger.warn('[my/organization] Auth user check failed (non-critical)', checkError);
+      logger.warn('[my/organization] Auth user check failed (non-critical)', { data: checkError });
     }
 
     // 👇 POSTハンドラの最上部（request.json() を呼ぶ前）に追加
     const cloned = request.clone();
     const rawBodyText = await cloned.text();
-    logger.debug('[ORG/CREATE] RAW BODY TEXT', rawBodyText);
+    logger.debug('[ORG/CREATE] RAW BODY TEXT', { rawBodyText });
 
     let rawBody: any = {};
     try { rawBody = JSON.parse(rawBodyText || '{}'); } catch {}
-    logger.debug('[ORG/CREATE] RAW BODY PARSED', rawBody);
+    logger.debug('[ORG/CREATE] RAW BODY PARSED', { rawBody });
     
     // ✅ ペイロード正規化：空文字→null、email補完
     const userEmail = user.email;
     const normalizedRawBody = normalizePayload(rawBody, userEmail);
     
     // 既存の正規化の直後にも残しておくと有効
-    logger.debug('[ORG/CREATE] AFTER NORMALIZE', normalizedRawBody);
+    logger.debug('[ORG/CREATE] AFTER NORMALIZE', { normalizedRawBody });
     
     // サニタイズ前後ログ（PIIマスク）
     logger.info('📥 受信JSON (正規化後):', {
@@ -279,10 +279,10 @@ export async function POST(request: NextRequest) {
     // 統一バリデーション（正規化済みデータ使用）
     let validatedData: OrganizationCreate;
     try {
-      logger.debug('[ORG/CREATE] About to validate with schema', normalizedRawBody);
+      logger.debug('[ORG/CREATE] About to validate with schema', { normalizedRawBody });
       validatedData = organizationCreateSchema.parse(normalizedRawBody);
       body = validatedData as any; // 既存の型との互換性のため
-      logger.debug('[ORG/CREATE] Validation successful', validatedData);
+      logger.debug('[ORG/CREATE] Validation successful', { validatedData });
       
       // サニタイズ後ログ
       const bodyAny = body as any;
@@ -293,12 +293,12 @@ export async function POST(request: NextRequest) {
         // 実際に存在する日付系フィールドのみチェック（foundedフィールドはUIに存在しないため除外）
       });
     } catch (error) {
-      logger.error('[ORG/CREATE] Validation error', error instanceof Error ? error : new Error(String(error)));
+      logger.error('[ORG/CREATE] Validation error', { data: error instanceof Error ? error : new Error(String(error)) });
       if (error instanceof z.ZodError) {
-        logger.error('[ORG/CREATE] Zod validation issues:', error.issues);
+        logger.error('[ORG/CREATE] Zod validation issues:', { data: error.issues });
         return handleZodError(error);
       }
-      logger.error('[ORG/CREATE] Non-zod validation error', error instanceof Error ? error : new Error(String(error)));
+      logger.error('[ORG/CREATE] Non-zod validation error', { data: error instanceof Error ? error : new Error(String(error)) });
       throw error;
     }
 
@@ -313,7 +313,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (existingOrg) {
-      logger.debug('Debug', '[POST /api/my/organization] Organization already exists, returning existing one');
+      logger.debug('[POST /api/my/organization] Organization already exists, returning existing one');
       
       // ✅ FIXED: 統一キャッシュ無効化 for idempotent case
       await revalidateOrgCache(user.id, existingOrg.slug);
@@ -333,7 +333,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    logger.debug('Debug', '🔍 About to insert with minimal data - no normalization');
+    logger.debug('🔍 About to insert with minimal data - no normalization');
 
     // 最小限のデータのみでシンプルに作成
     const timestamp = Date.now();
@@ -396,7 +396,7 @@ export async function POST(request: NextRequest) {
     Object.entries(body).forEach(([key, value]) => {
       // ✅ 特別に founded フィールドを完全除外（DBエラー回避）
       if (key === 'founded') {
-        logger.debug('🚫 founded フィールドを明示的に除外', value);
+        logger.debug('🚫 founded フィールドを明示的に除外', { value });
         return; // skip completely
       }
       
@@ -439,12 +439,12 @@ export async function POST(request: NextRequest) {
       // foundedフィールドはUIに存在しないため処理対象外
     });
 
-    logger.info('🔍 Complete organization data for INSERT:', JSON.stringify(organizationData, null, 2));
+    logger.info('🔍 Complete organization data for INSERT', { data: JSON.stringify(organizationData, null, 2) });
 
     // 🚀 GPT恒久対策: 空文字の日付フィールドを検出（デバッグ用）
     const emptyDates = findEmptyDateFields(organizationData, ['established_at']);
     if (emptyDates.length) {
-      logger.warn('⚠️ Empty date fields detected, normalizing', emptyDates);
+      logger.warn('⚠️ Empty date fields detected, normalizing', { data: emptyDates });
     }
 
     // 🚀 GPT恒久対策: INSERT直前の確実な正規化
@@ -452,7 +452,7 @@ export async function POST(request: NextRequest) {
       dateFields: ['established_at'], // DBにある日付カラムを列挙
     });
 
-    logger.info('🔍 Normalized organization data for INSERT:', JSON.stringify(organizationData, null, 2));
+    logger.info('🔍 Normalized organization data for INSERT', { data: JSON.stringify(organizationData, null, 2) });
 
     // 🚨 最終ガード: normalizeForInsert後でも空文字が残っている場合の緊急対応
     const dateFieldsToCheck = ['established_at'];
@@ -460,12 +460,12 @@ export async function POST(request: NextRequest) {
       if (organizationData[field] === '') {
         logger.error(`🚨 EMERGENCY: ${field} still contains empty string after normalization!`);
         organizationData[field] = null; // 強制的にnullに変換
-        logger.debug('Debug', `🔧 FIXED: ${field} forced to null`);
+        logger.debug(`🔧 FIXED: ${field} forced to null`);
       }
     });
 
     // 最終データ確認ログ
-    logger.info('🔍 FINAL organization data for INSERT (after emergency guard):', JSON.stringify(organizationData, null, 2));
+    logger.info('🔍 FINAL organization data for INSERT (after emergency guard)', { data: JSON.stringify(organizationData, null, 2) });
 
     // ✅ 最終ガード：日付は空文字の可能性が少しでもあれば null を明示して送る
     const finalGuardDateFields = ['established_at']; // 必要に応じて他のDATE型も追記
@@ -481,15 +481,15 @@ export async function POST(request: NextRequest) {
     if (PUBLISH_ON_SAVE) {
       organizationData.status = 'published';
       organizationData.is_published = true;
-      logger.debug('Debug', '[VERIFY] PUBLISH_ON_SAVE enabled for new org: forcing publication status');
+      logger.debug('[VERIFY] PUBLISH_ON_SAVE enabled for new org: forcing publication status');
     }
 
     // ホワイトリスト処理の前にこの修正を行う
     const insertPayload = buildOrgInsert(organizationData);
-    logger.debug('API/my/organization INSERT payload (final)', insertPayload);
+    logger.debug('API/my/organization INSERT payload (final)', { insertPayload });
 
     // ✅ 単純な組織作成（trigger が created_by を自動設定）
-    logger.debug('Debug', '[ORG/CREATE] Creating organization with trigger support...');
+    logger.debug('[ORG/CREATE] Creating organization with trigger support...');
     
     const { data, error } = await supabase
       .from('organizations')
@@ -516,7 +516,7 @@ export async function POST(request: NextRequest) {
       
       // 23505: unique constraint violation - idempotent処理
       if ((error as any).code === '23505') {
-        logger.debug('Debug', '[POST /api/my/organization] Unique constraint violation, trying to fetch existing organization');
+        logger.debug('[POST /api/my/organization] Unique constraint violation, trying to fetch existing organization');
         const { data: again } = await supabase
           .from('organizations')
           .select('*')
@@ -583,7 +583,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     const errorId = `post-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    logger.error('[POST /api/my/organization] Unexpected error:', { errorId, error });
+    logger.error('[POST /api/my/organization] Unexpected error:', { data: { errorId, error } });
     
     // エラーログを診断APIに送信
     logErrorToDiag({
@@ -630,7 +630,7 @@ async function revalidateOrgCache(userId: string, orgSlug?: string, oldSlug?: st
     
     return true;
   } catch (error) {
-    logger.error('[VERIFY] Transaction cache invalidation failed', error instanceof Error ? error : new Error(String(error)));
+    logger.error('[VERIFY] Transaction cache invalidation failed', { data: error instanceof Error ? error : new Error(String(error)) });
     return false;
   }
 }
@@ -649,7 +649,7 @@ export async function PUT(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      logger.warn('[my/organization] PUT Not authenticated', { authError, hasUser: !!user });
+      logger.warn('[my/organization] PUT Not authenticated', { data: { authError, hasUser: !!user } });
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
@@ -694,10 +694,10 @@ export async function PUT(request: NextRequest) {
     // 🚫 公開フラグの同期処理: is_published=true の時は status='published' に統一
     if ('is_published' in normalizedData && normalizedData.is_published === true) {
       normalizedData.status = 'published';
-      logger.debug('Debug', '[VERIFY] Auto-sync: is_published=true → status=published');
+      logger.debug('[VERIFY] Auto-sync: is_published=true → status=published');
     } else if ('is_published' in normalizedData && normalizedData.is_published === false) {
       normalizedData.status = 'draft';
-      logger.debug('Debug', '[VERIFY] Auto-sync: is_published=false → status=draft');
+      logger.debug('[VERIFY] Auto-sync: is_published=false → status=draft');
     }
 
     // 更新データの準備（created_byは変更不可）
@@ -709,7 +709,7 @@ export async function PUT(request: NextRequest) {
     // 🚀 GPT恒久対策: 空文字の日付フィールドを検出（デバッグ用）
     const emptyDatesUpdate = findEmptyDateFields(updateData, ['established_at']);
     if (emptyDatesUpdate.length) {
-      logger.warn('⚠️ UPDATE: Empty date fields detected, normalizing', emptyDatesUpdate);
+      logger.warn('⚠️ UPDATE: Empty date fields detected, normalizing', { data: emptyDatesUpdate });
     }
 
     // 🚀 GPT恒久対策: UPDATE直前の確実な正規化
@@ -717,7 +717,7 @@ export async function PUT(request: NextRequest) {
       dateFields: ['established_at'], // DBにある日付カラムを列挙
     });
 
-    logger.info('🔍 Normalized update data:', JSON.stringify(updateData, null, 2));
+    logger.info('🔍 Normalized update data', { data: JSON.stringify(updateData, null, 2) });
 
     // 🚨 最終ガード: UPDATE時も空文字が残っている場合の緊急対応
     const updateDateFieldsToCheck = ['established_at'];
@@ -725,23 +725,23 @@ export async function PUT(request: NextRequest) {
       if (updateData[field] === '') {
         logger.error(`🚨 UPDATE EMERGENCY: ${field} still contains empty string after normalization!`);
         updateData[field] = null; // 強制的にnullに変換
-        logger.debug('Debug', `🔧 UPDATE FIXED: ${field} forced to null`);
+        logger.debug(`🔧 UPDATE FIXED: ${field} forced to null`);
       }
     });
 
     // 最終データ確認ログ
-    logger.info('🔍 FINAL update data (after emergency guard):', JSON.stringify(updateData, null, 2));
+    logger.info('🔍 FINAL update data (after emergency guard)', { data: JSON.stringify(updateData, null, 2) });
 
     // 機能フラグ: 保存=公開の強制適用
     if (PUBLISH_ON_SAVE) {
       updateData.status = 'published';
       updateData.is_published = true;
-      logger.debug('Debug', '[VERIFY] PUBLISH_ON_SAVE enabled: forcing publication status');
+      logger.debug('[VERIFY] PUBLISH_ON_SAVE enabled: forcing publication status');
     }
 
     // ホワイトリスト＆空文字スクラブ適用
     const updatePayload = buildOrgInsert(updateData);
-    logger.debug('API/my/organization UPDATE payload (final)', updatePayload);
+    logger.debug('API/my/organization UPDATE payload (final)', { updatePayload });
 
     const { data, error } = await supabase
       .from('organizations')
@@ -752,7 +752,7 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
-      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
       return handleApiError(error);
     }
 
@@ -774,7 +774,7 @@ export async function PUT(request: NextRequest) {
     
     // If immediate refetch fails, try once more with small delay
     if (refetchError || !freshData) {
-      logger.warn('[FORCED_FRESH] Initial refetch failed, retrying after delay', refetchError);
+      logger.warn('[FORCED_FRESH] Initial refetch failed, retrying after delay', { data: refetchError });
       await new Promise(resolve => setTimeout(resolve, 100));
       
       const retryResult = await supabase
@@ -787,9 +787,9 @@ export async function PUT(request: NextRequest) {
       if (retryResult.data) {
         freshData = retryResult.data;
         refetchError = null;
-        logger.debug('Debug', '[FORCED_FRESH] Retry successful');
+        logger.debug('[FORCED_FRESH] Retry successful');
       } else {
-        logger.warn('[FORCED_FRESH] Retry also failed', retryResult.error);
+        logger.warn('[FORCED_FRESH] Retry also failed', { data: retryResult.error });
       }
     }
 
@@ -828,7 +828,7 @@ export async function PUT(request: NextRequest) {
       });
       
     } catch (cacheError) {
-      logger.warn('[VERIFY] Cache invalidation failed', cacheError);
+      logger.warn('[VERIFY] Cache invalidation failed', { data: cacheError });
     }
 
     return NextResponse.json(
@@ -843,7 +843,7 @@ export async function PUT(request: NextRequest) {
 
   } catch (error) {
     const errorId = `put-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    logger.error('[PUT /api/my/organization] Unexpected error:', { errorId, error });
+    logger.error('[PUT /api/my/organization] Unexpected error:', { data: { errorId, error } });
     
     // エラーログを診断APIに送信
     logErrorToDiag({
@@ -871,7 +871,7 @@ export async function DELETE(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      logger.warn('[my/organization] DELETE Not authenticated', { authError, hasUser: !!user });
+      logger.warn('[my/organization] DELETE Not authenticated', { data: { authError, hasUser: !!user } });
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
@@ -894,7 +894,7 @@ export async function DELETE(request: NextRequest) {
       .eq('created_by', user.id);
 
     if (error) {
-      logger.error('Database error', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
       return handleApiError(error);
     }
 
@@ -910,7 +910,7 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     const errorId = `delete-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    logger.error('[DELETE /api/my/organization] Unexpected error:', { errorId, error });
+    logger.error('[DELETE /api/my/organization] Unexpected error:', { data: { errorId, error } });
     
     // エラーログを診断APIに送信
     logErrorToDiag({

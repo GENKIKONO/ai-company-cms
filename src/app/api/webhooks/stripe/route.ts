@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const validationResult = StripeWebhookSchema.safeParse(event);
     
     if (!validationResult.success) {
-      logger.error('Invalid webhook payload:', validationResult.error);
+      logger.error('Invalid webhook payload:', { data: validationResult.error });
       return NextResponse.json(
         { error: 'Invalid payload' },
         { status: 400 }
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
 
   } catch (error) {
-    logger.error('Stripe webhook error:', error);
+    logger.error('Stripe webhook error:', { data: error });
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }
@@ -143,7 +143,7 @@ function verifyStripeSignature(payload: string, signature: string): boolean {
     );
 
   } catch (error) {
-    logger.error('Signature verification error:', error);
+    logger.error('Signature verification error:', { data: error });
     return false;
   }
 }
@@ -185,7 +185,7 @@ async function handleSubscriptionEvent(supabase: any, event: any): Promise<void>
     .eq('stripe_customer_id', subscription.customer);
 
   if (error) {
-    logger.error('Failed to update organization subscription:', error);
+    logger.error('Failed to update organization subscription:', { data: error });
     throw error;
   }
 }
@@ -209,11 +209,11 @@ async function handlePaymentSucceeded(supabase: any, event: any): Promise<void> 
     if (error && error.code === '42P01') {
       logger.warn('payment_history table does not exist, skipping insert');
     } else if (error) {
-      logger.error('Failed to record payment:', error);
+      logger.error('Failed to record payment:', { data: error });
       throw error;
     }
   } catch (error) {
-    logger.warn('Payment history logging failed:', error);
+    logger.warn('Payment history logging failed:', { data: error });
   }
 }
 
@@ -233,7 +233,7 @@ async function handlePaymentFailed(supabase: any, event: any): Promise<void> {
     .eq('stripe_customer_id', invoice.customer);
 
   if (error) {
-    logger.error('Failed to update organization on payment failure:', error);
+    logger.error('Failed to update organization on payment failure:', { data: error });
   }
 }
 

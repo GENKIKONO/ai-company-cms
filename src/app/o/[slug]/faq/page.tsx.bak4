@@ -28,15 +28,15 @@ async function getFAQData(slug: string): Promise<FAQPageData | null> {
       faqs: result.data.faqs || []
     };
   } catch (error) {
-    logger.error('Failed to fetch FAQ data', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Failed to fetch FAQ data', { data: error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
 
 export async function generateMetadata(
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const data = await getFAQData(resolvedParams.slug);
 
   if (!data) {
@@ -73,9 +73,9 @@ export async function generateMetadata(
 export default async function FAQPage({
   params
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const data = await getFAQData(resolvedParams.slug);
 
   if (!data) {

@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
 
   } catch (error) {
-    logger.error('Resend webhook error:', error);
+    logger.error('Resend webhook error:', { data: error });
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }
@@ -88,10 +88,10 @@ async function processResendEvent(event: any): Promise<void> {
     if (error && error.code === '42P01') {
       logger.warn('email_logs table does not exist, skipping insert');
     } else if (error) {
-      logger.error('Failed to log email event:', error);
+      logger.error('Failed to log email event:', { data: error });
     }
   } catch (error) {
-    logger.warn('Email event logging failed:', error);
+    logger.warn('Email event logging failed:', { data: error });
   }
 }
 

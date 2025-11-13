@@ -26,13 +26,14 @@ export async function generateAuthLink({
     : `${APP_URL}/auth/confirm`;
   
   try {
-    logger.info({
-      event: 'auth_link_generating',
-      type,
-      email,
-      redirectTo,
-      requestId,
-      timestamp: new Date().toISOString()
+    logger.info('auth_link_generating', {
+      data: {
+        type,
+        email,
+        redirectTo,
+        requestId,
+        timestamp: new Date().toISOString()
+      }
     });
 
     const admin = supabaseAdmin();
@@ -73,13 +74,14 @@ export async function generateAuthLink({
     }
 
     if (error) {
-      logger.error({
-        event: 'auth_link_error',
-        type,
-        email,
-        requestId,
-        error: error.message || error,
-        timestamp: new Date().toISOString()
+      logger.error('auth_link_error', {
+        data: {
+          type,
+          email,
+          requestId,
+          error: error.message || error,
+          timestamp: new Date().toISOString()
+        }
       });
 
       return {
@@ -89,13 +91,14 @@ export async function generateAuthLink({
       };
     }
 
-    logger.info({
-      event: 'auth_link_generated',
-      type,
-      email,
-      requestId,
-      hasUrl: !!data?.properties?.action_link,
-      timestamp: new Date().toISOString()
+    logger.info('auth_link_generated', {
+      data: {
+        type,
+        email,
+        requestId,
+        hasUrl: !!data?.properties?.action_link,
+        timestamp: new Date().toISOString()
+      }
     });
 
     return {
@@ -107,13 +110,14 @@ export async function generateAuthLink({
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     
-    logger.error({
-      event: 'auth_link_error',
-      type,
-      email,
-      requestId,
-      error: errorMessage,
-      timestamp: new Date().toISOString()
+    logger.error('auth_link_error', {
+      data: {
+        type,
+        email,
+        requestId,
+        error: errorMessage,
+        timestamp: new Date().toISOString()
+      }
     });
 
     return {

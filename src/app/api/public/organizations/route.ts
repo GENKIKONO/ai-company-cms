@@ -50,10 +50,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .eq('is_published', true)
       .order('created_at', { ascending: false });
 
-    logger.info('[public/organizations] orgs:', orgData?.length || 0);
+    logger.info(`[public/organizations] orgs count: ${orgData?.length || 0}`);
 
     if (orgError) {
-      logger.error('[public/organizations] organizations query error:', orgError);
+      logger.error('[public/organizations] organizations query error', { data: { error: orgError } });
       throw new Error(`Organizations query failed: ${orgError.message}`);
     }
 
@@ -101,13 +101,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .in('organization_id', organizationIds);
 
       if (servicesError) {
-        logger.warn('[public/organizations] services query failed:', servicesError.message);
+        logger.warn('[public/organizations] services query failed', { data: { error: servicesError.message } });
         servicesData = [];
       } else {
         servicesData = services || [];
       }
     } catch (error) {
-      logger.warn('[public/organizations] services query error:', error);
+      logger.warn('[public/organizations] services query error:', { data: error });
       servicesData = [];
     }
 
@@ -119,13 +119,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .in('organization_id', organizationIds);
 
       if (caseStudiesError) {
-        logger.warn('[public/organizations] case studies query failed:', caseStudiesError.message);
+        logger.warn('[public/organizations] case studies query failed', { data: { error: caseStudiesError.message } });
         caseStudiesData = [];
       } else {
         caseStudiesData = caseStudies || [];
       }
     } catch (error) {
-      logger.warn('[public/organizations] case studies query error:', error);
+      logger.warn('[public/organizations] case studies query error:', { data: error });
       caseStudiesData = [];
     }
 
@@ -174,7 +174,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
 
   } catch (error) {
-    logger.error('[public/organizations] API Error:', error);
+    logger.error('[public/organizations] API Error:', { data: error });
     
     return NextResponse.json({
       error: 'Internal server error',

@@ -27,15 +27,15 @@ async function getCaseStudiesData(slug: string): Promise<CaseStudiesPageData | n
       case_studies: result.data.case_studies || []
     };
   } catch (error) {
-    logger.error('Failed to fetch case studies data', error instanceof Error ? error : new Error(String(error)));
+    logger.error('Failed to fetch case studies data', { data: error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
 
 export async function generateMetadata(
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const data = await getCaseStudiesData(resolvedParams.slug);
 
   if (!data) {
@@ -72,9 +72,9 @@ export async function generateMetadata(
 export default async function CaseStudiesPage({
   params
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const data = await getCaseStudiesData(resolvedParams.slug);
 
   if (!data) {
