@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function NewPostPage() {
   const [loading, setLoading] = useState(false);
@@ -32,12 +33,30 @@ export default function NewPostPage() {
         })
       });
 
-      const result = await response.json();
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('認証が必要です。ログインし直してください。');
+          return;
+        }
+        
+        const result = await response.json();
+        
+        if (response.status === 404 && result.code === 'ORG_NOT_FOUND') {
+          setError('企業情報が見つかりません。先に企業情報を作成してください。');
+        } else if (response.status >= 500) {
+          setError('サーバーエラーが発生しました。しばらく後にお試しください。');
+        } else {
+          setError(result.error || result.message || '作成に失敗しました');
+        }
+        return;
+      }
 
-      if (response.ok && result.data) {
-        router.push('/dashboard/posts');
+      const result = await response.json();
+      
+      if (result.data) {
+        router.replace('/dashboard/posts');
       } else {
-        setError(result.message || result.error || '作成に失敗しました');
+        setError(result.error || result.message || '作成に失敗しました');
       }
     } catch (err) {
       setError('ネットワークエラーが発生しました');
@@ -54,12 +73,13 @@ export default function NewPostPage() {
             <h1 className="text-2xl font-bold text-gray-900">新しい記事</h1>
             <p className="text-gray-600 mt-2">記事の情報を入力してください</p>
           </div>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+          <Link
+            href="/dashboard"
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 inline-block"
+            replace
           >
             ダッシュボードに戻る
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -133,13 +153,13 @@ export default function NewPostPage() {
           >
             {loading ? '作成中...' : '作成'}
           </button>
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400"
+          <Link
+            href="/dashboard/posts"
+            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 inline-block text-center"
+            replace
           >
             キャンセル
-          </button>
+          </Link>
         </div>
       </form>
     </div>

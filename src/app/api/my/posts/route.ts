@@ -77,11 +77,19 @@ export async function POST(request: NextRequest) {
       .from('organizations')
       .select('id')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
-    if (orgError || !organization) {
+    if (orgError) {
+      logger.error('[my/posts] Failed to fetch organization', { data: orgError });
+      return NextResponse.json({ error: '企業情報の取得に失敗しました' }, { status: 500 });
+    }
+
+    if (!organization) {
       logger.debug('[my/posts] No organization found for user');
-      return NextResponse.json({ message: 'Organization required to create posts' }, { status: 400 });
+      return NextResponse.json({ 
+        error: '企業情報が見つかりません', 
+        code: 'ORG_NOT_FOUND' 
+      }, { status: 404 });
     }
 
     // リクエストボディを取得・検証
