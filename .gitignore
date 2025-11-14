@@ -38,3 +38,25 @@ next-env.d.ts
 # UAT logs (contain potentially sensitive test data)
 docs/uat/logs/*
 !docs/uat/logs/README.md
+
+# Backup files and temporary files
+*.backup
+*.bak
+*~
+*.tmp
+*.orig
+*.swp
+*.swo
+.#*
+#*#
+
+# Editor temporary files
+.vscode/settings.json
+*.code-workspace
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+# Stage documentation (temporary)
+stage1-task*.md

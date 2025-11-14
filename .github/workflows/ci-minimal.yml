@@ -1,0 +1,172 @@
+name: Minimal CI - Enforcement System
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/app/api/enforcement/**'
+      - 'src/tests/enforcement-*'
+      - 'supabase/migrations/*enforcement*'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/app/api/enforcement/**'
+      - 'src/tests/enforcement-*'
+      - 'supabase/migrations/*enforcement*'
+
+env:
+  NODE_VERSION: '18'
+  # Mock/Test environment variables (no real DB connection needed for core tests)
+  NEXT_PUBLIC_SUPABASE_URL: 'https://mock-project.supabase.co'
+  SUPABASE_SERVICE_ROLE_KEY: 'mock_service_role_key'
+  NEXT_PUBLIC_SITE_URL: 'https://test.aiohub.jp'
+  NODE_ENV: 'test'
+  LOG_LEVEL: 'warn'
+
+jobs:
+  enforcement-tests:
+    name: Enforcement System Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type checking
+        run: npm run typecheck
+
+      - name: Lint enforcement code
+        run: npx eslint src/app/api/enforcement/ src/tests/enforcement-* --ext .ts,.tsx
+
+      - name: Run core enforcement tests (simple/unit only)
+        run: |
+          echo "Running lightweight enforcement tests (DB-independent)..."
+          npm run test -- src/tests/enforcement-auto-unpublish-simple.test.ts --verbose
+
+      - name: Check enforcement API compile
+        run: |
+          echo "Verifying enforcement API files compile without errors..."
+          npx tsc --noEmit src/app/api/enforcement/actions/_shared.ts
+          npx tsc --noEmit src/app/api/enforcement/actions/warn/route.ts
+          npx tsc --noEmit src/app/api/enforcement/actions/suspend/route.ts
+
+      # NOTE: Integration tests that require real DB are skipped in CI
+      # Use scripts/rls-verification-test.js for manual DB testing
+      - name: Verify test configuration
+        run: |
+          echo "✅ Core enforcement tests completed"
+          echo "📝 For full integration testing, run: scripts/rls-verification-test.js"
+          echo "🔧 Integration tests are intentionally skipped in CI (marked with describe.skip)"
+
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for sensitive data
+        run: |
+          echo "Checking for sensitive data in enforcement files..."
+          
+          # Check for hardcoded secrets
+          if grep -r "sk_live_\|pk_live_\|whsec_" src/app/api/enforcement/ || true; then
+            echo "❌ Found hardcoded Stripe secrets"
+            exit 1
+          fi
+          
+          # Check for hardcoded Supabase keys
+          if grep -r "eyJ.*\." src/app/api/enforcement/ | grep -v "process.env" || true; then
+            echo "❌ Found hardcoded Supabase keys"
+            exit 1
+          fi
+          
+          echo "✅ No sensitive data found in enforcement code"
+
+      - name: Verify environment variable usage
+        run: |
+          echo "Verifying proper environment variable usage..."
+          
+          # Ensure Service Role Key is used properly
+          grep -r "SUPABASE_SERVICE_ROLE_KEY" src/app/api/enforcement/ || {
+            echo "❌ SUPABASE_SERVICE_ROLE_KEY not found in enforcement code"
+            exit 1
+          }
+          
+          # Ensure no direct secret usage
+          if grep -r "eyJ" src/app/api/enforcement/ | grep -v "process.env"; then
+            echo "❌ Found direct secret usage"
+            exit 1
+          fi
+          
+          echo "✅ Environment variables properly configured"
+
+  documentation-check:
+    name: Documentation Verification
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check enforcement documentation
+        run: |
+          echo "Verifying enforcement system documentation..."
+          
+          # Check for required documentation files
+          if [ ! -f "docs/ENFORCEMENT_OPERATIONS_MANUAL.md" ]; then
+            echo "❌ Missing enforcement operations manual"
+            exit 1
+          fi
+          
+          if [ ! -f "docs/ENFORCEMENT_TESTING.md" ]; then
+            echo "⚠️ Missing enforcement testing guide (recommended)"
+          fi
+          
+          # Verify auto-unpublish documentation in code
+          if ! grep -q "auto-unpublish" src/app/api/enforcement/actions/_shared.ts; then
+            echo "❌ Missing auto-unpublish documentation in code"
+            exit 1
+          fi
+          
+          echo "✅ Documentation checks passed"
+
+      - name: Verify environment documentation
+        run: |
+          echo "Checking environment variable documentation..."
+          
+          if [ ! -f "docs/ENVIRONMENT_VARIABLES.md" ]; then
+            echo "❌ Missing environment variables documentation"
+            exit 1
+          fi
+          
+          # Check for enforcement-specific env vars
+          if ! grep -q "ENFORCEMENT_CRON_TOKEN" docs/ENVIRONMENT_VARIABLES.md; then
+            echo "⚠️ Missing ENFORCEMENT_CRON_TOKEN documentation"
+          fi
+          
+          echo "✅ Environment documentation verified"
+
+# 🎯 Current CI Strategy:
+# - Runs only lightweight tests that don't require real DB connections
+# - Focuses on code quality (lint, typecheck, basic unit tests)  
+# - Skips integration tests that need Supabase setup
+# - For full testing: use scripts/rls-verification-test.js manually
+#
+# 🔧 To enable full CI integration:
+# 1. Set up test Supabase project
+# 2. Configure GitHub Secrets (see docs/CI_SECRETS_SETUP.md)
+# 3. Update env vars to use real secrets instead of mocks
+# 4. Enable integration tests (remove describe.skip)
+#
+# Only run on enforcement-related changes to minimize CI usage

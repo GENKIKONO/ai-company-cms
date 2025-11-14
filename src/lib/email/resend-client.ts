@@ -67,7 +67,7 @@ export async function sendHtmlEmail({
     });
 
     if (error) {
-      logger.error({
+      logger.error('Resend email send failed', {
         event: 'auth_email_error',
         provider: 'resend',
         to,
@@ -103,7 +103,7 @@ export async function sendHtmlEmail({
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     
-    logger.error({
+    logger.error('Resend unexpected error', {
       event: 'auth_email_error',
       provider: 'resend',
       to,

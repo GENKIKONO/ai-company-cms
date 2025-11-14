@@ -1,35 +1,32 @@
-'use client';
+import { redirect } from 'next/navigation';
+import { getServerUserWithStatus } from '@/lib/auth/server';
+import { DashboardLayoutContent } from '@/components/dashboard/DashboardLayoutContent';
+import type { AccountStatus } from '@/lib/auth/account-status-guard';
 
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AppErrorBoundary } from '@/components/common/AppErrorBoundary';
-import { ToastProvider } from '@/components/ui/toast';
-
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Get user profile with account status
+  const userProfile = await getServerUserWithStatus();
+  
+  // If no user session, redirect to login
+  if (!userProfile) {
+    redirect('/auth/login');
+  }
 
+  const accountStatus: AccountStatus = userProfile.accountStatus;
+
+  // If account is deleted, redirect to login (session should be invalid)
+  if (accountStatus === 'deleted') {
+    redirect('/auth/login');
+  }
+
+  // Render dashboard with account status awareness
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-[var(--aio-page-bg, #f3f4f6)]">
-        {/* デスクトップ用サイドバー */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-          <DashboardSidebar />
-        </div>
-
-        {/* メインコンテンツエリア */}
-        <div className="lg:pl-64">
-          <main className="py-10">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <AppErrorBoundary>
-                {children}
-              </AppErrorBoundary>
-            </div>
-          </main>
-        </div>
-
-      </div>
-    </ToastProvider>
+    <DashboardLayoutContent accountStatus={accountStatus}>
+      {children}
+    </DashboardLayoutContent>
   );
 }

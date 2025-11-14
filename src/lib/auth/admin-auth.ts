@@ -7,6 +7,7 @@ import { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { env } from '@/lib/env';
 import { logger } from '@/lib/utils/logger';
+import { assertAccountUsable, canAccessAdminFeatures, type AccountStatus } from '@/lib/auth/account-status-guard';
 
 export interface AuthContext {
   user: {
@@ -64,12 +65,26 @@ export async function requireAdminAuth(request: NextRequest): Promise<AuthResult
       };
     }
 
-    // 管理者権限をチェック
-    const isAdmin = await checkAdminPermission(user.id, user.email);
+    // プロファイル情報取得（account_status含む）
+    const { isAdmin, accountStatus } = await checkAdminPermissionWithStatus(user.id, user.email);
     if (!isAdmin) {
       return {
         success: false,
         error: 'Admin access required'
+      };
+    }
+
+    // アカウント状態チェック（active/warned以外は管理機能アクセス不可）
+    try {
+      assertAccountUsable(accountStatus);
+    } catch (error: any) {
+      // 制裁状態の場合は適切なエラーコードを返す
+      const errorMessage = error.code === 'ACCOUNT_DELETED' ? 'Authentication required' : 'Admin access restricted';
+      const statusCode = error.status || 403;
+      
+      return {
+        success: false,
+        error: `${errorMessage}: ${error.message || 'Account status restriction'}`
       };
     }
 
@@ -93,7 +108,7 @@ export async function requireAdminAuth(request: NextRequest): Promise<AuthResult
 }
 
 /**
- * 管理者権限チェック
+ * 管理者権限チェック（従来版）
  */
 async function checkAdminPermission(userId: string, email?: string): Promise<boolean> {
   // 環境変数で設定された管理者メールアドレスとマッチするかチェック
@@ -113,6 +128,59 @@ async function checkAdminPermission(userId: string, email?: string): Promise<boo
   // 例: データベースでユーザーの role を確認
   
   return false;
+}
+
+/**
+ * 管理者権限・アカウント状態チェック（account_status含む）
+ * @param userId - ユーザーID
+ * @param email - メールアドレス
+ * @returns 管理者権限とアカウントステータス
+ */
+async function checkAdminPermissionWithStatus(userId: string, email?: string): Promise<{
+  isAdmin: boolean;
+  accountStatus: AccountStatus;
+}> {
+  try {
+    // Supabaseクライアント作成（Service Role使用）
+    const supabase = createServerClient(
+      env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll: () => [],
+          setAll: () => {},
+        },
+      }
+    );
+
+    // プロファイル情報取得
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role, account_status')
+      .eq('id', userId)
+      .single();
+
+    const accountStatus = (profile?.account_status || 'active') as AccountStatus;
+    
+    // 既存の管理者チェックロジックを実行
+    let isAdmin = await checkAdminPermission(userId, email);
+    
+    // データベースのroleもチェック
+    if (!isAdmin && profile?.role === 'admin') {
+      isAdmin = true;
+    }
+
+    return {
+      isAdmin,
+      accountStatus
+    };
+  } catch (error) {
+    logger.error('Admin permission check error', { data: error });
+    return {
+      isAdmin: false,
+      accountStatus: 'active' as AccountStatus
+    };
+  }
 }
 
 /**

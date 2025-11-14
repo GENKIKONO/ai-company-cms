@@ -5,7 +5,7 @@
 /* eslint-disable no-console */
 
 import { WebVitalsData } from '../performance';
-import { logger } from '@/lib/log';
+import { logger as utilLogger } from '@/lib/log';
 
 // ログレベル定義
 export enum LogLevel {
@@ -79,17 +79,17 @@ export class ConsoleLogTransport implements LogTransport {
     
     switch (entry.level) {
       case LogLevel.ERROR:
-        logger.error(message, { data: entry.metadata });
-        if (entry.stack) logger.error(entry.stack);
+        utilLogger.error(message, { data: entry.metadata });
+        if (entry.stack) utilLogger.error(entry.stack);
         break;
       case LogLevel.WARN:
-        logger.warn(message, { data: entry.metadata });
+        utilLogger.warn(message, { data: entry.metadata });
         break;
       case LogLevel.INFO:
-        logger.info(message, { data: entry.metadata });
+        utilLogger.info(message, { data: entry.metadata });
         break;
       case LogLevel.DEBUG:
-        logger.debug(message, entry.metadata);
+        utilLogger.debug(message, entry.metadata);
         break;
     }
   }
@@ -270,7 +270,7 @@ export class ErrorMonitor {
     // 開発環境ではコンソール警告
     if (process.env.NODE_ENV === 'production') {
       // TODO: Slack/Discord/メール通知
-      logger.error('🚨 CRITICAL ERROR ALERT 🚨', {
+      utilLogger.error('🚨 CRITICAL ERROR ALERT 🚨', {
         error: error.message,
         category,
         metadata,

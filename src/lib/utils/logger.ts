@@ -1,4 +1,4 @@
-import { logger } from '@/lib/log';
+import { logger as baseLogger } from '@/lib/log';
 
 /* eslint-disable no-console */
 // 本番環境でのログ制御
@@ -41,9 +41,9 @@ export const logger = {
     
     if (isProd) {
       // In production, use structured logging (could be sent to external service)
-      logger.error(JSON.stringify(logData));
+      baseLogger.error(JSON.stringify(logData));
     } else {
-      logger.error(`[${timestamp}] ERROR: ${message}`, { data: { error, context } });
+      baseLogger.error(`[${timestamp}] ERROR: ${message}`, { data: { error, context } });
     }
   },
 
@@ -59,9 +59,9 @@ export const logger = {
     };
 
     if (isProd) {
-      logger.warn(JSON.stringify(logData));
+      baseLogger.warn(JSON.stringify(logData));
     } else {
-      logger.warn(`[${timestamp}] WARN: ${message}`, { data: { data, context } });
+      baseLogger.warn(`[${timestamp}] WARN: ${message}`, { data: { data, context } });
     }
   },
 
@@ -73,7 +73,7 @@ export const logger = {
     }
     
     const timestamp = new Date().toISOString();
-    logger.info(`[${timestamp}] INFO: ${message}`, { data: { data, context } });
+    baseLogger.info(`[${timestamp}] INFO: ${message}`, { data: { data, context } });
   },
 
   debug: (message: string, data?: any, context?: LogContext) => {
@@ -81,7 +81,7 @@ export const logger = {
     if (!isDev) return;
     
     const timestamp = new Date().toISOString();
-    logger.debug(`[${timestamp}] DEBUG: ${message}`, { data, context });
+    baseLogger.debug(`[${timestamp}] DEBUG: ${message}`, { data, context });
   }
 };
 
