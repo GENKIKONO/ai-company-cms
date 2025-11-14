@@ -19,20 +19,42 @@ export default function PostsManagementPage() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const response = await fetch('/api/my/posts', {
-        cache: 'no-store'
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        if (response.status === 401) {
+          throw new Error('認証が必要です。ログインし直してください。');
+        } else if (response.status === 404) {
+          throw new Error('企業情報が見つかりません。');
+        } else if (response.status >= 500) {
+          throw new Error('サーバーエラーが発生しました。しばらく後にお試しください。');
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
       }
       
       const result = await response.json();
+      
+      // API成功だが組織がない場合の処理
+      if (!result.data) {
+        setPosts([]);
+        setError('組織が見つからないため、記事を表示できません。');
+        return;
+      }
+      
       setPosts(result.data || []);
-      setError(null);
+      
     } catch (err) {
       logger.error('Failed to fetch posts:', { data: err });
-      setError(err instanceof Error ? err.message : 'Failed to fetch posts');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch posts';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

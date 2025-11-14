@@ -41,11 +41,18 @@ export async function GET() {
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select('id')
-      .eq('created_by', authData.user.id)
+      .eq('user_id', authData.user.id)
       .single();
 
     if (orgError || !orgData) {
-      return createNotFoundError('Organization');
+      logger.warn('Organization not found for user', { 
+        userId: authData.user.id, 
+        error: orgError?.message 
+      });
+      return NextResponse.json(
+        { data: [], message: 'No organization found for this user' },
+        { status: 200 }
+      );
     }
 
     // 記事一覧を取得（RLSポリシーにより自動的に自分の企業の記事のみ取得）
@@ -110,7 +117,7 @@ export async function POST(request: NextRequest) {
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select('id, plan')
-      .eq('created_by', authData.user.id)
+      .eq('user_id', authData.user.id)
       .single();
 
     if (orgError || !orgData) {
