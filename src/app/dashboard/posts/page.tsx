@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Post } from '@/types/database';
 import { HIGButton } from '@/design-system';
 import PublicPageLinks from '../components/PublicPageLinks';
+import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { logger } from '@/lib/utils/logger';
 
 export default function PostsManagementPage() {
@@ -139,17 +140,7 @@ export default function PostsManagementPage() {
         </div>
 
         {/* ナビゲーション */}
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-flex items-center"
-          >
-            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            ダッシュボードに戻る
-          </Link>
-        </div>
+        <DashboardBackLink />
 
         {/* エラー表示 */}
         {error && (

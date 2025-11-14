@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { UnifiedMobileNav } from "@/components/navigation/UnifiedMobileNav";
 import Footer from "@/components/layout/Footer";
-import Link from "next/link";
+import DynamicHeader from "@/components/header/DynamicHeader";
 
 export const metadata: Metadata = {
   title: "AIO Hub",
@@ -17,23 +17,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className="min-h-dvh antialiased">
-        <header className="hidden lg:block w-full bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center">
-                <Link href="/" className="text-xl font-semibold text-gray-900 hover:text-gray-700 transition-colors">AIO Hub</Link>
-              </div>
-              <nav className="hidden lg:flex space-x-8">
-                <Link href="/pricing" className="text-gray-700 hover:text-gray-900">料金プラン</Link>
-                <Link href="/organizations" className="text-gray-700 hover:text-gray-900">企業ディレクトリ</Link>
-                <Link href="/hearing-service" className="text-gray-700 hover:text-gray-900">ヒアリング代行</Link>
-              </nav>
-              <div className="flex items-center">
-                <Link href="/auth/login" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">ログイン</Link>
-              </div>
-            </div>
-          </div>
-        </header>
+        <DynamicHeader />
         <main className="min-h-dvh pb-0">{children}</main>
         <Footer />
         <UnifiedMobileNav />

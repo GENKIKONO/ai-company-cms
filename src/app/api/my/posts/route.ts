@@ -1,219 +1,149 @@
-// Single-Org Mode API: /api/my/posts
-// ユーザーの企業の記事を管理するためのAPI
-import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
-import type { Post, PostFormData } from '@/types/database';
-import { normalizePostPayload, validateSlug, createAuthError, createNotFoundError, createConflictError, createValidationError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
-import { PLAN_LIMITS } from '@/config/plans';
-import { logger } from '@/lib/utils/logger';
-
-// エラーログ送信関数（失敗しても無視）
-async function logErrorToDiag(errorInfo: any) {
-  try {
-    await fetch('/api/diag/ui', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'server_error',
-        ...errorInfo
-      }),
-      cache: 'no-store'
-    });
-  } catch {
-    // 診断ログ送信失敗は無視
-  }
-}
-
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// GET - ユーザー企業の記事一覧を取得
-export async function GET() {
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase-server';
+import { logger } from '@/lib/log';
+import { z } from 'zod';
+
+// POST request schema
+const createPostSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  content: z.string().optional(),
+  content_markdown: z.string().optional(),
+  slug: z.string().min(1, 'Slug is required'),
+  status: z.enum(['draft', 'published']).default('draft'),
+  is_published: z.boolean().optional()
+});
+
+// GET - ユーザーの投稿を取得
+export async function GET(request: NextRequest) {
   try {
     const supabase = await supabaseServer();
     
     // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
-      return createAuthError();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      logger.debug('[my/posts] Not authenticated');
+      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
-    // ユーザーの企業IDを取得
-    const { data: orgData, error: orgError } = await supabase
+    // ユーザーの組織を取得
+    const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('id')
-      .eq('user_id', authData.user.id)
+      .eq('created_by', user.id)
       .single();
 
-    if (orgError || !orgData) {
-      logger.warn('Organization not found for user', { 
-        userId: authData.user.id, 
-        error: orgError?.message 
-      });
-      return NextResponse.json(
-        { data: [], message: 'No organization found for this user' },
-        { status: 200 }
-      );
+    if (orgError || !organization) {
+      logger.debug('[my/posts] No organization found for user');
+      return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
     }
 
-    // 記事一覧を取得（RLSポリシーにより自動的に自分の企業の記事のみ取得）
-    const { data, error } = await supabase
+    // 組織の投稿を取得
+    const { data: posts, error: postsError } = await supabase
       .from('posts')
       .select('*')
-      .eq('organization_id', orgData.id)
+      .eq('org_id', organization.id)
       .order('created_at', { ascending: false });
 
-    if (error) {
-      logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json(
-        { error: 'Database error', message: error.message },
-        { status: 500 }
-      );
+    if (postsError) {
+      logger.error('[my/posts] Failed to fetch posts', { data: postsError });
+      return NextResponse.json({ message: 'Failed to fetch posts' }, { status: 500 });
     }
 
-    return NextResponse.json({ data: data || [] });
+    return NextResponse.json({ data: posts }, { status: 200 });
 
   } catch (error) {
-    const errorId = generateErrorId('get-posts');
-    logger.error('[GET /api/my/posts] Unexpected error:', { data: { errorId, error } });
-    
-    // エラーログを診断APIに送信
-    logErrorToDiag({
-      errorId,
-      endpoint: 'GET /api/my/posts',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    logger.error('[GET /api/my/posts] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 
-// POST - 新しい記事を作成
+// POST - 新しい投稿を作成
 export async function POST(request: NextRequest) {
   try {
     const supabase = await supabaseServer();
     
     // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
-      return createAuthError();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      logger.debug('[my/posts] Not authenticated');
+      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
-    const body: PostFormData = await request.json();
-
-    // 必須フィールドの検証
-    if (!body.title || !body.slug) {
-      return createValidationError('title/slug', 'Title and slug are required');
-    }
-
-    // slugバリデーション
-    const slugValidation = validateSlug(body.slug);
-    if (!slugValidation.isValid) {
-      return createValidationError('slug', slugValidation.error!);
-    }
-
-    // ユーザーの企業IDとプラン情報を取得
-    const { data: orgData, error: orgError } = await supabase
+    // ユーザーの組織を取得
+    const { data: organization, error: orgError } = await supabase
       .from('organizations')
-      .select('id, plan')
-      .eq('user_id', authData.user.id)
-      .single();
-
-    if (orgError || !orgData) {
-      return createNotFoundError('Organization');
-    }
-
-    // プラン制限チェック
-    const currentPlan = orgData.plan || 'trial';
-    const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.trial;
-    
-    if (planLimits.posts > 0) {
-      const { count: currentCount, error: countError } = await supabase
-        .from('posts')
-        .select('id', { count: 'exact' })
-        .eq('organization_id', orgData.id);
-
-      if (countError) {
-        logger.error('Error counting posts:', { data: countError });
-        return NextResponse.json(
-          { error: 'Database error', message: countError.message },
-          { status: 500 }
-        );
-      }
-
-      if ((currentCount || 0) >= planLimits.posts) {
-        return NextResponse.json(
-          {
-            error: 'Plan limit exceeded',
-            message: '上限に達しました。プランをアップグレードしてください。',
-            currentCount,
-            limit: planLimits.posts,
-            plan: currentPlan
-          },
-          { status: 402 }
-        );
-      }
-    }
-
-    // 同じ企業内でのslugの重複チェック
-    const { data: slugCheck } = await supabase
-      .from('posts')
       .select('id')
-      .eq('organization_id', orgData.id)
-      .eq('slug', body.slug)
+      .eq('created_by', user.id)
       .single();
 
-    if (slugCheck) {
-      return createConflictError('Slug already exists in this organization');
+    if (orgError || !organization) {
+      logger.debug('[my/posts] No organization found for user');
+      return NextResponse.json({ message: 'Organization required to create posts' }, { status: 400 });
     }
 
-    // データの正規化
-    const normalizedData = normalizePostPayload(body);
+    // リクエストボディを取得・検証
+    const body = await request.json();
+    const validatedData = createPostSchema.parse(body);
 
-    // 記事データの作成
+    // published_at の設定
+    const publishedAt = (validatedData.status === 'published' || validatedData.is_published) 
+      ? new Date().toISOString() 
+      : null;
+
+    // 投稿データを準備
     const postData = {
-      ...normalizedData,
-      organization_id: orgData.id,
+      org_id: organization.id,
+      created_by: user.id,
+      title: validatedData.title,
+      slug: validatedData.slug,
+      content_markdown: validatedData.content_markdown || validatedData.content || '',
+      content_html: validatedData.content_markdown || validatedData.content || '', // Simple fallback
+      status: validatedData.is_published ? 'published' : validatedData.status,
+      published_at: publishedAt
     };
 
-    const { data, error } = await supabase
+    // 重複スラッグチェック
+    const { data: existingPost } = await supabase
       .from('posts')
-      .insert([postData])
+      .select('id')
+      .eq('org_id', organization.id)
+      .eq('slug', validatedData.slug)
+      .single();
+
+    if (existingPost) {
+      return NextResponse.json({ 
+        message: 'A post with this slug already exists',
+        error: 'DUPLICATE_SLUG'
+      }, { status: 400 });
+    }
+
+    // 投稿を作成
+    const { data: newPost, error: createError } = await supabase
+      .from('posts')
+      .insert(postData)
       .select()
       .single();
 
-    if (error) {
-      logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
-      
-      // 制約違反の場合
-      if (error.code === '23505') {
-        if (error.message.includes('unique_posts_slug_per_org')) {
-          return createConflictError('Slug already exists in this organization');
-        }
-      }
-      
-      return NextResponse.json(
-        { error: 'Database error', message: error.message },
-        { status: 500 }
-      );
+    if (createError) {
+      logger.error('[my/posts] Failed to create post', { data: createError });
+      return NextResponse.json({ message: 'Failed to create post' }, { status: 500 });
     }
 
-    return NextResponse.json({ data }, { status: 201 });
+    logger.debug('[my/posts] Post created successfully', { id: newPost.id, title: newPost.title });
+    return NextResponse.json({ data: newPost }, { status: 201 });
 
   } catch (error) {
-    const errorId = generateErrorId('post-posts');
-    logger.error('[POST /api/my/posts] Unexpected error:', { data: { errorId, error } });
-    
-    // エラーログを診断APIに送信
-    logErrorToDiag({
-      errorId,
-      endpoint: 'POST /api/my/posts',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        message: 'Validation error',
+        errors: error.errors 
+      }, { status: 400 });
+    }
+
+    logger.error('[POST /api/my/posts] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }

@@ -11,6 +11,7 @@ import { logger } from '@/lib/utils/logger';
 
 export default function EmbedPage() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [services, setServices] = useState<Service[]>([]);
   const [widgetOptions, setWidgetOptions] = useState({
@@ -33,30 +34,71 @@ export default function EmbedPage() {
 
   const fetchData = async () => {
     try {
+      setError(null);
       const user = await getCurrentUser();
-      if (!user) return;
+      if (!user) {
+        setError('ログインが必要です。再度ログインしてください。');
+        return;
+      }
 
       // Get user's organization
       const orgResult = await fetch('/api/my/organization');
-      if (!orgResult.ok) throw new Error('Failed to fetch organization');
+      if (!orgResult.ok) {
+        const errorData = await orgResult.json().catch(() => ({}));
+        logger.error('Organization API error', { 
+          data: { 
+            status: orgResult.status, 
+            statusText: orgResult.statusText, 
+            errorData 
+          }
+        });
+        
+        if (orgResult.status === 401) {
+          setError('認証エラーが発生しました。再度ログインしてください。');
+        } else if (orgResult.status === 500) {
+          setError('サーバーエラーが発生しました。しばらく待ってから再試行してください。');
+        } else {
+          setError('組織情報の取得に失敗しました。');
+        }
+        return;
+      }
       
       const orgData = await orgResult.json();
       const org = orgData.data;
       
+      if (!org) {
+        setError('組織情報が見つかりません。先に企業情報を作成してください。');
+        return;
+      }
+      
       setOrganization(org);
 
       // Get services
-      const servicesResult = await fetch('/api/my/services');
-      if (!servicesResult.ok) throw new Error('Failed to fetch services');
-      
-      const servicesData = await servicesResult.json();
-      setServices(servicesData.data || []);
+      try {
+        const servicesResult = await fetch('/api/my/services');
+        if (servicesResult.ok) {
+          const servicesData = await servicesResult.json();
+          setServices(servicesData.data || []);
+        } else {
+          logger.warn('Services fetch failed', { data: { status: servicesResult.status } });
+          setServices([]);
+        }
+      } catch (servicesError) {
+        logger.warn('Services fetch error', { data: servicesError });
+        setServices([]);
+      }
 
     } catch (error) {
       logger.error('Failed to fetch data', { data: error instanceof Error ? error : new Error(String(error)) });
+      setError('データの取得中にエラーが発生しました。ページを再読み込みしてください。');
     } finally {
       setLoading(false);
     }
+  };
+
+  const retryFetch = () => {
+    setLoading(true);
+    fetchData();
   };
 
   const generateEmbedCode = () => {
@@ -108,14 +150,66 @@ export default function EmbedPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-red-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">エラーが発生しました</h3>
+                <p className="mt-1 text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <button
+              onClick={retryFetch}
+              className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] transition-colors"
+            >
+              再試行
+            </button>
+            <div>
+              <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm">
+                ダッシュボードに戻る
+              </Link>
+            </div>
+            {error.includes('企業情報を作成') && (
+              <div>
+                <Link href="/dashboard/company" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm">
+                  企業情報を作成する
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!organization) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">企業情報が見つかりません</h2>
-          <Link href="/dashboard" className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
-            ダッシュボードに戻る
-          </Link>
+          <div className="mt-4 space-y-2">
+            <div>
+              <button
+                onClick={retryFetch}
+                className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)]"
+              >
+                再試行
+              </button>
+            </div>
+            <div>
+              <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
+                ダッシュボードに戻る
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -123,7 +123,7 @@ export default async function FAQPage({
                 </nav>
               </div>
               <div className="flex items-center space-x-4">
-                <Link href="/login" className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                <Link href="/auth/login" className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                   ログイン
                 </Link>
               </div>
