@@ -35,8 +35,7 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({
-        ok: false,
-        error: 'Unauthorized'
+        error: '認証が必要です'
       }, { status: 401 });
     }
 
@@ -49,8 +48,8 @@ export async function POST(request: NextRequest) {
 
     if (orgError || !orgData) {
       return NextResponse.json({
-        ok: false,
-        error: 'Organization not found'
+        error: '企業情報が見つかりません',
+        code: 'ORG_NOT_FOUND'
       }, { status: 404 });
     }
 
@@ -96,7 +95,6 @@ export async function POST(request: NextRequest) {
         details: slugCheckError.details
       });
       return NextResponse.json({ 
-        ok: false,
         error: 'スラッグの重複チェックに失敗しました',
         code: slugCheckError.code
       }, { status: 500 });
@@ -110,7 +108,6 @@ export async function POST(request: NextRequest) {
         existingServiceId: existingService.id
       });
       return NextResponse.json({ 
-        ok: false,
         error: 'このスラッグは既に使用されています',
         code: 'DUPLICATE_SLUG'
       }, { status: 400 });
@@ -136,7 +133,7 @@ export async function POST(request: NextRequest) {
         .from('services')
         .insert(payload)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         logger.error('[services POST] Failed to create service', {
@@ -153,7 +150,6 @@ export async function POST(request: NextRequest) {
         // Postgres error 42P01 = relation does not exist
         if (error.code === '42P01') {
           return NextResponse.json({
-            ok: false,
             error: 'servicesテーブルが存在しません',
             code: error.code
           }, { status: 500 });
@@ -162,7 +158,6 @@ export async function POST(request: NextRequest) {
         // Postgres error 23502 = not null violation
         if (error.code === '23502') {
           return NextResponse.json({
-            ok: false,
             error: '必須フィールドが不足しています',
             code: error.code,
             details: error.details
@@ -171,7 +166,6 @@ export async function POST(request: NextRequest) {
 
         // その他のデータベースエラー
         return NextResponse.json({
-          ok: false,
           error: 'サービスの作成に失敗しました',
           code: error.code,
           details: error.details,
@@ -200,7 +194,6 @@ export async function POST(request: NextRequest) {
         error: dbError instanceof Error ? dbError : new Error(String(dbError))
       });
       return NextResponse.json({
-        ok: false,
         error: 'データベースエラーが発生しました'
       }, { status: 500 });
     }
@@ -212,7 +205,6 @@ export async function POST(request: NextRequest) {
         issues: error.issues
       });
       return NextResponse.json({
-        ok: false,
         error: '入力データが無効です',
         details: error.issues.map(issue => ({
           field: issue.path.join('.'),
@@ -225,7 +217,6 @@ export async function POST(request: NextRequest) {
       data: error instanceof Error ? error : new Error(String(error)) 
     });
     return NextResponse.json({
-      ok: false,
       error: error instanceof Error ? error.message : 'サーバーエラーが発生しました'
     }, { status: 500 });
   }

@@ -110,7 +110,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
             ご依頼いただきありがとうございます。<br />
             担当者より3営業日以内にご連絡いたします。
           </p>
-          <Link href="/dashboard">
+          <Link href="/dashboard" replace>
             <HIGButton
               variant="primary"
               size="lg"
@@ -130,6 +130,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
         <div className="mb-8">
           <Link
             href="/dashboard"
+            replace
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeft size={18} />

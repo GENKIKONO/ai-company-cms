@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { useToast } from '@/components/ui/toast';
 
 interface FAQ {
   id: string;
@@ -31,6 +32,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
   const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
+  const { addToast } = useToast();
 
   const [formData, setFormData] = useState<FAQFormData>({
     question: '',
@@ -50,10 +52,14 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
         const result = await response.json();
         setFAQs(result.data || []);
       } else {
-        setError('FAQ一覧の取得に失敗しました');
+        const errorMessage = 'FAQ一覧の取得に失敗しました';
+        setError(errorMessage);
+        addToast({ title: errorMessage, type: 'error' });
       }
     } catch (error) {
-      setError('FAQ一覧の取得に失敗しました');
+      const errorMessage = 'FAQ一覧の取得に失敗しました';
+      setError(errorMessage);
+      addToast({ title: errorMessage, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -116,12 +122,31 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
       if (response.ok) {
         await fetchFAQs();
         resetForm();
+        addToast({ title: editingFAQ ? 'FAQを更新しました' : 'FAQを作成しました', type: 'success' });
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'FAQの保存に失敗しました');
+        const errorData = await response.json().catch(() => ({}));
+        
+        let errorMessage = 'FAQの保存に失敗しました';
+        
+        if (response.status === 401) {
+          errorMessage = '認証が必要です。ログインし直してください。';
+        } else if (response.status === 404 && errorData.code === 'ORG_NOT_FOUND') {
+          errorMessage = '企業情報が見つかりません。先に企業情報を作成してください。';
+        } else if (response.status === 403) {
+          errorMessage = 'この操作を行う権限がありません。';
+        } else if (response.status >= 500) {
+          errorMessage = 'サーバーエラーが発生しました。しばらく後にお試しください。';
+        } else {
+          errorMessage = errorData.error || 'FAQの保存に失敗しました';
+        }
+        
+        setError(errorMessage);
+        addToast({ title: errorMessage, type: 'error' });
       }
     } catch (error) {
-      setError('FAQの保存に失敗しました');
+      const errorMessage = 'FAQの保存に失敗しました';
+      setError(errorMessage);
+      addToast({ title: errorMessage, type: 'error' });
     } finally {
       setSubmitting(false);
     }
@@ -139,11 +164,16 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
 
       if (response.ok) {
         await fetchFAQs();
+        addToast({ title: 'FAQを削除しました', type: 'success' });
       } else {
-        setError('FAQの削除に失敗しました');
+        const errorMessage = 'FAQの削除に失敗しました';
+        setError(errorMessage);
+        addToast({ title: errorMessage, type: 'error' });
       }
     } catch (error) {
-      setError('FAQの削除に失敗しました');
+      const errorMessage = 'FAQの削除に失敗しました';
+      setError(errorMessage);
+      addToast({ title: errorMessage, type: 'error' });
     }
   };
 

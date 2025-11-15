@@ -80,16 +80,17 @@ export async function POST(request: NextRequest) {
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
-      return createAuthError();
+      return NextResponse.json({
+        error: '認証が必要です'
+      }, { status: 401 });
     }
 
     const body: FAQFormData = await request.json();
 
     if (!body.question || !body.answer) {
-      return NextResponse.json(
-        { error: 'Validation error', message: 'Question and answer are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({
+        error: '質問と回答は必須です'
+      }, { status: 400 });
     }
 
     const { data: orgData, error: orgError } = await supabase
@@ -99,7 +100,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (orgError || !orgData) {
-      return createNotFoundError('Organization');
+      logger.debug('[my/faqs POST] No organization found for user');
+      return NextResponse.json({ 
+        error: '企業情報が見つかりません', 
+        code: 'ORG_NOT_FOUND' 
+      }, { status: 404 });
     }
 
     // プラン制限チェック
@@ -134,20 +139,41 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const normalizedData = normalizeFAQPayload(body);
-    const faqData = { ...normalizedData, organization_id: orgData.id };
+    // FAQデータを準備
+    const faqData = {
+      organization_id: orgData.id,
+      created_by: authData.user.id,
+      question: body.question,
+      answer: body.answer,
+      category: body.category || null,
+      sort_order: body.sort_order || 1,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
 
     const { data, error } = await supabase
       .from('faqs')
-      .insert([faqData])
+      .insert(faqData)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
-      return NextResponse.json(
-        { error: 'Database error', message: error.message },
-        { status: 500 }
-      );
+      logger.error('[my/faqs POST] Failed to create FAQ', {
+        userId: authData.user.id,
+        orgId: orgData.id,
+        faqData: { ...faqData, answer: '[内容省略]' },
+        error: error,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        message: error.message
+      });
+      return NextResponse.json({
+        error: 'FAQの作成に失敗しました',
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      }, { status: 500 });
     }
 
     return NextResponse.json({ data }, { status: 201 });

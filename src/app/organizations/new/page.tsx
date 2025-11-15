@@ -420,7 +420,7 @@ export default function NewOrganizationPage() {
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-4">
             <li>
-              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard" replace className="text-gray-500 hover:text-gray-700">
                 マイページ
               </Link>
             </li>
