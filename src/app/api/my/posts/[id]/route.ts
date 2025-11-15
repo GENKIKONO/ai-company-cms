@@ -27,9 +27,14 @@ export async function DELETE(
       .from('organizations')
       .select('id')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
-    if (orgError || !organization) {
+    if (orgError) {
+      logger.error('[my/posts/delete] Failed to fetch organization', { data: orgError });
+      return NextResponse.json({ message: 'Failed to fetch organization' }, { status: 500 });
+    }
+
+    if (!organization) {
       logger.debug('[my/posts/delete] No organization found for user');
       return NextResponse.json({ message: 'Organization not found' }, { status: 404 });
     }
@@ -40,9 +45,14 @@ export async function DELETE(
       .select('id')
       .eq('id', postId)
       .eq('org_id', organization.id)
-      .single();
+      .maybeSingle();
 
-    if (postError || !post) {
+    if (postError) {
+      logger.error('[my/posts/delete] Failed to check post existence', { data: postError });
+      return NextResponse.json({ message: 'Failed to check post existence' }, { status: 500 });
+    }
+
+    if (!post) {
       logger.debug('[my/posts/delete] Post not found or access denied', { postId, orgId: organization.id });
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }

@@ -33,11 +33,16 @@ export async function GET(request: NextRequest) {
       .from('organizations')
       .select('id')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
-    if (orgError || !organization) {
+    if (orgError) {
+      logger.error('[my/posts] Failed to fetch organization', { data: orgError });
+      return NextResponse.json({ message: 'Failed to fetch organization' }, { status: 500 });
+    }
+
+    if (!organization) {
       logger.debug('[my/posts] No organization found for user');
-      return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
+      return NextResponse.json({ data: [], message: 'No organization found', code: 'ORG_NOT_FOUND' }, { status: 200 });
     }
 
     // 組織の投稿を取得
@@ -107,8 +112,7 @@ export async function POST(request: NextRequest) {
       created_by: user.id,
       title: validatedData.title,
       slug: validatedData.slug,
-      content_markdown: validatedData.content_markdown || validatedData.content || '',
-      content_html: validatedData.content_markdown || validatedData.content || '', // Simple fallback
+      content: validatedData.content_markdown || validatedData.content || '',
       status: validatedData.is_published ? 'published' : validatedData.status,
       published_at: publishedAt
     };
@@ -119,7 +123,7 @@ export async function POST(request: NextRequest) {
       .select('id')
       .eq('org_id', organization.id)
       .eq('slug', validatedData.slug)
-      .single();
+      .maybeSingle();
 
     if (existingPost) {
       return NextResponse.json({ 

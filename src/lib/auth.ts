@@ -65,10 +65,15 @@ export async function getCurrentUser(): Promise<AppUser | null> {
       .from('profiles')
       .select('id, full_name, avatar_url, created_at')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (error) {
       authLogger.error('fetch user profile', error);
+      return null
+    }
+
+    if (!profile) {
+      authLogger.error('user profile not found', new Error('Profile not found'), { userId: user.id });
       return null
     }
 
@@ -232,12 +237,13 @@ export const profile = {
       .from('profiles')
       .select('id, full_name, avatar_url, created_at')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') return null; // レコードが見つからない
       throw error;
     }
+
+    if (!profile) return null; // レコードが見つからない
 
     // Get email from auth.users since it's not in profiles
     const { data: { user } } = await supabaseBrowser.auth.getUser();
