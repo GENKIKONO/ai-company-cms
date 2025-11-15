@@ -82,7 +82,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
       if (response.ok) {
         setIsSubmitted(true);
         setTimeout(() => {
-          router.push('/dashboard');
+          router.replace('/dashboard');
         }, 3000);
       } else {
         const error = await response.json();

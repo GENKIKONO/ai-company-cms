@@ -3,6 +3,7 @@ import "./globals.css";
 import { UnifiedMobileNav } from "@/components/navigation/UnifiedMobileNav";
 import Footer from "@/components/layout/Footer";
 import DynamicHeader from "@/components/header/DynamicHeader";
+import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "AIO Hub",
@@ -17,10 +18,12 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className="min-h-dvh antialiased">
-        <DynamicHeader />
-        <main className="min-h-dvh pb-0">{children}</main>
-        <Footer />
-        <UnifiedMobileNav />
+        <ToastProvider>
+          <DynamicHeader />
+          <main className="min-h-dvh pb-0">{children}</main>
+          <Footer />
+          <UnifiedMobileNav />
+        </ToastProvider>
       </body>
     </html>
   );

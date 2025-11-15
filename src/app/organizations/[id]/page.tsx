@@ -124,7 +124,7 @@ export default function EditOrganizationPage() {
           // フォームデータはuseEffectで自動同期される
         } else {
           logger.warn('[VERIFY] No organization data found, redirecting to dashboard');
-          router.push('/dashboard');
+          router.replace('/dashboard');
         }
         
         if (industriesResult.data) {
@@ -132,7 +132,7 @@ export default function EditOrganizationPage() {
         }
       } catch (error) {
         logger.error('Failed to fetch data', { data: error instanceof Error ? error : new Error(String(error)) });
-        router.push('/dashboard');
+        router.replace('/dashboard');
       } finally {
         setLoading(false);
       }

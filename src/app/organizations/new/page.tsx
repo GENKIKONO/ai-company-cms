@@ -382,7 +382,7 @@ export default function NewOrganizationPage() {
       if (isSuccessful) {
         logger.info('Organization creation/retrieval successful');
         // Single-Org モードでは企業作成後はダッシュボードにリダイレクト
-        router.push('/dashboard');
+        router.replace('/dashboard');
       } else {
         logger.error('Organization creation failed - unexpected response structure', { data: result });
         setErrors({ submit: '企業の作成に失敗しました' });

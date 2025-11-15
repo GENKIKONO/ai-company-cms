@@ -63,7 +63,7 @@ export default function EditServicePage() {
         if (orgResult.data) {
           setOrganization(orgResult.data);
         } else {
-          router.push('/dashboard');
+          router.replace('/dashboard');
           return;
         }
 
@@ -89,7 +89,7 @@ export default function EditServicePage() {
         }
       } catch (error) {
         logger.error('Failed to fetch data', { data: error instanceof Error ? error : new Error(String(error)) });
-        router.push('/dashboard');
+        router.replace('/dashboard');
       } finally {
         setLoading(false);
       }
