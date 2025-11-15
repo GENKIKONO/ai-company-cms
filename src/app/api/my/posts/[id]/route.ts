@@ -8,11 +8,12 @@ import { logger } from '@/lib/log';
 // DELETE - 特定の投稿を削除
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
   try {
     const supabase = await supabaseServer();
-    const postId = params.id;
+    const resolvedParams = await params;
+    const postId = resolvedParams.id;
     
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
