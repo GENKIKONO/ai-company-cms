@@ -24,25 +24,47 @@ export default function NewServicePage() {
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get('name')?.toString() || '',
+      summary: formData.get('summary')?.toString() || '',
       description: formData.get('description')?.toString() || '',
-      price: formData.get('price')?.toString() || '',
+      price: formData.get('price')?.toString() ? parseInt(formData.get('price')?.toString() || '0', 10) : null,
+      duration_months: formData.get('duration_months')?.toString() ? parseInt(formData.get('duration_months')?.toString() || '0', 10) : null,
       category: formData.get('category')?.toString() || '',
+      slug: formData.get('slug')?.toString() || '', // オプション
       is_published: publishStatus === 'published'
     };
 
     try {
-      const response = await fetch('/api/my/services', {
+      const response = await fetch('/api/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
 
-      const result = await response.json();
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        
+        if (response.status === 401) {
+          setError('認証が必要です。ログインし直してください。');
+          return;
+        } else if (response.status === 404 && result.error?.includes('Organization not found')) {
+          setError('企業情報が見つかりません。先に企業情報を作成してください。');
+        } else if (response.status === 400 && result.code === 'DUPLICATE_SLUG') {
+          setError('このスラッグは既に使用されています。別のスラッグを使用してください。');
+        } else if (response.status >= 500) {
+          const errorMsg = result.error || 'サーバーエラーが発生しました。しばらく後にお試しください。';
+          const logDetails = result.code ? ` (${result.code})` : '';
+          setError(errorMsg + logDetails);
+        } else {
+          setError(result.error || result.message || '作成に失敗しました');
+        }
+        return;
+      }
 
-      if (response.ok && result.data) {
+      const result = await response.json();
+      if (result.ok && result.data) {
         router.replace('/dashboard/services');
       } else {
-        setError(result.message || result.error || '作成に失敗しました');
+        setError(result.error || 'サービスの作成に失敗しました');
       }
     } catch (err) {
       setError('ネットワークエラーが発生しました');
@@ -140,6 +162,22 @@ export default function NewServicePage() {
               placeholder="コンサルティング"
             />
           </div>
+        </div>
+
+        <div>
+          <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+            スラッグ（オプション）
+          </label>
+          <input
+            type="text"
+            id="slug"
+            name="slug"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+            placeholder="ai-consulting-service"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            URL用の識別子。空白の場合は自動生成されます。半角英数字とハイフンのみ使用可能。
+          </p>
         </div>
 
         <ServiceImageUploader

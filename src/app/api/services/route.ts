@@ -5,6 +5,27 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { logger } from '@/lib/utils/logger';
+import { z } from 'zod';
+
+const createServiceSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  summary: z.string().optional(),
+  description: z.string().optional(),
+  price: z.number().optional().nullable(),
+  duration_months: z.number().optional().nullable(),
+  category: z.string().optional().nullable(),
+  slug: z.string().optional(), // スラッグは任意（自動生成される）
+  is_published: z.boolean().optional()
+});
+
+// サービス名からスラッグを生成するユーティリティ
+function generateServiceSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 50) + '-' + Date.now().toString(36);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,14 +54,65 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // リクエストボディ解析
+    // リクエストボディ解析とバリデーション
     const body = await request.json();
-    const { name, summary, description, price, duration_months, category } = body;
+    
+    // 数値フィールドの変換
+    const normalizedBody = {
+      ...body,
+      price: body.price ? parseInt(body.price, 10) : null,
+      duration_months: body.duration_months ? parseInt(body.duration_months, 10) : null
+    };
+    
+    const validatedData = createServiceSchema.parse(normalizedBody);
+    
+    logger.debug('[services POST] Service data validated', {
+      userId: user.id,
+      orgId: orgData.id,
+      name: validatedData.name,
+      slug: validatedData.slug
+    });
 
-    if (!name) {
-      return NextResponse.json({
+    // スラッグの生成または検証
+    const slug = validatedData.slug && validatedData.slug.trim() 
+      ? validatedData.slug.trim()
+      : generateServiceSlug(validatedData.name);
+
+    // スラッグの重複チェック
+    const { data: existingService, error: slugCheckError } = await supabase
+      .from('services')
+      .select('id')
+      .eq('organization_id', orgData.id)
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (slugCheckError) {
+      logger.error('[services POST] Failed to check slug uniqueness', {
+        userId: user.id,
+        orgId: orgData.id,
+        slug: slug,
+        error: slugCheckError,
+        code: slugCheckError.code,
+        details: slugCheckError.details
+      });
+      return NextResponse.json({ 
         ok: false,
-        error: 'name is required'
+        error: 'スラッグの重複チェックに失敗しました',
+        code: slugCheckError.code
+      }, { status: 500 });
+    }
+
+    if (existingService) {
+      logger.warn('[services POST] Duplicate slug detected', {
+        userId: user.id,
+        orgId: orgData.id,
+        slug: slug,
+        existingServiceId: existingService.id
+      });
+      return NextResponse.json({ 
+        ok: false,
+        error: 'このスラッグは既に使用されています',
+        code: 'DUPLICATE_SLUG'
       }, { status: 400 });
     }
 
@@ -48,13 +120,16 @@ export async function POST(request: NextRequest) {
     try {
       const payload = {
         organization_id: orgData.id,
-        name,
-        summary: summary || null,
-        description: description || null,
-        price: price ? parseInt(price, 10) : null,
-        duration_months: duration_months ? parseInt(duration_months, 10) : null,
-        category: category || null,
-        created_by: user.id, // ← ここで必ず設定（認証済みユーザーID）
+        name: validatedData.name,
+        summary: validatedData.summary || null,
+        description: validatedData.description || null,
+        price: validatedData.price,
+        duration_months: validatedData.duration_months,
+        category: validatedData.category,
+        slug: slug,
+        created_by: user.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       const { data, error } = await supabase
@@ -64,38 +139,53 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) {
+        logger.error('[services POST] Failed to create service', {
+          userId: user.id,
+          orgId: orgData.id,
+          serviceData: { ...payload, description: '[内容省略]' },
+          error: error,
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+          message: error.message
+        });
+
         // Postgres error 42P01 = relation does not exist
         if (error.code === '42P01') {
           return NextResponse.json({
             ok: false,
             error: 'servicesテーブルが存在しません',
-            sqlHint: `
--- Supabaseダッシュボードで以下のSQLを実行してください:
-
-CREATE TABLE IF NOT EXISTS public.services (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  org_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  summary TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- RLS (Row Level Security) を有効化
-ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
-
--- ポリシー作成
-CREATE POLICY "Users can manage their org services"
-ON public.services
-FOR ALL
-USING (org_id IN (
-  SELECT id FROM public.organizations WHERE user_id = auth.uid()
-));
-            `
-          });
+            code: error.code
+          }, { status: 500 });
         }
-        throw error;
+
+        // Postgres error 23502 = not null violation
+        if (error.code === '23502') {
+          return NextResponse.json({
+            ok: false,
+            error: '必須フィールドが不足しています',
+            code: error.code,
+            details: error.details
+          }, { status: 400 });
+        }
+
+        // その他のデータベースエラー
+        return NextResponse.json({
+          ok: false,
+          error: 'サービスの作成に失敗しました',
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        }, { status: 500 });
       }
+
+      logger.info('[services POST] Service created successfully', {
+        userId: user.id,
+        orgId: orgData.id,
+        serviceId: data.id,
+        name: data.name,
+        slug: data.slug
+      });
 
       return NextResponse.json({
         ok: true,
@@ -104,7 +194,11 @@ USING (org_id IN (
       }, { status: 201 });
 
     } catch (dbError) {
-      logger.error('Database error:', { data: dbError });
+      logger.error('[services POST] Database error', {
+        userId: user.id,
+        orgId: orgData.id,
+        error: dbError instanceof Error ? dbError : new Error(String(dbError))
+      });
       return NextResponse.json({
         ok: false,
         error: 'データベースエラーが発生しました'
@@ -112,10 +206,27 @@ USING (org_id IN (
     }
 
   } catch (error) {
-    logger.error('Services API error', { data: error instanceof Error ? error : new Error(String(error)) });
+    // Zod バリデーションエラー
+    if (error instanceof z.ZodError) {
+      logger.warn('[services POST] Validation error', {
+        issues: error.issues
+      });
+      return NextResponse.json({
+        ok: false,
+        error: '入力データが無効です',
+        details: error.issues.map(issue => ({
+          field: issue.path.join('.'),
+          message: issue.message
+        }))
+      }, { status: 400 });
+    }
+
+    logger.error('[services POST] Unexpected error', { 
+      data: error instanceof Error ? error : new Error(String(error)) 
+    });
     return NextResponse.json({
       ok: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'サーバーエラーが発生しました'
     }, { status: 500 });
   }
 }
