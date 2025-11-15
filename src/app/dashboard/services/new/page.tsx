@@ -40,7 +40,7 @@ export default function NewServicePage() {
       const result = await response.json();
 
       if (response.ok && result.data) {
-        router.push('/dashboard/services');
+        router.replace('/dashboard/services');
       } else {
         setError(result.message || result.error || '作成に失敗しました');
       }

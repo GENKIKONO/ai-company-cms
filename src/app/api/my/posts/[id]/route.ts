@@ -30,8 +30,19 @@ export async function DELETE(
       .maybeSingle();
 
     if (orgError) {
-      logger.error('[my/posts/delete] Failed to fetch organization', { data: orgError });
-      return NextResponse.json({ message: 'Failed to fetch organization' }, { status: 500 });
+      logger.error('[my/posts/delete] Failed to fetch organization', {
+        userId: user.id,
+        postId: postId,
+        error: orgError,
+        code: orgError.code,
+        details: orgError.details,
+        hint: orgError.hint
+      });
+      return NextResponse.json({ 
+        error: '企業情報の取得に失敗しました',
+        code: orgError.code,
+        message: 'Failed to fetch organization' 
+      }, { status: 500 });
     }
 
     if (!organization) {
@@ -48,8 +59,20 @@ export async function DELETE(
       .maybeSingle();
 
     if (postError) {
-      logger.error('[my/posts/delete] Failed to check post existence', { data: postError });
-      return NextResponse.json({ message: 'Failed to check post existence' }, { status: 500 });
+      logger.error('[my/posts/delete] Failed to check post existence', {
+        userId: user.id,
+        postId: postId,
+        orgId: organization.id,
+        error: postError,
+        code: postError.code,
+        details: postError.details,
+        hint: postError.hint
+      });
+      return NextResponse.json({ 
+        error: '記事の存在確認に失敗しました',
+        code: postError.code,
+        message: 'Failed to check post existence' 
+      }, { status: 500 });
     }
 
     if (!post) {
@@ -65,8 +88,20 @@ export async function DELETE(
       .eq('org_id', organization.id);
 
     if (deleteError) {
-      logger.error('[my/posts/delete] Failed to delete post', { data: deleteError });
-      return NextResponse.json({ message: 'Failed to delete post' }, { status: 500 });
+      logger.error('[my/posts/delete] Failed to delete post', {
+        userId: user.id,
+        postId: postId,
+        orgId: organization.id,
+        error: deleteError,
+        code: deleteError.code,
+        details: deleteError.details,
+        hint: deleteError.hint
+      });
+      return NextResponse.json({ 
+        error: '記事の削除に失敗しました',
+        code: deleteError.code,
+        message: 'Failed to delete post' 
+      }, { status: 500 });
     }
 
     logger.debug('[my/posts/delete] Post deleted successfully', { postId });

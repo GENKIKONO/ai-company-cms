@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
 import { HIGButton } from '@/design-system';
+import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 
 import { logger } from '@/lib/log';
 interface Service {
@@ -112,7 +114,7 @@ export default function EditServicePage() {
       const result = await response.json();
 
       if (result.ok) {
-        router.push('/dashboard/services');
+        router.replace('/dashboard/services');
       } else {
         setError(result.error || '更新に失敗しました');
       }
@@ -152,12 +154,13 @@ export default function EditServicePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">サービスが見つかりません</h2>
-          <button
-            onClick={() => router.push('/dashboard/services')}
-            className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]"
+          <Link
+            href="/dashboard/services"
+            className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-block"
+            replace
           >
             サービス一覧に戻る
-          </button>
+          </Link>
         </div>
       </div>
     );
@@ -171,12 +174,7 @@ export default function EditServicePage() {
             <h1 className="text-2xl font-bold text-gray-900">サービス編集</h1>
             <p className="text-gray-600 mt-2">サービス情報を更新してください</p>
           </div>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-          >
-            ダッシュボードに戻る
-          </button>
+          <DashboardBackLink variant="button" className="mb-0" />
         </div>
       </div>
 
@@ -385,13 +383,13 @@ export default function EditServicePage() {
           >
             {saving ? '更新中...' : '更新'}
           </HIGButton>
-          <button
-            type="button"
-            onClick={() => router.push('/dashboard/services')}
-            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400"
+          <Link
+            href="/dashboard/services"
+            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 inline-block text-center"
+            replace
           >
             キャンセル
-          </button>
+          </Link>
         </div>
       </form>
     </div>

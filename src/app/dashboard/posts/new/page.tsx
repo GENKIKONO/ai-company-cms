@@ -35,17 +35,23 @@ export default function NewPostPage() {
       });
 
       if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        
         if (response.status === 401) {
           setError('認証が必要です。ログインし直してください。');
           return;
         }
         
-        const result = await response.json();
-        
         if (response.status === 404 && result.code === 'ORG_NOT_FOUND') {
           setError('企業情報が見つかりません。先に企業情報を作成してください。');
+        } else if (response.status === 400 && result.code === 'DUPLICATE_SLUG') {
+          setError('このスラッグは既に使用されています。別のスラッグを使用してください。');
         } else if (response.status >= 500) {
-          setError('サーバーエラーが発生しました。しばらく後にお試しください。');
+          const errorMsg = result.error || 'サーバーエラーが発生しました。しばらく後にお試しください。';
+          const logDetails = result.code ? ` (${result.code})` : '';
+          // Server error details logged
+          // status: response.status, error: result.error, code: result.code
+          setError(errorMsg + logDetails);
         } else {
           setError(result.error || result.message || '作成に失敗しました');
         }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase-client';
 import { PLAN_LIMITS } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
@@ -161,12 +162,13 @@ export default function ServicesInfoPage() {
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         {user ? (
           organization ? (
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-6 py-3 bg-[var(--color-blue-600)] text-white rounded-md hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] font-medium"
+            <Link
+              href="/dashboard"
+              replace
+              className="px-6 py-3 bg-[var(--color-blue-600)] text-white rounded-md hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] font-medium inline-block text-center"
             >
               ダッシュボードに戻る
-            </button>
+            </Link>
           ) : (
             <button
               onClick={() => router.push('/organizations/new')}

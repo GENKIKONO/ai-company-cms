@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase-client';
 import { PLAN_LIMITS } from '@/config/plans';
 import type { Organization } from '@/types/database';
 import { HIGButton } from '@/design-system';
+import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { logger } from '@/lib/utils/logger';
 import { 
   fetchActiveCheckoutForOrg, 
@@ -335,12 +336,7 @@ export default function BillingPage() {
             </button>
           )}
           
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-medium"
-          >
-            ダッシュボードに戻る
-          </button>
+          <DashboardBackLink variant="button" className="mb-0" />
         </div>
       </div>
 

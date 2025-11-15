@@ -301,7 +301,7 @@ export default async function DashboardPage() {
             </Link>
 
             <Link 
-              href={`/organizations/${org.id}/services/new`}
+              href="/dashboard/services/new"
               className="group relative bg-blue-50 rounded-2xl p-6 border border-blue-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-4">

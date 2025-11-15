@@ -92,15 +92,15 @@ export default function DashboardActions({ organization, context = 'quickActions
   };
 
   const handleSettings = () => {
-    router.push('/dashboard/settings');
+    router.replace('/dashboard/settings');
   };
 
   const handleHelp = () => {
-    router.push('/dashboard/help');
+    router.replace('/dashboard/help');
   };
 
   const handleShowAllActivity = () => {
-    router.push('/dashboard/activity');
+    router.replace('/dashboard/activity');
   };
 
   const isDisabled = !organization?.id;

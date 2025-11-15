@@ -29,7 +29,7 @@ export default function NewFAQPage() {
       const result = await response.json();
 
       if (result.ok) {
-        router.push('/dashboard');
+        router.replace('/dashboard/faqs');
       } else {
         setError(result.error || '作成に失敗しました');
       }

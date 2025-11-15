@@ -34,7 +34,7 @@ export default function NewCaseStudyPage() {
       const result = await response.json();
 
       if (response.ok) {
-        router.push('/dashboard');
+        router.replace('/dashboard/case-studies');
       } else {
         setError(result.error || '作成に失敗しました');
       }

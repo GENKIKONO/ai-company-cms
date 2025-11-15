@@ -102,6 +102,7 @@ export default function CaseStudiesManagementPage() {
         <div className="mb-6">
           <Link
             href="/dashboard"
+            replace
             className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-flex items-center"
           >
             <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

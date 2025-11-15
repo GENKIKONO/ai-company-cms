@@ -47,7 +47,43 @@ export async function getServerUser(): Promise<ServerUser | null> {
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
+
+    // If profile doesn't exist, try to create it automatically 
+    if (!profile) {
+      logger.info('Auto-creating missing profile for user in getServerUser', {
+        component: 'auth-server',
+        userId: user.id,
+        userEmail: user.email
+      });
+
+      const { data: newProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || null,
+          account_status: 'active',
+          role: 'user'
+        })
+        .select('role')
+        .single();
+
+      if (createError) {
+        logger.warn('Failed to auto-create profile in getServerUser, using defaults', {
+          component: 'auth-server',
+          userId: user.id,
+          userEmail: user.email,
+          error: createError.message
+        });
+      }
+
+      return {
+        id: user.id,
+        email: user.email || '',
+        appRole: newProfile?.role || 'user'
+      };
+    }
 
     return {
       id: user.id,
@@ -99,7 +135,7 @@ export async function requireAdminPermission(): Promise<void> {
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!profile || profile.role !== 'admin') {
     throw new Error('Admin permission required');
@@ -155,7 +191,52 @@ export async function getServerUserWithStatus(): Promise<ServerUserWithStatus | 
       .from('profiles')
       .select('role, account_status')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
+
+    // If profile doesn't exist, create it automatically
+    if (!profile) {
+      logger.info('Auto-creating missing profile for authenticated user', {
+        component: 'auth-server',
+        userId: user.id,
+        userEmail: user.email
+      });
+
+      const { data: newProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || null,
+          account_status: 'active',
+          role: 'user'
+        })
+        .select('role, account_status')
+        .single();
+
+      if (createError) {
+        logger.error('Failed to auto-create profile for authenticated user', {
+          component: 'auth-server',
+          userId: user.id,
+          userEmail: user.email,
+          error: createError.message
+        });
+        
+        // Return safe defaults even if profile creation fails
+        return {
+          id: user.id,
+          email: user.email || '',
+          appRole: 'user',
+          accountStatus: 'active' as AccountStatus
+        };
+      }
+
+      return {
+        id: user.id,
+        email: user.email || '',
+        appRole: newProfile?.role || 'user',
+        accountStatus: (newProfile?.account_status || 'active') as AccountStatus
+      };
+    }
 
     return {
       id: user.id,

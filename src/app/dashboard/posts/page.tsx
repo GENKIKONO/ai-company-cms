@@ -30,14 +30,26 @@ export default function PostsManagementPage() {
       });
       
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
         if (response.status === 401) {
           throw new Error('認証が必要です。ログインし直してください。');
         } else if (response.status === 404) {
           throw new Error('企業情報が見つかりません。');
         } else if (response.status >= 500) {
-          throw new Error('サーバーエラーが発生しました。しばらく後にお試しください。');
+          const errorMsg = errorData.error || 'サーバーエラーが発生しました。しばらく後にお試しください。';
+          const logDetails = errorData.code ? ` (${errorData.code})` : '';
+          logger.error('Server error details:', {
+            status: response.status,
+            error: errorData.error,
+            code: errorData.code,
+            details: errorData.details,
+            hint: errorData.hint
+          });
+          throw new Error(errorMsg + logDetails);
         } else {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          const errorMsg = errorData.error || errorData.message || response.statusText;
+          throw new Error(`HTTP ${response.status}: ${errorMsg}`);
         }
       }
       
@@ -46,7 +58,11 @@ export default function PostsManagementPage() {
       // API成功だが組織がない場合の処理
       if (!result.data) {
         setPosts([]);
-        setError('組織が見つからないため、記事を表示できません。');
+        if (result.code === 'ORG_NOT_FOUND') {
+          setError('企業情報が見つかりません。先に企業情報を作成してください。');
+        } else {
+          setError('組織が見つからないため、記事を表示できません。');
+        }
         return;
       }
       
@@ -70,7 +86,15 @@ export default function PostsManagementPage() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMsg = errorData.error || errorData.message || response.statusText;
+        logger.error('Delete error details:', {
+          status: response.status,
+          error: errorData.error,
+          code: errorData.code,
+          details: errorData.details
+        });
+        throw new Error(`HTTP ${response.status}: ${errorMsg}`);
       }
 
       // リストから削除

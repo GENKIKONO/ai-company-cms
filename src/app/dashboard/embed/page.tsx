@@ -7,6 +7,7 @@ import { HIGButton } from '@/design-system';
 import { getOrganization } from '@/lib/organizations';
 import { Organization, Service } from '@/types/database';
 import Link from 'next/link';
+import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { logger } from '@/lib/utils/logger';
 
 export default function EmbedPage() {
@@ -173,7 +174,7 @@ export default function EmbedPage() {
               再試行
             </button>
             <div>
-              <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm">
+              <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm" replace>
                 ダッシュボードに戻る
               </Link>
             </div>
@@ -205,7 +206,7 @@ export default function EmbedPage() {
               </button>
             </div>
             <div>
-              <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
+              <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]" replace>
                 ダッシュボードに戻る
               </Link>
             </div>
@@ -229,12 +230,7 @@ export default function EmbedPage() {
                 企業情報をWebサイトに埋め込むためのWidgetコードを生成します
               </p>
             </div>
-            <Link
-              href="/dashboard"
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-            >
-              ダッシュボードに戻る
-            </Link>
+            <DashboardBackLink variant="button" className="mb-0" />
           </div>
         </div>
 

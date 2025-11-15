@@ -85,7 +85,7 @@ export default function EditOrganizationPage() {
       try {
         const currentUser = await getCurrentUser();
         if (!currentUser) {
-          router.push('/login');
+          router.push('/auth/login');
           return;
         }
         
