@@ -20,7 +20,8 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // TODO: Implement actual form submission
+    // TODO: Implement actual form submission to support@luxucare.com
+    // For now, show success message after simulated delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     setSubmitted(true);

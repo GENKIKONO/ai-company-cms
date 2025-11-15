@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Service } from '@/types/database';
 import PublicPageLinks from '../components/PublicPageLinks';
+import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { logger } from '@/lib/utils/logger';
 
 export default function ServicesManagementPage() {
@@ -58,58 +59,45 @@ export default function ServicesManagementPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-24 bg-gray-200 rounded"></div>
-              ))}
-            </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+            ))}
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* ヘッダー */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">サービス管理</h1>
-              <p className="text-lg text-gray-600 mt-2">提供サービスを管理します</p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <PublicPageLinks contentType="services" />
-              <Link
-                href="/dashboard/services/new"
-                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                新しいサービス
-              </Link>
-            </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* ヘッダー */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">サービス管理</h1>
+            <p className="text-lg text-gray-600 mt-2">提供サービスを管理します</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <PublicPageLinks contentType="services" />
+            <Link
+              href="/dashboard/services/new"
+              className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              新しいサービス
+            </Link>
           </div>
         </div>
+      </div>
 
-        {/* ナビゲーション */}
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-flex items-center"
-          >
-            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            ダッシュボードに戻る
-          </Link>
-        </div>
+      {/* ナビゲーション */}
+      <DashboardBackLink />
 
         {/* エラー表示 */}
         {error && (
@@ -205,7 +193,6 @@ export default function ServicesManagementPage() {
             </div>
           )}
         </div>
-      </main>
     </div>
   );
 }

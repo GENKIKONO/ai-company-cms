@@ -1,23 +1,11 @@
 import Link from 'next/link';
+import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 
 export default function HelpPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* パンくず */}
-        <nav className="flex mb-6" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-2">
-            <li>
-              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
-                ダッシュボード
-              </Link>
-            </li>
-            <li>
-              <span className="text-gray-500">/</span>
-            </li>
-            <li className="text-gray-900 font-medium">ヘルプ</li>
-          </ol>
-        </nav>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* ナビゲーション */}
+      <DashboardBackLink className="mb-6" />
 
         {/* コンテンツ */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -63,21 +51,9 @@ export default function HelpPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  ダッシュボードに戻る
-                </Link>
-              </div>
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }

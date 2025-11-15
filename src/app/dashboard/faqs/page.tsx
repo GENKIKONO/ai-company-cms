@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { FAQ } from '@/types/database';
 import PublicPageLinks from '../components/PublicPageLinks';
+import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { HIGButton } from '@/design-system';
 import { logger } from '@/lib/utils/logger';
 
@@ -59,24 +60,21 @@ export default function FAQsManagementPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-24 bg-gray-200 rounded"></div>
-              ))}
-            </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+            ))}
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ヘッダー */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -100,17 +98,7 @@ export default function FAQsManagementPage() {
         </div>
 
         {/* ナビゲーション */}
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-flex items-center"
-          >
-            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            ダッシュボードに戻る
-          </Link>
-        </div>
+        <DashboardBackLink />
 
         {/* エラー表示 */}
         {error && (
@@ -197,7 +185,6 @@ export default function FAQsManagementPage() {
             </div>
           )}
         </div>
-      </main>
     </div>
   );
 }
