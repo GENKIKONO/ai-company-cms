@@ -97,7 +97,7 @@ export default async function DashboardPage() {
 
 
   return (
-    <div className="min-h-screen bg-[var(--aio-page-bg, #f3f4f6)]">
+    <>
       {/* Modern Hero Section */}
       <section className="relative section-spacing overflow-hidden">
         {/* Background effects */}
@@ -171,8 +171,8 @@ export default async function DashboardPage() {
       
       <main className="max-w-7xl mx-auto px-6 lg:px-8 -mt-16 relative z-10">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
-          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12 mt-8">
+          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce min-h-[200px]">
             <div className="flex items-center justify-between mb-6">
               <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -205,7 +205,7 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce">
+          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce min-h-[200px]">
             <div className="flex items-center justify-between mb-6">
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 ${
                 org.is_published 
@@ -234,7 +234,7 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce">
+          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce min-h-[200px]">
             <div className="flex items-center justify-between mb-6">
               <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -252,7 +252,7 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce">
+          <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce min-h-[200px]">
             <div className="flex items-center justify-between mb-6">
               <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -534,7 +534,7 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </main>
-    </div>
+    </>
   );
   } catch (error) {
     logger.error('[Dashboard] 予期しないエラー', { data: error instanceof Error ? error : new Error(String(error)) });

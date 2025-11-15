@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 
 export default function NewPostPage() {
   const [loading, setLoading] = useState(false);
@@ -67,19 +68,12 @@ export default function NewPostPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      <DashboardBackLink variant="button" className="mb-2" />
+      
       <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">新しい記事</h1>
-            <p className="text-gray-600 mt-2">記事の情報を入力してください</p>
-          </div>
-          <Link
-            href="/dashboard"
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 inline-block"
-            replace
-          >
-            ダッシュボードに戻る
-          </Link>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">新しい記事</h1>
+          <p className="text-gray-600 mt-2">記事の情報を入力してください</p>
         </div>
       </div>
 
