@@ -88,24 +88,36 @@ export async function PUT(
       return createAuthError();
     }
 
-    const body: Partial<CaseStudyFormData> = await request.json();
+    const body: Partial<CaseStudyFormData> & { organizationId?: string } = await request.json();
 
-    // 存在確認
+    // organizationId を除去（snake_case 変換は不要、RLSで制御）
+    const { organizationId, ...restBody } = body;
+
+    // 存在確認 + RLS チェック（created_by を含む）
     const { data: existingCaseStudy, error: fetchError } = await supabase
       .from('case_studies')
-      .select('id')
+      .select('id, organization_id, created_by')
       .eq('id', id)
+      .eq('created_by', authData.user.id) // RLS compliance: 作成者のみ更新可能
       .single();
 
     if (fetchError || !existingCaseStudy) {
       return NextResponse.json(
-        { error: 'Not Found', message: 'Case study not found' },
+        { error: 'Not Found', message: 'Case study not found or access denied' },
         { status: 404 }
       );
     }
 
-    // データ正規化
-    const normalizedData = normalizeCaseStudyPayload(body);
+    // organizationId が指定されている場合は、既存レコードの organization_id と一致するかチェック
+    if (organizationId && existingCaseStudy.organization_id !== organizationId) {
+      return NextResponse.json(
+        { error: 'Validation error', message: 'Cannot change organization of existing case study' },
+        { status: 400 }
+      );
+    }
+
+    // organizationId を除去したデータを正規化
+    const normalizedData = normalizeCaseStudyPayload(restBody);
     const updateData = {
       ...normalizedData,
       updated_at: new Date().toISOString(),
@@ -157,16 +169,17 @@ export async function DELETE(
       return createAuthError();
     }
 
-    // 存在確認
+    // 存在確認 + RLS チェック（created_by を含む）
     const { data: existingCaseStudy, error: fetchError } = await supabase
       .from('case_studies')
-      .select('id')
+      .select('id, created_by')
       .eq('id', id)
+      .eq('created_by', authData.user.id) // RLS compliance: 作成者のみ削除可能
       .single();
 
     if (fetchError || !existingCaseStudy) {
       return NextResponse.json(
-        { error: 'Not Found', message: 'Case study not found' },
+        { error: 'Not Found', message: 'Case study not found or access denied' },
         { status: 404 }
       );
     }
@@ -174,7 +187,8 @@ export async function DELETE(
     const { error } = await supabase
       .from('case_studies')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('created_by', authData.user.id); // 削除時にも created_by チェック
 
     if (error) {
       return NextResponse.json(

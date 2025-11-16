@@ -95,31 +95,62 @@ export async function POST(request: NextRequest) {
       return createAuthError();
     }
 
-    const body: CaseStudyFormData = await request.json();
+    const body: CaseStudyFormData & { organizationId?: string } = await request.json();
 
     if (!body.title) {
       return NextResponse.json({ error: 'Validation error', message: 'Title is required' }, { status: 400 });
     }
 
-    const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
-      .select('id, plan')
-      .eq('created_by', authData.user.id)
-      .single();
+    // organizationId が body に含まれている場合は検証、含まれていない場合はユーザーの組織を取得
+    const { organizationId, ...restBody } = body;
+    let targetOrgData;
+    
+    if (organizationId) {
+      // organizationId が指定されている場合は、そのorganizationの所有者かチェック
+      const { data: orgData, error: orgError } = await supabase
+        .from('organizations')
+        .select('id, plan, created_by')
+        .eq('id', organizationId)
+        .eq('created_by', authData.user.id)
+        .single();
 
-    if (orgError || !orgData) {
-      return createNotFoundError('Organization');
+      if (orgError || !orgData) {
+        logger.error('[my/case-studies] POST Organization access denied', { 
+          userId: authData.user.id, 
+          organizationId,
+          error: orgError?.message 
+        });
+        return NextResponse.json({ 
+          error: 'RLS_FORBIDDEN', 
+          message: 'Row Level Security によって拒否されました' 
+        }, { status: 403 });
+      }
+      
+      targetOrgData = orgData;
+    } else {
+      // organizationId が指定されていない場合はユーザーの組織を取得
+      const { data: orgData, error: orgError } = await supabase
+        .from('organizations')
+        .select('id, plan')
+        .eq('created_by', authData.user.id)
+        .single();
+
+      if (orgError || !orgData) {
+        return createNotFoundError('Organization');
+      }
+      
+      targetOrgData = orgData;
     }
 
     // プラン制限チェック
-    const currentPlan = orgData.plan || 'trial';
+    const currentPlan = targetOrgData.plan || 'trial';
     const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.trial;
     
     if (planLimits.case_studies > 0) {
       const { count: currentCount, error: countError } = await supabase
         .from('case_studies')
         .select('id', { count: 'exact' })
-        .eq('organization_id', orgData.id);
+        .eq('organization_id', targetOrgData.id);
 
       if (countError) {
         logger.error('Error counting case studies:', { data: countError });
@@ -143,11 +174,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const normalizedData = normalizeCaseStudyPayload(body);
+    // organizationId を除去したbodyデータを正規化
+    const normalizedData = normalizeCaseStudyPayload(restBody);
     // RLS compliance: include both organization_id and created_by
     const caseStudyData = { 
       ...normalizedData, 
-      organization_id: orgData.id,
+      organization_id: targetOrgData.id,
       created_by: authData.user.id
     };
 
