@@ -37,20 +37,35 @@ export async function GET(
       return createAuthError();
     }
 
+    // Get user organization first for RLS compliance
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', authData.user.id)
+      .single();
+
+    if (orgError || !organization) {
+      return createNotFoundError('Organization');
+    }
+
+    // RLS compliance: check both organization ownership and created_by
     const { data, error } = await supabase
       .from('services')
       .select('*')
       .eq('id', id)
-      .single();
+      .eq('organization_id', organization.id)
+      .eq('created_by', authData.user.id)
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        return createNotFoundError('Service');
-      }
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
       );
+    }
+
+    if (!data) {
+      return createNotFoundError('Service');
     }
 
     return NextResponse.json({ data });
@@ -84,14 +99,34 @@ export async function PUT(
 
     const body: Partial<ServiceFormData> = await request.json();
 
-    // 存在確認
+    // Get user organization first for RLS compliance
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', authData.user.id)
+      .single();
+
+    if (orgError || !organization) {
+      return createNotFoundError('Organization');
+    }
+
+    // RLS compliance: check both organization ownership and created_by
     const { data: existingService, error: fetchError } = await supabase
       .from('services')
       .select('id')
       .eq('id', id)
-      .single();
+      .eq('organization_id', organization.id)
+      .eq('created_by', authData.user.id)
+      .maybeSingle();
 
-    if (fetchError || !existingService) {
+    if (fetchError) {
+      return NextResponse.json(
+        { error: 'Database error', message: fetchError.message },
+        { status: 500 }
+      );
+    }
+
+    if (!existingService) {
       return createNotFoundError('Service');
     }
 
@@ -102,12 +137,15 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     };
 
+    // Update with RLS compliance: both organization_id and created_by filters
     const { data, error } = await supabase
       .from('services')
       .update(updateData)
       .eq('id', id)
+      .eq('organization_id', organization.id)
+      .eq('created_by', authData.user.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       return NextResponse.json(
@@ -145,21 +183,44 @@ export async function DELETE(
       return createAuthError();
     }
 
-    // 存在確認
+    // Get user organization first for RLS compliance
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id')
+      .eq('created_by', authData.user.id)
+      .single();
+
+    if (orgError || !organization) {
+      return createNotFoundError('Organization');
+    }
+
+    // RLS compliance: check both organization ownership and created_by
     const { data: existingService, error: fetchError } = await supabase
       .from('services')
       .select('id')
       .eq('id', id)
-      .single();
+      .eq('organization_id', organization.id)
+      .eq('created_by', authData.user.id)
+      .maybeSingle();
 
-    if (fetchError || !existingService) {
+    if (fetchError) {
+      return NextResponse.json(
+        { error: 'Database error', message: fetchError.message },
+        { status: 500 }
+      );
+    }
+
+    if (!existingService) {
       return createNotFoundError('Service');
     }
 
+    // Delete with RLS compliance: both organization_id and created_by filters
     const { error } = await supabase
       .from('services')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('organization_id', organization.id)
+      .eq('created_by', authData.user.id);
 
     if (error) {
       return NextResponse.json(

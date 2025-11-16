@@ -35,6 +35,15 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
+  const [retryCount, setRetryCount] = useState(0);
+
+  // Auto-clear errors after 10 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(''), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const [formData, setFormData] = useState<ServiceFormData>({
     name: '',
@@ -51,15 +60,28 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
 
   const fetchServices = async () => {
     try {
+      setError(''); // Clear previous errors
       const response = await fetch('/api/my/services');
       if (response.ok) {
         const result = await response.json();
         setServices(result.data || []);
+        setRetryCount(0); // Reset retry count on success
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          setError('認証エラーです。再度ログインしてください。');
+        } else if (response.status === 404) {
+          setError('組織情報が見つかりません。');
+        } else {
+          setError(errorData.message || errorData.error || 'サービス一覧の取得に失敗しました');
+        }
+      }
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        setError('ネットワークエラーが発生しました。接続を確認してください。');
       } else {
         setError('サービス一覧の取得に失敗しました');
       }
-    } catch (error) {
-      setError('サービス一覧の取得に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -122,11 +144,23 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
         await fetchServices();
         resetForm();
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'サービスの保存に失敗しました');
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          setError('認証エラーです。再度ログインしてください。');
+        } else if (response.status === 404) {
+          setError('組織またはサービスが見つかりません。');
+        } else if (response.status === 403) {
+          setError('このサービスを編集する権限がありません。');
+        } else {
+          setError(errorData.error || errorData.message || 'サービスの保存に失敗しました');
+        }
       }
     } catch (error) {
-      setError('サービスの保存に失敗しました');
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        setError('ネットワークエラーが発生しました。接続を確認してください。');
+      } else {
+        setError('サービスの保存に失敗しました');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -145,10 +179,23 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
       if (response.ok) {
         await fetchServices();
       } else {
-        setError('サービスの削除に失敗しました');
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          setError('認証エラーです。再度ログインしてください。');
+        } else if (response.status === 404) {
+          setError('削除対象のサービスが見つかりません。');
+        } else if (response.status === 403) {
+          setError('このサービスを削除する権限がありません。');
+        } else {
+          setError(errorData.error || errorData.message || 'サービスの削除に失敗しました');
+        }
       }
     } catch (error) {
-      setError('サービスの削除に失敗しました');
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        setError('ネットワークエラーが発生しました。接続を確認してください。');
+      } else {
+        setError('サービスの削除に失敗しました');
+      }
     }
   };
 
@@ -178,7 +225,26 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
 
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{error}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-red-600">{error}</p>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => {
+                    setRetryCount(prev => prev + 1);
+                    fetchServices();
+                  }}
+                  className="text-sm text-red-700 hover:text-red-800 underline"
+                >
+                  再試行
+                </button>
+                <button
+                  onClick={() => setError('')}
+                  className="text-red-400 hover:text-red-500"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

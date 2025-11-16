@@ -31,13 +31,15 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search');
     const offset = (page - 1) * limit;
 
+    // RLS compliance: check both organization ownership and created_by
     let query = supabase
       .from('qa_entries')
       .select(`
         *,
         qa_categories!left(id, name, slug)
       `, { count: 'exact' })
-      .eq('organization_id', organization.id);
+      .eq('organization_id', organization.id)
+      .eq('created_by', user.id);
 
     if (status && ['draft', 'published', 'archived'].includes(status)) {
       query = query.eq('status', status);
@@ -118,8 +120,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // RLS compliance: include both organization_id and created_by
     const entryData = {
       organization_id: organization.id,
+      created_by: user.id, // Required for RLS policy
       category_id: body.category_id || null,
       question: body.question.trim(),
       answer: body.answer.trim(),
@@ -151,7 +155,7 @@ export async function POST(req: NextRequest) {
         *,
         qa_categories!left(id, name, slug)
       `)
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('Error creating entry', { data: error instanceof Error ? error : new Error(String(error)) });

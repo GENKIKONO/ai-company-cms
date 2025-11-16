@@ -39,10 +39,12 @@ export async function GET() {
       return createNotFoundError('Organization');
     }
 
+    // RLS compliance: check both organization ownership and created_by
     const { data, error } = await supabase
       .from('case_studies')
       .select('*')
       .eq('organization_id', orgData.id)
+      .eq('created_by', authData.user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -123,13 +125,18 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedData = normalizeCaseStudyPayload(body);
-    const caseStudyData = { ...normalizedData, organization_id: orgData.id };
+    // RLS compliance: include both organization_id and created_by
+    const caseStudyData = { 
+      ...normalizedData, 
+      organization_id: orgData.id,
+      created_by: authData.user.id
+    };
 
     const { data, error } = await supabase
       .from('case_studies')
       .insert([caseStudyData])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       return NextResponse.json({ error: 'Database error', message: error.message }, { status: 500 });

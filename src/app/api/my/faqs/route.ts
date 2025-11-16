@@ -45,10 +45,12 @@ export async function GET() {
       return createNotFoundError('Organization');
     }
 
+    // RLS compliance: check both organization ownership and created_by
     const { data, error } = await supabase
       .from('faqs')
       .select('*')
       .eq('organization_id', orgData.id)
+      .eq('created_by', authData.user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
