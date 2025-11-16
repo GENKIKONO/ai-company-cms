@@ -121,12 +121,36 @@ export async function createOrganization(organizationData: OrganizationFormData)
 // ✅ FIXED: 企業更新 - サーバーAPI経由でキャッシュ無効化を確実に実行 + ルーター更新
 export async function updateOrganization(id: string, organizationData: Partial<OrganizationFormData>) {
   try {
+    // RLS的に触ってほしくないフィールドをクライアント側でも除去
+    const { id: _, created_by, user_id, created_at, updated_at, ...cleanData } = organizationData;
+    
+    // 送信例:
+    // {
+    //   name: 'LuxuCare株式会社',
+    //   slug: 'luxucare', 
+    //   description: '企業の説明文...',
+    //   industries: ['コンサルティング', 'IT・ソフトウェア'],
+    //   show_services: true,
+    //   show_case_studies: true,
+    //   show_faqs: true,
+    //   show_posts: false,
+    //   is_published: true,
+    //   status: 'published',
+    //   address_region: '東京都',
+    //   address_locality: '渋谷区',
+    //   address_street: '道玄坂1-2-3',
+    //   lat: 35.6580339,
+    //   lng: 139.7016358,
+    //   email: 'contact@luxucare.com',
+    //   phone: '03-1234-5678'
+    // }
+
     const response = await fetch('/api/my/organization', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(organizationData),
+      body: JSON.stringify(cleanData),
     });
 
     if (!response.ok) {

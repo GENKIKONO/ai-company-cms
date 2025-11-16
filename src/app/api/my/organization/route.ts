@@ -655,31 +655,39 @@ export async function PUT(request: NextRequest) {
 
     const body: Partial<OrganizationFormData> = await request.json();
 
+    // RLS的に触ってほしくないフィールドを除去
+    const { created_by, user_id, id, ...cleanPayload } = body;
+
     // 企業の存在確認
     const { data: existingOrg, error: fetchError } = await supabase
       .from('organizations')
-      .select('id, slug')
+      .select('id, slug, created_by')
       .eq('created_by', user.id)
       .single();
 
     if (fetchError || !existingOrg) {
+      logger.error('[PUT organization] Organization not found or access denied', {
+        userId: user.id,
+        error: fetchError?.message,
+        errorCode: fetchError?.code
+      });
       return notFoundError('Organization');
     }
 
     // slugが変更される場合、バリデーション  
-    if (body.slug) {
-      const slugValidation = validateSlug(body.slug);
+    if (cleanPayload.slug) {
+      const slugValidation = validateSlug(cleanPayload.slug);
       if (!slugValidation.isValid) {
         return validationError({ slug: slugValidation.error }, 'Slug validation failed');
       }
     }
 
     // slugが変更される場合、重複チェック
-    if (body.slug && body.slug !== existingOrg.slug) {
+    if (cleanPayload.slug && cleanPayload.slug !== existingOrg.slug) {
       const { data: slugCheck } = await supabase
         .from('organizations')
         .select('id')
-        .eq('slug', body.slug)
+        .eq('slug', cleanPayload.slug)
         .neq('id', existingOrg.id)
         .single();
 
@@ -689,7 +697,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // データの正規化
-    const normalizedData = normalizeOrganizationPayload(body);
+    const normalizedData = normalizeOrganizationPayload(cleanPayload);
 
     // 🚫 公開フラグの同期処理: is_published=true の時は status='published' に統一
     if ('is_published' in normalizedData && normalizedData.is_published === true) {
@@ -743,87 +751,73 @@ export async function PUT(request: NextRequest) {
     const updatePayload = buildOrgInsert(updateData);
     logger.debug('API/my/organization UPDATE payload (final)', { updatePayload });
 
-    const { data, error } = await supabase
+    const { data: updatedOrg, error: updateError } = await supabase
       .from('organizations')
       .update(updatePayload)
       .eq('id', existingOrg.id)
-      .eq('created_by', user.id) // セキュリティのため二重チェック
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) {
-      logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
-      return handleApiError(error);
-    }
-
-    // 🔥 FORCED FRESH DATA: Guaranteed latest data with retry mechanism
-    let finalData = data;
-    let freshData = null;
-    let refetchError = null;
-    
-    // Try immediate refetch
-    const refetchResult = await supabase
-      .from('organizations')
-      .select('*')
-      .eq('id', existingOrg.id)
-      .eq('created_by', user.id)
-      .single();
-    
-    freshData = refetchResult.data;
-    refetchError = refetchResult.error;
-    
-    // If immediate refetch fails, try once more with small delay
-    if (refetchError || !freshData) {
-      logger.warn('[FORCED_FRESH] Initial refetch failed, retrying after delay', { data: refetchError });
-      await new Promise(resolve => setTimeout(resolve, 100));
+    if (updateError) {
+      logger.error('[PUT organization] Update failed', { 
+        userId: user.id, 
+        orgId: existingOrg.id, 
+        error: updateError.message, 
+        code: updateError.code 
+      });
       
-      const retryResult = await supabase
-        .from('organizations')
-        .select('*')
-        .eq('id', existingOrg.id)
-        .eq('created_by', user.id)
-        .single();
-        
-      if (retryResult.data) {
-        freshData = retryResult.data;
-        refetchError = null;
-        logger.debug('[FORCED_FRESH] Retry successful');
-      } else {
-        logger.warn('[FORCED_FRESH] Retry also failed', { data: retryResult.error });
+      // RLS関連エラーの場合は403を返す
+      if (updateError.code === '42501' || updateError.code === 'PGRST301' || updateError.message?.includes('RLS')) {
+        return NextResponse.json({ 
+          code: 'RLS_FORBIDDEN', 
+          message: 'Organization update blocked by RLS' 
+        }, { status: 403 });
       }
+      
+      return NextResponse.json({ 
+        error: 'Update failed', 
+        details: updateError.message 
+      }, { status: 500 });
     }
 
-    finalData = freshData || data;
-    logger.debug('[FORCED_FRESH] Final data guarantees latest state', { 
-      hadFreshData: !!freshData, 
-      finalSlug: finalData.slug,
-      finalUpdatedAt: finalData.updated_at 
-    });
+    // updatedOrgがnullの場合もRLSで0行更新の可能性
+    if (!updatedOrg) {
+      logger.error('[PUT organization] No rows updated (likely RLS)', { 
+        userId: user.id, 
+        orgId: existingOrg.id 
+      });
+      return NextResponse.json({ 
+        code: 'NO_ROWS_UPDATED', 
+        message: 'Organization update blocked by RLS or no rows matched' 
+      }, { status: 403 });
+    }
 
-    // ✅ 強化されたキャッシュ無効化：パス + タグ の両方を確実に実行
+    // ✅ キャッシュ無効化
     try {
       const { revalidatePath, revalidateTag } = await import('next/cache');
       
       // パス無効化（即時反映用）
       revalidatePath('/dashboard');
       revalidatePath(`/organizations/${existingOrg.id}`);
-      if (finalData.slug) {
-        revalidatePath(`/o/${finalData.slug}`);
+      if (updatedOrg.slug) {
+        revalidatePath(`/o/${updatedOrg.slug}`);
       }
-      if (existingOrg.slug && existingOrg.slug !== finalData.slug) {
+      if (existingOrg.slug && existingOrg.slug !== updatedOrg.slug) {
         revalidatePath(`/o/${existingOrg.slug}`); // 旧slug
       }
       
       // タグ無効化（ID ベース）
       revalidateTag(`org:${existingOrg.id}`);
-      revalidateTag(`org:${user.id}`); // ユーザーベースも保持
+      revalidateTag(`org:${user.id}`);
       
-      logger.info('[VERIFY] org-save', { 
+      logger.info('[VERIFY] org-save successful', { 
         payload: updatePayload, 
-        saved: data, 
-        fresh: finalData, 
-        refetchError,
-        revalidatedPaths: ['/dashboard', `/organizations/${existingOrg.id}`, finalData.slug ? `/o/${finalData.slug}` : null].filter(Boolean),
+        updated: updatedOrg,
+        revalidatedPaths: [
+          '/dashboard', 
+          `/organizations/${existingOrg.id}`, 
+          updatedOrg.slug ? `/o/${updatedOrg.slug}` : null
+        ].filter(Boolean),
         revalidatedTags: [`org:${existingOrg.id}`, `org:${user.id}`]
       });
       
@@ -831,15 +825,8 @@ export async function PUT(request: NextRequest) {
       logger.warn('[VERIFY] Cache invalidation failed', { data: cacheError });
     }
 
-    return NextResponse.json(
-      { data: finalData },
-      { 
-        status: 200,
-        headers: {
-          'Cache-Control': 'no-store, must-revalidate'
-        }
-      }
-    );
+    // 成功時は更新されたデータを返す
+    return NextResponse.json({ data: updatedOrg }, { status: 200 });
 
   } catch (error) {
     const errorId = `put-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
