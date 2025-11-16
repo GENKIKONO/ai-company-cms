@@ -52,7 +52,14 @@ function fromOrg(org?: Organization | null): OrganizationFormData {
     logo_url: org?.logo_url ?? '',
     same_as: org?.same_as ?? [],
     industries: org?.industries ?? [],
-    plan: org?.plan ?? 'trial'
+    plan: org?.plan ?? 'trial',
+    // Section visibility controls - proper DB sync
+    show_services: org?.show_services ?? true,
+    show_posts: org?.show_posts ?? true,
+    show_case_studies: org?.show_case_studies ?? true,
+    show_faqs: org?.show_faqs ?? true,
+    show_qa: org?.show_qa ?? true,
+    show_contact: org?.show_contact ?? true
   };
 }
 

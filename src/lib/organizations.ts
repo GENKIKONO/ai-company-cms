@@ -121,8 +121,8 @@ export async function createOrganization(organizationData: OrganizationFormData)
 // ✅ FIXED: 企業更新 - サーバーAPI経由でキャッシュ無効化を確実に実行 + ルーター更新
 export async function updateOrganization(id: string, organizationData: Partial<OrganizationFormData>) {
   try {
-    // RLS的に触ってほしくないフィールドをクライアント側でも除去
-    const { id: _, created_by, user_id, created_at, updated_at, ...cleanData } = organizationData;
+    // OrganizationFormData already excludes dangerous fields, use directly
+    const cleanData = organizationData;
     
     // 送信例:
     // {

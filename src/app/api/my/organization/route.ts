@@ -655,10 +655,10 @@ export async function PUT(request: NextRequest) {
 
     const body: Partial<OrganizationFormData> = await request.json();
 
-    // RLS的に触ってほしくないフィールドを除去
-    const { created_by, user_id, id, ...cleanPayload } = body;
+    // Client already filters dangerous fields, so body should be clean
+    const updateInput = body;
 
-    // 企業の存在確認
+    // 企業の存在確認（RLS: created_by = auth.uid()）
     const { data: existingOrg, error: fetchError } = await supabase
       .from('organizations')
       .select('id, slug, created_by')
@@ -675,19 +675,19 @@ export async function PUT(request: NextRequest) {
     }
 
     // slugが変更される場合、バリデーション  
-    if (cleanPayload.slug) {
-      const slugValidation = validateSlug(cleanPayload.slug);
+    if (updateInput.slug) {
+      const slugValidation = validateSlug(updateInput.slug);
       if (!slugValidation.isValid) {
         return validationError({ slug: slugValidation.error }, 'Slug validation failed');
       }
     }
 
     // slugが変更される場合、重複チェック
-    if (cleanPayload.slug && cleanPayload.slug !== existingOrg.slug) {
+    if (updateInput.slug && updateInput.slug !== existingOrg.slug) {
       const { data: slugCheck } = await supabase
         .from('organizations')
         .select('id')
-        .eq('slug', cleanPayload.slug)
+        .eq('slug', updateInput.slug)
         .neq('id', existingOrg.id)
         .single();
 
@@ -697,7 +697,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // データの正規化
-    const normalizedData = normalizeOrganizationPayload(cleanPayload);
+    const normalizedData = normalizeOrganizationPayload(updateInput);
 
     // 🚫 公開フラグの同期処理: is_published=true の時は status='published' に統一
     if ('is_published' in normalizedData && normalizedData.is_published === true) {
@@ -767,7 +767,7 @@ export async function PUT(request: NextRequest) {
       });
       
       // RLS関連エラーの場合は403を返す
-      if (updateError.code === '42501' || updateError.code === 'PGRST301' || updateError.message?.includes('RLS')) {
+      if (updateError.code === '42501' || updateError.code === 'PGRST301' || updateError.code === 'PGRST302' || updateError.message?.includes('RLS')) {
         return NextResponse.json({ 
           code: 'RLS_FORBIDDEN', 
           message: 'Organization update blocked by RLS' 
@@ -782,7 +782,7 @@ export async function PUT(request: NextRequest) {
 
     // updatedOrgがnullの場合もRLSで0行更新の可能性
     if (!updatedOrg) {
-      logger.error('[PUT organization] No rows updated (likely RLS)', { 
+      logger.error('[PUT organization] Update affected 0 rows', { 
         userId: user.id, 
         orgId: existingOrg.id 
       });
