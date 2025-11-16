@@ -133,8 +133,12 @@ export async function middleware(request: NextRequest) {
     response.headers.set(key, value);
   });
 
-  // 6. CSRF対策（非GET、webhookは除外）
-  if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS' && !pathname.includes('/webhooks/')) {
+  // 6. CSRF対策（非GET、webhookと認証済みダッシュボードAPIは除外）
+  const isExemptFromCSRF = pathname.includes('/webhooks/') || 
+                          pathname.startsWith('/api/my/') || 
+                          pathname.startsWith('/api/dashboard/');
+  
+  if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS' && !isExemptFromCSRF) {
     const csrfToken = request.headers.get('x-csrf-token');
     const sessionToken = request.cookies.get('session')?.value;
     
