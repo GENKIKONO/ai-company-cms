@@ -47,7 +47,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
 
   const fetchFAQs = async () => {
     try {
-      const response = await fetch('/api/my/faqs');
+      const response = await fetch(`/api/my/faqs?organizationId=${organizationId}`);
       if (response.ok) {
         const result = await response.json();
         setFAQs(result.data || []);
@@ -116,7 +116,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, organizationId }),
       });
 
       if (response.ok) {

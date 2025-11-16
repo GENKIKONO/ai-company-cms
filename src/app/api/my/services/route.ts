@@ -17,28 +17,49 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
-    // ユーザーの組織を取得
+    // organizationId クエリパラメータ必須チェック
+    const url = new URL(request.url);
+    const organizationId = url.searchParams.get('organizationId');
+    
+    if (!organizationId) {
+      logger.debug('[my/services] organizationId parameter required');
+      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
+    }
+
+    // 組織の所有者チェック
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
-      .select('id')
+      .select('id, created_by')
+      .eq('id', organizationId)
       .eq('created_by', user.id)
       .single();
 
     if (orgError || !organization) {
-      logger.debug('[my/services] No organization found for user');
-      return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
+      logger.error('[my/services] Organization access denied', { 
+        userId: user.id, 
+        organizationId,
+        error: orgError?.message 
+      });
+      return NextResponse.json({ 
+        error: 'RLS_FORBIDDEN', 
+        message: 'Row Level Security によって拒否されました' 
+      }, { status: 403 });
     }
 
     // 組織のサービスを取得 - RLS compliance: organization ownership + created_by check
     const { data: services, error: servicesError } = await supabase
       .from('services')
       .select('*')
-      .eq('organization_id', organization.id)
+      .eq('organization_id', organizationId)
       .eq('created_by', user.id)
       .order('created_at', { ascending: false });
 
     if (servicesError) {
-      logger.error('[my/services] Failed to fetch services', { data: servicesError });
+      logger.error('[my/services] Failed to fetch services', { 
+        data: servicesError,
+        userId: user.id,
+        organizationId 
+      });
       return NextResponse.json({ message: 'Failed to fetch services' }, { status: 500 });
     }
 
@@ -62,28 +83,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
-    // Get user organization
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .single();
-
-    if (orgError || !organization) {
-      logger.debug('[my/services] POST No organization found for user');
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
-    }
-
     const body = await request.json();
+
+    // organizationId 必須チェック
+    if (!body.organizationId) {
+      logger.debug('[my/services] POST organizationId required');
+      return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
+    }
 
     // Basic validation
     if (!body.name || !body.name.trim()) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
 
+    // 組織の所有者チェック
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id, created_by')
+      .eq('id', body.organizationId)
+      .eq('created_by', user.id)
+      .single();
+
+    if (orgError || !organization) {
+      logger.error('[my/services] POST Organization access denied', { 
+        userId: user.id, 
+        organizationId: body.organizationId,
+        error: orgError?.message,
+        code: orgError?.code 
+      });
+      return NextResponse.json({ 
+        error: 'RLS_FORBIDDEN', 
+        message: 'Row Level Security によって拒否されました' 
+      }, { status: 403 });
+    }
+
     // Prepare service data with RLS compliance
     const serviceData = {
-      organization_id: organization.id,
+      organization_id: body.organizationId,
       created_by: user.id, // Required for RLS policy
       name: body.name.trim(),
       summary: body.summary || null,
@@ -102,8 +138,28 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (error) {
-      logger.error('[my/services] POST Failed to create service', { data: error });
-      return NextResponse.json({ error: 'Failed to create service', details: error.message }, { status: 500 });
+      logger.error('[my/services] POST Failed to create service', { 
+        data: error,
+        userId: user.id,
+        organizationId: body.organizationId,
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
+      
+      // RLS エラーの場合は 403 を返す
+      if (error.code === '42501' || error.message?.includes('RLS')) {
+        return NextResponse.json({ 
+          error: 'RLS_FORBIDDEN', 
+          message: 'Row Level Security によって拒否されました' 
+        }, { status: 403 });
+      }
+      
+      return NextResponse.json({ 
+        error: 'Failed to create service', 
+        details: error.message 
+      }, { status: 500 });
     }
 
     return NextResponse.json({ data }, { status: 201 });

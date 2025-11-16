@@ -8,7 +8,11 @@ import QAEntryManager from './QAEntryManager';
 import { useQAData } from '@/hooks/useQAData';
 import { Folder, FileText, Search, TrendingUp } from 'lucide-react';
 
-export default function QAManager() {
+interface QAManagerProps {
+  organizationId: string;
+}
+
+export default function QAManager({ organizationId }: QAManagerProps) {
   const [activeTab, setActiveTab] = useState('entries');
   const { categories, loading, refreshCategories } = useQAData();
 
@@ -59,6 +63,7 @@ export default function QAManager() {
 
         <TabsContent value="entries" className="space-y-4">
           <QAEntryManager 
+            organizationId={organizationId}
             categories={categories} 
             onRefreshCategories={refreshCategories}
           />

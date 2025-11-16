@@ -20,7 +20,7 @@ async function logErrorToDiag(errorInfo: any) {
 export const dynamic = 'force-dynamic';
 
 // GET - ユーザー企業の事例一覧を取得
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await supabaseServer();
     
@@ -29,21 +29,40 @@ export async function GET() {
       return createAuthError();
     }
 
+    // organizationId クエリパラメータ必須チェック
+    const url = new URL(request.url);
+    const organizationId = url.searchParams.get('organizationId');
+    
+    if (!organizationId) {
+      logger.debug('[my/case-studies] organizationId parameter required');
+      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
+    }
+
+    // 組織の所有者チェック
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
-      .select('id')
+      .select('id, created_by')
+      .eq('id', organizationId)
       .eq('created_by', authData.user.id)
       .single();
 
     if (orgError || !orgData) {
-      return createNotFoundError('Organization');
+      logger.error('[my/case-studies] Organization access denied', { 
+        userId: authData.user.id, 
+        organizationId,
+        error: orgError?.message 
+      });
+      return NextResponse.json({ 
+        error: 'RLS_FORBIDDEN', 
+        message: 'Row Level Security によって拒否されました' 
+      }, { status: 403 });
     }
 
     // RLS compliance: check both organization ownership and created_by
     const { data, error } = await supabase
       .from('case_studies')
       .select('*')
-      .eq('organization_id', orgData.id)
+      .eq('organization_id', organizationId)
       .eq('created_by', authData.user.id)
       .order('created_at', { ascending: false });
 

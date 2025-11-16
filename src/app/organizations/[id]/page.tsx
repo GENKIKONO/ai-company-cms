@@ -1158,7 +1158,7 @@ export default function EditOrganizationPage() {
 
         {/* ナレッジベースタブ */}
         {activeTab === 'qa' && (
-          <QAManager />
+          <QAManager organizationId={organizationId} />
         )}
       </main>
 

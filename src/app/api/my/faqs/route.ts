@@ -26,7 +26,7 @@ async function logErrorToDiag(errorInfo: any) {
 export const dynamic = 'force-dynamic';
 
 // GET - ユーザー企業のFAQ一覧を取得
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await supabaseServer();
     
@@ -35,21 +35,40 @@ export async function GET() {
       return createAuthError();
     }
 
+    // organizationId クエリパラメータ必須チェック
+    const url = new URL(request.url);
+    const organizationId = url.searchParams.get('organizationId');
+    
+    if (!organizationId) {
+      logger.debug('[my/faqs] organizationId parameter required');
+      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
+    }
+
+    // 組織の所有者チェック
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
-      .select('id')
+      .select('id, created_by')
+      .eq('id', organizationId)
       .eq('created_by', authData.user.id)
       .single();
 
     if (orgError || !orgData) {
-      return createNotFoundError('Organization');
+      logger.error('[my/faqs] Organization access denied', { 
+        userId: authData.user.id, 
+        organizationId,
+        error: orgError?.message 
+      });
+      return NextResponse.json({ 
+        error: 'RLS_FORBIDDEN', 
+        message: 'Row Level Security によって拒否されました' 
+      }, { status: 403 });
     }
 
     // RLS compliance: check both organization ownership and created_by
     const { data, error } = await supabase
       .from('faqs')
       .select('*')
-      .eq('organization_id', orgData.id)
+      .eq('organization_id', organizationId)
       .eq('created_by', authData.user.id)
       .order('created_at', { ascending: false });
 
@@ -87,7 +106,13 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
-    const body: FAQFormData = await request.json();
+    const body: FAQFormData & { organizationId?: string } = await request.json();
+
+    // organizationId 必須チェック
+    if (!body.organizationId) {
+      logger.debug('[my/faqs] POST organizationId required');
+      return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
+    }
 
     if (!body.question || !body.answer) {
       return NextResponse.json({
@@ -95,18 +120,24 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // 組織の所有者チェック
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
-      .select('id, plan')
+      .select('id, plan, created_by')
+      .eq('id', body.organizationId)
       .eq('created_by', authData.user.id)
       .single();
 
     if (orgError || !orgData) {
-      logger.debug('[my/faqs POST] No organization found for user');
+      logger.error('[my/faqs] POST Organization access denied', { 
+        userId: authData.user.id, 
+        organizationId: body.organizationId,
+        error: orgError?.message 
+      });
       return NextResponse.json({ 
-        error: '企業情報が見つかりません', 
-        code: 'ORG_NOT_FOUND' 
-      }, { status: 404 });
+        error: 'RLS_FORBIDDEN', 
+        message: 'Row Level Security によって拒否されました' 
+      }, { status: 403 });
     }
 
     // プラン制限チェック

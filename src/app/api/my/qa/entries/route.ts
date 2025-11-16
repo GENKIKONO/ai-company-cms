@@ -12,18 +12,35 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's organization (Single-Org Mode: user owns organization)
+    const { searchParams } = new URL(req.url);
+    const organizationId = searchParams.get('organizationId');
+    
+    // organizationId 必須チェック
+    if (!organizationId) {
+      logger.debug('[my/qa/entries] organizationId parameter required');
+      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
+    }
+
+    // 組織の所有者チェック
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
-      .select('id')
+      .select('id, created_by')
+      .eq('id', organizationId)
       .eq('created_by', user.id)
       .single();
 
     if (orgError || !organization) {
-      return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
+      logger.error('[my/qa/entries] Organization access denied', { 
+        userId: user.id, 
+        organizationId,
+        error: orgError?.message 
+      });
+      return NextResponse.json({ 
+        error: 'RLS_FORBIDDEN', 
+        message: 'Row Level Security によって拒否されました' 
+      }, { status: 403 });
     }
 
-    const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
     const status = searchParams.get('status');
@@ -38,7 +55,7 @@ export async function GET(req: NextRequest) {
         *,
         qa_categories!left(id, name, slug)
       `, { count: 'exact' })
-      .eq('organization_id', organization.id)
+      .eq('organization_id', organizationId)
       .eq('created_by', user.id);
 
     if (status && ['draft', 'published', 'archived'].includes(status)) {
@@ -89,18 +106,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's organization (Single-Org Mode: user owns organization)
+    const body: QAEntryFormData & { organizationId?: string } = await req.json();
+    
+    // organizationId 必須チェック
+    if (!body.organizationId) {
+      logger.debug('[my/qa/entries] POST organizationId required');
+      return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
+    }
+
+    // 組織の所有者チェック
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
-      .select('id')
+      .select('id, created_by')
+      .eq('id', body.organizationId)
       .eq('created_by', user.id)
       .single();
 
     if (orgError || !organization) {
-      return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
+      logger.error('[my/qa/entries] POST Organization access denied', { 
+        userId: user.id, 
+        organizationId: body.organizationId,
+        error: orgError?.message 
+      });
+      return NextResponse.json({ 
+        error: 'RLS_FORBIDDEN', 
+        message: 'Row Level Security によって拒否されました' 
+      }, { status: 403 });
     }
-    
-    const body: QAEntryFormData = await req.json();
     
     if (!body.question?.trim() || !body.answer?.trim()) {
       return NextResponse.json({ error: 'Question and answer are required' }, { status: 400 });

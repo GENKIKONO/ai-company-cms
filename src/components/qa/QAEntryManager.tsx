@@ -14,11 +14,12 @@ import type { QAEntry, QAEntryWithCategory, QACategory, QAEntryFormData } from '
 import { logger } from '@/lib/utils/logger';
 
 interface QAEntryManagerProps {
+  organizationId: string;
   categories: QACategory[];
   onRefreshCategories?: () => void;
 }
 
-export default function QAEntryManager({ categories, onRefreshCategories }: QAEntryManagerProps) {
+export default function QAEntryManager({ organizationId, categories, onRefreshCategories }: QAEntryManagerProps) {
   const [entries, setEntries] = useState<QAEntryWithCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState<string | null>(null);
@@ -41,7 +42,8 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
     try {
       const params = new URLSearchParams({
         page: currentPage.toString(),
-        limit: '10'
+        limit: '10',
+        organizationId: organizationId
       });
 
       if (statusFilter !== 'all') {
@@ -78,6 +80,7 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          organizationId,
           category_id: formData.category_id || null,
           tags: formData.tags?.filter(tag => tag.trim()) || []
         })
@@ -104,6 +107,7 @@ export default function QAEntryManager({ categories, onRefreshCategories }: QAEn
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          organizationId,
           category_id: formData.category_id || null,
           tags: formData.tags?.filter(tag => tag.trim()) || []
         })

@@ -61,7 +61,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
   const fetchServices = async () => {
     try {
       setError(''); // Clear previous errors
-      const response = await fetch('/api/my/services');
+      const response = await fetch(`/api/my/services?organizationId=${organizationId}`);
       if (response.ok) {
         const result = await response.json();
         setServices(result.data || []);
@@ -72,6 +72,8 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
           setError('認証エラーです。再度ログインしてください。');
         } else if (response.status === 404) {
           setError('組織情報が見つかりません。');
+        } else if (response.status === 403) {
+          setError('組織にアクセスする権限がありません。組織の作成者のみが操作できます。');
         } else {
           setError(errorData.message || errorData.error || 'サービス一覧の取得に失敗しました');
         }
@@ -137,7 +139,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, organizationId }),
       });
 
       if (response.ok) {
@@ -150,7 +152,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
         } else if (response.status === 404) {
           setError('組織またはサービスが見つかりません。');
         } else if (response.status === 403) {
-          setError('このサービスを編集する権限がありません。');
+          setError('組織にアクセスする権限がありません。組織の作成者のみが操作できます。');
         } else {
           setError(errorData.error || errorData.message || 'サービスの保存に失敗しました');
         }
@@ -185,7 +187,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
         } else if (response.status === 404) {
           setError('削除対象のサービスが見つかりません。');
         } else if (response.status === 403) {
-          setError('このサービスを削除する権限がありません。');
+          setError('組織にアクセスする権限がありません。組織の作成者のみが削除できます。');
         } else {
           setError(errorData.error || errorData.message || 'サービスの削除に失敗しました');
         }

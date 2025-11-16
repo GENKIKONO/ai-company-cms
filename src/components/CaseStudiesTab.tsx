@@ -54,7 +54,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
 
   const fetchCaseStudies = async () => {
     try {
-      const response = await fetch('/api/my/case-studies');
+      const response = await fetch(`/api/my/case-studies?organizationId=${organizationId}`);
       if (response.ok) {
         const result = await response.json();
         setCaseStudies(result.data || []);
@@ -120,7 +120,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, organizationId }),
       });
 
       if (response.ok) {
