@@ -124,6 +124,9 @@ export interface Service {
   video_url?: string; // Service video URL (YouTube or external)
   cta_text?: string; // Call-to-action text
   cta_url?: string; // Call-to-action URL
+  status?: 'draft' | 'published'; // Service publication status
+  is_published: boolean; // Whether the service is publicly visible
+  created_by?: string; // User who created this service
   created_at: string;
   updated_at: string;
 }
@@ -159,13 +162,16 @@ export interface BusinessHours {
 
 export interface Post {
   id: string;
-  organization_id: string;
+  org_id: string; // Note: DBスキーマに合わせてorg_idに変更
   title: string;
   slug: string;
+  content?: string; // content_markdownとcontent_htmlを統合
   content_markdown?: string;
   content_html?: string;
   status: 'draft' | 'published';
+  is_published: boolean; // 公開フラグ
   published_at?: string;
+  created_by?: string; // 作成者
   created_at: string;
   updated_at: string;
 }
@@ -189,6 +195,9 @@ export interface FAQ {
   answer: string;
   category?: string;
   sort_order: number;
+  status?: 'draft' | 'published'; // FAQ publication status
+  is_published: boolean; // Whether the FAQ is publicly visible
+  created_by?: string; // User who created this FAQ
   created_at: string;
   updated_at: string;
 }
@@ -353,13 +362,17 @@ export interface ServiceFormData {
   video_url?: string;
   cta_text?: string;
   cta_url?: string;
+  status?: 'draft' | 'published';
+  is_published?: boolean;
 }
 
 export interface PostFormData {
   title: string;
-  slug: string;
+  slug?: string;
+  content?: string;
   content_markdown?: string;
   status: 'draft' | 'published';
+  is_published?: boolean;
 }
 
 export interface CaseStudyFormData {
@@ -375,6 +388,8 @@ export interface FAQFormData {
   answer: string;
   category?: string;
   sort_order?: number;
+  status?: 'draft' | 'published';
+  is_published?: boolean;
 }
 
 // Q&A Knowledge System Types

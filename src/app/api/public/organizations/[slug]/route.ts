@@ -76,6 +76,7 @@ export async function GET(
         .order('created_at', { ascending: false }),
       
       // 公開されたFAQ一覧
+      // Note: is_published = true で統一（statusフィールドは将来的に廃止予定）
       supabase
         .from('faqs')
         .select('*')

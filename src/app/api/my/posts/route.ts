@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     const { data: posts, error: postsError } = await supabase
       .from('posts')
       .select('*')
-      .eq('organization_id', organization.id)
+      .eq('org_id', organization.id)
       .order('created_at', { ascending: false });
 
     if (postsError) {
@@ -162,12 +162,13 @@ export async function POST(request: NextRequest) {
 
     // 投稿データを準備
     const postData = {
-      organization_id: organization.id,
+      org_id: organization.id,
       created_by: user.id,
       title: validatedData.title,
       slug: slug,
       content: validatedData.content_markdown || validatedData.content || '',
       status: validatedData.is_published ? 'published' : validatedData.status,
+      is_published: true, // 作成されたポストは即座に公開対象とする
       published_at: publishedAt,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
@@ -177,7 +178,7 @@ export async function POST(request: NextRequest) {
     const { data: existingPost, error: slugCheckError } = await supabase
       .from('posts')
       .select('id')
-      .eq('organization_id', organization.id)
+      .eq('org_id', organization.id)
       .eq('slug', slug)
       .maybeSingle();
 

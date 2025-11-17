@@ -181,34 +181,65 @@ export async function POST(request: NextRequest) {
       category: body.category || null,
       sort_order: body.sort_order || 1,
       is_published: true, // 作成されたFAQは即座に公開対象とする
+      status: 'published', // 公開状態を明示的に設定
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
 
-    const { data, error } = await supabase
+    // PGRST204対策: INSERT とSELECTを分離して安全に処理
+    const { data: insertData, error: insertError } = await supabase
       .from('faqs')
       .insert(faqData)
-      .select()
+      .select('id')
       .maybeSingle();
 
-    if (error) {
+    if (insertError) {
       logger.error('[my/faqs POST] Failed to create FAQ', {
         userId: authData.user.id,
         orgId: orgData.id,
         faqData: { ...faqData, answer: '[内容省略]' },
-        error: error,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-        message: error.message
+        error: insertError,
+        code: insertError.code,
+        details: insertError.details,
+        hint: insertError.hint,
+        message: insertError.message
       });
       return NextResponse.json({
         error: 'FAQの作成に失敗しました',
-        code: error.code,
-        details: error.details,
-        hint: error.hint
+        code: insertError.code,
+        details: insertError.details,
+        hint: insertError.hint
       }, { status: 500 });
     }
+
+    // INSERT成功後、改めてSELECTで取得（RLSポリシー対応）
+    let data = null;
+    if (insertData?.id) {
+      const { data: selectData, error: selectError } = await supabase
+        .from('faqs')
+        .select('*')
+        .eq('id', insertData.id)
+        .eq('organization_id', orgData.id)
+        .eq('created_by', authData.user.id)
+        .maybeSingle();
+
+      if (selectError) {
+        logger.warn('[my/faqs POST] SELECT after INSERT failed, but INSERT succeeded', {
+          userId: authData.user.id,
+          orgId: orgData.id,
+          faqId: insertData.id,
+          selectError: selectError.code
+        });
+        // SELECT失敗でもINSERT成功なら201を返す
+        data = { id: insertData.id, ...faqData };
+      } else {
+        data = selectData;
+      }
+    } else {
+      // INSERT成功したがIDが返ってこない場合
+      data = faqData;
+    }
+
 
     return NextResponse.json({ data }, { status: 201 });
 

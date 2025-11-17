@@ -98,8 +98,8 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
 
     try {
       const url = editingPost 
-        ? `/api/posts/${editingPost.id}`
-        : `/api/organizations/${organizationId}/posts`;
+        ? `/api/my/posts/${editingPost.id}`
+        : '/api/my/posts';
       
       const method = editingPost ? 'PUT' : 'POST';
       

@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     // 組織の所有者チェック
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
-      .select('id, created_by')
+      .select('id, slug, created_by')
       .eq('id', body.organizationId)
       .eq('created_by', user.id)
       .single();
@@ -127,6 +127,8 @@ export async function POST(request: NextRequest) {
       price: body.price ? parseInt(body.price, 10) : null,
       duration_months: body.duration_months ? parseInt(body.duration_months, 10) : null,
       category: body.category || null,
+      is_published: true, // 作成されたサービスは即座に公開対象とする
+      status: 'published', // 公開状態を明示的に設定
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -160,6 +162,31 @@ export async function POST(request: NextRequest) {
         error: 'Failed to create service', 
         details: error.message 
       }, { status: 500 });
+    }
+
+    // キャッシュ無効化（公開ページの即座反映用）
+    try {
+      const { revalidatePath } = await import('next/cache');
+      
+      // 関連ページのキャッシュを無効化
+      revalidatePath('/dashboard');
+      revalidatePath(`/organizations/${organization.id}`);
+      if (organization.slug) {
+        revalidatePath(`/o/${organization.slug}`);
+      }
+      
+      logger.debug('[my/services] POST Cache revalidation successful', {
+        userId: user.id,
+        orgId: organization.id,
+        orgSlug: organization.slug
+      });
+    } catch (revalidateError) {
+      // キャッシュ無効化エラーは非ブロッキング
+      logger.warn('[my/services] POST Cache revalidation failed', { 
+        userId: user.id,
+        orgId: organization.id,
+        error: revalidateError instanceof Error ? revalidateError.message : revalidateError 
+      });
     }
 
     return NextResponse.json({ data }, { status: 201 });
