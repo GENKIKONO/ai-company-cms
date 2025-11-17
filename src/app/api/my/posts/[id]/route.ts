@@ -75,7 +75,7 @@ export async function PUT(
       .from('posts')
       .select('*')
       .eq('id', postId)
-      .eq('org_id', organization.id)
+      .eq('organization_id', organization.id)
       .maybeSingle();
 
     if (postError) {
@@ -130,7 +130,7 @@ export async function PUT(
       const { data: duplicatePost, error: slugCheckError } = await supabase
         .from('posts')
         .select('id')
-        .eq('org_id', organization.id)
+        .eq('organization_id', organization.id)
         .eq('slug', slug)
         .neq('id', postId)
         .maybeSingle();

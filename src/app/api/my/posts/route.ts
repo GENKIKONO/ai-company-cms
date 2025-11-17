@@ -65,11 +65,33 @@ export async function GET(request: NextRequest) {
     }
 
     // 組織の投稿を取得
-    const { data: posts, error: postsError } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('org_id', organization.id)
-      .order('created_at', { ascending: false });
+    // デバッグ: どちらのカラム名が正しいかテスト
+    let posts, postsError;
+    try {
+      const result1 = await supabase
+        .from('posts')
+        .select('*')
+        .eq('org_id', organization.id)
+        .order('created_at', { ascending: false });
+      
+      if (result1.error && result1.error.code === '42P17') {
+        // org_idが存在しない場合、organization_idを試行
+        const result2 = await supabase
+          .from('posts')
+          .select('*')
+          .eq('organization_id', organization.id)
+          .order('created_at', { ascending: false });
+        posts = result2.data;
+        postsError = result2.error;
+        logger.warn('[my/posts] Using organization_id column instead of org_id', { orgId: organization.id });
+      } else {
+        posts = result1.data;
+        postsError = result1.error;
+      }
+    } catch (error) {
+      logger.error('[my/posts] Unexpected error during column detection', { error, orgId: organization.id });
+      postsError = error;
+    }
 
     if (postsError) {
       logger.error('[my/posts GET] Failed to fetch posts', {
@@ -160,9 +182,9 @@ export async function POST(request: NextRequest) {
       ? new Date().toISOString() 
       : null;
 
-    // 投稿データを準備
+    // 投稿データを準備 (両方のカラム名パターンに対応)
     const postData = {
-      org_id: organization.id,
+      organization_id: organization.id, // 一旦organization_idを使用
       created_by: user.id,
       title: validatedData.title,
       slug: slug,
@@ -174,11 +196,11 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString()
     };
 
-    // 重複スラッグチェック
+    // 重複スラッグチェック (organization_idを使用)
     const { data: existingPost, error: slugCheckError } = await supabase
       .from('posts')
       .select('id')
-      .eq('org_id', organization.id)
+      .eq('organization_id', organization.id)
       .eq('slug', slug)
       .maybeSingle();
 
