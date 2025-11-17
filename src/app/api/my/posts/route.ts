@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     const { data: posts, error: postsError } = await supabase
       .from('posts')
       .select('*')
-      .eq('org_id', organization.id)
+      .eq('organization_id', organization.id)
       .order('created_at', { ascending: false });
 
     if (postsError) {
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
 
     // 投稿データを準備
     const postData = {
-      org_id: organization.id,
+      organization_id: organization.id,
       created_by: user.id,
       title: validatedData.title,
       slug: slug,
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
     const { data: existingPost, error: slugCheckError } = await supabase
       .from('posts')
       .select('id')
-      .eq('org_id', organization.id)
+      .eq('organization_id', organization.id)
       .eq('slug', slug)
       .maybeSingle();
 

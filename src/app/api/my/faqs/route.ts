@@ -180,6 +180,7 @@ export async function POST(request: NextRequest) {
       answer: body.answer,
       category: body.category || null,
       sort_order: body.sort_order || 1,
+      is_published: true, // 作成されたFAQは即座に公開対象とする
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };

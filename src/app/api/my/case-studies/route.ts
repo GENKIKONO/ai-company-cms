@@ -70,7 +70,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Database error', message: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ data: data || [] });
+    // Map database 'outcome' field to frontend 'result' field for consistency
+    const mappedData = (data || []).map((caseStudy: any) => ({
+      ...caseStudy,
+      result: caseStudy.outcome,
+      // Remove outcome field to avoid confusion
+      outcome: undefined
+    }));
+
+    return NextResponse.json({ data: mappedData });
 
   } catch (error) {
     const errorId = generateErrorId('get-case-studies');
@@ -193,7 +201,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Database error', message: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ data }, { status: 201 });
+    // Map database 'outcome' field to frontend 'result' field for consistency
+    const mappedData = data ? {
+      ...data,
+      result: data.outcome,
+      outcome: undefined
+    } : null;
+
+    return NextResponse.json({ data: mappedData }, { status: 201 });
 
   } catch (error) {
     const errorId = generateErrorId('post-case-studies');

@@ -11,7 +11,7 @@ interface CaseStudy {
   industry: string | null;
   challenge: string | null;
   solution: string | null;
-  results: string | null;
+  result: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -23,7 +23,7 @@ interface CaseStudyFormData {
   industry: string;
   challenge: string;
   solution: string;
-  results: string;
+  result: string;
 }
 
 interface CaseStudiesTabProps {
@@ -45,7 +45,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
     industry: '',
     challenge: '',
     solution: '',
-    results: ''
+    result: ''
   });
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
       industry: '',
       challenge: '',
       solution: '',
-      results: ''
+      result: ''
     });
     setEditingCaseStudy(null);
     setShowForm(false);
@@ -91,7 +91,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
       industry: caseStudy.industry || '',
       challenge: caseStudy.challenge || '',
       solution: caseStudy.solution || '',
-      results: caseStudy.results || ''
+      result: caseStudy.result || ''
     });
     setEditingCaseStudy(caseStudy);
     setShowForm(true);
@@ -325,8 +325,8 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                   </label>
                   <textarea
                     rows={3}
-                    value={formData.results}
-                    onChange={(e) => setFormData(prev => ({ ...prev, results: e.target.value }))}
+                    value={formData.result}
+                    onChange={(e) => setFormData(prev => ({ ...prev, result: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   />
                 </div>

@@ -161,6 +161,13 @@ export function normalizeCaseStudyPayload(data: any) {
     'result'
   ]);
   
+  // Map 'result' to 'outcome' for database compatibility
+  // Database schema uses 'outcome' while frontend/types use 'result'
+  if (normalized.result !== undefined) {
+    normalized.outcome = normalized.result;
+    delete normalized.result;
+  }
+  
   // tags配列の正規化
   if (normalized.tags) {
     if (Array.isArray(normalized.tags)) {

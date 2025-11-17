@@ -56,7 +56,14 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ data });
+    // Map database 'outcome' field to frontend 'result' field for consistency
+    const mappedData = data ? {
+      ...data,
+      result: data.outcome,
+      outcome: undefined
+    } : null;
+
+    return NextResponse.json({ data: mappedData });
 
   } catch (error) {
     const errorId = `get-case-study-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -137,7 +144,14 @@ export async function PUT(
       );
     }
 
-    return NextResponse.json({ data });
+    // Map database 'outcome' field to frontend 'result' field for consistency
+    const mappedData = data ? {
+      ...data,
+      result: data.outcome,
+      outcome: undefined
+    } : null;
+
+    return NextResponse.json({ data: mappedData });
 
   } catch (error) {
     const errorId = `put-case-study-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
