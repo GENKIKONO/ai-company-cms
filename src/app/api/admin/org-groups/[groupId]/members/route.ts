@@ -20,7 +20,7 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
   try {
     const { data: group, error } = await supabaseAdmin
       .from('organization_groups')
-      .select('owner_org_id')
+      .select('owner_organization_id')
       .eq('id', groupId)
       .single();
 
@@ -28,7 +28,7 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
       return false;
     }
 
-    return await isUserAdminOfOrg(group.owner_org_id, userId);
+    return await isUserAdminOfOrg(group.owner_organization_id, userId);
   } catch (error: any) {
     logger.error('Error checking group ownership', {
       component: 'org-group-members-api',
@@ -86,7 +86,7 @@ export async function POST(
     // Verify group exists
     const { data: group, error: groupError } = await supabaseAdmin
       .from('organization_groups')
-      .select('id, name, owner_org_id')
+      .select('id, name, owner_organization_id')
       .eq('id', groupId)
       .single();
 
@@ -110,7 +110,7 @@ export async function POST(
       .from('org_group_members')
       .select('id')
       .eq('group_id', groupId)
-      .eq('org_id', organization_id)
+      .eq('organization_id', organization_id)
       .single();
 
     if (existingMember) {
@@ -124,9 +124,9 @@ export async function POST(
       .from('org_group_members')
       .insert({
         group_id: groupId,
-        org_id: organization_id,
+        organization_id: organization_id,
         role,
-        added_by: group.owner_org_id
+        added_by: group.owner_organization_id
       })
       .select(`
         id,
@@ -228,7 +228,7 @@ export async function DELETE(
     // Get group info
     const { data: group, error: groupError } = await supabaseAdmin
       .from('organization_groups')
-      .select('name, owner_org_id')
+      .select('name, owner_organization_id')
       .eq('id', groupId)
       .single();
 
@@ -237,7 +237,7 @@ export async function DELETE(
     }
 
     // Prevent removing the owner organization
-    if (organization_id === group.owner_org_id) {
+    if (organization_id === group.owner_organization_id) {
       return NextResponse.json({ 
         error: 'Cannot remove the owner organization from the group' 
       }, { status: 403 });
@@ -256,7 +256,7 @@ export async function DELETE(
         )
       `)
       .eq('group_id', groupId)
-      .eq('org_id', organization_id)
+      .eq('organization_id', organization_id)
       .single();
 
     if (!member) {
@@ -268,7 +268,7 @@ export async function DELETE(
       .from('org_group_members')
       .delete()
       .eq('group_id', groupId)
-      .eq('org_id', organization_id);
+      .eq('organization_id', organization_id);
 
     if (error) {
       logger.error('Error removing member from organization group', {

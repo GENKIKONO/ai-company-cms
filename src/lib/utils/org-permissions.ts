@@ -14,7 +14,7 @@ export async function isUserAdminOfOrg(orgId: string, userId?: string): Promise<
   try {
     const { data, error } = await supabaseAdmin
       .rpc('has_organization_role', {
-        org_id: orgId,
+        organization_id: orgId,
         required_role: 'admin',
         user_id: userId
       });

@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
       .insert({
         name,
         description,
-        owner_org_id: owner_organization_id
+        owner_organization_id: owner_organization_id
       })
       .select(`
         id,
@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
       .from('org_group_members')
       .insert({
         group_id: group.id,
-        org_id: owner_organization_id,
+        organization_id: owner_organization_id,
         role: 'admin',
         added_by: owner_organization_id
       });

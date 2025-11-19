@@ -1,0 +1,65 @@
+name: Forbidden Fields Check
+
+on:
+  pull_request:
+    paths:
+      - 'src/**/*.ts'
+      - 'src/**/*.tsx'
+  push:
+    branches: [main, develop]
+
+jobs:
+  forbidden-fields:
+    runs-on: ubuntu-latest
+    name: Check for forbidden field usage
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check for org_id usage
+        id: check-org-id
+        run: |
+          echo "🔍 Scanning for forbidden org_id field usage..."
+          
+          # Check for database queries using org_id
+          ORG_ID_QUERIES=$(grep -r "\.eq('org_id'" src/ || true)
+          ORG_ID_INSERTS=$(grep -r "org_id:" src/ --include="*.ts" --include="*.tsx" | grep -v "// ALLOWED:" || true)
+          ORG_ID_SELECTS=$(grep -r "\.select.*org_id" src/ || true)
+          
+          # Check for type definitions with org_id  
+          ORG_ID_TYPES=$(grep -r "org_id:" src/types/ || true)
+          
+          if [ -n "$ORG_ID_QUERIES" ] || [ -n "$ORG_ID_INSERTS" ] || [ -n "$ORG_ID_SELECTS" ] || [ -n "$ORG_ID_TYPES" ]; then
+            echo "❌ Found forbidden org_id usage:"
+            echo "Database queries:"
+            echo "$ORG_ID_QUERIES"
+            echo "Insert/Object usage:"  
+            echo "$ORG_ID_INSERTS"
+            echo "Select queries:"
+            echo "$ORG_ID_SELECTS"
+            echo "Type definitions:"
+            echo "$ORG_ID_TYPES"
+            echo ""
+            echo "💡 All database fields should use 'organization_id' instead of 'org_id'"
+            echo "💡 If this is a FK constraint name, add comment: // ALLOWED: FK constraint"
+            exit 1
+          else
+            echo "✅ No forbidden org_id usage found"
+          fi
+          
+      - name: Check for other deprecated patterns
+        run: |
+          echo "🔍 Checking for other deprecated patterns..."
+          
+          # Check for hardcoded API URLs instead of CACHE_KEYS
+          HARDCODED_ANALYTICS=$(grep -r "'/api/analytics" src/ --include="*.ts" --include="*.tsx" | grep -v "CACHE_KEYS" || true)
+          
+          if [ -n "$HARDCODED_ANALYTICS" ]; then
+            echo "⚠️  Found hardcoded analytics API URLs (should use CACHE_KEYS):"
+            echo "$HARDCODED_ANALYTICS"
+            echo "💡 Use CACHE_KEYS.analytics*() functions instead"
+            exit 1
+          fi
+          
+          echo "✅ No deprecated patterns found"

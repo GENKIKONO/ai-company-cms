@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { logger } from '@/lib/log';
 import { z } from 'zod';
+import { withOrgAuth } from '@/lib/auth/org-middleware';
 
 // POST request schema
 const updatePostSchema = z.object({
@@ -30,59 +31,25 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-  try {
+  const resolvedParams = await params;
+  const postId = resolvedParams.id;
+  
+  return withOrgAuth(request, async ({ orgId, userId }) => {
     const supabase = await supabaseServer();
-    const resolvedParams = await params;
-    const postId = resolvedParams.id;
-    
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      logger.debug('[my/posts/update] Not authenticated');
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
-
-    // ユーザーの組織を取得
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .maybeSingle();
-
-    if (orgError) {
-      logger.error('[my/posts/update] Failed to fetch organization', {
-        userId: user.id,
-        postId: postId,
-        error: orgError,
-        code: orgError.code,
-        details: orgError.details,
-        hint: orgError.hint
-      });
-      return NextResponse.json({ 
-        error: '企業情報の取得に失敗しました',
-        code: orgError.code,
-        message: 'Failed to fetch organization' 
-      }, { status: 500 });
-    }
-
-    if (!organization) {
-      logger.debug('[my/posts/update] No organization found for user');
-      return NextResponse.json({ message: 'Organization not found' }, { status: 404 });
-    }
 
     // 既存の投稿を取得（組織との関連性もチェック）
     const { data: existingPost, error: postError } = await supabase
       .from('posts')
       .select('*')
       .eq('id', postId)
-      .eq('organization_id', organization.id)
+      .eq('organization_id', orgId)
       .maybeSingle();
 
     if (postError) {
       logger.error('[my/posts/update] Failed to fetch existing post', {
-        userId: user.id,
+        userId,
         postId: postId,
-        orgId: organization.id,
+        orgId,
         error: postError,
         code: postError.code,
         details: postError.details,
@@ -96,8 +63,13 @@ export async function PUT(
     }
 
     if (!existingPost) {
-      logger.debug('[my/posts/update] Post not found or access denied', { postId, orgId: organization.id });
-      return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+      logger.debug('[my/posts/update] Post not found or access denied', { 
+        postId, 
+        orgId 
+      });
+      return NextResponse.json({ 
+        message: 'Post not found' 
+      }, { status: 404 });
     }
 
     // リクエストボディを取得・検証
@@ -130,16 +102,16 @@ export async function PUT(
       const { data: duplicatePost, error: slugCheckError } = await supabase
         .from('posts')
         .select('id')
-        .eq('organization_id', organization.id)
+        .eq('organization_id', orgId)
         .eq('slug', slug)
         .neq('id', postId)
         .maybeSingle();
 
       if (slugCheckError) {
         logger.error('[my/posts/update] Failed to check slug uniqueness', {
-          userId: user.id,
+          userId,
           postId: postId,
-          orgId: organization.id,
+          orgId,
           slug: slug,
           error: slugCheckError,
           code: slugCheckError.code,
@@ -153,9 +125,9 @@ export async function PUT(
 
       if (duplicatePost) {
         logger.warn('[my/posts/update] Duplicate slug detected', {
-          userId: user.id,
+          userId,
           postId: postId,
-          orgId: organization.id,
+          orgId,
           slug: slug,
           existingPostId: duplicatePost.id
         });
@@ -171,15 +143,15 @@ export async function PUT(
       .from('posts')
       .update(updateData)
       .eq('id', postId)
-      .eq('org_id', organization.id)
+      .eq('organization_id', orgId)
       .select()
       .single();
 
     if (updateError) {
       logger.error('[my/posts/update] Failed to update post', {
-        userId: user.id,
+        userId,
         postId: postId,
-        orgId: organization.id,
+        orgId,
         updateData: { ...updateData, content: '[内容省略]' },
         error: updateError,
         code: updateError.code,
@@ -197,8 +169,8 @@ export async function PUT(
     }
 
     logger.info('[my/posts/update] Post updated successfully', {
-      userId: user.id,
-      orgId: organization.id,
+      userId,
+      orgId,
       postId: updatedPost.id,
       title: updatedPost.title,
       slug: updatedPost.slug,
@@ -206,7 +178,7 @@ export async function PUT(
     });
     return NextResponse.json({ data: updatedPost }, { status: 200 });
 
-  } catch (error) {
+  }).catch(error => {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
         message: 'Validation error',
@@ -216,7 +188,7 @@ export async function PUT(
 
     logger.error('[PUT /api/my/posts/[id]] Unexpected error', { data: error });
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
-  }
+  });
 }
 
 // DELETE - 特定の投稿を削除
@@ -224,59 +196,25 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-  try {
+  const resolvedParams = await params;
+  const postId = resolvedParams.id;
+  
+  return withOrgAuth(request, async ({ orgId, userId }) => {
     const supabase = await supabaseServer();
-    const resolvedParams = await params;
-    const postId = resolvedParams.id;
-    
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      logger.debug('[my/posts/delete] Not authenticated');
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
-
-    // ユーザーの組織を取得
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .maybeSingle();
-
-    if (orgError) {
-      logger.error('[my/posts/delete] Failed to fetch organization', {
-        userId: user.id,
-        postId: postId,
-        error: orgError,
-        code: orgError.code,
-        details: orgError.details,
-        hint: orgError.hint
-      });
-      return NextResponse.json({ 
-        error: '企業情報の取得に失敗しました',
-        code: orgError.code,
-        message: 'Failed to fetch organization' 
-      }, { status: 500 });
-    }
-
-    if (!organization) {
-      logger.debug('[my/posts/delete] No organization found for user');
-      return NextResponse.json({ message: 'Organization not found' }, { status: 404 });
-    }
 
     // 投稿の存在確認（組織との関連性もチェック）
     const { data: post, error: postError } = await supabase
       .from('posts')
       .select('id')
       .eq('id', postId)
-      .eq('org_id', organization.id)
+      .eq('organization_id', orgId)
       .maybeSingle();
 
     if (postError) {
       logger.error('[my/posts/delete] Failed to check post existence', {
-        userId: user.id,
+        userId,
         postId: postId,
-        orgId: organization.id,
+        orgId,
         error: postError,
         code: postError.code,
         details: postError.details,
@@ -290,8 +228,13 @@ export async function DELETE(
     }
 
     if (!post) {
-      logger.debug('[my/posts/delete] Post not found or access denied', { postId, orgId: organization.id });
-      return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+      logger.debug('[my/posts/delete] Post not found or access denied', { 
+        postId, 
+        orgId 
+      });
+      return NextResponse.json({ 
+        message: 'Post not found' 
+      }, { status: 404 });
     }
 
     // 投稿を削除
@@ -299,13 +242,13 @@ export async function DELETE(
       .from('posts')
       .delete()
       .eq('id', postId)
-      .eq('org_id', organization.id);
+      .eq('organization_id', orgId);
 
     if (deleteError) {
       logger.error('[my/posts/delete] Failed to delete post', {
-        userId: user.id,
+        userId,
         postId: postId,
-        orgId: organization.id,
+        orgId,
         error: deleteError,
         code: deleteError.code,
         details: deleteError.details,
@@ -318,11 +261,15 @@ export async function DELETE(
       }, { status: 500 });
     }
 
-    logger.debug('[my/posts/delete] Post deleted successfully', { postId });
-    return NextResponse.json({ message: 'Post deleted successfully' }, { status: 200 });
+    logger.debug('[my/posts/delete] Post deleted successfully', { 
+      postId 
+    });
+    return NextResponse.json({ 
+      message: 'Post deleted successfully' 
+    }, { status: 200 });
 
-  } catch (error) {
+  }).catch(error => {
     logger.error('[DELETE /api/my/posts/[id]] Unexpected error', { data: error });
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
-  }
+  });
 }

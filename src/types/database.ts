@@ -162,7 +162,7 @@ export interface BusinessHours {
 
 export interface Post {
   id: string;
-  org_id: string; // Note: DBスキーマに合わせてorg_idに変更
+  organization_id: string; // 統一: organization_idを使用（org_idは廃止）
   title: string;
   slug: string;
   content?: string; // content_markdownとcontent_htmlを統合
@@ -517,7 +517,7 @@ export interface QAEntryFormData {
 // Subscription types
 export interface Subscription {
   id: string;
-  org_id: string;
+  organization_id: string;
   stripe_subscription_id: string;
   stripe_customer_id: string;
   status: 'active' | 'pending' | 'paused' | 'cancelled';

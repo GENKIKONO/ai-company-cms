@@ -100,7 +100,7 @@ async function getContentUnitData(
   let query = supabase
     .from('ai_content_units')
     .select('id, structured_data_complete, title, content_type')
-    .eq('org_id', orgId)
+    .eq('organization_id', orgId)
     .eq('url', url);
 
   if (contentUnitId) {
@@ -130,7 +130,7 @@ async function getAIAccessData(
   const { data: logs, error } = await supabase
     .from('ai_bot_logs')
     .select('bot_name')
-    .eq('org_id', orgId)
+    .eq('organization_id', orgId)
     .eq('url', url)
     .gte('accessed_at', startDate.toISOString())
     .lte('accessed_at', endDate.toISOString());
@@ -194,11 +194,11 @@ export async function calculateAllVisibilityScores(
     supabase
       .from('ai_content_units')
       .select('url')
-      .eq('org_id', orgId),
+      .eq('organization_id', orgId),
     supabase
       .from('ai_bot_logs')
       .select('url')
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
   ]);
 
   if (contentUnitsResult.error) {
@@ -249,12 +249,12 @@ export async function saveVisibilityScores(
   const { data: contentUnit } = await supabase
     .from('ai_content_units')
     .select('id')
-    .eq('org_id', orgId)
+    .eq('organization_id', orgId)
     .eq('url', url)
     .single();
 
   const scoreData = scores.map(score => ({
-    org_id: orgId,
+    organization_id: orgId,
     url: url,
     content_unit_id: contentUnit?.id || null,
     structured_data_score: score.structured_data_score,
@@ -270,7 +270,7 @@ export async function saveVisibilityScores(
   const { error } = await supabase
     .from('ai_visibility_scores')
     .upsert(scoreData, {
-      onConflict: 'org_id,url,calculated_at::DATE'
+      onConflict: 'organization_id,url,calculated_at::DATE'
     });
 
   if (error) {

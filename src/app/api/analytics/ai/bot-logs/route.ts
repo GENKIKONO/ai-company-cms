@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 // Type definitions
 interface BotLogsQuery {
-  org_id?: string;
+  organization_id?: string;
   start_date?: string; // ISO format
   end_date?: string;
   bot_name?: string;
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     // クエリパラメータ解析
     const { searchParams } = new URL(request.url);
     const query: BotLogsQuery = {
-      org_id: searchParams.get('org_id') || undefined,
+      organization_id: searchParams.get('organization_id') || searchParams.get('org_id') || undefined,
       start_date: searchParams.get('start_date') || undefined,
       end_date: searchParams.get('end_date') || undefined,
       bot_name: searchParams.get('bot_name') || undefined,
@@ -85,8 +85,8 @@ export async function GET(request: NextRequest) {
       `, { count: 'exact' });
 
     // フィルター適用
-    if (query.org_id) {
-      baseQuery = baseQuery.eq('org_id', query.org_id);
+    if (query.organization_id) {
+      baseQuery = baseQuery.eq('organization_id', query.organization_id);
     }
 
     if (query.start_date) {

@@ -54,7 +54,7 @@ export function AISEODashboard({ orgId, features }: AISEODashboardProps) {
     if (!features.ai_reports) return;
     
     // API: GET /api/analytics/export?org_id=${orgId}&format=${format}
-    const url = `/api/analytics/export?org_id=${orgId}&format=${format}`;
+    const url = `/api/analytics/export?organization_id=${orgId}&format=${format}`;
     window.open(url, '_blank');
   };
 
@@ -148,7 +148,7 @@ export function AISEODashboard({ orgId, features }: AISEODashboardProps) {
               fetch(`/api/analytics/seo/gsc`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ org_id: orgId, force_refresh: true })
+                body: JSON.stringify({ organization_id: orgId, force_refresh: true })
               }).then(() => mutate());
             }}
           >

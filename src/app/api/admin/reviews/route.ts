@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
 
     const { action, reason, admin_notes } = validation.data;
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('org_id');
+    const organizationId = searchParams.get('organization_id') || searchParams.get('org_id');
 
     if (!organizationId) {
       return validationError('Organization ID is required');

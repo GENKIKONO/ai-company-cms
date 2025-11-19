@@ -220,7 +220,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription): Prom
     const { error } = await supabase
       .from('subscriptions')
       .upsert({
-        org_id: organizationId,
+        organization_id: organizationId,
         stripe_subscription_id: subscription.id,
         stripe_customer_id: subscription.customer as string,
         status,
@@ -464,7 +464,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session):
 
     // Create or update subscription record
     const subscriptionData = {
-      org_id: organizationId,
+      organization_id: organizationId,
       stripe_subscription_id: subscription.id,
       stripe_customer_id: subscription.customer as string,
       status: subscription.status === 'active' ? 'active' : 'pending',

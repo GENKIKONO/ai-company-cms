@@ -93,7 +93,7 @@ export async function getAIGroupScope(userId: string): Promise<AIGroupScope | nu
           )
         )
       `)
-      .eq('org_id', userOrgData.id);
+      .eq('organization_id', userOrgData.id);
 
     if (groupError) {
       logger.error('AI Group Context: Failed to fetch group memberships', {
@@ -163,7 +163,7 @@ export async function getAIGroupScope(userId: string): Promise<AIGroupScope | nu
       const { data: orgDetails } = await supabase
         .from('organizations')
         .select('id, name, company_name, domain, industry, size')
-        .eq('id', sibling.org_id)
+        .eq('id', sibling.organization_id)
         .single();
 
       if (orgDetails) {

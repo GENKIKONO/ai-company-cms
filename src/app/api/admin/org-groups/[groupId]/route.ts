@@ -17,7 +17,7 @@ async function canManageGroup(groupId: string, userId: string): Promise<boolean>
     // Get all organizations in this group
     const { data: members, error } = await supabaseAdmin
       .from('org_group_members')
-      .select('org_id')
+      .select('org_id') // ALLOWED: FK constraint in join table
       .eq('group_id', groupId);
 
     if (error || !members) {
@@ -49,7 +49,7 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
   try {
     const { data: group, error } = await supabaseAdmin
       .from('organization_groups')
-      .select('owner_org_id')
+      .select('owner_organization_id')
       .eq('id', groupId)
       .single();
 
@@ -57,7 +57,7 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
       return false;
     }
 
-    return await isUserAdminOfOrg(group.owner_org_id, userId);
+    return await isUserAdminOfOrg(group.owner_organization_id, userId);
   } catch (error: any) {
     logger.error('Error checking group ownership', {
       component: 'org-groups-detail-api',
@@ -282,7 +282,7 @@ export async function DELETE(
     // Get group info for logging
     const { data: group } = await supabaseAdmin
       .from('organization_groups')
-      .select('name, owner_org_id')
+      .select('name, owner_organization_id')
       .eq('id', groupId)
       .single();
 
@@ -311,7 +311,7 @@ export async function DELETE(
       operation: 'delete',
       groupId,
       groupName: group.name,
-      ownerOrgId: group.owner_org_id,
+      ownerOrgId: group.owner_organization_id,
       userId: user.id
     });
 

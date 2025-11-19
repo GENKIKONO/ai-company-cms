@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 // Request/Response types
 interface GSCCollectionRequest {
-  org_id: string;
+  organization_id: string;
   site_url?: string; // 指定がない場合は組織のdefault URLを使用
   start_date?: string; // YYYY-MM-DD, default: 30日前
   end_date?: string; // YYYY-MM-DD, default: 昨日
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     // クエリパラメータ解析
     const { searchParams } = new URL(request.url);
-    const orgId = searchParams.get('org_id');
+    const orgId = searchParams.get('organization_id') || searchParams.get('org_id');
     const siteUrl = searchParams.get('site_url');
     const startDateParam = searchParams.get('start_date');
     const endDateParam = searchParams.get('end_date');
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
 
     if (!orgId) {
       return NextResponse.json(
-        { error: 'Validation error', message: 'org_id is required' },
+        { error: 'Validation error', message: 'organization_id is required' },
         { status: 400 }
       );
     }
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
       const { data: existingData, count } = await supabase
         .from('seo_search_console_metrics')
         .select('*', { count: 'exact' })
-        .eq('org_id', orgId)
+        .eq('organization_id', orgId)
         .gte('date_recorded', startDate)
         .lte('date_recorded', endDate);
 
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
       const { data: insertedQueries, error: queryError } = await supabase
         .from('seo_search_console_metrics')
         .upsert(queryMetrics, {
-          onConflict: 'org_id,url,search_query,date_recorded'
+          onConflict: 'organization_id,url,search_query,date_recorded'
         });
 
       if (queryError) {
@@ -165,7 +165,7 @@ export async function GET(request: NextRequest) {
       const { data: insertedPages, error: pageError } = await supabase
         .from('seo_search_console_metrics')
         .upsert(pageMetrics, {
-          onConflict: 'org_id,url,search_query,date_recorded'
+          onConflict: 'organization_id,url,search_query,date_recorded'
         });
 
       if (pageError) {
@@ -182,7 +182,7 @@ export async function GET(request: NextRequest) {
       user_id: 'test-user', // authData.user.id,
       metadata: {
         collection_id: collectionId,
-        org_id: orgId,
+        organization_id: orgId,
         site_url: targetSiteUrl,
         start_date: startDate,
         end_date: endDate,
@@ -238,7 +238,7 @@ export async function POST(request: NextRequest) {
     
     // Manual collection の場合は force_refresh = true で GET を実行
     const url = new URL(request.url);
-    url.searchParams.set('org_id', body.org_id);
+    url.searchParams.set('organization_id', body.organization_id);
     url.searchParams.set('force_refresh', 'true');
     if (body.site_url) url.searchParams.set('site_url', body.site_url);
     if (body.start_date) url.searchParams.set('start_date', body.start_date);
@@ -273,7 +273,7 @@ async function buildResponseFromCache(
   const { data: cachedData, error } = await supabase
     .from('seo_search_console_metrics')
     .select('*')
-    .eq('org_id', orgId)
+    .eq('organization_id', orgId)
     .gte('date_recorded', startDate)
     .lte('date_recorded', endDate)
     .order('impressions', { ascending: false });

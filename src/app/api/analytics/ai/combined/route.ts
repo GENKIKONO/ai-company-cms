@@ -101,7 +101,7 @@ interface PerformanceSummary {
 
 // Response types
 interface CombinedAnalyticsResponse {
-  org_id: string;
+  organization_id: string;
   analysis_period: {
     start_date: string;
     end_date: string;
@@ -171,13 +171,13 @@ export async function GET(request: NextRequest) {
 
     // クエリパラメータ解析
     const { searchParams } = new URL(request.url);
-    const orgId = searchParams.get('org_id');
+    const orgId = searchParams.get('organization_id') || searchParams.get('org_id');
     const trendDays = parseInt(searchParams.get('trend_days') || '30');
     const minDataPoints = parseInt(searchParams.get('min_data_points') || '5');
 
     if (!orgId) {
       return NextResponse.json(
-        { error: 'Validation error', message: 'org_id is required' },
+        { error: 'Validation error', message: 'organization_id is required' },
         { status: 400 }
       );
     }
@@ -202,7 +202,7 @@ export async function GET(request: NextRequest) {
           content_type
         )
       `)
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .gte('calculated_at', startDate.toISOString())
       .order('calculated_at', { ascending: false });
 
@@ -218,7 +218,7 @@ export async function GET(request: NextRequest) {
     const { data: seoMetrics, error: seoError } = await supabase
       .from('seo_search_console_metrics')
       .select('*')
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .gte('date_recorded', startDate.toISOString().split('T')[0])
       .is('search_query', null) // ページレベルのメトリクスのみ
       .order('date_recorded', { ascending: false });
@@ -235,7 +235,7 @@ export async function GET(request: NextRequest) {
     const { data: botLogs, error: botError } = await supabase
       .from('ai_bot_logs')
       .select('url, accessed_at')
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .gte('accessed_at', startDate.toISOString())
       .order('accessed_at', { ascending: false });
 
@@ -254,7 +254,7 @@ export async function GET(request: NextRequest) {
     );
 
     const response: CombinedAnalyticsResponse = {
-      org_id: orgId,
+      organization_id: orgId,
       analysis_period: {
         start_date: startDate.toISOString().split('T')[0],
         end_date: endDate.toISOString().split('T')[0],

@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         group:organization_groups!org_group_join_requests_group_id_fkey(
           id,
           name,
-          owner_org_id,
+          owner_organization_id,
           owner_organization:organizations!organization_groups_owner_org_id_fkey(
             id,
             name,
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
       if (isSystemAdmin) return true;
       
       // Group owner admins can see requests for their groups
-      return userAdminOrgIds.includes(group.owner_org_id);
+      return userAdminOrgIds.includes(group.owner_organization_id);
     });
 
     logger.info('Join requests retrieved successfully', {
@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
       .from('org_group_members')
       .select('id')
       .eq('group_id', invite.group_id)
-      .eq('org_id', organizationId)
+      .eq('organization_id', organizationId)
       .single();
 
     if (existingMember) {

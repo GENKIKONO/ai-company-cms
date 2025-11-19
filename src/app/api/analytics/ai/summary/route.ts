@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     // クエリパラメータ解析
     const { searchParams } = new URL(request.url);
-    const orgId = searchParams.get('org_id');
+    const orgId = searchParams.get('organization_id') || searchParams.get('org_id');
     const daysBack = parseInt(searchParams.get('days') || '30');
     
     const endDate = new Date();
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
         gte: startDate.toISOString(),
         lte: endDate.toISOString(),
       },
-      ...(orgId && { org_id: orgId }),
+      ...(orgId && { organization_id: orgId }),
     };
 
     // 1. 総ヒット数
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
       .lte('accessed_at', endDate.toISOString());
     
     if (orgId) {
-      totalHitsQuery = totalHitsQuery.eq('org_id', orgId);
+      totalHitsQuery = totalHitsQuery.eq('organization_id', orgId);
     }
 
     const { data: totalHits, error: totalError, count: totalCount } = await totalHitsQuery;
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
       .lte('accessed_at', endDate.toISOString());
     
     if (orgId) {
-      uniqueUrlsQuery = uniqueUrlsQuery.eq('org_id', orgId);
+      uniqueUrlsQuery = uniqueUrlsQuery.eq('organization_id', orgId);
     }
 
     const { data: uniqueUrls, error: uniqueError } = await uniqueUrlsQuery;
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
       .lte('accessed_at', endDate.toISOString());
     
     if (orgId) {
-      botBreakdownQuery = botBreakdownQuery.eq('org_id', orgId);
+      botBreakdownQuery = botBreakdownQuery.eq('organization_id', orgId);
     }
 
     const { data: botBreakdown, error: botError } = await botBreakdownQuery;
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
       .order('accessed_at', { ascending: false });
     
     if (orgId) {
-      topContentQuery = topContentQuery.eq('org_id', orgId);
+      topContentQuery = topContentQuery.eq('organization_id', orgId);
     }
 
     const { data: topContent, error: contentError } = await topContentQuery;

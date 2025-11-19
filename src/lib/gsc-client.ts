@@ -246,7 +246,7 @@ export function transformGSCMetrics(
   orgId: string,
   dateRecorded: string
 ): Array<{
-  org_id: string;
+  organization_id: string;
   url: string;
   search_query: string | null;
   impressions: number;
@@ -261,7 +261,7 @@ export function transformGSCMetrics(
     const url = isQueryDimension ? metric.keys[1] : metric.keys?.[0] || '';
 
     return {
-      org_id: orgId,
+      organization_id: orgId,
       url: url,
       search_query: query,
       impressions: metric.impressions,

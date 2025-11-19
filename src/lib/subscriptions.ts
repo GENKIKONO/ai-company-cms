@@ -32,7 +32,7 @@ export async function getOrganizationSubscription(organizationId: string) {
     const { data, error } = await supabaseBrowser
       .from('subscriptions')
       .select('*')
-      .eq('org_id', organizationId)
+      .eq('organization_id', organizationId)
       .in('status', ['active', 'pending'])
       .maybeSingle();
 

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { logger } from '@/lib/log';
 import { z } from 'zod';
+import { withOrgAuth } from '@/lib/auth/org-middleware';
 
 // POST request schema
 const createPostSchema = z.object({
@@ -27,76 +28,19 @@ function generateSlug(title: string): string {
 
 // GET - ユーザーの投稿を取得
 export async function GET(request: NextRequest) {
-  try {
+  return withOrgAuth(request, async ({ orgId }) => {
     const supabase = await supabaseServer();
     
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      logger.debug('[my/posts] Not authenticated');
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
-
-    // ユーザーの組織を取得
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .maybeSingle();
-
-    if (orgError) {
-      logger.error('[my/posts GET] Failed to fetch organization', {
-        userId: user.id,
-        error: orgError,
-        code: orgError.code,
-        details: orgError.details,
-        hint: orgError.hint
-      });
-      return NextResponse.json({ 
-        error: '企業情報の取得に失敗しました',
-        code: orgError.code,
-        message: 'Failed to fetch organization' 
-      }, { status: 500 });
-    }
-
-    if (!organization) {
-      logger.debug('[my/posts] No organization found for user');
-      return NextResponse.json({ data: [], message: 'No organization found', code: 'ORG_NOT_FOUND' }, { status: 200 });
-    }
-
-    // 組織の投稿を取得
-    // デバッグ: どちらのカラム名が正しいかテスト
-    let posts, postsError;
-    try {
-      const result1 = await supabase
-        .from('posts')
-        .select('*')
-        .eq('org_id', organization.id)
-        .order('created_at', { ascending: false });
-      
-      if (result1.error && result1.error.code === '42P17') {
-        // org_idが存在しない場合、organization_idを試行
-        const result2 = await supabase
-          .from('posts')
-          .select('*')
-          .eq('organization_id', organization.id)
-          .order('created_at', { ascending: false });
-        posts = result2.data;
-        postsError = result2.error;
-        logger.warn('[my/posts] Using organization_id column instead of org_id', { orgId: organization.id });
-      } else {
-        posts = result1.data;
-        postsError = result1.error;
-      }
-    } catch (error) {
-      logger.error('[my/posts] Unexpected error during column detection', { error, orgId: organization.id });
-      postsError = error;
-    }
+    // 組織の投稿を取得（organization_id前提）
+    const { data: posts, error: postsError } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('organization_id', orgId)
+      .order('created_at', { ascending: false });
 
     if (postsError) {
       logger.error('[my/posts GET] Failed to fetch posts', {
-        userId: user.id,
-        orgId: organization.id,
+        orgId,
         error: postsError,
         code: postsError.code,
         details: postsError.details,
@@ -110,55 +54,14 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ data: posts }, { status: 200 });
-
-  } catch (error) {
-    logger.error('[GET /api/my/posts] Unexpected error', { data: error });
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
-  }
+  });
 }
 
 // POST - 新しい投稿を作成
 export async function POST(request: NextRequest) {
-  try {
+  return withOrgAuth(request, async ({ orgId, userId }) => {
     const supabase = await supabaseServer();
     
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      logger.debug('[my/posts] Not authenticated');
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
-
-    // ユーザーの組織を取得
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .maybeSingle();
-
-    if (orgError) {
-      logger.error('[my/posts POST] Failed to fetch organization', {
-        userId: user.id,
-        error: orgError,
-        code: orgError.code,
-        details: orgError.details,
-        hint: orgError.hint
-      });
-      return NextResponse.json({ 
-        error: '企業情報の取得に失敗しました',
-        code: orgError.code,
-        message: 'Failed to fetch organization' 
-      }, { status: 500 });
-    }
-
-    if (!organization) {
-      logger.debug('[my/posts] No organization found for user');
-      return NextResponse.json({ 
-        error: '企業情報が見つかりません', 
-        code: 'ORG_NOT_FOUND' 
-      }, { status: 404 });
-    }
-
     // リクエストボディを取得・検証
     const body = await request.json();
     const validatedData = createPostSchema.parse(body);
@@ -169,8 +72,8 @@ export async function POST(request: NextRequest) {
       : generateSlug(validatedData.title);
 
     logger.debug('[my/posts POST] Post data validated', {
-      userId: user.id,
-      orgId: organization.id,
+      userId,
+      orgId,
       title: validatedData.title,
       slug: slug,
       status: validatedData.status,
@@ -182,10 +85,10 @@ export async function POST(request: NextRequest) {
       ? new Date().toISOString() 
       : null;
 
-    // 投稿データを準備 (両方のカラム名パターンに対応)
+    // 投稿データを準備（organization_id前提）
     const postData = {
-      organization_id: organization.id, // 一旦organization_idを使用
-      created_by: user.id,
+      organization_id: orgId,
+      created_by: userId,
       title: validatedData.title,
       slug: slug,
       content: validatedData.content_markdown || validatedData.content || '',
@@ -196,18 +99,18 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString()
     };
 
-    // 重複スラッグチェック (organization_idを使用)
+    // 重複スラッグチェック（organization_id前提）
     const { data: existingPost, error: slugCheckError } = await supabase
       .from('posts')
       .select('id')
-      .eq('organization_id', organization.id)
+      .eq('organization_id', orgId)
       .eq('slug', slug)
       .maybeSingle();
 
     if (slugCheckError) {
       logger.error('[my/posts POST] Failed to check slug uniqueness', {
-        userId: user.id,
-        orgId: organization.id,
+        userId,
+        orgId,
         slug: slug,
         error: slugCheckError,
         code: slugCheckError.code,
@@ -221,8 +124,8 @@ export async function POST(request: NextRequest) {
 
     if (existingPost) {
       logger.warn('[my/posts POST] Duplicate slug detected', {
-        userId: user.id,
-        orgId: organization.id,
+        userId,
+        orgId,
         slug: slug,
         existingPostId: existingPost.id
       });
@@ -234,7 +137,7 @@ export async function POST(request: NextRequest) {
 
     // 投稿を作成
     logger.debug('[my/posts POST] Inserting post data', {
-      userId: user.id,
+      userId,
       postData: { ...postData, content: '[内容省略]' }
     });
 
@@ -246,8 +149,8 @@ export async function POST(request: NextRequest) {
 
     if (createError) {
       logger.error('[my/posts POST] Failed to create post', {
-        userId: user.id,
-        orgId: organization.id,
+        userId,
+        orgId,
         postData: { ...postData, content: '[内容省略]' },
         error: createError,
         code: createError.code,
@@ -265,24 +168,23 @@ export async function POST(request: NextRequest) {
     }
 
     logger.info('[my/posts POST] Post created successfully', {
-      userId: user.id,
-      orgId: organization.id,
+      userId,
+      orgId,
       postId: newPost.id,
       title: newPost.title,
       slug: newPost.slug,
       status: newPost.status
     });
     return NextResponse.json({ data: newPost }, { status: 201 });
-
-  } catch (error) {
+  }).catch(error => {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
         message: 'Validation error',
         errors: error.errors 
       }, { status: 400 });
     }
-
+    
     logger.error('[POST /api/my/posts] Unexpected error', { data: error });
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
-  }
+  });
 }

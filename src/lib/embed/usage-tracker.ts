@@ -260,7 +260,7 @@ export class EmbedUsageTracker {
 
       const { data, error } = await this.supabase
         .rpc('get_top_embed_sources', {
-          org_id: organizationId,
+          organization_id: organizationId,
           start_date: startDate,
           end_date: endDate,
           result_limit: limit
@@ -289,7 +289,7 @@ export class EmbedUsageTracker {
       
       const { data, error } = await this.supabase
         .rpc('get_realtime_embed_stats', {
-          org_id: organizationId,
+          organization_id: organizationId,
           target_date: today
         });
 

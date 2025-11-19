@@ -5,6 +5,7 @@
 
 import useSWR from 'swr';
 import { fetcher } from '@/lib/utils/fetcher';
+import { CACHE_KEYS } from '@/lib/cache/keys';
 
 // 型定義
 export interface AiBotSummaryData {
@@ -123,7 +124,7 @@ export interface AiSeoCombinedData {
  */
 export function useAiBotSummary(orgId: string | null) {
   return useSWR<AiBotSummaryData>(
-    orgId ? `/api/analytics/ai/summary?org_id=${orgId}` : null,
+    orgId ? CACHE_KEYS.analyticsSummary(orgId) : null,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -145,7 +146,7 @@ export function useAiBotSummary(orgId: string | null) {
  */
 export function useAiVisibility(orgId: string | null) {
   return useSWR<AiVisibilityData>(
-    orgId ? `/api/analytics/ai/visibility?org_id=${orgId}` : null,
+    orgId ? CACHE_KEYS.analyticsVisibility(orgId) : null,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -168,7 +169,7 @@ export function useAiVisibility(orgId: string | null) {
  */
 export function useSeoGscData(orgId: string | null) {
   return useSWR<SeoGscData>(
-    orgId ? `/api/analytics/seo/gsc?org_id=${orgId}` : null,
+    orgId ? CACHE_KEYS.analyticsGsc(orgId) : null,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -191,7 +192,7 @@ export function useSeoGscData(orgId: string | null) {
  */
 export function useAiSeoCombined(orgId: string | null) {
   return useSWR<AiSeoCombinedData>(
-    orgId ? `/api/analytics/ai/combined?org_id=${orgId}&trend_days=30` : null,
+    orgId ? CACHE_KEYS.analyticsCombined(orgId) : null,
     fetcher,
     {
       revalidateOnFocus: false,

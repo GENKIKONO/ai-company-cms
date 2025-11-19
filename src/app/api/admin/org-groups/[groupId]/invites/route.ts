@@ -24,7 +24,7 @@ async function isGroupOwnerAdmin(groupId: string, userId: string): Promise<{ isA
   try {
     const { data: group, error } = await supabaseAdmin
       .from('organization_groups')
-      .select('owner_org_id')
+      .select('owner_organization_id')
       .eq('id', groupId)
       .single();
 
@@ -32,8 +32,8 @@ async function isGroupOwnerAdmin(groupId: string, userId: string): Promise<{ isA
       return { isAdmin: false };
     }
 
-    const isAdmin = await isUserAdminOfOrg(group.owner_org_id, userId);
-    return { isAdmin, ownerOrgId: group.owner_org_id };
+    const isAdmin = await isUserAdminOfOrg(group.owner_organization_id, userId);
+    return { isAdmin, ownerOrgId: group.owner_organization_id };
   } catch (error: any) {
     logger.error('Error checking group owner admin', {
       component: 'group-invites-api',

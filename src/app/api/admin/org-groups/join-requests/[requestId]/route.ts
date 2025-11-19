@@ -22,7 +22,7 @@ async function canManageJoinRequest(requestId: string, userId: string): Promise<
         group_id,
         group:organization_groups!org_group_join_requests_group_id_fkey(
           id,
-          owner_org_id
+          owner_organization_id
         )
       `)
       .eq('id', requestId)
@@ -53,7 +53,7 @@ async function canManageJoinRequest(requestId: string, userId: string): Promise<
     }
 
     // Check if user is admin of group owner organization
-    return await isUserAdminOfOrg(group.owner_org_id, userId);
+    return await isUserAdminOfOrg(group.owner_organization_id, userId);
   } catch (error: any) {
     logger.error('Error checking join request management permission', {
       component: 'join-request-decision-api',
@@ -150,7 +150,7 @@ export async function POST(
           .from('org_group_members')
           .select('id')
           .eq('group_id', joinRequest.group_id)
-          .eq('org_id', joinRequest.organization_id)
+          .eq('organization_id', joinRequest.organization_id)
           .single();
 
         if (!existingMember) {
@@ -159,7 +159,7 @@ export async function POST(
             .from('org_group_members')
             .insert({
               group_id: joinRequest.group_id,
-              org_id: joinRequest.organization_id,
+              organization_id: joinRequest.organization_id,
               role: 'member',
               added_by: joinRequest.organization_id // Self-added through join request
             });

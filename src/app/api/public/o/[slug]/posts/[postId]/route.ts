@@ -77,7 +77,7 @@ export async function GET(
         published_at,
         created_at,
         updated_at,
-        organization:organizations!org_id(
+        organization:organizations!organization_id(
           id,
           name,
           slug,
@@ -186,7 +186,7 @@ export async function HEAD(
       .select(`
         id,
         updated_at,
-        organization:organizations!org_id(slug, status)
+        organization:organizations!organization_id(slug, status)
       `)
       .eq('id', postId)
       .eq('status', 'published')

@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     const { data: existingSubscription } = await supabaseBrowser
       .from('subscriptions')
       .select('id, status')
-      .eq('org_id', organizationId)
+      .eq('organization_id', organizationId)
       .in('status', ['active', 'pending'])
       .maybeSingle();
 

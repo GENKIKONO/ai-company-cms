@@ -43,8 +43,8 @@ export async function GET(
         published_at,
         created_at,
         updated_at,
-        org_id,
-        organization:organizations!org_id(
+        organization_id,
+        organization:organizations!organization_id(
           id,
           name,
           slug
@@ -93,7 +93,7 @@ export async function PUT(
     const body = await request.json();
 
     // Remove system fields that shouldn't be updated directly
-    const { id, org_id, created_at, created_by, ...rawUpdateData } = body;
+    const { id, organization_id, created_at, created_by, ...rawUpdateData } = body;
     
     // Normalize data before saving
     const normalizedUpdateData = normalizePostData(rawUpdateData);
@@ -124,8 +124,8 @@ export async function PUT(
         published_at,
         created_at,
         updated_at,
-        org_id,
-        organization:organizations!org_id(
+        organization_id,
+        organization:organizations!organization_id(
           id,
           name,
           slug

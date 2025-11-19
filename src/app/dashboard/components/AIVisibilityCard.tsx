@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PLAN_LIMITS, type PlanType, getAIReportsLevel } from '@/config/plans';
+import { CACHE_KEYS } from '@/lib/cache/keys';
 import { logger } from '@/lib/utils/logger';
 
 interface AIVisibilityCardProps {
@@ -10,7 +11,7 @@ interface AIVisibilityCardProps {
 }
 
 interface VisibilityData {
-  org_id: string;
+  organization_id: string;
   overall_score: number;
   summary: {
     total_analyzed_urls: number;
@@ -50,13 +51,13 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
 
       // 1. AI Visibility Score を取得
       const visibilityResponse = await fetch(
-        `/api/analytics/ai/visibility?org_id=${organizationId}&trend_days=30&limit=50`,
+        CACHE_KEYS.analyticsVisibility(organizationId) + '&trend_days=30&limit=50',
         { cache: 'no-store' }
       );
 
       // 2. AI Bot Logs を取得
       const botLogsResponse = await fetch(
-        `/api/analytics/ai/bot-logs?org_id=${organizationId}&limit=10`,
+        CACHE_KEYS.analyticsBotLogs(organizationId),
         { cache: 'no-store' }
       );
 

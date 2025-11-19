@@ -4,8 +4,10 @@
  */
 
 import useSWR from 'swr';
+import { useCallback } from 'react';
 import { fetcher } from '@/lib/utils/fetcher';
-
+import { useCacheManager } from './useCacheManager';
+import { CACHE_KEYS } from '@/lib/cache/keys';
 import { logger } from '@/lib/log';
 export interface Organization {
   id: string;
@@ -30,7 +32,7 @@ export interface MeResponse {
  * 現在のユーザーと組織情報を同時に取得
  */
 export function useOrganization() {
-  const { data, error, isLoading } = useSWR<MeResponse>('/api/me', fetcher, {
+  const { data, error, isLoading, mutate } = useSWR<MeResponse>(CACHE_KEYS.organization, fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 5 * 60 * 1000, // 5分間キャッシュ
     onError: (error) => {
@@ -42,11 +44,38 @@ export function useOrganization() {
     }
   });
 
+  const { invalidateOrganizationData } = useCacheManager();
+
+  /**
+   * 組織関連キャッシュを一括無効化
+   * 組織情報変更時やコンテンツ更新時に使用
+   */
+  const invalidateOrganization = useCallback(async () => {
+    const orgId = data?.organization?.id;
+    
+    try {
+      // 組織関連データを一括無効化（アナリティクス含む）
+      await invalidateOrganizationData(orgId);
+      
+      // 自身のキャッシュも再検証
+      await mutate();
+      
+      logger.info('Organization cache invalidated', { orgId });
+    } catch (error) {
+      logger.error('Failed to invalidate organization cache', { 
+        error: error instanceof Error ? error.message : error,
+        orgId 
+      });
+    }
+  }, [data?.organization?.id, invalidateOrganizationData, mutate]);
+
   return {
     user: data?.user || null,
     organization: data?.organization || null,
     isLoading,
-    error: error?.status === 404 || error?.status === 401 ? null : error
+    error: error?.status === 404 || error?.status === 401 ? null : error,
+    invalidateOrganization, // 🆕 新機能
+    refresh: mutate, // 手動でのデータ再取得
   };
 }
 

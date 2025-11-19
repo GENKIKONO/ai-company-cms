@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
 CREATE TABLE IF NOT EXISTS public.case_studies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  org_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+  organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   summary TEXT,
@@ -87,7 +87,7 @@ ALTER TABLE public.case_studies ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can manage their org case studies"
 ON public.case_studies
 FOR ALL
-USING (org_id IN (
+USING (organization_id IN (
   SELECT id FROM public.organizations WHERE user_id = auth.uid()
 ));
             `

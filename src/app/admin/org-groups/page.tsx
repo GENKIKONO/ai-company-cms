@@ -229,11 +229,11 @@ export default function AdminOrgGroupsPage() {
               </div>
               
               <div>
-                <label htmlFor="owner_org_id" className="block text-sm font-medium mb-1">
+                <label htmlFor="owner_organization_id" className="block text-sm font-medium mb-1">
                   Owner Organization ID *
                 </label>
                 <Input
-                  id="owner_org_id"
+                  id="owner_organization_id"
                   value={newGroup.owner_organization_id}
                   onChange={(e) => setNewGroup(prev => ({ ...prev, owner_organization_id: e.target.value }))}
                   placeholder="UUID of the owner organization"

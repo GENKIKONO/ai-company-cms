@@ -845,7 +845,7 @@ export interface SupabaseDatabase {
       subscriptions: {
         Row: {
           id: string
-          org_id: string
+          organization_id: string
           stripe_subscription_id: string
           stripe_customer_id: string
           status: 'active' | 'inactive' | 'canceled' | 'past_due'
@@ -858,7 +858,7 @@ export interface SupabaseDatabase {
         }
         Insert: {
           id?: string
-          org_id: string
+          organization_id: string
           stripe_subscription_id: string
           stripe_customer_id: string
           status?: 'active' | 'inactive' | 'canceled' | 'past_due'
@@ -871,7 +871,7 @@ export interface SupabaseDatabase {
         }
         Update: {
           id?: string
-          org_id?: string
+          organization_id?: string
           stripe_subscription_id?: string
           stripe_customer_id?: string
           status?: 'active' | 'inactive' | 'canceled' | 'past_due'

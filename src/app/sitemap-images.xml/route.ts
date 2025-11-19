@@ -82,7 +82,7 @@ export async function GET() {
         name,
         media,
         updated_at,
-        organizations:org_id (
+        organizations:organization_id (
           slug,
           name
         )

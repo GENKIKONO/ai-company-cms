@@ -464,7 +464,7 @@ curl -X GET "https://api.aiohub.jp/api/search?q=キーワード&industries=IT" \
 
             <h2>認証</h2>
             <p>WebSocket接続時に認証トークンをクエリパラメータで送信：</p>
-            {renderCodeBlock('wss://api.aiohub.jp/ws/collaboration/{org_id}?token=your-api-key', 'url', 'ws-auth')}
+            {renderCodeBlock('wss://api.aiohub.jp/ws/collaboration/{organization_id}?token=your-api-key', 'url', 'ws-auth')}
 
             <h2>イベント</h2>
             <h3>nullJoined</h3>

@@ -101,7 +101,7 @@ export async function collectMonthlyData(
           content_type
         )
       `)
-      .eq('org_id', organizationId)
+      .eq('organization_id', organizationId)
       .gte('calculated_at', startDateStr)
       .lte('calculated_at', endDateStr)
       .order('calculated_at', { ascending: false });
@@ -110,7 +110,7 @@ export async function collectMonthlyData(
     const { data: botLogs } = await supabase
       .from('ai_bot_logs')
       .select('bot_name, accessed_at')
-      .eq('org_id', organizationId)
+      .eq('organization_id', organizationId)
       .gte('accessed_at', startDateStr)
       .lte('accessed_at', endDateStr);
 

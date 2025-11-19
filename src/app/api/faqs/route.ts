@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
 CREATE TABLE IF NOT EXISTS public.faqs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  org_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+  organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   question TEXT NOT NULL,
   answer TEXT,
@@ -86,7 +86,7 @@ ALTER TABLE public.faqs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can manage their org faqs"
 ON public.faqs
 FOR ALL
-USING (org_id IN (
+USING (organization_id IN (
   SELECT id FROM public.organizations WHERE user_id = auth.uid()
 ));
             `

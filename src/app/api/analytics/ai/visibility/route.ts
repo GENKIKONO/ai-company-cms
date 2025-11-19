@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 // Response types
 interface VisibilityResponse {
-  org_id: string;
+  organization_id: string;
   overall_score: number;
   score_trend: {
     date: string;
@@ -54,13 +54,13 @@ export async function GET(request: NextRequest) {
 
     // クエリパラメータ解析
     const { searchParams } = new URL(request.url);
-    const orgId = searchParams.get('org_id');
+    const orgId = searchParams.get('organization_id') || searchParams.get('org_id');
     const trendDays = parseInt(searchParams.get('trend_days') || '30');
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
 
     if (!orgId) {
       return NextResponse.json(
-        { error: 'Validation error', message: 'org_id is required' },
+        { error: 'Validation error', message: 'organization_id is required' },
         { status: 400 }
       );
     }
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
           content_type
         )
       `)
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .order('calculated_at', { ascending: false })
       .limit(limit);
 
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
     const { data: trendData, error: trendError } = await supabase
       .from('ai_visibility_scores')
       .select('calculated_at, total_visibility_score')
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .gte('calculated_at', trendStartDate.toISOString())
       .order('calculated_at', { ascending: true });
 
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
       : null;
 
     const response: VisibilityResponse = {
-      org_id: orgId,
+      organization_id: orgId,
       overall_score: averageScore,
       score_trend: scoreTrend,
       content_scores: contentScores,
@@ -204,7 +204,7 @@ export async function HEAD(request: NextRequest) {
   try {
     const supabase = await supabaseServer();
     const { searchParams } = new URL(request.url);
-    const orgId = searchParams.get('org_id');
+    const orgId = searchParams.get('organization_id') || searchParams.get('org_id');
 
     if (!orgId) {
       return new NextResponse(null, { status: 400 });
@@ -214,7 +214,7 @@ export async function HEAD(request: NextRequest) {
     const { data, error } = await supabase
       .from('ai_visibility_scores')
       .select('calculated_at')
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .order('calculated_at', { ascending: false })
       .limit(1)
       .single();

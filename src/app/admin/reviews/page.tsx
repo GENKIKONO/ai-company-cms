@@ -80,7 +80,7 @@ export default function AdminReviewsPage() {
     setActionLoading(orgId);
     
     try {
-      const response = await fetch(`/api/admin/reviews?org_id=${orgId}`, {
+      const response = await fetch(`/api/admin/reviews?organization_id=${orgId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

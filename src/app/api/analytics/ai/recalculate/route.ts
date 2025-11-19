@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 // Request/Response types
 interface RecalculateRequest {
-  org_id?: string;
+  organization_id?: string;
   url?: string; // 特定URLのみ再計算
   force_recalculate?: boolean;
   period_days?: number; // デフォルト30日
@@ -44,9 +44,9 @@ export async function POST(request: NextRequest) {
     const body: RecalculateRequest = await request.json();
     
     // バリデーション
-    if (!body.org_id) {
+    if (!body.organization_id) {
       return NextResponse.json(
-        { error: 'Validation error', message: 'org_id is required' },
+        { error: 'Validation error', message: 'organization_id is required' },
         { status: 400 }
       );
     }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     logger.info('AI Visibility Score recalculation started', {
       calculationId,
-      orgId: body.org_id,
+      orgId: body.organization_id,
       url: body.url,
       periodDays,
       forceRecalculate,
@@ -69,13 +69,13 @@ export async function POST(request: NextRequest) {
       // 特定URL のみ再計算
       try {
         const score = await calculateVisibilityScore({
-          orgId: body.org_id,
+          orgId: body.organization_id,
           url: body.url,
           periodDays,
         });
 
         // 結果をDBに保存
-        await saveIndividualScore(body.org_id, body.url, score);
+        await saveIndividualScore(body.organization_id, body.url, score);
         processedUrls = 1;
 
         logger.info('Single URL score calculation completed', {
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       // 組織内全URL の再計算
       try {
         // 1. 対象URL一覧を取得
-        const targetUrls = await getTargetUrls(body.org_id, forceRecalculate);
+        const targetUrls = await getTargetUrls(body.organization_id, forceRecalculate);
         
         logger.info('Target URLs identified for recalculation', {
           calculationId,
@@ -108,12 +108,12 @@ export async function POST(request: NextRequest) {
         for (const url of targetUrls) {
           try {
             const score = await calculateVisibilityScore({
-              orgId: body.org_id,
+              orgId: body.organization_id,
               url,
               periodDays,
             });
 
-            await saveIndividualScore(body.org_id, url, score);
+            await saveIndividualScore(body.organization_id, url, score);
             processedUrls++;
 
             // 進捗ログ（大量URL処理時のモニタリング用）
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
       user_id: 'test-user', // authData.user.id,
       metadata: {
         calculation_id: calculationId,
-        org_id: body.org_id,
+        organization_id: body.organization_id,
         processed_urls: processedUrls,
         failed_urls: failedUrls,
         period_days: periodDays,
@@ -205,13 +205,13 @@ async function getTargetUrls(orgId: string, forceRecalculate: boolean): Promise<
   if (forceRecalculate) {
     // 強制再計算: 全URL対象
     const { data: allUrls, error } = await supabase
-      .rpc('get_distinct_urls_for_org', { target_org_id: orgId });
+      .rpc('get_distinct_urls_for_org', { target_org_id: orgId }); // ALLOWED: RPC parameter
 
     if (error) {
       // RPC関数がない場合のフォールバック
       const [contentUrls, logUrls] = await Promise.all([
-        supabase.from('ai_content_units').select('url').eq('org_id', orgId),
-        supabase.from('ai_bot_logs').select('url').eq('org_id', orgId),
+        supabase.from('ai_content_units').select('url').eq('organization_id', orgId),
+        supabase.from('ai_bot_logs').select('url').eq('organization_id', orgId),
       ]);
 
       const urls = new Set([
@@ -232,7 +232,7 @@ async function getTargetUrls(orgId: string, forceRecalculate: boolean): Promise<
     const { data: recentScores, error } = await supabase
       .from('ai_visibility_scores')
       .select('url')
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .gte('calculated_at', yesterday.toISOString());
 
     if (error) {
@@ -261,14 +261,14 @@ async function saveIndividualScore(
   const { data: contentUnit } = await supabase
     .from('ai_content_units')
     .select('id')
-    .eq('org_id', orgId)
+    .eq('organization_id', orgId)
     .eq('url', url)
     .single();
 
   const { error } = await supabase
     .from('ai_visibility_scores')
     .upsert({
-      org_id: orgId,
+      organization_id: orgId,
       url: url,
       content_unit_id: contentUnit?.id || null,
       structured_data_score: score.structured_data_score,
@@ -280,7 +280,7 @@ async function saveIndividualScore(
       ai_bot_hits_count: score.ai_bot_hits_count,
       unique_bots_count: score.unique_bots_count,
     }, {
-      onConflict: 'org_id,url,calculated_at::DATE'
+      onConflict: 'organization_id,url,calculated_at::DATE'
     });
 
   if (error) {

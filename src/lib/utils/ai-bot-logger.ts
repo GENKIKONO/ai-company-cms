@@ -80,7 +80,7 @@ async function insertBotLog(entry: BotLogEntry): Promise<void> {
   const { data, error } = await supabase
     .from('ai_bot_logs')
     .insert({
-      org_id: entry.orgId,
+      organization_id: entry.orgId,
       url: entry.url,
       bot_name: entry.botName,
       user_agent: entry.userAgent,
@@ -117,7 +117,7 @@ export async function ensureContentUnit(
     const { data: existing, error: selectError } = await supabase
       .from('ai_content_units')
       .select('id')
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .eq('url', url)
       .eq('jsonld_id', jsonldId || '')
       .single();
@@ -134,7 +134,7 @@ export async function ensureContentUnit(
     const { data: created, error: insertError } = await supabase
       .from('ai_content_units')
       .insert({
-        org_id: orgId,
+        organization_id: orgId,
         url,
         jsonld_id: jsonldId,
         content_type: contentType,
