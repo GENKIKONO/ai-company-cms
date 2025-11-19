@@ -6,6 +6,7 @@
 import { useCallback } from 'react';
 import { useSWRConfig } from 'swr';
 import { CACHE_KEYS, getContentKey, getOrganizationRelatedKeys } from '@/lib/cache/keys';
+import { logger } from '@/lib/utils/logger';
 
 export function useCacheManager() {
   const { mutate } = useSWRConfig();
@@ -20,9 +21,9 @@ export function useCacheManager() {
     
     try {
       await Promise.all(tasks);
-      console.log(`✅ Invalidated ${keys.length} organization-related caches`, { orgId });
+      logger.info(`Invalidated ${keys.length} organization-related caches`, { orgId });
     } catch (error) {
-      console.error('❌ Failed to invalidate organization caches:', error);
+      logger.error('Failed to invalidate organization caches:', { data: error instanceof Error ? error : new Error(String(error)) });
     }
   }, [mutate]);
 
@@ -43,9 +44,9 @@ export function useCacheManager() {
         typeof key === 'string' && key.startsWith(`/api/my/${contentType}`)
       );
       
-      console.log(`✅ Invalidated ${contentType} cache`);
+      logger.info(`Invalidated ${contentType} cache`);
     } catch (error) {
-      console.error(`❌ Failed to invalidate ${contentType} cache:`, error);
+      logger.error(`Failed to invalidate ${contentType} cache:`, { data: error instanceof Error ? error : new Error(String(error)) });
     }
   }, [mutate]);
 
@@ -80,9 +81,9 @@ export function useCacheManager() {
     
     try {
       await Promise.all(tasks);
-      console.log(`✅ Invalidated analytics caches for org ${orgId}:`, typesToInvalidate);
+      logger.info(`Invalidated analytics caches for org ${orgId}`, { typesToInvalidate });
     } catch (error) {
-      console.error('❌ Failed to invalidate analytics caches:', error);
+      logger.error('Failed to invalidate analytics caches:', { data: error instanceof Error ? error : new Error(String(error)) });
     }
   }, [mutate]);
 
@@ -101,9 +102,9 @@ export function useCacheManager() {
       } else {
         await mutate(pattern);
       }
-      console.log('✅ Invalidated caches by pattern');
+      logger.info('Invalidated caches by pattern');
     } catch (error) {
-      console.error('❌ Failed to invalidate caches by pattern:', error);
+      logger.error('Failed to invalidate caches by pattern:', { data: error instanceof Error ? error : new Error(String(error)) });
     }
   }, [mutate]);
 

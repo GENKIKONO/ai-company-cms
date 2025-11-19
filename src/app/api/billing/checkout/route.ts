@@ -93,8 +93,10 @@ export async function POST(request: NextRequest) {
       orgId: organization.id
     });
 
-    // Check if required environment variables are set - use unified basic price ID
-    const priceId = checkoutInfo?.stripe_price_id || env.STRIPE_BASIC_PRICE_ID;
+    // Check if required environment variables are set - use normal pricing for legacy API
+    const priceId = checkoutInfo?.stripe_price_id || 
+                    process.env.STRIPE_NORMAL_BASIC_PRICE_ID || 
+                    env.STRIPE_BASIC_PRICE_ID;
     if (!priceId) {
       return createErrorResponse('MISSING_CONFIG', 'Subscription plan not configured', 400);
     }

@@ -1,6 +1,7 @@
 // データベース型定義
 
 export type UserRole = 'admin' | 'editor' | 'viewer';
+export type UserSegment = 'test_user' | 'early_user' | 'normal_user';
 export type OrganizationStatus = 'draft' | 'waiting_approval' | 'public_unverified' | 'published' | 'paused' | 'archived';
 export type PartnershipType = 'strategic' | 'technology' | 'distribution' | 'investment';
 export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
@@ -11,6 +12,7 @@ export interface AppUser {
   full_name?: string;
   avatar_url?: string;
   role: UserRole;
+  segment?: UserSegment;
   organization_id?: string;
   created_at: string;
   updated_at: string;

@@ -21,6 +21,7 @@ export interface User {
   id: string;
   email: string;
   full_name?: string;
+  segment?: 'test_user' | 'early_user' | 'normal_user';
 }
 
 export interface MeResponse {

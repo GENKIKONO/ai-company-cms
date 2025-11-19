@@ -35,6 +35,20 @@ export const env = {
   STRIPE_WEBHOOK_SECRET: cleanEnvValue(process.env.STRIPE_WEBHOOK_SECRET || ''),
   STRIPE_BASIC_PRICE_ID: cleanEnvValue(process.env.STRIPE_BASIC_PRICE_ID || ''),
   
+  // Segment-based Stripe Pricing (新しい価格体系)
+  // Normal pricing (基準価格)
+  STRIPE_NORMAL_BASIC_PRICE_ID: cleanEnvValue(process.env.STRIPE_NORMAL_BASIC_PRICE_ID || ''),
+  STRIPE_NORMAL_PRO_PRICE_ID: cleanEnvValue(process.env.STRIPE_NORMAL_PRO_PRICE_ID || ''),
+  STRIPE_NORMAL_BUSINESS_PRICE_ID: cleanEnvValue(process.env.STRIPE_NORMAL_BUSINESS_PRICE_ID || ''),
+  // Early user pricing (20% discount)
+  STRIPE_EARLY_BASIC_PRICE_ID: cleanEnvValue(process.env.STRIPE_EARLY_BASIC_PRICE_ID || ''),
+  STRIPE_EARLY_PRO_PRICE_ID: cleanEnvValue(process.env.STRIPE_EARLY_PRO_PRICE_ID || ''),
+  STRIPE_EARLY_BUSINESS_PRICE_ID: cleanEnvValue(process.env.STRIPE_EARLY_BUSINESS_PRICE_ID || ''),
+  // Test user pricing (30% discount)
+  STRIPE_TEST_BASIC_PRICE_ID: cleanEnvValue(process.env.STRIPE_TEST_BASIC_PRICE_ID || ''),
+  STRIPE_TEST_PRO_PRICE_ID: cleanEnvValue(process.env.STRIPE_TEST_PRO_PRICE_ID || ''),
+  STRIPE_TEST_BUSINESS_PRICE_ID: cleanEnvValue(process.env.STRIPE_TEST_BUSINESS_PRICE_ID || ''),
+  
   // 外部サービス
   RESEND_API_KEY: cleanEnvValue(process.env.RESEND_API_KEY || ''),
   SLACK_WEBHOOK_URL: cleanEnvValue(process.env.SLACK_WEBHOOK_URL || ''),
