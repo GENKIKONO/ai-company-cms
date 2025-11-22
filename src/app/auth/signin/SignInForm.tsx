@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-client';
 import { logger } from '@/lib/utils/logger';
+import { useToast } from '@/hooks/use-toast';
 
 interface SignInFormProps {
   redirectUrl?: string;
@@ -15,6 +16,7 @@ export default function SignInForm({ redirectUrl }: SignInFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,9 +47,15 @@ export default function SignInForm({ redirectUrl }: SignInFormProps) {
       // ログイン成功でダッシュボードへ遷移
       const targetUrl = redirectUrl || '/dashboard';
       
-      // ルーターをリフレッシュしてから遷移
-      router.refresh();
-      router.push(targetUrl);
+      // 成功通知を表示
+      toast({
+        title: "ログインしました",
+        description: "ダッシュボードへ移動します...",
+      });
+      
+      // 強制リダイレクト (ブラウザレベルでの完全リロード)
+      // これによりCookieが確実にサーバーへ送信される
+      window.location.href = targetUrl;
       
     } catch (err) {
       logger.error('Sign in error:', { data: err });

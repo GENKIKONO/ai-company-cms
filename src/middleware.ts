@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 import { rateLimit } from './lib/security/rate-limit';
 import { generateNonce } from './lib/security/nonce';
 
@@ -22,7 +23,48 @@ export async function middleware(request: NextRequest) {
   const clientIP = getClientIP(request);
   const method = request.method;
   
-  // 1. 管理API IP制限
+  // Supabase セッション更新処理
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
+
+  // Supabaseクライアントを作成してセッションを更新
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  // セッション更新実行
+  await supabase.auth.getUser();
+  
+  // 1. デバッグ・診断系API の本番環境無効化
+  if (process.env.NODE_ENV === 'production') {
+    if (pathname.startsWith('/api/debug/') || pathname.startsWith('/api/diag/')) {
+      return new NextResponse('Not Found', { status: 404 });
+    }
+  }
+  
+  // 2. 管理API IP制限
   if (pathname.startsWith(ADMIN_API_PREFIX)) {
     if (ADMIN_ALLOWED_IPS.length > 0 && !ADMIN_ALLOWED_IPS.includes(clientIP)) {
       return new NextResponse('Forbidden', { status: 403 });
@@ -34,7 +76,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 2. レート制限チェック
+  // 3. レート制限チェック
   const rateLimitKey = pathname.startsWith('/api/admin') ? '/api/admin' :
                       pathname.startsWith('/api') ? '/api' : 'default';
   const limit = RATE_LIMITS[rateLimitKey] || RATE_LIMITS.default;
@@ -57,14 +99,13 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  // 3. リクエストサイズ制限
+  // 4. リクエストサイズ制限
   const contentLength = request.headers.get('content-length');
   if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) { // 10MB
     return new NextResponse('Payload Too Large', { status: 413 });
   }
 
-  // 4. セキュリティヘッダ設定
-  const response = NextResponse.next();
+  // 5. セキュリティヘッダ設定  
   const nonce = generateNonce();
   
   const securityHeaders: SecurityHeaders = {
@@ -118,7 +159,7 @@ export async function middleware(request: NextRequest) {
     'X-Rate-Limit-Remaining': rateLimitResult.remaining.toString(),
   };
 
-  // 5. Cookie セキュリティ設定
+  // 6. Cookie セキュリティ設定
   if (pathname.startsWith('/auth') || pathname.startsWith('/api/auth')) {
     securityHeaders['Set-Cookie'] = [
       'SameSite=Strict',
@@ -133,7 +174,7 @@ export async function middleware(request: NextRequest) {
     response.headers.set(key, value);
   });
 
-  // 6. CSRF対策（非GET、webhookと認証済みダッシュボードAPIは除外）
+  // 7. CSRF対策（非GET、webhookと認証済みダッシュボードAPIは除外）
   const isExemptFromCSRF = pathname.includes('/webhooks/') || 
                           pathname.startsWith('/api/my/') || 
                           pathname.startsWith('/api/dashboard/');
