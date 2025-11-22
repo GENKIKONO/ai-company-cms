@@ -44,7 +44,10 @@ export default function SignInForm({ redirectUrl }: SignInFormProps) {
 
       // ログイン成功でダッシュボードへ遷移
       const targetUrl = redirectUrl || '/dashboard';
-      router.replace(targetUrl);
+      
+      // ルーターをリフレッシュしてから遷移
+      router.refresh();
+      router.push(targetUrl);
       
     } catch (err) {
       logger.error('Sign in error:', { data: err });
