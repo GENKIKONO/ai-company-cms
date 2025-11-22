@@ -1,225 +1,109 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { rateLimit } from './lib/security/rate-limit';
-import { generateNonce } from './lib/security/nonce';
-
-interface SecurityHeaders {
-  [key: string]: string;
-}
-
-// レート制限設定
-const RATE_LIMITS = {
-  '/api/admin': { requests: 10, window: 60000 }, // 10req/min
-  '/api': { requests: 100, window: 60000 },      // 100req/min
-  default: { requests: 200, window: 60000 }      // 200req/min
-};
-
-// IP制限（管理API用）
-const ADMIN_ALLOWED_IPS = process.env.ADMIN_ALLOWED_IPS?.split(',') || [];
-const ADMIN_API_PREFIX = '/api/admin';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const clientIP = getClientIP(request);
-  const method = request.method;
-  
-  // Supabase セッション更新処理
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
-  // Supabaseクライアントを作成してセッションを更新
+  const { pathname } = request.nextUrl;
+
+  // 静的ファイル、API、auth callbackは認証チェックから除外
+  if (
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/static/') ||
+    pathname.includes('.') ||
+    pathname === '/favicon.ico' ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
+    pathname === '/auth/callback' ||
+    pathname === '/auth/confirm' ||
+    pathname === '/auth/reset-password-confirm'
+  ) {
+    return response;
+  }
+
+  // Supabase認証処理
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value);
+          });
           response = NextResponse.next({
             request: {
               headers: request.headers,
             },
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
+          });
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
         },
       },
     }
-  )
-
-  // セッション更新実行
-  await supabase.auth.getUser();
-  
-  // 1. デバッグ・診断系API の本番環境無効化
-  if (process.env.NODE_ENV === 'production') {
-    if (pathname.startsWith('/api/debug/') || pathname.startsWith('/api/diag/')) {
-      return new NextResponse('Not Found', { status: 404 });
-    }
-  }
-  
-  // 2. 管理API IP制限
-  if (pathname.startsWith(ADMIN_API_PREFIX)) {
-    if (ADMIN_ALLOWED_IPS.length > 0 && !ADMIN_ALLOWED_IPS.includes(clientIP)) {
-      return new NextResponse('Forbidden', { status: 403 });
-    }
-    
-    // 管理APIはGET以外禁止（RPC呼び出しのみ）
-    if (method !== 'GET' && !pathname.includes('/webhooks/')) {
-      return new NextResponse('Method Not Allowed', { status: 405 });
-    }
-  }
-
-  // 3. レート制限チェック
-  const rateLimitKey = pathname.startsWith('/api/admin') ? '/api/admin' :
-                      pathname.startsWith('/api') ? '/api' : 'default';
-  const limit = RATE_LIMITS[rateLimitKey] || RATE_LIMITS.default;
-  
-  const rateLimitResult = await rateLimit(
-    `${clientIP}:${rateLimitKey}`,
-    limit.requests,
-    limit.window
   );
-  
-  if (!rateLimitResult.success) {
-    return new NextResponse('Too Many Requests', { 
-      status: 429,
-      headers: {
-        'Retry-After': Math.ceil(rateLimitResult.retryAfter / 1000).toString(),
-        'X-RateLimit-Limit': limit.requests.toString(),
-        'X-RateLimit-Remaining': '0',
-        'X-RateLimit-Reset': new Date(Date.now() + rateLimitResult.retryAfter).toISOString()
-      }
-    });
+
+  // 認証状態を確認
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  // 認証が必要なページ
+  const protectedPaths = ['/dashboard', '/admin', '/management-console', '/my'];
+  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
+
+  // 認証ページ
+  const authPaths = ['/auth/login', '/auth/signin', '/login', '/signin'];
+  const isAuthPath = authPaths.some(path => pathname.startsWith(path));
+
+  // 未認証ユーザーが保護されたページにアクセス
+  if (isProtectedPath && (!user || error)) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/auth/login';
+    url.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(url);
   }
 
-  // 4. リクエストサイズ制限
-  const contentLength = request.headers.get('content-length');
-  if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) { // 10MB
-    return new NextResponse('Payload Too Large', { status: 413 });
+  // 認証済みユーザーが認証ページにアクセス
+  if (isAuthPath && user && !error) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/dashboard';
+    return NextResponse.redirect(url);
   }
 
-  // 5. セキュリティヘッダ設定  
-  const nonce = generateNonce();
-  
-  const securityHeaders: SecurityHeaders = {
-    // XSS Protection
-    'X-Frame-Options': 'DENY',
-    'X-Content-Type-Options': 'nosniff',
-    'X-XSS-Protection': '1; mode=block',
-    
-    // HTTPS/Transport Security
-    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-    
-    // Content Security Policy
-    'Content-Security-Policy': [
-      `default-src 'self'`,
-      `script-src 'self' 'nonce-${nonce}' https://js.stripe.com`,
-      `style-src 'self' 'nonce-${nonce}'`,
-      `img-src 'self' data: https:`,
-      `connect-src 'self' https://*.supabase.co https://api.stripe.com`,
-      `font-src 'self'`,
-      `object-src 'none'`,
-      `base-uri 'self'`,
-      `form-action 'self'`,
-      `frame-ancestors 'none'`,
-      `block-all-mixed-content`,
-      `upgrade-insecure-requests`,
-      `report-uri /api/csp-report`,
-      `report-to csp-reports`
-    ].join('; '),
-    
-    // CSP Report Configuration
-    'Report-To': JSON.stringify({
-      group: 'csp-reports',
-      max_age: 86400,
-      endpoints: [{ url: '/api/csp-report' }]
-    }),
-    
-    // Permissions Policy
-    'Permissions-Policy': [
-      'camera=()',
-      'microphone=()',
-      'geolocation=()',
-      'payment=(self)',
-      'usb=()',
-      'interest-cohort=()'
-    ].join(', '),
-    
-    // Custom Security Headers
-    'X-Nonce': nonce,
-    'X-Rate-Limit-Limit': limit.requests.toString(),
-    'X-Rate-Limit-Remaining': rateLimitResult.remaining.toString(),
-  };
-
-  // 6. Cookie セキュリティ設定
-  if (pathname.startsWith('/auth') || pathname.startsWith('/api/auth')) {
-    securityHeaders['Set-Cookie'] = [
-      'SameSite=Strict',
-      'Secure',
-      'HttpOnly',
-      'Path=/',
-      `Max-Age=${7 * 24 * 60 * 60}` // 7 days
-    ].join('; ');
-  }
-
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
-
-  // 7. CSRF対策（非GET、webhookと認証済みダッシュボードAPIは除外）
-  const isExemptFromCSRF = pathname.includes('/webhooks/') || 
-                          pathname.startsWith('/api/my/') || 
-                          pathname.startsWith('/api/dashboard/');
-  
-  if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS' && !isExemptFromCSRF) {
-    const csrfToken = request.headers.get('x-csrf-token');
-    const sessionToken = request.cookies.get('session')?.value;
-    
-    if (!validateCSRFToken(csrfToken, sessionToken)) {
-      return new NextResponse('CSRF token invalid', { status: 403 });
+  // ルートページの処理
+  if (pathname === '/') {
+    const url = request.nextUrl.clone();
+    if (user && !error) {
+      url.pathname = '/dashboard';
+    } else {
+      url.pathname = '/auth/login';
     }
+    return NextResponse.redirect(url);
   }
 
   return response;
 }
 
-function getClientIP(request: NextRequest): string {
-  // Vercel/Edge function IP取得
-  return (
-    request.headers.get('x-forwarded-for')?.split(',')[0] ||
-    request.headers.get('x-real-ip') ||
-    'unknown'
-  );
-}
-
-function validateCSRFToken(token: string | null, session: string | null): boolean {
-  if (!token || !session) return false;
-  
-  try {
-    const crypto = require('crypto');
-    const expected = crypto
-      .createHmac('sha256', process.env.CSRF_SECRET || 'default-secret')
-      .update(session)
-      .digest('hex');
-    
-    return crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected));
-  } catch {
-    return false;
-  }
-}
-
 export const config = {
   matcher: [
-    '/api/:path*',
-    '/dashboard/:path*',
-    '/auth/:path*'
-  ]
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - api (API routes)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|api|static).*)',
+  ],
 };
