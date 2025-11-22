@@ -27,6 +27,9 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
+    "test:e2e:critical": "playwright test auth-flow.spec.ts posts-management.spec.ts admin-console.spec.ts segment-billing.spec.ts",
+    "test:e2e:billing": "playwright test segment-billing.spec.ts",
+    "test:e2e:admin": "playwright test admin-console.spec.ts",
     "test:setup": "playwright install",
     "test:production": "node scripts/production-test.js",
     "test:auth": "node scripts/auth-test.js",
@@ -63,6 +66,7 @@
     "validate:env": "node scripts/verify-env.mjs",
     "audit:rls": "node ./scripts/audit-rls.mjs",
     "smoke:api": "node ./scripts/smoke-api.mjs",
+    "smoke:api:critical": "node ./scripts/api-smoke-test-critical.js",
     "verify:all": "bash ./scripts/verify-all.sh",
     "check:no-mock": "ts-node scripts/check-no-mock.ts",
     "validate:feeds": "npm run validate:rss && npm run validate:sitemap",
@@ -73,7 +77,9 @@
     "aio:monthly": "npm run aio:report && echo '📅 月次AIO適合率チェック完了'",
     "audit:ux": "echo '🔍 AIOHub UX/UI監査開始...' && mkdir -p reports/responsive-audit/screenshots && playwright test --config=playwright.ux-audit.config.ts && npx ts-node scripts/generate-ux-audit-summary.ts && echo '✅ 監査完了: reports/responsive-audit/summary.md を確認'",
     "audit:ux:dev": "echo '🧪 UX監査テスト (ローカル)' && PLAYWRIGHT_BASE_URL=http://localhost:3000 playwright test --config=playwright.ux-audit.config.ts --headed",
-    "audit:ux:report": "npx ts-node scripts/generate-ux-audit-summary.ts"
+    "audit:ux:report": "npx ts-node scripts/generate-ux-audit-summary.ts",
+    "fix:useeffect": "node ./scripts/fix-useeffect-warnings.js",
+    "ci:mandatory": "npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.8",
