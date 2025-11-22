@@ -33,7 +33,7 @@ export async function getCMSData(page: string = 'homepage'): Promise<CMSData> {
     const result = await response.json();
     return result.data;
   } catch (error) {
-    console.error('Failed to fetch CMS data:', error);
+    // Failed to fetch CMS data: error
     
     // フォールバック用のデフォルトデータ
     return {
@@ -101,7 +101,7 @@ export async function getCMSDataClient(page: string = 'homepage'): Promise<CMSDa
     const result = await response.json();
     return result.data;
   } catch (error) {
-    console.error('Failed to fetch CMS data (client):', error);
+    // Failed to fetch CMS data (client): error
     throw error;
   }
 }

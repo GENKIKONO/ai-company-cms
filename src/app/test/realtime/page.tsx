@@ -35,7 +35,7 @@ export default function RealtimeTestPage() {
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
     setConnectionLog(prev => [...prev, `[${timestamp}] ${message}`]);
-    console.log(`[Realtime Test] ${message}`);
+    // [Realtime Test] ${message}
   };
 
   // イベント追加ヘルパー

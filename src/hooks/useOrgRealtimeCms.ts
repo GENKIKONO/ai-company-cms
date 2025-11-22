@@ -107,7 +107,7 @@ export function useOrgRealtimeCms(options: UseOrgRealtimeCmsOptions) {
             filter: `organization_id=eq.${organizationId}`
           },
           (payload) => {
-            console.log('[CMS Realtime] Section change:', payload);
+            // [CMS Realtime] Section change: payload
             
             setData(prev => {
               const newSections = [...prev.sections];
@@ -146,7 +146,7 @@ export function useOrgRealtimeCms(options: UseOrgRealtimeCmsOptions) {
             filter: `organization_id=eq.${organizationId}`
           },
           (payload) => {
-            console.log('[CMS Realtime] Setting change:', payload);
+            // [CMS Realtime] Setting change: payload
             
             setData(prev => {
               const newSettings = [...prev.settings];
@@ -185,7 +185,7 @@ export function useOrgRealtimeCms(options: UseOrgRealtimeCmsOptions) {
             filter: `organization_id=eq.${organizationId}`
           },
           (payload) => {
-            console.log('[CMS Realtime] Asset change:', payload);
+            // [CMS Realtime] Asset change: payload
             
             setData(prev => {
               const newAssets = [...prev.assets];
@@ -218,7 +218,7 @@ export function useOrgRealtimeCms(options: UseOrgRealtimeCmsOptions) {
 
       // チャンネル状態監視
       newChannel.subscribe((status) => {
-        console.log('[CMS Realtime] Status:', status);
+        // [CMS Realtime] Status: status
         
         if (status === 'SUBSCRIBED') {
           setIsConnected(true);

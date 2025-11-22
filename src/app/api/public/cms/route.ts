@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const section = url.searchParams.get('section');
     const setting = url.searchParams.get('setting');
 
-    let result: any = {};
+    const result: any = {};
 
     // サイト設定取得
     if (!section || setting) {

@@ -78,10 +78,10 @@ export function useCmsData(organizationId: string): CMSDataState & CmsOperations
     organizationId,
     autoConnect: true,
     onUpdate: (data) => {
-      console.log('[CMS Hook] Realtime update:', data);
+      // [CMS Hook] Realtime update: data
     },
     onError: (error) => {
-      console.error('[CMS Hook] Realtime error:', error);
+      // [CMS Hook] Realtime error: error
       setOperationState(prev => ({ ...prev, error: error.message }));
     }
   });

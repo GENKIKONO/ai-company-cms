@@ -26,10 +26,11 @@ export default function AdminApiTestPage() {
         const supabase = supabaseBrowser();
         
         // 認証ユーザー取得
-        const { data: { user, session }, error: authError } = await supabase.auth.getUser();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (authError || !user || !session) {
-          console.error('認証エラー:', authError?.message);
+        if (authError || sessionError || !user || !session) {
+          // 認証エラー: authError?.message || sessionError?.message
           return;
         }
 
@@ -44,14 +45,14 @@ export default function AdminApiTestPage() {
           .single();
 
         if (orgError || !userOrg) {
-          console.error('組織取得エラー:', orgError?.message);
+          // 組織取得エラー: orgError?.message
           return;
         }
 
         setOrganizationId(userOrg.organization_id);
 
       } catch (error) {
-        console.error('初期化エラー:', error);
+        // 初期化エラー: error
       }
     };
 
@@ -77,8 +78,8 @@ export default function AdminApiTestPage() {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const fullUrl = `${supabaseUrl}/functions/v1/admin-api${endpoint}`;
 
-      console.log(`🔗 Testing: ${method} ${fullUrl}`);
-      console.log(`🔑 Auth Token: ${authToken.substring(0, 20)}...`);
+      // Testing: ${method} ${fullUrl}
+      // Auth Token: ${authToken.substring(0, 20)}...
 
       const requestConfig: RequestInit = {
         method,
@@ -122,7 +123,7 @@ export default function AdminApiTestPage() {
         result
       ]);
 
-      console.log(`✅ Test completed: ${testId}`, result);
+      // Test completed: ${testId}
 
     } catch (error) {
       const duration = Date.now() - startTime;
@@ -139,7 +140,7 @@ export default function AdminApiTestPage() {
         result
       ]);
 
-      console.error(`❌ Test failed: ${testId}`, error);
+      // Test failed: ${testId}
     }
   };
 

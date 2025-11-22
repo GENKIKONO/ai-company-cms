@@ -39,7 +39,7 @@ export class AdminApiClient {
     const { data: { session }, error } = await supabase.auth.getSession();
     
     if (error || !session?.access_token) {
-      console.warn('[AdminApi] 認証トークンの取得に失敗:', error?.message);
+      // [AdminApi] 認証トークンの取得に失敗: error?.message
       return null;
     }
     
@@ -110,7 +110,7 @@ export class AdminApiClient {
       };
 
     } catch (error) {
-      console.error('[AdminApi] リクエストエラー:', error);
+      // [AdminApi] リクエストエラー: error
       
       if (error instanceof Error) {
         if (error.name === 'TimeoutError') {

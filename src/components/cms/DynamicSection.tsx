@@ -12,7 +12,7 @@ interface DynamicSectionProps {
 
 // ヒーローセクション
 const HeroSection: React.FC<{ section: CMSSection }> = ({ section }) => {
-  const title = getSectionContent(section, 'title', '');
+  const title = getSectionContent<string>(section, 'title', '');
   const subtitle = getSectionContent(section, 'subtitle', '');
   const ctaText = getSectionContent(section, 'cta_text', '開始する');
   const ctaUrl = getSectionContent(section, 'cta_url', '/register');
@@ -40,15 +40,12 @@ const HeroSection: React.FC<{ section: CMSSection }> = ({ section }) => {
           )}
           {ctaUrl && (
             <div className="flex gap-4 justify-center">
-              <Button 
-                asChild 
-                size="lg" 
-                className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-4"
+              <Link 
+                href={ctaUrl}
+                className="inline-block bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-4 rounded-md font-medium transition-colors"
               >
-                <Link href={ctaUrl}>
-                  {ctaText}
-                </Link>
-              </Button>
+                {ctaText}
+              </Link>
             </div>
           )}
         </div>
@@ -97,7 +94,7 @@ const FeatureListSection: React.FC<{ section: CMSSection }> = ({ section }) => {
 // テキストブロックセクション
 const TextBlockSection: React.FC<{ section: CMSSection }> = ({ section }) => {
   const content = getSectionContent(section, 'content', '');
-  const backgroundColor = getSectionContent(section, 'background_color', 'white');
+  const backgroundColor = getSectionContent<string>(section, 'background_color', 'white');
 
   return (
     <section className={`py-16 ${backgroundColor === 'gray' ? 'bg-gray-100' : 'bg-white'}`}>
