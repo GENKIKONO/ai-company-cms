@@ -41,7 +41,7 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
         }
       }
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      // Settings load failed - handle silently
     } finally {
       setIsLoading(false);
     }
