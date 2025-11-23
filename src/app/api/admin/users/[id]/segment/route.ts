@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 認証チェック
@@ -24,7 +24,7 @@ export async function PATCH(
       return authResult;
     }
 
-    const { userId } = await params;
+    const { id } = await params;
     const { segment }: { segment: UserSegment } = await request.json();
 
     // セグメントバリデーション
@@ -62,13 +62,13 @@ export async function PATCH(
     const { data, error } = await supabase
       .from('profiles')
       .update({ segment })
-      .eq('id', userId)
+      .eq('id', id)
       .select('id, email, segment')
       .single();
 
     if (error) {
       logger.error('Failed to update user segment', {
-        userId,
+        id,
         segment,
         error
       });
@@ -76,7 +76,7 @@ export async function PATCH(
     }
 
     logger.info('User segment updated successfully', {
-      userId,
+      id,
       newSegment: segment,
       adminId: (authResult as AuthContext).user.id
     });
@@ -88,7 +88,7 @@ export async function PATCH(
     });
 
   } catch (error) {
-    logger.error('[PATCH /api/admin/users/[userId]/segment] Failed to update user segment', {
+    logger.error('[PATCH /api/admin/users/[id]/segment] Failed to update user segment', {
       data: error instanceof Error ? error : new Error(String(error))
     });
     return handleApiError(error);
@@ -100,7 +100,7 @@ export async function PATCH(
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authResult = await requireAuth(request);
@@ -108,7 +108,7 @@ export async function GET(
       return authResult;
     }
 
-    const { userId } = await params;
+    const { id } = await params;
     
     const cookieStore = await cookies();
     const supabase = createServerClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
@@ -131,7 +131,7 @@ export async function GET(
     const { data, error } = await supabase
       .from('profiles')
       .select('id, email, segment')
-      .eq('id', userId)
+      .eq('id', id)
       .single();
 
     if (error) {
