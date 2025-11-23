@@ -39,16 +39,6 @@ export async function middleware(request: NextRequest) {
   const authPaths = ['/auth/login', '/auth/signin', '/login', '/signin'];
   const isAuthPath = authPaths.some(path => pathname.startsWith(path));
 
-  // ルートページ処理
-  if (pathname === '/') {
-    const url = request.nextUrl.clone();
-    if (isLoggedIn) {
-      url.pathname = '/dashboard';
-    } else {
-      url.pathname = '/auth/login';
-    }
-    return NextResponse.redirect(url);
-  }
 
   // 未認証ユーザーが保護されたページにアクセス
   if (isProtectedPath && !isLoggedIn) {
