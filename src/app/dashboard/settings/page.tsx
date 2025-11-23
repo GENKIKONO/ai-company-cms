@@ -28,7 +28,7 @@ export default function SettingsPage() {
           
           if (userOrg) {
             setOrganizationId(userOrg.organization_id);
-            setOrganizationSlug(userOrg.organizations?.slug || '');
+            setOrganizationSlug(userOrg.organizations?.[0]?.slug || '');
           }
         }
       } catch (error) {
