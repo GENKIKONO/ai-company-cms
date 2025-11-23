@@ -169,7 +169,7 @@ serve(async (req) => {
 ${webContent.slice(0, 8000)} // Token制限対策`
 
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
       {
         method: 'POST',
         headers: {
@@ -179,28 +179,50 @@ ${webContent.slice(0, 8000)} // Token制限対策`
           contents: [
             {
               parts: [
-                { text: systemPrompt },
-                { text: userPrompt }
+                { text: systemPrompt + '\n\n' + userPrompt }
               ]
             }
           ],
           generationConfig: {
             temperature: 0.1,
             maxOutputTokens: 2048,
-          }
+          },
+          safetySettings: [
+            {
+              category: 'HARM_CATEGORY_HARASSMENT',
+              threshold: 'BLOCK_NONE'
+            },
+            {
+              category: 'HARM_CATEGORY_HATE_SPEECH',
+              threshold: 'BLOCK_NONE'
+            },
+            {
+              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              threshold: 'BLOCK_NONE'
+            },
+            {
+              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              threshold: 'BLOCK_NONE'
+            }
+          ]
         })
       }
     )
 
     if (!geminiResponse.ok) {
-      throw new Error(`Gemini API failed: ${geminiResponse.status}`)
+      const errorText = await geminiResponse.text()
+      console.error(`[Ghostwriter] Gemini API Error ${geminiResponse.status}: ${errorText}`)
+      throw new Error(`Gemini API failed: ${geminiResponse.status} - ${errorText}`)
     }
 
     const geminiData = await geminiResponse.json()
+    console.log(`[Ghostwriter] Gemini API Response structure:`, JSON.stringify(geminiData, null, 2))
+    
     const generatedText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text
 
     if (!generatedText) {
-      throw new Error('No response from Gemini API')
+      console.error(`[Ghostwriter] No generated text found. Full response:`, geminiData)
+      throw new Error(`No response from Gemini API. Response: ${JSON.stringify(geminiData)}`)
     }
 
     console.log(`[Ghostwriter] Generated text: ${generatedText.slice(0, 200)}...`)
