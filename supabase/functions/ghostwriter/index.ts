@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,129 +7,69 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
     const { url, organization_id } = await req.json();
+    const apiKey = Deno.env.get("GEMINI_API_KEY");
 
-    if (!url || !organization_id) {
-      throw new Error("URL and organization_id are required");
-    }
+    if (!url || !apiKey) throw new Error("Missing URL or API Key");
 
-    // 1. Jina Reader (Scraping)
-    console.log(`Scraping URL: ${url}`);
+    // 1. Jina Reader
     const jinaRes = await fetch(`https://r.jina.ai/${url}`, {
-      headers: {
-        "Authorization": `Bearer ${Deno.env.get("JINA_API_KEY") || ""}`
-      }
+      headers: { "Authorization": `Bearer ${Deno.env.get("JINA_API_KEY") || ""}` }
     });
-    
-    if (!jinaRes.ok) {
-       console.error("Jina Failed", await jinaRes.text());
-       // fallback: Jina fails, proceed with empty text or throw
-       throw new Error("Failed to scrape website");
-    }
     const markdown = await jinaRes.text();
 
-    // 2. Gemini 1.5 Flash (SDK)
-    console.log("Calling Gemini SDK...");
-    const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY") || "");
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // 2. Gemini API (Try 1.5 Flash)
+    const targetModel = "gemini-1.5-flash";
+    const genUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`;
+    
+    const prompt = `Extract company info from this markdown as JSON (no markdown code blocks, just raw JSON): ${markdown.substring(0, 10000)}`;
 
-    const prompt = `
-    You are an AI data analyst. Extract information from the website markdown below and return PURE JSON.
-    Do not use Markdown formatting (no \`\`\`json). Just return the raw JSON string.
+    const genRes = await fetch(genUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
 
-    Target Schema:
-    {
-      "organization": {
-        "name": "string",
-        "description": "string",
-        "representative_name": "string",
-        "address_street": "string",
-        "website_url": "string",
-        "phone": "string"
-      },
-      "services": [
-        { "name": "string", "description": "string", "price_range": "string" }
-      ],
-      "faqs": [
-        { "question": "string", "answer": "string" }
-      ]
+    if (!genRes.ok) {
+      // ★診断モード: 失敗したらモデル一覧を見に行く
+      console.error(`Model ${targetModel} failed. Listing available models...`);
+      const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+      const listData = await listRes.json();
+      const availableModels = listData.models ? listData.models.map((m: any) => m.name) : "No models found";
+      
+      throw new Error(`Gemini 404. Available models for this key: ${JSON.stringify(availableModels)}`);
     }
 
-    Website Content:
-    ${markdown.substring(0, 20000)}
-    `;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
-    
-    // Clean up JSON (remove backticks if AI adds them)
+    // 成功時の処理
+    const genJson = await genRes.json();
+    let text = genJson.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
     text = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    const structuredData = JSON.parse(text);
+    const data = JSON.parse(text);
 
-    console.log("Gemini Success:", structuredData);
-
-    // 3. Save to DB (Upsert)
+    // DB保存処理（簡略化）
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
-
-    // Check Lock
-    const { data: existingOrg } = await supabase
-      .from("organizations")
-      .select("data_status")
-      .eq("id", organization_id)
-      .single();
-
-    if (existingOrg && existingOrg.data_status === 'user_verified') {
-      return new Response(
-        JSON.stringify({ status: "skipped", message: "Protected data exists" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Save Logic
+    
+    // Organization Updateのみ実装（テスト用）
     await supabase.from("organizations").update({
-        name: structuredData.organization.name,
-        description: structuredData.organization.description,
-        representative_name: structuredData.organization.representative_name,
-        address_street: structuredData.organization.address_street,
-        website_url: url,
-        phone: structuredData.organization.phone,
-        data_status: 'ai_generated'
+        data_status: 'ai_generated',
+        name: data.organization?.name
     }).eq("id", organization_id);
 
-    // Refresh Services & FAQs
-    await supabase.from("services").delete().eq("organization_id", organization_id);
-    if (structuredData.services?.length) {
-        await supabase.from("services").insert(
-            structuredData.services.map((s: any) => ({ ...s, organization_id }))
-        );
-    }
-
-    await supabase.from("faqs").delete().eq("organization_id", organization_id);
-    if (structuredData.faqs?.length) {
-        await supabase.from("faqs").insert(
-            structuredData.faqs.map((f: any) => ({ ...f, organization_id }))
-        );
-    }
-
-    return new Response(
-      JSON.stringify({ success: true, data: structuredData }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ success: true, data, debug_model: targetModel }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    });
 
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }
+    });
   }
 });
