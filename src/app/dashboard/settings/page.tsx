@@ -1,7 +1,43 @@
+'use client';
+
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { ChangePasswordForm } from '@/components/auth/ChangePasswordForm';
+import { GhostwriterInput } from '@/components/cms/GhostwriterInput';
+import { supabaseBrowser } from '@/lib/supabase-client';
 
 export default function SettingsPage() {
+  const [organizationId, setOrganizationId] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const getOrganizationId = async () => {
+      try {
+        const supabase = supabaseBrowser();
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: userOrg } = await supabase
+            .from('user_organizations')
+            .select('organization_id')
+            .eq('user_id', user.id)
+            .eq('role', 'owner')
+            .single();
+          
+          if (userOrg) {
+            setOrganizationId(userOrg.organization_id);
+          }
+        }
+      } catch (error) {
+        // Organization fetch failed - user might not be an owner
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getOrganizationId();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,7 +63,28 @@ export default function SettingsPage() {
         </div>
 
         {/* コンテンツ */}
-        <div className="space-y-6">
+        <div className="space-y-8">
+          {/* AI Ghostwriter - 最優先表示 */}
+          <div>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">AI企業情報自動生成</h2>
+            {isLoading ? (
+              <div className="animate-pulse bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-gray-200 rounded-2xl"></div>
+                  <div>
+                    <div className="h-6 bg-gray-200 rounded w-32 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-48"></div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="h-12 bg-gray-200 rounded-xl"></div>
+                  <div className="h-12 bg-gray-200 rounded-xl"></div>
+                </div>
+              </div>
+            ) : (
+              <GhostwriterInput organizationId={organizationId || ''} />
+            )}
+          </div>
           {/* セキュリティ設定 */}
           <div>
             <h2 className="text-lg font-medium text-gray-900 mb-4">セキュリティ設定</h2>
