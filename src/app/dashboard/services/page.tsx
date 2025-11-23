@@ -5,21 +5,54 @@ import Link from 'next/link';
 import type { Service } from '@/types/database';
 import PublicPageLinks from '../components/PublicPageLinks';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
+import { supabaseBrowser } from '@/lib/supabase-client';
 import { logger } from '@/lib/utils/logger';
 
 export default function ServicesManagementPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [organizationId, setOrganizationId] = useState<string>('');
 
   useEffect(() => {
-    fetchServices();
+    const getOrganizationId = async () => {
+      try {
+        const supabase = supabaseBrowser;
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: userOrg } = await supabase
+            .from('user_organizations')
+            .select('organization_id')
+            .eq('user_id', user.id)
+            .eq('role', 'owner')
+            .single();
+          
+          if (userOrg) {
+            setOrganizationId(userOrg.organization_id);
+          }
+        }
+      } catch (error) {
+        logger.error('Failed to get organization ID:', { data: error });
+        setError('組織情報の取得に失敗しました');
+      }
+    };
+
+    getOrganizationId();
   }, []);
 
+  useEffect(() => {
+    if (organizationId) {
+      fetchServices();
+    }
+  }, [organizationId]);
+
   const fetchServices = async () => {
+    if (!organizationId) return;
+    
     try {
       setLoading(true);
-      const response = await fetch('/api/my/services', {
+      const response = await fetch(`/api/my/services?organizationId=${organizationId}`, {
         cache: 'no-store'
       });
       

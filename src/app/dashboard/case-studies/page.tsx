@@ -4,21 +4,54 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { CaseStudy } from '@/types/database';
 import PublicPageLinks from '../components/PublicPageLinks';
+import { supabaseBrowser } from '@/lib/supabase-client';
 import { logger } from '@/lib/utils/logger';
 
 export default function CaseStudiesManagementPage() {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [organizationId, setOrganizationId] = useState<string>('');
 
   useEffect(() => {
-    fetchCaseStudies();
+    const getOrganizationId = async () => {
+      try {
+        const supabase = supabaseBrowser;
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: userOrg } = await supabase
+            .from('user_organizations')
+            .select('organization_id')
+            .eq('user_id', user.id)
+            .eq('role', 'owner')
+            .single();
+          
+          if (userOrg) {
+            setOrganizationId(userOrg.organization_id);
+          }
+        }
+      } catch (error) {
+        logger.error('Failed to get organization ID:', { data: error });
+        setError('組織情報の取得に失敗しました');
+      }
+    };
+
+    getOrganizationId();
   }, []);
 
+  useEffect(() => {
+    if (organizationId) {
+      fetchCaseStudies();
+    }
+  }, [organizationId]);
+
   const fetchCaseStudies = async () => {
+    if (!organizationId) return;
+    
     try {
       setLoading(true);
-      const response = await fetch('/api/my/case-studies', {
+      const response = await fetch(`/api/my/case-studies?organizationId=${organizationId}`, {
         cache: 'no-store'
       });
       
@@ -102,7 +135,6 @@ export default function CaseStudiesManagementPage() {
         <div className="mb-6">
           <Link
             href="/dashboard"
-            replace
             className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-flex items-center"
           >
             <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

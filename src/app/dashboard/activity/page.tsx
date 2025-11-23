@@ -8,7 +8,7 @@ export default function ActivityPage() {
         <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link href="/dashboard" replace className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
                 ダッシュボード
               </Link>
             </li>
@@ -68,7 +68,6 @@ export default function ActivityPage() {
               <div className="flex justify-between items-center">
                 <Link
                   href="/dashboard"
-                  replace
                   className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

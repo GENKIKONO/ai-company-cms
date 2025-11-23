@@ -6,21 +6,54 @@ import type { FAQ } from '@/types/database';
 import PublicPageLinks from '../components/PublicPageLinks';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { HIGButton } from '@/design-system';
+import { supabaseBrowser } from '@/lib/supabase-client';
 import { logger } from '@/lib/utils/logger';
 
 export default function FAQsManagementPage() {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [organizationId, setOrganizationId] = useState<string>('');
 
   useEffect(() => {
-    fetchFaqs();
+    const getOrganizationId = async () => {
+      try {
+        const supabase = supabaseBrowser;
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: userOrg } = await supabase
+            .from('user_organizations')
+            .select('organization_id')
+            .eq('user_id', user.id)
+            .eq('role', 'owner')
+            .single();
+          
+          if (userOrg) {
+            setOrganizationId(userOrg.organization_id);
+          }
+        }
+      } catch (error) {
+        logger.error('Failed to get organization ID:', { data: error });
+        setError('組織情報の取得に失敗しました');
+      }
+    };
+
+    getOrganizationId();
   }, []);
 
+  useEffect(() => {
+    if (organizationId) {
+      fetchFaqs();
+    }
+  }, [organizationId]);
+
   const fetchFaqs = async () => {
+    if (!organizationId) return;
+    
     try {
       setLoading(true);
-      const response = await fetch('/api/my/faqs', {
+      const response = await fetch(`/api/my/faqs?organizationId=${organizationId}`, {
         cache: 'no-store'
       });
       

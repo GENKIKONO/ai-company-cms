@@ -36,7 +36,10 @@ export interface MeResponse {
 export function useOrganization() {
   const { data, error, isLoading, mutate } = useSWR<MeResponse>(CACHE_KEYS.organization, fetcher, {
     revalidateOnFocus: false,
-    dedupingInterval: 5 * 60 * 1000, // 5分間キャッシュ
+    dedupingInterval: 5000, // 5秒間キャッシュ
+    refreshInterval: 0, // 自動リフレッシュ無効
+    errorRetryCount: 1, // エラー時1回のみリトライ
+    errorRetryInterval: 2000, // リトライ間隔2秒
     onError: (error) => {
       // 404の場合はエラーとして扱わない（認証されていない状態）
       if (error?.status === 404 || error?.status === 401) {
@@ -78,8 +81,8 @@ export function useOrganization() {
   }, [mutate]);
 
   /**
-   * 組織データが見つからない場合の自動リトライ機能
-   * ユーザーが存在するが組織が null の場合にセッションをリフレッシュ
+   * 組織データが見つからない場合のシンプルなリトライ機能
+   * ユーザーが存在するが組織が null の場合に1回だけセッションをリフレッシュ
    */
   useEffect(() => {
     const hasUser = data?.user && !isLoading;
@@ -87,12 +90,15 @@ export function useOrganization() {
     const noError = !error;
     
     if (hasUser && hasNoOrganization && noError) {
-      logger.debug('User found but no organization - attempting session refresh');
+      logger.debug('User found but no organization - attempting single session refresh');
       
-      // 1秒後にセッションリフレッシュを実行（UIの準備を待つ）
-      const timeoutId = setTimeout(() => {
-        forceRefreshWithSession();
-      }, 1000);
+      const timeoutId = setTimeout(async () => {
+        try {
+          await forceRefreshWithSession();
+        } catch (error) {
+          logger.error('Single retry failed:', { error });
+        }
+      }, 2000);
       
       return () => clearTimeout(timeoutId);
     }
@@ -121,14 +127,20 @@ export function useOrganization() {
     }
   }, [data?.organization?.id, invalidateOrganizationData, mutate]);
 
+  // データが不完全な場合の判定をシンプル化
+  const hasUser = !!data?.user;
+  const hasOrganization = !!data?.organization;
+  const isWaitingForOrganization = hasUser && !hasOrganization && !isLoading && !error;
+
   return {
     user: data?.user || null,
     organization: data?.organization || null,
-    isLoading,
+    isLoading: isLoading || isWaitingForOrganization, // 組織待機中は常にローディング
+    isWaitingForOrganization, // 明示的な待機状態
     error: error?.status === 404 || error?.status === 401 ? null : error,
-    invalidateOrganization, // 🆕 新機能
-    forceRefreshWithSession, // 🆕 強制セッションリフレッシュ
-    refresh: mutate, // 手動でのデータ再取得
+    invalidateOrganization,
+    forceRefreshWithSession,
+    refresh: mutate,
   };
 }
 

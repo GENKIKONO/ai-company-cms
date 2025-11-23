@@ -164,7 +164,6 @@ export default function ServicesInfoPage() {
           organization ? (
             <Link
               href="/dashboard"
-              replace
               className="px-6 py-3 bg-[var(--color-blue-600)] text-white rounded-md hover:bg-[var(--color-blue-700)] focus:ring-2 focus:ring-[var(--color-blue-300)] font-medium inline-block text-center"
             >
               ダッシュボードに戻る
