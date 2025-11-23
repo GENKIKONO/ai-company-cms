@@ -4,7 +4,7 @@
  */
 
 import useSWR from 'swr';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { fetcher } from '@/lib/utils/fetcher';
 import { useCacheManager } from './useCacheManager';
 import { CACHE_KEYS } from '@/lib/cache/keys';
@@ -34,20 +34,55 @@ export interface MeResponse {
  * 現在のユーザーと組織情報を同時に取得
  */
 export function useOrganization() {
-  const { data, error, isLoading, mutate } = useSWR<MeResponse>(CACHE_KEYS.organization, fetcher, {
-    revalidateOnFocus: false,
-    dedupingInterval: 5000, // 5秒間キャッシュ
-    refreshInterval: 0, // 自動リフレッシュ無効
-    errorRetryCount: 1, // エラー時1回のみリトライ
-    errorRetryInterval: 2000, // リトライ間隔2秒
-    onError: (error) => {
-      // 404の場合はエラーとして扱わない（認証されていない状態）
-      if (error?.status === 404 || error?.status === 401) {
-        return null;
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
+  // 認証状態を確認してからSWRを開始
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkAuth = async () => {
+      try {
+        const { data: { user } } = await supabaseBrowser.auth.getUser();
+        if (isMounted) {
+          setAuthUserId(user?.id || null);
+          setIsAuthChecking(false);
+        }
+      } catch (error) {
+        if (isMounted) {
+          logger.warn('Auth check failed:', { error });
+          setAuthUserId(null);
+          setIsAuthChecking(false);
+        }
       }
-      logger.error('useOrganization error:', { data: error });
+    };
+
+    checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // 認証ユーザーが確定した場合のみSWRを実行
+  const { data, error, isLoading, mutate } = useSWR<MeResponse>(
+    authUserId ? [CACHE_KEYS.organization, authUserId] : null, // 認証ユーザーがいる場合のみSWR実行
+    () => fetcher(CACHE_KEYS.organization), // fetcher関数は元のまま
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 5000, // 5秒間キャッシュ
+      refreshInterval: 0, // 自動リフレッシュ無効
+      errorRetryCount: 1, // エラー時1回のみリトライ
+      errorRetryInterval: 2000, // リトライ間隔2秒
+      onError: (error) => {
+        // 404の場合はエラーとして扱わない（認証されていない状態）
+        if (error?.status === 404 || error?.status === 401) {
+          return null;
+        }
+        logger.error('useOrganization error:', { data: error });
+      }
     }
-  });
+  );
 
   const { invalidateOrganizationData } = useCacheManager();
 
@@ -85,11 +120,12 @@ export function useOrganization() {
    * ユーザーが存在するが組織が null の場合に1回だけセッションをリフレッシュ
    */
   useEffect(() => {
-    const hasUser = data?.user && !isLoading;
-    const hasNoOrganization = !data?.organization && !isLoading;
+    // 認証チェックが完了してからのみリトライを実行
+    const hasUser = data?.user && !isLoading && !isAuthChecking;
+    const hasNoOrganization = !data?.organization && !isLoading && !isAuthChecking;
     const noError = !error;
     
-    if (hasUser && hasNoOrganization && noError) {
+    if (hasUser && hasNoOrganization && noError && authUserId) {
       logger.debug('User found but no organization - attempting single session refresh');
       
       const timeoutId = setTimeout(async () => {
@@ -102,7 +138,7 @@ export function useOrganization() {
       
       return () => clearTimeout(timeoutId);
     }
-  }, [data?.user, data?.organization, isLoading, error, forceRefreshWithSession]);
+  }, [data?.user, data?.organization, isLoading, error, isAuthChecking, authUserId, forceRefreshWithSession]);
 
   /**
    * 組織関連キャッシュを一括無効化
@@ -135,7 +171,7 @@ export function useOrganization() {
   return {
     user: data?.user || null,
     organization: data?.organization || null,
-    isLoading: isLoading || isWaitingForOrganization, // 組織待機中は常にローディング
+    isLoading: isAuthChecking || isLoading || isWaitingForOrganization, // 認証チェック中も含める
     isWaitingForOrganization, // 明示的な待機状態
     error: error?.status === 404 || error?.status === 401 ? null : error,
     invalidateOrganization,
