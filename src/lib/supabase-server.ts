@@ -6,8 +6,13 @@
  * - RLS適用のセキュアなデータアクセス
  * - セッション永続化・管理
  */
+// サーバーサイドでのみ動作を保証
+if (typeof window !== 'undefined') {
+  throw new Error('This file cannot be used in client components. Use supabase-client.ts instead.');
+}
+
 // テスト環境以外でserver-onlyを読み込み
-if (process.env.NODE_ENV !== 'test' && typeof window === 'undefined') {
+if (process.env.NODE_ENV !== 'test') {
   require('server-only');
 }
 import { createServerClient } from '@supabase/ssr';

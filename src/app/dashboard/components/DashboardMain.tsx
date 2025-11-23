@@ -123,9 +123,9 @@ export default function DashboardMain() {
           <div className="text-center">
             {/* Organization badge */}
             <div className="inline-flex items-center gap-3 glass-card backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 mb-8 spring-bounce">
-              {organization.logo_url ? (
+              {(organization as any).logo_url ? (
                 <Image
-                  src={organization.logo_url}
+                  src={(organization as any).logo_url}
                   alt={`${organization.name}のロゴ`}
                   width={24}
                   height={24}
@@ -141,7 +141,7 @@ export default function DashboardMain() {
               <span className="text-gray-700 font-medium" data-testid="organization-name">
                 {organization.name}
               </span>
-              <div className={`w-2 h-2 rounded-full ${organization.is_published ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+              <div className={`w-2 h-2 rounded-full ${(organization as any).is_published ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
             </div>
             
             {/* Main headline */}
@@ -154,7 +154,7 @@ export default function DashboardMain() {
             
             {/* Quick actions */}
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-              <PublishToggle organizationId={organization.id} isPublished={organization.is_published} />
+              <PublishToggle organizationId={organization.id} isPublished={(organization as any).is_published} organizationName={organization.name} />
               <Link
                 href={`/organizations/${organization.id}`}
                 className="btn-secondary flex-1 text-center"
@@ -196,13 +196,13 @@ export default function DashboardMain() {
           {/* Right column */}
           <div className="space-y-8">
             <DashboardActions organization={organization} />
-            <FirstTimeUserOnboarding />
+            <FirstTimeUserOnboarding organization={organization as any} />
           </div>
         </div>
         
         {/* Bottom section */}
         <div className="mt-12">
-          <DashboardClient />
+          <DashboardClient organizationId={organization.id} organizationName={organization.name} isPublished={(organization as any).is_published} />
         </div>
       </div>
     </>

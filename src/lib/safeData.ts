@@ -6,8 +6,7 @@ import { unstable_cache } from 'next/cache';
 import { serverFetch } from './serverFetch';
 import { logger } from '@/lib/utils/logger';
 
-// 🚫 キャッシュを使わない組織取得を re-export
-export { getCurrentUserOrganization } from './organizations-server';
+// Note: getCurrentUserOrganization moved to server-only context for better separation
 
 interface SafeOrganizationData {
   id: string;
