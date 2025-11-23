@@ -23,37 +23,29 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // ユーザー情報を取得
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('id, email, full_name, organization_id')
-      .eq('id', authUser.id)
-      .single();
-
-    if (userError) {
-      // ユーザーレコードが存在しない場合でも基本情報は返す
-      logger.warn('User record not found in users table:', { data: userError });
-      return NextResponse.json({
-        user: {
-          id: authUser.id,
-          email: authUser.email || null,
-          full_name: null
-        },
-        organization: null
-      });
-    }
+    // ユーザー情報を準備（Auth情報から）
+    const user = {
+      id: authUser.id,
+      email: authUser.email || null,
+      full_name: authUser.user_metadata?.full_name || null
+    };
 
     let organization = null;
 
-    // 組織情報を取得（organization_id が存在する場合）
-    if (userData?.organization_id) {
-      const { data: orgData, error: orgError } = await supabase
-        .from('organizations')
-        .select('id, name, slug, plan, feature_flags')
-        .eq('id', userData.organization_id)
-        .single();
+    // 組織情報を user_organizations テーブルから取得（同じロジックを getCurrentUserOrganization と統一）
+    const { data: userOrgData, error: userOrgError } = await supabase
+      .from('user_organizations')
+      .select('organization_id, organizations(id, name, slug, plan, feature_flags)')
+      .eq('user_id', authUser.id)
+      .eq('role', 'owner')
+      .single();
 
-      if (!orgError && orgData) {
+    if (!userOrgError && userOrgData?.organizations) {
+      const orgData = Array.isArray(userOrgData.organizations) 
+        ? userOrgData.organizations[0] 
+        : userOrgData.organizations;
+      
+      if (orgData) {
         organization = {
           id: orgData.id,
           name: orgData.name,
@@ -61,18 +53,18 @@ export async function GET(request: NextRequest) {
           plan: orgData.plan || 'free',
           feature_flags: orgData.feature_flags || {}
         };
-      } else {
-        logger.warn('Organization not found:', { data: orgError });
+        logger.debug('Organization found via user_organizations:', { orgId: orgData.id, name: orgData.name });
       }
+    } else {
+      logger.debug('No organization found in user_organizations:', { 
+        userId: authUser.id, 
+        error: userOrgError?.message 
+      });
     }
 
     // レスポンス返却
     return NextResponse.json({
-      user: {
-        id: userData.id,
-        email: userData.email,
-        full_name: userData.full_name || null
-      },
+      user,
       organization
     });
 

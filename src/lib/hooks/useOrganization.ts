@@ -4,11 +4,12 @@
  */
 
 import useSWR from 'swr';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { fetcher } from '@/lib/utils/fetcher';
 import { useCacheManager } from './useCacheManager';
 import { CACHE_KEYS } from '@/lib/cache/keys';
 import { logger } from '@/lib/log';
+import { supabaseBrowser } from '@/lib/supabase-client';
 export interface Organization {
   id: string;
   name: string;
@@ -48,6 +49,56 @@ export function useOrganization() {
   const { invalidateOrganizationData } = useCacheManager();
 
   /**
+   * セッションを強制リフレッシュして組織データを再取得
+   * ログイン後に組織が見つからない場合のフォールバック
+   */
+  const forceRefreshWithSession = useCallback(async () => {
+    try {
+      logger.info('Forcing session refresh to resolve organization data');
+      
+      // Supabaseセッションを強制リフレッシュ
+      const supabase = supabaseBrowser;
+      const { data: sessionData, error: sessionError } = await supabase.auth.refreshSession();
+      
+      if (sessionError) {
+        logger.warn('Session refresh failed:', { error: sessionError.message });
+      } else {
+        logger.info('Session refreshed successfully');
+      }
+      
+      // キャッシュをクリアして再取得
+      await mutate();
+      
+      logger.info('Organization data force refresh completed');
+    } catch (error) {
+      logger.error('Failed to force refresh session:', { 
+        error: error instanceof Error ? error.message : error 
+      });
+    }
+  }, [mutate]);
+
+  /**
+   * 組織データが見つからない場合の自動リトライ機能
+   * ユーザーが存在するが組織が null の場合にセッションをリフレッシュ
+   */
+  useEffect(() => {
+    const hasUser = data?.user && !isLoading;
+    const hasNoOrganization = !data?.organization && !isLoading;
+    const noError = !error;
+    
+    if (hasUser && hasNoOrganization && noError) {
+      logger.debug('User found but no organization - attempting session refresh');
+      
+      // 1秒後にセッションリフレッシュを実行（UIの準備を待つ）
+      const timeoutId = setTimeout(() => {
+        forceRefreshWithSession();
+      }, 1000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [data?.user, data?.organization, isLoading, error, forceRefreshWithSession]);
+
+  /**
    * 組織関連キャッシュを一括無効化
    * 組織情報変更時やコンテンツ更新時に使用
    */
@@ -76,6 +127,7 @@ export function useOrganization() {
     isLoading,
     error: error?.status === 404 || error?.status === 401 ? null : error,
     invalidateOrganization, // 🆕 新機能
+    forceRefreshWithSession, // 🆕 強制セッションリフレッシュ
     refresh: mutate, // 手動でのデータ再取得
   };
 }
