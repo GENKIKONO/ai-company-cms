@@ -17,10 +17,17 @@ export async function GET(request: NextRequest) {
     const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !authUser) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'unauthorized' }, 
         { status: 401 }
       );
+      
+      // キャッシュ防止ヘッダー（エラー応答でも）
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '0');
+      
+      return response;
     }
 
     // ユーザー情報を準備（Auth情報から）
@@ -62,19 +69,33 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // レスポンス返却
-    return NextResponse.json({
+    // レスポンス返却（キャッシュ防止ヘッダー付き）
+    const response = NextResponse.json({
       user,
       organization
     });
+    
+    // 追加のキャッシュ防止ヘッダー
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
 
   } catch (error) {
     logger.error('API /me error:', { data: error });
     
     // エラーが発生してもダッシュボードを壊さないよう、できるだけ情報を返す
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: null,
       organization: null
     }, { status: 500 });
+    
+    // キャッシュ防止ヘッダー（エラー応答でも）
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
   }
 }
