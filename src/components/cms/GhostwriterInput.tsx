@@ -8,12 +8,14 @@ import { supabaseBrowser } from '@/lib/supabase-client';
 
 interface GhostwriterInputProps {
   organizationId: string;
+  organizationSlug?: string;
 }
 
-export function GhostwriterInput({ organizationId }: GhostwriterInputProps) {
+export function GhostwriterInput({ organizationId, organizationSlug }: GhostwriterInputProps) {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -111,11 +113,19 @@ export function GhostwriterInput({ organizationId }: GhostwriterInputProps) {
         description: "企業情報が自動生成されました。データを確認してください。",
       });
 
+      // Show success UI
+      setShowSuccess(true);
+      
       // Refresh the page to show updated data
       router.refresh();
       
       // Clear the URL input
       setUrl('');
+      
+      // Hide success UI after 10 seconds
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 10000);
       
     } catch (error) {
       toast({
@@ -221,6 +231,43 @@ export function GhostwriterInput({ organizationId }: GhostwriterInputProps) {
             <span>コンテンツ生成</span>
           </div>
         </div>
+
+        {/* Success UI with public page preview */}
+        {showSuccess && organizationSlug && (
+          <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl animate-in slide-in-from-bottom duration-500">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-green-900">生成完了！</h3>
+                <p className="text-sm text-green-700">企業ページが自動で作成されました</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a
+                href={`/o/${organizationSlug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                <Globe className="w-5 h-5" />
+                公開ページを今すぐ確認する
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              
+              <button
+                onClick={() => setShowSuccess(false)}
+                className="inline-flex items-center justify-center px-4 py-3 border border-green-300 text-green-700 font-medium rounded-lg hover:bg-green-100 transition-colors duration-200"
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Usage note */}
         <div className="mt-6 p-3 bg-amber-50/50 border border-amber-200/50 rounded-lg">

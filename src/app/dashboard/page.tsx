@@ -8,6 +8,7 @@ import DashboardClient from '@/components/dashboard/DashboardClient';
 import PerformanceMetrics from './components/PerformanceMetrics';
 import DashboardActions from './components/DashboardActions';
 import AIVisibilityCard from './components/AIVisibilityCard';
+import { FirstTimeUserOnboarding } from '@/components/dashboard/FirstTimeUserOnboarding';
 import { hasEntitlementSync } from '@/lib/feature-flags/gate';
 import { logger } from '@/lib/utils/logger';
 
@@ -170,6 +171,16 @@ export default async function DashboardPage() {
       </section>
       
       <main className="max-w-7xl mx-auto px-6 lg:px-8 -mt-16 relative z-10">
+        {/* First-time user onboarding */}
+        {(stats.total === 0 && caseStudiesStats.total === 0) && (
+          <div className="mb-12">
+            <FirstTimeUserOnboarding 
+              organization={org}
+              userName={user.user_metadata?.name || user.email?.split('@')[0]}
+            />
+          </div>
+        )}
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12 mt-8">
           <div className="group glass-card backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 spring-bounce min-h-[200px]">

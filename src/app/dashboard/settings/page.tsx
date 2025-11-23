@@ -9,6 +9,7 @@ import { supabaseBrowser } from '@/lib/supabase-client';
 
 export default function SettingsPage() {
   const [organizationId, setOrganizationId] = useState<string>('');
+  const [organizationSlug, setOrganizationSlug] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -20,13 +21,14 @@ export default function SettingsPage() {
         if (user) {
           const { data: userOrg } = await supabase
             .from('user_organizations')
-            .select('organization_id')
+            .select('organization_id, organizations(slug)')
             .eq('user_id', user.id)
             .eq('role', 'owner')
             .single();
           
           if (userOrg) {
             setOrganizationId(userOrg.organization_id);
+            setOrganizationSlug(userOrg.organizations?.slug || '');
           }
         }
       } catch (error) {
@@ -106,7 +108,10 @@ export default function SettingsPage() {
                 </div>
               </div>
             ) : (
-              <GhostwriterInput organizationId={organizationId || ''} />
+              <GhostwriterInput 
+                organizationId={organizationId || ''} 
+                organizationSlug={organizationSlug || ''}
+              />
             )}
           </div>
           {/* セキュリティ設定 */}
