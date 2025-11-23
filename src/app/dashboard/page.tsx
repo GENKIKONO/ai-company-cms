@@ -443,7 +443,7 @@ export default async function DashboardPage() {
               </div>
             </div>
             
-            <PerformanceMetrics />
+            <PerformanceMetrics organizationId={org.id} />
             
             <div className="mt-8 pt-8 border-t border-gray-100">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

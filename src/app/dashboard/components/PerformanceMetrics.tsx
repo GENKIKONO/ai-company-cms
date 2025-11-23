@@ -4,14 +4,18 @@ import { useEffect, useState } from 'react';
 import { normalizeDashboardStats, getDefaultStats, type DashboardStats } from '@/lib/normalizers/dashboard';
 import { logger } from '@/lib/utils/logger';
 
-export default function PerformanceMetrics() {
+interface PerformanceMetricsProps {
+  organizationId: string;
+}
+
+export default function PerformanceMetrics({ organizationId }: PerformanceMetricsProps) {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const response = await fetch('/api/dashboard/stats');
+        const response = await fetch(`/api/dashboard/stats?organizationId=${organizationId}`);
         if (response.ok) {
           const data = await response.json();
           setStats(data);
@@ -29,7 +33,7 @@ export default function PerformanceMetrics() {
     }
 
     fetchStats();
-  }, []);
+  }, [organizationId]);
 
   if (loading) {
     return (

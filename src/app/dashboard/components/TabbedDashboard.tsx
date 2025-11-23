@@ -64,10 +64,10 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
   const loadContentStats = async () => {
     try {
       const [postsRes, servicesRes, caseStudiesRes, faqsRes] = await Promise.all([
-        fetch('/api/my/posts', { cache: 'no-store' }),
-        fetch('/api/my/services', { cache: 'no-store' }),
-        fetch('/api/my/case-studies', { cache: 'no-store' }),
-        fetch('/api/my/faqs', { cache: 'no-store' })
+        fetch(`/api/my/posts?organizationId=${organizationId}`, { cache: 'no-store' }),
+        fetch(`/api/my/services?organizationId=${organizationId}`, { cache: 'no-store' }),
+        fetch(`/api/my/case-studies?organizationId=${organizationId}`, { cache: 'no-store' }),
+        fetch(`/api/my/faqs?organizationId=${organizationId}`, { cache: 'no-store' })
       ]);
 
       const [postsData, servicesData, caseStudiesData, faqsData] = await Promise.all([
@@ -94,7 +94,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
     setLoading(prev => ({ ...prev, [tab]: true }));
 
     try {
-      const endpoint = `/api/my/${tab === 'case-studies' ? 'case-studies' : tab}`;
+      const endpoint = `/api/my/${tab === 'case-studies' ? 'case-studies' : tab}?organizationId=${organizationId}`;
       const response = await fetch(endpoint, { cache: 'no-store' });
       
       if (response.ok) {
@@ -127,7 +127,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
     if (!confirm(`この${getContentTypeLabel(type)}を削除しますか？`)) return;
 
     try {
-      const endpoint = `/api/my/${type}/${id}`;
+      const endpoint = `/api/my/${type}/${id}?organizationId=${organizationId}`;
       const response = await fetch(endpoint, { method: 'DELETE' });
 
       if (!response.ok) {

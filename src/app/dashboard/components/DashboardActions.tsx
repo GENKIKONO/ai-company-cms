@@ -55,7 +55,7 @@ export default function DashboardActions({ organization, context = 'quickActions
     setLoading(prev => ({ ...prev, export: true }));
     
     try {
-      const response = await fetch(`/api/dashboard/export?orgId=${organization.id}`);
+      const response = await fetch(`/api/dashboard/export?organizationId=${organization.id}`);
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
