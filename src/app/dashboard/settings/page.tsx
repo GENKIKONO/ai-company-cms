@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { ChangePasswordForm } from '@/components/auth/ChangePasswordForm';
 import { GhostwriterInput } from '@/components/cms/GhostwriterInput';
+import { SiteSettingsForm } from '@/components/admin/SiteSettingsForm';
 import { supabaseBrowser } from '@/lib/supabase-client';
 
 export default function SettingsPage() {
@@ -64,7 +65,30 @@ export default function SettingsPage() {
 
         {/* コンテンツ */}
         <div className="space-y-8">
-          {/* AI Ghostwriter - 最優先表示 */}
+          {/* サイト設定管理 - 司令塔機能 */}
+          <div>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">サイト設定管理</h2>
+            {isLoading ? (
+              <div className="animate-pulse bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200/50 p-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-gray-200 rounded-2xl"></div>
+                  <div>
+                    <div className="h-6 bg-gray-200 rounded w-32 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-48"></div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="h-12 bg-gray-200 rounded-xl"></div>
+                  <div className="h-12 bg-gray-200 rounded-xl"></div>
+                  <div className="h-24 bg-gray-200 rounded-xl"></div>
+                </div>
+              </div>
+            ) : (
+              <SiteSettingsForm organizationId={organizationId || ''} />
+            )}
+          </div>
+
+          {/* AI Ghostwriter - 企業情報自動生成 */}
           <div>
             <h2 className="text-lg font-medium text-gray-900 mb-4">AI企業情報自動生成</h2>
             {isLoading ? (
