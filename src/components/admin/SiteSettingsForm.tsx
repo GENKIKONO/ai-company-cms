@@ -119,29 +119,29 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
     setMessage(null);
 
     try {
-      const supabase = supabaseBrowser;
+      // Use server-side upload API to bypass RLS
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('organizationId', organizationId);
+
+      const response = await fetch('/api/admin/upload-logo', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
+      }
+
+      const result = await response.json();
       
-      // Generate unique filename
-      const fileExt = file.name.split('.').pop();
-      const fileName = `logo-${organizationId}-${Date.now()}.${fileExt}`;
-      
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('assets')
-        .upload(`logos/${fileName}`, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
+      if (!result.success) {
+        throw new Error(result.error || 'Upload failed');
+      }
 
-      if (error) throw error;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('assets')
-        .getPublicUrl(data.path);
-
-      // Update settings
-      setSettings(prev => ({ ...prev, logo_url: publicUrl }));
+      // Update settings with the public URL
+      setSettings(prev => ({ ...prev, logo_url: result.data.publicUrl }));
       setMessage({ type: 'success', text: 'ロゴをアップロードしました' });
       
       setTimeout(() => setMessage(null), 3000);
