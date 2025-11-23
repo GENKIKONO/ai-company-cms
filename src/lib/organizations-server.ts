@@ -2,6 +2,7 @@
 import { supabaseServer } from '@/lib/supabase-server';
 import { unstable_cache } from 'next/cache';
 import { logger } from '@/lib/log';
+import { Organization } from '@/types/database';
 
 export type OrgLite = {
   id: string;
@@ -34,7 +35,7 @@ export type OrgFull = OrgLite & {
   industries: string[] | null;
 };
 
-export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
+export async function getCurrentUserOrganization(): Promise<Organization | null> {
   // 🚫 ここでは unstable_cache・headers・cookies を使わない
   const supabase = await supabaseServer();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -68,7 +69,7 @@ export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
 
   const { data, error } = await supabase
     .from('organizations')
-    .select('id,name,slug,status,is_published,logo_url')
+    .select('id,name,slug,status,is_published,logo_url,description,legal_form,representative_name,corporate_number,verified,established_at,capital,employees,address_country,address_region,address_locality,address_postal_code,address_street,lat,lng,telephone,email,email_public,url,same_as,industries,meta_title,meta_description,meta_keywords,created_by,created_at,updated_at')
     .eq('created_by', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -86,7 +87,7 @@ export async function getCurrentUserOrganization(): Promise<OrgLite | null> {
     logger.error('[getCurrentUserOrganization] select error', { data: error instanceof Error ? error : new Error(String(error)) });
     return null;
   }
-  return data as OrgLite;
+  return data as Organization;
 }
 
 // ✅ IDベースキャッシュ関数を追加
