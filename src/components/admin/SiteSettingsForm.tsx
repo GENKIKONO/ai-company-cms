@@ -18,6 +18,8 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
   const [settings, setSettings] = useState<SiteSettings>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
@@ -96,6 +98,62 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setMessage({ type: 'error', text: '画像ファイルを選択してください' });
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage({ type: 'error', text: 'ファイルサイズは5MB以下にしてください' });
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(0);
+    setMessage(null);
+
+    try {
+      const supabase = supabaseBrowser;
+      
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `logo-${organizationId}-${Date.now()}.${fileExt}`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('assets')
+        .upload(`logos/${fileName}`, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('assets')
+        .getPublicUrl(data.path);
+
+      // Update settings
+      setSettings(prev => ({ ...prev, logo_url: publicUrl }));
+      setMessage({ type: 'success', text: 'ロゴをアップロードしました' });
+      
+      setTimeout(() => setMessage(null), 3000);
+
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || 'アップロードに失敗しました' });
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="animate-pulse bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200/50 p-8">
@@ -144,20 +202,87 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
 
       {/* フォーム */}
       <div className="space-y-6">
-        {/* ロゴURL */}
+        {/* ロゴアップロード */}
         <div>
-          <label htmlFor="logo_url" className="block text-sm font-medium text-gray-700 mb-2">
-            サイトロゴURL
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            サイトロゴ
           </label>
-          <input
-            type="url"
-            id="logo_url"
-            value={settings.logo_url || ''}
-            onChange={(e) => handleInputChange('logo_url', e.target.value)}
-            placeholder="https://example.com/logo.png"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
-          />
-          <p className="text-xs text-gray-500 mt-1">推奨サイズ: 200x60px (PNG/SVG)</p>
+          <div className="space-y-4">
+            {/* 現在のロゴプレビュー */}
+            {settings.logo_url && (
+              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex-shrink-0">
+                  <img 
+                    src={settings.logo_url} 
+                    alt="現在のロゴ" 
+                    className="w-20 h-20 object-contain rounded-lg border border-gray-200 bg-white"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">現在のロゴ</p>
+                  <p className="text-xs text-gray-500 break-all">{settings.logo_url}</p>
+                </div>
+              </div>
+            )}
+
+            {/* アップロードエリア */}
+            <div className="relative">
+              <input
+                type="file"
+                id="logo_upload"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                disabled={isUploading}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+              />
+              <div className={`border-2 border-dashed border-gray-300 rounded-xl p-8 text-center transition-all duration-200 ${
+                isUploading 
+                  ? 'bg-gray-50 border-gray-200' 
+                  : 'hover:border-blue-400 hover:bg-blue-50/50'
+              }`}>
+                {isUploading ? (
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+                      <svg className="animate-spin w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">アップロード中...</p>
+                      {uploadProgress > 0 && (
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${uploadProgress}%` }}
+                          ></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">画像をアップロード</p>
+                      <p className="text-xs text-gray-500">クリックして選択またはドラッグ&ドロップ</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <p className="text-xs text-gray-500">
+              推奨サイズ: 200x60px | 対応形式: PNG, JPG, SVG | 最大サイズ: 5MB
+            </p>
+          </div>
         </div>
 
         {/* SEOタイトル */}
