@@ -13,7 +13,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const getOrganizationId = async () => {
       try {
-        const supabase = supabaseBrowser();
+        const supabase = supabaseBrowser;
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {

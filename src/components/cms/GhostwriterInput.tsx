@@ -75,7 +75,7 @@ export function GhostwriterInput({ organizationId }: GhostwriterInputProps) {
       }, 2000);
 
       // Get Supabase session for auth token
-      const supabase = supabaseBrowser();
+      const supabase = supabaseBrowser;
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
