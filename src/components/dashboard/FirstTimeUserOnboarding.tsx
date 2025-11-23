@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Organization } from '@/types/organization';
+import { Organization } from '@/types/database';
 
 interface FirstTimeUserOnboardingProps {
   organization: Organization;
