@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { APP_URL } from '@/lib/utils/env';
 
 import { logger } from '@/lib/log';
@@ -36,7 +36,7 @@ export async function generateAuthLink({
       }
     });
 
-    const admin = supabaseAdmin();
+    const admin = supabaseAdmin;
     let data, error;
     
     if (type === 'signup') {

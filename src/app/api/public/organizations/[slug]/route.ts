@@ -1,7 +1,8 @@
 // Public API: /api/public/organizations/[slug]
 // 組織の公開情報とコンテンツを取得
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer, supabaseAdmin } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { logger } from '@/lib/log';
 import { detectAIBot, extractBotInfoFromHeaders, shouldLogBot, extractClientIP } from '@/lib/utils/ai-bot-detector';
 import { logAIBotAccess } from '@/lib/utils/ai-bot-logger';
@@ -26,7 +27,7 @@ export async function GET(
     logger.debug(`[API] Fetching organization data for slug: ${slug}`);
     
     // 🔥 FIX: Public API should use admin client to bypass RLS for published content
-    const supabase = supabaseAdmin();
+    const supabase = supabaseAdmin;
     
     // 組織情報を取得（is_published=true の企業のみ）
     const { data: organization, error: orgError } = await supabase
@@ -129,7 +130,7 @@ export async function HEAD(
 ) {
   try {
     const { slug } = await params;
-    const supabase = supabaseAdmin();
+    const supabase = supabaseAdmin;
     
     // 組織の存在確認のみ
     const { data, error } = await supabase

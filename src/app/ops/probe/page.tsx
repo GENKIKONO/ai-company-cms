@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from "@/lib/supabase/server"
 import { requireOpsAdminPage } from '@/lib/ops-guard';
 import { logger } from '@/lib/utils/logger';
 
@@ -31,7 +31,7 @@ interface StatusData {
 
 async function getOpsStatus(): Promise<StatusData | null> {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) return null;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import sharp from 'sharp';
 import { logger } from '@/lib/utils/logger';
 
@@ -132,7 +132,7 @@ async function generateOGPImage(options: OGPGenerationOptions): Promise<Buffer> 
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = await supabaseServer();
+    const supabaseBrowser = await createClient();
     
     // ユーザー認証確認
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();

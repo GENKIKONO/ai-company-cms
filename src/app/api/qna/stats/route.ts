@@ -2,15 +2,15 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { QAStatsAction } from '@/types/database';
 import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
     // Use service role client for stats insertion to allow anonymous users
-    const serviceSupabase = createClient(
+    const serviceSupabase = createSupabaseClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     );
     
     // Also get regular client for user authentication check (optional)
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // リクエストボディの解析
     const body = await request.json();
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者権限チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();

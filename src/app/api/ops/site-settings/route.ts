@@ -7,7 +7,7 @@
  * - RLSとmanual認証の二重チェック
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { env } from '@/lib/env';
 import { z } from 'zod';
 import { logger } from '@/lib/utils/logger';
@@ -35,7 +35,7 @@ const siteSettingsSchema = z.object({
 // GET - 現在のサイト設定を取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
 // POST/PUT - サイト設定を作成・更新
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -223,7 +223,7 @@ export const PUT = POST;
 // DELETE - サイト設定をリセット（デフォルトに戻す）
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();

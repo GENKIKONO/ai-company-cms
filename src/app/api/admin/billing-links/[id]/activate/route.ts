@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import { requireAdminPermission } from '@/lib/auth/server';
 
@@ -13,7 +13,7 @@ export async function PUT(
     // 管理者権限チェック
     await requireAdminPermission();
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const resolvedParams = await params;
     const linkId = resolvedParams.id;
 

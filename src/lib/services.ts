@@ -1,4 +1,4 @@
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { type Service, type ServiceFormData } from '@/types/database';
 
 export interface GetServicesOptions {

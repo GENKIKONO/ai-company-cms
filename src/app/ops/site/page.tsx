@@ -3,7 +3,7 @@
  * パス: /ops/site
  */
 import { redirect } from 'next/navigation';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from "@/lib/supabase/server"
 import { env } from '@/lib/env';
 import SiteSettingsForm from './SiteSettingsForm';
 import { logger } from '@/lib/utils/logger';
@@ -14,7 +14,7 @@ function isAdmin(userEmail?: string): boolean {
 }
 
 export default async function SiteSettingsPage() {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
   
   // 認証確認
   const { data: { user }, error } = await supabase.auth.getUser();

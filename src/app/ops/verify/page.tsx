@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from "@/lib/supabase/server"
 import { requireOpsAdminPage, getOpsAdminStatus } from '@/lib/ops-guard';
 import { logger } from '@/lib/utils/logger';
 
@@ -12,7 +12,7 @@ export default async function OpsVerifyPage() {
   
   // 管理者状態の詳細情報を取得
   const opsStatus = await getOpsAdminStatus();
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   return (

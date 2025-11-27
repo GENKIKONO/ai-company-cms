@@ -3,7 +3,7 @@
  * AI Botのアクセスをデータベースに記録
  */
 
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { extractBotInfoFromHeaders, extractClientIP, shouldLogBot } from './ai-bot-detector';
 import { logger } from '@/lib/log';
 
@@ -75,7 +75,7 @@ export async function logAIBotAccess(
 async function insertBotLog(entry: BotLogEntry): Promise<void> {
   logger.info('💾 [AI Bot Logger] Inserting bot log entry:', { data: entry });
   
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('ai_bot_logs')
@@ -111,7 +111,7 @@ export async function ensureContentUnit(
   jsonldId?: string
 ): Promise<string | null> {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 既存のContent Unitを検索
     const { data: existing, error: selectError } = await supabase

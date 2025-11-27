@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from "@/lib/supabase/server"
 import I18nHomePage from './I18nHomePage';
 
 // 認証状態を毎回評価するため動的SSRに設定
@@ -34,7 +34,7 @@ export default async function HomePage() {
   let siteSettings = defaultSettings;
   
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { data, error } = await supabase
       .from('site_settings')
       .select('*')

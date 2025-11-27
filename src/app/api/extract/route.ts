@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { JSDOM } from 'jsdom';
 import { logger } from '@/lib/utils/logger';
 
@@ -101,7 +101,7 @@ async function extractFromPDF(buffer: Buffer): Promise<ExtractionResult> {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = await supabaseServer();
+    const supabaseBrowser = await createClient();
     
     // ユーザー認証確認
     const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();

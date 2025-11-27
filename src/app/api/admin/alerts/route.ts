@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import { z } from 'zod';
 import type { Alert, AlertRule, MonitoringFilters, CreateAlertRuleRequest } from '@/lib/monitoring/types';
@@ -27,7 +27,7 @@ const alertRuleSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -206,7 +206,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     

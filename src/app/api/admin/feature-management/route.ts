@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 import { FeatureManagementGetResponse, FeatureManagementUpdateRequest, FeatureManagementUpdateResponse } from '@/types/feature-management';
@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 // GET - 機能レジストリとプラン設定を取得
 export async function GET() {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック（テスト用に一時無効化）
     // const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -71,7 +71,7 @@ export async function GET() {
 // POST - プラン機能設定を一括更新
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック（テスト用に一時無効化）
     // const { data: authData, error: authError } = await supabase.auth.getUser();

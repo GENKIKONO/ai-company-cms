@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
 
 interface ConsentRecord {

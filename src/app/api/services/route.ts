@@ -3,7 +3,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
@@ -29,7 +29,7 @@ function generateServiceSlug(name: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // ユーザー認証
     const { data: { user }, error: authError } = await supabase.auth.getUser();

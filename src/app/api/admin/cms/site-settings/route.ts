@@ -1,12 +1,12 @@
 // CMS サイト設定 API
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 // サイト設定一覧取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
 // サイト設定更新・作成
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
 // サイト設定削除
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 
@@ -47,7 +47,7 @@ interface BotLogsResponse {
 // GET - AI Bot ログ一覧取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック（テスト用に一時無効化）
     // TODO: 本格運用時は有効化

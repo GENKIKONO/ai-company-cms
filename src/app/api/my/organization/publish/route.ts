@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { handleApiError, validationError, notFoundError } from '@/lib/api/error-responses';
 import { logger } from '@/lib/utils/logger';
 
@@ -57,7 +57,7 @@ export async function PUT(request: NextRequest) {
     logger.debug('[my/organization/publish] PUT handler start');
     
     // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 認証ユーザー取得（Cookieベース）
     const {

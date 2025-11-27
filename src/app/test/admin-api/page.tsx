@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabaseBrowser } from '@/lib/supabase-browser';
+import { supabaseBrowser } from '@/lib/supabase/client';
 
 interface ApiTestResult {
   endpoint: string;

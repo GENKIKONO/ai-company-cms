@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 公開サービスを取得（実テーブル基準 - 存在するカラムのみ）
     const { data: services, error, count } = await supabase

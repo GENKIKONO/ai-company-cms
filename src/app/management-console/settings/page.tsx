@@ -5,14 +5,14 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { supabaseBrowser } from '@/lib/supabase-browser';
+import { createClient } from '@/lib/supabase/client';
 import { useSuccessToast, useErrorToast } from '@/components/ui/toast';
 
 const BUCKET = 'public-settings';
 const KEY = 'hero_image_url';
 
 export default function AdminSettingsPage() {
-  const supabase = supabaseBrowser();
+  const supabase = createClient();
   const [url, setUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const successToast = useSuccessToast();

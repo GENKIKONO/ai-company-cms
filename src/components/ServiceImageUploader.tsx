@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import Image from 'next/image';
 import { logger } from '@/lib/utils/logger';
 

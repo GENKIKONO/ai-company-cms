@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { logger } from '@/lib/utils/logger';
 
@@ -14,7 +14,7 @@ const changePasswordSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 認証状態確認
     const { data: { user }, error: authError } = await supabase.auth.getUser();

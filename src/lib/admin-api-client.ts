@@ -1,6 +1,6 @@
 'use client';
 
-import { supabaseBrowser } from '@/lib/supabase-browser';
+import { supabaseBrowser } from '@/lib/supabase/client';
 
 interface AdminApiResponse<T = any> {
   success: boolean;

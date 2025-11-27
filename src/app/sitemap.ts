@@ -1,9 +1,9 @@
 import { MetadataRoute } from 'next'
-import { supabaseServer } from '@/lib/supabase-server'
+import { createClient } from '@/lib/supabase/server'
 
 import { logger } from '@/lib/log';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabaseBrowser = await supabaseServer()
+  const supabase = await createClient()
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001'
   
   // Generate basic pages
@@ -42,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     // 公開企業の動的ページ
-    const { data: organizations } = await supabaseBrowser
+    const { data: organizations } = await supabase
       .from('organizations')
       .select('slug, updated_at')
       .eq('status', 'published')

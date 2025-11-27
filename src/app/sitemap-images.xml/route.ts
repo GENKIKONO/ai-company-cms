@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 interface ImageSitemapItem {
@@ -19,7 +19,7 @@ interface ImageSitemapItem {
 
 export async function GET() {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
     const items: ImageSitemapItem[] = [];
 

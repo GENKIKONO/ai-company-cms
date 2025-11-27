@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
 import { useToast } from '@/hooks/use-toast';
 

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 
@@ -47,7 +47,7 @@ interface VisibilityResponse {
 // GET - AI Visibility Score 取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック（テスト用に一時無効化）
     // TODO: 本格運用時は有効化 + Pro以上プラン制限
@@ -202,7 +202,7 @@ export async function GET(request: NextRequest) {
 // HEAD - メタデータのみ取得（パフォーマンス確認用）
 export async function HEAD(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const orgId = searchParams.get('organization_id') || searchParams.get('org_id');
 

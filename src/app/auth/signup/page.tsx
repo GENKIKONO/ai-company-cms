@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { BackLink } from '@/components/ui/back-link';
 // Dynamic import to avoid SSR issues
 // import { getAppUrl } from '@/lib/utils/env';

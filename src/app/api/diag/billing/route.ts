@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { PLAN_LIMITS } from '@/config/plans';
 
 export const runtime = 'nodejs';
@@ -70,7 +70,7 @@ export async function GET() {
 
     // 3. Database Schema Check
     try {
-      const supabase = await supabaseServer();
+      const supabase = await createClient();
       
       // Check if organizations table has Stripe columns
       const { data: orgColumns, error: orgError } = await supabase

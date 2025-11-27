@@ -1,6 +1,6 @@
 'use client';
 
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { type CaseStudy, type CaseStudyFormData } from '@/types/database';
 import { logger } from '@/lib/utils/logger';
 

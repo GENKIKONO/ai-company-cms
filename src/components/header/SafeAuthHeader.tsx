@@ -14,8 +14,8 @@ export default async function SafeAuthHeader() {
     let hasOrganization = false;
     if (isAuthenticated) {
       try {
-        const { supabaseServer } = await import('@/lib/supabase-server');
-        const supabase = await supabaseServer();
+        const { createClient } = await import('@/lib/supabase/server');
+        const supabase = await createClient();
         const { data: orgData } = await supabase
           .from('organizations')
           .select('id')

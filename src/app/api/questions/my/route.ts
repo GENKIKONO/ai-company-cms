@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import type { QuestionWithDetails } from '@/types/database';
 import { logger } from '@/lib/utils/logger';
 
 // GET: 現在のユーザーが投稿した質問一覧
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // ユーザー認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();

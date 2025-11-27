@@ -3,7 +3,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import fs from 'fs';
 import path from 'path';
 
@@ -127,7 +127,7 @@ function checkEnvironmentVariables(): EnvCheckResult {
 
 async function checkSupabaseConnection(): Promise<HealthCheckResult> {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 最小限のクエリ（select 1相当）
     const { data, error } = await supabase
@@ -158,7 +158,7 @@ async function checkSupabaseConnection(): Promise<HealthCheckResult> {
 
 async function checkAuthSystem(): Promise<HealthCheckResult> {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // getUser()の実行可否をチェック（未ログインでもOK）
     const { data: { user }, error } = await supabase.auth.getUser();

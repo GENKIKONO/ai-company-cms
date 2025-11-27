@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { id } = await params;
     
     // 認証チェック

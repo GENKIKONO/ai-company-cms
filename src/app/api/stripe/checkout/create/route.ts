@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserAdmin } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { stripe } from '@/lib/stripe';
 import { logger } from '@/lib/utils/logger';
 
@@ -15,7 +15,7 @@ interface CheckoutRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = supabaseBrowserAdmin();
+    const supabase = supabaseAdmin;
     
     // Note: In production, implement proper auth validation
     // For now, we'll proceed with the implementation

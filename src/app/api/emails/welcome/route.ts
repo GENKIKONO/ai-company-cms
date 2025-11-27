@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserAdmin } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { sendWelcomeEmail } from '@/lib/emails';
 import { logger } from '@/lib/utils/logger';
 
@@ -26,9 +26,9 @@ export async function POST(request: NextRequest) {
     }
 
     // メール送信ログをデータベースに記録（任意）
-    const supabaseBrowser = supabaseBrowserAdmin();
+    const supabase = supabaseAdmin;
     try {
-      await supabaseBrowser
+      await supabase
         .from('email_logs')
         .insert({
           email,

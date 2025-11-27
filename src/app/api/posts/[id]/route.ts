@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { logger } from '@/lib/utils/logger';
 
 // Normalize empty strings to null for optional fields
@@ -32,7 +32,7 @@ export async function GET(
     const resolvedParams = await params;
     const postId = resolvedParams.id;
 
-    const supabase = supabaseAdmin();
+    const supabase = supabaseAdmin;
     const { data, error } = await supabase
       .from('posts')
       .select(`
@@ -111,7 +111,7 @@ export async function PUT(
 
     const updateData = normalizedUpdateData;
 
-    const supabase = supabaseAdmin();
+    const supabase = supabaseAdmin;
     const { data, error } = await supabase
       .from('posts')
       .update(updateData)
@@ -166,7 +166,7 @@ export async function DELETE(
     const resolvedParams = await params;
     const postId = resolvedParams.id;
 
-    const supabase = supabaseAdmin();
+    const supabase = supabaseAdmin;
     
     // First verify the post exists
     const { data: post, error: checkError } = await supabase

@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCmsData } from '@/hooks/useCmsData';
-import { supabaseBrowser } from '@/lib/supabase-browser';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -75,7 +75,7 @@ export default function CMSAdminPage() {
   // 組織ID取得
   useEffect(() => {
     const getOrganizationId = async () => {
-      const supabase = supabaseBrowser();
+      const supabase = supabaseBrowser;
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {

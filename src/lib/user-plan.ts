@@ -4,7 +4,7 @@
  * ✅ FIXED: Replaces hardcoded 'free' plan checks with actual database lookups
  */
 
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import type { PlanType } from '@/config/plans';
 import { logger } from '@/lib/log';
 
@@ -23,7 +23,7 @@ export interface UserPlanInfo {
  */
 export async function getUserPlan(): Promise<UserPlanInfo> {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser();

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const now = new Date().toISOString();
 
     // 1) 期間指定ありでかつ現在時刻で有効なアクティブリンクを検索

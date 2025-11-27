@@ -1,6 +1,6 @@
 'use client';
 
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { vLog, logger } from '@/lib/utils/logger';
 import { type Organization, type OrganizationFormData, type OrganizationWithOwner } from '@/types/database';
 

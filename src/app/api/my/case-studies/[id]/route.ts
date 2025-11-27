@@ -1,7 +1,7 @@
 // Single-Org Mode API: /api/my/case-studies/[id]
 // 個別事例の更新・削除API
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import type { CaseStudyFormData } from '@/types/database';
 import { normalizeCaseStudyPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 
@@ -30,7 +30,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
@@ -88,7 +88,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
@@ -176,7 +176,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {

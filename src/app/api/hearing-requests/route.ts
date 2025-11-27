@@ -10,7 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
@@ -40,7 +40,7 @@ const hearingRequestSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Supabaseクライアント初期化
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Supabaseクライアント初期化
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();

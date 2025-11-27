@@ -3,7 +3,7 @@
  * Phase 4: Complete Type Safety Implementation
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
 import type { 
   SupabaseDatabase, 
   TableRow, 

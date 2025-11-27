@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
@@ -120,8 +121,8 @@ async function validateEnvironmentVariables() {
 
 async function validateDatabaseConnection() {
   try {
-    const { supabaseServer } = await import('@/lib/supabase-server');
-    const supabase = await supabaseServer();
+    const { createClient: createServerClient } = await import('@/lib/supabase/server');
+    const supabase = await createServerClient();
     
     // 基本接続テスト
     const { data, error } = await supabase

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserAdmin } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { stripe, getAIOHubProducts, createStripeCustomer } from '@/lib/stripe';
 import { logger } from '@/lib/utils/logger';
 import {
@@ -34,10 +34,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabaseBrowser = supabaseBrowserAdmin();
+    const supabase = supabaseAdmin;
 
     // 組織情報を取得
-    const { data: organization, error: orgError } = await supabaseBrowser
+    const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('id, name, owner_user_id, email, status')
       .eq('id', organizationId)
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 既存のサブスクリプションがないかチェック
-    const { data: existingSubscription } = await supabaseBrowser
+    const { data: existingSubscription } = await supabase
       .from('subscriptions')
       .select('id, status')
       .eq('organization_id', organizationId)
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     // Stripe顧客を作成または取得
     let customerId: string;
     
-    const { data: existingCustomer } = await supabaseBrowser
+    const { data: existingCustomer } = await supabase
       .from('stripe_customers')
       .select('stripe_customer_id')
       .eq('organization_id', organizationId)
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       customerId = customer.id;
 
       // 顧客情報をデータベースに保存
-      await supabaseBrowser
+      await supabase
         .from('stripe_customers')
         .insert({
           organization_id: organizationId,

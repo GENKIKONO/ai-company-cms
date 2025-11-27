@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { ChangePasswordForm } from '@/components/auth/ChangePasswordForm';
 import { GhostwriterInput } from '@/components/cms/GhostwriterInput';
 import { SiteSettingsForm } from '@/components/admin/SiteSettingsForm';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 
 export default function SettingsPage() {
   const [organizationId, setOrganizationId] = useState<string>('');

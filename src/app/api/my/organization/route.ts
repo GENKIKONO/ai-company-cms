@@ -30,7 +30,7 @@ import {
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
 import { normalizePayload, normalizeDateFields, normalizeForInsert, findEmptyDateFields } from '@/lib/utils/payload-normalizer';
 import { buildOrgInsert } from '@/lib/utils/org-whitelist';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/log';
 
 // デバッグモード判定関数
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     logger.debug('[my/organization] GET handler start');
     
     // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 認証ユーザー取得（Cookieベース）
     const {
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
     logger.debug('[my/organization] POST handler start');
     
     // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 認証ユーザー取得（Cookieベース）
     const {
@@ -640,7 +640,7 @@ export async function PUT(request: NextRequest) {
   const transaction: any = null;
   try {
     // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 認証ユーザー取得（Cookieベース）
     const {
@@ -849,7 +849,7 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 認証ユーザー取得（Cookieベース）
     const {

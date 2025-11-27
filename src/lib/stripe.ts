@@ -1,7 +1,7 @@
 // Stripe configuration for subscription implementation
 import { loadStripe } from '@stripe/stripe-js';
 import Stripe from 'stripe';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import type { Organization } from '@/types/database';
 import { UNIFIED_PRICES, UNIFIED_PLAN_CONFIG } from '@/config/unified-plans';
@@ -329,7 +329,7 @@ export async function getOrCreateCustomer(organization: Organization): Promise<s
     });
 
     // Update organization with new customer ID
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { error } = await supabase
       .from('organizations')
       .update({ stripe_customer_id: customer.id })
@@ -438,7 +438,7 @@ export async function updateSubscriptionInDB(subscriptionId: string) {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
     const customerId = subscription.customer as string;
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Find organization by customer ID
     const { data: org, error: fetchError } = await supabase

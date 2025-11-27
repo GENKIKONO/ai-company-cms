@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { PLAN_LIMITS, PlanType, getMaterialLimitMessage } from '@/config/plans';
 import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 // GET - ユーザー企業の営業資料一覧を取得
 export async function GET() {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -60,7 +60,7 @@ export async function GET() {
 // POST - 新しい営業資料を作成（プラン制限チェック）
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();

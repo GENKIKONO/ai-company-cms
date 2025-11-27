@@ -1,6 +1,6 @@
 // Single-Org Mode API: /api/my/case-studies
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import type { CaseStudy, CaseStudyFormData } from '@/types/database';
 import { PLAN_LIMITS } from '@/config/plans';
 import { normalizeCaseStudyPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
 // GET - ユーザー企業の事例一覧を取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
 // POST - 新しい事例を作成
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {

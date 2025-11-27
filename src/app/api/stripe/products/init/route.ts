@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { createAIOHubProducts, getAIOHubProducts } from '@/lib/stripe';
 import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseBrowser = await supabaseServer();
+    const supabase = await createClient();
 
     // 管理者権限チェック
-    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: appUser, error: userError } = await supabaseBrowser
+    const { data: appUser, error: userError } = await supabase
       .from('app_users')
       .select('role')
       .eq('id', user.id)
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { error: insertError } = await supabaseBrowser
+    const { error: insertError } = await supabase
       .from('stripe_products')
       .upsert(productsToSave, {
         onConflict: 'stripe_product_id'

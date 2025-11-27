@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 
@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 // GET - 組織別オーバーライド一覧取得（現在は空実装）
 export async function GET() {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -39,7 +39,7 @@ export async function GET() {
 // POST - 組織別オーバーライド作成/更新（現在は空実装）
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック
     const { data: authData, error: authError } = await supabase.auth.getUser();

@@ -4,7 +4,7 @@ import { useI18n } from '@/components/layout/I18nProvider';
 import Link from 'next/link';
 import { User } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { auth } from '@/lib/auth';
 import { logger } from '@/lib/utils/logger';
 

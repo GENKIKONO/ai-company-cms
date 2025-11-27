@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { apiLogger } from '@/lib/utils/logger';
 import type { QuestionFormData, QuestionWithDetails } from '@/types/database';
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const url = new URL(request.url);
     
     // パラメータ取得
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
 // POST: 新規質問の投稿（認証済みユーザーのみ）
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // ユーザー認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { apiLogger } from '@/lib/utils/logger';
 import type { QuestionAnswerData, QuestionWithDetails } from '@/types/database';
@@ -13,7 +13,7 @@ interface RouteParams {
 // GET: 特定の質問を取得
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const resolvedParams = await params;
     const questionId = resolvedParams.id;
 
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PUT: 質問の回答・ステータス更新（管理者・企業担当者のみ）
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const resolvedParams = await params;
     const questionId = resolvedParams.id;
 
@@ -253,7 +253,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const resolvedParams = await params;
     const questionId = resolvedParams.id;
 

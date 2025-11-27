@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { updateLastCheck } from '@/lib/ai-visibility-config';
 import { logger } from '@/lib/log';
@@ -31,10 +30,7 @@ function translateIssue(issue: string): string {
 // AI Visibility Monitoring System
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = supabaseAdmin;
     
     // Check authentication (admin only)
     const authHeader = request.headers.get('authorization');

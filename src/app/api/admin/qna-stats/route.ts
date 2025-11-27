@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import { NextRequest } from 'next/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import { 
   createErrorResponse,
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       return createErrorResponse(authResult.error || 'Unauthorized', 401);
     }
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const url = new URL(request.url);
     
     // パラメータ取得

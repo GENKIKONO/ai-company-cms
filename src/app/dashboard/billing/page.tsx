@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase-client';
+import { createClient } from '@/lib/supabase/client';
 import { PLAN_LIMITS } from '@/config/plans';
 import type { Organization } from '@/types/database';
 import { HIGButton } from '@/design-system';

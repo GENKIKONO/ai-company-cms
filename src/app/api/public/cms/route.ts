@@ -1,12 +1,12 @@
 // 公開CMS データ取得API（認証不要）
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 // 公開CMS データ取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const url = new URL(request.url);
     
     const page = url.searchParams.get('page') || 'homepage';

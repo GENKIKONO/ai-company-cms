@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { stripe, verifyWebhookSignature, updateSubscriptionInDB } from '@/lib/stripe';
-import { supabaseBrowserAdmin } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { SentryUtils } from '@/lib/utils/sentry-utils';
 import { sendPaymentFailedEmail } from '@/lib/emails';
 import { logger } from '@/lib/utils/logger';
@@ -17,7 +17,7 @@ interface WebhookProcessingResult {
 }
 
 async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessingResult> {
-  const supabase = supabaseBrowserAdmin();
+  const supabase = supabaseAdmin;
   const startTime = Date.now();
 
   return SentryUtils.withTransaction(
@@ -191,7 +191,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<WebhookProcessi
 
 async function handleSubscriptionChange(subscription: Stripe.Subscription): Promise<boolean> {
   try {
-    const supabase = supabaseBrowserAdmin();
+    const supabase = supabaseAdmin;
     const organizationId = subscription.metadata.organization_id;
 
     if (!organizationId) {
@@ -298,7 +298,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription): Prom
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Promise<boolean> {
   try {
-    const supabase = supabaseBrowserAdmin();
+    const supabase = supabaseAdmin;
     const organizationId = subscription.metadata.organization_id;
 
     if (!organizationId) {
@@ -379,7 +379,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
   try {
     logger.debug(`Payment failed for invoice ${invoice.id}`);
     
-    const supabase = supabaseBrowserAdmin();
+    const supabase = supabaseAdmin;
     
     // 顧客からorganization_idを取得
     if (typeof invoice.customer === 'string') {
@@ -429,7 +429,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
 
 async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session): Promise<boolean> {
   try {
-    const supabase = supabaseBrowserAdmin();
+    const supabase = supabaseAdmin;
     const organizationId = session.metadata?.organization_id;
     const setupFeeAmount = parseInt(session.metadata?.setup_fee_amount || '0');
     const planType = session.metadata?.plan_type;

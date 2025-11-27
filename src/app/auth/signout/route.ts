@@ -7,7 +7,7 @@
  * - ホームページへ303リダイレクト
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Supabaseセッション終了
     const { error } = await supabase.auth.signOut();
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 // GETアクセス時もサインアウト処理を実行（ユーザビリティ向上）
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Supabaseセッション終了
     const { error } = await supabase.auth.signOut();

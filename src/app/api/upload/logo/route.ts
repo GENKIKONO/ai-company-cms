@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/utils/logger';
 
 // Organization logo upload API with Service Role bypass (fixed auth)
 export async function POST(request: NextRequest) {
   try {
     // 認証チェック (Server-side)
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     const fileName = `${organizationId}/logo${fileExtension}`;
 
     // Service Role権限でストレージアップロード
-    const serviceSupabase = createClient(
+    const serviceSupabase = createSupabaseClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       {

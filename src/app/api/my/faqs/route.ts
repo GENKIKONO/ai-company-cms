@@ -1,7 +1,7 @@
 // Single-Org Mode API: /api/my/faqs
 // ユーザーの企業のFAQを管理するためのAPI
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import type { FAQ, FAQFormData } from '@/types/database';
 import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { PLAN_LIMITS } from '@/config/plans';
@@ -28,7 +28,7 @@ export const dynamic = 'force-dynamic';
 // GET - ユーザー企業のFAQ一覧を取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
 // POST - 新しいFAQを作成
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {

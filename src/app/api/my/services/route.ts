@@ -2,13 +2,13 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/log';
 
 // GET - ユーザーのサービスを取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
 // POST - Create a new service
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Authentication check
     const { data: { user }, error: authError } = await supabase.auth.getUser();

@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import type { ReviewAuditWithDetails } from '@/lib/types/review';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Check authentication and admin role
     const { data: { user }, error: authError } = await supabase.auth.getUser();

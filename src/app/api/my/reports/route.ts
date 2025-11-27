@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import type { MonthlyReport } from '@/types/database';
 
 // Get monthly reports for authenticated organization
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Get authenticated user and organization
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
 // Generate a new monthly report on-demand (for current or previous months only)
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Get authenticated user and organization
     const { data: { user }, error: authError } = await supabase.auth.getUser();

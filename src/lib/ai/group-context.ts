@@ -5,7 +5,7 @@
  * for AI operations that need to understand organizational relationships.
  */
 
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/log';
 
 export interface OrganizationContext {
@@ -41,7 +41,7 @@ export interface AIGroupScope {
  */
 export async function getAIGroupScope(userId: string): Promise<AIGroupScope | null> {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // Get user's organization
     const { data: userOrg, error: userOrgError } = await supabase
@@ -214,7 +214,7 @@ export async function getAIGroupScope(userId: string): Promise<AIGroupScope | nu
  */
 export async function getGroupOrganizations(groupId: string): Promise<OrganizationContext[]> {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     const { data: members, error } = await supabase
       .from('org_group_members')
@@ -320,7 +320,7 @@ export async function getAccessibleOrganizations(
       ...scope.sibling_orgs.map(org => org.id)
     ]);
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const filteredIds = organizationIds.filter(id => accessibleIds.has(id));
     

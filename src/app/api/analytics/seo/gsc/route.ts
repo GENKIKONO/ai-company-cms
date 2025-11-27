@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 import { createGSCClient, transformGSCMetrics } from '@/lib/gsc-client';
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
   const collectionId = generateErrorId('gsc-collection');
 
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Business以上プラン制限チェック（テスト用に一時無効化）
     // TODO: 本格運用時は有効化

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseBrowserAdmin } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { stripe } from '@/lib/stripe';
 import { logger } from '@/lib/utils/logger';
 import {
@@ -34,10 +34,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabaseBrowser = supabaseBrowserAdmin();
+    const supabase = supabaseAdmin;
 
     // 組織の所有者かチェック
-    const { data: organization, error: orgError } = await supabaseBrowser
+    const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('id, name, created_by')
       .eq('id', organizationId)
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Stripeカスタマー情報を取得
-    const { data: stripeCustomer, error: customerError } = await supabaseBrowser
+    const { data: stripeCustomer, error: customerError } = await supabase
       .from('stripe_customers')
       .select('stripe_customer_id')
       .eq('organization_id', organizationId)

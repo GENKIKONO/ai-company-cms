@@ -2,7 +2,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/log';
 import { z } from 'zod';
 import { withOrgAuth } from '@/lib/auth/org-middleware';
@@ -35,7 +35,7 @@ export async function PUT(
   const postId = resolvedParams.id;
   
   return withOrgAuth(request, async ({ orgId, userId }) => {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 既存の投稿を取得（組織との関連性もチェック）
     const { data: existingPost, error: postError } = await supabase
@@ -200,7 +200,7 @@ export async function DELETE(
   const postId = resolvedParams.id;
   
   return withOrgAuth(request, async ({ orgId, userId }) => {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // 投稿の存在確認（組織との関連性もチェック）
     const { data: post, error: postError } = await supabase

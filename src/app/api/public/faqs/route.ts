@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     let query = supabase
       .from('faqs')

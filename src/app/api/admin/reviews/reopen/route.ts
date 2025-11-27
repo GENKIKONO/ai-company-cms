@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import { z } from 'zod';
 import type { ReopenRequest } from '@/lib/types/review';
@@ -15,7 +15,7 @@ const reopenSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Check authentication and admin role
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
 // GET endpoint to check if an organization can be reopened
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // Check authentication and admin role
     const { data: { user }, error: authError } = await supabase.auth.getUser();

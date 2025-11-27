@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { createError, errorToResponse } from '@/lib/error-handler';
 import crypto from 'crypto';
 import { logger } from '@/lib/log';
@@ -29,7 +29,7 @@ export async function GET(
       throw createError.validation('Organization slug and post ID are required', { slug, postId });
     }
 
-    const supabase = supabaseAdmin();
+    const supabase = supabaseAdmin;
 
     // If preview mode, check authentication first
     let allowDraftAccess = false;
@@ -179,7 +179,7 @@ export async function HEAD(
   try {
     const resolvedParams = await params;
     const { slug, postId } = resolvedParams;
-    const supabase = supabaseAdmin();
+    const supabase = supabaseAdmin;
 
     const { data: post, error } = await supabase
       .from('posts')

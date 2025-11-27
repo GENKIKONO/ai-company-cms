@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { QACategoryFormData } from '@/types/database';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
   const { id } = await params;
   
   try {
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
   const { id } = await params;
   
   try {
@@ -135,7 +135,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
   const { id } = await params;
   
   try {

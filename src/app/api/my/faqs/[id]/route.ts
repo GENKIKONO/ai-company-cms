@@ -1,7 +1,7 @@
 // Single-Org Mode API: /api/my/faqs/[id]
 // 個別FAQの更新・削除API
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import type { FAQFormData } from '@/types/database';
 import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 
@@ -30,7 +30,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
@@ -75,7 +75,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
@@ -138,7 +138,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {

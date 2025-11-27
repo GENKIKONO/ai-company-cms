@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HIGButton } from '@/design-system';
-import supabaseClient from '@/lib/supabase-client';
+import supabaseClient from '@/lib/supabase/client';
 import type { FAQ } from '@/types/database';
 import { logger } from '@/lib/utils/logger';
 

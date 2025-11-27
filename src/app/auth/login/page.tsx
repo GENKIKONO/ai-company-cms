@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from "@/lib/supabase/server"
 import LoginForm from './LoginForm';
 import { logger } from '@/lib/utils/logger';
 
@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   
   // SSRでセッション確認
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     // ログイン済みなら /dashboard に redirect

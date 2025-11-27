@@ -3,7 +3,7 @@
  * 14日間無料トライアル機能の管理
  */
 
-import { createClient } from '@/lib/supabase-client';
+import { createClient } from '@/lib/supabase/client';
 import type { Organization } from '@/types/database';
 import { logger } from '@/lib/log';
 
@@ -20,7 +20,7 @@ export interface TrialStatus {
  */
 export async function startTrial(organizationId: string): Promise<boolean> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const trialEndDate = new Date();
     trialEndDate.setDate(trialEndDate.getDate() + 14);
 
@@ -76,7 +76,7 @@ export function getTrialStatus(organization: Organization): TrialStatus {
  */
 export async function transitionToStarter(organizationId: string): Promise<boolean> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { error } = await supabase
       .from('organizations')
@@ -99,7 +99,7 @@ export async function transitionToStarter(organizationId: string): Promise<boole
  */
 export async function checkAndTransitionExpiredTrials(): Promise<number> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const now = new Date().toISOString();
 
     // 期限切れのトライアル組織を取得

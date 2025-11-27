@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/log';
 import type { User } from '@supabase/supabase-js';
 
@@ -24,7 +24,7 @@ export async function withOrgAuth(
   handler: (context: OrgAuthContext) => Promise<NextResponse>
 ): Promise<NextResponse> {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();

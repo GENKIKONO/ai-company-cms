@@ -1,6 +1,6 @@
 'use client';
 
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { createClient } from '@/lib/supabase/client';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { type AppUser, type UserRole } from '@/types/database';
 import type { DatabaseResult, TableRow, TableUpdate } from '@/types/database.types';
@@ -56,12 +56,13 @@ export function hasPermission(userRole: UserRole, requiredRole: UserRole): boole
 // 現在のユーザー情報を取得
 export async function getCurrentUser(): Promise<AppUser | null> {
   try {
-    const { data: { user } } = await supabaseBrowser.auth.getUser()
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) return null
 
     // migrated from users → app_users → profiles
-    const { data: profile, error } = await supabaseBrowser
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('id, full_name, avatar_url, created_at')
       .eq('id', user.id)
@@ -97,7 +98,8 @@ export async function getCurrentUser(): Promise<AppUser | null> {
 export const auth = {
   // サインアップ
   signUp: async (email: string, password: string, fullName?: string) => {
-    const { data, error } = await supabaseBrowser.auth.signUp({
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -117,7 +119,8 @@ export const auth = {
 
   // サインイン
   signIn: async (email: string, password: string) => {
-    const { data, error } = await supabaseBrowser.auth.signInWithPassword({
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -128,7 +131,8 @@ export const auth = {
 
   // Googleサインイン
   signInWithGoogle: async () => {
-    const { data, error } = await supabaseBrowser.auth.signInWithOAuth({
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
@@ -145,7 +149,8 @@ export const auth = {
       logger.info('Starting complete sign out process');
       
       // 1. Supabase クライアント サインアウト
-      const { error: signOutError } = await supabaseBrowser.auth.signOut();
+      const supabase = await createClient();
+      const { error: signOutError } = await supabase.auth.signOut();
       if (signOutError) {
         authLogger.error('Supabase signOut', signOutError);
       }
@@ -188,7 +193,8 @@ export const auth = {
 
   // パスワードリセット
   resetPassword: async (email: string) => {
-    const { data, error } = await supabaseBrowser.auth.resetPasswordForEmail(email, {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
     });
 
@@ -198,13 +204,15 @@ export const auth = {
 
   // 現在のユーザー取得
   getCurrentUser: async (): Promise<User | null> => {
-    const { data: { user } } = await supabaseBrowser.auth.getUser();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     return user;
   },
 
   // プロフィール更新
   updateProfile: async (updates: Partial<AppUser>) => {
-    const { data: { user } } = await supabaseBrowser.auth.getUser()
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) throw new Error('Not authenticated')
 
@@ -214,7 +222,7 @@ export const auth = {
     if (updates.full_name !== undefined) profileUpdates.full_name = updates.full_name;
     if (updates.avatar_url !== undefined) profileUpdates.avatar_url = updates.avatar_url;
 
-    const { error } = await supabaseBrowser
+    const { error } = await supabase
       .from('profiles')
       .update(profileUpdates)
       .eq('id', user.id)
@@ -223,8 +231,9 @@ export const auth = {
   },
 
   // 認証状態の監視
-  onAuthStateChange: (callback: AuthCallback) => {
-    return supabaseBrowser.auth.onAuthStateChange(callback);
+  onAuthStateChange: async (callback: AuthCallback) => {
+    const supabase = await createClient();
+    return supabase.auth.onAuthStateChange(callback);
   },
 };
 
@@ -233,7 +242,8 @@ export const profile = {
   // プロフィール取得
   get: async (userId: string): Promise<AppUser | null> => {
     // migrated from users → app_users → profiles
-    const { data: profile, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('id, full_name, avatar_url, created_at')
       .eq('id', userId)
@@ -246,7 +256,7 @@ export const profile = {
     if (!profile) return null; // レコードが見つからない
 
     // Get email from auth.users since it's not in profiles
-    const { data: { user } } = await supabaseBrowser.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     const email = user?.id === userId ? user.email || '' : ''; // Only return email if it's current user
     
     return {
@@ -268,7 +278,8 @@ export const profile = {
     if (updates.full_name !== undefined) profileUpdates.full_name = updates.full_name;
     if (updates.avatar_url !== undefined) profileUpdates.avatar_url = updates.avatar_url;
 
-    const { data, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('profiles')
       .update(profileUpdates)
       .eq('id', userId)
@@ -284,7 +295,8 @@ export const profile = {
 export const savedSearches = {
   // 検索条件一覧取得
   list: async (userId: string) => {
-    const { data, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('user_saved_searches')
       .select('*')
       .eq('user_id', userId)
@@ -296,7 +308,8 @@ export const savedSearches = {
 
   // 検索条件保存
   save: async (userId: string, name: string, searchParams: SearchParams) => {
-    const { data, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('user_saved_searches')
       .insert({
         user_id: userId,
@@ -312,7 +325,8 @@ export const savedSearches = {
 
   // 検索条件更新
   update: async (id: string, updates: SavedSearchUpdates) => {
-    const { data, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('user_saved_searches')
       .update({
         ...updates,
@@ -328,7 +342,8 @@ export const savedSearches = {
 
   // 検索条件削除
   delete: async (id: string) => {
-    const { error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { error } = await supabase
       .from('user_saved_searches')
       .delete()
       .eq('id', id);
@@ -341,7 +356,8 @@ export const savedSearches = {
 export const favorites = {
   // お気に入り一覧取得
   list: async (userId: string) => {
-    const { data, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('user_favorites')
       .select(`
         *,
@@ -356,7 +372,8 @@ export const favorites = {
 
   // お気に入りに追加
   add: async (userId: string, organizationId: string) => {
-    const { data, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('user_favorites')
       .insert({
         user_id: userId,
@@ -371,7 +388,8 @@ export const favorites = {
 
   // お気に入りから削除
   remove: async (userId: string, organizationId: string) => {
-    const { error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { error } = await supabase
       .from('user_favorites')
       .delete()
       .eq('user_id', userId)
@@ -382,7 +400,8 @@ export const favorites = {
 
   // お気に入り状態確認
   check: async (userId: string, organizationId: string) => {
-    const { data, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('user_favorites')
       .select('id')
       .eq('user_id', userId)
@@ -398,7 +417,8 @@ export const favorites = {
 export const preferences = {
   // 設定取得
   get: async (userId: string) => {
-    const { data, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('user_preferences')
       .select('*')
       .eq('user_id', userId)
@@ -410,7 +430,8 @@ export const preferences = {
 
   // 設定更新
   update: async (userId: string, preferences: UserPreferences) => {
-    const { data, error } = await supabaseBrowser
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('user_preferences')
       .upsert({
         user_id: userId,

@@ -1,6 +1,6 @@
 // Server Component: 認証状態を毎回SSRで評価するヘッダー
 import Link from 'next/link';
-import { supabaseServer } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabase/server';
 import SignOutButton from './SignOutButton';
 
 interface AuthHeaderProps {

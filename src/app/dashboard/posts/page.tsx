@@ -6,7 +6,7 @@ import type { Post } from '@/types/database';
 import { HIGButton } from '@/design-system';
 import PublicPageLinks from '../components/PublicPageLinks';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
 
 export default function PostsManagementPage() {

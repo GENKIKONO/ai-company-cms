@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import { requireAdminPermission, getServerUser } from '@/lib/auth/server';
 
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     // 管理者権限チェック
     await requireAdminPermission();
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     // リンク一覧を取得
     const { data, error } = await supabase
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
 
     const body = await request.json();
     const { label, plan_type, stripe_price_id, stripe_checkout_url, discount_rate, campaign_type, start_at, end_at, is_public } = body;

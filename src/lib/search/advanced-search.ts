@@ -3,7 +3,7 @@
  * 複数フィルタリング条件とソート機能を提供
  */
 
-import { supabaseClient } from '@/lib/supabase-client';
+import { supabaseClient } from '@/lib/supabase/client';
 import { type Organization, type Service, type CaseStudy } from '@/types/database';
 import { logger } from '@/lib/utils/logger';
 

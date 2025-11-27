@@ -3,7 +3,7 @@
  * 包括的なアナリティクス・監視システム
  */
 
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 export interface AnalyticsEvent {
@@ -105,7 +105,7 @@ export class AnalyticsEngine {
    */
   static async trackEvent(event: Omit<AnalyticsEvent, 'timestamp'>): Promise<void> {
     try {
-      const supabase = await supabaseServer();
+      const supabase = await createClient();
       
       const eventData: AnalyticsEvent = {
         ...event,
@@ -192,7 +192,7 @@ export class AnalyticsEngine {
     endDate: string
   ): Promise<UsageMetrics> {
     try {
-      const supabase = await supabaseServer();
+      const supabase = await createClient();
       
       // DAU (Daily Active Users)
       const { data: dauData } = await supabase
@@ -261,7 +261,7 @@ export class AnalyticsEngine {
     endDate: string
   ): Promise<ContentMetrics> {
     try {
-      const supabase = await supabaseServer();
+      const supabase = await createClient();
 
       // 人気の組織
       const { data: orgViews } = await supabase
@@ -387,7 +387,7 @@ export class AnalyticsEngine {
     endDate: string
   ): Promise<BusinessMetrics> {
     try {
-      const supabase = await supabaseServer();
+      const supabase = await createClient();
 
       // 組織作成数
       const { count: organizations_created } = await supabase
@@ -499,7 +499,7 @@ export class AnalyticsEngine {
     recent_events: AnalyticsEvent[];
   }> {
     try {
-      const supabase = await supabaseServer();
+      const supabase = await createClient();
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
 
       // 過去5分のアクティブユーザー

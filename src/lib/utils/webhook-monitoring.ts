@@ -6,7 +6,7 @@ import { logger } from '@/lib/utils/logger';
 // Webhook の健全性監視とアラート機能
 
 // Webhook monitoring はサーバーサイドでのみ使用するため、動的インポートを使用
-// import { supabaseBrowserAdmin } from '@/lib/supabase-server';
+// import { supabaseAdmin } from '@/lib/supabase-admin-client';
 
 export interface WebhookHealthMetrics {
   totalEvents: number;
@@ -47,8 +47,8 @@ export async function getWebhookHealthMetrics(hoursBack: number = 24): Promise<W
 
   try {
     // 動的インポートでサーバーサイドコードを取得
-    const { supabaseBrowserAdmin } = await import('@/lib/supabase-server');
-    const supabase = supabaseBrowserAdmin();
+    const { supabaseAdmin } = await import('@/lib/supabase/server');
+    const supabase = supabaseAdmin();
     const cutoffTime = new Date(Date.now() - hoursBack * 60 * 60 * 1000).toISOString();
 
     // 指定期間内のイベント統計を取得
@@ -186,8 +186,8 @@ export async function cleanupOldWebhookEvents(): Promise<{ deleted: number; erro
 
   try {
     // 動的インポートでサーバーサイドコードを取得
-    const { supabaseBrowserAdmin } = await import('@/lib/supabase-server');
-    const supabase = supabaseBrowserAdmin();
+    const { supabaseAdmin } = await import('@/lib/supabase/server');
+    const supabase = supabaseAdmin();
     const cutoffTime = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(); // 30日前
 
     const { data, error, count } = await supabase

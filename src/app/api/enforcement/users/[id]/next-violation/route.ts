@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { logger } from '@/lib/utils/logger';
 

@@ -3,7 +3,7 @@
  * Phase 2: AI Visibility Score 計算ロジック
  */
 
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from './logger';
 
 export interface VisibilityScoreInput {
@@ -95,7 +95,7 @@ async function getContentUnitData(
   url: string, 
   contentUnitId?: string
 ): Promise<ContentUnitData | null> {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
 
   let query = supabase
     .from('ai_content_units')
@@ -125,7 +125,7 @@ async function getAIAccessData(
   startDate: Date,
   endDate: Date
 ): Promise<AIAccessData> {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
 
   const { data: logs, error } = await supabase
     .from('ai_bot_logs')
@@ -187,7 +187,7 @@ export async function calculateAllVisibilityScores(
   orgId: string,
   periodDays: number = 30
 ): Promise<VisibilityScoreResult[]> {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
 
   // 1. 対象URL一覧を取得（ai_content_units + ai_bot_logs から）
   const [contentUnitsResult, botLogsResult] = await Promise.all([
@@ -243,7 +243,7 @@ export async function saveVisibilityScores(
   scores: VisibilityScoreResult[],
   url: string
 ): Promise<void> {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
 
   // Content Unit IDを取得
   const { data: contentUnit } = await supabase

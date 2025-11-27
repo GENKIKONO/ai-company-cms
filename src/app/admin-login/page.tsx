@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabaseBrowser } from '@/lib/supabase-browser';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { useErrorToast, ToastProvider } from '@/components/ui/toast';
 import { logger } from '@/lib/utils/logger';
 
@@ -18,7 +18,7 @@ function AdminLoginForm() {
     setLoading(true);
 
     try {
-      const supabase = supabaseBrowser();
+      const supabase = supabaseBrowser;
       
       // ログイン実行
       const { error } = await supabase.auth.signInWithPassword({

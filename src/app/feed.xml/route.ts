@@ -5,13 +5,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { generateRss, PostWithOrg } from '@/lib/feed/rss-generator';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.jp';
     
     // 1. 実DBスキーマ準拠のクエリ（LEFT JOINで組織情報も取得）

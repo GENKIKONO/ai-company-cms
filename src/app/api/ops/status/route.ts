@@ -8,7 +8,7 @@
  * - 環境変数設定状態確認（値は漏らさない）
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { env, getCookieDomain } from '@/lib/env';
 import { logger } from '@/lib/utils/logger';
@@ -33,7 +33,7 @@ function maskEmail(email?: string): string {
 export async function GET(request: NextRequest) {
   try {
     // Supabase SSR 認証確認
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     const hasSession = !authError && !!user;

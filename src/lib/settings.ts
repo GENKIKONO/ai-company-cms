@@ -1,10 +1,10 @@
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import 'server-only';
 
 const TAG = 'settings';
 
 export async function getSetting(key: string): Promise<string | null> {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
   const { data } = await supabase
     .from('settings')
     .select('value')
@@ -15,7 +15,7 @@ export async function getSetting(key: string): Promise<string | null> {
 }
 
 export async function setSetting(key: string, value: string) {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
   const { error } = await supabase
     .from('settings')
     .upsert({ key, value }, { onConflict: 'key' });

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
 
 interface LoginFormProps {
@@ -25,7 +25,8 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
     setError('');
 
     try {
-      const { data, error: signInError } = await supabaseBrowser.auth.signInWithPassword({
+      const supabase = createClient();
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -48,27 +49,14 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
         return;
       }
 
-      // ログイン成功 - セッション確認を行う
       if (data.session) {
-        // Cookieが設定されるまで少し待機
-        await new Promise(resolve => setTimeout(resolve, 500));
+        logger.debug('[LoginForm] ログイン成功、リダイレクト開始');
         
-        // Cookieを確認してセッションが設定されているかチェック
-        const cookieString = document.cookie;
-        const hasSupabaseAuthToken = /sb-[^=;]+-auth-token=/.test(cookieString);
+        // 認証状態をリフレッシュしてからリダイレクト
+        router.refresh();
         
-        if (!hasSupabaseAuthToken) {
-          logger.warn('[LoginForm] セッションCookieが設定されていません、もう少し待機します');
-          // さらに1秒待機
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-
-        // ダッシュボードへ遷移
         const targetUrl = redirectUrl || '/dashboard';
-        logger.debug('[LoginForm] リダイレクト開始', targetUrl);
-        
-        // 強制的にページをリロードして認証状態を確実に反映
-        window.location.href = targetUrl;
+        router.push(targetUrl);
       } else {
         setError('ログインに失敗しました。セッションが作成されませんでした。');
       }

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 import { calculateAllVisibilityScores, calculateVisibilityScore } from '@/lib/utils/ai-visibility-calculator';
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   const calculationId = generateErrorId('recalculate-visibility');
   
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 管理者認証チェック（テスト用に一時無効化）
     // TODO: 本格運用時は有効化 + Pro以上プラン制限
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
  * 再計算対象URLを取得
  */
 async function getTargetUrls(orgId: string, forceRecalculate: boolean): Promise<string[]> {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
 
   if (forceRecalculate) {
     // 強制再計算: 全URL対象
@@ -255,7 +255,7 @@ async function saveIndividualScore(
   url: string, 
   score: any
 ): Promise<void> {
-  const supabase = await supabaseServer();
+  const supabase = await createClient();
 
   // Content Unit ID を取得
   const { data: contentUnit } = await supabase

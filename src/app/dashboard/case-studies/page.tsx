@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { CaseStudy } from '@/types/database';
 import PublicPageLinks from '../components/PublicPageLinks';
-import { supabaseBrowser } from '@/lib/supabase-client';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
 
 export default function CaseStudiesManagementPage() {

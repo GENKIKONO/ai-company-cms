@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { env } from '@/lib/env';
 import { logger } from '@/lib/utils/logger';
 
@@ -37,7 +37,7 @@ function isAdmin(userEmail?: string): boolean {
 export async function checkOpsAdmin(): Promise<OpsGuardResult> {
   try {
     // Supabase SSR認証確認
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
     
     if (error || !user) {
@@ -124,7 +124,7 @@ export async function requireOpsAdminAPI(request?: NextRequest): Promise<NextRes
  */
 export async function getOpsAdminStatus() {
   try {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
     
     const cookieStore = await cookies();

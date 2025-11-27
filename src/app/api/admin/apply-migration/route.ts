@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
@@ -8,16 +8,7 @@ export async function POST(request: NextRequest) {
     logger.debug('Applying coordinate fields migration...');
     
     // Service Role クライアント作成
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    );
+    const supabase = supabaseAdmin;
 
     // Execute the migration SQL directly
     const migrationSQL = `

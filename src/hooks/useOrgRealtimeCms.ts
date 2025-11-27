@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabaseBrowser } from '@/lib/supabase-browser';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface CMSRealtimeData {

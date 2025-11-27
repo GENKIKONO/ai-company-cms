@@ -2,7 +2,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/log';
 import { z } from 'zod';
 import { withOrgAuth } from '@/lib/auth/org-middleware';
@@ -29,7 +29,7 @@ function generateSlug(title: string): string {
 // GET - ユーザーの投稿を取得
 export async function GET(request: NextRequest) {
   return withOrgAuth(request, async ({ orgId }) => {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // 組織の投稿を取得（organization_id前提）
     const { data: posts, error: postsError } = await supabase
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 // POST - 新しい投稿を作成
 export async function POST(request: NextRequest) {
   return withOrgAuth(request, async ({ orgId, userId }) => {
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     
     // リクエストボディを取得・検証
     const body = await request.json();

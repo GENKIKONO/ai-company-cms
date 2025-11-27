@@ -8,7 +8,7 @@
  * - ops_admin クッキー設定
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 import { timingSafeEqual } from 'crypto';
 import { env, getCookieDomain } from '@/lib/env';
 import { logger } from '@/lib/utils/logger';
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Supabase SSR 認証確認
-    const supabase = await supabaseServer();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
