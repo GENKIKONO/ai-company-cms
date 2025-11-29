@@ -3,18 +3,20 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
+import { isAiCrawler, isPublicPath, isInternalPath } from '@/lib/utils/ai-crawler';
 // import { rateLimitMiddleware } from './src/middleware/rateLimit';
 
-// 公開ルート（常に素通し）
-const PUBLIC_PATHS = new Set([
-  '/', '/help', '/contact', '/terms', '/privacy',
+// ⚡ 注意: 公開パス定義は ai-crawler.ts に一元化済み
+// この middleware での公開判定は isPublicPath() を使用すること
+
+// 認証系ページ（公開だが特別扱い）
+const AUTH_PATHS = new Set([
   '/auth/login', '/login',
   '/auth/signin',
   '/auth/signup', '/signup',
   '/auth/confirm',
   '/auth/forgot-password',
   '/auth/reset-password-confirm',
-  '/search',
 ]);
 
 // 要ログインのプレフィックス  
@@ -54,13 +56,7 @@ const BASIC_AUTH_PROTECTED_PATHS = [
 const SEMI_PUBLIC_PREFIXES = ['/organizations'];
 
 // 認証系ページ（ログイン済ならリダイレクト）
-const AUTH_PAGES = new Set([
-  '/auth/login', '/login',
-  '/auth/signin',
-  '/auth/signup', '/signup',
-  '/auth/forgot-password',
-  '/auth/reset-password-confirm',
-]);
+const AUTH_PAGES = AUTH_PATHS; // 同じ定義を使用
 
 export async function middleware(req: NextRequest) {
   const startTime = Date.now();
@@ -95,10 +91,16 @@ export async function middleware(req: NextRequest) {
       return guardResult.response;
     }
 
-  // 公開パスは認証チェック不要
-  if (PUBLIC_PATHS.has(pathname)) {
+  // 🌐 公開パスは認証チェック不要（ai-crawler.ts で一元管理）
+  if (isPublicPath(pathname)) {
     console.log(`[Middleware] Public path, skipping auth: ${pathname}`);
     return NextResponse.next();
+  }
+  
+  // 🔐 認証系ページも公開だが特別扱い
+  if (AUTH_PATHS.has(pathname)) {
+    console.log(`[Middleware] Auth page, skipping auth check: ${pathname}`);
+    // 認証系ページの処理は下で行う
   }
 
   // Supabase SSR クライアント（セキュアCookie設定付き）
@@ -485,7 +487,18 @@ function getRiskLevel(incidentType: string): string {
 }
 
 function detectSuspiciousActivity(userAgent: string, path: string): boolean {
-  // Check for suspicious patterns
+  // Don't flag legitimate AI crawlers as suspicious
+  if (isAiCrawler(userAgent)) {
+    return false;
+  }
+  
+  // Don't flag legitimate search engines as suspicious  
+  const ua = userAgent.toLowerCase();
+  if (ua.includes('googlebot') || ua.includes('bingbot')) {
+    return false;
+  }
+  
+  // Check for suspicious patterns (excluding legitimate crawlers)
   const suspiciousPatterns = [
     /bot/i,
     /crawler/i,
@@ -548,18 +561,20 @@ async function aiVisibilityGuard(
       };
     }
     
-    // 3. Check bot access permissions
+    // 3. Check bot access permissions (updated for AI-friendly policy)
     const botCheck = analyzeBotAccess(userAgent, pathname);
     if (!botCheck.allowed) {
       await logAccess(supabase, ip, userAgent, pathname, method, 403, startTime, 'BOT_BLOCKED');
+      
+      // Only set noindex for legitimately blocked bot access
+      const response = new NextResponse('Bot Access Denied', { status: 403 });
+      if (botCheck.robotsTag) {
+        response.headers.set('X-Robots-Tag', botCheck.robotsTag);
+      }
+      
       return {
         blocked: true,
-        response: new NextResponse('Bot Access Denied', { 
-          status: 403,
-          headers: {
-            'X-Robots-Tag': 'noindex, nofollow'
-          }
-        })
+        response
       };
     }
     
@@ -677,7 +692,7 @@ function detectBotType(userAgent: string): string {
   if (ua.includes('googlebot') || ua.includes('bingbot')) {
     return 'search_engine';
   }
-  if (ua.includes('gptbot') || ua.includes('ccbot') || ua.includes('perplexitybot')) {
+  if (isAiCrawler(userAgent)) {
     return 'ai_crawler';
   }
   if (ua.includes('bot') || ua.includes('crawler') || ua.includes('spider')) {
@@ -708,46 +723,42 @@ function analyzeBotAccess(userAgent: string, pathname: string): {
 } {
   const ua = userAgent.toLowerCase();
   
-  // Allow all access to search engines
+  // 🌐 公開ページ: 全ての正当なクローラーに許可
+  if (isPublicPath(pathname)) {
+    return { allowed: true, robotsTag: 'index, follow' };
+  }
+  
+  // 🔒 内部ページ: AI クローラーを含む全てのクローラーをブロック
+  if (isInternalPath(pathname)) {
+    return { allowed: false, robotsTag: 'noindex, nofollow' };
+  }
+  
+  // 🤖 検索エンジン: 常に許可
   if (ua.includes('googlebot') || ua.includes('bingbot')) {
     return { allowed: true, robotsTag: 'index, follow' };
   }
   
-  // AI crawlers only allowed in /o/ path or essential files
-  if (ua.includes('gptbot') || ua.includes('ccbot') || ua.includes('perplexitybot')) {
-    const allowed = pathname.startsWith('/o/') || 
-                   pathname === '/robots.txt' || 
-                   pathname === '/sitemap.xml' ||
-                   pathname === '/';
-    return { 
-      allowed, 
-      robotsTag: allowed ? 'index, follow' : 'noindex, nofollow' 
-    };
+  // 🤖 AI クローラー: 公開 OK / 内部 NG の統一ルール
+  if (isAiCrawler(userAgent)) {
+    // 上記で既にチェック済みなので、この時点では許可
+    return { allowed: true, robotsTag: 'index, follow' };
   }
   
-  // Block empty or suspicious user agents on sensitive paths
-  if ((!ua || ua.length < 10 || ua === 'unknown') && isProtectedPath(pathname)) {
+  // 🚨 怪しいユーザーエージェント: 内部パスのみブロック
+  if ((!ua || ua.length < 10 || ua === 'unknown') && isInternalPath(pathname)) {
     return { allowed: false, robotsTag: 'noindex, nofollow' };
   }
   
-  // Allow normal browsers and unknown bots on public content
+  // その他: 通常ブラウザとして許可
   return { allowed: true };
 }
 
+/**
+ * @deprecated 使用しないでください。isInternalPath() を使用してください。
+ * 後方互換性のためのラッパー関数
+ */
 function isProtectedPath(pathname: string): boolean {
-  const protectedPaths = [
-    '/dashboard',
-    '/api/auth',
-    '/billing',
-    '/checkout',
-    '/preview',
-    '/webhooks',
-    '/admin',
-    '/management-console',
-    '/settings'
-  ];
-  
-  return protectedPaths.some(protectedPath => pathname.startsWith(protectedPath));
+  return isInternalPath(pathname);
 }
 
 async function autoBlockIP(supabase: any, ip: string, reason: string): Promise<void> {
