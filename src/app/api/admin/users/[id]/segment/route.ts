@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { env } from '@/lib/env';
 import { logger } from '@/lib/utils/logger';
-import { type UserSegment } from '@/types/database';
+import type { UserSegment } from '@/types/utils/database';;
 import { requireAuth, type AuthContext } from '@/lib/api/auth-middleware';
 import { handleApiError, createErrorResponse } from '@/lib/api/error-responses';
 

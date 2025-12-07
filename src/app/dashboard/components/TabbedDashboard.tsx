@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import type { Post, Service, CaseStudy, FAQ } from '@/types/database';
+import type { Post, Service, CaseStudy, FAQ } from '@/types/legacy/database';;
 import { ErrorDisplay } from '@/components/ui/error-display';
 import { LoadingSkeleton, EmptyState } from '@/components/ui/loading-skeleton';
 import { OrganizationPreview } from '@/components/ui/organization-preview';
@@ -49,19 +49,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
 
-  // Load content stats for overview
-  useEffect(() => {
-    loadContentStats();
-  }, []);
-
-  // Load content when tab changes
-  useEffect(() => {
-    if (activeTab !== 'overview') {
-      loadTabContent(activeTab);
-    }
-  }, [activeTab]);
-
-  const loadContentStats = async () => {
+  const loadContentStats = useCallback(async () => {
     try {
       const [postsRes, servicesRes, caseStudiesRes, faqsRes] = await Promise.all([
         fetch(`/api/my/posts?organizationId=${organizationId}`, { cache: 'no-store' }),
@@ -86,9 +74,10 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
     } catch (error) {
       logger.error('Failed to load content stats', { data: error instanceof Error ? error : new Error(String(error)) });
     }
-  };
+  }, [organizationId]);
 
-  const loadTabContent = async (tab: TabType) => {
+  // Load content stats for overview
+  const loadTabContent = useCallback(async (tab: TabType) => {
     if (tab === 'overview') return;
 
     setLoading(prev => ({ ...prev, [tab]: true }));
@@ -121,9 +110,20 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
     } finally {
       setLoading(prev => ({ ...prev, [tab]: false }));
     }
-  };
+  }, [organizationId]);
 
-  const handleDelete = async (type: string, id: string) => {
+  useEffect(() => {
+    loadContentStats();
+  }, [loadContentStats]);
+
+  // Load content when tab changes
+  useEffect(() => {
+    if (activeTab !== 'overview') {
+      loadTabContent(activeTab);
+    }
+  }, [activeTab, loadTabContent]);
+
+  const handleDelete = useCallback(async (type: string, id: string) => {
     if (!confirm(`この${getContentTypeLabel(type)}を削除しますか？`)) return;
 
     try {
@@ -158,7 +158,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
       logger.error(`Failed to delete ${type}:`, { data: error });
       showErrorToast('削除失敗', 'ネットワークエラーが発生しました');
     }
-  };
+  }, [organizationId, showSuccessToast, showErrorToast]);
 
   const getContentTypeLabel = (type: string): string => {
     const labels = {

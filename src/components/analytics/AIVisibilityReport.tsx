@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Brain, TrendingUp, Search, Eye, Download, RefreshCw } from 'lucide-react';
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { logger } from '@/lib/utils/logger';
 
 interface AIVisibilityMetrics {

@@ -1,0 +1,16 @@
+
+> luxucare-cms@0.1.1 dev
+> next dev
+
+ ⚠ Port 3000 is in use by process 16474, using available port 3001 instead.
+   ▲ Next.js 15.5.4
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.10.104:3001
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ✓ optimizeCss
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1701ms
+[?25h

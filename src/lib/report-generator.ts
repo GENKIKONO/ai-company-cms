@@ -6,7 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { PLAN_LIMITS, type PlanType } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
-import type { MonthlyReport } from '@/types/database';
+import type { MonthlyReport } from '@/types/domain/reports';;
 
 interface ReportData {
   organization: {

@@ -2,10 +2,8 @@ import Link from 'next/link';
 import { createClient } from "@/lib/supabase/server"
 import I18nHomePage from './I18nHomePage';
 
-// 認証状態を毎回評価するため動的SSRに設定
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-export const revalidate = 0;
+// P4-2: ISR設定（ホームページ）
+export const revalidate = 300; // 5分間隔での再生成
 
 // サイト設定の型定義
 interface SiteSettings {

@@ -3,7 +3,7 @@
  * @type=CaseStudy スキーマ準拠
  */
 
-import type { Organization, CaseStudy } from '@/types/database';
+import type { Organization, CaseStudy } from '@/types/legacy/database';;
 import { logger } from '@/lib/utils/logger';
 
 interface CaseStudyJsonLd {

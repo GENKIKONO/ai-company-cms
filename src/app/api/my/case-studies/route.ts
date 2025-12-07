@@ -1,8 +1,9 @@
 // Single-Org Mode API: /api/my/case-studies
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { CaseStudy, CaseStudyFormData } from '@/types/database';
-import { PLAN_LIMITS } from '@/config/plans';
+import type { CaseStudy } from '@/types/legacy/database';
+import type { CaseStudyFormData } from '@/types/domain/content';;
+import { getFeatureLimit } from '@/lib/org-features';
 import { normalizeCaseStudyPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 
@@ -150,36 +151,41 @@ export async function POST(request: NextRequest) {
       targetOrgData = orgData;
     }
 
-    // プラン制限チェック
-    const currentPlan = targetOrgData.plan || 'trial';
-    const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.trial;
-    
-    if (planLimits.case_studies > 0) {
-      const { count: currentCount, error: countError } = await supabase
-        .from('case_studies')
-        .select('id', { count: 'exact' })
-        .eq('organization_id', targetOrgData.id);
+    // プラン制限チェック（effective-features使用）
+    try {
+      const featureLimit = await getFeatureLimit(targetOrgData.id, 'case_studies');
+      
+      // null/undefined は無制限扱い
+      if (featureLimit !== null && featureLimit !== undefined) {
+        const { count: currentCount, error: countError } = await supabase
+          .from('case_studies')
+          .select('id', { count: 'exact' })
+          .eq('organization_id', targetOrgData.id);
 
-      if (countError) {
-        logger.error('Error counting case studies:', { data: countError });
-        return NextResponse.json(
-          { error: 'Database error', message: countError.message },
-          { status: 500 }
-        );
-      }
+        if (countError) {
+          logger.error('Error counting case studies:', { data: countError });
+          return NextResponse.json(
+            { error: 'Database error', message: countError.message },
+            { status: 500 }
+          );
+        }
 
-      if ((currentCount || 0) >= planLimits.case_studies) {
-        return NextResponse.json(
-          {
-            error: 'Plan limit exceeded',
-            message: '上限に達しました。プランをアップグレードしてください。',
-            currentCount,
-            limit: planLimits.case_studies,
-            plan: currentPlan
-          },
-          { status: 402 }
-        );
+        if ((currentCount || 0) >= featureLimit) {
+          return NextResponse.json(
+            {
+              error: 'Plan limit exceeded',
+              message: '上限に達しました。プランをアップグレードしてください。',
+              currentCount,
+              limit: featureLimit,
+              plan: targetOrgData.plan || 'trial'
+            },
+            { status: 402 }
+          );
+        }
       }
+    } catch (error) {
+      logger.error('Feature limit check failed, allowing creation:', { data: error });
+      // effective-features エラー時は作成を許可（FAQs/materialsと同じポリシー）
     }
 
     // organizationId を除去したbodyデータを正規化

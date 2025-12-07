@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateCaseStudyJsonLd } from '@/lib/utils/jsonld';
-import type { Organization, CaseStudy } from '@/types/database';
+import type { Organization, CaseStudy } from '@/types/legacy/database';;
 import { HIGButton } from '@/design-system';
 import { LogoImage } from '@/components/ui/optimized-image';
 import { logger } from '@/lib/utils/logger';

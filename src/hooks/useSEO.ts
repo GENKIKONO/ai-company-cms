@@ -3,7 +3,7 @@
  * メタデータ、構造化データ、canonical URLの管理
  */
 
-import { useEffect } from 'react';
+import { useEffect , useCallback} from 'react';
 import { sitemapGenerator } from '@/lib/utils/sitemap-generator';
 
 export interface SEOOptions {
@@ -40,14 +40,16 @@ export function useSEO(options: SEOOptions) {
       setMetaTag('keywords', options.keywords.join(', '));
     }
 
-    // Robots meta tag設定
+    // Robots meta tag設定（デフォルト：index, follow で AI フレンドリー）
     const robotsContent = [];
     if (options.noindex) robotsContent.push('noindex');
     if (options.nofollow) robotsContent.push('nofollow');
+    
     if (robotsContent.length > 0) {
       setMetaTag('robots', robotsContent.join(', '));
     } else {
-      removeMetaTag('robots');
+      // デフォルトで index, follow を明示的に設定
+      setMetaTag('robots', 'index, follow');
     }
 
     // Canonical URL設定
@@ -93,9 +95,9 @@ export function useSEO(options: SEOOptions) {
     options.image,
     options.type,
     options.locale,
-    JSON.stringify(options.keywords),
-    JSON.stringify(options.alternateLanguages),
-    JSON.stringify(options.structuredData)
+    options.keywords,
+    options.alternateLanguages,
+    options.structuredData
   ]);
 }
 
@@ -316,7 +318,7 @@ export function useStructuredData(data: object) {
     return () => {
       removeStructuredData();
     };
-  }, [JSON.stringify(data)]);
+  }, [data]);
 }
 
 /**

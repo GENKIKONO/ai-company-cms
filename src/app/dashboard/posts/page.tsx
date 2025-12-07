@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import Link from 'next/link';
-import type { Post } from '@/types/database';
+import type { Post } from '@/types/legacy/database';;
 import { HIGButton } from '@/design-system';
 import PublicPageLinks from '../components/PublicPageLinks';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
@@ -42,13 +42,7 @@ export default function PostsManagementPage() {
     getOrganizationId();
   }, []);
 
-  useEffect(() => {
-    if (organizationId) {
-      fetchPosts();
-    }
-  }, [organizationId]);
-
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     if (!organizationId) return;
     
     try {
@@ -108,9 +102,15 @@ export default function PostsManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId]);
 
-  const handleDelete = async (id: string) => {
+  useEffect(() => {
+    if (organizationId) {
+      fetchPosts();
+    }
+  }, [organizationId, fetchPosts]);
+
+  const handleDelete = useCallback(async (id: string) => {
     if (!confirm('この記事を削除しますか？')) return;
 
     try {
@@ -136,7 +136,7 @@ export default function PostsManagementPage() {
       logger.error('Failed to delete post:', { data: err });
       alert('削除に失敗しました: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
-  };
+  }, [posts]);
 
   const getStatusBadge = (status: string) => {
     const badges = {

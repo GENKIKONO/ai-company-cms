@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { apiLogger } from '@/lib/utils/logger';
-import type { QuestionFormData, QuestionWithDetails } from '@/types/database';
+import type { QuestionFormData, QuestionWithDetails } from '@/types/domain/questions';;
 
 // GET: 管理者用 - 全質問の取得
 export async function GET(request: NextRequest) {

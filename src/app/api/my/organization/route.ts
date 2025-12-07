@@ -6,7 +6,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { env } from '@/lib/env';
 import { z } from 'zod';
-import type { Organization, OrganizationFormData } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';
+import type { OrganizationFormData } from '@/types/domain/organizations';;
 import { PUBLISH_ON_SAVE } from '@/config/feature-flags';
 import { 
   organizationCreateSchema, 

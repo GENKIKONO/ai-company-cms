@@ -1,4 +1,4 @@
-import { type Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { signJsonLd, type SignedJsonLd } from '@/lib/ai-visibility/content-protection';
 
 export interface OrganizationStructuredData {
@@ -176,10 +176,6 @@ export function generateOrganizationJsonLd(
     structuredData.industry = organization.industries;
   }
 
-  // P0: Pending verification status
-  if (organization.status === 'public_unverified') {
-    structuredData.pendingVerification = true;
-  }
 
   return structuredData;
 }

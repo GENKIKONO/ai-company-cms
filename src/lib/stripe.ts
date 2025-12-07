@@ -3,7 +3,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { UNIFIED_PRICES, UNIFIED_PLAN_CONFIG } from '@/config/unified-plans';
 
 // Initialize Stripe.js with publishable key

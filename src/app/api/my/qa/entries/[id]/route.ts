@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { QAEntryFormData } from '@/types/database';
+import type { QAEntryFormData } from '@/types/domain/qa-system';;
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

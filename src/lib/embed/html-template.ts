@@ -3,7 +3,7 @@
  * セキュアで美しいiframe用HTML生成エンジン
  */
 
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 
 export interface IframeOptions {
   width?: string;

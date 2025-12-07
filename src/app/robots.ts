@@ -167,7 +167,7 @@ function getStaticRobots(baseUrl: string): MetadataRoute.Robots {
  * 🔒 内部パス（Disallow）:
  *   /dashboard/*, /admin/*, /management-console/*, /auth/*, /my/*, 
  *   /agency/*, /test/*, /api/auth/*, /webhooks/*, /checkout/*, /billing/*, 
- *   /preview/*, /private/*, /_next/*, *.pdf$, */temp/*
+ *   /preview/*, /private/*, /_next/*, *.pdf$, 一時ファイルパス
  * 
  * ⚡ 整合性:
  * - robots.ts / sitemap.ts / middleware.ts で同じパス定義を共有

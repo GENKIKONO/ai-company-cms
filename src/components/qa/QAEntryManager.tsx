@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit2, Trash2, Save, X, Search, Eye, FileText } from 'lucide-react';
-import type { QAEntry, QAEntryWithCategory, QACategory, QAEntryFormData } from '@/types/database';
+import type { QAEntry, QAEntryWithCategory, QACategory, QAEntryFormData } from '@/types/domain/qa-system';;
 import { logger } from '@/lib/utils/logger';
 
 interface QAEntryManagerProps {
@@ -38,7 +38,7 @@ export default function QAEntryManager({ organizationId, categories, onRefreshCa
     status: 'draft'
   });
 
-  const fetchEntries = async () => {
+  const fetchEntries = useCallback(async () => {
     try {
       const params = new URLSearchParams({
         page: currentPage.toString(),
@@ -67,13 +67,13 @@ export default function QAEntryManager({ organizationId, categories, onRefreshCa
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId, categoryFilter, currentPage, searchTerm, statusFilter]);
 
   useEffect(() => {
     fetchEntries();
-  }, [currentPage, statusFilter, categoryFilter, searchTerm]);
+  }, [fetchEntries]);
 
-  const handleCreate = async () => {
+  const handleCreate = useCallback(async () => {
     try {
       const response = await fetch('/api/my/qa/entries', {
         method: 'POST',
@@ -98,9 +98,9 @@ export default function QAEntryManager({ organizationId, categories, onRefreshCa
       logger.error('Error creating entry', { data: error instanceof Error ? error : new Error(String(error)) });
       alert('Failed to create entry');
     }
-  };
+  }, [organizationId, fetchEntries, formData]);
 
-  const handleUpdate = async (id: string) => {
+  const handleUpdate = useCallback(async (id: string) => {
     try {
       const response = await fetch(`/api/my/qa/entries/${id}`, {
         method: 'PUT',
@@ -124,9 +124,9 @@ export default function QAEntryManager({ organizationId, categories, onRefreshCa
       logger.error('Error updating entry', { data: error instanceof Error ? error : new Error(String(error)) });
       alert('Failed to update entry');
     }
-  };
+  }, [organizationId, fetchEntries, formData]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     try {
       const response = await fetch(`/api/my/qa/entries/${id}`, {
         method: 'DELETE'
@@ -142,7 +142,7 @@ export default function QAEntryManager({ organizationId, categories, onRefreshCa
       logger.error('Error deleting entry', { data: error instanceof Error ? error : new Error(String(error)) });
       alert('Failed to delete entry');
     }
-  };
+  }, [fetchEntries]);
 
   const startEdit = (entry: QAEntry) => {
     setFormData({

@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client';
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { logger } from '@/lib/log';
 
 export interface TrialStatus {

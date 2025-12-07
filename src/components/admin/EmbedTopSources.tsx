@@ -5,7 +5,7 @@
  * どのサイトでWidgetが多く使われているかを分析
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/utils/logger';
 
 interface SourceData {
@@ -29,11 +29,7 @@ export function EmbedTopSources({ organizationId, days = 30, limit = 20 }: TopSo
   const [error, setError] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'widget' | 'iframe'>('all');
 
-  useEffect(() => {
-    fetchTopSources();
-  }, [organizationId, days, limit, selectedFilter]);
-
-  const fetchTopSources = async () => {
+  const fetchTopSources = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -62,7 +58,11 @@ export function EmbedTopSources({ organizationId, days = 30, limit = 20 }: TopSo
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId, days, limit, selectedFilter]);
+
+  useEffect(() => {
+    fetchTopSources();
+  }, [fetchTopSources]);
 
   const formatUrl = (url: string): string => {
     try {

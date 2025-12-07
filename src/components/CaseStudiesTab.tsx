@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 interface CaseStudy {
@@ -48,11 +48,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
     result: ''
   });
 
-  useEffect(() => {
-    fetchCaseStudies();
-  }, [organizationId]);
-
-  const fetchCaseStudies = async () => {
+  const fetchCaseStudies = useCallback(async () => {
     try {
       const response = await fetch(`/api/my/case-studies?organizationId=${organizationId}`);
       if (response.ok) {
@@ -66,7 +62,11 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId]);
+
+  useEffect(() => {
+    fetchCaseStudies();
+  }, [fetchCaseStudies]);
 
   const resetForm = () => {
     setFormData({
@@ -97,7 +97,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
     setShowForm(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.title.trim()) {
@@ -135,9 +135,9 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [organizationId, editingCaseStudy, fetchCaseStudies, formData]);
 
-  const handleDelete = async (caseStudyId: string) => {
+  const handleDelete = useCallback(async (caseStudyId: string) => {
     if (!confirm('この事例を削除してもよろしいですか？')) {
       return;
     }
@@ -155,7 +155,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
     } catch (error) {
       setError('事例の削除に失敗しました');
     }
-  };
+  }, [fetchCaseStudies]);
 
   if (loading) {
     return (

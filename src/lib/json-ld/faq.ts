@@ -3,7 +3,7 @@
  * @type=FAQPage スキーマ準拠
  */
 
-import type { Organization, FAQ } from '@/types/database';
+import type { Organization, FAQ } from '@/types/legacy/database';;
 import { logger } from '@/lib/utils/logger';
 
 interface FAQPageJsonLd {

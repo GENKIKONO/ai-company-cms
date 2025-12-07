@@ -4,7 +4,7 @@
  */
 
 import { supabaseClient } from '@/lib/supabase/client';
-import { type Organization, type Service, type CaseStudy } from '@/types/database';
+import type { Organization, Service, CaseStudy } from '@/types/legacy/database';
 import { logger } from '@/lib/utils/logger';
 
 export interface AdvancedSearchFilters {

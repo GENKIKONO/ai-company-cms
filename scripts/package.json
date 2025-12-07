@@ -1,0 +1,21 @@
+{
+  "name": "@luxucare/test-scripts",
+  "version": "1.0.0",
+  "description": "P4-5 Testing Scripts",
+  "type": "module",
+  "scripts": {
+    "test:p45": "tsx test-p45-flow.ts",
+    "test:p45:watch": "tsx watch test-p45-flow.ts",
+    "test:health": "tsx test-p45-health-smoke.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "tsx": "^4.6.2",
+    "zod": "^3.22.4",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.7"
+  }
+}

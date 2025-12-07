@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { PLAN_LIMITS, PlanType, getMaterialLimitMessage } from '@/config/plans';
+import { getFeatureLimit } from '@/lib/org-features';
 import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 
@@ -89,37 +89,41 @@ export async function POST(request: NextRequest) {
       return createNotFoundError('Organization');
     }
 
-    // プラン制限チェック
-    const currentPlan = (orgData.plan || 'free') as PlanType;
-    const materialLimit = PLAN_LIMITS[currentPlan].materials;
-    
-    // 無制限以外の場合は制限チェック
-    if (materialLimit !== Number.POSITIVE_INFINITY) {
-      const { count: currentCount, error: countError } = await supabase
-        .from('sales_materials')
-        .select('id', { count: 'exact' })
-        .eq('organization_id', orgData.id);
+    // プラン制限チェック（effective-features使用）
+    try {
+      const featureLimit = await getFeatureLimit(orgData.id, 'materials');
+      
+      // null/undefined は無制限扱い
+      if (featureLimit !== null && featureLimit !== undefined) {
+        const { count: currentCount, error: countError } = await supabase
+          .from('sales_materials')
+          .select('id', { count: 'exact' })
+          .eq('organization_id', orgData.id);
 
-      if (countError) {
-        logger.error('Error counting materials:', { data: countError });
-        return NextResponse.json(
-          { error: 'Database error', message: countError.message },
-          { status: 500 }
-        );
-      }
+        if (countError) {
+          logger.error('Error counting materials:', { data: countError });
+          return NextResponse.json(
+            { error: 'Database error', message: countError.message },
+            { status: 500 }
+          );
+        }
 
-      if ((currentCount || 0) >= materialLimit) {
-        return NextResponse.json(
-          {
-            error: 'LimitExceeded',
-            message: getMaterialLimitMessage(currentPlan),
-            currentCount,
-            limit: materialLimit,
-            plan: currentPlan
-          },
-          { status: 403 }
-        );
+        if ((currentCount || 0) >= featureLimit) {
+          return NextResponse.json(
+            {
+              error: 'LimitExceeded',
+              message: 'ご契約プランの上限に達しています。プランをアップグレードしてください。',
+              currentCount,
+              limit: featureLimit,
+              plan: orgData.plan || 'trial'
+            },
+            { status: 403 }
+          );
+        }
       }
+    } catch (error) {
+      logger.error('Feature limit check failed, allowing creation:', { data: error });
+      // TODO: ここは後で要確認 - effective-features エラー時のフォールバック挙動
     }
 
     // 営業資料データの作成

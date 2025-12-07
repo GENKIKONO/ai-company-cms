@@ -2,7 +2,8 @@
 
 import { createClient } from '@/lib/supabase/client';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { type AppUser, type UserRole } from '@/types/database';
+import type { AppUser } from '@/types/legacy/database';
+import type { UserRole } from '@/types/utils/database';;
 import type { DatabaseResult, TableRow, TableUpdate } from '@/types/database.types';
 import type { ApiResponse, createApiResponse, createErrorResponse } from '@/types/api.types';
 import { authLogger, logger } from '@/lib/utils/logger';
@@ -86,7 +87,8 @@ export async function getCurrentUser(): Promise<AppUser | null> {
       avatar_url: profile.avatar_url,
       role: (user.app_metadata?.role as UserRole) || 'viewer',
       created_at: profile.created_at,
-      updated_at: profile.created_at // profiles doesn't have updated_at
+      updated_at: profile.created_at, // profiles doesn't have updated_at
+      email_verified: !!user.email_confirmed_at
     }
   } catch (error) {
     authLogger.error('get current user', error instanceof Error ? error : new Error(String(error)));
@@ -266,7 +268,8 @@ export const profile = {
       avatar_url: profile.avatar_url,
       role: 'viewer', // Default role since profiles doesn't store role
       created_at: profile.created_at,
-      updated_at: profile.created_at // profiles doesn't have updated_at
+      updated_at: profile.created_at, // profiles doesn't have updated_at
+      email_verified: !!user?.email_confirmed_at
     };
   },
 

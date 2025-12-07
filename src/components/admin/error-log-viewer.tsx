@@ -12,7 +12,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ErrorType, ErrorSeverity } from '@/lib/error-handling';
 
 import { logger } from '@/lib/log';
@@ -69,15 +69,7 @@ export default function ErrorLogViewer() {
   // 開発環境チェック
   const isDevelopment = process.env.NODE_ENV === 'development';
 
-  useEffect(() => {
-    if (!isDevelopment) return;
-
-    // 模擬データでのデモンストレーション（Phase 4基礎実装）
-    // 実際の実装では /api/log/error からデータを取得
-    loadErrorLogs();
-  }, [isDevelopment, filter]);
-
-  const loadErrorLogs = async () => {
+  const loadErrorLogs = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -137,7 +129,15 @@ export default function ErrorLogViewer() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filter.severity, filter.type]);
+
+  useEffect(() => {
+    if (!isDevelopment) return;
+
+    // 模擬データでのデモンストレーション（Phase 4基礎実装）
+    // 実際の実装では /api/log/error からデータを取得
+    loadErrorLogs();
+  }, [loadErrorLogs, isDevelopment]);
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);

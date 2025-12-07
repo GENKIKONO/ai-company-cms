@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import Link from 'next/link';
-import type { FAQ } from '@/types/database';
+import type { FAQ } from '@/types/legacy/database';;
 import PublicPageLinks from '../components/PublicPageLinks';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { HIGButton } from '@/design-system';
@@ -42,13 +42,7 @@ export default function FAQsManagementPage() {
     getOrganizationId();
   }, []);
 
-  useEffect(() => {
-    if (organizationId) {
-      fetchFaqs();
-    }
-  }, [organizationId]);
-
-  const fetchFaqs = async () => {
+  const fetchFaqs = useCallback(async () => {
     if (!organizationId) return;
     
     try {
@@ -70,9 +64,15 @@ export default function FAQsManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId]);
 
-  const handleDelete = async (id: string) => {
+  useEffect(() => {
+    if (organizationId) {
+      fetchFaqs();
+    }
+  }, [organizationId, fetchFaqs]);
+
+  const handleDelete = useCallback(async (id: string) => {
     if (!confirm('このFAQを削除しますか？')) return;
 
     try {
@@ -89,7 +89,7 @@ export default function FAQsManagementPage() {
       logger.error('Failed to delete FAQ:', { data: err });
       alert('削除に失敗しました: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
-  };
+  }, [faqs]);
 
   if (loading) {
     return (

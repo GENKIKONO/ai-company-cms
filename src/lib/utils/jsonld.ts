@@ -1,5 +1,5 @@
 // JSON-LD structured data generators for SEO
-import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/database';
+import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/legacy/database';;
 
 // Organization JSON-LD
 export function generateOrganizationJsonLd(organization: Organization) {

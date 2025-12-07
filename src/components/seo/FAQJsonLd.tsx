@@ -1,6 +1,7 @@
 'use client';
 
-import { type QAEntry, type Organization } from '@/types/database';
+import type { QAEntry } from '@/types/domain/qa-system';
+import type { Organization } from '@/types/legacy/database';;
 import { generateFAQJsonLdScript, isValidForFAQJsonLd } from '@/lib/structured-data/faq';
 
 interface FAQJsonLdProps {

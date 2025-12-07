@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, AlertCircle, TrendingUp } from 'lucide-react';
 import { calculateStructuredDataScore } from '@/lib/trial-manager';
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 
 interface StructuredDataScoreProps {
   organization: Organization;

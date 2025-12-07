@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useToast } from '@/components/ui/toast';
 
@@ -41,11 +41,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
     sort_order: null
   });
 
-  useEffect(() => {
-    fetchFAQs();
-  }, [organizationId]);
-
-  const fetchFAQs = async () => {
+  const fetchFAQs = useCallback(async () => {
     try {
       const response = await fetch(`/api/my/faqs?organizationId=${organizationId}`);
       if (response.ok) {
@@ -63,7 +59,11 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId, addToast]);
+
+  useEffect(() => {
+    fetchFAQs();
+  }, [fetchFAQs]);
 
   const resetForm = () => {
     setFormData({
@@ -88,7 +88,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
     setShowForm(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.question.trim()) {
@@ -150,9 +150,9 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [organizationId, addToast, editingFAQ, fetchFAQs, formData]);
 
-  const handleDelete = async (faqId: string) => {
+  const handleDelete = useCallback(async (faqId: string) => {
     if (!confirm('このFAQを削除してもよろしいですか？')) {
       return;
     }
@@ -175,7 +175,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
       setError(errorMessage);
       addToast({ title: errorMessage, type: 'error' });
     }
-  };
+  }, [addToast, fetchFAQs]);
 
   if (loading) {
     return (

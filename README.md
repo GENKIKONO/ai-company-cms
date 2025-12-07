@@ -145,6 +145,39 @@ DISABLE_APP_BASIC_AUTH=true
 ✅ Production ready - 本番環境正常動作確認完了
 ```
 
+## 開発環境運用
+
+### ローカル開発サーバー管理
+
+**⚠️ 重要: 複数の npm run dev プロセス起動を避ける**
+
+```bash
+# 開発開始前に既存プロセスを確認
+ps aux | grep "npm run dev\|next dev" | grep -v grep
+
+# 既存プロセスを終了（必要に応じて）
+pkill -f "next dev"
+
+# 新しい開発サーバーを起動
+npm run dev
+```
+
+**ポート競合エラーの対処:**
+```
+Error: listen EADDRINUSE: address already in use :::3000
+```
+
+この場合の対処手順:
+1. 別のターミナルで同じプロジェクトの `npm run dev` が動いていないか確認
+2. 他のNext.jsプロジェクトで3000番ポートを使用していないか確認  
+3. プロセス終了: `lsof -ti:3000 | xargs kill`
+4. 再度 `npm run dev` を実行
+
+**開発環境のベストプラクティス:**
+- 一つのプロジェクトにつき一つの開発サーバーのみ起動
+- 作業終了時は `Ctrl+C` でサーバーを明示的に停止
+- 別ブランチでの作業時は既存サーバーを停止してから新しいサーバーを起動
+
 ## 運用
 
 ### AI可視性監視
@@ -310,7 +343,38 @@ npm run smoke:api
 
 # まとめて実行
 npm run verify:all
+
+# AIインタビュアー機能のデータ整合性チェック
+npm run ai:validate-all
 ```
+
+### AIインタビュアー バリデーション
+
+AIインタビュアー機能のデータベーススキーマとデータ整合性をチェックする専用コマンドです。
+
+```bash
+# 質問軸（ai_interview_axes）の検証
+npm run ai:validate-axes
+
+# 質問テンプレート（ai_interview_questions）の検証  
+npm run ai:validate-questions
+
+# 組織キーワード（organization_keywords）の検証
+npm run ai:validate-keywords
+
+# 全ての検証をまとめて実行
+npm run ai:validate-all
+```
+
+**重要な仕様:**
+- これらは **スキーマ整合性チェック** を目的としており、データが0件の場合はエラーではなく警告として扱われます
+- 初期状態（データ未投入）では「レコードなし」と表示されますが、これは正常な動作です
+- スキーマ構造・型定義・外部キー制約に問題がある場合のみエラーが発生します
+
+**初期データ投入後の推奨タイミング:**
+- 新機能リリース前
+- データベースマイグレーション後  
+- 本番環境でのデータ整合性確認時
 
 ### 期待される成功出力例
 

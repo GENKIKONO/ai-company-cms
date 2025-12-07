@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PLAN_LIMITS } from '@/config/plans';
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { HIGButton } from '@/design-system';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { logger } from '@/lib/utils/logger';

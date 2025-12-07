@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { generateWidgetPreview } from '@/lib/embed/generator';
 import { logger } from '@/lib/utils/logger';
 

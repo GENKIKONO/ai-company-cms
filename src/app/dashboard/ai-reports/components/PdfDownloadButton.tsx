@@ -1,0 +1,132 @@
+'use client';
+
+import { useState } from 'react';
+import { Download, FileText, AlertCircle, Loader } from 'lucide-react';
+
+interface PdfDownloadButtonProps {
+  period: string; // YYYY-MM format
+  disabled?: boolean;
+  size?: 'sm' | 'md';
+}
+
+export function PdfDownloadButton({ 
+  period, 
+  disabled = false,
+  size = 'md' 
+}: PdfDownloadButtonProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDownload = async () => {
+    if (loading || disabled) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`/api/my/reports/monthly/${period}/pdf`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || 'PDFの生成に失敗しました');
+      }
+
+      // PDFファイルをダウンロード
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ai-monthly-report-${period}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+    } catch (err) {
+      console.error('PDF download failed:', err);
+      setError(err instanceof Error ? err.message : 'PDFダウンロードに失敗しました');
+    } finally {
+      setLoading(false);
+      
+      // エラーを3秒後にクリア
+      if (error) {
+        setTimeout(() => setError(null), 3000);
+      }
+    }
+  };
+
+  const getButtonClasses = () => {
+    const baseClasses = `
+      inline-flex items-center gap-2 rounded-lg font-medium transition-colors
+      ${disabled ? 'cursor-not-allowed opacity-50' : 'hover:opacity-90'}
+    `;
+    
+    if (size === 'sm') {
+      return `${baseClasses} px-3 py-1.5 text-sm`;
+    } else {
+      return `${baseClasses} px-4 py-2`;
+    }
+  };
+
+  const getButtonColor = () => {
+    if (error) {
+      return 'bg-red-100 text-red-800 border border-red-200';
+    }
+    if (loading) {
+      return 'bg-gray-100 text-gray-700 border border-gray-300';
+    }
+    return 'bg-[var(--aio-primary)] text-white hover:bg-[var(--aio-primary)]/90';
+  };
+
+  const getIcon = () => {
+    if (loading) {
+      return <Loader className="w-4 h-4 animate-spin" />;
+    }
+    if (error) {
+      return <AlertCircle className="w-4 h-4" />;
+    }
+    return <Download className="w-4 h-4" />;
+  };
+
+  const getButtonText = () => {
+    if (loading) return 'PDF生成中...';
+    if (error) return 'エラー';
+    return 'PDFダウンロード';
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={handleDownload}
+        disabled={disabled || loading}
+        className={`${getButtonClasses()} ${getButtonColor()}`}
+        title={disabled ? 'PDFダウンロードできません' : `${period}のレポートをPDFでダウンロード`}
+      >
+        {getIcon()}
+        <span>{getButtonText()}</span>
+      </button>
+
+      {/* エラーメッセージ */}
+      {error && (
+        <div className="absolute top-full left-0 mt-2 p-3 bg-red-100 border border-red-200 rounded-lg shadow-lg z-10 whitespace-nowrap">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600" />
+            <span className="text-sm text-red-800">{error}</span>
+          </div>
+          <div className="absolute top-0 left-4 -mt-1 w-2 h-2 bg-red-100 border-l border-t border-red-200 rotate-45"></div>
+        </div>
+      )}
+
+      {/* PDFアイコン付きの説明（オプション） */}
+      {!loading && !error && size === 'md' && (
+        <div className="absolute top-full left-0 mt-2 p-2 bg-gray-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10">
+          <div className="flex items-center gap-2">
+            <FileText className="w-3 h-3" />
+            <span>レポートをPDF形式でダウンロード</span>
+          </div>
+          <div className="absolute top-0 left-4 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+        </div>
+      )}
+    </div>
+  );
+}

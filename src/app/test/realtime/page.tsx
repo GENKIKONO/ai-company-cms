@@ -59,7 +59,7 @@ export default function RealtimeTestPage() {
   useEffect(() => {
     const getOrganizationId = async () => {
       try {
-        const supabase = supabaseBrowser();
+        const supabase = supabaseBrowser;
         addLog('認証ユーザー情報を取得中...');
         
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -107,7 +107,7 @@ export default function RealtimeTestPage() {
     }
 
     try {
-      const supabase = supabaseBrowser();
+      const supabase = supabaseBrowser;
       addLog('🔄 Realtimeチャンネルを開始中...');
 
       // 既存チャンネルがあれば切断
@@ -221,7 +221,7 @@ export default function RealtimeTestPage() {
     if (!organizationId) return;
 
     try {
-      const supabase = supabaseBrowser();
+      const supabase = supabaseBrowser;
       addLog(`📝 ${table}にテストデータを挿入中...`);
 
       if (table === 'posts') {

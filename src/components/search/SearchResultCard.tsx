@@ -18,7 +18,7 @@ import {
   Heart,
   Share2
 } from 'lucide-react';
-import { type Organization, type Service, type CaseStudy } from '@/types/database';
+import type { Organization, Service, CaseStudy } from '@/types/legacy/database';
 import { logger } from '@/lib/utils/logger';
 
 // Claude改善: 柔軟性を保った型定義

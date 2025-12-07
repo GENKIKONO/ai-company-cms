@@ -470,10 +470,12 @@ export async function getAIPromptContext(userId: string): Promise<string> {
   return contextLines.join('\n');
 }
 
-export default {
+const groupContextUtils = {
   getAIGroupScope,
   getGroupOrganizations,
   canUserAccessOrganization,
   getAccessibleOrganizations,
   getAIPromptContext
 };
+
+export default groupContextUtils;

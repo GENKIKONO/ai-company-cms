@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 
 interface LayoutMetrics {
   viewport: { width: number; height: number };
@@ -69,7 +69,7 @@ export default function LayoutDebugger() {
     return elements;
   };
 
-  const measureLayout = () => {
+  const measureLayout = useCallback(() => {
     const viewport = {
       width: window.innerWidth,
       height: window.innerHeight
@@ -90,7 +90,7 @@ export default function LayoutDebugger() {
       manualBreaks,
       typographyClasses
     });
-  };
+  }, []);
 
   useEffect(() => {
     if (isVisible) {
@@ -99,7 +99,7 @@ export default function LayoutDebugger() {
       window.addEventListener('resize', handleResize);
       return () => window.removeEventListener('resize', handleResize);
     }
-  }, [isVisible]);
+  }, [isVisible, measureLayout]);
 
   if (!isVisible) {
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/utils/logger';
 
@@ -52,11 +52,7 @@ export default function BillingLinksAdminPage() {
     is_public: true
   });
 
-  useEffect(() => {
-    fetchLinks();
-  }, []);
-
-  const fetchLinks = async () => {
+  const fetchLinks = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/admin/billing-links', {
@@ -80,7 +76,11 @@ export default function BillingLinksAdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchLinks();
+  }, [fetchLinks]);
 
   const handleActivate = async (linkId: string) => {
     try {

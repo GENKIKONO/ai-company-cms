@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { apiLogger } from '@/lib/utils/logger';
-import type { QuestionAnswerData, QuestionWithDetails } from '@/types/database';
+import type { QuestionAnswerData, QuestionWithDetails } from '@/types/domain/questions';;
 
 interface RouteParams {
   params: Promise<{

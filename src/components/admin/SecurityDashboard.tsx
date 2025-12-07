@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -54,7 +54,7 @@ export default function SecurityDashboard() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const fetchSecurityMetrics = async () => {
+  const fetchSecurityMetrics = useCallback(async () => {
     try {
       const now = new Date();
       const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
@@ -124,9 +124,9 @@ export default function SecurityDashboard() {
     } catch (error) {
       logger.error('Error fetching security metrics:', { data: error });
     }
-  };
+  }, [supabase]);
 
-  const fetchServiceRoleStats = async () => {
+  const fetchServiceRoleStats = useCallback(async () => {
     try {
       // Call the service role usage stats function
       const { data: stats, error } = await supabase.rpc('get_service_role_usage_stats');
@@ -153,9 +153,9 @@ export default function SecurityDashboard() {
     } catch (error) {
       logger.error('Error fetching service role stats:', { data: error });
     }
-  };
+  }, [supabase]);
 
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     setLoading(true);
     await Promise.all([
       fetchSecurityMetrics(),
@@ -163,18 +163,18 @@ export default function SecurityDashboard() {
     ]);
     setLastUpdate(new Date());
     setLoading(false);
-  };
+  }, [fetchSecurityMetrics, fetchServiceRoleStats]);
 
   useEffect(() => {
     fetchAllData();
-  }, []);
+  }, [fetchAllData]);
 
   useEffect(() => {
     if (!autoRefresh) return;
 
     const interval = setInterval(fetchAllData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
-  }, [autoRefresh]);
+  }, [fetchAllData, autoRefresh]);
 
   const getRiskPriority = (risk: string): number => {
     const priorities = { critical: 4, high: 3, medium: 2, low: 1 };

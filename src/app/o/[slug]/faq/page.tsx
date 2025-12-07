@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateFAQJsonLd, generateOrganizationJsonLd } from '@/lib/utils/jsonld';
-import type { Organization, FAQ } from '@/types/database';
+import type { Organization, FAQ } from '@/types/legacy/database';;
 import { HIGButton } from '@/design-system';
 import { logger } from '@/lib/utils/logger';
 

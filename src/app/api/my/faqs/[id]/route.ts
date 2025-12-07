@@ -2,7 +2,7 @@
 // 個別FAQの更新・削除API
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { FAQFormData } from '@/types/database';
+import type { FAQFormData } from '@/types/domain/content';;
 import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 
 async function logErrorToDiag(errorInfo: any) {

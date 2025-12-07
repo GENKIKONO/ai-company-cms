@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from "next";
 import "./globals.css";
 import { UnifiedMobileNav } from "@/components/navigation/UnifiedMobileNav";
@@ -8,6 +10,7 @@ import { ToastProvider } from "@/components/ui/toast";
 export const metadata: Metadata = {
   title: "AIO Hub",
   description: "AIに正しく理解されるためのCMS",
+  robots: "index, follow", // AI フレンドリーなデフォルト設定
 };
 
 export default function RootLayout({

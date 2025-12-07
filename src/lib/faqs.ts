@@ -1,7 +1,8 @@
 'use client';
 
 import { supabaseBrowser } from '@/lib/supabase/client';
-import { type FAQ, type FAQFormData } from '@/types/database';
+import type { FAQ } from '@/types/legacy/database';
+import type { FAQFormData } from '@/types/domain/content';;
 import { logger } from '@/lib/utils/logger';
 
 // FAQ一覧取得（特定企業）

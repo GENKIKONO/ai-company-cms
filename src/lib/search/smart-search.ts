@@ -4,7 +4,7 @@
  */
 
 import { performAdvancedSearch, type AdvancedSearchFilters } from './advanced-search';
-import { type Organization, type Service, type CaseStudy } from '@/types/database';
+import type { Organization, Service, CaseStudy } from '@/types/legacy/database';
 
 export interface SmartSearchQuery {
   originalQuery: string;

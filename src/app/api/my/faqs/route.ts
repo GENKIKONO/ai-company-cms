@@ -2,9 +2,10 @@
 // ユーザーの企業のFAQを管理するためのAPI
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { FAQ, FAQFormData } from '@/types/database';
+import type { FAQ } from '@/types/legacy/database';
+import type { FAQFormData } from '@/types/domain/content';;
 import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
-import { PLAN_LIMITS } from '@/config/plans';
+import { getFeatureLimit } from '@/lib/org-features';
 import { logger } from '@/lib/utils/logger';
 
 async function logErrorToDiag(errorInfo: any) {
@@ -140,36 +141,41 @@ export async function POST(request: NextRequest) {
       }, { status: 403 });
     }
 
-    // プラン制限チェック
-    const currentPlan = orgData.plan || 'trial';
-    const planLimits = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.trial;
-    
-    if (planLimits.faqs > 0) {
-      const { count: currentCount, error: countError } = await supabase
-        .from('faqs')
-        .select('id', { count: 'exact' })
-        .eq('organization_id', orgData.id);
+    // プラン制限チェック（effective-features使用）
+    try {
+      const featureLimit = await getFeatureLimit(orgData.id, 'faq_module');
+      
+      // null/undefined は無制限扱い
+      if (featureLimit !== null && featureLimit !== undefined) {
+        const { count: currentCount, error: countError } = await supabase
+          .from('faqs')
+          .select('id', { count: 'exact' })
+          .eq('organization_id', orgData.id);
 
-      if (countError) {
-        logger.error('Error counting FAQs:', { data: countError });
-        return NextResponse.json(
-          { error: 'Database error', message: countError.message },
-          { status: 500 }
-        );
-      }
+        if (countError) {
+          logger.error('Error counting FAQs:', { data: countError });
+          return NextResponse.json(
+            { error: 'Database error', message: countError.message },
+            { status: 500 }
+          );
+        }
 
-      if ((currentCount || 0) >= planLimits.faqs) {
-        return NextResponse.json(
-          {
-            error: 'Plan limit exceeded',
-            message: '上限に達しました。プランをアップグレードしてください。',
-            currentCount,
-            limit: planLimits.faqs,
-            plan: currentPlan
-          },
-          { status: 402 }
-        );
+        if ((currentCount || 0) >= featureLimit) {
+          return NextResponse.json(
+            {
+              error: 'Plan limit exceeded',
+              message: '上限に達しました。プランをアップグレードしてください。',
+              currentCount,
+              limit: featureLimit,
+              plan: orgData.plan || 'trial'
+            },
+            { status: 402 }
+          );
+        }
       }
+    } catch (error) {
+      logger.error('Feature limit check failed, allowing creation:', { data: error });
+      // TODO: ここは後で要確認 - effective-features エラー時のフォールバック挙動
     }
 
     // FAQデータを準備

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Flag, 
   AlertTriangle, 
@@ -49,22 +49,12 @@ export default function NextViolationFlagPanel({
   const [selectedAction, setSelectedAction] = useState<'suspend' | 'warn' | 'none'>('none');
   const [note, setNote] = useState('');
 
-  useEffect(() => {
-    if (userId) {
-      loadNextViolationFlag(userId);
-    } else {
-      setData(null);
-      setError(null);
-      resetForm();
-    }
-  }, [userId]);
-
   const resetForm = () => {
     setSelectedAction('none');
     setNote('');
   };
 
-  const loadNextViolationFlag = async (id: string) => {
+  const loadNextViolationFlag = useCallback(async (id: string) => {
     setLoading(true);
     setError(null);
 
@@ -90,9 +80,19 @@ export default function NextViolationFlagPanel({
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleSave = async () => {
+  useEffect(() => {
+    if (userId) {
+      loadNextViolationFlag(userId);
+    } else {
+      setData(null);
+      setError(null);
+      resetForm();
+    }
+  }, [userId, loadNextViolationFlag]);
+
+  const handleSave = useCallback(async () => {
     if (!userId) return;
 
     setSaving(true);
@@ -130,7 +130,7 @@ export default function NextViolationFlagPanel({
     } finally {
       setSaving(false);
     }
-  };
+  }, [userId, selectedAction, note, loadNextViolationFlag, onFlagUpdated]);
 
   const getActionColor = (action: string | null) => {
     switch (action) {

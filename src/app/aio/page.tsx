@@ -14,6 +14,9 @@ import { aioCopy } from './copy';
 import { UNIFIED_PRICES } from '@/config/unified-plans';
 import { generateAIOPricingJsonLD } from '@/lib/generatePricingJsonLD';
 
+// P4-2: ISR設定（静的ページ）
+export const revalidate = 1800; // 30分間隔での再生成
+
 export const metadata: Metadata = {
   title: aioCopy.metadata.title,
   description: aioCopy.metadata.description,

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, ChevronDown, ChevronUp } from 'lucide-react';
-import type { QAEntry, QACategory } from '@/types/database';
+import type { QAEntry, QACategory } from '@/types/domain/qa-system';;
 import { logger } from '@/lib/utils/logger';
 
 interface QAPublicDisplayProps {
@@ -26,7 +26,7 @@ export default function QAPublicDisplay({ organizationSlug, className = '' }: QA
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
-  const fetchQAData = async () => {
+  const fetchQAData = useCallback(async () => {
     try {
       const params = new URLSearchParams({
         org_slug: organizationSlug,
@@ -52,13 +52,13 @@ export default function QAPublicDisplay({ organizationSlug, className = '' }: QA
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationSlug, searchTerm, selectedCategory]);
 
   useEffect(() => {
     if (organizationSlug) {
       fetchQAData();
     }
-  }, [organizationSlug, selectedCategory, searchTerm]);
+  }, [organizationSlug, selectedCategory, searchTerm, fetchQAData]);
 
   const toggleExpanded = (entryId: string) => {
     const newExpanded = new Set(expandedItems);

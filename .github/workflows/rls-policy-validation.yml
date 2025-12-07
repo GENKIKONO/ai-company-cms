@@ -1,0 +1,225 @@
+# =========================================================
+# RLS Policy Validation - GitHub Actions Workflow
+# AIOHub Phase 3 - EPIC 3-2
+# =========================================================
+
+name: RLS Policy Validation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/policies/**'
+      - 'supabase/functions/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**' 
+      - 'supabase/policies/**'
+      - 'supabase/functions/**'
+
+jobs:
+  rls-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 全履歴取得（差分検出用）
+      
+      - name: Setup Supabase CLI
+        run: |
+          curl -fsSL https://github.com/supabase/cli/releases/download/v1.100.0/supabase_linux_amd64.tar.gz | tar -xz
+          sudo mv supabase /usr/local/bin/
+          supabase --version
+      
+      # マイグレーション適用（変更がある場合のみ）
+      - name: Apply database migrations
+        if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          # プロジェクトにリンク
+          supabase link --project-ref ${{ vars.SUPABASE_PROJECT_REF }}
+          
+          # マイグレーション適用
+          echo "Applying migrations..."
+          supabase db push
+          
+          # Edge Functions デプロイ（RLS Testerが更新された場合）
+          if git diff --name-only HEAD~1 | grep -q "supabase/functions/rls-tester"; then
+            echo "RLS Tester function updated, deploying..."
+            supabase functions deploy rls-tester
+          fi
+      
+      # RLS テスト実行
+      - name: Run RLS Policy Tests
+        id: rls-test
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Starting RLS policy validation..."
+          
+          # RLS Tester Edge Function を呼び出し
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            "$SUPABASE_URL/functions/v1/rls-tester" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"trigger_source\": \"github-actions\",
+              \"git_commit\": \"$GITHUB_SHA\",
+              \"git_branch\": \"$GITHUB_REF_NAME\",
+              \"environment\": \"${{ github.event_name == 'push' && 'staging' || 'pr-test' }}\"
+            }")
+          
+          # レスポンス分離（最後の行がHTTPステータス）
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+          
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response Body: $BODY"
+          
+          # ステータスコード確認
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "❌ Edge Function call failed with status $HTTP_CODE"
+            echo "::error::RLS Tester Edge Function failed: $BODY"
+            exit 1
+          fi
+          
+          # JSON パース（jq使用）
+          echo "$BODY" > /tmp/rls_test_result.json
+          
+          TOTAL=$(echo "$BODY" | jq -r '.total // 0')
+          PASSED=$(echo "$BODY" | jq -r '.passed // 0')
+          FAILED=$(echo "$BODY" | jq -r '.failed // 0')
+          ERROR_COUNT=$(echo "$BODY" | jq -r '.error // 0')
+          SUCCESS_RATE=$(echo "$BODY" | jq -r '.success_rate // 0')
+          TEST_RUN_ID=$(echo "$BODY" | jq -r '.test_run_id // "unknown"')
+          STATUS=$(echo "$BODY" | jq -r '.status // "UNKNOWN"')
+          
+          # 結果サマリー出力
+          echo "🔍 RLS Policy Test Results"
+          echo "=========================="
+          echo "Test Run ID: $TEST_RUN_ID"
+          echo "Total scenarios: $TOTAL"
+          echo "✅ Passed: $PASSED"
+          echo "❌ Failed: $FAILED"
+          echo "🔥 Errors: $ERROR_COUNT"
+          echo "📊 Success rate: $SUCCESS_RATE%"
+          echo "Status: $STATUS"
+          echo "=========================="
+          
+          # GitHub Step Output設定
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "error_count=$ERROR_COUNT" >> $GITHUB_OUTPUT
+          echo "success_rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+          echo "test_run_id=$TEST_RUN_ID" >> $GITHUB_OUTPUT
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          
+          # CI判定: 失敗またはエラーがある場合は CI を失敗させる
+          if [ "$FAILED" -gt 0 ] || [ "$ERROR_COUNT" -gt 0 ] || [ "$STATUS" = "FAILED" ]; then
+            echo "::error::RLS Policy validation failed - $FAILED failed scenarios, $ERROR_COUNT errors"
+            echo "::notice::Check the Super Admin Console for detailed results: $SUPABASE_URL/admin/console"
+            exit 1
+          fi
+          
+          # 成功率が90%未満の場合も警告
+          if [ "$(echo "$SUCCESS_RATE < 90" | bc -l)" = "1" ]; then
+            echo "::warning::RLS Policy success rate is below 90% ($SUCCESS_RATE%)"
+          fi
+          
+          echo "✅ All RLS policy tests passed successfully!"
+      
+      # PRコメント投稿（Pull Request時のみ）
+      - name: Comment on PR
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        env:
+          TOTAL: ${{ steps.rls-test.outputs.total }}
+          PASSED: ${{ steps.rls-test.outputs.passed }}
+          FAILED: ${{ steps.rls-test.outputs.failed }}
+          ERROR_COUNT: ${{ steps.rls-test.outputs.error_count }}
+          SUCCESS_RATE: ${{ steps.rls-test.outputs.success_rate }}
+          TEST_RUN_ID: ${{ steps.rls-test.outputs.test_run_id }}
+          STATUS: ${{ steps.rls-test.outputs.status }}
+        with:
+          script: |
+            const { TOTAL, PASSED, FAILED, ERROR_COUNT, SUCCESS_RATE, TEST_RUN_ID, STATUS } = process.env;
+            
+            const statusEmoji = STATUS === 'COMPLETED' ? '✅' : '❌';
+            const successEmoji = FAILED == 0 && ERROR_COUNT == 0 ? '🎉' : '⚠️';
+            
+            const comment = `
+            ## ${statusEmoji} RLS Policy Validation Results
+            
+            **Test Run ID:** \`${TEST_RUN_ID}\`
+            
+            | Metric | Value |
+            |--------|-------|
+            | 📊 Total Scenarios | ${TOTAL} |
+            | ✅ Passed | ${PASSED} |
+            | ❌ Failed | ${FAILED} |
+            | 🔥 Errors | ${ERROR_COUNT} |
+            | 📈 Success Rate | ${SUCCESS_RATE}% |
+            | 🏁 Status | ${STATUS} |
+            
+            ${FAILED > 0 || ERROR_COUNT > 0 ? 
+              '⚠️ **Some RLS policies failed validation. Please review the failed scenarios in the Super Admin Console.**' : 
+              '🎉 **All RLS policies are working correctly!**'
+            }
+            
+            <details>
+            <summary>📖 How to investigate issues</summary>
+            
+            1. Check the [Super Admin Console](${{ vars.SUPABASE_URL }}/admin/console) for detailed test results
+            2. Look for scenarios with \`actual_result != expected_result\`
+            3. Review RLS policies for the affected tables
+            4. Test manually with the specific user roles that failed
+            
+            </details>
+            
+            ---
+            *This comment was automatically generated by the RLS Policy Validation workflow.*
+            `;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+      
+      # Slack通知（オプション、失敗時のみ）
+      - name: Notify Slack on failure
+        if: ${{ failure() && github.event_name == 'push' }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TOTAL: ${{ steps.rls-test.outputs.total }}
+          FAILED: ${{ steps.rls-test.outputs.failed }}
+          ERROR_COUNT: ${{ steps.rls-test.outputs.error_count }}
+          SUCCESS_RATE: ${{ steps.rls-test.outputs.success_rate }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST -H 'Content-type: application/json' \
+              --data "{
+                \"text\": \"🚨 RLS Policy Validation Failed\",
+                \"blocks\": [
+                  {
+                    \"type\": \"section\",
+                    \"text\": {
+                      \"type\": \"mrkdwn\",
+                      \"text\": \"*RLS Policy validation failed on \`$GITHUB_REF_NAME\` branch*\n\n📊 Results:\n• Failed: $FAILED\n• Errors: $ERROR_COUNT\n• Success Rate: $SUCCESS_RATE%\n\n<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|View workflow run>\"
+                    }
+                  }
+                ]
+              }" \
+              $SLACK_WEBHOOK_URL
+          fi

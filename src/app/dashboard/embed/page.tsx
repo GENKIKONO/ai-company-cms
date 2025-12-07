@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { WidgetPreview } from '@/components/embed/WidgetPreview';
 import { getCurrentUser } from '@/lib/auth';
 import { HIGButton } from '@/design-system';
 import { getOrganization } from '@/lib/organizations';
-import { Organization, Service } from '@/types/database';
+import type { Organization, Service } from '@/types/legacy/database';;
 import Link from 'next/link';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { logger } from '@/lib/utils/logger';
@@ -25,15 +25,7 @@ export default function EmbedPage() {
   });
   const [embedCode, setEmbedCode] = useState('');
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    generateEmbedCode();
-  }, [organization, widgetOptions]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setError(null);
       const user = await getCurrentUser();
@@ -95,14 +87,14 @@ export default function EmbedPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const retryFetch = () => {
     setLoading(true);
     fetchData();
   };
 
-  const generateEmbedCode = () => {
+  const generateEmbedCode = useCallback(() => {
     if (!organization?.slug) {
       setEmbedCode('');
       return;
@@ -130,7 +122,7 @@ export default function EmbedPage() {
 </iframe>`;
     
     setEmbedCode(code);
-  };
+  }, [organization, widgetOptions]);
 
   const copyToClipboard = async () => {
     try {
@@ -141,6 +133,14 @@ export default function EmbedPage() {
       alert('コピーに失敗しました');
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    generateEmbedCode();
+  }, [generateEmbedCode]);
 
   if (loading) {
     return (

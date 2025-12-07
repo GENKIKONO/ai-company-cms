@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     // 1. Next.js での認証確認 (Q19)
     // ============================================
     
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -279,7 +279,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // 認証確認 (GETでも必要)
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

@@ -3,7 +3,7 @@
  * 要件定義準拠: 記事・ブログ投稿のための構造化データ
  */
 
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 
 interface Post {
   id: string;

@@ -5,7 +5,7 @@
  * プラン別制限と使用状況を監視
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PLAN_NAMES } from '@/config/plans';
 import type { PlanType } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
@@ -44,11 +44,7 @@ export function EmbedLimitCard() {
   const [error, setError] = useState<string | null>(null);
   const [showOnlyWarnings, setShowOnlyWarnings] = useState(false);
 
-  useEffect(() => {
-    fetchLimitData();
-  }, []);
-
-  const fetchLimitData = async () => {
+  const fetchLimitData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -61,14 +57,18 @@ export function EmbedLimitCard() {
 
       const result = await response.json();
       setLimits(result.organizations || []);
-      setStats(result.stats || stats);
+      setStats(prevStats => result.stats || prevStats);
     } catch (err) {
       setError(err instanceof Error ? err.message : '不明なエラー');
       logger.error('Failed to fetch limit data:', { data: err });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchLimitData();
+  }, [fetchLimitData]);
 
   const filteredLimits = showOnlyWarnings 
     ? limits.filter(org => org.warningLevel !== 'none')

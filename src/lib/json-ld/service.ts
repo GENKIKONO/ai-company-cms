@@ -3,7 +3,8 @@
  * 要件定義準拠: 価格未入力時offers非出力
  */
 
-import type { Organization, Service, ServiceMedia } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';
+import type { ServiceWithLegacyFields, ServiceMedia } from '@/types/utils/database';
 import { logger } from '@/lib/utils/logger';
 
 interface ServiceJsonLd {
@@ -55,7 +56,7 @@ function omitEmpty<T extends object>(obj: T): Partial<T> {
  * Service の JSON-LD を生成
  * 要件定義準拠: 価格未入力時はoffers非出力
  */
-export function generateServiceJsonLd(service: Service, org: Organization): ServiceJsonLd | null {
+export function generateServiceJsonLd(service: ServiceWithLegacyFields, org: Organization): ServiceJsonLd | null {
   // Safety guard: prevent generation when organization slug is undefined/empty
   if (!org || !org.slug || !org.slug.trim()) { 
     logger.debug('[VERIFY][JSON-LD] skip because slug empty');
@@ -142,7 +143,7 @@ export interface ServiceJsonLdValidationResult {
   warnings: string[];
 }
 
-export function validateServiceJsonLd(service: Service, org: Organization): ServiceJsonLdValidationResult {
+export function validateServiceJsonLd(service: ServiceWithLegacyFields, org: Organization): ServiceJsonLdValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -201,7 +202,7 @@ export function validateServiceJsonLd(service: Service, org: Organization): Serv
 /**
  * Service JSON-LD をHTML用文字列として出力
  */
-export function serviceJsonLdToHtml(service: Service, org: Organization): string | null {
+export function serviceJsonLdToHtml(service: ServiceWithLegacyFields, org: Organization): string | null {
   const jsonLd = generateServiceJsonLd(service, org);
   if (!jsonLd) return null;
   return JSON.stringify(jsonLd, null, 2);

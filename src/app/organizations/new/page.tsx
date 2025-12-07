@@ -7,7 +7,8 @@ import { getCurrentUser } from '@/lib/auth';
 import { getIndustries } from '@/lib/organizations';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
-import { type AppUser, type OrganizationFormData } from '@/types/database';
+import type { AppUser } from '@/types/legacy/database';
+import type { OrganizationFormData } from '@/types/domain/organizations';;
 import OrgLogoUploader from '@/components/OrgLogoUploader';
 
 // プラン別タグ数制限

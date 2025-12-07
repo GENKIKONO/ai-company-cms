@@ -88,7 +88,9 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   const navigation = isDashboard ? dashboardNavigation : publicNavigation;
 
   // マウント状態管理
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // アニメーション制御: 開く処理
   useEffect(() => {

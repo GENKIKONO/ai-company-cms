@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { QuestionWithDetails } from '@/types/database';
+import type { QuestionWithDetails } from '@/types/domain/questions';;
 import { logger } from '@/lib/utils/logger';
 
 // GET: 現在のユーザーが投稿した質問一覧

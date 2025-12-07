@@ -1,0 +1,403 @@
+# GitHub Actions - Weekly Schema Check
+# EPIC 3-7: pg_dump補助によるスキーマDiff二重化検証
+# 
+# 目的:
+# - Edge Functions（nightly-schema-diff）の補助検証
+# - pg_dump --schema-only による期待値と実体の二重チェック
+# - 週次包括レポートの生成とSlack通知
+
+name: Weekly Schema Check
+
+on:
+  schedule:
+    # 毎週日曜日 02:00 UTC (日本時間 11:00)
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      environment_pair:
+        description: 'Environment pair to compare (e.g., staging:production)'
+        required: true
+        default: 'staging:production'
+      notification_channel:
+        description: 'Slack notification channel'
+        required: false
+        default: '#alerts'
+
+env:
+  NODE_VERSION: '18'
+  POSTGRES_VERSION: '15'
+
+jobs:
+  schema-check:
+    name: Weekly Schema Cross-Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - source_env: staging
+            target_env: production
+            comparison_type: cross_env
+          - source_env: production
+            target_env: production
+            comparison_type: self_check
+    
+    steps:
+      # ============================================
+      # 1. セットアップ
+      # ============================================
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Setup PostgreSQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-${{ env.POSTGRES_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      # ============================================
+      # 2. 環境変数・認証設定
+      # ============================================
+      
+      - name: Configure Supabase CLI
+        run: |
+          npm install -g @supabase/cli@latest
+          echo "SUPABASE_ACCESS_TOKEN=${{ secrets.SUPABASE_ACCESS_TOKEN }}" >> $GITHUB_ENV
+          echo "SUPABASE_PROJECT_ID=${{ secrets.SUPABASE_PROJECT_ID }}" >> $GITHUB_ENV
+          
+      - name: Set environment URLs
+        run: |
+          case "${{ matrix.source_env }}" in
+            "production")
+              echo "SOURCE_DB_URL=${{ secrets.SUPABASE_PROD_DB_URL }}" >> $GITHUB_ENV
+              echo "SOURCE_API_URL=${{ secrets.SUPABASE_PROD_URL }}" >> $GITHUB_ENV
+              echo "SOURCE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_PROD_SERVICE_ROLE_KEY }}" >> $GITHUB_ENV
+              ;;
+            "staging")
+              echo "SOURCE_DB_URL=${{ secrets.SUPABASE_STAGING_DB_URL }}" >> $GITHUB_ENV
+              echo "SOURCE_API_URL=${{ secrets.SUPABASE_STAGING_URL }}" >> $GITHUB_ENV
+              echo "SOURCE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_STAGING_SERVICE_ROLE_KEY }}" >> $GITHUB_ENV
+              ;;
+          esac
+          
+          case "${{ matrix.target_env }}" in
+            "production")
+              echo "TARGET_DB_URL=${{ secrets.SUPABASE_PROD_DB_URL }}" >> $GITHUB_ENV
+              echo "TARGET_API_URL=${{ secrets.SUPABASE_PROD_URL }}" >> $GITHUB_ENV
+              echo "TARGET_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_PROD_SERVICE_ROLE_KEY }}" >> $GITHUB_ENV
+              ;;
+            "staging")
+              echo "TARGET_DB_URL=${{ secrets.SUPABASE_STAGING_DB_URL }}" >> $GITHUB_ENV
+              echo "TARGET_API_URL=${{ secrets.SUPABASE_STAGING_URL }}" >> $GITHUB_ENV
+              echo "TARGET_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_STAGING_SERVICE_ROLE_KEY }}" >> $GITHUB_ENV
+              ;;
+          esac
+          
+      # ============================================
+      # 3. pg_dump スキーマダンプ取得
+      # ============================================
+      
+      - name: Create schema dumps
+        run: |
+          # Work directory for dumps
+          mkdir -p schema-dumps
+          
+          # Source environment dump
+          echo "Dumping schema from ${{ matrix.source_env }}..."
+          pg_dump "$SOURCE_DB_URL" \
+            --schema-only \
+            --no-owner \
+            --no-privileges \
+            --schema=public \
+            --exclude-schema=auth \
+            --exclude-schema=storage \
+            --exclude-schema=supabase_migrations \
+            --exclude-schema=extensions \
+            --exclude-schema=realtime \
+            --exclude-table-data=supabase_migrations.* \
+            > schema-dumps/${{ matrix.source_env }}_schema.sql
+            
+          # Target environment dump (if different)
+          if [ "${{ matrix.source_env }}" != "${{ matrix.target_env }}" ]; then
+            echo "Dumping schema from ${{ matrix.target_env }}..."
+            pg_dump "$TARGET_DB_URL" \
+              --schema-only \
+              --no-owner \
+              --no-privileges \
+              --schema=public \
+              --exclude-schema=auth \
+              --exclude-schema=storage \
+              --exclude-schema=supabase_migrations \
+              --exclude-schema=extensions \
+              --exclude-schema=realtime \
+              --exclude-table-data=supabase_migrations.* \
+              > schema-dumps/${{ matrix.target_env }}_schema.sql
+          fi
+          
+      # ============================================
+      # 4. スキーマDiff計算
+      # ============================================
+      
+      - name: Calculate schema diff
+        id: schema_diff
+        run: |
+          # Schema diff calculation
+          if [ "${{ matrix.source_env }}" != "${{ matrix.target_env }}" ]; then
+            echo "Calculating diff between ${{ matrix.source_env }} and ${{ matrix.target_env }}..."
+            
+            # Text-based diff
+            if diff -u schema-dumps/${{ matrix.target_env }}_schema.sql schema-dumps/${{ matrix.source_env }}_schema.sql > schema-dumps/diff.txt; then
+              echo "No schema differences detected"
+              echo "has_differences=false" >> $GITHUB_OUTPUT
+              echo "diff_lines=0" >> $GITHUB_OUTPUT
+            else
+              echo "Schema differences detected"
+              diff_lines=$(wc -l < schema-dumps/diff.txt)
+              echo "has_differences=true" >> $GITHUB_OUTPUT
+              echo "diff_lines=$diff_lines" >> $GITHUB_OUTPUT
+              
+              # Truncate diff if too large
+              if [ $diff_lines -gt 500 ]; then
+                head -n 500 schema-dumps/diff.txt > schema-dumps/diff_truncated.txt
+                echo "Diff truncated to 500 lines (was $diff_lines lines)" >> schema-dumps/diff_truncated.txt
+                mv schema-dumps/diff_truncated.txt schema-dumps/diff.txt
+              fi
+            fi
+          else
+            echo "Self-check mode for ${{ matrix.source_env }}"
+            echo "has_differences=false" >> $GITHUB_OUTPUT
+            echo "diff_lines=0" >> $GITHUB_OUTPUT
+            
+            # Basic schema validation
+            schema_lines=$(wc -l < schema-dumps/${{ matrix.source_env }}_schema.sql)
+            echo "Schema has $schema_lines lines"
+            echo "schema_lines=$schema_lines" >> $GITHUB_OUTPUT
+          fi
+          
+      # ============================================
+      # 5. Edge Functions連携チェック
+      # ============================================
+      
+      - name: Check Edge Function diff history
+        id: edge_check
+        run: |
+          # Query recent Edge Function diff results
+          echo "Checking nightly-schema-diff results for ${{ matrix.source_env }}..."
+          
+          # Create Node.js script to query Supabase
+          cat > check_edge_diff.js << 'EOF'
+          const { createClient } = require('@supabase/supabase-js');
+          
+          async function checkEdgeDiff() {
+            const supabase = createClient(
+              process.env.SOURCE_API_URL,
+              process.env.SOURCE_SERVICE_ROLE_KEY
+            );
+            
+            const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days ago
+            
+            const { data, error } = await supabase
+              .from('schema_diff_history')
+              .select('id, environment, diff_at, summary, severity')
+              .eq('environment', process.env.SOURCE_ENV)
+              .gte('diff_at', since)
+              .order('diff_at', { ascending: false })
+              .limit(10);
+              
+            if (error) {
+              console.error('Error querying diff history:', error);
+              process.exit(1);
+            }
+            
+            console.log(`Found ${data?.length || 0} diff records in the last 7 days`);
+            
+            if (data && data.length > 0) {
+              const latestDiff = data[0];
+              console.log(`Latest diff: ${latestDiff.diff_at} (${latestDiff.severity})`);
+              console.log(`Summary:`, JSON.stringify(latestDiff.summary, null, 2));
+              
+              // Output for GitHub Actions
+              console.log(`::set-output name=latest_diff_id::${latestDiff.id}`);
+              console.log(`::set-output name=latest_diff_severity::${latestDiff.severity}`);
+              console.log(`::set-output name=edge_diff_count::${data.length}`);
+              
+              const totalChanges = latestDiff.summary?.total_changes || 0;
+              console.log(`::set-output name=latest_total_changes::${totalChanges}`);
+            } else {
+              console.log('::set-output name=edge_diff_count::0');
+              console.log('::set-output name=latest_total_changes::0');
+            }
+          }
+          
+          checkEdgeDiff().catch(console.error);
+          EOF
+          
+          SOURCE_ENV=${{ matrix.source_env }} node check_edge_diff.js
+          
+      # ============================================
+      # 6. 詳細レポート生成
+      # ============================================
+      
+      - name: Generate comprehensive report
+        id: report
+        run: |
+          cat > weekly_schema_report.md << EOF
+          # Weekly Schema Check Report
+          
+          **Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')  
+          **Comparison:** ${{ matrix.source_env }} → ${{ matrix.target_env }}  
+          **Type:** ${{ matrix.comparison_type }}  
+          
+          ## Summary
+          
+          - **pg_dump Differences:** ${{ steps.schema_diff.outputs.has_differences == 'true' && 'Yes' || 'No' }}
+          - **Diff Lines:** ${{ steps.schema_diff.outputs.diff_lines || 0 }}
+          - **Edge Function Diffs (7d):** ${{ steps.edge_check.outputs.edge_diff_count || 0 }}
+          - **Latest Edge Changes:** ${{ steps.edge_check.outputs.latest_total_changes || 0 }}
+          
+          ## Edge Function Status
+          
+          EOF
+          
+          if [ "${{ steps.edge_check.outputs.latest_diff_id }}" != "" ]; then
+            cat >> weekly_schema_report.md << EOF
+          - **Latest Diff ID:** ${{ steps.edge_check.outputs.latest_diff_id }}
+          - **Severity:** ${{ steps.edge_check.outputs.latest_diff_severity }}
+          - **Console Link:** $SOURCE_API_URL/admin/schema-diff/${{ steps.edge_check.outputs.latest_diff_id }}
+          
+          EOF
+          fi
+          
+          if [ "${{ steps.schema_diff.outputs.has_differences }}" = "true" ]; then
+            cat >> weekly_schema_report.md << EOF
+          ## pg_dump Schema Differences
+          
+          \`\`\`diff
+          $(cat schema-dumps/diff.txt)
+          \`\`\`
+          
+          EOF
+          fi
+          
+          cat >> weekly_schema_report.md << EOF
+          ## Files Generated
+          
+          - Source Schema: schema-dumps/${{ matrix.source_env }}_schema.sql
+          - Target Schema: schema-dumps/${{ matrix.target_env }}_schema.sql
+          - Diff Output: schema-dumps/diff.txt
+          
+          ---
+          
+          Generated by GitHub Actions weekly-schema-check workflow  
+          Repository: ${{ github.repository }}  
+          Commit: ${{ github.sha }}
+          EOF
+          
+          echo "Report generated successfully"
+          
+      # ============================================
+      # 7. アーティファクトアップロード
+      # ============================================
+      
+      - name: Upload schema dumps
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema-dumps-${{ matrix.source_env }}-${{ matrix.target_env }}-${{ github.run_number }}
+          path: schema-dumps/
+          retention-days: 30
+          
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-report-${{ matrix.source_env }}-${{ matrix.target_env }}-${{ github.run_number }}
+          path: weekly_schema_report.md
+          retention-days: 90
+          
+      # ============================================
+      # 8. Slack通知（差分検出時）
+      # ============================================
+      
+      - name: Send Slack notification
+        if: steps.schema_diff.outputs.has_differences == 'true' || steps.edge_check.outputs.latest_total_changes > 0
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ steps.schema_diff.outputs.has_differences == 'true' && 'warning' || 'good' }}
+          channel: ${{ github.event.inputs.notification_channel || '#alerts' }}
+          fields: repo,commit,author,action,eventName,ref,workflow,job,took
+          custom_payload: |
+            {
+              text: "Weekly Schema Check: ${{ matrix.source_env }} → ${{ matrix.target_env }}",
+              attachments: [{
+                color: "${{ steps.schema_diff.outputs.has_differences == 'true' && 'warning' || 'good' }}",
+                fields: [
+                  {
+                    title: "pg_dump Differences",
+                    value: "${{ steps.schema_diff.outputs.has_differences == 'true' && steps.schema_diff.outputs.diff_lines || 'None' }}",
+                    short: true
+                  },
+                  {
+                    title: "Edge Function Diffs",
+                    value: "${{ steps.edge_check.outputs.edge_diff_count || 0 }} (7 days)",
+                    short: true
+                  },
+                  {
+                    title: "Latest Changes",
+                    value: "${{ steps.edge_check.outputs.latest_total_changes || 0 }}",
+                    short: true
+                  },
+                  {
+                    title: "Comparison",
+                    value: "${{ matrix.source_env }} → ${{ matrix.target_env }}",
+                    short: true
+                  }
+                ],
+                actions: [
+                  {
+                    type: "button",
+                    text: "View Artifacts",
+                    url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                ]
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+  # ============================================
+  # 集約ジョブ（全マトリックス完了後）
+  # ============================================
+  
+  summary:
+    name: Summary Report
+    needs: schema-check
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Generate summary
+        run: |
+          echo "Weekly schema check completed for all environment pairs"
+          echo "Results available in artifacts"
+          
+          # TODO: 必要に応じて週次レポートをPRコメント等で報告
+          
+      - name: Final Slack notification
+        if: contains(needs.schema-check.result, 'failure')
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#alerts'
+          text: 'Weekly Schema Check failed - please check workflow logs'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

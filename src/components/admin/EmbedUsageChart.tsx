@@ -5,7 +5,7 @@
  * 過去30日間の使用状況をビジュアル表示
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/utils/logger';
 
 interface UsageData {
@@ -27,11 +27,7 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
   const [selectedMetric, setSelectedMetric] = useState<'loads' | 'clicks' | 'errors'>('loads');
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchUsageData();
-  }, [organizationId, days]);
-
-  const fetchUsageData = async () => {
+  const fetchUsageData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -63,7 +59,11 @@ export function EmbedUsageChart({ organizationId, days = 30 }: ChartProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId, days]);
+
+  useEffect(() => {
+    fetchUsageData();
+  }, [fetchUsageData]);
 
   const getMaxValue = () => {
     if (data.length === 0) return 100;

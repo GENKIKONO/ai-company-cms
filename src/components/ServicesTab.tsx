@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
 
@@ -54,11 +54,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
     image_url: ''
   });
 
-  useEffect(() => {
-    fetchServices();
-  }, [organizationId]);
-
-  const fetchServices = async () => {
+  const fetchServices = useCallback(async () => {
     try {
       setError(''); // Clear previous errors
       const response = await fetch(`/api/my/services?organizationId=${organizationId}`);
@@ -87,7 +83,11 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId]);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   const resetForm = () => {
     setFormData({
@@ -116,7 +116,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
     setShowForm(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
@@ -166,9 +166,9 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [organizationId, editingService, fetchServices, formData]);
 
-  const handleDelete = async (serviceId: string) => {
+  const handleDelete = useCallback(async (serviceId: string) => {
     if (!confirm('このサービスを削除してもよろしいですか？')) {
       return;
     }
@@ -199,7 +199,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
         setError('サービスの削除に失敗しました');
       }
     }
-  };
+  }, [fetchServices]);
 
   if (loading) {
     return (

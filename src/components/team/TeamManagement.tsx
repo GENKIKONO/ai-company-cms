@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Users, UserPlus, Shield, Crown, Edit3, Eye, Trash2, Mail } from 'lucide-react';
-import type { UserRole } from '@/types/database';
+import type { UserRole } from '@/types/utils/database';
 import { logger } from '@/lib/utils/logger';
 
 interface TeamMember {

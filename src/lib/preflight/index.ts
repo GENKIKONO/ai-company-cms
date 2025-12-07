@@ -3,7 +3,7 @@
  * 要件定義準拠: JSON-LD検証 + Subscription確認 + DNS検証
  */
 
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { 
   validateOrganizationJsonLd, 
   type JsonLdValidationResult 

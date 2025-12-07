@@ -167,7 +167,7 @@ function EnhancedSearchForm() {
     if (filters.query || searchParams.toString()) {
       performSearch(filters);
     }
-  }, []);
+  }, [filters, searchParams, performSearch]);
 
   // クエリ変更時のサジェスト
   useEffect(() => {

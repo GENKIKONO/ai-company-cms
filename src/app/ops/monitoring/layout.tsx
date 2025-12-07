@@ -3,6 +3,8 @@
  * 要件定義準拠: 管理者専用アクセス
  */
 
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';

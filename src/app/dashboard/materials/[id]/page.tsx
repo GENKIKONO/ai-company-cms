@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { SalesMaterial } from '@/types/database';
+import type { SalesMaterial } from '@/types/domain/sales';;
 import { logger } from '@/lib/utils/logger';
 
 export default function MaterialViewPage() {
@@ -16,14 +16,7 @@ export default function MaterialViewPage() {
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
 
-  useEffect(() => {
-    if (materialId) {
-      fetchMaterial();
-      logMaterialView();
-    }
-  }, [materialId]);
-
-  const fetchMaterial = async () => {
+  const fetchMaterial = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/my/materials/${materialId}`);
@@ -41,9 +34,9 @@ export default function MaterialViewPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [materialId]);
 
-  const logMaterialView = async () => {
+  const logMaterialView = useCallback(async () => {
     try {
       // 重複計測防止: sessionStorageで同一セッション内の重複viewを防ぐ
       const sessionKey = `material_view_${materialId}`;
@@ -76,9 +69,16 @@ export default function MaterialViewPage() {
       // サイレントエラー：統計ログの失敗はユーザー体験に影響させない
       logger.warn('Failed to log material view', { data: error });
     }
-  };
+  }, [materialId]);
 
-  const handleDownload = async () => {
+  useEffect(() => {
+    if (materialId) {
+      fetchMaterial();
+      logMaterialView();
+    }
+  }, [materialId, fetchMaterial, logMaterialView]);
+
+  const handleDownload = useCallback(async () => {
     if (!material) return;
 
     try {
@@ -126,7 +126,7 @@ export default function MaterialViewPage() {
     } finally {
       setDownloading(false);
     }
-  };
+  }, [material, materialId]);
 
   if (loading) {
     return (

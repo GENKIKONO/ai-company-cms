@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
-import type { QACategory, QACategoryFormData } from '@/types/database';
+import type { QACategory, QACategoryFormData } from '@/types/domain/qa-system';;
 import { logger } from '@/lib/utils/logger';
 
 interface QACategoryManagerProps {

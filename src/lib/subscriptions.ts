@@ -1,7 +1,8 @@
 'use client';
 
 import { supabaseBrowser } from '@/lib/supabase/client';
-import { type Subscription, type Organization } from '@/types/database';
+import type { Subscription } from '@/types/domain/billing';
+import type { Organization } from '@/types/legacy/database';;
 import { SUBSCRIPTION_PLANS } from '@/lib/stripe';
 import { logger } from '@/lib/utils/logger';
 

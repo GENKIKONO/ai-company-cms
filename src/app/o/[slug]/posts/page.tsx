@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateOrganizationJsonLd } from '@/lib/utils/jsonld';
-import type { Organization, Post } from '@/types/database';
+import type { Organization, Post } from '@/types/legacy/database';;
 import { logger } from '@/lib/utils/logger';
 
 interface PostsPageData {

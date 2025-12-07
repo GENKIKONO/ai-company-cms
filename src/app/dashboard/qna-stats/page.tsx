@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   HIGCard,
   HIGCardHeader,
@@ -52,12 +52,7 @@ export default function CompanyQAStatsPage() {
   // 期間プリセット
   const [selectedPreset, setSelectedPreset] = useState<'7d' | '30d' | '90d' | 'custom'>('30d');
 
-  // データ取得
-  useEffect(() => {
-    loadStats();
-  }, [filters]);
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -84,7 +79,12 @@ export default function CompanyQAStatsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters.from, filters.to, filters.qnaId, filters.categoryId]);
+
+  // データ取得
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
   // プリセット期間変更
   const handlePresetChange = (preset: '7d' | '30d' | '90d') => {
@@ -109,7 +109,7 @@ export default function CompanyQAStatsPage() {
   };
 
   // CSVエクスポート
-  const handleExport = async (type: 'daily' | 'byQNA') => {
+  const handleExport = useCallback(async (type: 'daily' | 'byQNA') => {
     try {
       setExporting(type);
 
@@ -148,7 +148,7 @@ export default function CompanyQAStatsPage() {
     } finally {
       setExporting(null);
     }
-  };
+  }, [filters.from, filters.to, filters.categoryId]);
 
   // ローディング状態
   if (loading) {

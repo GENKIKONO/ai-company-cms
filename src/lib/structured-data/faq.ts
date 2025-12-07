@@ -1,4 +1,5 @@
-import { type QAEntry, type QAEntryWithCategory, type Organization } from '@/types/database';
+import type { QAEntry, QAEntryWithCategory } from '@/types/domain/qa-system';
+import type { Organization } from '@/types/legacy/database';;
 
 export interface FAQStructuredData {
   '@context': string;

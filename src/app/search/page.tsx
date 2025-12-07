@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { globalSearch, getIndustries, getServiceCategories } from '@/lib/organizations';
-import { type Organization, type Service, type CaseStudy } from '@/types/database';
+import type { Organization, Service, CaseStudy } from '@/types/legacy/database';
 import { logger } from '@/lib/utils/logger';
 
 // Next.js 15: Force dynamic rendering to resolve useSearchParams prerender warning

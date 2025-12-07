@@ -27,7 +27,7 @@ import {
   Hash,
   Search
 } from 'lucide-react';
-import type { QuestionWithDetails } from '@/types/database';
+import type { QuestionWithDetails } from '@/types/domain/questions';;
 import { translateQuestionStatus, generateQuestionsCSV } from '@/lib/qna-stats';
 import { logger } from '@/lib/utils/logger';
 

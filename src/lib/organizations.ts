@@ -2,7 +2,8 @@
 
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { vLog, logger } from '@/lib/utils/logger';
-import { type Organization, type OrganizationFormData, type OrganizationWithOwner } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';
+import type { OrganizationFormData, OrganizationWithOwner } from '@/types/domain/organizations';
 
 // 企業一覧取得
 export async function getOrganizations(options: {

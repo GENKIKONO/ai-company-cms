@@ -1,6 +1,6 @@
 'use client';
 
-import { type Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { generateOrganizationJsonLdScript, isValidForJsonLd } from '@/lib/structured-data/organization';
 
 interface OrganizationJsonLdProps {

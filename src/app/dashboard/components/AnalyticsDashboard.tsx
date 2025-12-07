@@ -6,7 +6,7 @@ import StructuredDataScore from '@/components/analytics/StructuredDataScore';
 import AIVisibilityReport from '@/components/analytics/AIVisibilityReport';
 import TeamManagement from '@/components/team/TeamManagement';
 import { getTrialStatus, type TrialStatus } from '@/lib/trial-manager';
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { PLAN_LIMITS } from '@/config/plans';
 import { getVisibleFeaturesForPlan } from '@/lib/features';
 import { logger } from '@/lib/utils/logger';

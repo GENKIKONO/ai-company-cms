@@ -2,7 +2,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { unstable_cache } from 'next/cache';
 import { logger } from '@/lib/log';
-import { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 
 export type OrgLite = {
   id: string;

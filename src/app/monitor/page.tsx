@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { isSystemMonitoringAllowed, getSystemMonitoringLimitMessage } from '@/config/plans';
 import { HIGButton } from '@/design-system';
 import { logger } from '@/lib/utils/logger';
+import { supabaseBrowser } from '@/lib/supabase/client';
 
 interface MonitorData {
   timestamp: string;
@@ -30,31 +30,75 @@ export default function MonitorPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<string>('');
+  const [organizationId, setOrganizationId] = useState<string>('');
 
-  // ✅ プランチェック - FIXED: Client-side plan check via API
+  // 組織IDを取得
   useEffect(() => {
-    async function checkPlanAccess() {
+    const getOrganizationId = async () => {
       try {
-        const response = await fetch('/api/user/plan');
-        if (!response.ok) {
-          throw new Error('Failed to fetch user plan');
-        }
+        const supabase = supabaseBrowser;
+        const { data: { user } } = await supabase.auth.getUser();
         
-        const { plan } = await response.json();
-        
-        if (!isSystemMonitoringAllowed(plan)) {
-          router.push('/pricing?feature=monitor');
-          return;
+        if (user) {
+          const { data: userOrg } = await supabase
+            .from('user_organizations')
+            .select('organization_id')
+            .eq('user_id', user.id)
+            .eq('role', 'owner')
+            .single();
+          
+          if (userOrg) {
+            setOrganizationId(userOrg.organization_id);
+          } else {
+            // 組織が見つからない場合はpricingページにリダイレクト
+            router.push('/pricing?feature=monitor');
+          }
+        } else {
+          // 認証されていない場合はログインページにリダイレクト  
+          router.push('/auth/login');
         }
       } catch (error) {
-        logger.error('Plan check error', { data: error instanceof Error ? error : new Error(String(error)) });
-        // Fallback to pricing page on error
+        logger.error('Failed to get organization ID:', { data: error });
         router.push('/pricing?feature=monitor');
       }
-    }
-    
-    checkPlanAccess();
+    };
+
+    getOrganizationId();
   }, [router]);
+
+  // システム監視機能のアクセス制御チェック（API経由で安全にeffective-features使用）
+  useEffect(() => {
+    if (!organizationId) return;
+    
+    const checkFeatureAccess = async () => {
+      try {
+        const response = await fetch('/api/my/features/system-monitoring', {
+          cache: 'no-store'
+        });
+        
+        if (response.ok) {
+          const { hasAccess, reason } = await response.json();
+          if (!hasAccess) {
+            logger.debug('System monitoring access denied', { reason, organizationId });
+            router.push('/pricing?feature=monitor');
+            return;
+          }
+        } else {
+          // API呼び出し失敗時もアクセス拒否
+          logger.debug('System monitoring API check failed', { 
+            status: response.status,
+            organizationId
+          });
+          router.push('/pricing?feature=monitor');
+        }
+      } catch (error) {
+        logger.error('Feature access check error', { data: error instanceof Error ? error : new Error(String(error)) });
+        router.push('/pricing?feature=monitor');
+      }
+    };
+    
+    checkFeatureAccess();
+  }, [organizationId, router]);
 
   const fetchMonitorData = async () => {
     try {

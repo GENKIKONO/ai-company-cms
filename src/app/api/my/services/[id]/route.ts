@@ -2,7 +2,7 @@
 // 個別サービスの更新・削除API
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { ServiceFormData } from '@/types/database';
+import type { ServiceFormData } from '@/types/domain/content';;
 import { normalizeServicePayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 
 async function logErrorToDiag(errorInfo: any) {

@@ -11,6 +11,7 @@ import {
   Cog6ToothIcon,
   UserGroupIcon,
   ChatBubbleLeftRightIcon,
+  DocumentPlusIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -19,6 +20,7 @@ const navigation = [
   { name: 'サービス管理', href: '/dashboard/services', icon: BriefcaseIcon },
   { name: '事例管理', href: '/dashboard/case-studies', icon: UserGroupIcon },
   { name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },
+  { name: '企業専用AIチャット', href: '/dashboard/org-ai-chat', icon: DocumentPlusIcon },
   { name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },
   { name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },
   { name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },

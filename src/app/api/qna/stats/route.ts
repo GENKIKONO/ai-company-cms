@@ -4,7 +4,7 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { QAStatsAction } from '@/types/database';
+import type { QAStatsAction } from '@/types/domain/qa-system';;
 import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {

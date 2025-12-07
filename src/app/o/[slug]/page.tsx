@@ -11,7 +11,46 @@ import FAQJsonLd from '@/components/seo/FAQJsonLd';
 import QAPublicDisplay from '@/components/qa/QAPublicDisplay';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { createFullAddress } from '@/lib/structured-data/organization';
-import type { Organization, Post, Service, CaseStudy, FAQ, QAEntry } from '@/types/database';
+import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/legacy/database';
+import type { QAEntry } from '@/types/domain/qa-system';;
+
+// P4-2: ISR設定（組織ページ）
+export const revalidate = 600; // 10分間隔での再生成
+
+// P4-2: generateStaticParams適用（公開組織の事前生成）
+export async function generateStaticParams() {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+
+    // 公開中の組織slugsを取得
+    const { data: orgs } = await supabase
+      .from('organizations')
+      .select('slug')
+      .eq('status', 'published')
+      .eq('is_published', true)
+      .limit(200); // 大量の組織がある場合の制限
+
+    if (!orgs) return [];
+
+    return orgs
+      .filter(org => org.slug)
+      .map(org => ({ slug: org.slug }));
+  } catch (error) {
+    // 静的生成時のエラーは空配列を返してランタイム生成にフォールバック
+    console.warn('[generateStaticParams] Failed to fetch organizations for static generation:', error);
+    return [];
+  }
+}
 
 interface OrganizationPageData {
   organization: Organization;
@@ -190,7 +229,7 @@ const getOrganizationDataCached = (slug: string) => {
     [`org-public-${safeSlug}`],
     { 
       tags: [`org-public:${safeSlug}`, `org-public`], 
-      revalidate: 300 // 5分キャッシュ 
+      revalidate: 600 // 10分キャッシュ（P4-2: 組織ページ） 
     }
   )();
 };
@@ -358,14 +397,6 @@ export default async function OrganizationDetailPage({
                         size="lg"
                         showLabel={true}
                       />
-                      {organization.status === 'public_unverified' && (
-                        <div className="flex items-center gap-2 px-4 py-2 bg-yellow-50 text-yellow-700 rounded-2xl border border-yellow-200 shadow-sm">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
-                          <span className="font-semibold">審査中</span>
-                        </div>
-                      )}
                     </div>
                     {organization.legal_form && (
                       <p className="text-lg lg:text-xl text-gray-600 mt-2">{organization.legal_form}</p>

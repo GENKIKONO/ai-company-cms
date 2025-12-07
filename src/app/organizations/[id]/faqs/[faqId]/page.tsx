@@ -7,7 +7,8 @@ import { HIGButton } from '@/design-system';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
 import { getFAQ, updateFAQ, deleteFAQ, getFAQCategories, getPopularFAQCategories } from '@/lib/faqs';
-import { type AppUser, type Organization, type FAQ, type FAQFormData } from '@/types/database';
+import type { AppUser, Organization, FAQ } from '@/types/legacy/database';
+import type { FAQFormData } from '@/types/domain/content';;
 import { logger } from '@/lib/utils/logger';
 
 export default function EditFAQPage() {

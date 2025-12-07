@@ -3,7 +3,7 @@
 // 管理系ページ: cookiesを使用するためリクエスト時実行が必要
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { useSuccessToast, useErrorToast } from '@/components/ui/toast';
@@ -18,12 +18,14 @@ export default function AdminSettingsPage() {
   const successToast = useSuccessToast();
   const errorToast = useErrorToast();
 
+  const loadSettings = useCallback(async () => {
+    const { data } = await supabase.from('settings').select('value').eq('key', KEY).maybeSingle();
+    setUrl(data?.value ?? '');
+  }, [supabase]);
+
   useEffect(() => {
-    (async () => {
-      const { data } = await supabase.from('settings').select('value').eq('key', KEY).maybeSingle();
-      setUrl(data?.value ?? '');
-    })();
-  }, []);
+    loadSettings();
+  }, [loadSettings]);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

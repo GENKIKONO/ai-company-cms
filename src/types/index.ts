@@ -1,10 +1,23 @@
 // 型定義のエントリーポイント
 
+// Supabase自動生成型
+export * from './supabase';
+
 // データベース関連の型をエクスポート
 export * from './database';
 
+// AIインタビュアー関連の型をエクスポート
+export * from './ai-interviewer';
+
 // API関連の型をエクスポート
 export * from './api';
+
+// 型エイリアス（移行用）
+import { Database } from './supabase';
+export type SupabaseDB = Database;
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
+export type Inserts<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert'];
+export type Updates<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update'];
 
 // 追加の共通型定義
 export type Status = 'loading' | 'success' | 'error' | 'idle';

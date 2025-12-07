@@ -92,7 +92,7 @@ export function useOrgRealtimeCms(options: UseOrgRealtimeCmsOptions) {
   const connect = useCallback(async () => {
     if (!organizationId || channel) return;
     
-    const supabase = supabaseBrowser();
+    const supabase = supabaseBrowser;
     
     try {
       // 組織専用チャンネルに接続

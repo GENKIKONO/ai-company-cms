@@ -1,5 +1,6 @@
 import { supabaseBrowser } from '@/lib/supabase/client';
-import { type Service, type ServiceFormData } from '@/types/database';
+import type { Service } from '@/types/legacy/database';
+import type { ServiceFormData } from '@/types/domain/content';;
 
 export interface GetServicesOptions {
   search?: string;

@@ -16,8 +16,8 @@ import AioSection from '@/components/layout/AioSection';
 // 将来的な価格統一のための参照（現在はヒアリングサービス独自価格を使用）
 import { generateHearingServiceJsonLD } from '@/lib/generatePricingJsonLD';
 
-// ISR設定: 即時反映を優先（安定後は60などに調整可）
-export const revalidate = 0;
+// P4-2: ISR設定（静的ページ）
+export const revalidate = 1800; // 30分間隔での再生成
 
 export const metadata: Metadata = {
   title: 'AI最適化ヒアリング代行サービス | LuxuCare CMS',

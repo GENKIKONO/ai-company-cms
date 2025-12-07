@@ -3,12 +3,13 @@
 // 強制動的レンダリング（古いSSRキャッシュで上書きされないように）
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization, updateOrganization, updateOrganizationStatus, getIndustries } from '@/lib/organizations';
-import { type AppUser, type Organization, type OrganizationFormData } from '@/types/database';
+import type { AppUser, Organization } from '@/types/legacy/database';
+import type { OrganizationFormData } from '@/types/domain/organizations';;
 import { geocodeJP, isValidJapaneseCoordinates } from '@/lib/geocode';
 import { type Coordinates } from '@/types/geo';
 import ServicesTab from '@/components/ServicesTab';
@@ -87,68 +88,68 @@ export default function EditOrganizationPage() {
   const [formData, setFormData] = useState<OrganizationFormData>(() => fromOrg(null));
 
   // 認証確認とデータ取得
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const currentUser = await getCurrentUser();
-        if (!currentUser) {
-          router.push('/auth/login');
-          return;
-        }
-        
-        setUser(currentUser);
-        
-        // 'new'または'create'の場合は早期return（新規作成ページ）
-        if (organizationId === 'new' || organizationId === 'create') {
-          router.push('/organizations/new');
-          return;
-        }
-        
-        // UUIDでない値をチェック
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-        if (!uuidRegex.test(organizationId)) {
-          router.push('/404');
-          return;
-        }
-        
-        // 企業データと業界一覧を取得
-        logger.debug('[VERIFY] Fetching fresh organization data for edit page', organizationId);
-        
-        const [orgResult, industriesResult] = await Promise.all([
-          getOrganization(organizationId),
-          getIndustries()
-        ]);
-
-        if (orgResult.data) {
-          const org = orgResult.data;
-          logger.debug('[VERIFY] Fresh organization loaded for edit', { 
-            id: org.id, 
-            slug: org.slug, 
-            name: org.name,
-            updated_at: org.updated_at 
-          });
-          setOrganization(org);
-          // フォームデータはuseEffectで自動同期される
-        } else {
-          logger.warn('[VERIFY] No organization data found, redirecting to dashboard');
-          router.replace('/dashboard');
-        }
-        
-        if (industriesResult.data) {
-          setIndustries(industriesResult.data);
-        }
-      } catch (error) {
-        logger.error('Failed to fetch data', { data: error instanceof Error ? error : new Error(String(error)) });
-        router.replace('/dashboard');
-      } finally {
-        setLoading(false);
+  const fetchData = useCallback(async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        router.push('/auth/login');
+        return;
       }
-    }
+      
+      setUser(currentUser);
+      
+      // 'new'または'create'の場合は早期return（新規作成ページ）
+      if (organizationId === 'new' || organizationId === 'create') {
+        router.push('/organizations/new');
+        return;
+      }
+      
+      // UUIDでない値をチェック
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(organizationId)) {
+        router.push('/404');
+        return;
+      }
+      
+      // 企業データと業界一覧を取得
+      logger.debug('[VERIFY] Fetching fresh organization data for edit page', organizationId);
+      
+      const [orgResult, industriesResult] = await Promise.all([
+        getOrganization(organizationId),
+        getIndustries()
+      ]);
 
+      if (orgResult.data) {
+        const org = orgResult.data;
+        logger.debug('[VERIFY] Fresh organization loaded for edit', { 
+          id: org.id, 
+          slug: org.slug, 
+          name: org.name,
+          updated_at: org.updated_at 
+        });
+        setOrganization(org);
+        // フォームデータはuseEffectで自動同期される
+      } else {
+        logger.warn('[VERIFY] No organization data found, redirecting to dashboard');
+        router.replace('/dashboard');
+      }
+      
+      if (industriesResult.data) {
+        setIndustries(industriesResult.data);
+      }
+    } catch (error) {
+      logger.error('Failed to fetch data', { data: error instanceof Error ? error : new Error(String(error)) });
+      router.replace('/dashboard');
+    } finally {
+      setLoading(false);
+    }
+  }, [organizationId, router]);
+
+  useEffect(() => {
     if (organizationId) {
       fetchData();
     }
-  }, [organizationId, router]);
+  }, [organizationId, fetchData]);
 
   // organization更新時のフォーム自動同期
   useEffect(() => {
@@ -176,7 +177,7 @@ export default function EditOrganizationPage() {
         });
       }
     }
-  }, [organization?.id, organization?.updated_at, organization?.slug, organization?.status, organization?.name, organization?.description, organization?.lat, organization?.lng]);
+  }, [organization]);
 
   const handleInputChange = (field: keyof OrganizationFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -207,7 +208,10 @@ export default function EditOrganizationPage() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const validateForm = (): boolean => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // バリデーション処理（旧 validateForm のロジックをここに移動）
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
@@ -236,13 +240,9 @@ export default function EditOrganizationPage() {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    const isValid = Object.keys(newErrors).length === 0;
     
-    if (!validateForm()) {
+    if (!isValid) {
       return;
     }
 
@@ -291,9 +291,9 @@ export default function EditOrganizationPage() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [organizationId, router, formData]);
 
-  const handleStatusChange = async (newStatus: 'draft' | 'published' | 'archived') => {
+  const handleStatusChange = useCallback(async (newStatus: 'draft' | 'published' | 'archived') => {
     try {
       const result = await updateOrganizationStatus(organizationId, newStatus);
       if (result.data) {
@@ -302,12 +302,12 @@ export default function EditOrganizationPage() {
     } catch (error) {
       logger.error('Failed to update status', { data: error instanceof Error ? error : new Error(String(error)) });
     }
-  };
+  }, [organizationId]);
 
   // [VERIFY][DELETE_GUARD] Organization delete function removed for safety
 
   // 住所から座標を取得
-  const handleDetectLocation = async () => {
+  const handleDetectLocation = useCallback(async () => {
     const fullAddress = `${formData.address_region}${formData.address_locality}${formData.address_street}`;
     
     if (!fullAddress.trim()) {
@@ -341,7 +341,7 @@ export default function EditOrganizationPage() {
     } finally {
       setGeocoding(false);
     }
-  };
+  }, [formData.address_region, formData.address_locality, formData.address_street, errors]);
 
   // 手動座標入力の処理
   const handleManualCoordinates = (lat: number, lng: number) => {

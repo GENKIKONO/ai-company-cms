@@ -48,7 +48,7 @@ export async function getWebhookHealthMetrics(hoursBack: number = 24): Promise<W
   try {
     // 動的インポートでサーバーサイドコードを取得
     const { supabaseAdmin } = await import('@/lib/supabase/server');
-    const supabase = supabaseAdmin();
+    const supabase = supabaseAdmin;
     const cutoffTime = new Date(Date.now() - hoursBack * 60 * 60 * 1000).toISOString();
 
     // 指定期間内のイベント統計を取得
@@ -187,7 +187,7 @@ export async function cleanupOldWebhookEvents(): Promise<{ deleted: number; erro
   try {
     // 動的インポートでサーバーサイドコードを取得
     const { supabaseAdmin } = await import('@/lib/supabase/server');
-    const supabase = supabaseAdmin();
+    const supabase = supabaseAdmin;
     const cutoffTime = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(); // 30日前
 
     const { data, error, count } = await supabase

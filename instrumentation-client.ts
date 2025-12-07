@@ -63,7 +63,7 @@ Sentry.init({
     },
     contexts: {
       app: {
-        name: 'luxucare-cms',
+        name: 'ai-company-cms',
         version: process.env.NEXT_PUBLIC_APP_VERSION || 'unknown',
       },
     },

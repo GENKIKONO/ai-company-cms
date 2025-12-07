@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import Link from 'next/link';
-import type { Service } from '@/types/database';
+import type { Service } from '@/types/legacy/database';;
 import PublicPageLinks from '../components/PublicPageLinks';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { supabaseBrowser } from '@/lib/supabase/client';
@@ -41,13 +41,7 @@ export default function ServicesManagementPage() {
     getOrganizationId();
   }, []);
 
-  useEffect(() => {
-    if (organizationId) {
-      fetchServices();
-    }
-  }, [organizationId]);
-
-  const fetchServices = async () => {
+  const fetchServices = useCallback(async () => {
     if (!organizationId) return;
     
     try {
@@ -69,9 +63,15 @@ export default function ServicesManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId]);
 
-  const handleDelete = async (id: string) => {
+  useEffect(() => {
+    if (organizationId) {
+      fetchServices();
+    }
+  }, [organizationId, fetchServices]);
+
+  const handleDelete = useCallback(async (id: string) => {
     if (!confirm('このサービスを削除しますか？')) return;
 
     try {
@@ -88,7 +88,7 @@ export default function ServicesManagementPage() {
       logger.error('Failed to delete service:', { data: err });
       alert('削除に失敗しました: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
-  };
+  }, [services]);
 
   if (loading) {
     return (

@@ -2,8 +2,46 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateServiceJsonLd, generateOrganizationJsonLd } from '@/lib/utils/jsonld';
-import type { Organization, Service } from '@/types/database';
+import type { Organization, Service } from '@/types/legacy/database';;
 import { logger } from '@/lib/utils/logger';
+
+// P4-2: ISR設定（サービス一覧ページ）
+export const revalidate = 600; // 10分間隔での再生成
+
+// P4-2: generateStaticParams適用（公開組織サービス一覧の事前生成）
+export async function generateStaticParams() {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+
+    // サービスを持つ公開中組織のslugsを取得
+    const { data: orgs } = await supabase
+      .from('organizations')
+      .select('slug')
+      .eq('status', 'published')
+      .eq('is_published', true)
+      .eq('show_services', true)
+      .limit(100); // サービスページの制限
+
+    if (!orgs) return [];
+
+    return orgs
+      .filter(org => org.slug)
+      .map(org => ({ slug: org.slug }));
+  } catch (error) {
+    console.warn('[generateStaticParams] Failed to fetch organizations with services:', error);
+    return [];
+  }
+}
 
 interface ServicesPageData {
   organization: Organization;

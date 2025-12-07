@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { redirect } from 'next/navigation';
 import { getServerUserWithStatus } from '@/lib/auth/server';
 import { DashboardLayoutContent } from '@/components/dashboard/DashboardLayoutContent';

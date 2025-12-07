@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { HIGButton } from '@/design-system';
 import supabaseClient from '@/lib/supabase/client';
-import type { FAQ, FAQFormData } from '@/types/database';
+import type { FAQ } from '@/types/legacy/database';
+import type { FAQFormData } from '@/types/domain/content';;
 import { logger } from '@/lib/utils/logger';
 
 const POPULAR_CATEGORIES = [
@@ -36,15 +37,9 @@ export default function EditFAQPage() {
     sort_order: 1
   });
 
-  useEffect(() => {
-    if (faqId) {
-      fetchFAQ();
-    }
-  }, [faqId]);
-
-  const fetchFAQ = async () => {
+  const fetchFAQ = useCallback(async () => {
     try {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+      const { data: { user } } = await supabaseClient().auth.getUser();
       if (!user) {
         router.push('/auth/login');
         return;
@@ -52,7 +47,7 @@ export default function EditFAQPage() {
 
       const response = await fetch(`/api/my/faqs/${faqId}`, {
         headers: {
-          'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session?.access_token}`
+          'Authorization': `Bearer ${(await supabaseClient().auth.getSession()).data.session?.access_token}`
         }
       });
 
@@ -78,7 +73,13 @@ export default function EditFAQPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router, faqId]);
+
+  useEffect(() => {
+    if (faqId) {
+      fetchFAQ();
+    }
+  }, [faqId, fetchFAQ]);
 
   const handleInputChange = (field: keyof FAQFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -92,7 +93,10 @@ export default function EditFAQPage() {
     }
   };
 
-  const validateForm = (): boolean => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // バリデーション処理（旧 validateForm のロジックをここに移動）
     const newErrors: Record<string, string> = {};
 
     if (!formData.question.trim()) {
@@ -108,19 +112,15 @@ export default function EditFAQPage() {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    const isValid = Object.keys(newErrors).length === 0;
     
-    if (!validateForm()) {
+    if (!isValid) {
       return;
     }
 
     setSubmitting(true);
     try {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+      const { data: { user } } = await supabaseClient().auth.getUser();
       if (!user) {
         router.push('/auth/login');
         return;
@@ -130,7 +130,7 @@ export default function EditFAQPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session?.access_token}`
+          'Authorization': `Bearer ${(await supabaseClient().auth.getSession()).data.session?.access_token}`
         },
         body: JSON.stringify(formData)
       });
@@ -152,7 +152,7 @@ export default function EditFAQPage() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [router, faqId, formData]);
 
   if (loading) {
     return (

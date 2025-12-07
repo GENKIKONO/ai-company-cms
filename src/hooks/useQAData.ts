@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { QACategory, QAEntry } from '@/types/database';
+import { useState, useEffect , useCallback} from 'react';
+import type { QACategory, QAEntry } from '@/types/domain/qa-system';
 import { logger } from '@/lib/utils/logger';
 
 export function useQAData() {
@@ -9,7 +9,7 @@ export function useQAData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       setError(null);
       const response = await fetch('/api/my/qa/categories');
@@ -27,7 +27,7 @@ export function useQAData() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const refreshCategories = () => {
     setLoading(true);
@@ -36,7 +36,7 @@ export function useQAData() {
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   return {
     categories,
@@ -63,7 +63,7 @@ export function useQAEntries(filters?: {
     totalPages: 1
   });
 
-  const fetchEntries = async () => {
+  const fetchEntries = useCallback(async () => {
     try {
       setError(null);
       const params = new URLSearchParams();
@@ -93,7 +93,7 @@ export function useQAEntries(filters?: {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters?.category_id, filters?.limit, filters?.page, filters?.search, filters?.status]);
 
   const refreshEntries = () => {
     setLoading(true);
@@ -102,7 +102,7 @@ export function useQAEntries(filters?: {
 
   useEffect(() => {
     fetchEntries();
-  }, [filters?.status, filters?.category_id, filters?.search, filters?.page, filters?.limit]);
+  }, [fetchEntries]);
 
   return {
     entries,
@@ -121,7 +121,7 @@ export function useQASearch(query: string, options?: {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const search = async (searchQuery: string) => {
+  const search = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults([]);
       return;
@@ -153,7 +153,7 @@ export function useQASearch(query: string, options?: {
     } finally {
       setLoading(false);
     }
-  };
+  }, [options?.category_id, options?.limit]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -161,7 +161,7 @@ export function useQASearch(query: string, options?: {
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [query, options?.category_id, options?.limit]);
+  }, [query, options?.category_id, options?.limit, search]);
 
   return {
     results,

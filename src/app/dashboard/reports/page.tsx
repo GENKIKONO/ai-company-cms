@@ -10,7 +10,7 @@ import {
   CheckCircleIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
-import type { MonthlyReport } from '@/types/database';
+import type { MonthlyReport } from '@/types/domain/reports';;
 
 import { logger } from '@/lib/log';
 interface ReportsResponse {

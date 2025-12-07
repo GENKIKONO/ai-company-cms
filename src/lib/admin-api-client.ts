@@ -35,7 +35,7 @@ export class AdminApiClient {
    * 認証トークン取得
    */
   private async getAuthToken(): Promise<string | null> {
-    const supabase = supabaseBrowser();
+    const supabase = supabaseBrowser;
     const { data: { session }, error } = await supabase.auth.getSession();
     
     if (error || !session?.access_token) {

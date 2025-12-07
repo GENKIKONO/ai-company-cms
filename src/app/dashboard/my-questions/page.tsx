@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { 
   HIGCard,
@@ -22,7 +22,7 @@ import {
   Filter,
   RefreshCw
 } from 'lucide-react';
-import type { QuestionWithDetails } from '@/types/database';
+import type { QuestionWithDetails } from '@/types/domain/questions';;
 import { translateQuestionStatus } from '@/lib/qna-stats';
 import { logger } from '@/lib/utils/logger';
 
@@ -49,12 +49,7 @@ export default function MyQuestionsPage() {
     closed: questions.filter(q => q.status === 'closed').length
   };
 
-  // データ取得
-  useEffect(() => {
-    loadQuestions();
-  }, [statusFilter]);
-
-  const loadQuestions = async () => {
+  const loadQuestions = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -80,7 +75,12 @@ export default function MyQuestionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter]);
+
+  // データ取得
+  useEffect(() => {
+    loadQuestions();
+  }, [loadQuestions]);
 
   const toggleExpanded = (questionId: string) => {
     const newExpanded = new Set(expandedQuestions);

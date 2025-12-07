@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HIGButton } from '@/design-system';
 import supabaseClient from '@/lib/supabase/client';
-import type { FAQFormData } from '@/types/database';
+import type { FAQFormData } from '@/types/domain/content';;
 import { logger } from '@/lib/utils/logger';
 
 const POPULAR_CATEGORIES = [
@@ -71,7 +71,7 @@ export default function NewFAQPage() {
 
     setSubmitting(true);
     try {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+      const { data: { user } } = await supabaseClient().auth.getUser();
       if (!user) {
         router.push('/auth/login');
         return;
@@ -81,7 +81,7 @@ export default function NewFAQPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session?.access_token}`
+          'Authorization': `Bearer ${(await supabaseClient().auth.getSession()).data.session?.access_token}`
         },
         body: JSON.stringify(formData)
       });

@@ -3,6 +3,8 @@
  * 管理者権限チェックと共通レイアウト
  */
 
+export const dynamic = 'force-dynamic';
+
 import { redirect } from 'next/navigation';
 import { getServerUser, isAdmin } from '@/lib/auth/server';
 

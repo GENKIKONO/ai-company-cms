@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { generateServiceJsonLd } from '@/lib/utils/jsonld';
 import { HIGButton } from '@/design-system';
-import type { Organization, Service } from '@/types/database';
+import type { Organization, Service } from '@/types/legacy/database';;
 import { LogoImage } from '@/components/ui/optimized-image';
 import { logger } from '@/lib/utils/logger';
 

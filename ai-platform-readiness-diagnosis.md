@@ -1,7 +1,7 @@
 # AI Hub プラットフォーム 運用可能性診断レポート
 
 **診断日時:** 2025-11-14  
-**プロジェクト:** LuxuCare AI Hub Platform (luxucare-cms)  
+**プロジェクト:** LuxuCare AI Hub Platform (ai-company-cms)  
 **バージョン:** 0.1.1
 
 ---

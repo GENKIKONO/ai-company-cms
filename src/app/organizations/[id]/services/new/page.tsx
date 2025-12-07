@@ -7,7 +7,8 @@ import { HIGButton } from '@/design-system';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
 import { createService, generateServiceSlug, getServiceCategories } from '@/lib/services';
-import { type AppUser, type Organization, type ServiceFormData } from '@/types/database';
+import type { AppUser, Organization } from '@/types/legacy/database';
+import type { ServiceFormData } from '@/types/domain/content';;
 import ServiceImageUploader from '@/components/ServiceImageUploader';
 import { logger } from '@/lib/utils/logger';
 

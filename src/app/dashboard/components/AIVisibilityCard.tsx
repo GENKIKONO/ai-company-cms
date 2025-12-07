@@ -1,7 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { PLAN_LIMITS, type PlanType, getAIReportsLevel } from '@/config/plans';
+// AIVisibilityCard - AI可視性スコア表示カード
+// effective-features統合済み: サーバーサイドでcanUseFeature/getFeatureLevelを実行し、
+// クライアント側ではその結果に基づいて表示制御を行う（プラン文字列フォールバック付き）
+
+import { useState, useEffect, useCallback } from 'react';
+import { type PlanType } from '@/config/plans';
 import { CACHE_KEYS } from '@/lib/cache/keys';
 import { logger } from '@/lib/utils/logger';
 
@@ -31,23 +35,79 @@ interface BotLogsData {
   total_count: number;
 }
 
+interface AIFeatureStatus {
+  hasAccess: boolean;
+  level: string | null;
+  plan: string;
+  reason?: string;
+}
+
 export default function AIVisibilityCard({ organizationId, organizationPlan = 'starter' }: AIVisibilityCardProps) {
   const [visibilityData, setVisibilityData] = useState<VisibilityData | null>(null);
   const [botLogsData, setBotLogsData] = useState<BotLogsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // effective-features ベースの機能状態（API経由で取得）
+  const [aiFeatureStatus, setAiFeatureStatus] = useState<AIFeatureStatus | null>(null);
+  
+  // effective-features ベースの表示制御
+  const aiReportsLevel = aiFeatureStatus?.level || false;
+  const showAdvancedFeatures = aiFeatureStatus?.hasAccess || false;
 
-  const aiReportsLevel = getAIReportsLevel(organizationPlan);
-  const showAdvancedFeatures = organizationPlan === 'pro' || organizationPlan === 'business' || organizationPlan === 'enterprise';
+  // AI機能アクセス制御チェック（effective-features ベース）
+  // サーバーサイドでcanUseFeature/getFeatureLevelを安全に実行し、
+  // クライアント側ではその結果に基づいて表示制御を行う
+  const loadAIFeatureStatus = useCallback(async () => {
+    try {
+      const featureResponse = await fetch('/api/my/features/ai-reports', {
+        cache: 'no-store'
+      });
+      
+      if (featureResponse.ok) {
+        const featureData = await featureResponse.json();
+        logger.debug('AI feature status loaded via effective-features', {
+          hasAccess: featureData.hasAccess,
+          level: featureData.level,
+          plan: featureData.plan,
+          reason: featureData.reason
+        });
+        setAiFeatureStatus(featureData);
+      } else {
+        // フォールバック: プラン文字列ベースの制御（レガシー）
+        logger.debug('AI feature check failed, using plan-based fallback', { 
+          organizationPlan,
+          status: featureResponse.status 
+        });
+        setAiFeatureStatus({
+          hasAccess: organizationPlan === 'pro' || organizationPlan === 'business' || organizationPlan === 'enterprise',
+          level: organizationPlan === 'pro' ? 'basic' : organizationPlan === 'business' || organizationPlan === 'enterprise' ? 'advanced' : null,
+          plan: organizationPlan,
+          reason: 'fallback_to_plan'
+        });
+      }
+    } catch (error) {
+      logger.error('Failed to load AI feature status', { data: error });
+      // エラー時はプラン文字列フォールバック
+      setAiFeatureStatus({
+        hasAccess: organizationPlan === 'pro' || organizationPlan === 'business' || organizationPlan === 'enterprise',
+        level: organizationPlan === 'pro' ? 'basic' : organizationPlan === 'business' || organizationPlan === 'enterprise' ? 'advanced' : null,
+        plan: organizationPlan,
+        reason: 'error_fallback'
+      });
+    }
+  }, [organizationPlan]);
 
-  useEffect(() => {
-    loadAIData();
-  }, [organizationId]);
-
-  const loadAIData = async () => {
+  const loadAIData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
+
+      // 0. AI機能アクセス制御チェック（effective-features ベース）を最初に実行
+      await loadAIFeatureStatus();
+
+      // アクセス権限がない場合はデータ取得をスキップ
+      // （UIは権限に応じた表示になる）
 
       // 1. AI Visibility Score を取得
       const visibilityResponse = await fetch(
@@ -74,7 +134,7 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
         setBotLogsData(botLogsResult);
       }
 
-      // どちらも失敗した場合のみエラーとする
+      // どちらも失敗した場合のみログ出力（エラー状態にはしない）
       if (!visibilityResponse.ok && !botLogsResponse.ok) {
         logger.debug('Both AI APIs failed, showing placeholder data');
       }
@@ -85,7 +145,11 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId, loadAIFeatureStatus]);
+
+  useEffect(() => {
+    loadAIData();
+  }, [loadAIData]);
 
   const formatScore = (score: number | undefined): string => {
     if (score === undefined || score === null) return '--';
@@ -126,9 +190,9 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
           </svg>
         </div>
 
-        {/* プラン別表示制御 */}
+        {/* effective-features ベースの表示制御 */}
         <div className="text-right">
-          {!aiReportsLevel && (
+          {!showAdvancedFeatures && (
             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
               Proプラン以上
             </span>

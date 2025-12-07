@@ -68,9 +68,9 @@ export default function PublishGate({
     } finally {
       setIsLoading(false);
     }
-  }, [organizationId]);
+  }, []);
 
-  const handlePublish = async () => {
+  const handlePublish = useCallback(async () => {
     if (!gateResult?.canPublish) {
       return;
     }
@@ -102,7 +102,7 @@ export default function PublishGate({
     } finally {
       setIsPublishing(false);
     }
-  };
+  }, [checkPublishGate, gateResult?.canPublish, onStatusChange]);
 
   useEffect(() => {
     // 初回ロード時にチェック実行

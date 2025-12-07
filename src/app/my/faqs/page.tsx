@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HIGButton } from '@/design-system';
 import supabaseClient from '@/lib/supabase/client';
-import type { FAQ } from '@/types/database';
+import type { FAQ } from '@/types/legacy/database';;
 import { logger } from '@/lib/utils/logger';
 
 export default function MyFAQsPage() {
@@ -15,13 +15,9 @@ export default function MyFAQsPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchFAQs();
-  }, []);
-
-  const fetchFAQs = async () => {
+  const fetchFAQs = useCallback(async () => {
     try {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+      const { data: { user } } = await supabaseClient().auth.getUser();
       if (!user) {
         router.push('/auth/login');
         return;
@@ -29,7 +25,7 @@ export default function MyFAQsPage() {
 
       const response = await fetch('/api/my/faqs', {
         headers: {
-          'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session?.access_token}`
+          'Authorization': `Bearer ${(await supabaseClient().auth.getSession()).data.session?.access_token}`
         }
       });
 
@@ -45,7 +41,11 @@ export default function MyFAQsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchFAQs();
+  }, [fetchFAQs]);
 
   const deleteFAQ = async (id: string) => {
     if (!confirm('このFAQを削除しますか？この操作は取り消せません。')) {
@@ -54,7 +54,7 @@ export default function MyFAQsPage() {
 
     setDeleting(id);
     try {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+      const { data: { user } } = await supabaseClient().auth.getUser();
       if (!user) {
         router.push('/auth/login');
         return;
@@ -63,7 +63,7 @@ export default function MyFAQsPage() {
       const response = await fetch(`/api/my/faqs/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session?.access_token}`
+          'Authorization': `Bearer ${(await supabaseClient().auth.getSession()).data.session?.access_token}`
         }
       });
 

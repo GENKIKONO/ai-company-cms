@@ -1,7 +1,8 @@
 'use client';
 
 import { supabaseBrowser } from '@/lib/supabase/client';
-import { type CaseStudy, type CaseStudyFormData } from '@/types/database';
+import type { CaseStudy } from '@/types/legacy/database';
+import type { CaseStudyFormData } from '@/types/domain/content';;
 import { logger } from '@/lib/utils/logger';
 
 // ケーススタディ一覧取得（特定企業）

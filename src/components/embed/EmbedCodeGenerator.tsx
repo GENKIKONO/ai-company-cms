@@ -5,8 +5,8 @@
  * 管理画面でWidget/iframeの埋め込みコードを生成・プレビュー
  */
 
-import React, { useState, useEffect } from 'react';
-import type { Organization } from '@/types/database';
+import React, { useState, useEffect, useCallback } from 'react';
+import type { Organization } from '@/types/legacy/database';;
 import { WidgetPreview } from './WidgetPreview';
 import { logger } from '@/lib/utils/logger';
 
@@ -53,11 +53,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
   const currentBaseUrl = baseUrl || (typeof window !== 'undefined' ? window.location.origin : 'https://aiohub.jp');
 
   // 埋め込みコード生成
-  useEffect(() => {
-    generateEmbedCode();
-  }, [options, organization.slug]);
-
-  const generateEmbedCode = () => {
+  const generateEmbedCode = useCallback(() => {
     // Safety guard: prevent code generation when slug is undefined/empty
     if (!organization.slug || organization.slug.trim() === '') {
       setGeneratedCode('<!-- エラー: 企業のスラッグが設定されていません。企業情報を編集してスラッグを設定してください。 -->');
@@ -117,7 +113,11 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
 <script src="${currentBaseUrl}/api/public/embed/${organization.slug}/widget${queryString}" async></script>`);
         break;
     }
-  };
+  }, [currentBaseUrl, organization.slug, organization.name, options]);
+
+  useEffect(() => {
+    generateEmbedCode();
+  }, [generateEmbedCode]);
 
   const copyToClipboard = async () => {
     try {

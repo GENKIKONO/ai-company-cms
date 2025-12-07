@@ -7,7 +7,8 @@ import { HIGButton } from '@/design-system';
 import { getCurrentUser } from '@/lib/auth';
 import { getOrganization } from '@/lib/organizations';
 import { createCaseStudy } from '@/lib/case-studies';
-import { type AppUser, type Organization, type CaseStudyFormData } from '@/types/database';
+import type { AppUser, Organization } from '@/types/legacy/database';
+import type { CaseStudyFormData } from '@/types/domain/content';;
 import { logger } from '@/lib/utils/logger';
 
 export default function NewCaseStudyPage() {

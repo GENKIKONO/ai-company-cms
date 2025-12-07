@@ -10,7 +10,6 @@ import PerformanceMetrics from './PerformanceMetrics';
 import DashboardActions from './DashboardActions';
 import AIVisibilityCard from './AIVisibilityCard';
 import { FirstTimeUserOnboarding } from '@/components/dashboard/FirstTimeUserOnboarding';
-import { hasEntitlementSync } from '@/lib/feature-flags/gate';
 import { logger } from '@/lib/utils/logger';
 import { useEffect, useState } from 'react';
 
@@ -27,7 +26,7 @@ interface CaseStudiesStats {
 }
 
 export default function DashboardMain() {
-  const { user, organization, isLoading, isWaitingForOrganization } = useOrganization();
+  const { user, organization, isLoading } = useOrganization();
   const [stats, setStats] = useState<DashboardStats>({ total: 0, draft: 0, published: 0, archived: 0 });
   const [caseStudiesStats, setCaseStudiesStats] = useState<CaseStudiesStats>({ total: 0, published: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
@@ -57,13 +56,13 @@ export default function DashboardMain() {
   }, [organization?.id]);
 
   // ローディング中（組織データ待機中も含む）- 必ずローディング表示を優先
-  if (isLoading || isWaitingForOrganization || (user && !organization && !isLoading)) {
+  if (isLoading || (user && !organization && !isLoading)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">
-            {isWaitingForOrganization ? '組織情報を取得中...' : 'データを読み込み中...'}
+            データを読み込み中...
           </p>
           <p className="mt-2 text-sm text-gray-400">
             しばらくお待ちください

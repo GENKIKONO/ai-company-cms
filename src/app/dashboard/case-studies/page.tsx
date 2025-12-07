@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import type { CaseStudy } from '@/types/database';
+import type { CaseStudy } from '@/types/legacy/database';;
 import PublicPageLinks from '../components/PublicPageLinks';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
@@ -40,13 +40,7 @@ export default function CaseStudiesManagementPage() {
     getOrganizationId();
   }, []);
 
-  useEffect(() => {
-    if (organizationId) {
-      fetchCaseStudies();
-    }
-  }, [organizationId]);
-
-  const fetchCaseStudies = async () => {
+  const fetchCaseStudies = useCallback(async () => {
     if (!organizationId) return;
     
     try {
@@ -68,7 +62,13 @@ export default function CaseStudiesManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId]);
+
+  useEffect(() => {
+    if (organizationId) {
+      fetchCaseStudies();
+    }
+  }, [organizationId, fetchCaseStudies]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('この事例を削除しますか？')) return;

@@ -6,6 +6,7 @@ interface SelectProps {
   value: string;
   onValueChange: (value: string) => void;
   children: React.ReactNode;
+  disabled?: boolean;
 }
 
 interface SelectTriggerProps {
@@ -26,7 +27,7 @@ interface SelectValueProps {
   placeholder?: string;
 }
 
-export function Select({ value, onValueChange, children }: SelectProps) {
+export function Select({ value, onValueChange, children, disabled }: SelectProps) {
   // Extract options from children
   const options: Array<{ value: string; children: React.ReactNode }> = [];
   
@@ -44,6 +45,7 @@ export function Select({ value, onValueChange, children }: SelectProps) {
     <select
       value={value}
       onChange={(e) => onValueChange(e.target.value)}
+      disabled={disabled}
       className="w-full px-[var(--space-sm)] py-[var(--space-xs)] hig-text-body bg-[var(--color-background)] border border-[var(--color-border-primary)] rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-[var(--duration-fast)]"
     >
       {options.map((option) => (

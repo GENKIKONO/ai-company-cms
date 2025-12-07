@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runAiVisibilityJob } from '@/lib/jobs/ai-visibility-job';
+import { runWeeklyAiCitationsAggregation } from '@/lib/jobs/ai-citations-aggregation-job';
 import { logger } from '@/lib/log';
 
 // Unified Daily Maintenance Cron
@@ -19,6 +20,7 @@ export async function GET(request: NextRequest) {
     const startTime = Date.now();
     const results = {
       aiVisibility: null as any,
+      aiCitationsAggregation: null as any,
       cleanup: null as any,
       healthCheck: null as any,
       errors: [] as string[]
@@ -36,7 +38,19 @@ export async function GET(request: NextRequest) {
       results.aiVisibility = { success: false, error: errorMsg, timestamp: new Date().toISOString() };
     }
     
-    // 2. Database cleanup job
+    // 2. AI Citations aggregation job (weekly basis)
+    try {
+      logger.debug('[Daily Cron] Running AI citations aggregation...');
+      results.aiCitationsAggregation = await runWeeklyAiCitationsAggregation(request);
+      logger.debug(`[Daily Cron] AI citations aggregation completed: ${results.aiCitationsAggregation.success ? 'SUCCESS' : 'FAILED'}`);
+    } catch (error) {
+      const errorMsg = `AI citations aggregation failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      logger.error(errorMsg);
+      results.errors.push(errorMsg);
+      results.aiCitationsAggregation = { success: false, error: errorMsg, timestamp: new Date().toISOString() };
+    }
+
+    // 3. Database cleanup job
     try {
       logger.debug('[Daily Cron] Running database cleanup...');
       results.cleanup = await runDatabaseCleanup();
@@ -48,7 +62,7 @@ export async function GET(request: NextRequest) {
       results.cleanup = { success: false, error: errorMsg, timestamp: new Date().toISOString() };
     }
     
-    // 3. Health check job
+    // 4. Health check job
     try {
       logger.debug('[Daily Cron] Running health checks...');
       results.healthCheck = await runHealthCheck();
@@ -61,8 +75,8 @@ export async function GET(request: NextRequest) {
     }
     
     const duration = Date.now() - startTime;
-    const successCount = [results.aiVisibility, results.cleanup, results.healthCheck].filter(r => r?.success).length;
-    const totalJobs = 3;
+    const successCount = [results.aiVisibility, results.aiCitationsAggregation, results.cleanup, results.healthCheck].filter(r => r?.success).length;
+    const totalJobs = 4;
     
     logger.info('[Daily Cron] Daily maintenance completed:', {
       duration: `${duration}ms`,
@@ -154,6 +168,7 @@ async function sendMaintenanceSummary(results: any, duration: number) {
   try {
     const failedJobs = [];
     if (!results.aiVisibility?.success) failedJobs.push('AI Visibility');
+    if (!results.aiCitationsAggregation?.success) failedJobs.push('AI Citations Aggregation');
     if (!results.cleanup?.success) failedJobs.push('Database Cleanup');
     if (!results.healthCheck?.success) failedJobs.push('Health Check');
     

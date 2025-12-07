@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { MetadataRoute } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { PUBLIC_PATHS } from '@/lib/utils/ai-crawler'

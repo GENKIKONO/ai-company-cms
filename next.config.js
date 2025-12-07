@@ -170,11 +170,17 @@ const nextConfig = {
       const adminEmail = process.env.ADMIN_EMAIL;
       const opsPassword = process.env.ADMIN_OPS_PASSWORD;
       const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+      const openaiKey = process.env.OPENAI_API_KEY;
+      const openaiModel = process.env.OPENAI_MODEL;
+      const openaiModelFallback = process.env.OPENAI_MODEL_FALLBACK;
       
       console.log('\n🔍 [BUILD] Environment Validation:');
       console.log(`ADMIN_EMAIL: ${adminEmail ? '✅ Set' : '⚠️ Optional (not required for basic operation)'}`);
       console.log(`ADMIN_OPS_PASSWORD: ${opsPassword ? (opsPassword.trim().length >= 20 ? '✅ Set (length ok)' : `⚠️ Set (${opsPassword.trim().length} chars, need >=20)`) : '⚠️ Optional (not required for basic operation)'}`);
       console.log(`NEXT_PUBLIC_APP_URL: ${appUrl === 'https://aiohub.jp' ? '✅ aiohub.jp' : `⚠️ ${appUrl || 'Missing (recommended for production)'}`}`);
+      console.log(`OPENAI_API_KEY: ${openaiKey && openaiKey !== 'your_openai_api_key_here' ? '✅ Set' : '⚠️ Not set or placeholder'}`);
+      console.log(`OPENAI_MODEL: ${openaiModel || 'gpt-4o-mini (default)'}`);
+      console.log(`OPENAI_MODEL_FALLBACK: ${openaiModelFallback || 'gpt-3.5-turbo (default)'}`);
       console.log('');
       
       // Run acceptance test
@@ -227,12 +233,6 @@ const sentryWebpackPluginOptions = {
   silent: true, // Suppresses source map uploading logs during build
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
-  
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options
-
-  // Suppresses source map uploading logs during build
-  silent: true,
   
   // Upload source maps in production only
   dryRun: process.env.NODE_ENV !== 'production',

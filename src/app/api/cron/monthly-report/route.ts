@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { collectMonthlyData, generateHTMLReport, saveReportToStorage } from '@/lib/report-generator';
 import { logger } from '@/lib/utils/logger';
-import type { MonthlyReport } from '@/types/database';
+import type { MonthlyReport } from '@/types/domain/reports';;
 
 // Monthly Report Generation Cron
 // Schedule: Monthly on 1st at 5:00 AM JST (20:00 UTC on previous day)

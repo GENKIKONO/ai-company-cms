@@ -58,9 +58,9 @@ export async function requireAuth(request: NextRequest): Promise<AuthContext | R
       return unauthorizedError('Authentication required');
     }
 
-    // ユーザーの組織情報を取得
+    // ユーザーの組織情報を取得（Supabase Q1回答準拠）
     const { data: organizations } = await supabase
-      .from('organization_profiles')
+      .from('organization_members')
       .select('organization_id, role')
       .eq('user_id', user.id);
 
@@ -150,4 +150,51 @@ export function requireSelfServeAccess(authContext: AuthContext): Response | nul
     return forbiddenError('Self-serve access required');
   }
   return null;
+}
+
+/**
+ * 組織メンバー権限チェック（高レベルAPI）
+ * 既存のAPIで使われているパターンに合わせた便利関数
+ */
+export async function requireOrgMember(
+  orgId: string,
+  request?: NextRequest
+): Promise<{ success: true; user: any; userAccess: any; orgId: string } | { success: false; code: string; message: string }> {
+  try {
+    // requestが渡されていない場合は、新しい空のリクエストを作成（テスト用）
+    const authReq = request || new NextRequest(new URL('http://localhost'));
+    
+    const authResult = await requireAuth(authReq);
+    if (authResult instanceof Response) {
+      return {
+        success: false,
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required'
+      };
+    }
+
+    // 組織アクセス権限チェック
+    const orgAccessError = requireOrgOwner(authResult, orgId);
+    if (orgAccessError) {
+      return {
+        success: false,
+        code: 'PERMISSION_DENIED',
+        message: `Access denied to organization ${orgId}`
+      };
+    }
+
+    return {
+      success: true,
+      user: authResult.user,
+      userAccess: authResult.userAccess,
+      orgId
+    };
+  } catch (error) {
+    logger.error('Organization member check failed', { data: error instanceof Error ? error : new Error(String(error)) });
+    return {
+      success: false,
+      code: 'AUTH_ERROR',
+      message: 'Authentication check failed'
+    };
+  }
 }

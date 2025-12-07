@@ -59,7 +59,8 @@ export const UNIFIED_PLAN_CONFIG = {
     stripePrice: UNIFIED_STRIPE_PRICES.trial,
     limits: PLAN_LIMITS.trial,
     features: PLAN_FEATURES.trial,
-    period: '14日間'
+    period: '14日間',
+    stripePriceId: null as string | null  // Stripe price_id（実際の値は後で設定）
   },
   starter: {
     id: 'starter' as const,
@@ -69,7 +70,8 @@ export const UNIFIED_PLAN_CONFIG = {
     stripePrice: UNIFIED_STRIPE_PRICES.starter,
     limits: PLAN_LIMITS.starter,
     features: PLAN_FEATURES.starter,
-    period: '月額'
+    period: '月額',
+    stripePriceId: null as string | null  // Stripe price_id（実際の値は後で設定）
   },
   pro: {
     id: 'pro' as const,
@@ -79,7 +81,8 @@ export const UNIFIED_PLAN_CONFIG = {
     stripePrice: UNIFIED_STRIPE_PRICES.pro,
     limits: PLAN_LIMITS.pro,
     features: PLAN_FEATURES.pro,
-    period: '月額'
+    period: '月額',
+    stripePriceId: null as string | null  // Stripe price_id（実際の値は後で設定）
   },
   business: {
     id: 'business' as const,
@@ -89,7 +92,8 @@ export const UNIFIED_PLAN_CONFIG = {
     stripePrice: UNIFIED_STRIPE_PRICES.business,
     limits: PLAN_LIMITS.business,
     features: PLAN_FEATURES.business,
-    period: '月額'
+    period: '月額',
+    stripePriceId: null as string | null  // Stripe price_id（実際の値は後で設定）
   },
   enterprise: {
     id: 'enterprise' as const,
@@ -100,7 +104,8 @@ export const UNIFIED_PLAN_CONFIG = {
     limits: PLAN_LIMITS.enterprise,
     features: PLAN_FEATURES.enterprise,
     period: '月額',
-    isCustom: true
+    isCustom: true,
+    stripePriceId: null as string | null  // Stripe price_id（実際の値は後で設定）
   }
 } as const;
 

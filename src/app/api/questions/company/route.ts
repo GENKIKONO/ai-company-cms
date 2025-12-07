@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { QuestionWithDetails } from '@/types/database';
+import type { QuestionWithDetails } from '@/types/domain/questions';;
 import { logger } from '@/lib/utils/logger';
 
 // GET: 企業担当者が自社に向けられた質問を取得

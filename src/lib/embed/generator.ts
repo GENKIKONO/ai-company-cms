@@ -3,7 +3,7 @@
  * AI最適化された企業情報をセキュアに外部配布
  */
 
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { logger } from '@/lib/log';
 
 export interface WidgetOptions {

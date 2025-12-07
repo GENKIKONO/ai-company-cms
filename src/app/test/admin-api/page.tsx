@@ -23,7 +23,7 @@ export default function AdminApiTestPage() {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const supabase = supabaseBrowser();
+        const supabase = supabaseBrowser;
         
         // 認証ユーザー取得
         const { data: { user }, error: authError } = await supabase.auth.getUser();

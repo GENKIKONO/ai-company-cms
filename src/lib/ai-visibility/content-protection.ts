@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { type Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 
 // Content Protection for AI Visibility
 export interface ProtectedContent {

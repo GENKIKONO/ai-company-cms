@@ -1,6 +1,9 @@
 import { Metadata } from 'next';
 import InfoPageShell from '@/components/common/InfoPageShell';
 
+// P4-2: ISR設定（静的ページ）
+export const revalidate = 1800; // 30分間隔での再生成
+
 export const metadata: Metadata = {
   title: '機能一覧 | AIO Hub',
   description: 'AIO Hubで現在提供している機能の一覧です。',

@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { HIGButton } from '@/design-system';
 import AioSection from '@/components/layout/AioSection';
 
+// P4-2: ISR設定（静的ページ）
+export const revalidate = 1800; // 30分間隔での再生成
+
 export const metadata: Metadata = {
   title: 'サービス概要 | AIO Hub AI企業CMS',
   description: 'AIO Hub AI企業CMSのサービス概要。AI技術を活用した企業情報の統合管理プラットフォームについて詳しくご説明します。',

@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -66,11 +66,7 @@ export default function AdminOrgGroupsPage() {
 
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadGroups();
-  }, [currentPage, searchTerm]);
-
-  async function loadGroups() {
+  const loadGroups = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -106,7 +102,11 @@ export default function AdminOrgGroupsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentPage, searchTerm, toast]);
+
+  useEffect(() => {
+    loadGroups();
+  }, [loadGroups]);
 
   async function createGroup() {
     if (!newGroup.name || !newGroup.owner_organization_id) {

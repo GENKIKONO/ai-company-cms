@@ -3,7 +3,8 @@
  * 全エンティティのJSON-LD生成とバリデーションを統合管理
  */
 
-import { Organization, Service, CaseStudy, FAQ } from '@/types/database';
+import type { Organization, CaseStudy, FAQ } from '@/types/legacy/database';
+import type { ServiceWithLegacyFields } from '@/types/utils/database';
 import {
   validateOrganizationJsonLd,
   type OrganizationJsonLdValidationResult,
@@ -46,7 +47,7 @@ export interface JsonLdValidationSummary {
  */
 export function validateOrganizationJsonLdComplete(
   organization: Organization,
-  services?: Service[],
+  services?: ServiceWithLegacyFields[],
   caseStudies?: CaseStudy[],
   faqs?: FAQ[]
 ): JsonLdValidationSummary {

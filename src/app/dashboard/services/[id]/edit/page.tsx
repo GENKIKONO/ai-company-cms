@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useCallback} from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
@@ -49,11 +49,7 @@ export default function EditServicePage() {
     is_published: false
   });
 
-  useEffect(() => {
-    fetchService();
-  }, [serviceId]);
-
-  const fetchService = async () => {
+  const fetchService = useCallback(async () => {
     try {
       const response = await fetch(`/api/my/services/${serviceId}`);
       if (!response.ok) throw new Error('Failed to fetch service');
@@ -82,9 +78,13 @@ export default function EditServicePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [serviceId]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    fetchService();
+  }, [fetchService]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     setError('');
@@ -123,7 +123,7 @@ export default function EditServicePage() {
     } finally {
       setSaving(false);
     }
-  };
+  }, [serviceId, formData, router]);
 
   const updateFeature = (index: number, value: string) => {
     const newFeatures = [...formData.features];

@@ -21,7 +21,8 @@ import { normalizeForInsert, findEmptyDateFields } from '@/lib/utils/payload-nor
 import { buildOrgInsert } from '@/lib/utils/org-whitelist';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import type { Organization, OrganizationFormData } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';
+import type { OrganizationFormData } from '@/types/domain/organizations';;
 import { logger } from '@/lib/log';
 import {
   organizationCreateSchema,

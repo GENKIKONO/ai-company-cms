@@ -3,7 +3,7 @@
  * 要件定義準拠: 空値省略、E.164電話番号、addressCountry="JP"
  */
 
-import type { Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 
 interface OrganizationJsonLd {
   '@context': string;

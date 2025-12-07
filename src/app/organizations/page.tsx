@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getOrganizations, getIndustries } from '@/lib/organizations';
-import { type Organization } from '@/types/database';
+import type { Organization } from '@/types/legacy/database';;
 import { logger } from '@/lib/log';
 import AioSection from '@/components/layout/AioSection';
 
