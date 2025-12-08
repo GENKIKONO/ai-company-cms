@@ -27,7 +27,9 @@ export interface User {
 
 export interface MeResponse {
   user: User | null;
-  organization: Organization | null;
+  organization: Organization | null;        // 後方互換
+  organizations?: Organization[];           // 新形式: 複数組織対応
+  selectedOrganization?: Organization | null; // 新形式: 選択中組織
 }
 
 /**
@@ -44,13 +46,22 @@ export function useOrganization() {
       revalidateOnFocus: false,
       dedupingInterval: 5000,
       refreshInterval: 0,
-      errorRetryCount: 1,
-      errorRetryInterval: 2000,
+      errorRetryCount: 2,
+      errorRetryInterval: 3000,
       onError: (error) => {
         if (error?.status === 404 || error?.status === 401) {
           return null;
         }
-        logger.error('useOrganization error:', { data: error });
+        logger.error('useOrganization SWR error:', { 
+          error: error?.message || 'Unknown error',
+          status: error?.status,
+          userId: user?.id 
+        });
+      },
+      fallbackData: null,
+      shouldRetryOnError: (error) => {
+        // 認証エラーの場合はリトライしない
+        return error?.status !== 401 && error?.status !== 404;
       }
     }
   );
@@ -83,7 +94,9 @@ export function useOrganization() {
 
   return {
     user: data?.user || null,
-    organization: data?.organization || null,
+    organization: data?.organization || null,        // 後方互換
+    organizations: data?.organizations || [],        // 新形式
+    selectedOrganization: data?.selectedOrganization || null, // 新形式
     isLoading: authLoading || isLoading,
     error: error?.status === 404 || error?.status === 401 ? null : error,
     invalidateOrganization,
