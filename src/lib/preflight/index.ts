@@ -58,6 +58,9 @@ async function checkSubscriptionStatus(org: Organization): Promise<PreflightChec
     if (isActive && hasValidPlan) {
       check.status = 'pass';
       check.message = `Subscription active (${org.plan})`;
+      // TODO: [SUPABASE_FEATURE_MIGRATION] org.plan 直接参照を get_effective_org_features 経由に移行検討
+      // 現在: org.plan === 'trial' での判定
+      // 将来: canUseFeatureFromOrg(org, 'trial_mode') または trial_status フィールド活用を検討
     } else if (org.plan === 'trial') {
       check.status = 'warning';
       check.message = 'Trial plan has limited features';

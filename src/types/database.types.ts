@@ -93,7 +93,7 @@ export interface SupabaseDatabase {
           mission_statement: string | null
           vision_statement: string | null
           values: string[] | null
-          feature_flags: Record<string, unknown> | null
+          feature_flags: Record<string, unknown> | null  // TODO: [TYPE_SAFETY] 型安全なFeatureFlagsインターフェースに移行
           entitlements: Record<string, unknown> | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null

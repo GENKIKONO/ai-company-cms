@@ -1,3 +1,6 @@
+// TODO: [SUPABASE_ORG_GROUP_MIGRATION] 新しい型をインポートして段階的に移行
+// import type { OrganizationGroupWithMembersAndOwner, OrgGroupMemberRow } from '@/types/org-groups-supabase';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { requireAdminPermission } from '@/lib/auth/server';
@@ -17,7 +20,7 @@ async function canManageGroup(groupId: string, userId: string): Promise<boolean>
     // Get all organizations in this group
     const { data: members, error } = await supabaseAdmin
       .from('org_group_members')
-      .select('org_id') // ALLOWED: FK constraint in join table
+      .select('organization_id') // TODO: [SUPABASE_ORG_GROUP_MIGRATION] org_id → organization_id に修正
       .eq('group_id', groupId);
 
     if (error || !members) {
@@ -26,7 +29,7 @@ async function canManageGroup(groupId: string, userId: string): Promise<boolean>
 
     // Check if user is admin of any organization in this group
     for (const member of members) {
-      const isAdmin = await isUserAdminOfOrg(member.org_id, userId);
+      const isAdmin = await isUserAdminOfOrg((member as any).organization_id, userId);
       if (isAdmin) {
         return true;
       }
@@ -57,7 +60,7 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
       return false;
     }
 
-    return await isUserAdminOfOrg(group.owner_organization_id, userId);
+    return await isUserAdminOfOrg((group as any).owner_organization_id, userId);
   } catch (error: any) {
     logger.error('Error checking group ownership', {
       component: 'org-groups-detail-api',
@@ -126,8 +129,8 @@ export async function GET(
       component: 'org-groups-detail-api',
       operation: 'get',
       groupId,
-      groupName: group.name,
-      memberCount: group.members?.length || 0
+      groupName: (group as any).name,
+      memberCount: (group as any).members?.length || 0
     });
 
     return NextResponse.json({ data: group });
@@ -186,7 +189,8 @@ export async function PATCH(
     }
 
     // Update the group
-    const { data: group, error } = await supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] organization_groups テーブルの型定義を Supabase client に追加
+    const { data: group, error } = await (supabaseAdmin as any)
       .from('organization_groups')
       .update({
         ...updateData,
@@ -232,7 +236,7 @@ export async function PATCH(
       component: 'org-groups-detail-api',
       operation: 'update',
       groupId,
-      groupName: group.name,
+      groupName: (group as any).name,
       userId: user.id
     });
 
@@ -310,8 +314,8 @@ export async function DELETE(
       component: 'org-groups-detail-api',
       operation: 'delete',
       groupId,
-      groupName: group.name,
-      ownerOrgId: group.owner_organization_id,
+      groupName: (group as any).name,
+      ownerOrgId: (group as any).owner_organization_id,
       userId: user.id
     });
 

@@ -7,13 +7,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerUser } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
-import type { Database } from '@/types/supabase';
 import { CONTENT_TYPES, SUPPORTED_LANGUAGES } from '@/types/ai-interviewer';
 import { INTERVIEW_CONTENT_TYPE, type InterviewContentType } from '@/types/enums';
 import type { InterviewQuestion, InterviewAxis } from '@/types/interview-session';
 
-// Supabase型定義のエイリアス
-type OrganizationKeywordRow = Database['public']['Tables']['organization_keywords']['Row'];
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
+// Supabase型定義のエイリアス（一時的に any でバイパス）
+type OrganizationKeywordRow = any;
 
 // レスポンス型定義
 interface InterviewQuestionsResponse {

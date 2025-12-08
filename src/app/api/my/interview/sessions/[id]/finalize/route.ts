@@ -12,6 +12,9 @@ import { generateInterviewContent, type CitationItem, type FinalizeResult } from
 import { logFinalizeResult, logContentUnits } from '@/lib/ai/logAiResponseWithCitations';
 import { logInterviewQuestionBatch, generateLogEntriesFromAnswers, type QuestionLogEntry } from '@/lib/interview/question-logging';
 import type { InterviewAnswersJson } from '@/types/interview-session';
+// TODO: [SUPABASE_PLAN_MIGRATION] このロジックは isFeatureQuotaLimitReached に寄せる想定
+// 現在: checkMonthlyQuestionUsage() で静的制限チェック
+// 提案: isFeatureQuotaLimitReached(orgId, 'ai_interview') で RPC ベース制限チェック
 import { checkMonthlyQuestionUsage } from '@/lib/billing/interview-credits';
 
 /**

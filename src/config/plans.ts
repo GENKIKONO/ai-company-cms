@@ -1,19 +1,29 @@
 /**
  * LuxuCare CMS プラン設定
  * 料金・制限・機能の一元管理
+ * 
+ * TODO: [SUPABASE_PLAN_MISMATCH] 下記設定は Supabase plan_features テーブルと矛盾する部分があります
+ * - plan_type: Supabase には 'trial' は存在せず starter/pro/business/enterprise のみ
+ * - 無制限表現: Supabase では -1、コードでは Number.POSITIVE_INFINITY
+ * - feature_key 名称: Supabase の実 feature_key と一部不一致（qa_items等）
+ * Phase 3-D で plan_features ベースに段階移行予定（既存挙動は保持）
  */
 
 export const PLAN_LIMITS = {
+  // TODO: [PLAN_TYPE_MISMATCH] 'trial' は Supabase plan_features に存在しない
+  // 既存コードで使用中のため保持、将来的に starter に統合検討
   trial: { 
     services: 5, 
     materials: 10, 
     embeds: 1,
-    external_links: Number.POSITIVE_INFINITY,
-    category_tags: Number.POSITIVE_INFINITY,
+    external_links: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
+    category_tags: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
     logo_size: 'medium',
     verified_badge: false,
     ai_reports: false,
     system_monitoring: false,
+    // TODO: [FEATURE_KEY_MISMATCH] 'qa_items' は Supabase feature_registry に存在しない
+    // Supabase では 'posts' として管理、または独立機能として追加検討
     qa_items: 10,  // Trial: 10項目まで
     case_studies: 5,  // 導入事例制限
     posts: 10,  // 記事制限
@@ -25,8 +35,8 @@ export const PLAN_LIMITS = {
     services: 5, 
     materials: 10, 
     embeds: 1,
-    external_links: Number.POSITIVE_INFINITY,
-    category_tags: Number.POSITIVE_INFINITY,
+    external_links: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
+    category_tags: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
     logo_size: 'medium',
     verified_badge: false,
     ai_reports: false,
@@ -41,8 +51,8 @@ export const PLAN_LIMITS = {
     services: 20, 
     materials: 10, 
     embeds: 5,
-    external_links: Number.POSITIVE_INFINITY,
-    category_tags: Number.POSITIVE_INFINITY,
+    external_links: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
+    category_tags: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
     logo_size: 'medium',
     verified_badge: false,
     ai_reports: true,
@@ -54,19 +64,19 @@ export const PLAN_LIMITS = {
     structured_score: true  // 構造化スコア表示
   },
   business: { 
-    services: Number.POSITIVE_INFINITY, 
-    materials: Number.POSITIVE_INFINITY, 
+    services: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */, 
+    materials: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */, 
     embeds: 20,
-    external_links: Number.POSITIVE_INFINITY,
-    category_tags: Number.POSITIVE_INFINITY,
+    external_links: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
+    category_tags: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
     logo_size: 'large',
     verified_badge: true,
     ai_reports: 'advanced',
     system_monitoring: true,
-    qa_items: Number.POSITIVE_INFINITY,  // Business: 無制限
-    case_studies: Number.POSITIVE_INFINITY,  // 導入事例無制限
-    posts: Number.POSITIVE_INFINITY,  // 記事無制限
-    faqs: Number.POSITIVE_INFINITY,  // FAQ無制限
+    qa_items: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,  // Business: 無制限
+    case_studies: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,  // 導入事例無制限
+    posts: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,  // 記事無制限
+    faqs: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,  // FAQ無制限
     approval_flow: true,  // 承認フロー機能
     auth_badges: true,  // 認証バッジ機能
     search_console: false,  // Search Console連携（未実装）
@@ -75,19 +85,19 @@ export const PLAN_LIMITS = {
     team_management: true  // チーム権限管理
   },
   enterprise: { 
-    services: Number.POSITIVE_INFINITY, 
-    materials: Number.POSITIVE_INFINITY, 
-    embeds: Number.POSITIVE_INFINITY,
-    external_links: Number.POSITIVE_INFINITY,
-    category_tags: Number.POSITIVE_INFINITY,
+    services: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */, 
+    materials: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */, 
+    embeds: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
+    external_links: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
+    category_tags: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
     logo_size: 'large_svg',
     verified_badge: true,
     ai_reports: 'advanced',
     system_monitoring: true,
-    qa_items: Number.POSITIVE_INFINITY,
-    case_studies: Number.POSITIVE_INFINITY,  // 導入事例無制限
-    posts: Number.POSITIVE_INFINITY,  // 記事無制限
-    faqs: Number.POSITIVE_INFINITY,  // FAQ無制限
+    qa_items: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
+    case_studies: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,  // 導入事例無制限
+    posts: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,  // 記事無制限
+    faqs: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,  // FAQ無制限
     approval_flow: true,
     auth_badges: true,
     search_console: true,
@@ -176,6 +186,19 @@ export const PLAN_FEATURES = {
 } as const;
 
 /**
+ * TODO: [SUPABASE_FEATURE_MIGRATION] 以下の静的プラン判定関数群を canUseFeatureFromOrg ベースに段階移行
+ * 
+ * 現在の静的関数:
+ * - isServiceLimitReached, isMaterialLimitReached, isEmbedLimitReached など
+ * - isVerifiedBadgeAllowed, getAIReportsLevel, isSystemMonitoringAllowed など
+ * 
+ * 将来の方針:
+ * - get_effective_org_features RPC + canUseFeatureFromOrg で動的判定に移行
+ * - 既存の静的チェック関数は段階的に非推奨化
+ * - 新規開発では canUseFeatureFromOrg を使用
+ */
+
+/**
  * 価格表示フォーマッター
  */
 export function formatPrice(planType: PlanType): string {
@@ -185,55 +208,80 @@ export function formatPrice(planType: PlanType): string {
   return `¥${price.toLocaleString()}/月（税込）`;
 }
 
+// TODO: [UNIFICATION_CANDIDATE] 以下の重複パターン関数は effective-features の isFeatureLimitReached で統一可能
+// Phase 3-B で @/lib/org-features/effective-features.ts に移行予定
+
 /**
+ * 汎用制限チェック関数（重複パターンの統一）
+ * @private 内部実装用 - 将来的に effective-features へ移行
+ */
+function isGenericLimitReached(planType: PlanType, featureKey: keyof typeof PLAN_LIMITS[PlanType], currentCount: number): boolean {
+  const limit = (PLAN_LIMITS[planType] as any)[featureKey];
+  return currentCount >= limit;
+}
+
+/**
+ * 汎用制限メッセージ生成（重複パターンの統一）
+ * @private 内部実装用 - 将来的に effective-features へ移行
+ */
+function getGenericLimitMessage(planType: PlanType, featureKey: keyof typeof PLAN_LIMITS[PlanType], limitName: string, unit: string): string {
+  const limit = (PLAN_LIMITS[planType] as any)[featureKey];
+  if (limit === Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */) return '';
+  return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（${limitName}上限: ${limit}${unit}）。`;
+}
+
+/**
+ * TODO: [SUPABASE_FEATURE_MIGRATION] 静的制限チェックを get_org_quota_usage ベースに移行検討
+ * 現在: PLAN_LIMITS 静的定義 + planType による制限チェック
+ * 将来: isFeatureQuotaLimitReached(organizationId, 'services') に統一可能
+ * 
  * サービス制限チェック
  */
 export function isServiceLimitReached(planType: PlanType, currentCount: number): boolean {
-  const limit = PLAN_LIMITS[planType].services;
-  return currentCount >= limit;
+  return isGenericLimitReached(planType, 'services', currentCount);
 }
 
 /**
  * サービス制限メッセージ
  */
 export function getServiceLimitMessage(planType: PlanType): string {
-  const limit = PLAN_LIMITS[planType].services;
-  if (limit === Number.POSITIVE_INFINITY) return '';
-  return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（サービス登録上限: ${limit}件）。`;
+  return getGenericLimitMessage(planType, 'services', 'サービス登録', '件');
 }
 
 /**
+ * TODO: [SUPABASE_FEATURE_MIGRATION] 静的制限チェックを get_org_quota_usage ベースに移行検討
+ * 現在: PLAN_LIMITS 静的定義 + planType による制限チェック
+ * 将来: isFeatureQuotaLimitReached(organizationId, 'materials') に統一可能
+ * 
  * 営業資料制限チェック
  */
 export function isMaterialLimitReached(planType: PlanType, currentCount: number): boolean {
-  const limit = PLAN_LIMITS[planType].materials;
-  return currentCount >= limit;
+  return isGenericLimitReached(planType, 'materials', currentCount);
 }
 
 /**
  * 営業資料制限メッセージ
  */
 export function getMaterialLimitMessage(planType: PlanType): string {
-  const limit = PLAN_LIMITS[planType].materials;
-  if (limit === Number.POSITIVE_INFINITY) return '';
-  return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（営業資料添付上限: ${limit}個）。`;
+  return getGenericLimitMessage(planType, 'materials', '営業資料添付', '個');
 }
 
 /**
+ * TODO: [SUPABASE_FEATURE_MIGRATION] 静的制限チェックを get_org_quota_usage ベースに移行検討
+ * 現在: PLAN_LIMITS 静的定義 + planType による制限チェック
+ * 将来: isFeatureQuotaLimitReached(organizationId, 'embeds') に統一可能（Phase 5-Aで既に API レベルは移行済み）
+ * 
  * 外部埋め込み制限チェック
  */
 export function isEmbedLimitReached(planType: PlanType, currentCount: number): boolean {
-  const limit = PLAN_LIMITS[planType].embeds;
-  return currentCount >= limit;
+  return isGenericLimitReached(planType, 'embeds', currentCount);
 }
 
 /**
  * 外部埋め込み制限メッセージ
  */
 export function getEmbedLimitMessage(planType: PlanType): string {
-  const limit = PLAN_LIMITS[planType].embeds;
-  if (limit === Number.POSITIVE_INFINITY) return '';
-  return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（外部埋め込み上限: ${limit}個）。`;
+  return getGenericLimitMessage(planType, 'embeds', '外部埋め込み', '個');
 }
 
 /**
@@ -290,25 +338,21 @@ export function getSystemMonitoringLimitMessage(planType: PlanType): string {
  * Q&A項目制限チェック
  */
 export function isQALimitReached(planType: PlanType, currentCount: number): boolean {
-  const limit = PLAN_LIMITS[planType].qa_items;
-  return currentCount >= limit;
+  return isGenericLimitReached(planType, 'qa_items', currentCount);
 }
 
 /**
  * Q&A項目制限メッセージ
  */
 export function getQALimitMessage(planType: PlanType): string {
-  const limit = PLAN_LIMITS[planType].qa_items;
-  if (limit === Number.POSITIVE_INFINITY) return '';
-  return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（Q&A項目上限: ${limit}件）。`;
+  return getGenericLimitMessage(planType, 'qa_items', 'Q&A項目', '件');
 }
 
 /**
  * 記事制限チェック
  */
 export function isPostLimitReached(planType: PlanType, currentCount: number): boolean {
-  const limit = PLAN_LIMITS[planType].posts;
-  return currentCount >= limit;
+  return isGenericLimitReached(planType, 'posts', currentCount);
 }
 
 /**
@@ -316,9 +360,9 @@ export function isPostLimitReached(planType: PlanType, currentCount: number): bo
  */
 export function getPostLimitMessage(planType: PlanType): string {
   const limit = PLAN_LIMITS[planType].posts;
+  // 特殊ケース: 記事は一部プランで完全無効
   if (limit === 0) return `記事機能は${PLAN_NAMES.pro}以上のプランで利用可能です。`;
-  if (limit === Number.POSITIVE_INFINITY) return '';
-  return `ご契約プラン（${PLAN_NAMES[planType]}）の上限に達しています（記事上限: ${limit}件）。`;
+  return getGenericLimitMessage(planType, 'posts', '記事', '件');
 }
 
 /**

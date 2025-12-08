@@ -1,5 +1,8 @@
 'use client';
 
+// TODO: [SUPABASE_CMS_MIGRATION] 新しい型をインポートして段階的に移行
+// import type { CmsSiteSettingsRow, CmsSectionRow, CmsAssetRow } from '@/types/cms-supabase';
+
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useOrgRealtimeCms, useCMSSectionByKey, useCMSSettingByKey } from '@/hooks/useOrgRealtimeCms';
 import { useAdminApiClient, type AdminApiResponse } from '@/lib/admin-api-client';

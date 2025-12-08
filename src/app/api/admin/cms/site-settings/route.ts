@@ -1,4 +1,6 @@
 // CMS サイト設定 API
+// TODO: [SUPABASE_CMS_MIGRATION] 現在は key-value 形式だが、Supabase の「正」では組織ごとの構造化設定になります
+// 将来的には organization_id ベースの構造化設定 (logo_url, hero_title, seo_title 等) に移行予定
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
@@ -21,7 +23,7 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (orgError || userOrg?.role !== 'admin') {
+    if (orgError || !userOrg || (userOrg as any)?.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -90,7 +92,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (orgError || userOrg?.role !== 'admin') {
+    if (orgError || !userOrg || (userOrg as any)?.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -113,8 +115,8 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString()
     };
 
-    const { data, error } = await supabase
-      .from('cms_site_settings')
+    const { data, error } = await (supabase
+      .from('cms_site_settings') as any)
       .upsert(settingData, {
         onConflict: 'key'
       })
@@ -170,7 +172,7 @@ export async function DELETE(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (orgError || userOrg?.role !== 'admin') {
+    if (orgError || !userOrg || (userOrg as any)?.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 

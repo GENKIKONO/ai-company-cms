@@ -54,7 +54,8 @@ export async function GET(request: NextRequest) {
     debugLog('Q&A Stats request', { dateFrom, dateTo, qnaId, categoryId, organizationId });
 
     // 基本クエリの構築
-    let baseQuery = supabase
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] qna_stats テーブルの型定義を Supabase client に追加
+    let baseQuery = (supabase as any)
       .from('qna_stats')
       .select(`
         *,

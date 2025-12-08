@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { handleApiError, validationError, notFoundError } from '@/lib/api/error-responses';
 import { logger } from '@/lib/utils/logger';
+import { isFeatureQuotaLimitReached } from '@/lib/org-features/quota';
 
 // パブリケーション状態スキーマ
 const publishStatusSchema = z.object({
@@ -122,6 +123,36 @@ export async function PUT(request: NextRequest) {
           }
         }
       );
+    }
+
+    // Phase 5-A: 埋め込みウィジェット quota チェック
+    // 新しく公開に変更する場合のみチェック（非公開にする場合は制限なし）
+    if (newIsPublished && !existingOrg.is_published) {
+      try {
+        const quotaLimitReached = await isFeatureQuotaLimitReached(existingOrg.id, 'embeds');
+        if (quotaLimitReached) {
+          logger.warn('[QUOTA] Embeds quota exceeded for organization publish', {
+            organizationId: existingOrg.id,
+            userId: user.id
+          });
+          
+          return NextResponse.json(
+            {
+              error: 'quota_exceeded',
+              feature: 'embeds',
+              message: '埋め込みウィジェットの上限に達しています。プランの変更をご検討ください。',
+            },
+            { status: 429 }
+          );
+        }
+      } catch (quotaError) {
+        // fail-open: quota チェック中にエラーが発生した場合はログ出力して処理を続行
+        logger.error('[QUOTA] Failed to check embeds quota, proceeding with publication (fail-open)', {
+          error: quotaError instanceof Error ? quotaError.message : String(quotaError),
+          organizationId: existingOrg.id,
+          userId: user.id
+        });
+      }
     }
 
     // ✅ トランザクション的更新: is_published と status を同時更新

@@ -1,4 +1,4 @@
-import type { Database } from '@/types/supabase';
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
 
 // 新仕様のanswerとgenerated_content_json構造型定義
 export interface InterviewAnswerTurn {
@@ -47,12 +47,16 @@ export interface GeneratedContentJson {
   embedding_context: EmbeddingContextData;
 }
 
+// Define interview-related enums since they don't exist in database types
+export type InterviewContentType = 'service' | 'product' | 'company' | 'post' | 'other';
+export type InterviewSessionStatus = 'draft' | 'in_progress' | 'completed' | 'archived';
+
 export interface InterviewSession {
   id: string;
   organization_id: string | null;
   user_id: string | null;
-  content_type: Database['public']['Enums']['interview_content_type'];
-  status: Database['public']['Enums']['interview_session_status'];
+  content_type: InterviewContentType;
+  status: InterviewSessionStatus;
   answers: InterviewAnswersJson;
   generated_content?: string | null;
   generated_content_json?: GeneratedContentJson | null;
@@ -67,7 +71,7 @@ export interface InterviewSession {
 export interface CreateInterviewSessionInput {
   organizationId: string | null;
   userId: string | null;
-  contentType: Database['public']['Enums']['interview_content_type'];
+  contentType: InterviewContentType;
   questionIds: string[];
 }
 
@@ -85,7 +89,7 @@ export interface InterviewQuestion {
   id: string;
   axis_code: string;
   question_text: string;
-  content_type?: Database['public']['Enums']['interview_content_type'];
+  content_type?: InterviewContentType;
   lang: string;
   sort_order: number;
   is_active: boolean;
@@ -105,7 +109,7 @@ export interface InterviewAxis {
 // Phase 2-1: Session management types
 export interface SessionListParams {
   organization_id?: string;
-  status?: Database['public']['Enums']['interview_session_status'];
+  status?: InterviewSessionStatus;
   page?: number;
   page_size?: number;
 }

@@ -10,6 +10,46 @@ import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
+// Internal type definitions for data processing
+interface VisibilityScoreEntry {
+  url: string;
+  calculated_at: string;
+  total_visibility_score: number | string;
+  structured_data_score: number | null;
+  ai_access_score: number | null;
+  seo_performance_score: number | null;
+  ai_bot_hits_count: number | null;
+  unique_bots_count: number | null;
+  ai_content_units?: {
+    title: string;
+    content_type: string;
+  } | null;
+}
+
+interface TrendDataEntry {
+  calculated_at: string;
+  total_visibility_score: number | string;
+}
+
+interface DailyTrendStats {
+  total: number;
+  count: number;
+}
+
+// Helper functions for safe operations
+function toSafeNumber(value: unknown, defaultValue: number = 0): number {
+  if (typeof value === 'number' && !isNaN(value)) return value;
+  if (typeof value === 'string') {
+    const parsed = parseFloat(value);
+    return !isNaN(parsed) ? parsed : defaultValue;
+  }
+  return defaultValue;
+}
+
+function calculateAverage(total: number, count: number): number {
+  return count > 0 ? Math.round(total / count) : 0;
+}
+
 // Response types
 interface VisibilityResponse {
   organization_id: string;
@@ -111,11 +151,12 @@ export async function GET(request: NextRequest) {
     
     // 最新スコアのURL別グループ化（同一URLの最新データのみ）
     const latestByUrl = scores.reduce((acc, score) => {
-      if (!acc[score.url] || new Date(score.calculated_at) > new Date(acc[score.url].calculated_at)) {
-        acc[score.url] = score;
+      const entry = score as VisibilityScoreEntry;
+      if (!acc[entry.url] || new Date(entry.calculated_at) > new Date(acc[entry.url].calculated_at)) {
+        acc[entry.url] = entry;
       }
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, VisibilityScoreEntry>);
 
     const latestScoresList = Object.values(latestByUrl);
 
@@ -123,56 +164,62 @@ export async function GET(request: NextRequest) {
     const totalUrls = latestScoresList.length;
     let scoreSum = 0;
     for (const score of latestScoresList) {
-      scoreSum += parseFloat(String((score as any).total_visibility_score || 0));
+      const entry = score as VisibilityScoreEntry;
+      scoreSum += toSafeNumber(entry.total_visibility_score, 0);
     }
-    const averageScore = totalUrls > 0 ? Math.round(scoreSum / totalUrls) : 0;
+    const averageScore = calculateAverage(scoreSum, totalUrls);
 
     // トレンド集計（日別平均）
     const dailyTrends = (trendData || []).reduce((acc, score) => {
-      const date = score.calculated_at.split('T')[0]; // YYYY-MM-DD
+      const entry = score as TrendDataEntry;
+      const date = entry.calculated_at.split('T')[0]; // YYYY-MM-DD
       if (!acc[date]) {
         acc[date] = { total: 0, count: 0 };
       }
-      acc[date].total += Number(score.total_visibility_score);
+      acc[date].total += toSafeNumber(entry.total_visibility_score, 0);
       acc[date].count += 1;
       return acc;
-    }, {} as Record<string, { total: number; count: number }>);
+    }, {} as Record<string, DailyTrendStats>);
 
     const scoreTrend = Object.entries(dailyTrends)
-      .map(([date, data]) => ({
+      .map(([date, data]: [string, DailyTrendStats]) => ({
         date,
-        score: Math.round(data.total / data.count),
+        score: calculateAverage(data.total, data.count),
         total_urls: data.count,
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
     // コンテンツスコア詳細
     const contentScores = latestScoresList
-      .map((score: any) => ({
+      .map((score: VisibilityScoreEntry) => ({
         url: score.url,
         title: score.ai_content_units?.title || null,
         content_type: score.ai_content_units?.content_type || null,
-        total_score: Number(score.total_visibility_score),
+        total_score: toSafeNumber(score.total_visibility_score, 0),
         component_scores: {
-          structured_data: score.structured_data_score,
-          ai_access: score.ai_access_score,
-          seo_performance: score.seo_performance_score,
+          structured_data: toSafeNumber(score.structured_data_score, 0),
+          ai_access: toSafeNumber(score.ai_access_score, 0),
+          seo_performance: toSafeNumber(score.seo_performance_score, 0),
         },
         ai_metrics: {
-          bot_hits: score.ai_bot_hits_count || 0,
-          unique_bots: score.unique_bots_count || 0,
+          bot_hits: toSafeNumber(score.ai_bot_hits_count, 0),
+          unique_bots: toSafeNumber(score.unique_bots_count, 0),
         },
         last_calculated: score.calculated_at,
       }))
       .sort((a, b) => b.total_score - a.total_score); // スコア降順
 
     // サマリー統計
-    const topPerformingUrls = latestScoresList.filter((score: any) => Number(score.total_visibility_score) >= 80).length;
-    const improvementNeededUrls = latestScoresList.filter((score: any) => Number(score.total_visibility_score) <= 50).length;
-    const lastCalculation = latestScoresList.length > 0 
-      ? latestScoresList.reduce((latest: string, score: any) => 
+    const topPerformingUrls = latestScoresList.filter((score: VisibilityScoreEntry) => 
+      toSafeNumber(score.total_visibility_score, 0) >= 80
+    ).length;
+    const improvementNeededUrls = latestScoresList.filter((score: VisibilityScoreEntry) => 
+      toSafeNumber(score.total_visibility_score, 0) <= 50
+    ).length;
+    const lastCalculation: string | null = latestScoresList.length > 0 
+      ? (latestScoresList as VisibilityScoreEntry[]).reduce((latest: string, score: VisibilityScoreEntry) => 
           new Date(score.calculated_at) > new Date(latest) ? score.calculated_at : latest, 
-          (latestScoresList[0] as any).calculated_at
+          (latestScoresList[0] as VisibilityScoreEntry).calculated_at
         )
       : null;
 
@@ -186,7 +233,7 @@ export async function GET(request: NextRequest) {
         average_score: averageScore,
         top_performing_urls: topPerformingUrls,
         improvement_needed_urls: improvementNeededUrls,
-        last_calculation: (lastCalculation as string) || '',
+        last_calculation: lastCalculation,
       },
     };
 

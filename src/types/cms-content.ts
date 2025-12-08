@@ -1,9 +1,12 @@
 /**
  * P2-6: CMS統合ダッシュボード用型定義
- * Supabase enum と v_admin_contents VIEW に対応
+ * TODO: [SUPABASE_CMS_MIGRATION] v_admin_contents VIEW は存在しない可能性があります
+ * 新しい型定義は src/types/cms-supabase.ts を使用してください
  */
 
 import type { CmsGenerationSource } from './interview-generated';
+// TODO: [SUPABASE_CMS_MIGRATION] 新しい型をインポートして段階的に移行
+// import type { PublicContentRow, CmsSectionRow } from './cms-supabase';
 
 // Supabase enum と完全一致（重要）
 export type CmsContentType =
@@ -41,7 +44,8 @@ export const CMS_CONTENT_STATUS_LABELS: Record<CmsContentStatus, string> = {
   archived: 'アーカイブ'
 };
 
-// Supabase v_admin_contents VIEW の行型
+// TODO: [SUPABASE_CMS_MIGRATION] v_admin_contents VIEW は存在しない可能性があります
+// 代わりに public_*_tbl 系のテーブルを直接使用することを検討してください
 export interface AdminContentListItem {
   id: string;
   organization_id: string;
@@ -56,6 +60,7 @@ export interface AdminContentListItem {
   region_code: string | null;
   base_path: string | null;
   meta: Record<string, any>;
+  // TODO: [SUPABASE_CMS_MIGRATION] public_*_tbl 系テーブルに変更予定
   source_table: string; // posts, news, faqs, case_studies, qa_entries, sales_materials, ai_interview_sessions
   generation_source: CmsGenerationSource | null;
 }
@@ -110,14 +115,24 @@ export interface AdminContentUpdateRequest {
 }
 
 // Source Table の型定義
+// TODO: [SUPABASE_CMS_MIGRATION] public_*_tbl 系テーブルに変更を検討
 export type SourceTableType = 
-  | 'posts'
-  | 'news' 
-  | 'faqs'
-  | 'case_studies'
+  | 'posts' // TODO: → public_posts_tbl
+  | 'news'  // TODO: → public_news_tbl
+  | 'faqs'  // TODO: → public_faqs_tbl
+  | 'case_studies'  // TODO: → public_case_studies_tbl
   | 'qa_entries'
   | 'sales_materials'
   | 'ai_interview_sessions';
+
+// TODO: [SUPABASE_CMS_MIGRATION] Supabaseの「正」に合わせた新しい型も定義
+export type PublicSourceTableType = 
+  | 'public_posts_tbl'
+  | 'public_news_tbl'
+  | 'public_services_tbl'
+  | 'public_products_tbl'
+  | 'public_case_studies_tbl'
+  | 'public_faqs_tbl';
 
 // Source Table の妥当性チェック用
 export const VALID_SOURCE_TABLES: SourceTableType[] = [
@@ -128,6 +143,16 @@ export const VALID_SOURCE_TABLES: SourceTableType[] = [
   'qa_entries',
   'sales_materials',
   'ai_interview_sessions'
+];
+
+// TODO: [SUPABASE_CMS_MIGRATION] 新しいテーブル用
+export const VALID_PUBLIC_SOURCE_TABLES: PublicSourceTableType[] = [
+  'public_posts_tbl',
+  'public_news_tbl',
+  'public_services_tbl',
+  'public_products_tbl',
+  'public_case_studies_tbl',
+  'public_faqs_tbl'
 ];
 
 export function isValidSourceTable(value: string): value is SourceTableType {

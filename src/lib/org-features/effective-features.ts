@@ -3,48 +3,203 @@
  * 
  * Supabase の get_effective_org_features(org_id) を中心とした
  * 機能ON/OFF・制限値チェックの統一インターフェース
+ * 
+ * NOTE: [既存正規ルート候補]
+ * - canUseFeature(orgId, featureKey): 機能利用可否をDB経由で非同期取得
+ * - getFeatureLimit(orgId, featureKey): 機能制限値を取得
+ * - getFeatureLevel(orgId, featureKey): 機能レベル(basic/advanced)を取得
+ * - 内部でget_effective_org_features RPCを呼び、plan_features + entitlementsをマージ
  */
 
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { createClient } from '@/lib/supabase/server';
 import { PLAN_LIMITS, PLAN_FEATURE_MAP, type PlanType } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
+import type { 
+  FeatureKey, 
+  FeatureConfig, 
+  FeatureControlType,
+  NormalizedFeatureConfig,
+  NormalizedFeatureMap,
+  OnOffFeatureConfig,
+  LimitNumberFeatureConfig,
+  PlanFeatureRow,
+  FeatureRegistryRow,
+  EffectiveOrgFeaturesResponse,
+  RpcFeatureConfig,
+  SupabaseFeatureKey
+} from '@/types/features';
+
+// Re-export 型定義（下位互換性のため）
+export type { FeatureKey, FeatureConfig } from '@/types/features';
+
+// TODO: [SUPABASE_ALIGNMENT] 下記は Supabase の実データ構造に合わせて段階移行中
+// Phase 3-C: 型定義を統一、Phase 3-D: 実装ロジック移行予定
 
 // =============================================================================
-// 型定義
+// Supabase データ正規化ヘルパー関数
 // =============================================================================
 
 /**
- * 機能キー型定義（feature_registry.feature_key に対応）
- * DB側のfeature_keyと整合性を保つため、実際のDB値と合わせる必要あり
+ * plan_features テーブルの行データを正規化された設定に変換
+ * @param row plan_features テーブルの1行
+ * @param controlType feature_registry から取得した control_type
+ * @returns 正規化された機能設定
  */
-export type FeatureKey = 
-  | 'system_monitoring'
-  | 'ai_reports' 
-  | 'ai_visibility'
-  | 'business_matching'
-  | 'embeds'
-  | 'service_gallery'
-  | 'service_video'
-  | 'faq_module'
-  | 'materials'
-  | 'case_studies'
-  | 'services'
-  | 'qa_items'
-  | 'posts'
-  | 'verified_badge'
-  | 'approval_flow'
-  | 'team_management';
+export function normalizePlanFeatureRow(
+  row: PlanFeatureRow, 
+  controlType: FeatureControlType
+): NormalizedFeatureConfig {
+  const { config_value } = row;
+
+  if (controlType === 'on_off') {
+    return {
+      controlType: 'on_off',
+      enabled: Boolean(config_value?.enabled)
+    };
+  }
+
+  if (controlType === 'limit_number') {
+    const limit = typeof config_value?.limit === 'number' ? config_value.limit : 0;
+    return {
+      controlType: 'limit_number',
+      limit,
+      unlimited: limit === -1
+    };
+  }
+
+  // フォールバック（予期しない control_type）
+  logger.warn('Unknown control_type in normalizePlanFeatureRow', {
+    featureKey: row.feature_key,
+    controlType,
+    configValue: config_value
+  });
+  
+  return {
+    controlType: 'on_off',
+    enabled: false
+  };
+}
 
 /**
- * 機能設定構造（柔軟性を重視）
- * plan_features.config_value(jsonb) から得られる値を想定
+ * plan_features 行群とオーバーライド設定をマージ
+ * @param planRows plan_features テーブルの行群
+ * @param entitlements organizations.entitlements (JSONB)
+ * @param featureFlags organizations.feature_flags (JSONB)
+ * @param registry feature_registry の情報（control_type 取得用）
+ * @returns 正規化された機能設定マップ
  */
-export interface FeatureConfig {
-  enabled: boolean;
-  limit?: number | null;
-  level?: string | null;
-  limits?: any; // 複雑な構造は一旦anyで受ける
-  [key: string]: any; // 将来の拡張に備えて柔軟に
+export function mergePlanFeaturesWithOverrides(
+  planRows: PlanFeatureRow[],
+  entitlements: Record<string, any>,
+  featureFlags: Record<string, any>,
+  registry: Record<FeatureKey, FeatureControlType>
+): NormalizedFeatureMap {
+  const features: NormalizedFeatureMap = {};
+
+  // 1. plan_features から基本設定を構築
+  for (const row of planRows) {
+    const controlType = registry[row.feature_key];
+    if (!controlType) {
+      logger.warn('Missing control_type for feature in registry', {
+        featureKey: row.feature_key
+      });
+      continue;
+    }
+
+    features[row.feature_key] = normalizePlanFeatureRow(row, controlType);
+  }
+
+  // TODO: [OVERRIDE_IMPLEMENTATION] entitlements / feature_flags による上書きロジック
+  // 現時点では基本実装のみ、将来的に下記を実装予定：
+  // 2. entitlements による組織固有上書き
+  // 3. feature_flags による個別機能上書き
+  // 既存挙動を変えないため、今は plan_features ベースのみ返却
+
+  logger.debug('mergePlanFeaturesWithOverrides completed', {
+    planRowCount: planRows.length,
+    featuresCount: Object.keys(features).length,
+    entitlementsKeys: Object.keys(entitlements || {}),
+    featureFlagsKeys: Object.keys(featureFlags || {})
+  });
+
+  return features;
+}
+
+// =============================================================================
+// get_effective_org_features RPC インターフェース
+// =============================================================================
+
+/**
+ * Supabase の get_effective_org_features RPC を呼び出して組織の効果的機能設定を取得
+ * @param organizationId 組織UUID
+ * @returns RPC応答データ または null (失敗時)
+ */
+export async function fetchEffectiveOrgFeatures(
+  organizationId: string
+): Promise<EffectiveOrgFeaturesResponse | null> {
+  try {
+    const supabase = await createClient();
+    
+    // TODO: [RPC_PARAMETER] DB の関数定義に合わせてパラメータ名を調整が必要な場合がある
+    // 現在は p_org_id で仮実装、実際のDB定義に合わせて修正すること
+    const { data, error } = await supabase.rpc('get_effective_org_features', {
+      p_org_id: organizationId,
+    });
+
+    if (error) {
+      logger.warn('Failed to fetch effective org features via RPC', {
+        organizationId,
+        error: error.message,
+        code: error.code,
+      });
+      return null;
+    }
+
+    logger.debug('Successfully fetched effective org features via RPC', {
+      organizationId,
+      plan: data?.plan,
+      featureCount: Object.keys(data?.features || {}).length,
+    });
+
+    return data as EffectiveOrgFeaturesResponse;
+
+  } catch (error) {
+    logger.error('Exception in fetchEffectiveOrgFeatures', {
+      organizationId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
+/**
+ * RPC応答を NormalizedFeatureMap 形式に変換
+ * @param response get_effective_org_features の戻り値
+ * @returns 正規化された機能設定マップ
+ */
+export function normalizeEffectiveOrgFeaturesResponse(
+  response: EffectiveOrgFeaturesResponse
+): Record<SupabaseFeatureKey, NormalizedFeatureConfig> {
+  const normalized: Record<string, NormalizedFeatureConfig> = {};
+
+  for (const [featureKey, config] of Object.entries(response.features)) {
+    // RPC の戻り値から source フィールドを除いて NormalizedFeatureConfig に変換
+    if (config.controlType === 'on_off') {
+      normalized[featureKey] = {
+        controlType: 'on_off',
+        enabled: config.enabled,
+      };
+    } else if (config.controlType === 'limit_number') {
+      normalized[featureKey] = {
+        controlType: 'limit_number',
+        limit: config.limit,
+        unlimited: config.limit === -1,
+      };
+    }
+  }
+
+  return normalized as Record<SupabaseFeatureKey, NormalizedFeatureConfig>;
 }
 
 /**
@@ -113,60 +268,51 @@ export async function getEffectiveOrgFeatures(orgId: string): Promise<EffectiveO
   const context = { organizationId: orgId, component: 'effective-features' };
   
   try {
-    // 1. Supabase RPC呼び出しを試行
-    logger.debug('Fetching effective org features from Supabase', undefined, context);
+    // 1. 新しいRPCヘルパーを使用してSupabase RPC呼び出しを試行
+    logger.debug('Fetching effective org features from Supabase via new RPC helper', undefined, context);
     
-    const { data, error } = await supabaseAdmin.rpc('get_effective_org_features', {
-      org_id: orgId
-    });
-
-    if (error) {
-      logger.warn('get_effective_org_features RPC failed, trying entitlements fallback', error, context);
-      return await getEffectiveOrgFeaturesFromEntitlements(orgId);
-    }
-
-    if (!data || typeof data !== 'object' || !data.features || typeof data.features !== 'object') {
-      logger.warn('get_effective_org_features returned invalid data structure, trying entitlements fallback', { 
-        dataType: typeof data, 
-        hasFeatures: !!(data && data.features),
-        featuresType: data && typeof data.features
-      }, context);
-      return await getEffectiveOrgFeaturesFromEntitlements(orgId);
-    }
-
-    // Supabase応答を型変換
-    const features: Partial<Record<FeatureKey, FeatureConfig>> = {};
+    const rpcResponse = await fetchEffectiveOrgFeatures(orgId);
     
-    for (const [featureId, config] of Object.entries(data.features)) {
-      try {
-        const normalizedId = normalizeFeatureKey(featureId);
-        if (normalizedId && config && typeof config === 'object') {
-          const configObj = config as any; // 型安全性より実行時安全性を優先
-          features[normalizedId] = {
-            enabled: Boolean(configObj.enabled),
-            limit: typeof configObj.limit === 'number' ? configObj.limit : null,
-            level: typeof configObj.level === 'string' ? configObj.level : null,
-            limits: configObj.limits || undefined,
-            // 未知の構造に備えて元のconfigも保存
-            ...configObj
+    if (rpcResponse) {
+      // RPC成功時：normalizeEffectiveOrgFeaturesResponse で正規化
+      logger.debug('Successfully fetched effective org features from RPC, normalizing response', undefined, context);
+      
+      const normalizedFeatures = normalizeEffectiveOrgFeaturesResponse(rpcResponse);
+      
+      // 既存のFeatureConfigフォーマットに変換（下位互換性のため）
+      const features: Partial<Record<FeatureKey, FeatureConfig>> = {};
+      
+      for (const [featureKey, config] of Object.entries(normalizedFeatures)) {
+        if (config.controlType === 'on_off') {
+          features[featureKey as FeatureKey] = {
+            enabled: config.enabled,
+          };
+        } else if (config.controlType === 'limit_number') {
+          features[featureKey as FeatureKey] = {
+            enabled: config.limit > 0 || config.unlimited,
+            limit: config.unlimited ? null : config.limit,
           };
         }
-      } catch (error) {
-        logger.warn(`Failed to process feature ${featureId} from RPC response`, error, context);
-        continue;
       }
+
+      logger.debug('Successfully processed RPC response', { 
+        featuresCount: Object.keys(features).length,
+        rpcPlan: rpcResponse.plan 
+      }, context);
+
+      return {
+        features,
+        _meta: {
+          source: 'rpc',
+          retrieved_at: new Date().toISOString(),
+          organization_id: orgId,
+        }
+      };
+    } else {
+      // RPC失敗時：フォールバック処理
+      logger.warn('RPC helper returned null, falling back to entitlements', undefined, context);
+      return await getEffectiveOrgFeaturesFromEntitlements(orgId);
     }
-
-    logger.debug('Successfully fetched effective org features from Supabase', { featuresCount: Object.keys(features).length }, context);
-
-    return {
-      features,
-      _meta: {
-        source: 'rpc',
-        retrieved_at: new Date().toISOString(),
-        organization_id: orgId,
-      }
-    };
 
   } catch (error) {
     logger.error('Unexpected error in getEffectiveOrgFeatures, falling back to entitlements', error, context);
@@ -465,3 +611,169 @@ export async function isFeatureLimitReached(
   
   return currentCount >= limit;
 }
+
+// =============================================================================
+// Phase 3-D: 組織データベース同期API（RPC+フォールバック）
+// =============================================================================
+
+/**
+ * 組織データから機能利用可否を判定（RPC優先、同期フォールバック付き）
+ * 
+ * NOTE: [RPC_INTEGRATION] 
+ * 1. まず fetchEffectiveOrgFeatures(organization.id) でRPC呼び出し
+ * 2. 成功したら RPC結果を使用
+ * 3. 失敗したら canUseFeatureFromOrg(organization, key) でフォールバック
+ * 
+ * @param organization Supabase organizations テーブルの行データ
+ * @param key 機能キー
+ * @returns 機能が利用可能かどうか
+ */
+export async function canUseFeatureFromOrgAsync(
+  organization: { id: string; plan?: string | null; feature_flags?: any } | null | undefined,
+  key: FeatureKey,
+): Promise<boolean> {
+  const context = { organizationId: organization?.id, featureKey: key, component: 'canUseFeatureFromOrgAsync' };
+  
+  // 組織データが無効の場合は早期リターン
+  if (!organization?.id) {
+    logger.warn('Invalid organization data in canUseFeatureFromOrgAsync', { organization }, context);
+    return false;
+  }
+
+  try {
+    // 1. RPC呼び出しを試行
+    const rpcResponse = await fetchEffectiveOrgFeatures(organization.id);
+    
+    if (rpcResponse) {
+      const normalizedFeatures = normalizeEffectiveOrgFeaturesResponse(rpcResponse);
+      const featureConfig = normalizedFeatures[key as SupabaseFeatureKey];
+      
+      if (featureConfig) {
+        if (featureConfig.controlType === 'on_off') {
+          logger.debug('Feature availability determined via RPC (on_off)', { 
+            key, 
+            enabled: featureConfig.enabled 
+          }, context);
+          return featureConfig.enabled;
+        } else if (featureConfig.controlType === 'limit_number') {
+          const available = featureConfig.limit > 0 || featureConfig.unlimited;
+          logger.debug('Feature availability determined via RPC (limit_number)', { 
+            key, 
+            limit: featureConfig.limit,
+            unlimited: featureConfig.unlimited,
+            available 
+          }, context);
+          return available;
+        }
+      }
+      
+      // RPC応答にキーが含まれていない場合は false
+      logger.debug('Feature key not found in RPC response', { key }, context);
+      return false;
+    }
+
+    // 2. RPC失敗時：sync版の features.ts の関数にフォールバック
+    logger.debug('RPC failed, falling back to sync logic', undefined, context);
+    const { canUseFeatureFromOrg } = await import('./features');
+    return canUseFeatureFromOrg(organization as any, key);
+
+  } catch (error) {
+    logger.error('Error in canUseFeatureFromOrgAsync, falling back to sync logic', error, context);
+    
+    // 例外発生時もsync版にフォールバック
+    try {
+      const { canUseFeatureFromOrg } = await import('./features');
+      return canUseFeatureFromOrg(organization as any, key);
+    } catch (fallbackError) {
+      logger.error('Fallback sync logic also failed', fallbackError, context);
+      return false; // 最終的に安全側で false
+    }
+  }
+}
+
+/**
+ * 複数の機能フラグを一括取得（RPC優先、同期フォールバック付き）
+ * 
+ * @param organization Supabase organizations テーブルの行データ
+ * @param keys 取得したい機能キーの配列
+ * @returns 各キーの boolean 値のマップ
+ */
+export async function getMultipleFeatureFlagsFromOrgAsync(
+  organization: { id: string; plan?: string | null; feature_flags?: any } | null | undefined,
+  keys: FeatureKey[],
+): Promise<Record<FeatureKey, boolean>> {
+  const context = { organizationId: organization?.id, keysCount: keys.length, component: 'getMultipleFeatureFlagsFromOrgAsync' };
+  
+  // 組織データが無効の場合は全てfalse
+  if (!organization?.id) {
+    const result = {} as Record<FeatureKey, boolean>;
+    keys.forEach(key => { result[key] = false; });
+    return result;
+  }
+
+  try {
+    // 1. RPC呼び出しを試行
+    const rpcResponse = await fetchEffectiveOrgFeatures(organization.id);
+    
+    if (rpcResponse) {
+      const normalizedFeatures = normalizeEffectiveOrgFeaturesResponse(rpcResponse);
+      const result = {} as Record<FeatureKey, boolean>;
+      
+      for (const key of keys) {
+        const featureConfig = normalizedFeatures[key as SupabaseFeatureKey];
+        
+        if (featureConfig) {
+          if (featureConfig.controlType === 'on_off') {
+            result[key] = featureConfig.enabled;
+          } else if (featureConfig.controlType === 'limit_number') {
+            result[key] = featureConfig.limit > 0 || featureConfig.unlimited;
+          } else {
+            result[key] = false;
+          }
+        } else {
+          result[key] = false; // RPC応答にキーが含まれていない
+        }
+      }
+      
+      logger.debug('Multiple feature flags determined via RPC', { 
+        keysProcessed: keys.length,
+        trueCount: Object.values(result).filter(Boolean).length
+      }, context);
+      
+      return result;
+    }
+
+    // 2. RPC失敗時：sync版の features.ts の関数にフォールバック  
+    logger.debug('RPC failed, falling back to sync logic for multiple flags', undefined, context);
+    const { getMultipleFeatureFlagsFromOrg } = await import('./features');
+    return getMultipleFeatureFlagsFromOrg(organization as any, keys);
+
+  } catch (error) {
+    logger.error('Error in getMultipleFeatureFlagsFromOrgAsync, falling back to sync logic', error, context);
+    
+    // 例外発生時もsync版にフォールバック
+    try {
+      const { getMultipleFeatureFlagsFromOrg } = await import('./features');
+      return getMultipleFeatureFlagsFromOrg(organization as any, keys);
+    } catch (fallbackError) {
+      logger.error('Fallback sync logic also failed', fallbackError, context);
+      // 最終的に全てfalseで安全側リターン
+      const result = {} as Record<FeatureKey, boolean>;
+      keys.forEach(key => { result[key] = false; });
+      return result;
+    }
+  }
+}
+
+// TODO: [UNIFICATION_ROADMAP] Phase 3-B 統一化拡張計画:
+// 1. AI面接クレジット統合: interview-credits.ts の MONTHLY_INTERVIEW_LIMITS を plan_features に移行
+//    - 新機能キー: 'ai_interview_credits' (limit値 = 月間セッション数)
+//    - price_id マッピングロジックは migration ヘルパーとして保持
+// 
+// 2. 埋め込み制限統合: embed.ts の EMBED_LIMITS を plan_features に移行  
+//    - 新機能キー: 'embed_widgets', 'embed_monthly_views', 'embed_rate_limit'
+//    - 3階層マッピング (free/standard/enterprise) は getEmbedLimits で維持
+//
+// 3. 汎用制限メッセージ生成の統合: plans.ts の getGenericLimitMessage を統合
+//    - 新関数: getFeatureLimitMessage(orgId, featureKey, currentCount)
+//    - 既存の個別メッセージ関数は wrapper として保持

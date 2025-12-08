@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Build query
-    let query = supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
+    let query = (supabaseAdmin as any)
       .from('org_group_join_requests')
       .select(`
         id,
@@ -84,7 +85,8 @@ export async function GET(request: NextRequest) {
       .map(org => org.organization_id);
 
     // Check system admin role
-    const { data: profile } = await supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] profiles テーブルの型定義を Supabase client に追加
+    const { data: profile } = await (supabaseAdmin as any)
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -171,7 +173,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify and validate invite code
-    const { data: invite, error: inviteError } = await supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_invites テーブルの型定義を Supabase client に追加
+    const { data: invite, error: inviteError } = await (supabaseAdmin as any)
       .from('org_group_invites')
       .select(`
         id,
@@ -246,7 +249,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create join request
-    const { data: joinRequest, error } = await supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
+    const { data: joinRequest, error } = await (supabaseAdmin as any)
       .from('org_group_join_requests')
       .insert({
         group_id: invite.group_id,

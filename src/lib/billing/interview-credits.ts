@@ -4,15 +4,21 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/supabase';
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
 import { logger } from '@/lib/utils/logger';
 
-type SupabaseClientType = SupabaseClient<Database>;
+type SupabaseClientType = SupabaseClient<any>;
 
 /**
  * プラン種別定義
  */
 type PlanKey = 'starter' | 'pro' | 'business' | 'enterprise';
+
+// TODO: [UNIFICATION_CANDIDATE] Phase 3-B: AI面接クレジット制限の Supabase plan_features 移行
+// 現状: Stripe price_id → 環境変数マッピング → 静的制限値
+// 提案: plan_features テーブルで ai_interview_credits 機能の limit 値管理
+// 利点: 管理画面でのクォータ一元表示、プラン別カスタマイズ、オーバーライド可能
+// 影響: 既存の price_id マッピングロジック維持必須（後方互換性）
 
 /**
  * プラン別月間AIインタビュー上限
@@ -100,6 +106,8 @@ export interface QuestionUsageResult {
 }
 
 /**
+ * DEPRECATED: Supabase get_org_quota_usage / isFeatureQuotaLimitReached に移行済み。新規コードでは使用しないこと。
+ * 
  * 組織の今月の質問数使用状況を確認し、新しい質問実行の可否を判定
  */
 export async function checkMonthlyQuestionUsage(
@@ -255,6 +263,8 @@ async function getCurrentMonthUsage(
 }
 
 /**
+ * DEPRECATED: Supabase get_org_quota_usage / isFeatureQuotaLimitReached に移行済み。新規コードでは使用しないこと。
+ * 
  * 質問実行前の事前チェック（複数質問の場合）
  * セッション作成時に指定された質問数がプラン制限内かをチェック
  */
@@ -284,6 +294,8 @@ export async function checkQuestionQuota(
 }
 
 /**
+ * DEPRECATED: Supabase get_org_quota_usage / fetchOrgQuotaUsage に移行済み。新規コードでは使用しないこと。
+ * 
  * プラン情報の取得（管理画面表示用）
  */
 export async function getOrganizationPlanInfo(

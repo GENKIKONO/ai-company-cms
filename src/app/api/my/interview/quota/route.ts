@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthUser, requireOrgMember } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
+// TODO: [SUPABASE_PLAN_MIGRATION] このロジックは get_org_quota_usage RPC に寄せる想定
+// 現在: getOrganizationPlanInfo() でStripe price_id → 静的制限値
+// 提案: fetchOrgQuotaUsage(orgId, 'ai_interview') → plan_features ベースの動的制限値
 import { getOrganizationPlanInfo } from '@/lib/billing/interview-credits';
 
 /**

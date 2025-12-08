@@ -13,7 +13,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Admin role check
-    const { data: userOrg, error: orgError } = await supabase
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] user_organizations テーブルの型定義を Supabase client に追加
+    const { data: userOrg, error: orgError } = await (supabase as any)
       .from('user_organizations')
       .select('role')
       .eq('user_id', user.id)

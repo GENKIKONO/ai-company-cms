@@ -46,6 +46,9 @@ export async function startTrial(organizationId: string): Promise<boolean> {
 export function getTrialStatus(organization: Organization): TrialStatus {
   const now = new Date();
   const endDate = organization.trial_end_date ? new Date(organization.trial_end_date) : null;
+  // TODO: [SUPABASE_FEATURE_MIGRATION] organization.plan 直接参照を get_effective_org_features 経由に移行検討
+  // 現在: organization.plan === 'trial' での判定
+  // 将来: canUseFeatureFromOrg(organization, 'trial_mode') などに統一可能か検討
   const isTrialing = organization.subscription_status === 'trialing' && organization.plan === 'trial';
   
   if (!endDate || !isTrialing) {
@@ -81,6 +84,7 @@ export async function transitionToStarter(organizationId: string): Promise<boole
     const { error } = await supabase
       .from('organizations')
       .update({
+        // TODO: [SUPABASE_FEATURE_MIGRATION] plan フィールド直接更新を get_effective_org_features 連携方式に移行検討
         plan: 'starter',
         subscription_status: 'active',
         trial_end_date: null,

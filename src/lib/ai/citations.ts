@@ -5,13 +5,13 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
-import type { Database } from '@/types/supabase';
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
 
 // Supabase型定義のエイリアス
-type CitationsResponseRow = Database['public']['Tables']['ai_citations_responses']['Row'];
-type CitationsResponseInsert = Database['public']['Tables']['ai_citations_responses']['Insert'];
-type CitationsItemRow = Database['public']['Tables']['ai_citations_items']['Row'];
-type CitationsItemInsert = Database['public']['Tables']['ai_citations_items']['Insert'];
+type CitationsResponseRow = any;
+type CitationsResponseInsert = any;
+type CitationsItemRow = any;
+type CitationsItemInsert = any;
 
 // エクスポート用の型定義
 export interface AiCitationItemInput {

@@ -150,23 +150,41 @@ class AlertManager {
       context
     });
 
-    // TODO: Integrate with actual email service (Resend, SendGrid, etc.)
-    // Example integration would look like:
-    /*
+    // 実際のメール送信サービス連携
     try {
-      await emailService.send({
-        to: this.config.adminEmails,
-        subject: `🚨 Critical Alert: ${message}`,
-        html: this.generateEmailTemplate(message, context)
-      });
-      return true;
-    } catch (error) {
-      logger.error('Failed to send email alert', { data: { error } });
+      const { sendHtmlEmail } = await import('@/lib/email/resend-client');
+      
+      // 管理者向けアラートメールテンプレート生成
+      const html = this.generateAlertEmailHtml(message, context);
+      
+      // 全管理者に送信
+      const results = await Promise.allSettled(
+        this.config.adminEmails.map(email =>
+          sendHtmlEmail({
+            to: email,
+            subject: `🚨 Critical Alert: ${message}`,
+            html,
+            requestId: `alert-${crypto.randomUUID()}`
+          })
+        )
+      );
+      
+      const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+      const failureCount = results.length - successCount;
+      
+      if (failureCount > 0) {
+        logger.warn(`Failed to send ${failureCount}/${results.length} alert emails`, {
+          component: 'alert-manager',
+          message,
+          context
+        });
+      }
+      
+      return successCount > 0; // 少なくとも1通成功すれば true
+    } catch (emailError) {
+      logger.error('Failed to send email alert', { data: { error: emailError } });
       return false;
     }
-    */
-
-    return true; // Return true for now since we're logging the intent
   }
 
   /**
@@ -273,6 +291,60 @@ class AlertManager {
         slack: this.config.slackEnabled
       }
     };
+  }
+
+  /**
+   * Generate simple HTML template for alert emails
+   */
+  private generateAlertEmailHtml(message: string, context?: AlertContext): string {
+    const timestamp = context?.timestamp || new Date().toISOString();
+    const severity = context?.severity || 'critical';
+    const environment = process.env.NEXT_PUBLIC_APP_ENV || 'unknown';
+    
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Critical Alert - AIO Hub</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: #dc3545; color: white; padding: 20px; margin: -30px -30px 20px; border-radius: 8px 8px 0 0; }
+        .alert-level { font-size: 18px; font-weight: bold; }
+        .message { font-size: 16px; line-height: 1.5; margin: 20px 0; }
+        .details { background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 20px 0; }
+        .footer { color: #6c757d; font-size: 14px; margin-top: 30px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="alert-level">🚨 ${severity.toUpperCase()} ALERT</div>
+            <div>AIO Hub System Monitoring</div>
+        </div>
+        
+        <div class="message">
+            <strong>Alert Message:</strong><br>
+            ${message}
+        </div>
+        
+        <div class="details">
+            <strong>Details:</strong><br>
+            • Environment: ${environment}<br>
+            • Timestamp: ${timestamp}<br>
+            • Severity: ${severity}
+            ${context?.userId ? `<br>• User ID: ${context.userId}` : ''}
+            ${context?.organizationId ? `<br>• Organization ID: ${context.organizationId}` : ''}
+        </div>
+        
+        <div class="footer">
+            This is an automated alert from AIO Hub monitoring system.<br>
+            Please investigate immediately if this is a critical alert.
+        </div>
+    </div>
+</body>
+</html>`;
   }
 }
 

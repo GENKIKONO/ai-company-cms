@@ -236,8 +236,8 @@ async function fetchConsoleDataFromViews(): Promise<AdminConsoleData> {
 
     // サマリーデータの取得結果とマッピング
     let summary: AdminConsoleSummary;
-    if (summaryResult.status === 'fulfilled' && summaryResult.value.data) {
-      const summaryRow = summaryResult.value.data as AdminSummaryRaw;
+    if (summaryResult.status === 'fulfilled' && (summaryResult.value as any)?.data) {
+      const summaryRow = (summaryResult.value as any).data as AdminSummaryRaw;
       summary = mapSummaryRowToSummary(summaryRow);
       logger.info('Summary loaded from VIEW', summary);
     } else {

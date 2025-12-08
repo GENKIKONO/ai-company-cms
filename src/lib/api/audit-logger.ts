@@ -119,7 +119,7 @@ export function estimateResponseSize(response: NextResponse): number {
 /**
  * 構造化ログ出力
  */
-export function logStructured(level: LogLevel, message: string, data?: Record<string, any>) {
+export async function logStructured(level: LogLevel, message: string, data?: Record<string, any>) {
   const logEntry = {
     timestamp: new Date().toISOString(),
     level,
@@ -132,7 +132,42 @@ export function logStructured(level: LogLevel, message: string, data?: Record<st
   // 本番環境では外部ログサービス（例：Datadog, CloudWatch）に送信
   // 開発環境ではコンソール出力
   if (process.env.NODE_ENV === 'production') {
-    // TODO: 外部ログサービス連携
+    // Sentryに構造化ログとして送信
+    try {
+      const { captureMessage } = await import('@/lib/utils/sentry-utils');
+      captureMessage(`Audit Log: ${message}`, 'info', {
+        audit: logEntry,
+        service: 'aiohub-cms',
+        environment: process.env.NODE_ENV || 'development',
+      });
+    } catch (sentryError) {
+      console.warn('Failed to send audit log to Sentry:', sentryError);
+    }
+
+    // Supabaseのaudit_logテーブルに保存（重要なログのみ）
+    if (level === LogLevel.ERROR || level === LogLevel.WARN) {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+        
+        await supabase.from('audit_log').insert({
+          table_name: 'structured_logs',
+          operation: 'INSERT',
+          record_id: crypto.randomUUID(),
+          user_id: data?.userId || null,
+          new_values: logEntry,
+          changed_fields: ['level', 'message', 'data'],
+          ip_address: data?.ip || null,
+          user_agent: data?.userAgent || null,
+        });
+      } catch (dbError) {
+        console.warn('Failed to save audit log to database:', dbError);
+      }
+    }
+
     logger.info(JSON.stringify(logEntry));
   } else {
     logger.info(`[${level.toUpperCase()}] ${message}`, { data: data || '' });

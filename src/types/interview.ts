@@ -3,12 +3,37 @@
  * 軸ごとのグルーピング / キーワード連動機能
  */
 
-import { Database } from '@/types/supabase'
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
+import { InterviewContentType } from './interview-session'
 
-// 基本型の定義（Supabaseスキーマベース）
-export type AiInterviewAxis = Database['public']['Tables']['ai_interview_axes']['Row']
-export type AiInterviewQuestion = Database['public']['Tables']['ai_interview_questions']['Row']
-export type InterviewContentType = Database['public']['Enums']['interview_content_type']
+// 基本型の定義（手動定義版）
+export interface AiInterviewAxis {
+  id: string
+  axis_code: string
+  label_ja: string | null
+  label_en: string | null
+  description_ja: string | null
+  description_en: string | null
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface AiInterviewQuestion {
+  id: string
+  axis_id: string
+  question_text: string
+  content_type: InterviewContentType
+  lang: string
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// Re-export for consistency
+export type { InterviewContentType }
 
 // P2-4用の拡張型定義（keywordsカラムを含む）
 export interface InterviewQuestionWithKeywords extends Omit<AiInterviewQuestion, 'created_at' | 'updated_at'> {

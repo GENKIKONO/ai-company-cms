@@ -21,7 +21,7 @@ import type {
  */
 function isValidContentType(contentType: string): contentType is InterviewContentType {
   const validTypes: InterviewContentType[] = [
-    'service', 'product', 'post', 'news', 'faq', 'case_study'
+    'service', 'product', 'company', 'post', 'other'
   ];
   return validTypes.includes(contentType as InterviewContentType);
 }

@@ -4,7 +4,7 @@ import { requireAuthUser, requireOrgMember } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import type { SessionListResponse, SessionListParams, InterviewAnswersJson } from '@/types/interview-session';
-import { checkQuestionQuota } from '@/lib/billing/interview-credits';
+import { isFeatureQuotaLimitReached } from '@/lib/org-features/quota';
 
 const SessionListParamsSchema = z.object({
   organization_id: z.string().uuid().optional(),
@@ -171,47 +171,41 @@ export async function POST(request: NextRequest): Promise<NextResponse<{ success
 
     const supabase = await createClient();
     
-    // 【プラン制限チェック】組織セッションの場合のみ質問数制限をチェック
+    // Phase 5-A: AI面接 quota チェック（新しい統一システムを使用）
     if (organizationId) {
-      const quotaCheck = await checkQuestionQuota(supabase, organizationId, questionIds.length);
-      
-      // 制限超過または要求質問数が残り枠を超える場合はブロック
-      if (quotaCheck.isExceeded || !quotaCheck.canExecuteAll) {
-        logger.warn('Question quota exceeded for session creation', {
-          organizationId,
-          requestedQuestions: questionIds.length,
-          currentUsage: quotaCheck.currentUsage,
-          monthlyLimit: quotaCheck.monthlyLimit,
-          remainingQuestions: quotaCheck.remainingQuestions,
-          priceId: quotaCheck.priceId,
-          isExceeded: quotaCheck.isExceeded,
-          canExecuteAll: quotaCheck.canExecuteAll
-        });
+      try {
+        const quotaLimitReached = await isFeatureQuotaLimitReached(organizationId, 'ai_interview');
+        if (quotaLimitReached) {
+          logger.warn('[QUOTA] AI interview quota exceeded for session creation', {
+            organizationId,
+            userId: user.id,
+            requestedQuestions: questionIds.length
+          });
+          
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'quota_exceeded',
+              feature: 'ai_interview',
+              message: 'AI面接の利用上限に達しています。プランの見直しまたは管理者への連絡をご検討ください。',
+            },
+            { status: 429 }
+          );
+        }
         
-        return NextResponse.json(
-          {
-            success: false,
-            error: `月間のAIインタビュー上限に達しています。プラン: ${quotaCheck.priceId || 'デフォルト'}, 使用済み: ${quotaCheck.currentUsage}/${quotaCheck.monthlyLimit}, リクエスト: ${questionIds.length}問, 利用可能: ${quotaCheck.remainingQuestions}問`,
-            code: 'QUOTA_EXCEEDED',
-            quota: {
-              priceId: quotaCheck.priceId,
-              currentUsage: quotaCheck.currentUsage,
-              monthlyLimit: quotaCheck.monthlyLimit,
-              requestedQuestions: questionIds.length,
-              remainingQuestions: quotaCheck.remainingQuestions
-            }
-          },
-          { status: 402 } // Payment Required
-        );
+        logger.info('[QUOTA] AI interview quota check passed', {
+          organizationId,
+          userId: user.id,
+          requestedQuestions: questionIds.length
+        });
+      } catch (quotaError) {
+        // fail-open: quota チェック中にエラーが発生した場合はログ出力して処理を続行
+        logger.error('[QUOTA] Failed to check ai_interview quota, proceeding with session creation (fail-open)', {
+          error: quotaError instanceof Error ? quotaError.message : String(quotaError),
+          organizationId,
+          userId: user.id
+        });
       }
-      
-      logger.info('Question quota check passed', {
-        organizationId,
-        requestedQuestions: questionIds.length,
-        priceId: quotaCheck.priceId,
-        remainingQuestions: quotaCheck.remainingQuestions,
-        monthlyLimit: quotaCheck.monthlyLimit
-      });
     }
 
     // セッション作成（新しいJSON構造を使用）

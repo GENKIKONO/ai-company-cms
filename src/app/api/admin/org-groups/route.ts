@@ -137,7 +137,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the group
-    const { data: group, error } = await supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] organization_groups テーブルの型定義を Supabase client に追加
+    const { data: group, error } = await (supabaseAdmin as any)
       .from('organization_groups')
       .insert({
         name,
@@ -177,7 +178,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Add owner organization as admin member
-    const { error: memberError } = await supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_members テーブルの型定義を Supabase client に追加
+    const { error: memberError } = await (supabaseAdmin as any)
       .from('org_group_members')
       .insert({
         group_id: group.id,

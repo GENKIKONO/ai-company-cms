@@ -32,11 +32,11 @@ export async function PUT(
     }
 
     // トランザクション的に処理：同じplan_type + campaign_typeの他のリンクを非アクティブ化
-    const { error: deactivateError } = await supabase
-      .from('billing_checkout_links')
+    const { error: deactivateError } = await (supabase
+      .from('billing_checkout_links') as any)
       .update({ is_active: false })
-      .eq('plan_type', targetLink.plan_type)
-      .eq('campaign_type', targetLink.campaign_type);
+      .eq('plan_type', (targetLink as { plan_type: string }).plan_type)
+      .eq('campaign_type', (targetLink as { campaign_type: string }).campaign_type);
 
     if (deactivateError) {
       logger.error('Failed to deactivate existing links', { data: deactivateError instanceof Error ? deactivateError : new Error(String(deactivateError)) });
@@ -47,8 +47,8 @@ export async function PUT(
     }
 
     // 対象リンクをアクティブ化
-    const { data, error: activateError } = await supabase
-      .from('billing_checkout_links')
+    const { data, error: activateError } = await (supabase
+      .from('billing_checkout_links') as any)
       .update({ is_active: true })
       .eq('id', linkId)
       .select()
@@ -64,7 +64,7 @@ export async function PUT(
 
     return NextResponse.json({ 
       data,
-      message: `Link activated for ${targetLink.plan_type} ${targetLink.campaign_type}`
+      message: `Link activated for ${(targetLink as { plan_type: string }).plan_type} ${(targetLink as { campaign_type: string }).campaign_type}`
     });
 
   } catch (error) {

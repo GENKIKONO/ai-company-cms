@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (orgError || userOrg?.role !== 'admin') {
+    if (orgError || !userOrg || (userOrg as any)?.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (orgError || userOrg?.role !== 'admin') {
+    if (orgError || !userOrg || (userOrg as any)?.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -139,8 +139,8 @@ export async function POST(request: NextRequest) {
       created_at: new Date().toISOString()
     };
 
-    const { data, error } = await supabase
-      .from('cms_assets')
+    const { data, error } = await (supabase
+      .from('cms_assets') as any)
       .insert(assetData)
       .select()
       .single();
@@ -194,7 +194,7 @@ export async function DELETE(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (orgError || userOrg?.role !== 'admin') {
+    if (orgError || !userOrg || (userOrg as any)?.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 

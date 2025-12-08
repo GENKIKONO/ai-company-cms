@@ -15,7 +15,8 @@ const decisionSchema = z.object({
 async function canManageJoinRequest(requestId: string, userId: string): Promise<boolean> {
   try {
     // Get join request with group info
-    const { data: request, error } = await supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
+    const { data: request, error } = await (supabaseAdmin as any)
       .from('org_group_join_requests')
       .select(`
         id,
@@ -42,7 +43,8 @@ async function canManageJoinRequest(requestId: string, userId: string): Promise<
     }
 
     // Check system admin role
-    const { data: profile } = await supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] profiles テーブルの型定義を Supabase client に追加
+    const { data: profile } = await (supabaseAdmin as any)
       .from('profiles')
       .select('role')
       .eq('id', userId)
@@ -115,7 +117,8 @@ export async function POST(
     }
 
     // Get join request details
-    const { data: joinRequest, error: requestError } = await supabaseAdmin
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
+    const { data: joinRequest, error: requestError } = await (supabaseAdmin as any)
       .from('org_group_join_requests')
       .select(`
         id,
@@ -155,7 +158,8 @@ export async function POST(
 
         if (!existingMember) {
           // Add organization to group
-          const { error: memberError } = await supabaseAdmin
+          // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_members テーブルの型定義を Supabase client に追加
+          const { error: memberError } = await (supabaseAdmin as any)
             .from('org_group_members')
             .insert({
               group_id: joinRequest.group_id,
@@ -180,16 +184,18 @@ export async function POST(
         }
 
         // Increment invite code usage
-        await supabaseAdmin
+        // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_invites テーブルの型定義を Supabase client に追加
+        await (supabaseAdmin as any)
           .from('org_group_invites')
           .update({ 
-            used_count: supabaseAdmin.rpc('increment_used_count', { invite_code: joinRequest.invite_code })
+            used_count: (supabaseAdmin as any).rpc('increment_used_count', { invite_code: joinRequest.invite_code })
           })
           .eq('code', joinRequest.invite_code);
       }
 
       // Update join request status
-      const { data: updatedRequest, error: updateError } = await supabaseAdmin
+      // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
+      const { data: updatedRequest, error: updateError } = await (supabaseAdmin as any)
         .from('org_group_join_requests')
         .update({
           status: decision === 'approve' ? 'approved' : 'rejected',

@@ -24,10 +24,16 @@ export const env = {
   ADMIN_EMAIL: cleanEnvValue(process.env.ADMIN_EMAIL || '').toLowerCase(),
   ADMIN_OPS_PASSWORD: cleanEnvValue(process.env.ADMIN_OPS_PASSWORD || ''),
   
+  // セキュリティ設定
+  JWT_SECRET: cleanEnvValue(process.env.JWT_SECRET || ''),
+  
   // フィーチャーフラグ
   SHOW_BUILD_BANNER: process.env.SHOW_BUILD_BANNER === 'true',
   SHOW_BUILD_BADGE: process.env.SHOW_BUILD_BADGE !== 'false', // デフォルトtrue、本番でfalse
   ENABLE_PARTNER_FLOW: process.env.ENABLE_PARTNER_FLOW !== 'false', // デフォルトtrue
+  
+  // 監視・エラー管理
+  NEXT_PUBLIC_SENTRY_DSN: cleanEnvValue(process.env.NEXT_PUBLIC_SENTRY_DSN || ''),
   
   // Stripe設定
   STRIPE_SECRET_KEY: cleanEnvValue(process.env.STRIPE_SECRET_KEY || ''),
@@ -60,10 +66,11 @@ export const env = {
 } as const;
 
 /**
- * 環境変数の健全性チェック
+ * 環境変数の健全性チェック（拡張版）
  */
-export function validateEnvVars(): { valid: boolean; issues: string[] } {
+export function validateEnvVars(): { valid: boolean; issues: string[]; warnings: string[] } {
   const issues: string[] = [];
+  const warnings: string[] = [];
   
   // 改行チェック
   Object.entries(process.env).forEach(([key, value]) => {
@@ -72,26 +79,131 @@ export function validateEnvVars(): { valid: boolean; issues: string[] } {
     }
   });
   
-  // 必須環境変数チェック
-  const required = [
+  // CRITICAL: 必須環境変数チェック
+  const critical = [
     'NEXT_PUBLIC_SUPABASE_URL', 
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY'
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'NEXT_PUBLIC_APP_URL'
   ];
   
-  required.forEach(key => {
+  critical.forEach(key => {
     if (!process.env[key]?.trim()) {
-      issues.push(`Missing required environment variable: ${key}`);
+      issues.push(`🚨 CRITICAL: Missing required environment variable: ${key}`);
     }
   });
   
-  // パスワード長チェック
+  // HIGH PRIORITY: 主要機能チェック
+  const high = [
+    'ADMIN_EMAIL',
+    'RESEND_API_KEY',
+    'OPENAI_API_KEY',
+    'JWT_SECRET'
+  ];
+  
+  high.forEach(key => {
+    if (!process.env[key]?.trim()) {
+      warnings.push(`⚠️  HIGH: Missing environment variable for main features: ${key}`);
+    }
+  });
+  
+  // セキュリティチェック
   if (env.ADMIN_OPS_PASSWORD && env.ADMIN_OPS_PASSWORD.length < 20) {
-    issues.push('ADMIN_OPS_PASSWORD should be at least 20 characters');
+    issues.push('🔒 ADMIN_OPS_PASSWORD should be at least 20 characters');
+  }
+  
+  if (env.JWT_SECRET && env.JWT_SECRET.length < 32) {
+    issues.push('🔒 JWT_SECRET should be at least 32 characters');
+  }
+  
+  // URL検証
+  if (env.NEXT_PUBLIC_APP_URL) {
+    try {
+      new URL(env.NEXT_PUBLIC_APP_URL);
+    } catch {
+      issues.push('🌐 NEXT_PUBLIC_APP_URL is not a valid URL');
+    }
+  }
+  
+  // 本番環境特別チェック
+  if (process.env.NODE_ENV === 'production') {
+    if (env.NEXT_PUBLIC_APP_URL?.includes('localhost')) {
+      issues.push('🚨 PRODUCTION: NEXT_PUBLIC_APP_URL should not contain localhost');
+    }
+    
+    if (!env.NEXT_PUBLIC_SENTRY_DSN) {
+      warnings.push('📊 PRODUCTION: Consider setting NEXT_PUBLIC_SENTRY_DSN for error monitoring');
+    }
   }
   
   return {
     valid: issues.length === 0,
-    issues
+    issues,
+    warnings
+  };
+}
+
+/**
+ * 起動時環境変数チェック（ログ付き）
+ */
+export function startupEnvCheck(): boolean {
+  const result = validateEnvVars();
+  
+  // ログ出力（本番環境では軽量化）
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  if (!isProduction || result.issues.length > 0) {
+    console.log('🔍 Environment Variables Check');
+    console.log('================================');
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Total variables: ${Object.keys(process.env).length}`);
+  }
+  
+  // Critical issues
+  if (result.issues.length > 0) {
+    console.error('❌ Environment Issues Found:');
+    result.issues.forEach(issue => console.error(`  ${issue}`));
+    
+    if (isProduction) {
+      console.error('🚨 Production deployment blocked due to environment issues');
+      return false;
+    }
+  }
+  
+  // Warnings
+  if (result.warnings.length > 0 && !isProduction) {
+    console.warn('⚠️  Environment Warnings:');
+    result.warnings.forEach(warning => console.warn(`  ${warning}`));
+  }
+  
+  // Success
+  if (result.valid && !isProduction) {
+    console.log('✅ All critical environment variables are configured');
+  }
+  
+  if (!isProduction || result.issues.length > 0) {
+    console.log('================================');
+  }
+  
+  return result.valid;
+}
+
+/**
+ * 本番環境向け軽量チェック
+ */
+export function productionEnvCheck(): { critical: string[]; missing: number } {
+  const critical = [
+    'NEXT_PUBLIC_SUPABASE_URL', 
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'NEXT_PUBLIC_APP_URL'
+  ];
+  
+  const missing = critical.filter(key => !process.env[key]?.trim());
+  
+  return {
+    critical: missing,
+    missing: missing.length
   };
 }
 

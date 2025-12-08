@@ -1,4 +1,8 @@
 // 公開CMS データ取得API（認証不要）
+// TODO: [SUPABASE_CMS_MIGRATION] 将来的には以下に移行予定：
+// 1. Site Settings: organization_id ベースの構造化設定
+// 2. Public Content: public_*_tbl 系テーブルからの取得
+// 3. Show Flags: organizations.show_* フラグとの統合
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';

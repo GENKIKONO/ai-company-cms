@@ -261,15 +261,32 @@ export class ErrorMonitor {
     ].includes(category);
   }
 
-  private sendCriticalAlert(
+  private async sendCriticalAlert(
     error: Error,
     category: ErrorCategory,
     metadata?: Record<string, any>
-  ): void {
+  ): Promise<void> {
     // 本番環境では外部アラートサービスに送信
     // 開発環境ではコンソール警告
     if (process.env.NODE_ENV === 'production') {
-      // TODO: Slack/Discord/メール通知
+      // Slack通知を送信
+      try {
+        const { slackNotifier } = await import('@/lib/utils/slack-notifier');
+        await slackNotifier.notifyError({
+          title: `Critical ${category} Error`,
+          message: error.message,
+          severity: 'critical',
+          environment: process.env.NEXT_PUBLIC_APP_ENV || 'production',
+          userId: metadata?.userId,
+          organizationId: metadata?.organizationId,
+          url: metadata?.url,
+          stackTrace: error.stack,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (slackError) {
+        utilLogger.error('Failed to send Slack alert:', slackError);
+      }
+      
       utilLogger.error('🚨 CRITICAL ERROR ALERT 🚨', {
         error: error.message,
         category,

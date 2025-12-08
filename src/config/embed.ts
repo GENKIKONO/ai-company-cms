@@ -10,6 +10,12 @@ export type EmbedType = 'widget' | 'iframe' | 'html';
 export type EmbedTheme = 'light' | 'dark' | 'auto';
 export type EmbedSize = 'small' | 'medium' | 'large';
 
+// TODO: [UNIFICATION_CANDIDATE] Phase 3-B: 埋め込み制限の effective-features 統合
+// 現状: 静的 EMBED_LIMITS の3階層 (free/standard/enterprise) 設定
+// 提案: plan_features テーブルで embed_widgets, embed_monthly_views 等の機能管理
+// 利点: プラン別カスタマイズ、組織別オーバーライド、管理画面での一元設定
+// 影響: 既存の3階層マッピング (getEmbedLimits) 維持必須（後方互換性）
+
 /**
  * プラン別埋め込み制限
  */

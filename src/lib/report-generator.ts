@@ -6,13 +6,19 @@
 import { createClient } from '@supabase/supabase-js';
 import { PLAN_LIMITS, type PlanType } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
-import type { MonthlyReport } from '@/types/domain/reports';;
+import { canUseFeatureFromOrg } from '@/lib/org-features';
+import type { MonthlyReport } from '@/types/domain/reports';
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
+
+type OrganizationRow = any;
 
 interface ReportData {
   organization: {
     id: string;
     name: string;
     plan: PlanType;
+    // NOTE: [FEATURE_MIGRATION] 新しい正規ルート用：フル組織情報を含む
+    fullOrganization?: OrganizationRow;
   };
   period: {
     year: number;
@@ -66,10 +72,10 @@ export async function collectMonthlyData(
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 組織情報取得
+    // 組織情報取得（機能判定用の全情報を含む）
     const { data: org, error: orgError } = await supabase
       .from('organizations')
-      .select('id, name, plan')
+      .select('*')
       .eq('id', organizationId)
       .single();
 
@@ -122,7 +128,8 @@ export async function collectMonthlyData(
       organization: {
         id: org.id,
         name: org.name,
-        plan: (org.plan as PlanType) || 'starter'
+        plan: (org.plan as PlanType) || 'starter',
+        fullOrganization: org
       },
       period: {
         year,
@@ -218,7 +225,11 @@ function processBotLogsData(botLogs: any[]) {
 export function generateHTMLReport(data: ReportData): string {
   const { organization, period, aiVisibilityData, botLogsData } = data;
   const plan = organization.plan;
-  const showAdvanced = plan === 'pro' || plan === 'business' || plan === 'enterprise';
+  
+  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
+  const showAdvanced = organization.fullOrganization
+    ? canUseFeatureFromOrg(organization.fullOrganization, 'ai_reports')
+    : plan === 'pro' || plan === 'business' || plan === 'enterprise'; // 既存の後方互換性
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('ja-JP', {

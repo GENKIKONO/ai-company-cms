@@ -32,8 +32,10 @@ async function isGroupOwnerAdmin(groupId: string, userId: string): Promise<{ isA
       return { isAdmin: false };
     }
 
-    const isAdmin = await isUserAdminOfOrg(group.owner_organization_id, userId);
-    return { isAdmin, ownerOrgId: group.owner_organization_id };
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] organization_groups テーブルの型定義を Supabase client に追加
+    const ownerOrgId = (group as any).owner_organization_id;
+    const isAdmin = await isUserAdminOfOrg(ownerOrgId, userId);
+    return { isAdmin, ownerOrgId };
   } catch (error: any) {
     logger.error('Error checking group owner admin', {
       component: 'group-invites-api',
@@ -209,6 +211,7 @@ export async function POST(
     }
 
     // Create invite
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_invites テーブルの型定義を Supabase client に追加
     const { data: invite, error } = await supabaseAdmin
       .from('org_group_invites')
       .insert({
@@ -219,7 +222,7 @@ export async function POST(
         used_count: 0,
         created_by: user.id,
         note: note || null
-      })
+      } as any)
       .select(`
         id,
         group_id,
@@ -251,11 +254,15 @@ export async function POST(
       return NextResponse.json({ error: 'Failed to create invite' }, { status: 500 });
     }
 
+    if (!invite) {
+      return NextResponse.json({ error: 'Failed to create invite' }, { status: 500 });
+    }
+
     logger.info('Group invite created successfully', {
       component: 'group-invites-api',
       operation: 'create',
       groupId,
-      inviteId: invite.id,
+      inviteId: (invite as any).id,
       code: inviteCode.substring(0, 4) + '...',
       userId: user.id
     });

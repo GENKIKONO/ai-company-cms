@@ -8,8 +8,8 @@ import TeamManagement from '@/components/team/TeamManagement';
 import { getTrialStatus, type TrialStatus } from '@/lib/trial-manager';
 import type { Organization } from '@/types/legacy/database';;
 import { PLAN_LIMITS } from '@/config/plans';
-import { getVisibleFeaturesForPlan } from '@/lib/features';
 import { logger } from '@/lib/utils/logger';
+import { canUseFeatureFromOrg } from '@/lib/org-features';
 
 interface AnalyticsDashboardProps {
   organization: Organization;
@@ -76,13 +76,13 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
 
   const planLimits = PLAN_LIMITS[organization.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.starter;
   
-  // 新しい機能レジストリから機能を取得
-  const features = getVisibleFeaturesForPlan(organization.plan as any || 'starter');
-  const hasStructuredScoreFeature = features.some(f => f.id === 'structuredData');
-  const hasAIVisibilityFeature = features.some(f => f.id === 'aiVisibilityScore');
-  
-  // チーム管理は機能レジストリにないため、プラン別判定を維持
-  const hasTeamManagement = organization.plan === 'business' || organization.plan === 'pro';
+  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
+  // 構造化データ機能
+  const hasStructuredScoreFeature = canUseFeatureFromOrg(organization, 'structured_data_output');
+  // AI可視性機能
+  const hasAIVisibilityFeature = canUseFeatureFromOrg(organization, 'ai_visibility_analytics');
+  // チーム管理機能
+  const hasTeamManagement = canUseFeatureFromOrg(organization, 'team_management');
 
   if (loading) {
     return (

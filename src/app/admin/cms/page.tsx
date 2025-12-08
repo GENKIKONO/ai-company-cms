@@ -86,8 +86,8 @@ export default function CMSAdminPage() {
           .eq('role', 'owner')
           .single();
         
-        if (userOrg) {
-          setOrganizationId(userOrg.organization_id);
+        if (userOrg && 'organization_id' in userOrg) {
+          setOrganizationId((userOrg as { organization_id: string }).organization_id);
         }
       }
     };

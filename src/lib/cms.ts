@@ -1,8 +1,13 @@
 // CMS データ取得ユーティリティ
+// TODO: [SUPABASE_CMS_MIGRATION] 新しい型に段階的に移行予定
+// import type { CmsSiteSettingsRow, CmsSectionRow } from '@/types/cms-supabase';
+
+// TODO: [SUPABASE_CMS_MIGRATION] key-value から構造化設定に移行予定
 export interface CMSSettings {
   [key: string]: any;
 }
 
+// TODO: [SUPABASE_CMS_MIGRATION] この型は CmsSectionRow に統合予定
 export interface CMSSection {
   section_key: string;
   section_type: string;

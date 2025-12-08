@@ -54,8 +54,57 @@ async function persistErrorLog(errorEntry: ErrorLogEntry): Promise<void> {
       });
     }
 
-    // 本番環境での永続化処理（Phase 4では基礎実装）
-    // TODO: Supabaseのerror_logsテーブルまたは外部監視サービスに送信
+    // 本番環境での永続化処理 - Sentryと簡易DB保存を実装
+    if (process.env.NODE_ENV === 'production') {
+      // Sentryにフロントエンドエラーを送信
+      try {
+        const { captureException } = await import('@/lib/utils/sentry-utils');
+        const error = new Error(errorEntry.error.message);
+        error.stack = errorEntry.error.stack;
+        
+        captureException(error, {
+          frontend: {
+            component: errorEntry.context.component,
+            url: errorEntry.context.url,
+            userAgent: errorEntry.context.userAgent,
+            userId: errorEntry.context.userId,
+          },
+          severity: errorEntry.severity,
+          timestamp: errorEntry.timestamp,
+        });
+      } catch (sentryError) {
+        logger.error('Failed to send frontend error to Sentry:', sentryError);
+      }
+
+      // 高重要度エラーをaudit_logテーブルに保存
+      if (errorEntry.severity === ErrorSeverity.CRITICAL || errorEntry.severity === ErrorSeverity.HIGH) {
+        try {
+          const { createClient } = await import('@supabase/supabase-js');
+          const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+          );
+          
+          await supabase.from('audit_log').insert({
+            table_name: 'frontend_errors',
+            operation: 'INSERT',
+            record_id: crypto.randomUUID(),
+            user_id: errorEntry.context.userId || null,
+            new_values: {
+              error: errorEntry.error,
+              context: errorEntry.context,
+              severity: errorEntry.severity,
+              timestamp: errorEntry.timestamp,
+            },
+            changed_fields: ['error', 'context', 'severity'],
+            ip_address: null, // フロントエンドからはIP不明
+            user_agent: errorEntry.context.userAgent || null,
+          });
+        } catch (dbError) {
+          logger.error('Failed to save frontend error to database:', dbError);
+        }
+      }
+    }
     
     // 重要度の高いエラーは即座にアラート
     if (errorEntry.severity === ErrorSeverity.CRITICAL || 

@@ -28,7 +28,8 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
       return false;
     }
 
-    return await isUserAdminOfOrg(group.owner_organization_id, userId);
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] organization_groups テーブルの型定義を Supabase client に追加
+    return await isUserAdminOfOrg((group as any).owner_organization_id, userId);
   } catch (error: any) {
     logger.error('Error checking group ownership', {
       component: 'org-group-members-api',
@@ -120,14 +121,15 @@ export async function POST(
     }
 
     // Add member
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_members テーブルの型定義を Supabase client に追加
     const { data: member, error } = await supabaseAdmin
       .from('org_group_members')
       .insert({
         group_id: groupId,
         organization_id: organization_id,
         role,
-        added_by: group.owner_organization_id
-      })
+        added_by: (group as any).owner_organization_id
+      } as any)
       .select(`
         id,
         role,
@@ -160,9 +162,9 @@ export async function POST(
       component: 'org-group-members-api',
       operation: 'add',
       groupId,
-      groupName: group.name,
+      groupName: (group as any).name,
       orgId: organization_id,
-      orgName: org.name || org.company_name,
+      orgName: (org as any).name || (org as any).company_name,
       role,
       userId: user.id
     });
@@ -237,7 +239,7 @@ export async function DELETE(
     }
 
     // Prevent removing the owner organization
-    if (organization_id === group.owner_organization_id) {
+    if (organization_id === (group as any).owner_organization_id) {
       return NextResponse.json({ 
         error: 'Cannot remove the owner organization from the group' 
       }, { status: 403 });
@@ -282,18 +284,19 @@ export async function DELETE(
     }
 
     // Handle organization data which might be array or object
-    const org = Array.isArray(member.organization) 
-      ? member.organization[0] 
-      : member.organization;
+    const memberData = member as any;
+    const org = Array.isArray(memberData.organization) 
+      ? memberData.organization[0] 
+      : memberData.organization;
 
     logger.info('Member removed from organization group successfully', {
       component: 'org-group-members-api',
       operation: 'remove',
       groupId,
-      groupName: group.name,
+      groupName: (group as any).name,
       orgId: organization_id,
       orgName: org?.name || org?.company_name,
-      role: member.role,
+      role: memberData.role,
       userId: user.id
     });
 

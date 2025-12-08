@@ -2,6 +2,12 @@
 /**
  * Feature Management Admin API
  * プラン機能設定の管理
+ * 
+ * TODO: [SUPABASE_FEATURE_MIGRATION] 現在の戦略との整合性
+ * - Admin API: feature_registry, plan_features の直接管理（このファイル）
+ * - Client API: get_effective_org_features RPC 使用
+ * - Quota API: get_org_quota_usage RPC 使用
+ * 将来的にはRPC ベースに統一することを検討
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -106,6 +112,7 @@ export async function POST(request: NextRequest) {
     let updatedCount = 0;
     
     for (const update of body.updates) {
+      // TODO: [SUPABASE_TYPE_FOLLOWUP] plan_features テーブルの型定義を Supabase client に追加
       const { data, error } = await supabase
         .from('plan_features')
         .upsert({
@@ -113,7 +120,7 @@ export async function POST(request: NextRequest) {
           feature_key: update.feature_key,
           config_value: update.config_value,
           updated_at: new Date().toISOString(),
-        }, {
+        } as any, {
           onConflict: 'plan_type,feature_key'
         });
 
@@ -141,9 +148,10 @@ export async function POST(request: NextRequest) {
       },
     };
 
+    // TODO: [SUPABASE_TYPE_FOLLOWUP] audit_logs テーブルの型定義を Supabase client に追加
     const { data: auditLog, error: auditError } = await supabase
       .from('audit_logs')
-      .insert([auditLogData])
+      .insert([auditLogData] as any)
       .select('id')
       .single();
 
@@ -155,7 +163,7 @@ export async function POST(request: NextRequest) {
     const response: FeatureManagementUpdateResponse = {
       success: true,
       updated_count: updatedCount,
-      audit_log_id: auditLog?.id || 'unknown',
+      audit_log_id: (auditLog as any)?.id || 'unknown',
     };
 
     return NextResponse.json(response);

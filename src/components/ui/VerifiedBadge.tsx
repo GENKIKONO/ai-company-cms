@@ -1,9 +1,16 @@
 import React from 'react';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import { type PlanType } from '@/config/plans';
+import { canUseFeatureFromOrg } from '@/lib/org-features/features';
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
+
+type OrganizationRow = any;
 
 interface VerifiedBadgeProps {
   verified?: boolean;
+  // 新しい正規ルート用
+  organization?: OrganizationRow;
+  // 既存の後方互換性用（deprecated）
   plan?: PlanType;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
@@ -12,13 +19,16 @@ interface VerifiedBadgeProps {
 
 export function VerifiedBadge({ 
   verified = false, 
+  organization,
   plan = 'starter',
   className = '',
   size = 'md',
   showLabel = false
 }: VerifiedBadgeProps) {
-  // Business プラン以上でかつ承認済みの場合のみ表示
-  const isEligibleForVerification = plan === 'business' || plan === 'pro' || plan === 'enterprise';
+  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
+  const isEligibleForVerification = organization
+    ? canUseFeatureFromOrg(organization, 'verified_badge')
+    : plan === 'business' || plan === 'pro' || plan === 'enterprise'; // 既存の後方互換性
   const shouldShowBadge = verified && isEligibleForVerification;
 
   if (!shouldShowBadge) {
@@ -54,6 +64,9 @@ export function VerifiedBadge({
 
 interface VerifiedStatusProps {
   verified?: boolean;
+  // 新しい正規ルート用
+  organization?: OrganizationRow;
+  // 既存の後方互換性用（deprecated）
   plan?: PlanType;
   organizationName: string;
   className?: string;
@@ -61,11 +74,15 @@ interface VerifiedStatusProps {
 
 export function VerifiedStatus({ 
   verified = false, 
+  organization,
   plan = 'starter',
   organizationName,
   className = ''
 }: VerifiedStatusProps) {
-  const isEligibleForVerification = plan === 'business' || plan === 'pro' || plan === 'enterprise';
+  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
+  const isEligibleForVerification = organization
+    ? canUseFeatureFromOrg(organization, 'verified_badge')
+    : plan === 'business' || plan === 'pro' || plan === 'enterprise'; // 既存の後方互換性
   const shouldShowBadge = verified && isEligibleForVerification;
 
   return (
@@ -76,6 +93,7 @@ export function VerifiedStatus({
       {shouldShowBadge && (
         <VerifiedBadge 
           verified={verified}
+          organization={organization}
           plan={plan}
           size="md"
           showLabel={false}

@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 新規リンク作成
-    const { data, error } = await supabase
-      .from('billing_checkout_links')
+    const { data, error } = await (supabase
+      .from('billing_checkout_links') as any)
       .insert([{
         label,
         plan_type,

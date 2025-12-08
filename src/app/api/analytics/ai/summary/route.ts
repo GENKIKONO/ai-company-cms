@@ -33,6 +33,38 @@ interface AISummaryResponse {
   };
 }
 
+// Internal type definitions for data processing
+interface BotLogEntry {
+  bot_name: string;
+  url: string;
+}
+
+interface ContentLogEntry {
+  url: string;
+  bot_name: string;
+  ai_content_units: {
+    title: string;
+    content_type: string;
+  }[] | null;
+}
+
+interface UrlStatsEntry {
+  url: string;
+  title: string | null;
+  hit_count: number;
+  bots: Set<string>;
+}
+
+// Helper function for safe number conversion
+function toSafeNumber(value: unknown, defaultValue: number = 0): number {
+  return typeof value === 'number' && !isNaN(value) ? value : defaultValue;
+}
+
+// Helper function for safe percentage calculation
+function calculatePercentage(count: number, total: number): number {
+  return total > 0 ? (count / total) * 100 : 0;
+}
+
 // GET - AI Bot アクセス統計サマリ
 export async function GET(request: NextRequest) {
   try {
@@ -142,35 +174,48 @@ export async function GET(request: NextRequest) {
 
     // Bot別集計
     const botCounts = (botBreakdown || []).reduce((acc, log) => {
-      acc[log.bot_name] = (acc[log.bot_name] || 0) + 1;
+      const entry = log as BotLogEntry;
+      const currentCount = toSafeNumber(acc[entry.bot_name], 0);
+      acc[entry.bot_name] = currentCount + 1;
       return acc;
     }, {} as Record<string, number>);
 
     const botBreakdownResult = Object.entries(botCounts)
-      .map(([botName, count]) => ({
-        bot_name: botName,
-        hit_count: count,
-        percentage: totalBotHits > 0 ? (count / totalBotHits) * 100 : 0,
-      }))
+      .map(([botName, count]) => {
+        const safeCount = toSafeNumber(count, 0);
+        return {
+          bot_name: botName,
+          hit_count: safeCount,
+          percentage: calculatePercentage(safeCount, totalBotHits),
+        };
+      })
       .sort((a, b) => b.hit_count - a.hit_count);
 
     // URL別集計（Bot多様性計算含む）
     const urlStats = (topContent || []).reduce((acc, log) => {
-      if (!acc[log.url]) {
-        acc[log.url] = {
-          url: log.url,
-          title: (log.ai_content_units && Array.isArray(log.ai_content_units) && log.ai_content_units.length > 0) ? log.ai_content_units[0].title : null,
+      const entry = log as ContentLogEntry;
+      if (!acc[entry.url]) {
+        // タイトル取得：ai_content_units配列の最初の要素から取得
+        const title = (entry.ai_content_units && 
+                      Array.isArray(entry.ai_content_units) && 
+                      entry.ai_content_units.length > 0) 
+                      ? entry.ai_content_units[0].title 
+                      : null;
+        
+        acc[entry.url] = {
+          url: entry.url,
+          title,
           hit_count: 0,
           bots: new Set<string>(),
         };
       }
-      acc[log.url].hit_count++;
-      acc[log.url].bots.add(log.bot_name);
+      acc[entry.url].hit_count++;
+      acc[entry.url].bots.add(entry.bot_name);
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, UrlStatsEntry>);
 
     const topAccessedContent = Object.values(urlStats)
-      .map((stat: any) => ({
+      .map((stat: UrlStatsEntry) => ({
         url: stat.url,
         title: stat.title,
         hit_count: stat.hit_count,

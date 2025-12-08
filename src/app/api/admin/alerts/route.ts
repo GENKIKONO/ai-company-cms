@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    if (profileError || userProfile?.role !== 'admin') {
+    if (profileError || !userProfile || (userProfile as any).role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    if (profileError || userProfile?.role !== 'admin') {
+    if (profileError || !userProfile || (userProfile as any).role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
       rule_name: ruleData.name,
       metric_name: ruleData.metric_name,
       severity: ruleData.severity,
-      created_by: userProfile.full_name
+      created_by: userProfile && 'full_name' in userProfile ? (userProfile as { full_name: string }).full_name : user.id
     });
 
     return NextResponse.json({

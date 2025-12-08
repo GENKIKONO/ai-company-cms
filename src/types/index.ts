@@ -1,7 +1,7 @@
 // 型定義のエントリーポイント
 
-// Supabase自動生成型
-export * from './supabase';
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
+// export * from './supabase';
 
 // データベース関連の型をエクスポート
 export * from './database';
@@ -12,12 +12,12 @@ export * from './ai-interviewer';
 // API関連の型をエクスポート
 export * from './api';
 
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
 // 型エイリアス（移行用）
-import { Database } from './supabase';
-export type SupabaseDB = Database;
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
-export type Inserts<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert'];
-export type Updates<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update'];
+export type SupabaseDB = any;
+export type Tables<T extends string> = any;
+export type Inserts<T extends string> = any;
+export type Updates<T extends string> = any;
 
 // 追加の共通型定義
 export type Status = 'loading' | 'success' | 'error' | 'idle';

@@ -2,12 +2,16 @@
   "name": "ai-company-cms",
   "version": "0.1.1",
   "private": true,
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "next dev",
     "prebuild": "npx ts-node scripts/check-no-mock.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "check:predeploy": "node scripts/predeploy-check.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
     "types:gen": "supabase gen types typescript --project-id=$SUPABASE_PROJECT_ID --schema=public > src/types/supabase.ts",
@@ -49,6 +53,7 @@
     "test:setup": "playwright install",
     "test:production": "node scripts/production-test.js",
     "test:auth": "node scripts/auth-test.js",
+    "smoke:test": "node scripts/smoke-test.mjs",
     "diag:ui": "node -e \"fetch((process.env.APP_URL || 'http://localhost:3000') + '/api/diag/ui').then(r=>r.json()).then(j=>console.log(JSON.stringify(j,null,2))).catch(e=>{console.error(e);process.exit(1);})\"",
     "uat:env-check": "node scripts/uat/verify-env.mjs",
     "uat:dns-check": "node scripts/uat/verify-dns.mjs",

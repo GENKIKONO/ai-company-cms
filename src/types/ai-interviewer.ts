@@ -3,20 +3,20 @@
  * 実際のSupabaseスキーマに準拠
  */
 
-import { Database } from './supabase';
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
 
 // Supabase生成型のエイリアス
-export type InterviewAxisRow = Database['public']['Tables']['ai_interview_axes']['Row'];
-export type InterviewAxisInsert = Database['public']['Tables']['ai_interview_axes']['Insert'];
-export type InterviewAxisUpdate = Database['public']['Tables']['ai_interview_axes']['Update'];
+export type InterviewAxisRow = any;
+export type InterviewAxisInsert = any;
+export type InterviewAxisUpdate = any;
 
-export type InterviewQuestionRow = Database['public']['Tables']['ai_interview_questions']['Row'];
-export type InterviewQuestionInsert = Database['public']['Tables']['ai_interview_questions']['Insert'];
-export type InterviewQuestionUpdate = Database['public']['Tables']['ai_interview_questions']['Update'];
+export type InterviewQuestionRow = any;
+export type InterviewQuestionInsert = any;
+export type InterviewQuestionUpdate = any;
 
-export type OrganizationKeywordRow = Database['public']['Tables']['organization_keywords']['Row'];
-export type OrganizationKeywordInsert = Database['public']['Tables']['organization_keywords']['Insert'];
-export type OrganizationKeywordUpdate = Database['public']['Tables']['organization_keywords']['Update'];
+export type OrganizationKeywordRow = any;
+export type OrganizationKeywordInsert = any;
+export type OrganizationKeywordUpdate = any;
 
 // 質問軸コード（想定される値）
 export const INTERVIEW_AXES = {

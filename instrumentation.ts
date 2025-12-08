@@ -1,5 +1,14 @@
 export async function register() {
+  // Environment validation on startup
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const { startupEnvCheck } = await import('./src/lib/env');
+    const envValid = startupEnvCheck();
+    
+    if (!envValid && process.env.NODE_ENV === 'production') {
+      console.error('🚨 Application startup blocked due to critical environment variable issues');
+      process.exit(1);
+    }
+    
     await import('./sentry.server.config');
   }
 

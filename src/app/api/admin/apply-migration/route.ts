@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       CREATE INDEX IF NOT EXISTS idx_organizations_coordinates ON public.organizations(lat, lng) WHERE lat IS NOT NULL AND lng IS NOT NULL;
     `;
 
-    const { error: migrationError } = await supabase.rpc('exec_sql', { 
+    const { error: migrationError } = await (supabase.rpc as any)('exec_sql', { 
       sql: migrationSQL 
     });
 
@@ -79,13 +79,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Test coordinate field update
-    const { error: updateError } = await supabase
-      .from('organizations')
+    const { error: updateError } = await (supabase
+      .from('organizations') as any)
       .update({ 
         lat: 35.6762, // Tokyo Station coordinates
         lng: 139.6503 
       })
-      .eq('id', testOrg.id);
+      .eq('id', (testOrg as { id: string }).id);
 
     if (updateError) {
       logger.error('Coordinate field update test failed:', { data: updateError });
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       message: 'Coordinate fields migration applied and verified successfully',
-      testOrgId: testOrg.id
+      testOrgId: (testOrg as { id: string }).id
     });
 
   } catch (error: any) {

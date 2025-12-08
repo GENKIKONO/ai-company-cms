@@ -303,14 +303,14 @@ export function createAdminAuthCheck() {
 /**
  * セキュリティログ記録
  */
-export function logSecurityEvent(event: {
+export async function logSecurityEvent(event: {
   type: 'admin_access' | 'auth_failure' | 'rate_limit' | 'permission_denied';
   userId?: string;
   email?: string;
   ip?: string;
   userAgent?: string;
   details?: any;
-}): void {
+}): Promise<void> {
   const logEntry = {
     timestamp: new Date().toISOString(),
     event: event.type,
@@ -323,7 +323,23 @@ export function logSecurityEvent(event: {
 
   // 本番環境では外部ログサービスに送信
   if (process.env.NODE_ENV === 'production') {
-    // TODO: Send to external logging service (Sentry, CloudWatch, etc.)
+    // 重要なセキュリティイベントはSentryに送信
+    try {
+      const { captureMessage } = await import('@/lib/utils/sentry-utils');
+      captureMessage(`Security Event: ${event.type}`, 'warning', {
+        userId: event.userId,
+        email: event.email,
+        ip: event.ip,
+        userAgent: event.userAgent,
+        details: event.details,
+        security: {
+          eventType: event.type,
+          timestamp: logEntry.timestamp,
+        },
+      });
+    } catch (sentryError) {
+      console.warn('Failed to send security event to Sentry:', sentryError);
+    }
     logger.debug('SECURITY EVENT', logEntry);
   } else {
     logger.debug('🔒 Security Event', logEntry);

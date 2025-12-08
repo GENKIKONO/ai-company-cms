@@ -1,4 +1,8 @@
 import React from 'react';
+import { canUseFeatureFromOrg } from '@/lib/org-features';
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
+
+type OrganizationRow = any;
 
 interface MonthlyReportEmailProps {
   organizationName: string;
@@ -12,7 +16,10 @@ interface MonthlyReportEmailProps {
     top_performing_urls: number;
     improvement_needed_urls: number;
   };
-  plan: string;
+  // NOTE: [FEATURE_MIGRATION] 新しい正規ルート用
+  organization?: OrganizationRow;
+  // 既存の後方互換性用（deprecated）
+  plan?: string;
 }
 
 export function MonthlyReportEmailTemplate({
@@ -20,9 +27,13 @@ export function MonthlyReportEmailTemplate({
   reportPeriod,
   reportUrl,
   dataSummary,
-  plan
+  organization,
+  plan = 'starter'
 }: MonthlyReportEmailProps) {
-  const showAdvanced = plan === 'pro' || plan === 'business' || plan === 'enterprise';
+  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
+  const showAdvanced = organization
+    ? canUseFeatureFromOrg(organization, 'ai_reports')
+    : plan === 'pro' || plan === 'business' || plan === 'enterprise'; // 既存の後方互換性
 
   return (
     <html>
@@ -232,7 +243,7 @@ export function MonthlyReportEmailTemplate({
           <div className="content">
             <div className="greeting">
               <strong>{organizationName}</strong> 様
-              <span className="plan-badge">{plan}</span>
+              <span className="plan-badge">{organization?.plan || plan}</span>
             </div>
             
             <p>
@@ -315,7 +326,10 @@ export function renderMonthlyReportEmail(props: MonthlyReportEmailProps): string
   // In a real implementation, you would use a React SSR method like ReactDOMServer.renderToString
   // For now, we'll return a formatted HTML string
   
-  const showAdvanced = props.plan === 'pro' || props.plan === 'business' || props.plan === 'enterprise';
+  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
+  const showAdvanced = props.organization
+    ? canUseFeatureFromOrg(props.organization, 'ai_reports')
+    : props.plan === 'pro' || props.plan === 'business' || props.plan === 'enterprise'; // 既存の後方互換性
   
   return `<!DOCTYPE html>
 <html>
@@ -521,7 +535,7 @@ export function renderMonthlyReportEmail(props: MonthlyReportEmailProps): string
     <div class="content">
       <div class="greeting">
         <strong>${props.organizationName}</strong> 様
-        <span class="plan-badge">${props.plan}</span>
+        <span class="plan-badge">${props.organization?.plan || props.plan}</span>
       </div>
       
       <p>

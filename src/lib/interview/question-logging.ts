@@ -4,10 +4,10 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/supabase';
+// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
 import { logger } from '@/lib/utils/logger';
 
-type SupabaseClientType = SupabaseClient<Database>;
+type SupabaseClientType = SupabaseClient<any>;
 
 export interface QuestionLogEntry {
   organization_id: string;
@@ -25,7 +25,7 @@ export async function logInterviewQuestion(
   entry: QuestionLogEntry
 ): Promise<void> {
   try {
-    const logData: Database['public']['Tables']['ai_interview_question_logs']['Insert'] = {
+    const logData: any = {
       organization_id: entry.organization_id,
       session_id: entry.session_id,
       question_id: entry.question_id,
@@ -69,7 +69,7 @@ export async function logInterviewQuestionBatch(
   }
 
   try {
-    const logData: Database['public']['Tables']['ai_interview_question_logs']['Insert'][] = 
+    const logData: any[] = 
       entries.map(entry => ({
         organization_id: entry.organization_id,
         session_id: entry.session_id,

@@ -11,6 +11,7 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { AISEODashboard } from '@/components/analytics/AISEODashboard';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useOrganization } from '@/lib/hooks/useOrganization';
+import { getMultipleFeatureFlagsFromOrg } from '@/lib/org-features/features';
 
 export default function AISEOReportPage() {
   return (
@@ -88,9 +89,9 @@ function AISEOReportContent() {
   }
 
   // 最低限の機能フラグチェック
-  const hasBasicAnalytics = 
-    organization.feature_flags?.ai_bot_analytics || 
-    organization.feature_flags?.ai_visibility_analytics;
+  // NOTE: [FEATURE_MIGRATION_COMPLETE] 型安全なヘルパーに移行完了
+  const analyticsFlags = getMultipleFeatureFlagsFromOrg(organization, ['ai_bot_analytics', 'ai_visibility_analytics', 'ai_reports']);
+  const hasBasicAnalytics = analyticsFlags.ai_bot_analytics || analyticsFlags.ai_visibility_analytics;
   
   if (!hasBasicAnalytics) {
     return (
@@ -121,11 +122,7 @@ function AISEOReportContent() {
       {/* メインダッシュボード */}
       <AISEODashboard 
         orgId={organization.id} 
-        features={{
-          ai_bot_analytics: organization.feature_flags?.ai_bot_analytics || false,
-          ai_visibility_analytics: organization.feature_flags?.ai_visibility_analytics || false,
-          ai_reports: organization.feature_flags?.ai_reports || false
-        }} 
+        features={analyticsFlags}
       />
     </div>
   );
