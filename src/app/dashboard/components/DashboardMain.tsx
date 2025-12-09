@@ -37,6 +37,10 @@ export default function DashboardMain() {
     isDataFetched,
     isReallyEmpty 
   } = useOrganization();
+  
+  // 組織の最終チェック：organizationsに組織があるのにorganizationが未設定の場合の対処
+  const currentOrganization = organization || (organizations.length > 0 ? organizations[0] : null);
+  
   const [stats, setStats] = useState<DashboardStats>({ total: 0, draft: 0, published: 0, archived: 0 });
   const [caseStudiesStats, setCaseStudiesStats] = useState<CaseStudiesStats>({ total: 0, published: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
@@ -44,14 +48,14 @@ export default function DashboardMain() {
 
   // 統計データの取得
   useEffect(() => {
-    if (organization?.id) {
+    if (currentOrganization?.id) {
       const fetchStats = async () => {
         try {
           setStatsLoading(true);
           setStatsError(null);
           const [statsResult, caseStudiesResult] = await Promise.all([
             getOrganizationStatsSafe(),
-            getCaseStudiesStatsSafe(organization.id)
+            getCaseStudiesStatsSafe(currentOrganization.id)
           ]);
           
           setStats(statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 });
@@ -65,11 +69,11 @@ export default function DashboardMain() {
       };
 
       fetchStats();
-    } else if (!isLoading && user && !organization) {
+    } else if (!isLoading && user && !currentOrganization) {
       // 認証済みかつ組織がないことが確定した場合は統計ローディングを止める
       setStatsLoading(false);
     }
-  }, [organization?.id, isLoading, user]);
+  }, [currentOrganization?.id, isLoading, user]);
 
   // ローディング中の判定を明確化
   if (isLoading) {
@@ -190,7 +194,8 @@ export default function DashboardMain() {
   }
 
   // パターンB: userあり & org 0件 - 組織がない場合のオンボーディング（詳細説明付き）
-  if (user && (!organization || !organization.id)) {
+  // データ取得完了後に組織が本当に0件の場合のみオンボーディングを表示
+  if (user && isDataFetched && (!organizations || organizations.length === 0)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-lg w-full bg-white rounded-lg shadow-md p-6 mx-4">
@@ -245,7 +250,24 @@ export default function DashboardMain() {
     );
   }
 
-  logger.debug(`[Dashboard] Rendering dashboard UI for user ${user.id}, org: ${organization.id}`);
+  // 最終的に現在の組織が決まっていない場合はローディング表示
+  if (!currentOrganization) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-6">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <h2 className="mt-4 text-lg font-semibold text-gray-900">
+            組織情報を確認しています
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            組織データの処理中です...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  logger.debug(`[Dashboard] Rendering dashboard UI for user ${user.id}, org: ${currentOrganization.id}`);
 
   return (
     <>
@@ -258,10 +280,10 @@ export default function DashboardMain() {
           <div className="text-center">
             {/* Organization badge */}
             <div className="inline-flex items-center gap-3 glass-card backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 mb-8 spring-bounce">
-              {(organization as any).logo_url ? (
+              {(currentOrganization as any).logo_url ? (
                 <Image
-                  src={(organization as any).logo_url}
-                  alt={`${organization.name}のロゴ`}
+                  src={(currentOrganization as any).logo_url}
+                  alt={`${currentOrganization.name}のロゴ`}
                   width={24}
                   height={24}
                   className="w-6 h-6 object-contain rounded"
@@ -269,14 +291,14 @@ export default function DashboardMain() {
               ) : (
                 <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                   <span className="text-white font-semibold text-sm">
-                    {organization.name.charAt(0)}
+                    {currentOrganization.name.charAt(0)}
                   </span>
                 </div>
               )}
               <span className="text-gray-700 font-medium" data-testid="organization-name">
-                {organization.name}
+                {currentOrganization.name}
               </span>
-              <div className={`w-2 h-2 rounded-full ${(organization as any).is_published ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+              <div className={`w-2 h-2 rounded-full ${(currentOrganization as any).is_published ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
             </div>
             
             {/* Main headline */}
@@ -289,9 +311,9 @@ export default function DashboardMain() {
             
             {/* Quick actions */}
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-              <PublishToggle organizationId={organization.id} isPublished={(organization as any).is_published} organizationName={organization.name} />
+              <PublishToggle organizationId={currentOrganization.id} isPublished={(currentOrganization as any).is_published} organizationName={currentOrganization.name} />
               <Link
-                href={`/organizations/${organization.id}`}
+                href={`/organizations/${currentOrganization.id}`}
                 className="btn-secondary flex-1 text-center"
               >
                 企業ページを編集
@@ -337,8 +359,8 @@ export default function DashboardMain() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left column */}
           <div className="space-y-8">
-            <PerformanceMetrics organizationId={organization.id} />
-            <AIVisibilityCard organizationId={organization.id} />
+            <PerformanceMetrics organizationId={currentOrganization.id} />
+            <AIVisibilityCard organizationId={currentOrganization.id} />
           </div>
           
           {/* Right column */}
@@ -350,7 +372,7 @@ export default function DashboardMain() {
         
         {/* Bottom section */}
         <div className="mt-12">
-          <DashboardClient organizationId={organization.id} organizationName={organization.name} isPublished={(organization as any).is_published} />
+          <DashboardClient organizationId={currentOrganization.id} organizationName={currentOrganization.name} isPublished={(currentOrganization as any).is_published} />
         </div>
 
         {/* 一時デバッグ表示：組織一覧 */}
