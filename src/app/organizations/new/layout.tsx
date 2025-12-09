@@ -9,7 +9,7 @@ export default function NewOrganizationLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       {children}
     </div>
   );

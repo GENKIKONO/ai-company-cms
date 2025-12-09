@@ -220,7 +220,7 @@ export default function OrganizationsPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen">
+      <div>
         <AioSection tone="white">
           <div className="text-center py-8">Loading...</div>
         </AioSection>
@@ -229,7 +229,7 @@ export default function OrganizationsPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div>
       <AioSection tone="white">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* ページタイトル */}

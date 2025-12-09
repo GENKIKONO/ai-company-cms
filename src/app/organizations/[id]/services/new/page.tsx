@@ -158,7 +158,7 @@ export default function NewServicePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-16">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
@@ -167,7 +167,7 @@ export default function NewServicePage() {
 
   if (!organization) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">企業が見つかりません</h2>
           <Link href="/dashboard" replace className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
@@ -179,8 +179,8 @@ export default function NewServicePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div>
+      <div>
         {/* パンくずナビ */}
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-4">
@@ -449,7 +449,7 @@ export default function NewServicePage() {
                 href={`/organizations/${organizationId}`}
                 className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               >
-                キャンセル
+                企業ページに戻る
               </Link>
               <HIGButton
                 type="submit"
@@ -462,7 +462,7 @@ export default function NewServicePage() {
             </div>
           </div>
         </form>
-      </main>
+      </div>
     </div>
   );
 }

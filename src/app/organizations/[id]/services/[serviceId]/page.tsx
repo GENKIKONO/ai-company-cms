@@ -174,7 +174,7 @@ export default function EditServicePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-16">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
@@ -183,7 +183,7 @@ export default function EditServicePage() {
 
   if (!organization || !service) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">サービスが見つかりません</h2>
           <Link href="/dashboard" className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
@@ -195,8 +195,8 @@ export default function EditServicePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div>
+      <div>
         {/* パンくずナビ */}
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-4">
@@ -406,7 +406,7 @@ export default function EditServicePage() {
             </div>
           </div>
         </form>
-      </main>
+      </div>
 
       {/* 削除確認モーダル */}
       {showDeleteConfirm && (

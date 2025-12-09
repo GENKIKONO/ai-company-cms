@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useOrganization } from '@/lib/hooks/useOrganization';
 import { 
   HomeIcon,
   DocumentTextIcon,
@@ -12,20 +13,43 @@ import {
   UserGroupIcon,
   ChatBubbleLeftRightIcon,
   DocumentPlusIcon,
+  BuildingOfficeIcon,
 } from '@heroicons/react/24/outline';
 
-const navigation = [
-  { name: 'ダッシュボード', href: '/dashboard', icon: HomeIcon },
-  { name: '記事管理', href: '/dashboard/posts', icon: DocumentTextIcon },
-  { name: 'サービス管理', href: '/dashboard/services', icon: BriefcaseIcon },
-  { name: '事例管理', href: '/dashboard/case-studies', icon: UserGroupIcon },
-  { name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },
-  { name: '企業専用AIチャット', href: '/dashboard/org-ai-chat', icon: DocumentPlusIcon },
-  { name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },
-  { name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },
-  { name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },
-  { name: '設定', href: '/dashboard/settings', icon: Cog6ToothIcon },
-];
+const getNavigation = (organization: any) => {
+  const baseNavigation = [
+    { name: 'ダッシュボード', href: '/dashboard', icon: HomeIcon },
+    { name: '記事管理', href: '/dashboard/posts', icon: DocumentTextIcon },
+    { name: 'サービス管理', href: '/dashboard/services', icon: BriefcaseIcon },
+    { name: '事例管理', href: '/dashboard/case-studies', icon: UserGroupIcon },
+    { name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },
+    { name: '企業専用AIチャット', href: '/dashboard/org-ai-chat', icon: DocumentPlusIcon },
+    { name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },
+    { name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },
+    { name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },
+    { name: '設定', href: '/dashboard/settings', icon: Cog6ToothIcon },
+  ];
+
+  // Add organization management link if organization exists
+  if (organization) {
+    const orgNavigation = [
+      { name: 'ダッシュボード', href: '/dashboard', icon: HomeIcon },
+      { name: '組織設定', href: `/organizations/${organization.id}`, icon: BuildingOfficeIcon },
+      { name: '記事管理', href: '/dashboard/posts', icon: DocumentTextIcon },
+      { name: 'サービス管理', href: '/dashboard/services', icon: BriefcaseIcon },
+      { name: '事例管理', href: '/dashboard/case-studies', icon: UserGroupIcon },
+      { name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },
+      { name: '企業専用AIチャット', href: '/dashboard/org-ai-chat', icon: DocumentPlusIcon },
+      { name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },
+      { name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },
+      { name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },
+      { name: '設定', href: '/dashboard/settings', icon: Cog6ToothIcon },
+    ];
+    return orgNavigation;
+  }
+
+  return baseNavigation;
+};
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -33,6 +57,8 @@ function classNames(...classes: string[]) {
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { organization } = useOrganization();
+  const navigation = getNavigation(organization);
 
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 border-r border-gray-200">
