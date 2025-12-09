@@ -2,14 +2,21 @@
  * Current User API Endpoint
  * 現在ログイン中のユーザーと所属組織の情報を返す
  * 
- * Version 2: 複数組織対応準備版
- * - get_my_organizations_slim RPC優先使用（存在する場合）
- * - フォールバック: 既存の user_organizations テーブル直接クエリ
+ * Version 3: RLS強化対応版
+ * - get_my_organizations_slim() RPC ベース（パラメータなし、SECURITY INVOKER）
+ * - フォールバック: organization_members テーブルクエリ（RLS対応）
  * - 戻り値: user + organizations[] + selectedOrganization（後方互換のためorganizationも維持）
+ * - エラーハンドリング強化（42501対応、無限ローディング防止）
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { 
+  GetMyOrganizationsSlimRow, 
+  OrganizationSummary, 
+  MeApiResponse, 
+  normalizeOrganizationSummary 
+} from '@/types/organization-summary';
 
 import { logger } from '@/lib/log';
 export const dynamic = 'force-dynamic';
@@ -42,17 +49,16 @@ export async function GET(request: NextRequest) {
       full_name: authUser.user_metadata?.full_name || null
     };
 
-    let organizations: any[] = [];
-    let selectedOrganization = null;
+    let organizations: OrganizationSummary[] = [];
+    let selectedOrganization: OrganizationSummary | null = null;
+    let errorMessage: string | undefined = undefined;
     
-    // Step 1: Try get_my_organizations_slim RPC first (準備中のRPC)
+    // Step 1: Try get_my_organizations_slim RPC (本番環境でAvailable)
     try {
       logger.debug('Attempting get_my_organizations_slim RPC...', { userId: authUser.id });
       
       const { data: rpcData, error: rpcError } = await supabase
-        .rpc('get_my_organizations_slim', { 
-          include_demo: false  // 本番組織のみ 
-        });
+        .rpc('get_my_organizations_slim');  // パラメータなし（新仕様）
 
       if (!rpcError && rpcData && Array.isArray(rpcData)) {
         logger.info('get_my_organizations_slim RPC success:', { 
@@ -60,72 +66,134 @@ export async function GET(request: NextRequest) {
           orgCount: rpcData.length 
         });
         
-        organizations = rpcData.map((org: any) => ({
-          id: org.org_id || org.id,
-          name: org.org_name || org.name,
-          slug: org.org_slug || org.slug,
-          plan: org.plan || 'free',
-          feature_flags: org.feature_flags || {}
-        }));
+        // 型安全な変換
+        const allOrgs = (rpcData as GetMyOrganizationsSlimRow[])
+          .map(normalizeOrganizationSummary);
         
-        // 選択ロジック: 先頭組織を選択（今後改善予定）
+        // デモ組織を除外（is_demo_guess: false のみ）
+        organizations = allOrgs.filter(org => !org.isDemoGuess);
+        
+        // 選択ロジック: 先頭の本番組織を選択
         selectedOrganization = organizations.length > 0 ? organizations[0] : null;
-      } else {
-        logger.info('get_my_organizations_slim RPC not available or failed, using fallback:', { 
+        
+        logger.debug('Organizations processed (demo filtered):', { 
           userId: authUser.id, 
-          rpcError: rpcError?.message 
+          totalOrgs: allOrgs.length,
+          prodOrgs: organizations.length,
+          hasDemo: allOrgs.some(org => org.isDemoGuess)
         });
-        throw new Error('RPC not available, using fallback');
+        
+      } else {
+        logger.warn('get_my_organizations_slim RPC failed:', { 
+          userId: authUser.id, 
+          rpcError: rpcError?.message,
+          rpcCode: rpcError?.code 
+        });
+        
+        // RLS error (42501) or other auth errors
+        if (rpcError?.code === '42501' || rpcError?.code === 'PGRST301') {
+          throw new Error('RLS_PERMISSION_DENIED');
+        }
+        
+        throw new Error('RPC_UNAVAILABLE');
       }
-    } catch (rpcFallbackError) {
-      // Step 2: Fallback to existing user_organizations table logic
-      logger.debug('Using fallback user_organizations query...', { userId: authUser.id });
+    } catch (rpcError: any) {
+      // Step 2: Fallback to organization_members table query (RLS対応)
+      logger.debug('Using fallback organization_members query...', { 
+        userId: authUser.id, 
+        fallbackReason: rpcError.message 
+      });
       
-      const { data: userOrgData, error: userOrgError } = await supabase
-        .from('user_organizations')
-        .select('organization_id, organizations(id, name, slug, plan, feature_flags)')
-        .eq('user_id', authUser.id)
-        .eq('role', 'owner');  // Note: removed .single() to support multiple orgs
+      try {
+        const { data: memberData, error: memberError } = await supabase
+          .from('organization_members')  // RLS有効テーブル（user_id = auth.uid()）
+          .select(`
+            organization_id, 
+            organizations(
+              id, 
+              name, 
+              slug, 
+              plan, 
+              feature_flags,
+              show_services,
+              show_posts,
+              show_case_studies,
+              show_faqs,
+              show_qa,
+              show_news,
+              show_partnership,
+              show_contact
+            )
+          `);
 
-      if (!userOrgError && userOrgData && userOrgData.length > 0) {
-        organizations = userOrgData
-          .filter(item => item.organizations) // Filter out null organizations
-          .map(item => {
-            const orgData = Array.isArray(item.organizations) 
-              ? item.organizations[0] 
-              : item.organizations;
-            
-            return {
-              id: orgData.id,
-              name: orgData.name,
-              slug: orgData.slug,
-              plan: orgData.plan || 'free',
-              feature_flags: orgData.feature_flags || {}
-            };
+        if (!memberError && memberData && memberData.length > 0) {
+          organizations = memberData
+            .filter(item => item.organizations) // null チェック
+            .map(item => {
+              const orgData: any = Array.isArray(item.organizations) 
+                ? item.organizations[0] 
+                : item.organizations;
+              
+              return {
+                id: orgData.id,
+                name: orgData.name,
+                slug: orgData.slug,
+                plan: orgData.plan || 'free',
+                
+                // show_* フィールド（fallback時はデフォルト値）
+                showServices: orgData.show_services ?? true,
+                showPosts: orgData.show_posts ?? true,
+                showCaseStudies: orgData.show_case_studies ?? true,
+                showFaqs: orgData.show_faqs ?? true,
+                showQa: orgData.show_qa ?? true,
+                showNews: orgData.show_news ?? true,
+                showPartnership: orgData.show_partnership ?? true,
+                showContact: orgData.show_contact ?? true,
+                
+                isDemoGuess: false, // fallback時は不明のため false
+                feature_flags: orgData.feature_flags || {}
+              } as OrganizationSummary;
+            });
+          
+          selectedOrganization = organizations.length > 0 ? organizations[0] : null;
+          
+          logger.info('Organizations found via organization_members fallback:', { 
+            userId: authUser.id, 
+            orgCount: organizations.length 
           });
-        
-        // 選択ロジック: 先頭組織を選択
-        selectedOrganization = organizations.length > 0 ? organizations[0] : null;
-        
-        logger.debug('Organizations found via user_organizations fallback:', { 
+          
+        } else {
+          // No organizations found - 正常ケース
+          logger.info('No organizations found for user:', { 
+            userId: authUser.id, 
+            memberError: memberError?.message 
+          });
+          
+          // 42501 エラーの場合は権限不足を示す
+          if (memberError?.code === '42501') {
+            errorMessage = '組織情報へのアクセス権がありません。管理者にお問い合わせください。';
+          }
+        }
+      } catch (fallbackError: any) {
+        logger.error('Fallback organization query also failed:', { 
           userId: authUser.id, 
-          orgCount: organizations.length 
+          fallbackError: fallbackError.message 
         });
-      } else {
-        logger.debug('No organizations found in fallback query:', { 
-          userId: authUser.id, 
-          error: userOrgError?.message 
-        });
+        
+        errorMessage = 'データの取得に失敗しました。しばらく後に再度お試しください。';
       }
     }
 
     // レスポンス返却（キャッシュ防止ヘッダー付き）
-    const response = NextResponse.json({
+    const responseData: MeApiResponse = {
       user,
       organizations,                    // 新形式: 複数組織対応
       selectedOrganization,            // 新形式: 現在選択中の組織
-      organization: selectedOrganization  // 旧形式: 後方互換性のため維持
-    });
+      organization: selectedOrganization,  // 旧形式: 後方互換性のため維持
+      error: errorMessage              // エラー情報（あれば）
+    };
+    
+    const response = NextResponse.json(responseData);
     
     // 追加のキャッシュ防止ヘッダー
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -138,12 +206,15 @@ export async function GET(request: NextRequest) {
     logger.error('API /me error:', { data: error });
     
     // エラーが発生してもダッシュボードを壊さないよう、できるだけ情報を返す
-    const response = NextResponse.json({
+    const errorResponseData: MeApiResponse = {
       user: null,
       organizations: [],
       selectedOrganization: null,
-      organization: null  // 後方互換
-    }, { status: 500 });
+      organization: null,  // 後方互換
+      error: 'サーバーエラーが発生しました。しばらく後に再度お試しください。'
+    };
+    
+    const response = NextResponse.json(errorResponseData, { status: 500 });
     
     // キャッシュ防止ヘッダー（エラー応答でも）
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

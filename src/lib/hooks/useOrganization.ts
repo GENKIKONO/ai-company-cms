@@ -1,6 +1,11 @@
 /**
  * 組織コンテキストフック
  * 現在のユーザーの組織情報を管理
+ * 
+ * Version 3: RLS強化対応版
+ * - MeApiResponse 型使用（organization-summary.ts ベース）
+ * - エラーハンドリング強化（42501対応）
+ * - 後方互換性維持
  */
 
 import useSWR from 'swr';
@@ -10,6 +15,9 @@ import { useCacheManager } from './useCacheManager';
 import { CACHE_KEYS } from '@/lib/cache/keys';
 import { logger } from '@/lib/log';
 import { useAuth } from './useAuth';
+import { MeApiResponse, OrganizationSummary } from '@/types/organization-summary';
+
+// 後方互換のために旧型定義も維持
 export interface Organization {
   id: string;
   name: string;
@@ -25,11 +33,13 @@ export interface User {
   segment?: 'test_user' | 'early_user' | 'normal_user';
 }
 
+// 旧 MeResponse は OrganizationSummary ベースの新形式に移行
 export interface MeResponse {
   user: User | null;
-  organization: Organization | null;        // 後方互換
-  organizations?: Organization[];           // 新形式: 複数組織対応
-  selectedOrganization?: Organization | null; // 新形式: 選択中組織
+  organization: OrganizationSummary | null;        // 後方互換（型をOrganizationSummaryに変更）
+  organizations?: OrganizationSummary[];           // 新形式
+  selectedOrganization?: OrganizationSummary | null; // 新形式
+  error?: string;                                  // エラー情報
 }
 
 /**
@@ -39,7 +49,7 @@ export function useOrganization() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
 
   // 認証されたユーザーがいる場合のみSWRを実行
-  const { data, error, isLoading, mutate } = useSWR<MeResponse>(
+  const { data, error, isLoading, mutate } = useSWR<MeApiResponse>(
     isAuthenticated && user ? [CACHE_KEYS.organization, user.id] : null,
     () => fetcher(CACHE_KEYS.organization),
     {
@@ -49,9 +59,21 @@ export function useOrganization() {
       errorRetryCount: 2,
       errorRetryInterval: 3000,
       onError: (error) => {
+        // 認証関連のエラーはリトライしない（想定内）
         if (error?.status === 404 || error?.status === 401) {
           return null;
         }
+        
+        // RLS 権限エラー（42501）も想定内として扱う
+        if (error?.status === 403) {
+          logger.warn('useOrganization: insufficient privileges:', { 
+            status: error?.status,
+            userId: user?.id 
+          });
+          return null;
+        }
+        
+        // その他のエラーはログに記録
         logger.error('useOrganization SWR error:', { 
           error: error?.message || 'Unknown error',
           status: error?.status,
@@ -60,8 +82,8 @@ export function useOrganization() {
       },
       fallbackData: null,
       shouldRetryOnError: (error) => {
-        // 認証エラーの場合はリトライしない
-        return error?.status !== 401 && error?.status !== 404;
+        // 認証エラーや権限エラーの場合はリトライしない
+        return error?.status !== 401 && error?.status !== 404 && error?.status !== 403;
       }
     }
   );
@@ -98,7 +120,10 @@ export function useOrganization() {
     organizations: data?.organizations || [],        // 新形式
     selectedOrganization: data?.selectedOrganization || null, // 新形式
     isLoading: authLoading || isLoading,
-    error: error?.status === 404 || error?.status === 401 ? null : error,
+    // エラーハンドリング強化：API内でのエラーメッセージも含める
+    error: data?.error || (error?.status === 404 || error?.status === 401 || error?.status === 403 ? null : error),
+    // RLS権限エラーの場合の専用フラグ
+    hasPermissionError: data?.error?.includes('アクセス権') || error?.status === 403,
     invalidateOrganization,
     refresh: mutate,
   };

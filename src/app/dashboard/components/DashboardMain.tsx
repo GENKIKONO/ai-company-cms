@@ -26,7 +26,7 @@ interface CaseStudiesStats {
 }
 
 export default function DashboardMain() {
-  const { user, organization, isLoading, error } = useOrganization();
+  const { user, organization, isLoading, error, hasPermissionError } = useOrganization();
   const [stats, setStats] = useState<DashboardStats>({ total: 0, draft: 0, published: 0, archived: 0 });
   const [caseStudiesStats, setCaseStudiesStats] = useState<CaseStudiesStats>({ total: 0, published: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
@@ -73,6 +73,48 @@ export default function DashboardMain() {
           <p className="mt-2 text-sm text-gray-400">
             しばらくお待ちください
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  // RLS権限エラーの場合
+  if (hasPermissionError && user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">🔒</span>
+            </div>
+            <h2 className="text-xl font-semibold text-red-600 mb-2">アクセス権限がありません</h2>
+            <p className="text-gray-600 text-sm">
+              組織情報にアクセスする権限がありません。<br/>
+              組織の管理者にお問い合わせください。
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
+            >
+              再読み込み
+            </button>
+            
+            <Link
+              href="/auth/logout"
+              className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-md text-center block"
+            >
+              ログアウト
+            </Link>
+          </div>
+          
+          <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+            <p className="text-xs text-gray-500">
+              ユーザー: {user.email}
+            </p>
+          </div>
         </div>
       </div>
     );
