@@ -53,54 +53,76 @@ export async function GET(request: NextRequest) {
     let selectedOrganization: OrganizationSummary | null = null;
     let errorMessage: string | undefined = undefined;
     
-    // Step 1: Try get_my_organizations_slim RPC (本番環境でAvailable)
+    // Try using get_user_organizations RPC first
     try {
-      logger.debug('Attempting get_my_organizations_slim RPC...', { userId: authUser.id });
+      logger.debug('Trying get_user_organizations RPC...', { userId: authUser.id });
       
-      const { data: rpcData, error: rpcError } = await supabase
-        .rpc('get_my_organizations_slim');  // パラメータなし（新仕様）
+      const { data: userOrgsData, error: userOrgsError } = await supabase
+        .rpc('get_user_organizations');
 
-      if (!rpcError && rpcData && Array.isArray(rpcData)) {
-        logger.info('get_my_organizations_slim RPC success:', { 
-          userId: authUser.id, 
-          orgCount: rpcData.length 
-        });
+
+      if (!userOrgsError && userOrgsData && Array.isArray(userOrgsData) && userOrgsData.length > 0) {
+        // RPC成功時は、organization_id のリストを取得してorganizationsテーブルから詳細を取得
+        const orgIds = userOrgsData.map(org => org.organization_id);
         
-        // 型安全な変換
-        organizations = (rpcData as GetMyOrganizationsSlimRow[])
-          .map(normalizeOrganizationSummary);
-        
-        // すべての組織を含める（デモフィルタリングなし）
-        
-        // 選択ロジック: 先頭の組織を選択（LuxuCareが含まれることを確保）
-        selectedOrganization = organizations.length > 0 ? organizations[0] : null;
-        
-      } else {
-        logger.warn('get_my_organizations_slim RPC failed:', { 
-          userId: authUser.id, 
-          rpcError: rpcError?.message,
-          rpcCode: rpcError?.code 
-        });
-        
-        // RLS error (42501) or other auth errors
-        if (rpcError?.code === '42501' || rpcError?.code === 'PGRST301') {
-          throw new Error('RLS_PERMISSION_DENIED');
+        const { data: orgsData, error: orgsError } = await supabase
+          .from('organizations')
+          .select(`
+            id, 
+            name, 
+            slug, 
+            plan, 
+            feature_flags,
+            show_services,
+            show_posts,
+            show_case_studies,
+            show_faqs,
+            show_qa,
+            show_news,
+            show_partnership,
+            show_contact
+          `)
+          .in('id', orgIds);
+
+
+        if (!orgsError && orgsData) {
+          organizations = orgsData.map(orgData => ({
+            id: orgData.id,
+            name: orgData.name,
+            slug: orgData.slug,
+            plan: orgData.plan || 'free',
+            
+            // show_* フィールド
+            showServices: orgData.show_services ?? true,
+            showPosts: orgData.show_posts ?? true,
+            showCaseStudies: orgData.show_case_studies ?? true,
+            showFaqs: orgData.show_faqs ?? true,
+            showQa: orgData.show_qa ?? true,
+            showNews: orgData.show_news ?? true,
+            showPartnership: orgData.show_partnership ?? true,
+            showContact: orgData.show_contact ?? true,
+            
+            isDemoGuess: false,
+            feature_flags: orgData.feature_flags || {}
+          } as OrganizationSummary));
+          
+          selectedOrganization = organizations.length > 0 ? organizations[0] : null;
+          
+          logger.info('Organizations found via get_user_organizations RPC:', { 
+            userId: authUser.id, 
+            orgCount: organizations.length 
+          });
+        } else {
+          throw new Error('Failed to fetch organization details');
         }
-        
-        throw new Error('RPC_UNAVAILABLE');
-      }
-    } catch (rpcError: any) {
-      // Step 2: Fallback to organization_members table query (RLS対応)
-      logger.debug('Using fallback organization_members query...', { 
-        userId: authUser.id, 
-        fallbackReason: rpcError.message 
-      });
-      
-      try {
+      } else {
+        // Fallback to direct query
+        logger.debug('Fallback: Querying organization_members directly...', { userId: authUser.id });
         const { data: memberData, error: memberError } = await supabase
           .from('organization_members')  // RLS有効テーブル（user_id = auth.uid()）
           .select(`
             organization_id, 
+            role,
             organizations(
               id, 
               name, 
@@ -117,6 +139,7 @@ export async function GET(request: NextRequest) {
               show_contact
             )
           `);
+
 
         if (!memberError && memberData && memberData.length > 0) {
           organizations = memberData
@@ -149,7 +172,7 @@ export async function GET(request: NextRequest) {
           
           selectedOrganization = organizations.length > 0 ? organizations[0] : null;
           
-          logger.info('Organizations found via organization_members fallback:', { 
+          logger.info('Organizations found via organization_members query:', { 
             userId: authUser.id, 
             orgCount: organizations.length 
           });
@@ -158,7 +181,8 @@ export async function GET(request: NextRequest) {
           // No organizations found - 正常ケース
           logger.info('No organizations found for user:', { 
             userId: authUser.id, 
-            memberError: memberError?.message 
+            memberError: memberError?.message,
+            memberErrorCode: memberError?.code 
           });
           
           // 42501 エラーの場合は権限不足を示す
@@ -166,14 +190,14 @@ export async function GET(request: NextRequest) {
             errorMessage = '組織情報へのアクセス権がありません。管理者にお問い合わせください。';
           }
         }
-      } catch (fallbackError: any) {
-        logger.error('Fallback organization query also failed:', { 
-          userId: authUser.id, 
-          fallbackError: fallbackError.message 
-        });
-        
-        errorMessage = 'データの取得に失敗しました。しばらく後に再度お試しください。';
       }
+    } catch (queryError: any) {
+      logger.error('Organization query failed:', { 
+        userId: authUser.id, 
+        queryError: queryError.message 
+      });
+      
+      errorMessage = 'データの取得に失敗しました。しばらく後に再度お試しください。';
     }
 
     // レスポンス返却（キャッシュ防止ヘッダー付き）
