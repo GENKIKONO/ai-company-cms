@@ -67,13 +67,13 @@ export async function GET(request: NextRequest) {
         });
         
         // 型安全な変換
-        const allOrgs = (rpcData as GetMyOrganizationsSlimRow[])
+        organizations = (rpcData as GetMyOrganizationsSlimRow[])
           .map(normalizeOrganizationSummary);
         
-        // 詳細なデモフィルタリングログ
-        logger.debug('RPC Raw organizations before filtering:', {
+        // デモフィルタリングなし：すべての組織を含める
+        logger.debug('RPC All organizations (no filtering):', {
           userId: authUser.id,
-          allOrgs: allOrgs.map(org => ({
+          organizations: organizations.map(org => ({
             name: org.name,
             slug: org.slug,
             isDemoGuess: org.isDemoGuess,
@@ -81,20 +81,8 @@ export async function GET(request: NextRequest) {
           }))
         });
         
-        // デモ組織を除外（is_demo_guess: false のみ）
-        // NOTE: luxucare は is_demo_guess = false であることを確認
-        organizations = allOrgs.filter(org => !org.isDemoGuess);
-        
-        // 選択ロジック: 先頭の本番組織を選択
+        // 選択ロジック: 先頭の組織を選択（LuxuCareが含まれることを確保）
         selectedOrganization = organizations.length > 0 ? organizations[0] : null;
-        
-        logger.debug('Organizations processed (demo filtered):', { 
-          userId: authUser.id, 
-          totalOrgs: allOrgs.length,
-          prodOrgs: organizations.length,
-          hasDemo: allOrgs.some(org => org.isDemoGuess),
-          filteredOut: allOrgs.filter(org => org.isDemoGuess).map(org => org.name)
-        });
         
       } else {
         logger.warn('get_my_organizations_slim RPC failed:', { 
@@ -163,7 +151,7 @@ export async function GET(request: NextRequest) {
                 showPartnership: orgData.show_partnership ?? true,
                 showContact: orgData.show_contact ?? true,
                 
-                isDemoGuess: false, // fallback時は不明のため false
+                isDemoGuess: false, // fallback時はすべて本番として扱う
                 feature_flags: orgData.feature_flags || {}
               } as OrganizationSummary;
             });
