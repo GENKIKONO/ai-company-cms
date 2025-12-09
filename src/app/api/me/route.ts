@@ -70,16 +70,7 @@ export async function GET(request: NextRequest) {
         organizations = (rpcData as GetMyOrganizationsSlimRow[])
           .map(normalizeOrganizationSummary);
         
-        // デモフィルタリングなし：すべての組織を含める
-        logger.debug('RPC All organizations (no filtering):', {
-          userId: authUser.id,
-          organizations: organizations.map(org => ({
-            name: org.name,
-            slug: org.slug,
-            isDemoGuess: org.isDemoGuess,
-            plan: org.plan
-          }))
-        });
+        // すべての組織を含める（デモフィルタリングなし）
         
         // 選択ロジック: 先頭の組織を選択（LuxuCareが含まれることを確保）
         selectedOrganization = organizations.length > 0 ? organizations[0] : null;
@@ -194,26 +185,6 @@ export async function GET(request: NextRequest) {
       error: errorMessage              // エラー情報（あれば）
     };
 
-    // 一時デバッグ: /api/me レスポンス内容をログ出力
-    logger.debug('=== /api/me Response Debug ===', {
-      userId: user.id,
-      userEmail: user.email,
-      organizationsCount: organizations.length,
-      organizations: organizations.map(org => ({
-        id: org.id,
-        name: org.name,
-        slug: org.slug,
-        plan: org.plan,
-        isDemoGuess: org.isDemoGuess
-      })),
-      selectedOrganization: selectedOrganization ? {
-        id: selectedOrganization.id,
-        name: selectedOrganization.name,
-        slug: selectedOrganization.slug,
-        isDemoGuess: selectedOrganization.isDemoGuess
-      } : null,
-      error: errorMessage
-    });
     
     const response = NextResponse.json(responseData);
     

@@ -95,28 +95,6 @@ export function useOrganization() {
   const hasOrganizations = data?.organizations && data.organizations.length > 0;
   const isReallyEmpty = isDataFetched && !hasOrganizations;
 
-  // デバッグログ出力（LuxuCare組織確認用）
-  if (user && isDataFetched) {
-    logger.debug('=== useOrganization Debug ===', {
-      userId: user.id,
-      userEmail: user.email,
-      isDataFetched,
-      organizationsCount: data?.organizations?.length || 0,
-      organizations: data?.organizations?.map(org => ({
-        id: org.id,
-        name: org.name,
-        slug: org.slug,
-        isDemoGuess: org.isDemoGuess
-      })) || [],
-      selectedOrganization: data?.selectedOrganization ? {
-        id: data.selectedOrganization.id,
-        name: data.selectedOrganization.name,
-        slug: data.selectedOrganization.slug
-      } : null,
-      hasPermissionError: data?.error?.includes('アクセス権') || error?.status === 403,
-      error: data?.error
-    });
-  }
 
   /**
    * 組織関連キャッシュを一括無効化
