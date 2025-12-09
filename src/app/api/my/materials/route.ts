@@ -12,7 +12,7 @@ import { logger } from '@/lib/utils/logger';
 export const dynamic = 'force-dynamic';
 
 // GET - ユーザー企業の営業資料一覧を取得
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     
@@ -22,22 +22,51 @@ export async function GET() {
       return createAuthError();
     }
 
-    // ユーザーの企業IDを取得
-    const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', authData.user.id)
-      .single();
-
-    if (orgError || !orgData) {
-      return createNotFoundError('Organization');
+    // organizationId クエリパラメータ必須チェック
+    const url = new URL(request.url);
+    const organizationId = url.searchParams.get('organizationId');
+    
+    if (!organizationId) {
+      logger.debug('[my/materials] organizationId parameter required');
+      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
     }
 
-    // 営業資料一覧を取得（RLSポリシーにより自動的に自分の企業の資料のみ取得）
+    // 組織メンバーシップチェック（RLSモデルに準拠）
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', organizationId)
+      .eq('user_id', authData.user.id)
+      .maybeSingle();
+
+    if (membershipError) {
+      logger.error('[my/materials] Organization membership check failed', { 
+        userId: authData.user.id, 
+        organizationId,
+        error: membershipError.message 
+      });
+      return NextResponse.json({ 
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
+    }
+
+    if (!membership) {
+      logger.warn('[my/materials] User not a member of organization', { 
+        userId: authData.user.id, 
+        organizationId 
+      });
+      return NextResponse.json({ 
+        error: 'FORBIDDEN', 
+        message: 'この組織のメンバーではありません' 
+      }, { status: 403 });
+    }
+
+    // 営業資料一覧を取得（RLSにより組織メンバーのみアクセス可能）
     const { data, error } = await supabase
       .from('sales_materials')
       .select('*')
-      .eq('organization_id', orgData.id)
+      .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -78,15 +107,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ユーザーの企業IDとプラン情報を取得
+    // organizationId 必須チェック
+    if (!body.organizationId) {
+      logger.debug('[my/materials] POST organizationId required');
+      return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
+    }
+
+    // 組織メンバーシップチェック（RLSモデルに準拠）
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', body.organizationId)
+      .eq('user_id', authData.user.id)
+      .maybeSingle();
+
+    if (membershipError || !membership) {
+      logger.error('[my/materials] POST Organization membership check failed', { 
+        userId: authData.user.id, 
+        organizationId: body.organizationId,
+        error: membershipError?.message 
+      });
+      return NextResponse.json({ 
+        error: 'FORBIDDEN', 
+        message: 'この組織のメンバーではありません' 
+      }, { status: 403 });
+    }
+
+    // 組織情報取得（プラン制限チェック用）
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select('id, plan')
-      .eq('created_by', authData.user.id)
+      .eq('id', body.organizationId)
       .single();
 
     if (orgError || !orgData) {
-      return createNotFoundError('Organization');
+      logger.error('[my/materials] POST Organization data fetch failed', { 
+        userId: authData.user.id, 
+        organizationId: body.organizationId,
+        error: orgError?.message 
+      });
+      return NextResponse.json({ 
+        error: 'INTERNAL_ERROR', 
+        message: '組織情報の取得に失敗しました' 
+      }, { status: 500 });
     }
 
     // プラン制限チェック（effective-features使用）

@@ -5,44 +5,19 @@ import Link from 'next/link';
 import type { Service } from '@/types/legacy/database';;
 import PublicPageLinks from '../components/PublicPageLinks';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
-import { supabaseBrowser } from '@/lib/supabase/client';
+import { useOrganization } from '@/lib/hooks/useOrganization';
 import { logger } from '@/lib/utils/logger';
 
 export default function ServicesManagementPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [organizationId, setOrganizationId] = useState<string>('');
-
-  useEffect(() => {
-    const getOrganizationId = async () => {
-      try {
-        const supabase = supabaseBrowser;
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          const { data: userOrg } = await supabase
-            .from('user_organizations')
-            .select('organization_id')
-            .eq('user_id', user.id)
-            .eq('role', 'owner')
-            .single();
-          
-          if (userOrg) {
-            setOrganizationId(userOrg.organization_id);
-          }
-        }
-      } catch (error) {
-        logger.error('Failed to get organization ID:', { data: error });
-        setError('組織情報の取得に失敗しました');
-      }
-    };
-
-    getOrganizationId();
-  }, []);
+  
+  const { organization, isLoading: orgLoading, error: orgError } = useOrganization();
+  const organizationId = organization?.id || '';
 
   const fetchServices = useCallback(async () => {
-    if (!organizationId) return;
+    if (!organizationId || orgLoading) return;
     
     try {
       setLoading(true);
@@ -63,13 +38,19 @@ export default function ServicesManagementPage() {
     } finally {
       setLoading(false);
     }
-  }, [organizationId]);
+  }, [organizationId, orgLoading]);
 
   useEffect(() => {
-    if (organizationId) {
+    if (organizationId && !orgLoading) {
       fetchServices();
     }
-  }, [organizationId, fetchServices]);
+  }, [organizationId, orgLoading, fetchServices]);
+
+  useEffect(() => {
+    if (orgError) {
+      setError('組織情報の取得に失敗しました');
+    }
+  }, [orgError]);
 
   const handleDelete = useCallback(async (id: string) => {
     if (!confirm('このサービスを削除しますか？')) return;
@@ -90,7 +71,7 @@ export default function ServicesManagementPage() {
     }
   }, [services]);
 
-  if (loading) {
+  if (loading || orgLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="animate-pulse">

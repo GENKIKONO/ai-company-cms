@@ -45,32 +45,42 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
     }
 
-    // 組織の所有者チェック
-    const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
-      .select('id, created_by')
-      .eq('id', organizationId)
-      .eq('created_by', authData.user.id)
-      .single();
+    // 組織メンバーシップチェック（RLSモデルに準拠）
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', organizationId)
+      .eq('user_id', authData.user.id)
+      .maybeSingle();
 
-    if (orgError || !orgData) {
-      logger.error('[my/faqs] Organization access denied', { 
+    if (membershipError) {
+      logger.error('[my/faqs] Organization membership check failed', { 
         userId: authData.user.id, 
         organizationId,
-        error: orgError?.message 
+        error: membershipError.message 
       });
       return NextResponse.json({ 
-        error: 'RLS_FORBIDDEN', 
-        message: 'Row Level Security によって拒否されました' 
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
+    }
+
+    if (!membership) {
+      logger.warn('[my/faqs] User not a member of organization', { 
+        userId: authData.user.id, 
+        organizationId 
+      });
+      return NextResponse.json({ 
+        error: 'FORBIDDEN', 
+        message: 'この組織のメンバーではありません' 
       }, { status: 403 });
     }
 
-    // RLS compliance: check both organization ownership and created_by
+    // FAQs取得（RLSにより組織メンバーのみアクセス可能）
     const { data, error } = await supabase
       .from('faqs')
       .select('*')
       .eq('organization_id', organizationId)
-      .eq('created_by', authData.user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -121,24 +131,43 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 組織の所有者チェック
+    // 組織メンバーシップチェック（RLSモデルに準拠）
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', body.organizationId)
+      .eq('user_id', authData.user.id)
+      .maybeSingle();
+
+    if (membershipError || !membership) {
+      logger.error('[my/faqs] POST Organization membership check failed', { 
+        userId: authData.user.id, 
+        organizationId: body.organizationId,
+        error: membershipError?.message 
+      });
+      return NextResponse.json({ 
+        error: 'FORBIDDEN', 
+        message: 'この組織のメンバーではありません' 
+      }, { status: 403 });
+    }
+
+    // 組織情報取得（プラン制限チェック用）
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
-      .select('id, plan, created_by')
+      .select('id, plan')
       .eq('id', body.organizationId)
-      .eq('created_by', authData.user.id)
       .single();
 
     if (orgError || !orgData) {
-      logger.error('[my/faqs] POST Organization access denied', { 
+      logger.error('[my/faqs] POST Organization data fetch failed', { 
         userId: authData.user.id, 
         organizationId: body.organizationId,
         error: orgError?.message 
       });
       return NextResponse.json({ 
-        error: 'RLS_FORBIDDEN', 
-        message: 'Row Level Security によって拒否されました' 
-      }, { status: 403 });
+        error: 'INTERNAL_ERROR', 
+        message: '組織情報の取得に失敗しました' 
+      }, { status: 500 });
     }
 
     // プラン制限チェック（effective-features使用）
@@ -226,7 +255,6 @@ export async function POST(request: NextRequest) {
         .select('*')
         .eq('id', insertData.id)
         .eq('organization_id', orgData.id)
-        .eq('created_by', authData.user.id)
         .maybeSingle();
 
       if (selectError) {
