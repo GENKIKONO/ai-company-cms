@@ -90,12 +90,12 @@ export function useOrganization() {
 
   const { invalidateOrganizationData } = useCacheManager();
 
-  // 一時デバッグ: organizationsの状態判定
+  // データ取得状態の判定
   const isDataFetched = !isLoading && !authLoading && data !== undefined;
   const hasOrganizations = data?.organizations && data.organizations.length > 0;
   const isReallyEmpty = isDataFetched && !hasOrganizations;
 
-  // デバッグログ出力
+  // デバッグログ出力（LuxuCare組織確認用）
   if (user && isDataFetched) {
     logger.debug('=== useOrganization Debug ===', {
       userId: user.id,
@@ -103,11 +103,16 @@ export function useOrganization() {
       isDataFetched,
       organizationsCount: data?.organizations?.length || 0,
       organizations: data?.organizations?.map(org => ({
+        id: org.id,
         name: org.name,
         slug: org.slug,
         isDemoGuess: org.isDemoGuess
       })) || [],
-      selectedOrganization: data?.selectedOrganization?.name || null,
+      selectedOrganization: data?.selectedOrganization ? {
+        id: data.selectedOrganization.id,
+        name: data.selectedOrganization.name,
+        slug: data.selectedOrganization.slug
+      } : null,
       hasPermissionError: data?.error?.includes('アクセス権') || error?.status === 403,
       error: data?.error
     });
@@ -138,7 +143,7 @@ export function useOrganization() {
 
   return {
     user: data?.user || null,
-    organization: data?.organization || null,        // 後方互換
+    organization: data?.selectedOrganization || data?.organization || null, // selectedOrganizationを優先
     organizations: data?.organizations || [],        // 新形式
     selectedOrganization: data?.selectedOrganization || null, // 新形式
     isLoading: authLoading || isLoading,
