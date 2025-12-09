@@ -26,7 +26,17 @@ interface CaseStudiesStats {
 }
 
 export default function DashboardMain() {
-  const { user, organization, isLoading, error, hasPermissionError } = useOrganization();
+  const { 
+    user, 
+    organization, 
+    organizations, 
+    selectedOrganization, 
+    isLoading, 
+    error, 
+    hasPermissionError,
+    isDataFetched,
+    isReallyEmpty 
+  } = useOrganization();
   const [stats, setStats] = useState<DashboardStats>({ total: 0, draft: 0, published: 0, archived: 0 });
   const [caseStudiesStats, setCaseStudiesStats] = useState<CaseStudiesStats>({ total: 0, published: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
@@ -342,6 +352,38 @@ export default function DashboardMain() {
         <div className="mt-12">
           <DashboardClient organizationId={organization.id} organizationName={organization.name} isPublished={(organization as any).is_published} />
         </div>
+
+        {/* 一時デバッグ表示：組織一覧 */}
+        {user && isDataFetched && (
+          <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h3 className="text-sm font-semibold text-yellow-800 mb-2">🐛 デバッグ: 組織データ（一時表示）</h3>
+            <div className="text-xs text-yellow-700 space-y-1">
+              <p><strong>ユーザー:</strong> {user.email} ({user.id})</p>
+              <p><strong>データ取得完了:</strong> {isDataFetched ? 'はい' : 'いいえ'}</p>
+              <p><strong>組織数:</strong> {organizations.length}</p>
+              <p><strong>本当に0件:</strong> {isReallyEmpty ? 'はい' : 'いいえ'}</p>
+              <p><strong>選択中の組織:</strong> {selectedOrganization?.name || 'なし'}</p>
+              
+              {organizations.length > 0 && (
+                <div className="mt-2">
+                  <strong>組織一覧:</strong>
+                  <ul className="ml-4 space-y-1">
+                    {organizations.map((org, index) => (
+                      <li key={org.id}>
+                        {index + 1}. <strong>{org.name}</strong> (slug: {org.slug}, 
+                        plan: {org.plan}, demo: {org.isDemoGuess ? 'はい' : 'いいえ'})
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {error && (
+                <p className="mt-2 text-red-600"><strong>エラー:</strong> {error.toString()}</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

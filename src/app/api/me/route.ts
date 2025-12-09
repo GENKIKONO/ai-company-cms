@@ -70,7 +70,19 @@ export async function GET(request: NextRequest) {
         const allOrgs = (rpcData as GetMyOrganizationsSlimRow[])
           .map(normalizeOrganizationSummary);
         
+        // 詳細なデモフィルタリングログ
+        logger.debug('RPC Raw organizations before filtering:', {
+          userId: authUser.id,
+          allOrgs: allOrgs.map(org => ({
+            name: org.name,
+            slug: org.slug,
+            isDemoGuess: org.isDemoGuess,
+            plan: org.plan
+          }))
+        });
+        
         // デモ組織を除外（is_demo_guess: false のみ）
+        // NOTE: luxucare は is_demo_guess = false であることを確認
         organizations = allOrgs.filter(org => !org.isDemoGuess);
         
         // 選択ロジック: 先頭の本番組織を選択
@@ -80,7 +92,8 @@ export async function GET(request: NextRequest) {
           userId: authUser.id, 
           totalOrgs: allOrgs.length,
           prodOrgs: organizations.length,
-          hasDemo: allOrgs.some(org => org.isDemoGuess)
+          hasDemo: allOrgs.some(org => org.isDemoGuess),
+          filteredOut: allOrgs.filter(org => org.isDemoGuess).map(org => org.name)
         });
         
       } else {
@@ -192,6 +205,27 @@ export async function GET(request: NextRequest) {
       organization: selectedOrganization,  // 旧形式: 後方互換性のため維持
       error: errorMessage              // エラー情報（あれば）
     };
+
+    // 一時デバッグ: /api/me レスポンス内容をログ出力
+    logger.debug('=== /api/me Response Debug ===', {
+      userId: user.id,
+      userEmail: user.email,
+      organizationsCount: organizations.length,
+      organizations: organizations.map(org => ({
+        id: org.id,
+        name: org.name,
+        slug: org.slug,
+        plan: org.plan,
+        isDemoGuess: org.isDemoGuess
+      })),
+      selectedOrganization: selectedOrganization ? {
+        id: selectedOrganization.id,
+        name: selectedOrganization.name,
+        slug: selectedOrganization.slug,
+        isDemoGuess: selectedOrganization.isDemoGuess
+      } : null,
+      error: errorMessage
+    });
     
     const response = NextResponse.json(responseData);
     

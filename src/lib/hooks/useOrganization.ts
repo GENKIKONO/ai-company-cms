@@ -90,6 +90,28 @@ export function useOrganization() {
 
   const { invalidateOrganizationData } = useCacheManager();
 
+  // 一時デバッグ: organizationsの状態判定
+  const isDataFetched = !isLoading && !authLoading && data !== undefined;
+  const hasOrganizations = data?.organizations && data.organizations.length > 0;
+  const isReallyEmpty = isDataFetched && !hasOrganizations;
+
+  // デバッグログ出力
+  if (user && isDataFetched) {
+    logger.debug('=== useOrganization Debug ===', {
+      userId: user.id,
+      userEmail: user.email,
+      isDataFetched,
+      organizationsCount: data?.organizations?.length || 0,
+      organizations: data?.organizations?.map(org => ({
+        name: org.name,
+        slug: org.slug,
+        isDemoGuess: org.isDemoGuess
+      })) || [],
+      selectedOrganization: data?.selectedOrganization?.name || null,
+      hasPermissionError: data?.error?.includes('アクセス権') || error?.status === 403,
+      error: data?.error
+    });
+  }
 
   /**
    * 組織関連キャッシュを一括無効化
@@ -124,6 +146,9 @@ export function useOrganization() {
     error: data?.error || (error?.status === 404 || error?.status === 401 || error?.status === 403 ? null : error),
     // RLS権限エラーの場合の専用フラグ
     hasPermissionError: data?.error?.includes('アクセス権') || error?.status === 403,
+    // デバッグ用：未取得と0件の区別
+    isDataFetched,
+    isReallyEmpty,
     invalidateOrganization,
     refresh: mutate,
   };
