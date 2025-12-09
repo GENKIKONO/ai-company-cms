@@ -65,54 +65,75 @@ export default function DashboardMain() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center max-w-md mx-auto px-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">
-            データを読み込み中...
+          <h2 className="mt-4 text-lg font-semibold text-gray-900">
+            データを読み込んでいます
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            アカウント情報と企業情報を確認しています...
           </p>
-          <p className="mt-2 text-sm text-gray-400">
-            しばらくお待ちください
-          </p>
+          <div className="mt-6 bg-blue-50 rounded-lg p-4">
+            <p className="text-xs text-blue-600">
+              読み込みに時間がかかる場合は、ネットワーク接続をご確認ください
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // RLS権限エラーの場合
+  // RLS権限エラーの場合（具体的な説明付き）
   if (hasPermissionError && user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+        <div className="max-w-lg w-full bg-white rounded-lg shadow-md p-6 mx-4">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">🔒</span>
             </div>
-            <h2 className="text-xl font-semibold text-red-600 mb-2">アクセス権限がありません</h2>
-            <p className="text-gray-600 text-sm">
-              組織情報にアクセスする権限がありません。<br/>
-              組織の管理者にお問い合わせください。
+            <h2 className="text-xl font-semibold text-red-600 mb-3">企業情報にアクセスできません</h2>
+            <div className="text-left bg-red-50 rounded-lg p-4 mb-4">
+              <p className="text-sm text-red-700 mb-2">
+                <strong>問題:</strong> 企業のデータベースにアクセスする権限がありません
+              </p>
+              <p className="text-sm text-red-700 mb-2">
+                <strong>考えられる原因:</strong>
+              </p>
+              <ul className="text-xs text-red-600 ml-4 space-y-1">
+                <li>• 企業メンバーから除外された可能性があります</li>
+                <li>• 一時的なシステムエラーの可能性があります</li>
+                <li>• アカウントの設定に問題がある可能性があります</li>
+              </ul>
+            </div>
+            <p className="text-sm text-gray-600">
+              企業の管理者にご連絡いただくか、<br/>
+              一度ログアウトして再度ログインをお試しください。
             </p>
           </div>
           
           <div className="space-y-3">
             <button
               onClick={() => window.location.reload()}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
             >
-              再読み込み
+              ページを再読み込みする
             </button>
             
             <Link
               href="/auth/logout"
-              className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-md text-center block"
+              className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-md text-center block transition-colors"
             >
-              ログアウト
+              ログアウトして再度ログイン
             </Link>
           </div>
           
           <div className="mt-6 pt-4 border-t border-gray-200 text-center">
             <p className="text-xs text-gray-500">
-              ユーザー: {user.email}
+              ログインユーザー: {user.email}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              問題が解決しない場合は、このメールアドレスを管理者にお伝えください
             </p>
           </div>
         </div>
@@ -158,19 +179,29 @@ export default function DashboardMain() {
     );
   }
 
-  // パターンB: userあり & org 0件 - 組織がない場合のオンボーディング
+  // パターンB: userあり & org 0件 - 組織がない場合のオンボーディング（詳細説明付き）
   if (user && (!organization || !organization.id)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+        <div className="max-w-lg w-full bg-white rounded-lg shadow-md p-6 mx-4">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">🏢</span>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">企業情報を登録しましょう</h2>
-            <p className="text-gray-600 text-sm">
-              AIOHub をご利用いただくには企業情報の登録が必要です。<br/>
-              数分で完了する簡単な手続きです。
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">企業情報をまだ登録していません</h2>
+            <div className="text-left bg-blue-50 rounded-lg p-4 mb-4">
+              <p className="text-sm text-blue-700 mb-2">
+                <strong>AIOHub をご利用いただくには:</strong>
+              </p>
+              <ul className="text-sm text-blue-600 ml-4 space-y-1">
+                <li>• 企業情報の登録が必要です</li>
+                <li>• 登録は3〜5分程度で完了します</li>
+                <li>• 登録後すぐにAI機能をお使いいただけます</li>
+              </ul>
+            </div>
+            <p className="text-sm text-gray-600">
+              企業名、業界、基本的な情報を入力するだけで、<br/>
+              すぐにAI可視性分析を開始できます。
             </p>
           </div>
           

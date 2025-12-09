@@ -38,7 +38,7 @@ export function OrgQuotaBadge({ label, quota, className = '' }: OrgQuotaBadgePro
     return (
       <span className={`${baseClasses} bg-green-50 text-green-700 border-green-200 ${className}`}>
         <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-        {label}: 無制限
+        {label}: 回数無制限で利用可能
       </span>
     );
   }
@@ -48,7 +48,7 @@ export function OrgQuotaBadge({ label, quota, className = '' }: OrgQuotaBadgePro
     return (
       <span className={`${baseClasses} bg-red-50 text-red-700 border-red-200 ${className}`}>
         <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-        {label}: 利用不可
+        {label}: 現在のプランでは利用できません
       </span>
     );
   }
@@ -71,12 +71,17 @@ export function OrgQuotaBadge({ label, quota, className = '' }: OrgQuotaBadgePro
     dotClasses = 'bg-yellow-400';
   }
 
+  // 月の表示文言を決定
+  const remainingText = typeof remaining === 'number' && remaining >= 0
+    ? `（今月あと${remaining}回）`
+    : '';
+
   return (
     <span className={`${baseClasses} ${statusClasses} ${className}`}>
       <span className={`w-2 h-2 ${dotClasses} rounded-full`}></span>
-      {label}: {usage} / {effectiveLimit}
-      {typeof remaining === 'number' && (
-        <span className="text-xs opacity-75">（残り {remaining}）</span>
+      {label}: 今月 {usage} / {effectiveLimit} 回利用
+      {remainingText && (
+        <span className="text-xs opacity-75">{remainingText}</span>
       )}
     </span>
   );
