@@ -17,6 +17,16 @@ import type {
   SupabasePlanType 
 } from '@/types/features';
 
+// RPC結果の拡張型（エラー情報を含む）
+export interface FetchOrgQuotaUsageResult {
+  data?: NormalizedOrgQuotaUsage;
+  error?: {
+    type: 'permission' | 'not_found' | 'network' | 'unknown';
+    message: string;
+    code?: string;
+  };
+}
+
 /**
  * RPC 生レスポンスを正規化された形式に変換
  * @param raw get_org_quota_usage RPC の戻り値
@@ -66,12 +76,12 @@ export function normalizeOrgQuotaUsageResponse(
  * Supabase get_org_quota_usage RPC を呼び出して組織の機能使用量を取得
  * @param organizationId 組織UUID
  * @param featureKey 機能キー
- * @returns 正規化された quota/usage データ または null（失敗時）
+ * @returns quota/usage データまたはエラー情報
  */
 export async function fetchOrgQuotaUsage(
   organizationId: string,
   featureKey: SupabaseFeatureKey,
-): Promise<NormalizedOrgQuotaUsage | null> {
+): Promise<FetchOrgQuotaUsageResult> {
   try {
     const supabase = await createClient();
     
@@ -81,13 +91,37 @@ export async function fetchOrgQuotaUsage(
     });
 
     if (error) {
+      // 42501: insufficient_privilege (RLS権限エラー)
+      if (error.code === '42501') {
+        console.error('RLS permission error in fetchOrgQuotaUsage', {
+          organizationId,
+          featureKey,
+          error: error.message,
+          code: error.code,
+        });
+        return {
+          error: {
+            type: 'permission',
+            message: 'この組織の使用量情報にアクセスする権限がありません',
+            code: error.code,
+          }
+        };
+      }
+
+      // その他のエラー
       console.error('Failed to fetch org quota usage via RPC', {
         organizationId,
         featureKey,
         error: error.message,
         code: error.code,
       });
-      return null;
+      return {
+        error: {
+          type: 'unknown',
+          message: '使用量情報の取得に失敗しました',
+          code: error.code,
+        }
+      };
     }
 
     if (!data) {
@@ -95,10 +129,15 @@ export async function fetchOrgQuotaUsage(
         organizationId,
         featureKey,
       });
-      return null;
+      return {
+        error: {
+          type: 'not_found',
+          message: '組織の使用量情報が見つかりません',
+        }
+      };
     }
 
-    return normalizeOrgQuotaUsageResponse(data as OrgQuotaUsageRpcResponse);
+    return { data: normalizeOrgQuotaUsageResponse(data as OrgQuotaUsageRpcResponse) };
 
   } catch (error) {
     console.error('Exception in fetchOrgQuotaUsage', {
@@ -106,8 +145,28 @@ export async function fetchOrgQuotaUsage(
       featureKey,
       error: error instanceof Error ? error.message : String(error),
     });
-    return null;
+    return {
+      error: {
+        type: 'network',
+        message: 'ネットワークエラーが発生しました',
+      }
+    };
   }
+}
+
+/**
+ * 後方互換性のためのラッパー関数
+ * @deprecated 新しいコードでは fetchOrgQuotaUsage を直接使用し、エラーハンドリングを行ってください
+ * @param organizationId 組織UUID
+ * @param featureKey 機能キー
+ * @returns 正規化された quota/usage データ または null（失敗時）
+ */
+export async function fetchOrgQuotaUsageLegacy(
+  organizationId: string,
+  featureKey: SupabaseFeatureKey,
+): Promise<NormalizedOrgQuotaUsage | null> {
+  const result = await fetchOrgQuotaUsage(organizationId, featureKey);
+  return result.data || null;
 }
 
 /**
@@ -121,12 +180,33 @@ export async function isFeatureQuotaLimitReached(
   featureKey: SupabaseFeatureKey,
 ): Promise<boolean> {
   try {
-    const quota = await fetchOrgQuotaUsage(organizationId, featureKey);
+    const result = await fetchOrgQuotaUsage(organizationId, featureKey);
     
-    if (!quota) {
-      // RPC 失敗時は fail-open（現状の挙動を壊さない）
+    if (result.error) {
+      // RLS権限エラーの場合は fail-open（現状の挙動を壊さない）
+      if (result.error.type === 'permission') {
+        console.error('RLS permission error in isFeatureQuotaLimitReached, returning fail-open', {
+          organizationId,
+          featureKey,
+          error: result.error.message,
+        });
+      } else {
+        console.error('Error in isFeatureQuotaLimitReached, returning fail-open', {
+          organizationId,
+          featureKey,
+          error: result.error.message,
+        });
+      }
       return false;
     }
+
+    if (!result.data) {
+      // 予期しない状態
+      console.error('Unexpected state in isFeatureQuotaLimitReached - no data and no error');
+      return false;
+    }
+
+    const quota = result.data;
 
     // unlimited の場合は常に利用可能
     if (quota.limits.unlimited) {

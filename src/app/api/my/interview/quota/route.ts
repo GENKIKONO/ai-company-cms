@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthUser, requireOrgMember } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
-// TODO: [SUPABASE_PLAN_MIGRATION] このロジックは get_org_quota_usage RPC に寄せる想定
-// 現在: getOrganizationPlanInfo() でStripe price_id → 静的制限値
-// 提案: fetchOrgQuotaUsage(orgId, 'ai_interview') → plan_features ベースの動的制限値
-import { getOrganizationPlanInfo } from '@/lib/billing/interview-credits';
+import { fetchOrgQuotaUsage } from '@/lib/org-features/quota';
 
 /**
  * インタビュー質問数の使用状況取得API
@@ -74,28 +71,81 @@ export async function GET(request: NextRequest): Promise<NextResponse<QuotaRespo
       );
     }
 
-    const supabase = await createClient();
+    // 新しいRPCベースのクオータ取得
+    const quotaResult = await fetchOrgQuotaUsage(organizationId, 'ai_interview');
 
-    // プラン情報と使用状況を取得
-    const planInfo = await getOrganizationPlanInfo(supabase, organizationId);
+    if (quotaResult.error) {
+      // 権限エラーの場合
+      if (quotaResult.error.type === 'permission') {
+        logger.warn('RLS permission error in interview quota API:', {
+          organizationId,
+          userId: user.id,
+          error: quotaResult.error.message
+        });
+        return NextResponse.json(
+          {
+            success: false,
+            error: quotaResult.error.message
+          },
+          { status: 403 }
+        );
+      }
 
-    logger.debug('Quota information retrieved', {
+      // その他のエラー
+      logger.error('Error fetching interview quota:', {
+        organizationId,
+        userId: user.id,
+        error: quotaResult.error.message
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: quotaResult.error.message
+        },
+        { status: 500 }
+      );
+    }
+
+    if (!quotaResult.data) {
+      logger.error('No quota data returned for interview:', {
+        organizationId,
+        userId: user.id
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'クオータ情報の取得に失敗しました'
+        },
+        { status: 500 }
+      );
+    }
+
+    const quota = quotaResult.data;
+    
+    // レスポンス形式を既存APIと互換性を保つよう変換
+    const monthlyLimit = quota.limits.unlimited ? Number.POSITIVE_INFINITY : quota.limits.effectiveLimit;
+    const currentUsage = quota.usage.usedInWindow;
+    const remainingQuestions = quota.limits.unlimited ? Number.POSITIVE_INFINITY : quota.usage.remaining;
+    const usagePercentage = quota.limits.unlimited ? 0 : Math.round((currentUsage / quota.limits.effectiveLimit) * 100);
+    const isExceeded = !quota.limits.unlimited && currentUsage >= quota.limits.effectiveLimit;
+
+    logger.debug('Quota information retrieved via RPC', {
       organizationId,
       userId: user.id,
-      priceId: planInfo.priceId,
-      currentUsage: planInfo.currentUsage,
-      monthlyLimit: planInfo.monthlyLimit
+      featureKey: 'ai_interview',
+      currentUsage,
+      monthlyLimit: quota.limits.unlimited ? 'unlimited' : quota.limits.effectiveLimit
     });
 
     return NextResponse.json({
       success: true,
       data: {
-        priceId: planInfo.priceId,
-        monthlyLimit: planInfo.monthlyLimit,
-        currentUsage: planInfo.currentUsage,
-        remainingQuestions: planInfo.remainingQuestions,
-        usagePercentage: planInfo.usagePercentage,
-        isExceeded: planInfo.isExceeded
+        priceId: quota.plan || null, // プランIDをそのまま使用（後方互換性のため）
+        monthlyLimit: quota.limits.unlimited ? -1 : quota.limits.effectiveLimit, // -1 で無制限を表現
+        currentUsage,
+        remainingQuestions: quota.limits.unlimited ? -1 : quota.usage.remaining, // -1 で無制限を表現
+        usagePercentage,
+        isExceeded
       }
     });
 
@@ -113,12 +163,17 @@ export async function GET(request: NextRequest): Promise<NextResponse<QuotaRespo
       );
     }
 
-    // 組織メンバーアクセスエラーの場合
-    if (error instanceof Error && (error.message.includes('Organization') || error.message.includes('Forbidden'))) {
+    // 組織メンバーアクセスエラーやRLS権限エラーの場合
+    if (error instanceof Error && (
+      error.message.includes('Organization') || 
+      error.message.includes('Forbidden') ||
+      error.message.includes('42501') ||
+      error.message.includes('insufficient_privilege')
+    )) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Forbidden'
+          error: 'この組織のクオータ情報にアクセスする権限がありません'
         },
         { status: 403 }
       );

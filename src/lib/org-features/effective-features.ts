@@ -130,30 +130,70 @@ export function mergePlanFeaturesWithOverrides(
 // get_effective_org_features RPC インターフェース
 // =============================================================================
 
+// RPC結果の拡張型（エラー情報を含む）
+export interface FetchOrgFeaturesResult {
+  data?: EffectiveOrgFeaturesResponse;
+  error?: {
+    type: 'permission' | 'not_found' | 'network' | 'unknown';
+    message: string;
+    code?: string;
+  };
+}
+
 /**
  * Supabase の get_effective_org_features RPC を呼び出して組織の効果的機能設定を取得
  * @param organizationId 組織UUID
- * @returns RPC応答データ または null (失敗時)
+ * @returns RPC応答データまたはエラー情報
  */
 export async function fetchEffectiveOrgFeatures(
   organizationId: string
-): Promise<EffectiveOrgFeaturesResponse | null> {
+): Promise<FetchOrgFeaturesResult> {
   try {
     const supabase = await createClient();
     
-    // TODO: [RPC_PARAMETER] DB の関数定義に合わせてパラメータ名を調整が必要な場合がある
-    // 現在は p_org_id で仮実装、実際のDB定義に合わせて修正すること
     const { data, error } = await supabase.rpc('get_effective_org_features', {
       p_org_id: organizationId,
     });
 
     if (error) {
+      // 42501: insufficient_privilege (RLS権限エラー)
+      if (error.code === '42501') {
+        logger.warn('RLS permission error in fetchEffectiveOrgFeatures', {
+          organizationId,
+          error: error.message,
+          code: error.code,
+        });
+        return {
+          error: {
+            type: 'permission',
+            message: 'この組織の機能情報にアクセスする権限がありません',
+            code: error.code,
+          }
+        };
+      }
+
+      // その他のエラー
       logger.warn('Failed to fetch effective org features via RPC', {
         organizationId,
         error: error.message,
         code: error.code,
       });
-      return null;
+      return {
+        error: {
+          type: 'unknown',
+          message: '機能情報の取得に失敗しました',
+          code: error.code,
+        }
+      };
+    }
+
+    if (!data) {
+      return {
+        error: {
+          type: 'not_found',
+          message: '組織の機能情報が見つかりません',
+        }
+      };
     }
 
     logger.debug('Successfully fetched effective org features via RPC', {
@@ -162,14 +202,19 @@ export async function fetchEffectiveOrgFeatures(
       featureCount: Object.keys(data?.features || {}).length,
     });
 
-    return data as EffectiveOrgFeaturesResponse;
+    return { data: data as EffectiveOrgFeaturesResponse };
 
   } catch (error) {
     logger.error('Exception in fetchEffectiveOrgFeatures', {
       organizationId,
       error: error instanceof Error ? error.message : String(error),
     });
-    return null;
+    return {
+      error: {
+        type: 'network',
+        message: 'ネットワークエラーが発生しました',
+      }
+    };
   }
 }
 
@@ -271,13 +316,13 @@ export async function getEffectiveOrgFeatures(orgId: string): Promise<EffectiveO
     // 1. 新しいRPCヘルパーを使用してSupabase RPC呼び出しを試行
     logger.debug('Fetching effective org features from Supabase via new RPC helper', undefined, context);
     
-    const rpcResponse = await fetchEffectiveOrgFeatures(orgId);
+    const rpcResult = await fetchEffectiveOrgFeatures(orgId);
     
-    if (rpcResponse) {
+    if (rpcResult.data) {
       // RPC成功時：normalizeEffectiveOrgFeaturesResponse で正規化
       logger.debug('Successfully fetched effective org features from RPC, normalizing response', undefined, context);
       
-      const normalizedFeatures = normalizeEffectiveOrgFeaturesResponse(rpcResponse);
+      const normalizedFeatures = normalizeEffectiveOrgFeaturesResponse(rpcResult.data);
       
       // 既存のFeatureConfigフォーマットに変換（下位互換性のため）
       const features: Partial<Record<FeatureKey, FeatureConfig>> = {};
@@ -297,7 +342,7 @@ export async function getEffectiveOrgFeatures(orgId: string): Promise<EffectiveO
 
       logger.debug('Successfully processed RPC response', { 
         featuresCount: Object.keys(features).length,
-        rpcPlan: rpcResponse.plan 
+        rpcPlan: rpcResult.data.plan 
       }, context);
 
       return {
@@ -308,9 +353,17 @@ export async function getEffectiveOrgFeatures(orgId: string): Promise<EffectiveO
           organization_id: orgId,
         }
       };
+    } else if (rpcResult.error) {
+      // RPC失敗時：エラー情報をログ出力してフォールバック処理
+      if (rpcResult.error.type === 'permission') {
+        logger.warn('RLS permission error, falling back to entitlements', { error: rpcResult.error }, context);
+      } else {
+        logger.warn('RPC error, falling back to entitlements', { error: rpcResult.error }, context);
+      }
+      return await getEffectiveOrgFeaturesFromEntitlements(orgId);
     } else {
-      // RPC失敗時：フォールバック処理
-      logger.warn('RPC helper returned null, falling back to entitlements', undefined, context);
+      // 予期しない状態
+      logger.warn('Unexpected RPC result, falling back to entitlements', undefined, context);
       return await getEffectiveOrgFeaturesFromEntitlements(orgId);
     }
 
@@ -642,10 +695,10 @@ export async function canUseFeatureFromOrgAsync(
 
   try {
     // 1. RPC呼び出しを試行
-    const rpcResponse = await fetchEffectiveOrgFeatures(organization.id);
+    const rpcResult = await fetchEffectiveOrgFeatures(organization.id);
     
-    if (rpcResponse) {
-      const normalizedFeatures = normalizeEffectiveOrgFeaturesResponse(rpcResponse);
+    if (rpcResult.data) {
+      const normalizedFeatures = normalizeEffectiveOrgFeaturesResponse(rpcResult.data);
       const featureConfig = normalizedFeatures[key as SupabaseFeatureKey];
       
       if (featureConfig) {
@@ -672,8 +725,16 @@ export async function canUseFeatureFromOrgAsync(
       return false;
     }
 
-    // 2. RPC失敗時：sync版の features.ts の関数にフォールバック
-    logger.debug('RPC failed, falling back to sync logic', undefined, context);
+    // 2. RPC失敗時（権限エラーを含む）：sync版の features.ts の関数にフォールバック
+    if (rpcResult.error) {
+      if (rpcResult.error.type === 'permission') {
+        logger.debug('RLS permission error, falling back to sync logic', { error: rpcResult.error }, context);
+      } else {
+        logger.debug('RPC error, falling back to sync logic', { error: rpcResult.error }, context);
+      }
+    } else {
+      logger.debug('RPC failed, falling back to sync logic', undefined, context);
+    }
     const { canUseFeatureFromOrg } = await import('./features');
     return canUseFeatureFromOrg(organization as any, key);
 
@@ -713,10 +774,10 @@ export async function getMultipleFeatureFlagsFromOrgAsync(
 
   try {
     // 1. RPC呼び出しを試行
-    const rpcResponse = await fetchEffectiveOrgFeatures(organization.id);
+    const rpcResult = await fetchEffectiveOrgFeatures(organization.id);
     
-    if (rpcResponse) {
-      const normalizedFeatures = normalizeEffectiveOrgFeaturesResponse(rpcResponse);
+    if (rpcResult.data) {
+      const normalizedFeatures = normalizeEffectiveOrgFeaturesResponse(rpcResult.data);
       const result = {} as Record<FeatureKey, boolean>;
       
       for (const key of keys) {
@@ -743,8 +804,16 @@ export async function getMultipleFeatureFlagsFromOrgAsync(
       return result;
     }
 
-    // 2. RPC失敗時：sync版の features.ts の関数にフォールバック  
-    logger.debug('RPC failed, falling back to sync logic for multiple flags', undefined, context);
+    // 2. RPC失敗時（権限エラーを含む）：sync版の features.ts の関数にフォールバック
+    if (rpcResult.error) {
+      if (rpcResult.error.type === 'permission') {
+        logger.debug('RLS permission error, falling back to sync logic for multiple flags', { error: rpcResult.error }, context);
+      } else {
+        logger.debug('RPC error, falling back to sync logic for multiple flags', { error: rpcResult.error }, context);
+      }
+    } else {
+      logger.debug('RPC failed, falling back to sync logic for multiple flags', undefined, context);
+    }
     const { getMultipleFeatureFlagsFromOrg } = await import('./features');
     return getMultipleFeatureFlagsFromOrg(organization as any, keys);
 
