@@ -7,16 +7,21 @@ import { fetchOrgQuotaUsage } from '@/lib/org-features/quota';
 /**
  * インタビュー質問数の使用状況取得API
  * フロントエンドが残り質問数を表示するために使用
+ * 
+ * NOTE: 新実装（Supabase RPC ベース）
+ * - 旧実装: Stripe price_id → 静的制限値
+ * - 新実装: get_org_quota_usage RPC → plan_features ベースの動的制限値
+ * - 無制限は -1 で表現（既存フロントエンド互換性のため）
  */
 
 interface QuotaResponse {
   success: boolean;
   data?: {
     priceId: string | null;
-    monthlyLimit: number;              // 常に数値（無制限は廃止）
+    monthlyLimit: number;              // -1: 無制限, 0以上: 制限値
     currentUsage: number;
-    remainingQuestions: number;         // 常に数値（無制限は廃止）
-    usagePercentage: number;           // 常に数値（無制限は廃止）
+    remainingQuestions: number;         // -1: 無制限, 0以上: 残り数
+    usagePercentage: number;           // 無制限時は 0
     isExceeded: boolean;
   };
   error?: string;

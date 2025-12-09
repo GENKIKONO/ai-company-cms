@@ -10,6 +10,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/utils/logger';
 import type { 
   NormalizedOrgQuotaUsage, 
   OrgQuotaUsageRpcResponse, 
@@ -93,7 +94,7 @@ export async function fetchOrgQuotaUsage(
     if (error) {
       // 42501: insufficient_privilege (RLS権限エラー)
       if (error.code === '42501') {
-        console.error('RLS permission error in fetchOrgQuotaUsage', {
+        logger.error('RLS permission error in fetchOrgQuotaUsage', {
           organizationId,
           featureKey,
           error: error.message,
@@ -109,7 +110,7 @@ export async function fetchOrgQuotaUsage(
       }
 
       // その他のエラー
-      console.error('Failed to fetch org quota usage via RPC', {
+      logger.error('Failed to fetch org quota usage via RPC', {
         organizationId,
         featureKey,
         error: error.message,
@@ -125,7 +126,7 @@ export async function fetchOrgQuotaUsage(
     }
 
     if (!data) {
-      console.error('get_org_quota_usage returned no data', {
+      logger.error('get_org_quota_usage returned no data', {
         organizationId,
         featureKey,
       });
@@ -140,7 +141,7 @@ export async function fetchOrgQuotaUsage(
     return { data: normalizeOrgQuotaUsageResponse(data as OrgQuotaUsageRpcResponse) };
 
   } catch (error) {
-    console.error('Exception in fetchOrgQuotaUsage', {
+    logger.error('Exception in fetchOrgQuotaUsage', {
       organizationId,
       featureKey,
       error: error instanceof Error ? error.message : String(error),
@@ -185,13 +186,13 @@ export async function isFeatureQuotaLimitReached(
     if (result.error) {
       // RLS権限エラーの場合は fail-open（現状の挙動を壊さない）
       if (result.error.type === 'permission') {
-        console.error('RLS permission error in isFeatureQuotaLimitReached, returning fail-open', {
+        logger.error('RLS permission error in isFeatureQuotaLimitReached, returning fail-open', {
           organizationId,
           featureKey,
           error: result.error.message,
         });
       } else {
-        console.error('Error in isFeatureQuotaLimitReached, returning fail-open', {
+        logger.error('Error in isFeatureQuotaLimitReached, returning fail-open', {
           organizationId,
           featureKey,
           error: result.error.message,
@@ -202,7 +203,7 @@ export async function isFeatureQuotaLimitReached(
 
     if (!result.data) {
       // 予期しない状態
-      console.error('Unexpected state in isFeatureQuotaLimitReached - no data and no error');
+      logger.error('Unexpected state in isFeatureQuotaLimitReached - no data and no error');
       return false;
     }
 
@@ -222,7 +223,7 @@ export async function isFeatureQuotaLimitReached(
     return quota.usage.usedInWindow >= quota.limits.effectiveLimit;
 
   } catch (error) {
-    console.error('Exception in isFeatureQuotaLimitReached', {
+    logger.error('Exception in isFeatureQuotaLimitReached', {
       organizationId,
       featureKey,
       error: error instanceof Error ? error.message : String(error),
