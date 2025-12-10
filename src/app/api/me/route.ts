@@ -28,6 +28,13 @@ export async function GET(request: NextRequest) {
     // 現在のユーザーセッションを取得
     const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
     
+    console.log('[ME_DEBUG] Entry point:', { 
+      hasAuthUser: !!authUser, 
+      userId: authUser?.id,
+      userEmail: authUser?.email,
+      authError: authError?.message 
+    });
+    
     if (authError || !authUser) {
       const response = NextResponse.json(
         { error: 'unauthorized' }, 
@@ -60,6 +67,15 @@ export async function GET(request: NextRequest) {
       const { data: userOrgsData, error: userOrgsError } = await supabase
         .rpc('get_user_organizations');
 
+      console.log('[ME_DEBUG] get_user_organizations result:', { 
+        hasError: !!userOrgsError, 
+        errorMessage: userOrgsError?.message,
+        errorCode: userOrgsError?.code,
+        dataIsArray: Array.isArray(userOrgsData),
+        dataLength: userOrgsData?.length || 0,
+        firstOrgId: userOrgsData?.[0]?.organization_id,
+        firstOrgRole: userOrgsData?.[0]?.role
+      });
 
       if (!userOrgsError && userOrgsData && Array.isArray(userOrgsData) && userOrgsData.length > 0) {
         // RPC成功時は、organization_id のリストを取得してorganizationsテーブルから詳細を取得
@@ -84,6 +100,15 @@ export async function GET(request: NextRequest) {
           `)
           .in('id', orgIds);
 
+        console.log('[ME_DEBUG] organizations table query result:', { 
+          orgIds: orgIds,
+          hasOrgsError: !!orgsError,
+          orgsErrorMessage: orgsError?.message,
+          orgsErrorCode: orgsError?.code,
+          orgsDataLength: orgsData?.length || 0,
+          firstOrgId: orgsData?.[0]?.id,
+          firstOrgSlug: orgsData?.[0]?.slug
+        });
 
         if (!orgsError && orgsData) {
           organizations = orgsData.map(orgData => ({
@@ -209,6 +234,15 @@ export async function GET(request: NextRequest) {
       error: errorMessage              // エラー情報（あれば）
     };
 
+    console.log('[ME_DEBUG] Final response:', { 
+      hasUser: !!user,
+      organizationsLength: organizations.length,
+      selectedOrgId: selectedOrganization?.id,
+      selectedOrgSlug: selectedOrganization?.slug,
+      selectedOrgPlan: selectedOrganization?.plan,
+      hasError: !!errorMessage,
+      errorMessage: errorMessage
+    });
     
     const response = NextResponse.json(responseData);
     
