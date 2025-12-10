@@ -34,6 +34,7 @@ export default function DashboardMain() {
     isLoading, 
     error, 
     hasPermissionError,
+    hasSystemError,
     isDataFetched,
     isReallyEmpty 
   } = useOrganization();
@@ -188,6 +189,58 @@ export default function DashboardMain() {
           >
             ログインページへ
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // システム/DBエラーの場合（組織メンバーシップは確認できているが詳細取得失敗）
+  if (hasSystemError && user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-lg w-full bg-white rounded-lg shadow-md p-6 mx-4">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <h2 className="text-xl font-semibold text-yellow-600 mb-3">データベースエラー</h2>
+            <div className="text-left bg-yellow-50 rounded-lg p-4 mb-4">
+              <p className="text-sm text-yellow-700 mb-2">
+                <strong>状況:</strong> 組織のメンバーシップは確認できていますが、組織の詳細情報の取得中にエラーが発生しています
+              </p>
+              <p className="text-sm text-yellow-700 mb-2">
+                <strong>詳細:</strong> {error}
+              </p>
+              <p className="text-sm text-yellow-700">
+                <strong>対処:</strong> 一時的なシステムエラーの可能性があります。しばらく待ってから再度お試しください
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            >
+              ページを再読み込みする
+            </button>
+            
+            <Link
+              href="/"
+              className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-md text-center block transition-colors"
+            >
+              ホームページに戻る
+            </Link>
+          </div>
+          
+          <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+            <p className="text-xs text-gray-500">
+              ログインユーザー: {user.email}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              エラーが継続する場合は、このメールアドレスを添えてサポートにお問い合わせください
+            </p>
+          </div>
         </div>
       </div>
     );

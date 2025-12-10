@@ -129,6 +129,8 @@ export function useOrganization() {
     error: data?.error || (error?.status === 404 || error?.status === 401 || error?.status === 403 ? null : error),
     // RLS権限エラーの場合の専用フラグ
     hasPermissionError: data?.error?.includes('アクセス権') || error?.status === 403,
+    // システム・DBエラーの場合の専用フラグ（組織詳細取得失敗など）
+    hasSystemError: data?.error?.includes('組織詳細の取得に失敗しました') || data?.error?.includes('メンバーシップは確認済みです'),
     // デバッグ用：未取得と0件の区別
     isDataFetched,
     isReallyEmpty,

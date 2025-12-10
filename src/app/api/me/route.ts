@@ -138,7 +138,14 @@ export async function GET(request: NextRequest) {
             orgCount: organizations.length 
           });
         } else {
-          throw new Error('Failed to fetch organization details');
+          // DBエラーが発生したが、メンバーシップは確認できているのでエラーフラグを設定
+          errorMessage = `組織詳細の取得に失敗しました。メンバーシップは確認済みです。（エラー: ${orgsError?.code || 'UNKNOWN'}）`;
+          logger.error('Organization details query failed but membership confirmed:', { 
+            userId: authUser.id, 
+            orgIds,
+            errorCode: orgsError?.code,
+            errorMessage: orgsError?.message 
+          });
         }
       } else {
         // Fallback to direct query
