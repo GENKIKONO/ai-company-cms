@@ -7,6 +7,7 @@ import type { FAQFormData } from '@/types/domain/content';;
 import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { getFeatureLimit } from '@/lib/org-features';
 import { logger } from '@/lib/utils/logger';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 
 async function logErrorToDiag(errorInfo: any) {
   try {
@@ -32,6 +33,8 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     
     const { data: authData, error: authError } = await supabase.auth.getUser();
+    
+    
     if (authError || !authData.user) {
       return createAuthError();
     }
@@ -45,35 +48,27 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
     }
 
-    // 組織メンバーシップチェック（RLSモデルに準拠）
-    const { data: membership, error: membershipError } = await supabase
-      .from('organization_members')
-      .select('organization_id, role')
-      .eq('organization_id', organizationId)
-      .eq('user_id', authData.user.id)
-      .maybeSingle();
-
-    if (membershipError) {
-      logger.error('[my/faqs] Organization membership check failed', { 
+    // 組織アクセス権限チェック（validate_org_access RPC使用）
+    try {
+      await validateOrgAccess(organizationId, authData.user.id);
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
+      
+      // Unexpected error
+      logger.error('[my/faqs] Unexpected org access validation error', { 
         userId: authData.user.id, 
         organizationId,
-        error: membershipError.message 
+        error: error instanceof Error ? error.message : error 
       });
       return NextResponse.json({ 
         error: 'INTERNAL_ERROR', 
         message: 'メンバーシップ確認に失敗しました' 
       }, { status: 500 });
-    }
-
-    if (!membership) {
-      logger.warn('[my/faqs] User not a member of organization', { 
-        userId: authData.user.id, 
-        organizationId 
-      });
-      return NextResponse.json({ 
-        error: 'FORBIDDEN', 
-        message: 'この組織のメンバーではありません' 
-      }, { status: 403 });
     }
 
     // FAQs取得（RLSにより組織メンバーのみアクセス可能）
@@ -131,24 +126,27 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 組織メンバーシップチェック（RLSモデルに準拠）
-    const { data: membership, error: membershipError } = await supabase
-      .from('organization_members')
-      .select('organization_id, role')
-      .eq('organization_id', body.organizationId)
-      .eq('user_id', authData.user.id)
-      .maybeSingle();
-
-    if (membershipError || !membership) {
-      logger.error('[my/faqs] POST Organization membership check failed', { 
+    // 組織アクセス権限チェック（validate_org_access RPC使用）
+    try {
+      await validateOrgAccess(body.organizationId, authData.user.id);
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
+      
+      // Unexpected error
+      logger.error('[my/faqs] POST Unexpected org access validation error', { 
         userId: authData.user.id, 
         organizationId: body.organizationId,
-        error: membershipError?.message 
+        error: error instanceof Error ? error.message : error 
       });
       return NextResponse.json({ 
-        error: 'FORBIDDEN', 
-        message: 'この組織のメンバーではありません' 
-      }, { status: 403 });
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
     }
 
     // 組織情報取得（プラン制限チェック用）

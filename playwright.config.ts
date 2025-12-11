@@ -1,4 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
+import * as dotenv from 'dotenv';
+
+// .env.localを確実に読み込む
+dotenv.config({ path: '.env.local' });
+
+// BASE_URLの一元管理
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3002';
 
 /**
  * LuxuCare E2Eテスト設定
@@ -17,7 +24,7 @@ export default defineConfig({
   ],
   
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    baseURL: BASE_URL,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -45,7 +52,7 @@ export default defineConfig({
 
   webServer: {
     command: 'npm run dev',
-    url: 'http://localhost:3000',
+    url: BASE_URL,
     reuseExistingServer: true,
     timeout: 120000,
   },

@@ -6,6 +6,7 @@ import type { CaseStudyFormData } from '@/types/domain/content';;
 import { getFeatureLimit } from '@/lib/org-features';
 import { normalizeCaseStudyPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 
 async function logErrorToDiag(errorInfo: any) {
   try {
@@ -39,35 +40,27 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
     }
 
-    // 組織メンバーシップチェック（RLSモデルに準拠）
-    const { data: membership, error: membershipError } = await supabase
-      .from('organization_members')
-      .select('organization_id, role')
-      .eq('organization_id', organizationId)
-      .eq('user_id', authData.user.id)
-      .maybeSingle();
 
-    if (membershipError) {
-      logger.error('[my/case-studies] Organization membership check failed', { 
+    // 組織アクセス権限チェック（validate_org_access RPC使用）
+    try {
+      await validateOrgAccess(organizationId, authData.user.id);
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
+      
+      logger.error('[my/case-studies] GET Unexpected org access validation error', { 
         userId: authData.user.id, 
         organizationId,
-        error: membershipError.message 
+        error: error instanceof Error ? error.message : error 
       });
       return NextResponse.json({ 
         error: 'INTERNAL_ERROR', 
         message: 'メンバーシップ確認に失敗しました' 
       }, { status: 500 });
-    }
-
-    if (!membership) {
-      logger.warn('[my/case-studies] User not a member of organization', { 
-        userId: authData.user.id, 
-        organizationId 
-      });
-      return NextResponse.json({ 
-        error: 'FORBIDDEN', 
-        message: 'この組織のメンバーではありません' 
-      }, { status: 403 });
     }
 
     // 事例取得（RLSにより組織メンバーのみアクセス可能）
@@ -125,24 +118,26 @@ export async function POST(request: NextRequest) {
     let targetOrgData;
     
     if (organizationId) {
-      // organizationId が指定されている場合は、組織メンバーシップをチェック
-      const { data: membership, error: membershipError } = await supabase
-        .from('organization_members')
-        .select('organization_id, role')
-        .eq('organization_id', organizationId)
-        .eq('user_id', authData.user.id)
-        .maybeSingle();
-
-      if (membershipError || !membership) {
-        logger.error('[my/case-studies] POST Organization membership check failed', { 
+      // organizationId が指定されている場合は、組織アクセス権限チェック（validate_org_access RPC使用）
+      try {
+        await validateOrgAccess(organizationId, authData.user.id);
+      } catch (error) {
+        if (error instanceof OrgAccessError) {
+          return NextResponse.json({ 
+            error: error.code, 
+            message: error.message 
+          }, { status: error.statusCode });
+        }
+        
+        logger.error('[my/case-studies] POST Unexpected org access validation error', { 
           userId: authData.user.id, 
           organizationId,
-          error: membershipError?.message 
+          error: error instanceof Error ? error.message : error 
         });
         return NextResponse.json({ 
-          error: 'FORBIDDEN', 
-          message: 'この組織のメンバーではありません' 
-        }, { status: 403 });
+          error: 'INTERNAL_ERROR', 
+          message: 'メンバーシップ確認に失敗しました' 
+        }, { status: 500 });
       }
       
       // 組織情報取得（プラン制限チェック用）
@@ -175,6 +170,28 @@ export async function POST(request: NextRequest) {
 
       if (orgError || !orgData) {
         return createNotFoundError('Organization');
+      }
+
+      // ユーザー所有組織への権限チェック
+      try {
+        await validateOrgAccess(orgData.id, authData.user.id);
+      } catch (error) {
+        if (error instanceof OrgAccessError) {
+          return NextResponse.json({ 
+            error: error.code, 
+            message: error.message 
+          }, { status: error.statusCode });
+        }
+        
+        logger.error('[my/case-studies] POST Unexpected org access validation error (user org)', { 
+          userId: authData.user.id, 
+          organizationId: orgData.id,
+          error: error instanceof Error ? error.message : error 
+        });
+        return NextResponse.json({ 
+          error: 'INTERNAL_ERROR', 
+          message: 'メンバーシップ確認に失敗しました' 
+        }, { status: 500 });
       }
       
       targetOrgData = orgData;

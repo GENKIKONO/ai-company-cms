@@ -2,11 +2,11 @@
  * Current User API Endpoint
  * 現在ログイン中のユーザーと所属組織の情報を返す
  * 
- * Version 3: RLS強化対応版
- * - get_my_organizations_slim() RPC ベース（パラメータなし、SECURITY INVOKER）
- * - フォールバック: organization_members テーブルクエリ（RLS対応）
+ * Version 4: get_my_organizations_slim ベース + 構造化エラーハンドリング
+ * - get_my_organizations_slim() RPC を第1選択（SECURITY INVOKER）
+ * - フォールバック: organization_members テーブルクエリ（簡潔版）
  * - 戻り値: user + organizations[] + selectedOrganization（後方互換のためorganizationも維持）
- * - エラーハンドリング強化（42501対応、無限ローディング防止）
+ * - エラーハンドリング強化（errorType構造化、42501対応）
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -14,12 +14,39 @@ import { createClient } from '@/lib/supabase/server';
 import { 
   GetMyOrganizationsSlimRow, 
   OrganizationSummary, 
-  MeApiResponse, 
   normalizeOrganizationSummary 
 } from '@/types/organization-summary';
 
 import { logger } from '@/lib/log';
 export const dynamic = 'force-dynamic';
+
+// エラー種別の構造化型定義
+type MeErrorType =
+  | 'permission_denied'   // RLS 42501 / validate_org_access 相当
+  | 'system_error'        // 想定外の内部エラー
+  | 'none';               // エラーなし
+
+// 拡張された API レスポンス型
+interface MeApiResponseExtended {
+  user: {
+    id: string;
+    email: string | null;
+    full_name: string | null;
+  } | null;
+  
+  // 新形式
+  organizations: OrganizationSummary[];
+  selectedOrganization: OrganizationSummary | null;
+  
+  // 後方互換
+  organization: OrganizationSummary | null;
+  
+  // エラー情報（正常時は undefined）
+  error?: string;
+  
+  // 新規: 構造化エラー種別
+  errorType?: MeErrorType;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -56,189 +83,59 @@ export async function GET(request: NextRequest) {
       full_name: authUser.user_metadata?.full_name || null
     };
 
+    console.log('[ME_DEBUG] user', {
+      id: authUser?.id,
+      email: authUser?.email,
+    });
+
     let organizations: OrganizationSummary[] = [];
     let selectedOrganization: OrganizationSummary | null = null;
     let errorMessage: string | undefined = undefined;
+    let errorType: MeErrorType = 'none';
     
-    // Try using get_user_organizations RPC first
-    try {
-      logger.debug('Trying get_user_organizations RPC...', { userId: authUser.id });
+    // RPC一本＋素直なマッピングで組織取得
+    const { data: orgRows, error: orgError } = await supabase
+      .rpc('get_my_organizations_slim');
+
+    console.log('[ME_DEBUG] orgs_from_rpc', orgRows);
+    console.log('[ME_DEBUG] rpc_error', orgError);
+
+    if (orgError) {
+      // RPCエラーは system_error として扱う（DB側は正常の前提）
+      console.error('[ME_DEBUG] get_my_organizations_slim error', orgError);
+      errorType = 'system_error';
+      errorMessage = '組織情報の取得に失敗しました';
+    } else {
+      // RPC成功 - 素直にマッピング
+      const rawOrganizations = (orgRows ?? []);
+      organizations = rawOrganizations.map(normalizeOrganizationSummary);
+      selectedOrganization = organizations.length > 0 ? organizations[0] : null;
       
-      const { data: userOrgsData, error: userOrgsError } = await supabase
-        .rpc('get_user_organizations');
-
-      console.log('[ME_DEBUG] get_user_organizations result:', { 
-        hasError: !!userOrgsError, 
-        errorMessage: userOrgsError?.message,
-        errorCode: userOrgsError?.code,
-        dataIsArray: Array.isArray(userOrgsData),
-        dataLength: userOrgsData?.length || 0,
-        firstOrgId: userOrgsData?.[0]?.organization_id,
-        firstOrgRole: userOrgsData?.[0]?.role
-      });
-
-      if (!userOrgsError && userOrgsData && Array.isArray(userOrgsData) && userOrgsData.length > 0) {
-        // RPC成功時は、organization_id のリストを取得してorganizationsテーブルから詳細を取得
-        const orgIds = userOrgsData.map(org => org.organization_id);
-        
-        const { data: orgsData, error: orgsError } = await supabase
-          .from('organizations')
-          .select(`
-            id, 
-            name, 
-            slug, 
-            plan, 
-            feature_flags,
-            show_services,
-            show_posts,
-            show_case_studies,
-            show_faqs,
-            show_qa,
-            show_news,
-            show_partnership,
-            show_contact
-          `)
-          .in('id', orgIds);
-
-        console.log('[ME_DEBUG] organizations table query result:', { 
-          orgIds: orgIds,
-          hasOrgsError: !!orgsError,
-          orgsErrorMessage: orgsError?.message,
-          orgsErrorCode: orgsError?.code,
-          orgsDataLength: orgsData?.length || 0,
-          firstOrgId: orgsData?.[0]?.id,
-          firstOrgSlug: orgsData?.[0]?.slug
-        });
-
-        if (!orgsError && orgsData) {
-          organizations = orgsData.map(orgData => ({
-            id: orgData.id,
-            name: orgData.name,
-            slug: orgData.slug,
-            plan: orgData.plan || 'free',
-            
-            // show_* フィールド
-            showServices: orgData.show_services ?? true,
-            showPosts: orgData.show_posts ?? true,
-            showCaseStudies: orgData.show_case_studies ?? true,
-            showFaqs: orgData.show_faqs ?? true,
-            showQa: orgData.show_qa ?? true,
-            showNews: orgData.show_news ?? true,
-            showPartnership: orgData.show_partnership ?? true,
-            showContact: orgData.show_contact ?? true,
-            
-            isDemoGuess: false,
-            feature_flags: orgData.feature_flags || {}
-          } as OrganizationSummary));
-          
-          selectedOrganization = organizations.length > 0 ? organizations[0] : null;
-          
-          logger.info('Organizations found via get_user_organizations RPC:', { 
-            userId: authUser.id, 
-            orgCount: organizations.length 
-          });
-        } else {
-          // DBエラーが発生したが、メンバーシップは確認できているのでエラーフラグを設定
-          errorMessage = `組織詳細の取得に失敗しました。メンバーシップは確認済みです。（エラー: ${orgsError?.code || 'UNKNOWN'}）`;
-          logger.error('Organization details query failed but membership confirmed:', { 
-            userId: authUser.id, 
-            orgIds,
-            errorCode: orgsError?.code,
-            errorMessage: orgsError?.message 
-          });
-        }
-      } else {
-        // Fallback to direct query
-        logger.debug('Fallback: Querying organization_members directly...', { userId: authUser.id });
-        const { data: memberData, error: memberError } = await supabase
-          .from('organization_members')  // RLS有効テーブル（user_id = auth.uid()）
-          .select(`
-            organization_id, 
-            role,
-            organizations(
-              id, 
-              name, 
-              slug, 
-              plan, 
-              feature_flags,
-              show_services,
-              show_posts,
-              show_case_studies,
-              show_faqs,
-              show_qa,
-              show_news,
-              show_partnership,
-              show_contact
-            )
-          `);
-
-
-        if (!memberError && memberData && memberData.length > 0) {
-          organizations = memberData
-            .filter(item => item.organizations) // null チェック
-            .map(item => {
-              const orgData: any = Array.isArray(item.organizations) 
-                ? item.organizations[0] 
-                : item.organizations;
-              
-              return {
-                id: orgData.id,
-                name: orgData.name,
-                slug: orgData.slug,
-                plan: orgData.plan || 'free',
-                
-                // show_* フィールド（fallback時はデフォルト値）
-                showServices: orgData.show_services ?? true,
-                showPosts: orgData.show_posts ?? true,
-                showCaseStudies: orgData.show_case_studies ?? true,
-                showFaqs: orgData.show_faqs ?? true,
-                showQa: orgData.show_qa ?? true,
-                showNews: orgData.show_news ?? true,
-                showPartnership: orgData.show_partnership ?? true,
-                showContact: orgData.show_contact ?? true,
-                
-                isDemoGuess: false, // fallback時はすべて本番として扱う
-                feature_flags: orgData.feature_flags || {}
-              } as OrganizationSummary;
-            });
-          
-          selectedOrganization = organizations.length > 0 ? organizations[0] : null;
-          
-          logger.info('Organizations found via organization_members query:', { 
-            userId: authUser.id, 
-            orgCount: organizations.length 
-          });
-          
-        } else {
-          // No organizations found - 正常ケース
-          logger.info('No organizations found for user:', { 
-            userId: authUser.id, 
-            memberError: memberError?.message,
-            memberErrorCode: memberError?.code 
-          });
-          
-          // 42501 エラーの場合は権限不足を示す
-          if (memberError?.code === '42501') {
-            errorMessage = '組織情報へのアクセス権がありません。管理者にお問い合わせください。';
-          }
-        }
-      }
-    } catch (queryError: any) {
-      logger.error('Organization query failed:', { 
+      console.log('[ME_DEBUG] organizations mapped:', { 
         userId: authUser.id, 
-        queryError: queryError.message 
+        orgCount: organizations.length,
+        firstOrgId: organizations[0]?.id,
+        firstOrgName: organizations[0]?.name
       });
       
-      errorMessage = 'データの取得に失敗しました。しばらく後に再度お試しください。';
+      // 0件でも正常（errorType: 'none' のまま）
+      errorType = 'none';
+      errorMessage = undefined;
     }
 
+    console.log('[ME_DEBUG] response_summary', {
+      organizationsLength: organizations.length,
+      errorType,
+    });
+
     // レスポンス返却（キャッシュ防止ヘッダー付き）
-    const responseData: MeApiResponse = {
+    const responseData: MeApiResponseExtended = {
       user,
       organizations,                    // 新形式: 複数組織対応
       selectedOrganization,            // 新形式: 現在選択中の組織
       organization: selectedOrganization,  // 旧形式: 後方互換性のため維持
-      error: errorMessage              // エラー情報（あれば）
+      error: errorMessage,             // エラー情報（あれば）
+      errorType                        // 新規: 構造化エラー種別
     };
 
     console.log('[ME_DEBUG] Final response:', { 
@@ -247,6 +144,7 @@ export async function GET(request: NextRequest) {
       selectedOrgId: selectedOrganization?.id,
       selectedOrgSlug: selectedOrganization?.slug,
       selectedOrgPlan: selectedOrganization?.plan,
+      errorType,
       hasError: !!errorMessage,
       errorMessage: errorMessage
     });
@@ -264,12 +162,13 @@ export async function GET(request: NextRequest) {
     logger.error('API /me error:', { data: error });
     
     // エラーが発生してもダッシュボードを壊さないよう、できるだけ情報を返す
-    const errorResponseData: MeApiResponse = {
+    const errorResponseData: MeApiResponseExtended = {
       user: null,
       organizations: [],
       selectedOrganization: null,
       organization: null,  // 後方互換
-      error: 'サーバーエラーが発生しました。しばらく後に再度お試しください。'
+      error: 'サーバーエラーが発生しました。しばらく後に再度お試しください。',
+      errorType: 'system_error'
     };
     
     const response = NextResponse.json(errorResponseData, { status: 500 });

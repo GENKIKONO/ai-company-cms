@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { QACategoryFormData } from '@/types/domain/qa-system';;
 import { logger } from '@/lib/utils/logger';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
@@ -12,27 +13,52 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // ユーザーの企業IDを取得（単一組織モード）
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .single();
-
-    if (orgError || !organization) {
-      return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
+    // organizationId クエリパラメータ必須チェック（他のAPIと統一）
+    const { searchParams } = new URL(req.url);
+    const organizationId = searchParams.get('organizationId');
+    
+    if (!organizationId) {
+      logger.debug('[my/qa/categories] organizationId parameter required');
+      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
     }
 
+
+    // validateOrgAccessでメンバーシップ確認
+    try {
+      await validateOrgAccess(organizationId, user.id, 'read');
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
+      return NextResponse.json({ 
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
+    }
+
+    // 対象テーブル単体＋organization_idフィルタで取得
     const { data: categories, error } = await supabase
       .from('qa_categories')
       .select('*')
-      .or(`organization_id.eq.${organization.id},visibility.eq.global`)
+      .or(`organization_id.eq.${organizationId},visibility.eq.global`)
       .eq('is_active', true)
       .order('sort_order', { ascending: true });
 
     if (error) {
-      logger.error('Error fetching categories', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
+      console.error('[QA_CATEGORIES_DEBUG] supabase error', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
+      return NextResponse.json({ 
+        error: 'Failed to fetch categories', 
+        message: error.message,
+        details: error.details 
+      }, { status: 500 });
     }
 
     return NextResponse.json({ data: categories });
@@ -52,25 +78,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // ユーザーの企業IDを取得（単一組織モード）
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .single();
+    const body: QACategoryFormData & { organizationId?: string } = await req.json();
 
-    if (orgError || !organization) {
-      return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
+    // organizationId 必須チェック（他のAPIと統一）
+    if (!body.organizationId) {
+      logger.debug('[my/qa/categories] POST organizationId required');
+      return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
     }
 
-    const body: QACategoryFormData = await req.json();
+    // validateOrgAccessでメンバーシップ確認
+    try {
+      await validateOrgAccess(body.organizationId, user.id, 'write');
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
+      return NextResponse.json({ 
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
+    }
     
     if (!body.name?.trim() || !body.slug?.trim()) {
       return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 });
     }
 
     const categoryData = {
-      organization_id: organization.id,
+      organization_id: body.organizationId,
       name: body.name.trim(),
       slug: body.slug.trim(),
       description: body.description?.trim() || null,
@@ -99,7 +136,7 @@ export async function POST(req: NextRequest) {
     await supabase
       .from('qa_content_logs')
       .insert({
-        organization_id: organization.id,
+        organization_id: body.organizationId,
         category_id: category.id,
         action: 'category_create',
         actor_user_id: user.id,

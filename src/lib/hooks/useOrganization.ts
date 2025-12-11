@@ -2,9 +2,9 @@
  * 組織コンテキストフック
  * 現在のユーザーの組織情報を管理
  * 
- * Version 3: RLS強化対応版
+ * Version 4: 構造化エラーハンドリング対応版
  * - MeApiResponse 型使用（organization-summary.ts ベース）
- * - エラーハンドリング強化（42501対応）
+ * - errorType ベースのエラー判定（文字列フォールバック付き）
  * - 後方互換性維持
  */
 
@@ -16,6 +16,17 @@ import { CACHE_KEYS } from '@/lib/cache/keys';
 import { logger } from '@/lib/log';
 import { useAuth } from './useAuth';
 import { MeApiResponse, OrganizationSummary } from '@/types/organization-summary';
+
+// 構造化エラータイプ（/api/me と同期）
+type MeErrorType =
+  | 'permission_denied'   // RLS 42501 / アクセス権なし
+  | 'system_error'        // 内部エラー
+  | 'none';               // エラーなし
+
+// 拡張 MeApiResponse（errorType フィールド付き）
+interface ExtendedMeApiResponse extends MeApiResponse {
+  errorType?: MeErrorType;
+}
 
 // 後方互換のために旧型定義も維持
 export interface Organization {
@@ -48,8 +59,8 @@ export interface MeResponse {
 export function useOrganization() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
 
-  // 認証されたユーザーがいる場合のみSWRを実行
-  const { data, error, isLoading, mutate } = useSWR<MeApiResponse>(
+  // 認証されたユーザーがいる場合のみSWRを実行（拡張型を使用）
+  const { data, error, isLoading, mutate } = useSWR<ExtendedMeApiResponse>(
     isAuthenticated && user ? [CACHE_KEYS.organization, user.id] : null,
     () => fetcher(CACHE_KEYS.organization),
     {
@@ -90,10 +101,19 @@ export function useOrganization() {
 
   const { invalidateOrganizationData } = useCacheManager();
 
+  // エラー状態の判定（優先度: errorType → 文字列フォールバック）
+  const hasPermissionError = data?.errorType !== undefined
+    ? data.errorType === 'permission_denied'
+    : (data?.error?.includes('アクセス権') || error?.status === 403);
+  
+  const hasSystemError = data?.errorType !== undefined
+    ? data.errorType === 'system_error'
+    : (data?.error?.includes('組織詳細の取得に失敗しました') || data?.error?.includes('メンバーシップは確認済みです'));
+
   // データ取得状態の判定
   const isDataFetched = !isLoading && !authLoading && data !== undefined;
   const hasOrganizations = data?.organizations && data.organizations.length > 0;
-  const isReallyEmpty = isDataFetched && !hasOrganizations;
+  const isReallyEmpty = isDataFetched && !hasOrganizations && !hasPermissionError && !hasSystemError;
 
 
   /**
@@ -127,11 +147,10 @@ export function useOrganization() {
     isLoading: authLoading || isLoading,
     // エラーハンドリング強化：API内でのエラーメッセージも含める
     error: data?.error || (error?.status === 404 || error?.status === 401 || error?.status === 403 ? null : error),
-    // RLS権限エラーの場合の専用フラグ
-    hasPermissionError: data?.error?.includes('アクセス権') || error?.status === 403,
-    // システム・DBエラーの場合の専用フラグ（組織詳細取得失敗など）
-    hasSystemError: data?.error?.includes('組織詳細の取得に失敗しました') || data?.error?.includes('メンバーシップは確認済みです'),
-    // デバッグ用：未取得と0件の区別
+    // 構造化エラー対応版：errorType 優先、文字列フォールバック付き
+    hasPermissionError,
+    hasSystemError,
+    // デバッグ用：未取得と0件の区別（エラー状態を除外）
     isDataFetched,
     isReallyEmpty,
     invalidateOrganization,

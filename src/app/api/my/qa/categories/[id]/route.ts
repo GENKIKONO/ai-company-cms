@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { QACategoryFormData } from '@/types/domain/qa-system';;
 import { logger } from '@/lib/utils/logger';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient();
@@ -22,6 +23,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
+    }
+
+    // 組織アクセス権限チェック（validate_org_access RPC使用）
+    try {
+      await validateOrgAccess(organization.id, user.id);
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
+      
+      logger.error('[my/qa/categories/[id]] GET Unexpected org access validation error', { 
+        userId: user.id, 
+        organizationId: organization.id,
+        error: error instanceof Error ? error.message : error 
+      });
+      return NextResponse.json({ 
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
     }
 
     const { data: category, error } = await supabase
@@ -66,6 +89,28 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
+    }
+
+    // 組織アクセス権限チェック（validate_org_access RPC使用）
+    try {
+      await validateOrgAccess(organization.id, user.id);
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
+      
+      logger.error('[my/qa/categories/[id]] PUT Unexpected org access validation error', { 
+        userId: user.id, 
+        organizationId: organization.id,
+        error: error instanceof Error ? error.message : error 
+      });
+      return NextResponse.json({ 
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
     }
 
     // Check if category exists and user has access
@@ -153,6 +198,28 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
+    }
+
+    // 組織アクセス権限チェック（validate_org_access RPC使用）
+    try {
+      await validateOrgAccess(organization.id, user.id);
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
+      
+      logger.error('[my/qa/categories/[id]] DELETE Unexpected org access validation error', { 
+        userId: user.id, 
+        organizationId: organization.id,
+        error: error instanceof Error ? error.message : error 
+      });
+      return NextResponse.json({ 
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
     }
 
     // Check if category exists and user has access

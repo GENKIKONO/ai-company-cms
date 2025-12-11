@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getFeatureLimit } from '@/lib/org-features';
 import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,38 +32,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
     }
 
-    // 組織メンバーシップチェック（RLSモデルに準拠）
-    const { data: membership, error: membershipError } = await supabase
-      .from('organization_members')
-      .select('organization_id, role')
-      .eq('organization_id', organizationId)
-      .eq('user_id', authData.user.id)
-      .maybeSingle();
-
-    if (membershipError) {
-      logger.error('[my/materials] Organization membership check failed', { 
-        userId: authData.user.id, 
-        organizationId,
-        error: membershipError.message 
-      });
+    // validateOrgAccessでメンバーシップ確認
+    try {
+      await validateOrgAccess(organizationId, authData.user.id, 'read');
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
       return NextResponse.json({ 
         error: 'INTERNAL_ERROR', 
         message: 'メンバーシップ確認に失敗しました' 
       }, { status: 500 });
     }
 
-    if (!membership) {
-      logger.warn('[my/materials] User not a member of organization', { 
-        userId: authData.user.id, 
-        organizationId 
-      });
-      return NextResponse.json({ 
-        error: 'FORBIDDEN', 
-        message: 'この組織のメンバーではありません' 
-      }, { status: 403 });
-    }
-
-    // 営業資料一覧を取得（RLSにより組織メンバーのみアクセス可能）
+    // 対象テーブル単体＋organization_idフィルタで取得
     const { data, error } = await supabase
       .from('sales_materials')
       .select('*')
@@ -70,9 +56,14 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
+      console.error('[MATERIALS_DEBUG] supabase error', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
       return NextResponse.json(
-        { error: 'Database error', message: error.message },
+        { error: 'Database error', message: error.message, details: error.details },
         { status: 500 }
       );
     }
@@ -113,24 +104,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
     }
 
-    // 組織メンバーシップチェック（RLSモデルに準拠）
-    const { data: membership, error: membershipError } = await supabase
-      .from('organization_members')
-      .select('organization_id, role')
-      .eq('organization_id', body.organizationId)
-      .eq('user_id', authData.user.id)
-      .maybeSingle();
-
-    if (membershipError || !membership) {
-      logger.error('[my/materials] POST Organization membership check failed', { 
-        userId: authData.user.id, 
-        organizationId: body.organizationId,
-        error: membershipError?.message 
-      });
+    // validateOrgAccessでメンバーシップ確認
+    try {
+      await validateOrgAccess(body.organizationId, authData.user.id, 'write');
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
       return NextResponse.json({ 
-        error: 'FORBIDDEN', 
-        message: 'この組織のメンバーではありません' 
-      }, { status: 403 });
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
     }
 
     // 組織情報取得（プラン制限チェック用）

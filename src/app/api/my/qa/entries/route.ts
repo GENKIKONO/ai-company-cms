@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { QAEntryFormData } from '@/types/domain/qa-system';;
 import { logger } from '@/lib/utils/logger';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
@@ -21,75 +22,45 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
     }
 
-    // 組織の所有者チェック
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id, created_by')
-      .eq('id', organizationId)
-      .eq('created_by', user.id)
-      .single();
 
-    if (orgError || !organization) {
-      logger.error('[my/qa/entries] Organization access denied', { 
-        userId: user.id, 
-        organizationId,
-        error: orgError?.message 
-      });
+    // validateOrgAccessでメンバーシップ確認
+    try {
+      await validateOrgAccess(organizationId, user.id, 'read');
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
       return NextResponse.json({ 
-        error: 'RLS_FORBIDDEN', 
-        message: 'Row Level Security によって拒否されました' 
-      }, { status: 403 });
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
     }
 
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
-    const status = searchParams.get('status');
-    const category_id = searchParams.get('category_id');
-    const search = searchParams.get('search');
-    const offset = (page - 1) * limit;
-
-    // RLS compliance: check both organization ownership and created_by
-    let query = supabase
+    // 対象テーブル単体＋organization_idフィルタで取得
+    const { data: entries, error } = await supabase
       .from('qa_entries')
-      .select(`
-        *,
-        qa_categories!left(id, name, slug)
-      `, { count: 'exact' })
+      .select('*')
       .eq('organization_id', organizationId)
-      .eq('created_by', user.id);
-
-    if (status && ['draft', 'published', 'archived'].includes(status)) {
-      query = query.eq('status', status);
-    }
-
-    if (category_id) {
-      query = query.eq('category_id', category_id);
-    }
-
-    if (search && search.trim()) {
-      query = query.textSearch('search_vector', search.trim());
-    }
-
-    const { data: entries, error, count } = await query
-      .order('last_edited_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+      .order('last_edited_at', { ascending: false });
 
     if (error) {
-      logger.error('Error fetching entries', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json({ error: 'Failed to fetch entries' }, { status: 500 });
+      console.error('[QA_ENTRIES_DEBUG] supabase error', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
+      return NextResponse.json({ 
+        error: 'Failed to fetch entries', 
+        message: error.message,
+        details: error.details 
+      }, { status: 500 });
     }
 
-    const totalPages = Math.ceil((count || 0) / limit);
-
-    return NextResponse.json({
-      data: entries,
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        totalPages
-      }
-    });
+    return NextResponse.json({ data: entries || [] });
 
   } catch (error) {
     logger.error('Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
@@ -114,48 +85,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
     }
 
-    // 組織の所有者チェック
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id, created_by')
-      .eq('id', body.organizationId)
-      .eq('created_by', user.id)
-      .single();
-
-    if (orgError || !organization) {
-      logger.error('[my/qa/entries] POST Organization access denied', { 
-        userId: user.id, 
-        organizationId: body.organizationId,
-        error: orgError?.message 
-      });
+    // validateOrgAccessでメンバーシップ確認
+    try {
+      await validateOrgAccess(body.organizationId, user.id, 'write');
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return NextResponse.json({ 
+          error: error.code, 
+          message: error.message 
+        }, { status: error.statusCode });
+      }
       return NextResponse.json({ 
-        error: 'RLS_FORBIDDEN', 
-        message: 'Row Level Security によって拒否されました' 
-      }, { status: 403 });
+        error: 'INTERNAL_ERROR', 
+        message: 'メンバーシップ確認に失敗しました' 
+      }, { status: 500 });
     }
     
     if (!body.question?.trim() || !body.answer?.trim()) {
       return NextResponse.json({ error: 'Question and answer are required' }, { status: 400 });
     }
 
-    // Validate category if provided
-    if (body.category_id) {
-      const { data: category, error: categoryError } = await supabase
-        .from('qa_categories')
-        .select('id')
-        .eq('id', body.category_id)
-        .or(`organization_id.eq.${organization.id},visibility.eq.global`)
-        .single();
-
-      if (categoryError || !category) {
-        return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
-      }
-    }
-
-    // RLS compliance: include both organization_id and created_by
+    // QA entry data preparation (simplified to match FAQs pattern)
     const entryData = {
-      organization_id: organization.id,
-      created_by: user.id, // Required for RLS policy
+      organization_id: body.organizationId,
+      created_by: user.id,
       category_id: body.category_id || null,
       question: body.question.trim(),
       answer: body.answer.trim(),
@@ -166,28 +119,11 @@ export async function POST(req: NextRequest) {
       published_at: body.status === 'published' ? new Date().toISOString() : null
     };
 
-    // Generate content hash
-    const contentString = `${entryData.question}|${entryData.answer}|${entryData.tags.join(',')}`;
-    const contentHash = await crypto.subtle.digest(
-      'SHA-256',
-      new TextEncoder().encode(contentString)
-    );
-    const hashArray = Array.from(new Uint8Array(contentHash));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-    const finalEntryData = {
-      ...entryData,
-      content_hash: hashHex
-    };
-
     const { data: entry, error } = await supabase
       .from('qa_entries')
-      .insert(finalEntryData)
-      .select(`
-        *,
-        qa_categories!left(id, name, slug)
-      `)
-      .maybeSingle();
+      .insert(entryData)
+      .select()
+      .single();
 
     if (error) {
       logger.error('Error creating entry', { data: error instanceof Error ? error : new Error(String(error)) });
@@ -198,12 +134,12 @@ export async function POST(req: NextRequest) {
     await supabase
       .from('qa_content_logs')
       .insert({
-        organization_id: organization.id,
+        organization_id: body.organizationId,
         qa_entry_id: entry.id,
         category_id: entry.category_id,
         action: 'create',
         actor_user_id: user.id,
-        changes: { created: finalEntryData },
+        changes: { created: entryData },
         metadata: { ip: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown", user_agent: req.headers.get('user-agent') }
       });
 
