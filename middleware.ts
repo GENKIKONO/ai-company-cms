@@ -53,7 +53,8 @@ const BASIC_AUTH_PROTECTED_PATHS = [
 // 3. どちらかが未設定 → Basic認証スキップ（事故防止）
 
 // 半公開ルート（ディレクトリ表示は公開、編集は要ログイン）
-const SEMI_PUBLIC_PREFIXES = ['/organizations'];
+// 注意: /organizations 自体は完全公開パスなので除外
+const SEMI_PUBLIC_PREFIXES: string[] = [];
 
 // 認証系ページ（ログイン済ならリダイレクト）
 const AUTH_PAGES = AUTH_PATHS; // 同じ定義を使用
@@ -63,6 +64,7 @@ export async function middleware(req: NextRequest) {
   
   try {
     const { pathname } = req.nextUrl;
+    console.log(`[DEBUG] Middleware called for: ${pathname}`);
 
     // Next内部・API・静的リソースは対象外
     if (
@@ -79,6 +81,18 @@ export async function middleware(req: NextRequest) {
 
     console.log(`[Middleware] Processing: ${pathname}`);
 
+    // 🌐 企業ディレクトリは必ず公開（全てのセキュリティチェックより優先）
+    if (pathname === '/organizations') {
+      console.log(`[Middleware] Organizations directory is public, skipping all checks: ${pathname}`);
+      return NextResponse.next();
+    }
+
+    // 🌐 公開パスは認証チェック不要（ai-crawler.ts で一元管理）
+    if (isPublicPath(pathname)) {
+      console.log(`[Middleware] Public path, skipping all checks: ${pathname}`);
+      return NextResponse.next();
+    }
+
     // 🔒 HTTP Basic Authentication for admin paths (Phase 4.5 - Production Guard)
     const basicAuthResult = await checkBasicAuthentication(req, pathname);
     if (basicAuthResult.blocked) {
@@ -90,12 +104,6 @@ export async function middleware(req: NextRequest) {
     if (guardResult.blocked) {
       return guardResult.response;
     }
-
-  // 🌐 公開パスは認証チェック不要（ai-crawler.ts で一元管理）
-  if (isPublicPath(pathname)) {
-    console.log(`[Middleware] Public path, skipping auth: ${pathname}`);
-    return NextResponse.next();
-  }
   
   // 🔐 認証系ページも公開だが特別扱い
   if (AUTH_PATHS.has(pathname)) {
@@ -151,15 +159,18 @@ export async function middleware(req: NextRequest) {
 
   console.log(`[Middleware] Auth check: ${pathname}, isAuthed: ${isAuthed}, isProtected: ${isProtected}, isAuthPage: ${isAuthPage}`);
 
-  // 半公開ルートの処理（/organizations/new や /organizations/[id]/edit は要ログイン）
-  const requiresAuthInSemiPublic = isSemiPublic && (
-    pathname.includes('/new') || 
-    pathname.includes('/edit') ||
-    pathname.match(/\/organizations\/[^\/]+\/(edit|settings)$/)
-  );
+  // 組織編集ページの処理（/organizations/new や /organizations/[id]/edit は要ログイン）
+  // 注意: /organizations (一覧ページ) は除外し、/organizations/ 以下のパスのみを対象とする
+  const requiresAuthForOrgEdit = 
+    pathname !== '/organizations' &&
+    pathname.startsWith('/organizations/') && (
+      pathname.includes('/new') || 
+      pathname.includes('/edit') ||
+      pathname.match(/\/organizations\/[^\/]+\/(edit|settings)$/)
+    );
 
-  // 未ログインで保護ページ、または半公開の編集ページ、または管理者ページに来たら /auth/login に intended redirect 付きで送る
-  if (!isAuthed && (isProtected || requiresAuthInSemiPublic || isAdminPath)) {
+  // 未ログインで保護ページ、または組織編集ページ、または管理者ページに来たら /auth/login に intended redirect 付きで送る
+  if (!isAuthed && (isProtected || requiresAuthForOrgEdit || isAdminPath)) {
     const loginUrl = new URL('/auth/login', req.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
