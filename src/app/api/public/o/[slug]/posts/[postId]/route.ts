@@ -42,12 +42,12 @@ export async function GET(
           
           if (!authError && user) {
             // Check if user has access to the organization
-            const { data: orgAccess } = await supabase
+            const { data: orgAccess, error: orgAccessError } = await supabase
               .from('organizations')
               .select('id')
               .eq('slug', slug)
               .eq('created_by', user.id)
-              .single();
+              .maybeSingle();
             
             if (orgAccess) {
               allowDraftAccess = true;
@@ -97,7 +97,7 @@ export async function GET(
       query.eq('status', statusCondition);
     }
 
-    const { data: post, error } = await query.single() as { data: any | null; error: any };
+    const { data: post, error } = await query.maybeSingle() as { data: any | null; error: any };
 
     const queryDuration = Date.now() - queryStart;
     if (queryDuration > 1000) {
@@ -190,7 +190,7 @@ export async function HEAD(
       `)
       .eq('id', postId)
       .eq('status', 'published')
-      .single() as { data: any | null; error: any };
+      .maybeSingle() as { data: any | null; error: any };
 
     if (error || !post || post.organization?.slug !== slug || post.organization?.status !== 'published') {
       return new Response(null, { status: 404 });
