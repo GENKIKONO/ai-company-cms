@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from('site_settings')
       .select('*')
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') {
       logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
     const { data: existing } = await supabase
       .from('site_settings')
       .select('id')
-      .single();
+      .maybeSingle();
 
     let result;
     if (existing) {
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
         .update(validatedData)
         .eq('id', existing.id)
         .select()
-        .single();
+        .maybeSingle();
       
       if (error) {
         logger.error('Database update error', { data: error instanceof Error ? error : new Error(String(error)) });
@@ -179,6 +179,16 @@ export async function POST(request: NextRequest) {
         );
       }
       
+      if (!data) {
+        return NextResponse.json(
+          { 
+            code: 'NOT_FOUND',
+            reason: 'Site settings record not found after update'
+          },
+          { status: 500 }
+        );
+      }
+      
       result = { data, message: 'updated' };
     } else {
       // 新規作成
@@ -186,7 +196,7 @@ export async function POST(request: NextRequest) {
         .from('site_settings')
         .insert([validatedData])
         .select()
-        .single();
+        .maybeSingle();
       
       if (error) {
         logger.error('Database insert error', { data: error instanceof Error ? error : new Error(String(error)) });
@@ -195,6 +205,16 @@ export async function POST(request: NextRequest) {
             code: 'DATABASE_ERROR',
             reason: 'Failed to create site settings',
             details: error.message
+          },
+          { status: 500 }
+        );
+      }
+      
+      if (!data) {
+        return NextResponse.json(
+          { 
+            code: 'INSERT_FAILED',
+            reason: 'Site settings creation failed - no data returned'
           },
           { status: 500 }
         );
