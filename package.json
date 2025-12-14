@@ -56,7 +56,7 @@
     "build:e2e": "next build",
     "start:e2e": "node scripts/kill-port.mjs 3099 && NODE_ENV=production next start -p 3099",
     "test:e2e:dashboard": "playwright test tests/e2e/dashboard-routes-smoke.spec.ts",
-    "test:e2e:dashboard:ci": "npm run build:e2e && CI=true playwright test tests/e2e/dashboard-routes-smoke.spec.ts --reporter=line",
+    "test:e2e:dashboard:ci": "node scripts/kill-port.mjs 3099 && npm run build:e2e && NODE_ENV=production next start -p 3099 & sleep 2 && npx wait-on http://localhost:3099/ --timeout 120000 && CI=1 PLAYWRIGHT_BASE_URL=http://localhost:3099 npx playwright test tests/e2e/dashboard-routes-smoke.spec.ts --reporter=line",
     "test:e2e:billing": "playwright test segment-billing.spec.ts",
     "test:e2e:admin": "playwright test admin-console.spec.ts",
     "test:setup": "playwright install",
