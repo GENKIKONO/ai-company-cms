@@ -563,7 +563,7 @@ export default function InterviewSessionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="">
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
@@ -583,7 +583,7 @@ export default function InterviewSessionPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="">
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <DashboardBackLink variant="button" className="mb-4" />
@@ -607,7 +607,7 @@ export default function InterviewSessionPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="">
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">セッションが見つかりません</h1>
@@ -624,7 +624,7 @@ export default function InterviewSessionPage() {
   const currentAnswer = currentQuestion && autoSave ? autoSave.answers[currentQuestion.id] : '';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="">
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ヘッダー */}
         <div className="mb-8">

@@ -11,7 +11,7 @@ export default function ServicesInfoPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="">
         <div className="text-lg">読み込み中...</div>
       </div>
     );

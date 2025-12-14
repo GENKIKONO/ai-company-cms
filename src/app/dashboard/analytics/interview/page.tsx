@@ -191,7 +191,7 @@ export default async function InterviewAnalyticsPage({ searchParams }: PageProps
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)]">
+    <div className="">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ヘッダー */}
         <div className="mb-8">

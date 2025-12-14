@@ -268,7 +268,7 @@ export default function CompanyQuestionsPage() {
   // ローディング状態
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--color-background-primary)] p-6">
+      <div className=" p-6">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse space-y-6">
             <div className="h-10 bg-[var(--color-background-secondary)] rounded w-1/3"></div>
@@ -287,7 +287,7 @@ export default function CompanyQuestionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-background-primary)] p-6">
+    <div className=" p-6">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* ヘッダー */}

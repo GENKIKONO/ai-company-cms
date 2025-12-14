@@ -53,7 +53,7 @@ export default function OrgAIChatPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-center items-center h-96">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
@@ -65,7 +65,7 @@ export default function OrgAIChatPage() {
 
   if (error || !organizationId) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <DashboardBackLink />
           
@@ -94,7 +94,7 @@ export default function OrgAIChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DashboardBackLink />
         

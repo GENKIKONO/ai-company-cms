@@ -191,7 +191,7 @@ export default function TestInterviewPage() {
   const failCount = results.filter(r => !r.success).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="">
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <DashboardBackLink variant="button" className="mb-4" />

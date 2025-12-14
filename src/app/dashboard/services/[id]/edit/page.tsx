@@ -145,7 +145,7 @@ export default function EditServicePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className=" flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
         <span className="ml-3 text-gray-600">読み込み中...</span>
       </div>
@@ -154,7 +154,7 @@ export default function EditServicePage() {
 
   if (!service) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className=" flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">サービスが見つかりません</h2>
           <Link

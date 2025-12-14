@@ -185,7 +185,7 @@ export default function BillingPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="">
         <div className="text-lg">読み込み中...</div>
       </div>
     );
@@ -193,7 +193,7 @@ export default function BillingPage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="">
         <div className="text-red-600">{error}</div>
       </div>
     );
@@ -201,7 +201,7 @@ export default function BillingPage() {
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="">
         <div className="text-gray-600">データが見つかりません</div>
       </div>
     );
