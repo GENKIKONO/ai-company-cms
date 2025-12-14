@@ -54,9 +54,19 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
       .from('organization_groups')
       .select('owner_organization_id')
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
 
-    if (error || !group) {
+    if (error) {
+      logger.error('Database error checking group ownership', {
+        component: 'org-groups-detail-api',
+        groupId,
+        userId,
+        error: error.message
+      });
+      return false;
+    }
+
+    if (!group) {
       return false;
     }
 
@@ -113,14 +123,23 @@ export async function GET(
         )
       `)
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
 
-    if (error || !group) {
-      logger.warn('Organization group not found', {
+    if (error) {
+      logger.error('Database error retrieving organization group', {
         component: 'org-groups-detail-api',
         operation: 'get',
         groupId,
-        error: error?.message
+        error: error.message
+      });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+
+    if (!group) {
+      logger.warn('Organization group not found', {
+        component: 'org-groups-detail-api',
+        operation: 'get',
+        groupId
       });
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
     }
@@ -209,7 +228,7 @@ export async function PATCH(
           company_name
         )
       `)
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('Error updating organization group', {
@@ -229,7 +248,12 @@ export async function PATCH(
     }
 
     if (!group) {
-      return NextResponse.json({ error: 'Group not found' }, { status: 404 });
+      logger.error('Update returning null - unexpected', {
+        component: 'org-groups-detail-api',
+        operation: 'update',
+        groupId
+      });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     logger.info('Organization group updated successfully', {
@@ -284,11 +308,21 @@ export async function DELETE(
     }
 
     // Get group info for logging
-    const { data: group } = await supabaseAdmin
+    const { data: group, error: groupError } = await supabaseAdmin
       .from('organization_groups')
       .select('name, owner_organization_id')
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
+
+    if (groupError) {
+      logger.error('Database error retrieving group for deletion', {
+        component: 'org-groups-detail-api',
+        operation: 'delete',
+        groupId,
+        error: groupError.message
+      });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 
     if (!group) {
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
