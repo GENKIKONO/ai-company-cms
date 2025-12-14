@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/utils/logger';
+import { LockIcon } from '@/components/icons/HIGIcons';
 
 interface CheckoutLink {
   id: string;
@@ -293,7 +294,7 @@ export default function BillingLinksAdminPage() {
                   className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded"
                 />
                 <label htmlFor="is_public" className="ml-2 block text-sm text-gray-700">
-                  公開CTA表示（チェックを外すと🔒プライベートリンク：運営が手動で配布する特別価格のリンク）
+                  公開CTA表示（チェックを外すと<LockIcon className="w-3 h-3 inline mx-1" aria-hidden />プライベートリンク：運営が手動で配布する特別価格のリンク）
                 </label>
               </div>
               <div className="col-span-2 flex justify-end space-x-3">
@@ -344,7 +345,7 @@ export default function BillingLinksAdminPage() {
                         )}
                         {!link.is_public && (
                           <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
-                            🔒 プライベートリンク
+                            <LockIcon className="w-3 h-3 inline mr-1" aria-hidden /> プライベートリンク
                           </span>
                         )}
                         {link.discount_rate > 0 && (
@@ -379,7 +380,7 @@ export default function BillingLinksAdminPage() {
                         onClick={() => copyLinkToClipboard(link)}
                         className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
                       >
-                        {link.is_public ? 'リンクコピー' : '🔒 プライベートリンクコピー'}
+                        {link.is_public ? 'リンクコピー' : <><LockIcon className="w-3 h-3 inline mr-1" aria-hidden /> プライベートリンクコピー</>}
                       </button>
                     </div>
                   </div>

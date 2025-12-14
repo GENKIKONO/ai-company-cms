@@ -6,8 +6,7 @@
  * - 制限ロジックには一切関与しない（fail-open設計）
  */
 
-import { getCurrentUser } from '@/lib/auth';
-import { getOrganization } from '@/lib/organizations';
+import { getCurrentUserOrganization } from '@/lib/organizations-server';
 import { fetchOrgQuotaUsage } from '@/lib/org-features';
 import { logger } from '@/lib/utils/logger';
 import type { SimpleQuotaProps } from '@/components/quota/OrgQuotaBadge';
@@ -32,16 +31,13 @@ export default async function InterviewPageWithQuota() {
   let aiInterviewQuota: SimpleQuotaProps | null = null;
   
   try {
-    // 組織情報を取得
-    const user = await getCurrentUser();
-    if (user?.id) {
-      const organization = await getOrganization(user.id);
-      if (organization?.data?.id) {
-        // Quota 情報を取得（fail-open）
-        const quotaResult = await fetchOrgQuotaUsage(organization.data.id, 'ai_interview');
-        // 新しいRPC結果構造に対応
-        aiInterviewQuota = normalizeQuotaForProps(quotaResult.data || null);
-      }
+    // 組織情報を取得（Server専用関数を使用）
+    const organization = await getCurrentUserOrganization();
+    if (organization?.id) {
+      // Quota 情報を取得（fail-open）
+      const quotaResult = await fetchOrgQuotaUsage(organization.id, 'ai_interview');
+      // 新しいRPC結果構造に対応
+      aiInterviewQuota = normalizeQuotaForProps(quotaResult.data || null);
     }
   } catch (error) {
     // fail-open: エラー時はquotaをnullのままにして、Client Componentは従来通り動作

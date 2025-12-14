@@ -1,0 +1,77 @@
+name: RLS Regression Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rls-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      RLS_REGRESSION_ADMIN_TOKEN: ${{ secrets.RLS_REGRESSION_ADMIN_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Start Next.js dev server
+        run: |
+          npm run dev -- --port 3000 &
+          echo "DEV_SERVER_PID=$!" >> $GITHUB_ENV
+        env:
+          NODE_ENV: development
+
+      - name: Wait for dev server to be ready
+        run: |
+          npx wait-on http://127.0.0.1:3000 -t 120000 -v
+          echo "✅ Dev server is ready"
+
+      - name: Run RLS regression test
+        run: |
+          npx playwright test tests/e2e/rls-regression.spec.ts --reporter=line
+        env:
+          CI: true
+
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rls-regression-test-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+      - name: Cleanup dev server
+        if: always()
+        run: |
+          if [ -n "$DEV_SERVER_PID" ]; then
+            echo "Killing dev server (PID: $DEV_SERVER_PID)"
+            kill $DEV_SERVER_PID || true
+            timeout 10 tail --pid=$DEV_SERVER_PID -f /dev/null || true
+          fi
+          pkill -f "next.*dev.*3000" || true
+          echo "✅ Dev server cleanup completed"

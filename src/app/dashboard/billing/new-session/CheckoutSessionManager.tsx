@@ -45,7 +45,9 @@ export default function CheckoutSessionManager() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create checkout session');
+        const errorMessage = data.error || 'Failed to create checkout session';
+        setError(errorMessage);
+        return;
       }
 
       if (data.checkout_url) {

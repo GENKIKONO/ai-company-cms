@@ -145,24 +145,24 @@ export async function POST(request: NextRequest) {
       .from('posts')
       .insert(postData)
       .select()
-      .single();
+      .maybeSingle();
 
-    if (createError) {
+    if (createError || !newPost) {
       logger.error('[my/posts POST] Failed to create post', {
         userId,
         orgId,
         postData: { ...postData, content: '[内容省略]' },
         error: createError,
-        code: createError.code,
-        details: createError.details,
-        hint: createError.hint,
-        message: createError.message
+        code: createError?.code,
+        details: createError?.details,
+        hint: createError?.hint,
+        message: createError?.message
       });
       return NextResponse.json({ 
         error: '記事の作成に失敗しました',
-        code: createError.code,
-        details: createError.details,
-        hint: createError.hint,
+        code: createError?.code,
+        details: createError?.details,
+        hint: createError?.hint,
         message: 'Failed to create post' 
       }, { status: 500 });
     }

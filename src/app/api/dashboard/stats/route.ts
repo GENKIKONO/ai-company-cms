@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       .from('organizations')
       .select('id')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !orgData) {
       return NextResponse.json({
@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
           .eq('organization_id', orgId)
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
         
         if (analyticsData) {
           analytics.pageViews = Number(analyticsData.page_views) || 0;

@@ -61,20 +61,29 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid period format. Use YYYY-MM' }, { status: 400 });
     }
 
-    // レポート詳細を取得
+    // レポート詳細を取得（.single()禁止 → .maybeSingle()で安全化）
     const { data: report, error } = await supabase
       .from('ai_monthly_reports')
       .select('*')
       .eq('organization_id', organizationId)
       .eq('period_start', periodDate.start)
       .eq('period_end', periodDate.end)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json({ error: 'Report not found' }, { status: 404 });
-      }
-      throw error;
+      console.error('Failed to query ai_monthly_reports detail:', error);
+      return NextResponse.json(
+        { 
+          error: 'Failed to fetch report',
+          details: error.message 
+        },
+        { status: 500 }
+      );
+    }
+
+    // .maybeSingle()はデータなしでもerrorにならないため明示的null分岐
+    if (!report) {
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 });
     }
 
     return NextResponse.json({

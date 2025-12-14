@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/middleware';
+import { ROUTES } from '@/lib/routes';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -32,7 +33,7 @@ export async function middleware(request: NextRequest) {
   const isLoggedIn = user && !error;
 
   // 保護されたパス（未ログインなら /auth/login へ）
-  const protectedPaths = ['/dashboard', '/admin', '/management-console', '/my'];
+  const protectedPaths = [ROUTES.dashboard, '/admin', '/management-console', '/my'];
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
 
   // 認証ページ（ログイン済みなら /dashboard へ）
@@ -51,7 +52,7 @@ export async function middleware(request: NextRequest) {
   // 認証済みユーザーが認証ページにアクセス
   if (isAuthPath && isLoggedIn) {
     const url = request.nextUrl.clone();
-    url.pathname = '/dashboard';
+    url.pathname = ROUTES.dashboard;
     return NextResponse.redirect(url);
   }
 

@@ -32,7 +32,7 @@ async function setupE2EUser() {
   console.log('🔧 Setting up E2E test user and organization...');
   
   try {
-    // 1. Create or update test organization
+    // 1. Create or update test organization (simplified to avoid JSONB errors)
     console.log('1. Creating/updating test organization...');
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
@@ -42,16 +42,6 @@ async function setupE2EUser() {
         slug: 'e2e-test-org',
         plan: 'pro',
         created_by: E2E_USER_ID,
-        feature_flags: {},
-        entitlements: {},
-        show_services: true,
-        show_posts: true,
-        show_case_studies: true,
-        show_faqs: true,
-        show_qa: true,
-        show_news: true,
-        show_partnership: true,
-        show_contact: true,
         updated_at: new Date().toISOString()
       }, {
         onConflict: 'id'

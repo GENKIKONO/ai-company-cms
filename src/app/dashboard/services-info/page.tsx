@@ -1,47 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { PLAN_LIMITS } from '@/config/plans';
-import { logger } from '@/lib/utils/logger';
+import { useOrganization } from '@/lib/hooks/useOrganization';
 
 export default function ServicesInfoPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [organization, setOrganization] = useState<any>(null);
+  const { user, organization, isLoading } = useOrganization();
 
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        const supabase = createClient();
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
-        setUser(user);
-        
-        if (user) {
-          // ユーザーの組織があるかチェック
-          const { data: org } = await supabase
-            .from('organizations')
-            .select('*')
-            .eq('created_by', user.id)
-            .single();
-          
-          setOrganization(org);
-        }
-      } catch (error) {
-        logger.error('Auth check failed', { data: error instanceof Error ? error : new Error(String(error)) });
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    checkAuth();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">読み込み中...</div>
@@ -108,7 +76,7 @@ export default function ServicesInfoPage() {
         <h3 className="text-lg font-medium text-gray-900 mb-4">主要機能</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">🏢 企業管理</h4>
+            <h4 className="font-medium text-gray-900 mb-2">企業管理</h4>
             <ul className="text-sm text-gray-600 space-y-1">
               <li>• 企業情報の一元管理</li>
               <li>• SEO最適化された企業ページ</li>

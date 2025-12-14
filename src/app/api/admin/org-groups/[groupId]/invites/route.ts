@@ -26,9 +26,13 @@ async function isGroupOwnerAdmin(groupId: string, userId: string): Promise<{ isA
       .from('organization_groups')
       .select('owner_organization_id')
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
 
-    if (error || !group) {
+    if (error) {
+      return { isAdmin: false };
+    }
+
+    if (!group) {
       return { isAdmin: false };
     }
 
@@ -82,9 +86,19 @@ export async function GET(
       .from('organization_groups')
       .select('id, name')
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
 
-    if (groupError || !group) {
+    if (groupError) {
+      logger.error('Error fetching group', {
+        component: 'group-invites-api',
+        operation: 'list',
+        groupId,
+        error: groupError.message
+      });
+      return NextResponse.json({ error: 'Failed to fetch group' }, { status: 500 });
+    }
+
+    if (!group) {
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
     }
 
@@ -186,9 +200,19 @@ export async function POST(
       .from('organization_groups')
       .select('id, name')
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
 
-    if (groupError || !group) {
+    if (groupError) {
+      logger.error('Error fetching group', {
+        component: 'group-invites-api',
+        operation: 'create',
+        groupId,
+        error: groupError.message
+      });
+      return NextResponse.json({ error: 'Failed to fetch group' }, { status: 500 });
+    }
+
+    if (!group) {
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
     }
 
@@ -197,11 +221,21 @@ export async function POST(
 
     // Check if code already exists
     if (customCode) {
-      const { data: existingCode } = await supabaseAdmin
+      const { data: existingCode, error: codeError } = await supabaseAdmin
         .from('org_group_invites')
         .select('id')
         .eq('code', inviteCode)
-        .single();
+        .maybeSingle();
+
+      if (codeError) {
+        logger.error('Error checking existing invite code', {
+          component: 'group-invites-api',
+          operation: 'create',
+          groupId,
+          error: codeError.message
+        });
+        return NextResponse.json({ error: 'Failed to check invite code' }, { status: 500 });
+      }
 
       if (existingCode) {
         return NextResponse.json({ 
@@ -235,7 +269,7 @@ export async function POST(
         created_at,
         revoked_at
       `)
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('Error creating group invite', {
@@ -255,6 +289,11 @@ export async function POST(
     }
 
     if (!invite) {
+      logger.error('Invite creation succeeded but no data returned', {
+        component: 'group-invites-api',
+        operation: 'create',
+        groupId
+      });
       return NextResponse.json({ error: 'Failed to create invite' }, { status: 500 });
     }
 

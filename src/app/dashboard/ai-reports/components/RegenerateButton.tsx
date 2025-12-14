@@ -36,8 +36,8 @@ export function RegenerateButton({
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.details || 'レポートの再生成に失敗しました');
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.details || error.message || 'レポートの再生成に失敗しました');
       }
 
       const result = await response.json();

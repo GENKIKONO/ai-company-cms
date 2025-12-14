@@ -69,7 +69,14 @@ export async function GET(request: NextRequest) {
       .limit(12);
 
     if (error) {
-      throw error;
+      console.error('Failed to query ai_monthly_reports:', error);
+      return NextResponse.json(
+        { 
+          error: 'Failed to fetch reports',
+          details: error.message 
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({

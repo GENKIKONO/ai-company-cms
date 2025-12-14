@@ -65,6 +65,25 @@ export default function CompanyQuestionsPage() {
       const response = await fetch(`/api/questions/company?${params}`);
       
       if (!response.ok) {
+        if (response.status === 404) {
+          // 企業が見つからない場合（created_by制約によりアクセス不可）
+          setQuestions([]);
+          setStats({ total: 0, open: 0, answered: 0, closed: 0 });
+          setCompany({ id: '', name: '企業情報が取得できません' });
+          setError('企業の作成者としてログインする必要があります。管理者権限を確認してください。');
+          return;
+        } else if (response.status === 401) {
+          // 認証エラー
+          setError('ログインが必要です。再度ログインしてください。');
+          return;
+        } else if (response.status === 403) {
+          // 権限エラー
+          setQuestions([]);
+          setStats({ total: 0, open: 0, answered: 0, closed: 0 });
+          setCompany({ id: '', name: 'アクセス権限がありません' });
+          setError('この機能を利用する権限がありません。企業管理者に連絡してください。');
+          return;
+        }
         const errorData = await response.json();
         throw new Error(errorData.error || '質問の取得に失敗しました');
       }
@@ -155,8 +174,18 @@ export default function CompanyQuestionsPage() {
         // 統計を再読み込み
         loadQuestions();
       } else {
-        const errorData = await response.json();
-        alert(errorData.error || '回答の送信に失敗しました');
+        let errorMessage = '回答の送信に失敗しました';
+        if (response.status === 403) {
+          errorMessage = 'この質問に回答する権限がありません';
+        } else if (response.status === 404) {
+          errorMessage = '質問が見つかりません';
+        } else if (response.status === 401) {
+          errorMessage = 'ログインが必要です';
+        } else {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        }
+        alert(errorMessage);
       }
     } catch (error) {
       logger.error('Answer submission failed', { data: error instanceof Error ? error : new Error(String(error)) });
@@ -187,8 +216,18 @@ export default function CompanyQuestionsPage() {
         // 統計を再読み込み
         loadQuestions();
       } else {
-        const errorData = await response.json();
-        alert(errorData.error || 'ステータスの更新に失敗しました');
+        let errorMessage = 'ステータスの更新に失敗しました';
+        if (response.status === 403) {
+          errorMessage = 'この質問のステータスを更新する権限がありません';
+        } else if (response.status === 404) {
+          errorMessage = '質問が見つかりません';
+        } else if (response.status === 401) {
+          errorMessage = 'ログインが必要です';
+        } else {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        }
+        alert(errorMessage);
       }
     } catch (error) {
       logger.error('Status update failed', { data: error instanceof Error ? error : new Error(String(error)) });

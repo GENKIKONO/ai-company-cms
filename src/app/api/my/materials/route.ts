@@ -121,13 +121,12 @@ export async function POST(request: NextRequest) {
     }
 
     // 組織情報取得（プラン制限チェック用）
-    const { data: orgData, error: orgError } = await supabase
+    const { data: orgs, error: orgError } = await supabase
       .from('organizations')
       .select('id, plan')
-      .eq('id', body.organizationId)
-      .single();
+      .eq('id', body.organizationId);
 
-    if (orgError || !orgData) {
+    if (orgError) {
       logger.error('[my/materials] POST Organization data fetch failed', { 
         userId: authData.user.id, 
         organizationId: body.organizationId,
@@ -137,6 +136,14 @@ export async function POST(request: NextRequest) {
         error: 'INTERNAL_ERROR', 
         message: '組織情報の取得に失敗しました' 
       }, { status: 500 });
+    }
+
+    const orgData = orgs?.[0];
+    if (!orgData) {
+      return NextResponse.json({ 
+        error: 'ORGANIZATION_NOT_FOUND', 
+        message: '組織が見つかりません' 
+      }, { status: 404 });
     }
 
     // プラン制限チェック（effective-features使用）
@@ -189,8 +196,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from('sales_materials')
       .insert([materialData])
-      .select()
-      .single();
+      .select();
 
     if (error) {
       logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });

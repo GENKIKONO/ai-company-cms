@@ -52,9 +52,12 @@ export default function EditServicePage() {
   const fetchService = useCallback(async () => {
     try {
       const response = await fetch(`/api/my/services/${serviceId}`);
-      if (!response.ok) throw new Error('Failed to fetch service');
+      if (!response.ok) {
+        setError('サービスの読み込みに失敗しました');
+        return;
+      }
       
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ data: null, error: 'Failed to parse response' }));
       const serviceData = result.data;
       
       setService(serviceData);
@@ -111,7 +114,7 @@ export default function EditServicePage() {
         body: JSON.stringify(submitData)
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ ok: false, error: 'Failed to parse response' }));
 
       if (result.ok) {
         router.replace('/dashboard/services');

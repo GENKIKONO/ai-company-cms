@@ -16,14 +16,28 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's organization
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: userProfiles, error: profileError } = await supabase
       .from('app_users')
       .select('organization_id')
-      .eq('id', user.id)
-      .single();
+      .eq('id', user.id);
 
-    if (profileError || !userProfile?.organization_id) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+    if (profileError) {
+      logger.error('[Reports API] Failed to fetch user profile', { data: profileError });
+      return NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 });
+    }
+
+    const userProfile = userProfiles?.[0];
+    if (!userProfile?.organization_id) {
+      return NextResponse.json({ 
+        success: true,
+        data: [],
+        pagination: {
+          total: 0,
+          limit: 50,
+          offset: 0,
+          has_more: false
+        }
+      });
     }
 
     const organizationId = userProfile.organization_id;
@@ -126,13 +140,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's organization
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: userProfiles, error: profileError } = await supabase
       .from('app_users')
       .select('organization_id')
-      .eq('id', user.id)
-      .single();
+      .eq('id', user.id);
 
-    if (profileError || !userProfile?.organization_id) {
+    if (profileError) {
+      logger.error('[Reports API] Failed to fetch user profile in POST', { data: profileError });
+      return NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 });
+    }
+
+    const userProfile = userProfiles?.[0];
+    if (!userProfile?.organization_id) {
       return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
     }
 
@@ -162,15 +181,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if report already exists
-    const { data: existingReport, error: checkError } = await supabase
+    const { data: existingReports, error: checkError } = await supabase
       .from('monthly_reports')
       .select('id, status')
       .eq('organization_id', organizationId)
       .eq('year', year)
-      .eq('month', month)
-      .single();
+      .eq('month', month);
 
-    if (checkError && checkError.code !== 'PGRST116') { // Not "not found" error
+    if (checkError) {
       logger.error('[Reports API] Error checking existing report', { data: checkError });
       return NextResponse.json(
         { error: 'Failed to check existing reports' },
@@ -178,6 +196,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const existingReport = existingReports?.[0];
     if (existingReport) {
       if (existingReport.status === 'generating') {
         return NextResponse.json(

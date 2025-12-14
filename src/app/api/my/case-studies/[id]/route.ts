@@ -41,7 +41,7 @@ export async function GET(
       .from('case_studies')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -106,7 +106,7 @@ export async function PUT(
       .select('id, organization_id, created_by')
       .eq('id', id)
       .eq('created_by', authData.user.id) // RLS compliance: 作成者のみ更新可能
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingCaseStudy) {
       return NextResponse.json(
@@ -135,7 +135,7 @@ export async function PUT(
       .update(updateData)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       return NextResponse.json(
@@ -189,7 +189,7 @@ export async function DELETE(
       .select('id, created_by')
       .eq('id', id)
       .eq('created_by', authData.user.id) // RLS compliance: 作成者のみ削除可能
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingCaseStudy) {
       return NextResponse.json(

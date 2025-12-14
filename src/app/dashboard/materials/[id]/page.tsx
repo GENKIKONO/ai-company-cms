@@ -22,10 +22,11 @@ export default function MaterialViewPage() {
       const response = await fetch(`/api/my/materials/${materialId}`);
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        setError(`HTTP ${response.status}: ${response.statusText}`);
+        return;
       }
       
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ error: 'Failed to parse response', data: null }));
       setMaterial(result.data);
       setError(null);
     } catch (err) {

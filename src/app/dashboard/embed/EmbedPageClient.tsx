@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect , useCallback} from 'react';
+import { ROUTES } from '@/lib/routes';
 import { WidgetPreview } from '@/components/embed/WidgetPreview';
 import { getCurrentUser } from '@/lib/auth';
 import { HIGButton } from '@/design-system';
@@ -191,13 +192,13 @@ export default function EmbedPageClient({ embedsQuota }: EmbedPageClientProps) {
               再試行
             </button>
             <div>
-              <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm" replace>
+              <Link href={ROUTES.dashboard} className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm" replace>
                 ダッシュボードに戻る
               </Link>
             </div>
             {error.includes('企業情報を作成') && (
               <div>
-                <Link href="/dashboard/company" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm">
+                <Link href={ROUTES.dashboardCompany} className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm">
                   企業情報を作成する
                 </Link>
               </div>

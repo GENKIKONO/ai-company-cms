@@ -28,7 +28,7 @@ export default function OrgAIChatPage() {
             .select('organization_id')
             .eq('user_id', user.id)
             .eq('role', 'owner')
-            .single();
+            .maybeSingle();
           
           if (userOrg) {
             setOrganizationId(userOrg.organization_id);

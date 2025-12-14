@@ -18,9 +18,13 @@ async function isGroupOwnerAdmin(groupId: string, userId: string): Promise<boole
       .from('organization_groups')
       .select('owner_organization_id')
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
 
-    if (error || !group) {
+    if (error) {
+      return false;
+    }
+
+    if (!group) {
       return false;
     }
 
@@ -86,9 +90,20 @@ export async function PATCH(
       .select('id, group_id')
       .eq('id', inviteId)
       .eq('group_id', groupId)
-      .single();
+      .maybeSingle();
 
-    if (existingError || !existingInvite) {
+    if (existingError) {
+      logger.error('Error fetching invite for verification', {
+        component: 'group-invite-manage-api',
+        operation: 'verify-invite',
+        groupId,
+        inviteId,
+        error: existingError.message
+      });
+      return NextResponse.json({ error: 'Failed to verify invite' }, { status: 500 });
+    }
+
+    if (!existingInvite) {
       return NextResponse.json({ error: 'Invite not found' }, { status: 404 });
     }
 
@@ -127,7 +142,7 @@ export async function PATCH(
         created_at,
         revoked_at
       `)
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('Error updating group invite', {

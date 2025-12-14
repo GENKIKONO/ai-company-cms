@@ -41,16 +41,17 @@ export async function GET(
       .from('faqs')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        return createNotFoundError('FAQ');
-      }
       return NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
       );
+    }
+
+    if (!data) {
+      return createNotFoundError('FAQ');
     }
 
     return NextResponse.json({ data });
@@ -89,7 +90,7 @@ export async function PUT(
       .from('faqs')
       .select('id')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingFAQ) {
       return createNotFoundError('FAQ');
@@ -107,7 +108,7 @@ export async function PUT(
       .update(updateData)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       return NextResponse.json(
@@ -150,7 +151,7 @@ export async function DELETE(
       .from('faqs')
       .select('id')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingFAQ) {
       return createNotFoundError('FAQ');

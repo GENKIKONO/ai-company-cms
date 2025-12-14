@@ -71,7 +71,7 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ success: false, error: 'Invalid response format' }));
 
       if (!response.ok || !result.success) {
         logger.error('[CHAT] API error:', { data: result });

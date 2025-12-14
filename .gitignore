@@ -60,3 +60,5 @@ ehthumbs.db
 
 # Stage documentation (temporary)
 stage1-task*.md
+playwright-report/
+test-results/

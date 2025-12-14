@@ -6,10 +6,9 @@
  * フィールド追加・変更時は Supabase 側と整合性を保つこと
  */
 
-// Supabase RPC の生戻り値型（snake_case）
+// Supabase RPC の生戻り値型（organizations テーブルベース）
 export interface GetMyOrganizationsSlimRow {
-  user_id: string;
-  organization_id: string;
+  id: string; // organizations.id
   name: string;
   slug: string;
   plan: string;
@@ -70,7 +69,7 @@ export interface MeApiResponse {
 // ヘルパー関数：RPC結果を正規化
 export function normalizeOrganizationSummary(row: GetMyOrganizationsSlimRow): OrganizationSummary {
   return {
-    id: row.organization_id,
+    id: row.id,
     name: row.name,
     slug: row.slug,
     plan: (row.plan as OrganizationSummary['plan']) || 'free',

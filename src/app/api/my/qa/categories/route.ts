@@ -122,13 +122,19 @@ export async function POST(req: NextRequest) {
       .from('qa_categories')
       .insert(categoryData)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       if (error.code === '23505') {
         return NextResponse.json({ error: 'Category slug already exists' }, { status: 409 });
       }
       logger.error('Error creating category', { data: error instanceof Error ? error : new Error(String(error)) });
+      return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });
+    }
+
+    // .maybeSingle()はデータなしでもerrorにならないため明示的null分岐
+    if (!category) {
+      logger.error('Error creating category: no data returned from insert');
       return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });
     }
 

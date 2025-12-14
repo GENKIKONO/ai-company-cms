@@ -82,6 +82,8 @@ interface VisibilityResponse {
     improvement_needed_urls: number; // スコア50以下
     last_calculation: string | null;
   };
+  is_fallback?: boolean;
+  fallback_reason?: string;
 }
 
 // GET - AI Visibility Score 取得
@@ -120,6 +122,27 @@ export async function GET(request: NextRequest) {
       .limit(limit);
 
     if (scoresError) {
+      // Check for missing table (fail-open)
+      if (scoresError.code === '42P01' || scoresError.message?.includes('does not exist')) {
+        logger.debug('ai_visibility_scores table missing, returning empty data', { orgId });
+        const fallbackResponse: VisibilityResponse = {
+          organization_id: orgId,
+          overall_score: 0,
+          score_trend: [],
+          content_scores: [],
+          summary: {
+            total_analyzed_urls: 0,
+            average_score: 0,
+            top_performing_urls: 0,
+            improvement_needed_urls: 0,
+            last_calculation: null,
+          },
+          is_fallback: true,
+          fallback_reason: 'MISSING_TABLE'
+        };
+        return NextResponse.json(fallbackResponse);
+      }
+      
       logger.error('Error fetching visibility scores:', { data: scoresError });
       return NextResponse.json(
         { error: 'Database error', message: scoresError.message },
@@ -139,6 +162,7 @@ export async function GET(request: NextRequest) {
       .order('calculated_at', { ascending: true });
 
     if (trendError) {
+      // Check for missing table (fail-open) - already returned early if table missing
       logger.error('Error fetching trend data:', { data: trendError });
       return NextResponse.json(
         { error: 'Database error', message: trendError.message },

@@ -81,7 +81,10 @@ export async function GET(request: NextRequest): Promise<NextResponse<InterviewQ
 
     if (axesError) {
       logger.error('Failed to fetch interview axes', axesError);
-      throw new Error(`Failed to fetch axes: ${axesError.message}`);
+      return NextResponse.json(
+        { error: `Failed to fetch axes: ${axesError.message}` },
+        { status: 500 }
+      );
     }
 
     // 2. 質問を取得（指定されたcontentType・langでフィルタ）
@@ -95,7 +98,10 @@ export async function GET(request: NextRequest): Promise<NextResponse<InterviewQ
 
     if (questionsError) {
       logger.error('Failed to fetch interview questions', questionsError);
-      throw new Error(`Failed to fetch questions: ${questionsError.message}`);
+      return NextResponse.json(
+        { error: `Failed to fetch questions: ${questionsError.message}` },
+        { status: 500 }
+      );
     }
 
     // 3. 組織キーワードを取得（organizationIdが指定されている場合のみ）

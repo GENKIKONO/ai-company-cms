@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
         .from('users')
         .select('id, email')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       logger.debug('[my/organization] Public user existence check', {
         userId: user.id,
@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
             updated_at: new Date().toISOString()
           })
           .select()
-          .single();
+          .maybeSingle();
 
         if (createUserError) {
           logger.error('[my/organization] Failed to create user:', { data: createUserError });
@@ -496,7 +496,7 @@ export async function POST(request: NextRequest) {
       .from('organizations')
       .insert([insertPayload])
       .select()
-      .single();
+      .maybeSingle();
     
     logger.debug('[ORG/CREATE] Insert result', { 
       success: !error, 
@@ -664,7 +664,7 @@ export async function PUT(request: NextRequest) {
       .from('organizations')
       .select('id, slug, created_by')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingOrg) {
       logger.error('[PUT organization] Organization not found or access denied', {
@@ -690,7 +690,7 @@ export async function PUT(request: NextRequest) {
         .select('id')
         .eq('slug', updateInput.slug)
         .neq('id', existingOrg.id)
-        .single();
+        .maybeSingle();
 
       if (slugCheck) {
         return conflictError('Organization', 'slug');
@@ -868,7 +868,7 @@ export async function DELETE(request: NextRequest) {
       .from('organizations')
       .select('id')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingOrg) {
       return notFoundError('Organization');

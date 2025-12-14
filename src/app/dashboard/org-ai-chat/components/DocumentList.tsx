@@ -35,7 +35,7 @@ export default function DocumentList({ organizationId }: DocumentListProps) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({ error: 'Invalid response format' }));
         
         if (response.status === 401) {
           throw new Error('認証が必要です。ログインし直してください。');
@@ -50,7 +50,7 @@ export default function DocumentList({ organizationId }: DocumentListProps) {
         }
       }
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ success: false, error: 'Invalid response format' }));
       
       if (result.success) {
         setDocuments(result.documents || []);

@@ -15,9 +15,14 @@ export default function PerformanceMetrics({ organizationId }: PerformanceMetric
   useEffect(() => {
     async function fetchStats() {
       try {
+        if (!organizationId) {
+          setStats(getDefaultStats());
+          return;
+        }
+        
         const response = await fetch(`/api/dashboard/stats?organizationId=${organizationId}`);
         if (response.ok) {
-          const data = await response.json();
+          const data = await response.json().catch(() => ({}));
           setStats(data);
         } else {
           // API失敗時もデフォルトスキーマで表示を継続

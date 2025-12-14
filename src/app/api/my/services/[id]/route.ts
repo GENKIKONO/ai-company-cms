@@ -42,7 +42,7 @@ export async function GET(
       .from('organizations')
       .select('id')
       .eq('created_by', authData.user.id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !organization) {
       return createNotFoundError('Organization');
@@ -104,7 +104,7 @@ export async function PUT(
       .from('organizations')
       .select('id')
       .eq('created_by', authData.user.id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !organization) {
       return createNotFoundError('Organization');
@@ -188,7 +188,7 @@ export async function DELETE(
       .from('organizations')
       .select('id')
       .eq('created_by', authData.user.id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !organization) {
       return createNotFoundError('Organization');

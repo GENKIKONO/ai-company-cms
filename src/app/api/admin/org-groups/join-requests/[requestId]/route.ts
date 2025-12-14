@@ -27,9 +27,13 @@ async function canManageJoinRequest(requestId: string, userId: string): Promise<
         )
       `)
       .eq('id', requestId)
-      .single();
+      .maybeSingle();
 
-    if (error || !request || !request.group) {
+    if (error) {
+      return false;
+    }
+
+    if (!request || !request.group) {
       return false;
     }
 
@@ -44,11 +48,15 @@ async function canManageJoinRequest(requestId: string, userId: string): Promise<
 
     // Check system admin role
     // TODO: [SUPABASE_TYPE_FOLLOWUP] profiles テーブルの型定義を Supabase client に追加
-    const { data: profile } = await (supabaseAdmin as any)
+    const { data: profile, error: profileError } = await (supabaseAdmin as any)
       .from('profiles')
       .select('role')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
+
+    if (profileError) {
+      return false;
+    }
 
     if (profile?.role === 'admin') {
       return true;
@@ -130,9 +138,19 @@ export async function POST(
         reason
       `)
       .eq('id', requestId)
-      .single();
+      .maybeSingle();
 
-    if (requestError || !joinRequest) {
+    if (requestError) {
+      logger.error('Error fetching join request details', {
+        component: 'join-request-decision-api',
+        operation: 'decide',
+        requestId,
+        error: requestError.message
+      });
+      return NextResponse.json({ error: 'Failed to fetch join request' }, { status: 500 });
+    }
+
+    if (!joinRequest) {
       return NextResponse.json({ error: 'Join request not found' }, { status: 404 });
     }
 
@@ -149,12 +167,24 @@ export async function POST(
     try {
       if (decision === 'approve') {
         // Check if organization is already a member (double-check)
-        const { data: existingMember } = await supabaseAdmin
+        const { data: existingMember, error: memberCheckError } = await supabaseAdmin
           .from('org_group_members')
           .select('id')
           .eq('group_id', joinRequest.group_id)
           .eq('organization_id', joinRequest.organization_id)
-          .single();
+          .maybeSingle();
+
+        if (memberCheckError) {
+          logger.error('Error checking existing membership', {
+            component: 'join-request-decision-api',
+            operation: 'approve',
+            requestId,
+            error: memberCheckError.message
+          });
+          return NextResponse.json({ 
+            error: 'Failed to verify membership status' 
+          }, { status: 500 });
+        }
 
         if (!existingMember) {
           // Add organization to group
@@ -233,7 +263,7 @@ export async function POST(
             company_name
           )
         `)
-        .single();
+        .maybeSingle();
 
       if (updateError) {
         logger.error('Error updating join request status', {
@@ -242,6 +272,18 @@ export async function POST(
           requestId,
           decision,
           error: updateError.message
+        });
+        return NextResponse.json({ 
+          error: 'Failed to update join request status' 
+        }, { status: 500 });
+      }
+
+      if (!updatedRequest) {
+        logger.error('Update succeeded but no data returned', {
+          component: 'join-request-decision-api',
+          operation: 'decide',
+          requestId,
+          decision
         });
         return NextResponse.json({ 
           error: 'Failed to update join request status' 

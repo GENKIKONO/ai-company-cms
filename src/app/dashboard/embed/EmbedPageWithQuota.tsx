@@ -6,8 +6,7 @@
  * - 制限ロジックには一切関与しない（fail-open設計）
  */
 
-import { getCurrentUser } from '@/lib/auth';
-import { getOrganization } from '@/lib/organizations';
+import { getCurrentUserOrganization } from '@/lib/organizations-server';
 import { fetchOrgQuotaUsage } from '@/lib/org-features';
 import type { SimpleQuotaProps } from '@/components/quota/OrgQuotaBadge';
 import EmbedPageClient from './EmbedPageClient';
@@ -31,15 +30,12 @@ export default async function EmbedPageWithQuota() {
   let embedsQuota: SimpleQuotaProps | null = null;
   
   try {
-    // 組織情報を取得
-    const user = await getCurrentUser();
-    if (user?.id) {
-      const organization = await getOrganization(user.id);
-      if (organization?.data?.id) {
-        // Quota 情報を取得（fail-open）
-        const quotaData = await fetchOrgQuotaUsage(organization.data.id, 'embeds');
-        embedsQuota = normalizeQuotaForProps(quotaData);
-      }
+    // 組織情報を取得（Server専用関数を使用）
+    const organization = await getCurrentUserOrganization();
+    if (organization?.id) {
+      // Quota 情報を取得（fail-open）
+      const quotaData = await fetchOrgQuotaUsage(organization.id, 'embeds');
+      embedsQuota = normalizeQuotaForProps(quotaData);
     }
   } catch (error) {
     // fail-open: エラー時はquotaをnullのままにして、Client Componentは従来通り動作

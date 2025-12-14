@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       .select('id, created_by')
       .eq('id', organization_id)
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !organization) {
       return NextResponse.json({ 

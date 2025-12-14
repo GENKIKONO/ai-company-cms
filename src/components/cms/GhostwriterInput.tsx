@@ -109,7 +109,7 @@ export function GhostwriterInput({ organizationId, organizationSlug }: Ghostwrit
       const result = await response.json();
       
       toast({
-        title: "🎉 AI生成完了!",
+        title: "AI生成完了!",
         description: "企業情報が自動生成されました。データを確認してください。",
       });
 

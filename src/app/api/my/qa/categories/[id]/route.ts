@@ -19,7 +19,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       .from('organizations')
       .select('id')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       .select('*')
       .eq('id', id)
       .or(`organization_id.eq.${organization.id},visibility.eq.global`)
-      .single();
+      .maybeSingle();
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -85,7 +85,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       .from('organizations')
       .select('id')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
@@ -120,7 +120,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       .eq('id', id)
       .eq('organization_id', organization.id)
       .eq('visibility', 'org')
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingCategory) {
       return NextResponse.json({ error: 'Category not found or access denied' }, { status: 404 });
@@ -146,7 +146,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       .update(updateData)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       if (error.code === '23505') {
@@ -194,7 +194,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       .from('organizations')
       .select('id')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
@@ -229,7 +229,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       .eq('id', id)
       .eq('organization_id', organization.id)
       .eq('visibility', 'org')
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingCategory) {
       return NextResponse.json({ error: 'Category not found or access denied' }, { status: 404 });

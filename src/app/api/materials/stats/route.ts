@@ -51,11 +51,10 @@ export async function POST(request: NextRequest) {
         const { data: orgData } = await supabase
           .from('organizations')
           .select('id')
-          .eq('created_by', user.id)
-          .single();
+          .eq('created_by', user.id);
         
-        if (orgData) {
-          company_id = orgData.id;
+        if (orgData && orgData.length > 0) {
+          company_id = orgData[0].id;
         }
       }
     } catch (error) {
@@ -76,8 +75,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await serviceSupabase
       .from('sales_materials_stats')
       .insert([statsData])
-      .select()
-      .single();
+      .select();
 
     if (error) {
       logger.error('Error inserting material stats', { data: error instanceof Error ? error : new Error(String(error)) });
@@ -87,12 +85,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const insertedRecord = Array.isArray(data) ? data[0] : data;
     return NextResponse.json({ 
       success: true,
       data: {
-        id: data.id,
-        action: data.action,
-        created_at: data.created_at
+        id: insertedRecord?.id,
+        action: insertedRecord?.action,
+        created_at: insertedRecord?.created_at
       }
     });
 

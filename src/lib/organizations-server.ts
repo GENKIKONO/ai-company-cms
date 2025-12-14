@@ -1,4 +1,5 @@
 // src/lib/organizations-server.ts
+import 'server-only';
 import { createClient } from '@/lib/supabase/server';
 import { unstable_cache } from 'next/cache';
 import { logger } from '@/lib/log';

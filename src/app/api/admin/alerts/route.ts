@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       .from('app_users')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (profileError || !userProfile || (userProfile as any).role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
       .from('app_users')
       .select('role, full_name')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (profileError || !userProfile || (userProfile as any).role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });

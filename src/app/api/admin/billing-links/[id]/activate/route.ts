@@ -22,7 +22,7 @@ export async function PUT(
       .from('billing_checkout_links')
       .select('plan_type, campaign_type')
       .eq('id', linkId)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !targetLink) {
       return NextResponse.json(
@@ -52,7 +52,7 @@ export async function PUT(
       .update({ is_active: true })
       .eq('id', linkId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (activateError) {
       logger.error('Failed to activate target link', { data: activateError instanceof Error ? activateError : new Error(String(activateError)) });

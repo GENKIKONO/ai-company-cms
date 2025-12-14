@@ -27,12 +27,35 @@ export function PdfDownloadButton({
       const response = await fetch(`/api/my/reports/monthly/${period}/pdf`);
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.details || 'PDFの生成に失敗しました');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || errorData.details || 'PDFの生成に失敗しました');
+      }
+
+      // Check content-type to ensure it's actually a PDF
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/pdf')) {
+        // Try to get error details from response text (limit to avoid large content)
+        let errorDetail = 'サーバーの応答形式が正しくありません';
+        try {
+          const text = await response.text();
+          if (text.length < 500) {
+            const jsonData = JSON.parse(text);
+            if (jsonData.message) errorDetail = jsonData.message;
+          }
+        } catch {
+          // Ignore parse errors
+        }
+        throw new Error(errorDetail);
       }
 
       // PDFファイルをダウンロード
       const blob = await response.blob();
+      
+      // Validate blob type as additional safety check
+      if (blob.type && !blob.type.includes('application/pdf')) {
+        throw new Error('ダウンロードデータがPDF形式ではありません');
+      }
+      
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -44,14 +67,13 @@ export function PdfDownloadButton({
 
     } catch (err) {
       console.error('PDF download failed:', err);
-      setError(err instanceof Error ? err.message : 'PDFダウンロードに失敗しました');
-    } finally {
-      setLoading(false);
+      const errorMessage = err instanceof Error ? err.message : 'PDFダウンロードに失敗しました';
+      setError(errorMessage);
       
       // エラーを3秒後にクリア
-      if (error) {
-        setTimeout(() => setError(null), 3000);
-      }
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setLoading(false);
     }
   };
 

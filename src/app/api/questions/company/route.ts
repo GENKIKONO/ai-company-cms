@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       .from('organizations')
       .select('id, name')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !orgData) {
       return NextResponse.json(

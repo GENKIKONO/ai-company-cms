@@ -1,8 +1,6 @@
 'use client';
 
-import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
-import { HIGButton, SecondaryCTA } from '@/design-system';
 
 export default function GlobalError({
   error,
@@ -12,8 +10,8 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Capture error in Sentry
-    Sentry.captureException(error);
+    // Log error to console instead of Sentry in global-error
+    console.error('Global error:', error);
   }, [error]);
 
   return (
@@ -36,21 +34,19 @@ export default function GlobalError({
             </div>
             
             <div className="space-y-3">
-              <HIGButton variant="primary"
+              <button
                 onClick={reset}
-                size="md"
-                className="w-full"
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
                 再試行
-              </HIGButton>
+              </button>
               
-              <SecondaryCTA
+              <button
                 onClick={() => window.location.href = '/'}
-                size="medium"
-                className="w-full"
+                className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
               >
                 ホームに戻る
-              </SecondaryCTA>
+              </button>
             </div>
             
             {process.env.NODE_ENV === 'development' && (

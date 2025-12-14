@@ -65,7 +65,7 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
       });
       
       if (featureResponse.ok) {
-        const featureData = await featureResponse.json();
+        const featureData = await featureResponse.json().catch(() => ({}));
         logger.debug('AI feature status loaded via effective-features', {
           hasAccess: featureData.hasAccess,
           level: featureData.level,
@@ -125,12 +125,12 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
       let botLogsResult = null;
 
       if (visibilityResponse.ok) {
-        visibilityResult = await visibilityResponse.json();
+        visibilityResult = await visibilityResponse.json().catch(() => null);
         setVisibilityData(visibilityResult);
       }
 
       if (botLogsResponse.ok) {
-        botLogsResult = await botLogsResponse.json();
+        botLogsResult = await botLogsResponse.json().catch(() => null);
         setBotLogsData(botLogsResult);
       }
 

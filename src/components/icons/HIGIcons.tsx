@@ -341,6 +341,55 @@ export const PartnershipIcon = createIcon(
   </>
 );
 
+export const LockIcon = createIcon(
+  'LockIcon',
+  <>
+    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </>
+);
+
+export const BarChartIcon = createIcon(
+  'BarChartIcon',
+  <>
+    <line x1="12" x2="12" y1="20" y2="10" />
+    <line x1="18" x2="18" y1="20" y2="4" />
+    <line x1="6" x2="6" y1="20" y2="16" />
+  </>
+);
+
+export const BulbIcon = createIcon(
+  'BulbIcon',
+  <>
+    <path d="M9 21h6" />
+    <path d="M12 3a6 6 0 0 1 6 6c0 2-1 3-2 4v2a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-2c-1-1-2-2-2-4a6 6 0 0 1 6-6z" />
+  </>
+);
+
+export const ClipboardIcon = createIcon(
+  'ClipboardIcon',
+  <>
+    <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+  </>
+);
+
+export const BriefcaseIcon = createIcon(
+  'BriefcaseIcon',
+  <>
+    <path d="M20 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z" />
+    <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </>
+);
+
+export const CelebrationIcon = createIcon(
+  'CelebrationIcon',
+  <>
+    <path d="M6 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v2l-2 5v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10L5 5V3z" />
+    <path d="m8 8 2 2 4-4" />
+  </>
+);
+
 // Icon component with size variants
 export const Icon = React.forwardRef<SVGSVGElement, IconProps & { name: string }>(
   ({ name, ...props }, ref) => {

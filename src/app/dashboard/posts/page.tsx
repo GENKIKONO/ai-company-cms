@@ -6,50 +6,23 @@ import type { Post } from '@/types/legacy/database';;
 import { HIGButton } from '@/design-system';
 import PublicPageLinks from '../components/PublicPageLinks';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
-import { supabaseBrowser } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
+import { useOrganization } from '@/lib/hooks/useOrganization';
 
 export default function PostsManagementPage() {
+  const { organization, isLoading: orgLoading } = useOrganization();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [organizationId, setOrganizationId] = useState<string>('');
-
-  useEffect(() => {
-    const getOrganizationId = async () => {
-      try {
-        const supabase = supabaseBrowser;
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          const { data: userOrg } = await supabase
-            .from('user_organizations')
-            .select('organization_id')
-            .eq('user_id', user.id)
-            .eq('role', 'owner')
-            .single();
-          
-          if (userOrg) {
-            setOrganizationId(userOrg.organization_id);
-          }
-        }
-      } catch (error) {
-        logger.error('Failed to get organization ID:', { data: error });
-        setError('組織情報の取得に失敗しました');
-      }
-    };
-
-    getOrganizationId();
-  }, []);
 
   const fetchPosts = useCallback(async () => {
-    if (!organizationId) return;
+    if (!organization?.id) return;
     
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`/api/my/posts?organizationId=${organizationId}`, {
+      const response = await fetch(`/api/my/posts?organizationId=${organization.id}`, {
         cache: 'no-store',
         headers: {
           'Content-Type': 'application/json'
@@ -60,9 +33,11 @@ export default function PostsManagementPage() {
         const errorData = await response.json().catch(() => ({}));
         
         if (response.status === 401) {
-          throw new Error('認証が必要です。ログインし直してください。');
+          setError('認証が必要です。ログインし直してください。');
+          return;
         } else if (response.status === 404) {
-          throw new Error('企業情報が見つかりません。');
+          setError('企業情報が見つかりません。');
+          return;
         } else if (response.status >= 500) {
           const errorMsg = errorData.error || 'サーバーエラーが発生しました。しばらく後にお試しください。';
           const logDetails = errorData.code ? ` (${errorData.code})` : '';
@@ -73,10 +48,12 @@ export default function PostsManagementPage() {
             details: errorData.details,
             hint: errorData.hint
           });
-          throw new Error(errorMsg + logDetails);
+          setError(errorMsg + logDetails);
+          return;
         } else {
           const errorMsg = errorData.error || errorData.message || response.statusText;
-          throw new Error(`HTTP ${response.status}: ${errorMsg}`);
+          setError(`HTTP ${response.status}: ${errorMsg}`);
+          return;
         }
       }
       
@@ -102,13 +79,13 @@ export default function PostsManagementPage() {
     } finally {
       setLoading(false);
     }
-  }, [organizationId]);
+  }, [organization?.id]);
 
   useEffect(() => {
-    if (organizationId) {
+    if (organization?.id) {
       fetchPosts();
     }
-  }, [organizationId, fetchPosts]);
+  }, [organization?.id, fetchPosts]);
 
   const handleDelete = useCallback(async (id: string) => {
     if (!confirm('この記事を削除しますか？')) return;
@@ -154,7 +131,8 @@ export default function PostsManagementPage() {
     return text[status as keyof typeof text] || '不明';
   };
 
-  if (loading) {
+  // 組織情報の読み込み中またはPOSTS読み込み中
+  if (orgLoading || (loading && organization?.id)) {
     return (
       <div className="min-h-screen bg-gray-50">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -165,6 +143,24 @@ export default function PostsManagementPage() {
                 <div key={i} className="h-24 bg-gray-200 rounded"></div>
               ))}
             </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // 組織情報が確定していない場合
+  if (!organization?.id) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              組織情報が必要です
+            </h2>
+            <p className="text-gray-600">
+              記事を管理するには組織情報が必要です。
+            </p>
           </div>
         </main>
       </div>

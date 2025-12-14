@@ -37,44 +37,60 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid period format. Use YYYY-MM' }, { status: 400 });
     }
 
-    // レポートデータを取得
+    // レポートデータを取得（.single()禁止 → .maybeSingle()で安全化）
     const { data: report, error } = await supabase
       .from('ai_monthly_reports')
       .select('*')
       .eq('organization_id', organizationId)
       .eq('period_start', periodDate.start)
       .eq('period_end', periodDate.end)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json({ error: 'Report not found' }, { status: 404 });
-      }
-      throw error;
+      console.error('Failed to query ai_monthly_reports for PDF:', error);
+      return NextResponse.json(
+        { 
+          error: 'Failed to fetch report for PDF',
+          details: error.message 
+        },
+        { status: 500 }
+      );
     }
 
-    // 組織情報も取得（PDF表紙用）
-    const { data: organization } = await supabase
+    // .maybeSingle()はデータなしでもerrorにならないため明示的null分岐
+    if (!report) {
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+    }
+
+    // 組織情報も取得（PDF表紙用・.single()禁止 → .maybeSingle()で安全化）
+    const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('name')
       .eq('id', organizationId)
-      .single();
+      .maybeSingle();
+
+    if (orgError) {
+      console.error('Failed to query organization for PDF:', orgError);
+      return NextResponse.json(
+        { 
+          error: 'Failed to fetch organization info for PDF',
+          details: orgError.message 
+        },
+        { status: 500 }
+      );
+    }
 
     // HTML生成（ブラウザでPDF印刷可能）
     const htmlContent = generateHtmlReport(report, organization);
 
-    // HTMLファイル名を生成
-    const fileName = `ai-monthly-report-${resolvedParams.period}.html`;
-
-    // HTMLファイルとしてレスポンス（ブラウザがPDF変換可能）
-    return new NextResponse(htmlContent, {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Content-Disposition': `inline; filename="${fileName}"`,
-        'Cache-Control': 'no-cache',
+    // PDF generation is not implemented - return 501 Not Implemented
+    return NextResponse.json(
+      {
+        error: 'Not Implemented',
+        message: 'PDF生成機能は現在実装されていません。HTMLプレビューをご利用ください。'
       },
-    });
+      { status: 501 }
+    );
 
   } catch (error) {
     console.error('Failed to generate PDF report:', error);

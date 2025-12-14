@@ -1,0 +1,4394 @@
+{
+  "throwError": {
+    "count": 67,
+    "violations": [
+      {
+        "file": "src/app/dashboard/admin/billing-links/page.tsx",
+        "line": 68,
+        "content": "throw new Error(`HTTP ${response.status}: ${response.statusText}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/admin/billing-links/page.tsx",
+        "line": 94,
+        "content": "throw new Error(`HTTP ${response.status}: ${response.statusText}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/admin/billing-links/page.tsx",
+        "line": 124,
+        "content": "throw new Error(errorData.error || `HTTP ${response.status}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/ai-citations/page.tsx",
+        "line": 225,
+        "content": "throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/ai-citations/page.tsx",
+        "line": 231,
+        "content": "throw new Error((result as AICitationsApiErrorResponse).message);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/[period]/page.tsx",
+        "line": 50,
+        "content": "throw new Error('指定された期間のレポートが見つかりません');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/[period]/page.tsx",
+        "line": 52,
+        "content": "throw new Error('レポートの取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/components/PdfDownloadButton.tsx",
+        "line": 31,
+        "content": "throw new Error(errorData.message || errorData.details || 'PDFの生成に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/components/PdfDownloadButton.tsx",
+        "line": 48,
+        "content": "throw new Error(errorDetail);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/components/PdfDownloadButton.tsx",
+        "line": 56,
+        "content": "throw new Error('ダウンロードデータがPDF形式ではありません');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/components/RegenerateButton.tsx",
+        "line": 40,
+        "content": "throw new Error(error.details || error.message || 'レポートの再生成に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/page.tsx",
+        "line": 40,
+        "content": "throw new Error(errorData.details || errorData.message || 'レポート一覧の取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/analytics/interview/InterviewAnalyticsDashboard.tsx",
+        "line": 278,
+        "content": "throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/analytics/interview/InterviewAnalyticsDashboard.tsx",
+        "line": 284,
+        "content": "throw new Error(result.message);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/analytics/interview/page.tsx",
+        "line": 64,
+        "content": "throw new Error(`View query failed: ${viewError.message}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/components/DashboardActions.tsx",
+        "line": 61,
+        "content": "throw new Error(`HTTP ${response.status}: ${response.statusText}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/components/PublishToggle.tsx",
+        "line": 40,
+        "content": "throw new Error(errorData.message || 'Failed to update publish status');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "line": 134,
+        "content": "throw new Error(`HTTP ${response.status}: ${response.statusText}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/interview/[sessionId]/page.tsx",
+        "line": 370,
+        "content": "throw new Error(errorData.error || 'Failed to load session');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/interview/[sessionId]/page.tsx",
+        "line": 375,
+        "content": "throw new Error('Failed to load session data');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/interview/[sessionId]/page.tsx",
+        "line": 398,
+        "content": "throw new Error(errorData.error || 'Failed to load questions');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/interview/history/page.tsx",
+        "line": 190,
+        "content": "throw new Error(errorData.error || 'Failed to load sessions');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/interview/history/page.tsx",
+        "line": 232,
+        "content": "throw new Error(errorData.error || 'Failed to delete session');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 152,
+        "content": "throw new Error(errorData.error || 'Failed to load interview data');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 204,
+        "content": "throw new Error(errorData.error || 'Failed to create interview session');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 212,
+        "content": "throw new Error(result.error || 'Unknown error');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/materials/[id]/page.tsx",
+        "line": 92,
+        "content": "throw new Error('Download failed');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/my-questions/page.tsx",
+        "line": 66,
+        "content": "throw new Error(errorData.error || '質問の取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/org-ai-chat/components/DocumentList.tsx",
+        "line": 41,
+        "content": "throw new Error('認証が必要です。ログインし直してください。');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/org-ai-chat/components/DocumentList.tsx",
+        "line": 43,
+        "content": "throw new Error('アクセス権限がありません。');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/org-ai-chat/components/DocumentList.tsx",
+        "line": 46,
+        "content": "throw new Error(errorMsg);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/org-ai-chat/components/DocumentList.tsx",
+        "line": 49,
+        "content": "throw new Error(`HTTP ${response.status}: ${errorMsg}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/org-ai-chat/components/DocumentList.tsx",
+        "line": 58,
+        "content": "throw new Error(result.error || '文書一覧の取得に失敗しました。');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/posts/page.tsx",
+        "line": 107,
+        "content": "throw new Error(`HTTP ${response.status}: ${errorMsg}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/qna-stats/page.tsx",
+        "line": 70,
+        "content": "throw new Error(errorData.error || `HTTP ${response.status}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/qna-stats/page.tsx",
+        "line": 125,
+        "content": "throw new Error('Export failed');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/questions/page.tsx",
+        "line": 88,
+        "content": "throw new Error(errorData.error || '質問の取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/reports/page.tsx",
+        "line": 42,
+        "content": "throw new Error('Failed to fetch reports');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/app/dashboard/reports/page.tsx",
+        "line": 72,
+        "content": "throw new Error(data.error || 'Failed to generate report');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/EmbedLimitCard.tsx",
+        "line": 55,
+        "content": "throw new Error('制限情報の取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/EmbedRealtimeStats.tsx",
+        "line": 69,
+        "content": "throw new Error('リアルタイム統計の取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/EmbedTopSources.tsx",
+        "line": 50,
+        "content": "throw new Error('人気サイトデータの取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/EmbedUsageChart.tsx",
+        "line": 51,
+        "content": "throw new Error('使用状況データの取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/Enforcement/ActionForm.tsx",
+        "line": 165,
+        "content": "throw new Error(result.error || `${selectedAction.label}処分の実行に失敗しました`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/Enforcement/NextViolationFlagPanel.tsx",
+        "line": 66,
+        "content": "throw new Error(result.error || '次の違反フラグの取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/Enforcement/NextViolationFlagPanel.tsx",
+        "line": 116,
+        "content": "throw new Error(result.error || '次の違反フラグの更新に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/Enforcement/ViolationForm.tsx",
+        "line": 96,
+        "content": "throw new Error(result.error || '違反登録に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/Enforcement/ViolationForm.tsx",
+        "line": 144,
+        "content": "throw new Error(result.error || '推奨制裁の実行に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/Enforcement/ViolationStatsPanel.tsx",
+        "line": 89,
+        "content": "throw new Error(result.error || '違反統計の取得に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/PlanFeatureMatrix.tsx",
+        "line": 35,
+        "content": "if (!response.ok) throw new Error('Failed to fetch data');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/PlanFeatureMatrix.tsx",
+        "line": 134,
+        "content": "if (!response.ok) throw new Error('Failed to save data');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/SiteSettingsForm.tsx",
+        "line": 134,
+        "content": "throw new Error(errorData.error || 'Upload failed');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/admin/SiteSettingsForm.tsx",
+        "line": 140,
+        "content": "throw new Error(result.error || 'Upload failed');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ai-citations/SessionCitationsPanel.tsx",
+        "line": 190,
+        "content": "throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ai-citations/SessionCitationsPanel.tsx",
+        "line": 196,
+        "content": "throw new Error((result as import('@/types/ai-citations').AICitationsApiErrorResponse).message);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/cms/GhostwriterInput.tsx",
+        "line": 84,
+        "content": "throw new Error('認証が必要です');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/cms/GhostwriterInput.tsx",
+        "line": 106,
+        "content": "throw new Error(errorData.error || `API Error: ${response.status}`);",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ExtractionAssistant.tsx",
+        "line": 37,
+        "content": "throw new Error(errorData.error || 'URLからの抽出に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ExtractionAssistant.tsx",
+        "line": 71,
+        "content": "throw new Error(errorData.error || 'PDFからの抽出に失敗しました');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/layout/I18nProvider.tsx",
+        "line": 82,
+        "content": "throw new Error('useI18n must be used within an I18nProvider');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ui/alert-dialog.tsx",
+        "line": 64,
+        "content": "throw new Error('AlertDialogTrigger must be used within an AlertDialog');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ui/alert-dialog.tsx",
+        "line": 83,
+        "content": "throw new Error('AlertDialogContent must be used within an AlertDialog');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ui/alert-dialog.tsx",
+        "line": 135,
+        "content": "throw new Error('AlertDialogAction must be used within an AlertDialog');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ui/alert-dialog.tsx",
+        "line": 154,
+        "content": "throw new Error('AlertDialogCancel must be used within an AlertDialog');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ui/tabs.tsx",
+        "line": 57,
+        "content": "throw new Error('TabsTrigger must be used within a Tabs component');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ui/tabs.tsx",
+        "line": 80,
+        "content": "throw new Error('TabsContent must be used within a Tabs component');",
+        "match": "throw new Error("
+      },
+      {
+        "file": "src/components/ui/toast.tsx",
+        "line": 27,
+        "content": "throw new Error('useToast must be used within a ToastProvider');",
+        "match": "throw new Error("
+      }
+    ]
+  },
+  "responseJson": {
+    "count": 228,
+    "violations": [
+      {
+        "file": "src/app/admin-login/page.tsx",
+        "line": 37,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/ai-visibility/page.tsx",
+        "line": 56,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/ai-visibility/page.tsx",
+        "line": 81,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/content-refresh/page.tsx",
+        "line": 230,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/content-refresh/page.tsx",
+        "line": 336,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/content-refresh/page.tsx",
+        "line": 339,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/embeddings/bulk/page.tsx",
+        "line": 43,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/embeddings/bulk/page.tsx",
+        "line": 94,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/embeddings/page.tsx",
+        "line": 113,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/enforcement/page.tsx",
+        "line": 94,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/material-stats/page.tsx",
+        "line": 63,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/material-stats/page.tsx",
+        "line": 67,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/metrics/components/MetricsFilters.tsx",
+        "line": 49,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/org-groups/[groupId]/page.tsx",
+        "line": 102,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/org-groups/[groupId]/page.tsx",
+        "line": 158,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/org-groups/[groupId]/page.tsx",
+        "line": 209,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/org-groups/join/page.tsx",
+        "line": 54,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/org-groups/join/page.tsx",
+        "line": 106,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/org-groups/page.tsx",
+        "line": 89,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/org-groups/page.tsx",
+        "line": 137,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/qna-stats/page.tsx",
+        "line": 75,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/qna-stats/page.tsx",
+        "line": 79,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/questions/page.tsx",
+        "line": 89,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/questions/page.tsx",
+        "line": 93,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/questions/page.tsx",
+        "line": 154,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/questions/page.tsx",
+        "line": 169,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/questions/page.tsx",
+        "line": 191,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/questions/page.tsx",
+        "line": 198,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/questions/page.tsx",
+        "line": 221,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/reviews/components/ReviewHistory.tsx",
+        "line": 43,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/reviews/page.tsx",
+        "line": 65,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/reviews/page.tsx",
+        "line": 98,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/translations/bulk/page.tsx",
+        "line": 46,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/translations/bulk/page.tsx",
+        "line": 102,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/translations/page.tsx",
+        "line": 50,
+        "content": "const result: TranslationJobsResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/translations/page.tsx",
+        "line": 67,
+        "content": "const result: TranslationMetricsResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/admin/translations/page.tsx",
+        "line": 91,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/admin/content-refresh/route.ts",
+        "line": 196,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/cron/daily/route.ts",
+        "line": 148,
+        "content": "const healthData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/interview/finalize/route.ts",
+        "line": 374,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/my/org-docs/chat/route.ts",
+        "line": 53,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/my/org-docs/chat/route.ts",
+        "line": 341,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/public/[slug]/jsonld/route.ts",
+        "line": 27,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/public/embed/[slug]/iframe/route.ts",
+        "line": 41,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/public/embed/[slug]/widget/route.ts",
+        "line": 41,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/public/embed/iframe/[slug]/route.ts",
+        "line": 41,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/public/embed/widget/[slug]/route.ts",
+        "line": 41,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/api/public/sitemap/route.ts",
+        "line": 27,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/auth/confirm/page.tsx",
+        "line": 144,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/auth/forgot-password/page.tsx",
+        "line": 28,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/auth/login/LoginForm.tsx",
+        "line": 93,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/auth/signup/page.tsx",
+        "line": 131,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/admin/billing-links/page.tsx",
+        "line": 71,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/admin/billing-links/page.tsx",
+        "line": 123,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/admin/contents/page.tsx",
+        "line": 392,
+        "content": "const result: AdminContentApiResponse<AdminContentListResponse> = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/ai-citations/page.tsx",
+        "line": 228,
+        "content": "const result: AICitationsApiResponse<OrgCitationsPeriodResponse> = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/components/RegenerateButton.tsx",
+        "line": 43,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/page.tsx",
+        "line": 43,
+        "content": "const data: ReportsListResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/analytics/interview/InterviewAnalyticsDashboard.tsx",
+        "line": 281,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/billing/new-session/CheckoutSessionManager.tsx",
+        "line": 45,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/billing/page.tsx",
+        "line": 127,
+        "content": "const { url } = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/billing/page.tsx",
+        "line": 152,
+        "content": "const { url } = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/case-studies/new/page.tsx",
+        "line": 34,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/components/PublicPageLinks.tsx",
+        "line": 21,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/components/PublishToggle.tsx",
+        "line": 39,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/components/PublishToggle.tsx",
+        "line": 43,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "line": 90,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/faqs/new/page.tsx",
+        "line": 29,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/interview/history/page.tsx",
+        "line": 189,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/interview/history/page.tsx",
+        "line": 193,
+        "content": "const result: SessionListResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/interview/history/page.tsx",
+        "line": 231,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 151,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 155,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 203,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 207,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/my-questions/page.tsx",
+        "line": 65,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/my-questions/page.tsx",
+        "line": 69,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/posts/new/page.tsx",
+        "line": 61,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/posts/page.tsx",
+        "line": 60,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/qna-stats/page.tsx",
+        "line": 69,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/qna-stats/page.tsx",
+        "line": 73,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/questions/page.tsx",
+        "line": 87,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/questions/page.tsx",
+        "line": 91,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/questions/page.tsx",
+        "line": 159,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/questions/page.tsx",
+        "line": 185,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/questions/page.tsx",
+        "line": 209,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/questions/page.tsx",
+        "line": 227,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/dashboard/services/new/page.tsx",
+        "line": 62,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/I18nHomePage.tsx",
+        "line": 55,
+        "content": "const stats = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/contacts/page.tsx",
+        "line": 37,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/hearings/page.tsx",
+        "line": 99,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/hearings/page.tsx",
+        "line": 102,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/hearings/page.tsx",
+        "line": 220,
+        "content": "draftResponses.map(response => response.json())",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/reports/page.tsx",
+        "line": 67,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/users/page.tsx",
+        "line": 170,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/users/page.tsx",
+        "line": 177,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/users/page.tsx",
+        "line": 201,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/users/page.tsx",
+        "line": 227,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/users/page.tsx",
+        "line": 247,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/users/page.tsx",
+        "line": 251,
+        "content": "const details = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/users/page.tsx",
+        "line": 296,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/users/page.tsx",
+        "line": 326,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/management-console/users/page.tsx",
+        "line": 362,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/monitor/page.tsx",
+        "line": 80,
+        "content": "const { hasAccess, reason } = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/monitor/page.tsx",
+        "line": 109,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/my/ai-interviewer/service/components/ServiceInterviewerClient.tsx",
+        "line": 73,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/my/faqs/[id]/edit/page.tsx",
+        "line": 58,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/my/faqs/[id]/edit/page.tsx",
+        "line": 139,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/my/faqs/[id]/edit/page.tsx",
+        "line": 143,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/my/faqs/new/page.tsx",
+        "line": 90,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/my/faqs/new/page.tsx",
+        "line": 94,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/my/faqs/page.tsx",
+        "line": 36,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/o/[slug]/case-studies/page.tsx",
+        "line": 24,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/o/[slug]/faq/page.tsx",
+        "line": 25,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/o/[slug]/posts/[id]/page.tsx",
+        "line": 50,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/o/[slug]/posts/page.tsx",
+        "line": 24,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/o/[slug]/services/page.tsx",
+        "line": 62,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/ops/diagnostics/page.tsx",
+        "line": 66,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/ops/login/OpsLoginForm.tsx",
+        "line": 39,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/ops/probe/page.tsx",
+        "line": 47,
+        "content": "return await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/ops/site/page.tsx",
+        "line": 47,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/ops/site/SiteSettingsForm.tsx",
+        "line": 63,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/ops/site/SiteSettingsForm.tsx",
+        "line": 70,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/ops/site/SiteSettingsForm.tsx",
+        "line": 120,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/organizations/[id]/hearing-request/page.tsx",
+        "line": 88,
+        "content": "const error = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/organizations/new/page.tsx",
+        "line": 310,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/organizations/new/page.tsx",
+        "line": 363,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/qna/ask/page.tsx",
+        "line": 64,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/qna/ask/page.tsx",
+        "line": 78,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/qna/ask/page.tsx",
+        "line": 137,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/test-feature-management/page.tsx",
+        "line": 22,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/app/test/admin-api/page.tsx",
+        "line": 103,
+        "content": "responseData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/EmbeddingStatusWidget.tsx",
+        "line": 33,
+        "content": "const result: EmbeddingMetricsResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/EmbedLimitCard.tsx",
+        "line": 58,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/EmbedRealtimeStats.tsx",
+        "line": 72,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/EmbedTopSources.tsx",
+        "line": 53,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/EmbedUsageChart.tsx",
+        "line": 54,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/Enforcement/ActionForm.tsx",
+        "line": 162,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/Enforcement/NextViolationFlagPanel.tsx",
+        "line": 63,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/Enforcement/NextViolationFlagPanel.tsx",
+        "line": 113,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/Enforcement/ViolationForm.tsx",
+        "line": 93,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/Enforcement/ViolationForm.tsx",
+        "line": 141,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/Enforcement/ViolationStatsPanel.tsx",
+        "line": 86,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/PlanFeatureMatrix.tsx",
+        "line": 37,
+        "content": "const data: FeatureManagementGetResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/PlanFeatureMatrix.tsx",
+        "line": 136,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/SiteSettingsForm.tsx",
+        "line": 33,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/SiteSettingsForm.tsx",
+        "line": 133,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/SiteSettingsForm.tsx",
+        "line": 137,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/admin/TranslationStatusWidget.tsx",
+        "line": 33,
+        "content": "const result: TranslationMetricsResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/ai-citations/SessionCitationsPanel.tsx",
+        "line": 193,
+        "content": "const result: AICitationsApiResponse<SessionCitationsResponse> = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/auth/ChangePasswordForm.tsx",
+        "line": 81,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/CaseStudiesTab.tsx",
+        "line": 55,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/CaseStudiesTab.tsx",
+        "line": 130,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/cms/GhostwriterInput.tsx",
+        "line": 109,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/ExtractionAssistant.tsx",
+        "line": 36,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/ExtractionAssistant.tsx",
+        "line": 40,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/ExtractionAssistant.tsx",
+        "line": 70,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/ExtractionAssistant.tsx",
+        "line": 74,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/FAQsTab.tsx",
+        "line": 48,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/interview/ContentGenerationPanel.tsx",
+        "line": 204,
+        "content": "const result: GenerateContentApiResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/OrgLogoUploader.tsx",
+        "line": 80,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/PostsTab.tsx",
+        "line": 55,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/PostsTab.tsx",
+        "line": 118,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/PublishGate.tsx",
+        "line": 46,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/PublishGate.tsx",
+        "line": 86,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/qa/QACategoryManager.tsx",
+        "line": 38,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/qa/QACategoryManager.tsx",
+        "line": 90,
+        "content": "const error = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/qa/QACategoryManager.tsx",
+        "line": 112,
+        "content": "const error = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/qa/QACategoryManager.tsx",
+        "line": 131,
+        "content": "const error = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/qa/QAEntryManager.tsx",
+        "line": 61,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/qa/QAEntryManager.tsx",
+        "line": 94,
+        "content": "const error = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/qa/QAEntryManager.tsx",
+        "line": 120,
+        "content": "const error = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/qa/QAEntryManager.tsx",
+        "line": 138,
+        "content": "const error = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/qa/QAPublicDisplay.tsx",
+        "line": 46,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/components/ServicesTab.tsx",
+        "line": 62,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/hooks/useApiClient.ts",
+        "line": 39,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/hooks/useApiClient.ts",
+        "line": 52,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/hooks/useAutoSaveDiffInterviewAnswers.ts",
+        "line": 88,
+        "content": "const data: SaveAnswerDiffResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/hooks/useAutoSaveInterviewAnswers.ts",
+        "line": 73,
+        "content": "const data: SaveAnswersResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/hooks/useInterviewQuestions.ts",
+        "line": 48,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/hooks/useInterviewQuestions.ts",
+        "line": 61,
+        "content": "return response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/hooks/useQAData.ts",
+        "line": 21,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/hooks/useQAData.ts",
+        "line": 83,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/hooks/useQAData.ts",
+        "line": 147,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/admin-api-client.ts",
+        "line": 92,
+        "content": "responseData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/admin/metrics.ts",
+        "line": 41,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/admin/metrics.ts",
+        "line": 80,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/ai/llm-client.ts",
+        "line": 214,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/ai/openai-client.ts",
+        "line": 77,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/api.ts",
+        "line": 324,
+        "content": "data = await response.json()",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/cache/cdn-purge.ts",
+        "line": 47,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/cache/cdn-purge.ts",
+        "line": 102,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/cms.ts",
+        "line": 38,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/cms.ts",
+        "line": 106,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/email-client.ts",
+        "line": 17,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/email-client.ts",
+        "line": 70,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/embedding-client.ts",
+        "line": 108,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/embedding-client.ts",
+        "line": 157,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/geocode.ts",
+        "line": 114,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/gsc-client.ts",
+        "line": 149,
+        "content": "const data: GSCResponse = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/jobs/ai-visibility-job.ts",
+        "line": 53,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/monitoring/production-monitoring.ts",
+        "line": 196,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/ogp.ts",
+        "line": 212,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/ogp.ts",
+        "line": 219,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/ogp.ts",
+        "line": 259,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/ogp.ts",
+        "line": 266,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/organizations.ts",
+        "line": 162,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/organizations.ts",
+        "line": 208,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/organizations.ts",
+        "line": 230,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/sdk.ts",
+        "line": 85,
+        "content": "return await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/subscriptions.ts",
+        "line": 142,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/subscriptions.ts",
+        "line": 166,
+        "content": "const data = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/supabase/admin-rpc.ts",
+        "line": 344,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/text-extraction.ts",
+        "line": 50,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/text-extraction.ts",
+        "line": 110,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/translation-client.ts",
+        "line": 94,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/translation-client.ts",
+        "line": 142,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/utils/checkout-helpers.ts",
+        "line": 54,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/utils/fetcher.ts",
+        "line": 24,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/utils/fetcher.ts",
+        "line": 34,
+        "content": "return response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/utils/fetcher.ts",
+        "line": 54,
+        "content": "const errorData = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/utils/fetcher.ts",
+        "line": 64,
+        "content": "return response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/vector-search-client.ts",
+        "line": 57,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/lib/vector-search-client.ts",
+        "line": 84,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/server/embedding-admin-client.ts",
+        "line": 57,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/server/embedding-admin-client.ts",
+        "line": 111,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/server/translation-admin-client.ts",
+        "line": 58,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      },
+      {
+        "file": "src/server/translation-admin-client.ts",
+        "line": 112,
+        "content": "const result = await response.json();",
+        "match": "response.json()"
+      }
+    ]
+  },
+  "supabaseSingle": {
+    "count": 257,
+    "violations": [
+      {
+        "file": "src/app/admin/cms/page.tsx",
+        "line": 87,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/admin/console/page.tsx",
+        "line": 216,
+        "content": ".single()",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/alerts/route.ts",
+        "line": 42,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/alerts/route.ts",
+        "line": 221,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/apply-migration/route.ts",
+        "line": 72,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/billing-links/[id]/activate/route.ts",
+        "line": 25,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/billing-links/[id]/activate/route.ts",
+        "line": 55,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/billing-links/route.ts",
+        "line": 104,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/assets/route.ts",
+        "line": 22,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/assets/route.ts",
+        "line": 103,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/assets/route.ts",
+        "line": 146,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/assets/route.ts",
+        "line": 195,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/sections/route.ts",
+        "line": 22,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/sections/route.ts",
+        "line": 96,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/sections/route.ts",
+        "line": 137,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/sections/route.ts",
+        "line": 186,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/site-settings/route.ts",
+        "line": 24,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/site-settings/route.ts",
+        "line": 93,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/site-settings/route.ts",
+        "line": 124,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/cms/site-settings/route.ts",
+        "line": 173,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/contacts/route.ts",
+        "line": 21,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/feature-management/route.ts",
+        "line": 156,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/jobs/content-diff/route.ts",
+        "line": 145,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/migrate/route.ts",
+        "line": 27,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/invites/[inviteId]/route.ts",
+        "line": 21,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/invites/[inviteId]/route.ts",
+        "line": 89,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/invites/[inviteId]/route.ts",
+        "line": 130,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/invites/route.ts",
+        "line": 29,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/invites/route.ts",
+        "line": 85,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/invites/route.ts",
+        "line": 189,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/invites/route.ts",
+        "line": 204,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/invites/route.ts",
+        "line": 238,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/members/route.ts",
+        "line": 25,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/members/route.ts",
+        "line": 92,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/members/route.ts",
+        "line": 103,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/members/route.ts",
+        "line": 115,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/members/route.ts",
+        "line": 148,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/members/route.ts",
+        "line": 235,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/members/route.ts",
+        "line": 262,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/route.ts",
+        "line": 57,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/route.ts",
+        "line": 116,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/route.ts",
+        "line": 212,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/[groupId]/route.ts",
+        "line": 291,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/[requestId]/route.ts",
+        "line": 30,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/[requestId]/route.ts",
+        "line": 51,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/[requestId]/route.ts",
+        "line": 133,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/[requestId]/route.ts",
+        "line": 157,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/[requestId]/route.ts",
+        "line": 236,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/route.ts",
+        "line": 93,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/route.ts",
+        "line": 189,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/route.ts",
+        "line": 228,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/route.ts",
+        "line": 243,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/join-requests/route.ts",
+        "line": 287,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/route.ts",
+        "line": 133,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/org-groups/route.ts",
+        "line": 160,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/reviews/history/route.ts",
+        "line": 24,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/reviews/reopen/route.ts",
+        "line": 33,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/reviews/reopen/route.ts",
+        "line": 58,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/reviews/reopen/route.ts",
+        "line": 159,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/reviews/reopen/route.ts",
+        "line": 181,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/reviews/route.ts",
+        "line": 169,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/system/health/route.ts",
+        "line": 22,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/system/health/route.ts",
+        "line": 142,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/upload-logo/route.ts",
+        "line": 21,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/users/[id]/details/route.ts",
+        "line": 30,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/users/[id]/segment/route.ts",
+        "line": 67,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/admin/users/[id]/segment/route.ts",
+        "line": 135,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/ai-interview-sessions/route.ts",
+        "line": 139,
+        "content": ".single()",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/ai-interview-sessions/route.ts",
+        "line": 238,
+        "content": ".single()",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/analytics/ai/recalculate/route.ts",
+        "line": 266,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/analytics/ai/visibility/route.ts",
+        "line": 291,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/analytics/seo/gsc/route.ts",
+        "line": 93,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/billing/checkout-segmented/route.ts",
+        "line": 80,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/billing/checkout-segmented/route.ts",
+        "line": 91,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/billing/checkout/route.ts",
+        "line": 63,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/billing/portal/route.ts",
+        "line": 62,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/cases/route.ts",
+        "line": 27,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/cases/route.ts",
+        "line": 63,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/cron/monthly-report/route.ts",
+        "line": 68,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/dashboard/stats/route.ts",
+        "line": 65,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/dashboard/stats/route.ts",
+        "line": 164,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/diag/org/route.ts",
+        "line": 77,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/diag/org/route.ts",
+        "line": 86,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/actions/_shared.ts",
+        "line": 179,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/actions/_shared.ts",
+        "line": 223,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/users/[id]/next-violation/route.ts",
+        "line": 94,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/users/[id]/next-violation/route.ts",
+        "line": 235,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/users/[id]/next-violation/route.ts",
+        "line": 244,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/users/[id]/status/route.ts",
+        "line": 62,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/users/[id]/violations-summary/route.ts",
+        "line": 55,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/users/[id]/violations-summary/route.ts",
+        "line": 74,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/violations/route.ts",
+        "line": 85,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/violations/route.ts",
+        "line": 109,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/enforcement/violations/route.ts",
+        "line": 195,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/faqs/route.ts",
+        "line": 27,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/faqs/route.ts",
+        "line": 62,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/hearing-requests/route.ts",
+        "line": 80,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/hearing-requests/route.ts",
+        "line": 122,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/interview/finalize/route.ts",
+        "line": 310,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/ai-citations/route.ts",
+        "line": 135,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/case-studies/[id]/route.ts",
+        "line": 44,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/case-studies/[id]/route.ts",
+        "line": 109,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/case-studies/[id]/route.ts",
+        "line": 138,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/case-studies/[id]/route.ts",
+        "line": 192,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/features/ai-reports/route.ts",
+        "line": 26,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/features/system-monitoring/route.ts",
+        "line": 26,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/interview-questions/route.ts",
+        "line": 117,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/interview/sessions/route.ts",
+        "line": 234,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/org-docs/files/route.ts",
+        "line": 134,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/organization/publish/route.ts",
+        "line": 92,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/organization/publish/route.ts",
+        "line": 173,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/organization/route.ts",
+        "line": 191,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/organization/route.ts",
+        "line": 229,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/organization/route.ts",
+        "line": 499,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/organization/route.ts",
+        "line": 667,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/organization/route.ts",
+        "line": 693,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/organization/route.ts",
+        "line": 871,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/categories/[id]/route.ts",
+        "line": 22,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/categories/[id]/route.ts",
+        "line": 55,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/categories/[id]/route.ts",
+        "line": 88,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/categories/[id]/route.ts",
+        "line": 123,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/categories/[id]/route.ts",
+        "line": 149,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/categories/[id]/route.ts",
+        "line": 197,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/categories/[id]/route.ts",
+        "line": 232,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/entries/[id]/route.ts",
+        "line": 22,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/entries/[id]/route.ts",
+        "line": 58,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/entries/[id]/route.ts",
+        "line": 91,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/entries/[id]/route.ts",
+        "line": 125,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/entries/[id]/route.ts",
+        "line": 144,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/entries/[id]/route.ts",
+        "line": 191,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/entries/[id]/route.ts",
+        "line": 242,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/entries/[id]/route.ts",
+        "line": 276,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/entries/route.ts",
+        "line": 126,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qa/search/route.ts",
+        "line": 19,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qna-stats/export/route.ts",
+        "line": 28,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/qna-stats/route.ts",
+        "line": 35,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/reports/monthly/[period]/pdf/route.ts",
+        "line": 40,
+        "content": "// レポートデータを取得（.single()禁止 → .maybeSingle()で安全化）",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/reports/monthly/[period]/pdf/route.ts",
+        "line": 65,
+        "content": "// 組織情報も取得（PDF表紙用・.single()禁止 → .maybeSingle()で安全化）",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/reports/monthly/[period]/regenerate/route.ts",
+        "line": 64,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/my/reports/monthly/[period]/route.ts",
+        "line": 64,
+        "content": "// レポート詳細を取得（.single()禁止 → .maybeSingle()で安全化）",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/ops/site-settings/route.ts",
+        "line": 67,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/ops/site-settings/route.ts",
+        "line": 158,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/ops/site-settings/route.ts",
+        "line": 168,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/ops/site-settings/route.ts",
+        "line": 189,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/organizations/route.ts",
+        "line": 220,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/organizations/route.ts",
+        "line": 233,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/organizations/route.ts",
+        "line": 292,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/partners/route.ts",
+        "line": 60,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/partners/route.ts",
+        "line": 122,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/posts/[id]/route.ts",
+        "line": 59,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/posts/[id]/route.ts",
+        "line": 134,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/posts/[id]/route.ts",
+        "line": 176,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/posts/route.ts",
+        "line": 27,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/posts/route.ts",
+        "line": 62,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/public/o/[slug]/posts/[postId]/route.ts",
+        "line": 50,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/public/o/[slug]/posts/[postId]/route.ts",
+        "line": 100,
+        "content": "const { data: post, error } = await query.single() as { data: any | null; error: any };",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/public/o/[slug]/posts/[postId]/route.ts",
+        "line": 193,
+        "content": ".single() as { data: any | null; error: any };",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/public/organizations/[slug]/route.ts",
+        "line": 38,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/public/organizations/[slug]/route.ts",
+        "line": 141,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/public/reports/route.ts",
+        "line": 142,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/public/reports/route.ts",
+        "line": 169,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/qa/public/route.ts",
+        "line": 25,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/qna/stats/route.ts",
+        "line": 67,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/qna/stats/route.ts",
+        "line": 92,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/questions/[id]/route.ts",
+        "line": 39,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/questions/[id]/route.ts",
+        "line": 60,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/questions/[id]/route.ts",
+        "line": 127,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/questions/[id]/route.ts",
+        "line": 147,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/questions/[id]/route.ts",
+        "line": 203,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/questions/company/route.ts",
+        "line": 25,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/questions/route.ts",
+        "line": 137,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/questions/route.ts",
+        "line": 162,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/services/route.ts",
+        "line": 47,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/stripe/checkout/create/route.ts",
+        "line": 38,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/stripe/checkout/route.ts",
+        "line": 44,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/stripe/customer-portal/route.ts",
+        "line": 44,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/stripe/products/init/route.ts",
+        "line": 23,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/stripe/webhook/route.ts",
+        "line": 245,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/stripe/webhook/route.ts",
+        "line": 329,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/api/upload/logo/route.ts",
+        "line": 56,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/dashboard/admin/contents/page.tsx",
+        "line": 328,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/dashboard/ai-citations/page.tsx",
+        "line": 176,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/dashboard/analytics/interview/page.tsx",
+        "line": 168,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/dashboard/billing/page.tsx",
+        "line": 63,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/dashboard/case-studies/page.tsx",
+        "line": 28,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/dashboard/settings/page.tsx",
+        "line": 27,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/monitor/page.tsx",
+        "line": 48,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/o/[slug]/feed.xml/route.ts",
+        "line": 25,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/page.tsx",
+        "line": 39,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/test/admin-api/page.tsx",
+        "line": 45,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/app/test/realtime/page.tsx",
+        "line": 80,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/components/header/SafeAuthHeader.tsx",
+        "line": 23,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai-reports/generator.ts",
+        "line": 32,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai-visibility-config.ts",
+        "line": 35,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai/citations.ts",
+        "line": 112,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai/citations.ts",
+        "line": 231,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai/group-context.ts",
+        "line": 63,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai/group-context.ts",
+        "line": 167,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai/interview/session.ts",
+        "line": 49,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai/interview/session.ts",
+        "line": 93,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai/interview/session.ts",
+        "line": 166,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai/interview/session.ts",
+        "line": 259,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/ai/logAiResponseWithCitations.ts",
+        "line": 76,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/auth.ts",
+        "line": 290,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/auth.ts",
+        "line": 323,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/auth.ts",
+        "line": 340,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/auth.ts",
+        "line": 386,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/auth.ts",
+        "line": 412,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/auth.ts",
+        "line": 428,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/auth.ts",
+        "line": 445,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/auth/admin-auth.ts",
+        "line": 161,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/billing/campaign.ts",
+        "line": 77,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/billing/campaign.ts",
+        "line": 92,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/billing/campaign.ts",
+        "line": 178,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/case-studies.ts",
+        "line": 36,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/case-studies.ts",
+        "line": 56,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/case-studies.ts",
+        "line": 74,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/contract-violations.ts",
+        "line": 179,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/embed/usage-tracker.ts",
+        "line": 194,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/faqs.ts",
+        "line": 36,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/faqs.ts",
+        "line": 71,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/faqs.ts",
+        "line": 96,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/hearing/permissions.ts",
+        "line": 189,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/hearing/permissions.ts",
+        "line": 239,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/hearing/permissions.ts",
+        "line": 267,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/hearing/permissions.ts",
+        "line": 301,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/hearing/permissions.ts",
+        "line": 355,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/interview-generation.ts",
+        "line": 43,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/interview-generation.ts",
+        "line": 307,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/interview-generation.ts",
+        "line": 396,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/job-runs.ts",
+        "line": 253,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/job-runs.ts",
+        "line": 284,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/job-runs.ts",
+        "line": 358,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/job-runs.ts",
+        "line": 417,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/job-runs.ts",
+        "line": 480,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/org-features/effective-features.ts",
+        "line": 389,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/organizations-server.ts",
+        "line": 77,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/organizations-server.ts",
+        "line": 107,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/organizations-server.ts",
+        "line": 135,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/organizations.ts",
+        "line": 85,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/organizations.ts",
+        "line": 112,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/organizations.ts",
+        "line": 275,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/performance/database-optimization.ts",
+        "line": 101,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/report-generator.ts",
+        "line": 80,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/rls-denied-events.ts",
+        "line": 231,
+        "content": ".single(),",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/services.ts",
+        "line": 69,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/services.ts",
+        "line": 87,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/services.ts",
+        "line": 95,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/services.ts",
+        "line": 106,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/services.ts",
+        "line": 201,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/stripe.ts",
+        "line": 448,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/supabase.ts",
+        "line": 130,
+        "content": ".single()",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/supabase.ts",
+        "line": 191,
+        "content": ".single()",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/utils/ai-bot-logger.ts",
+        "line": 123,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/utils/ai-bot-logger.ts",
+        "line": 146,
+        "content": ".single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/utils/ai-visibility-calculator.ts",
+        "line": 110,
+        "content": "const { data, error } = await query.single();",
+        "match": ".single()"
+      },
+      {
+        "file": "src/lib/utils/ai-visibility-calculator.ts",
+        "line": 254,
+        "content": ".single();",
+        "match": ".single()"
+      }
+    ]
+  },
+  "hardcodedDashboard": {
+    "count": 176,
+    "violations": [
+      {
+        "file": "src/app/api/my/organization/publish/route.ts",
+        "line": 25,
+        "content": "'/dashboard',",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/api/my/organization/route.ts",
+        "line": 609,
+        "content": "'/dashboard',",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/api/my/organization/route.ts",
+        "line": 801,
+        "content": "revalidatePath('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/api/my/organization/route.ts",
+        "line": 818,
+        "content": "'/dashboard',",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/api/my/services/route.ts",
+        "line": 200,
+        "content": "revalidatePath('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/auth/callback/page.tsx",
+        "line": 38,
+        "content": "router.push('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/auth/callback/page.tsx",
+        "line": 44,
+        "content": "router.push('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/auth/login/LoginForm.tsx",
+        "line": 58,
+        "content": "const targetUrl = redirectUrl || '/dashboard';",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/auth/login/page.tsx",
+        "line": 25,
+        "content": "const redirectUrl = resolvedSearchParams.redirect || '/dashboard';",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/auth/signin/SignInForm.tsx",
+        "line": 48,
+        "content": "const targetUrl = redirectUrl || '/dashboard';",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/dashboard/_components/RequireOrganization.tsx",
+        "line": 67,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/dashboard/activity/page.tsx",
+        "line": 11,
+        "content": "<Link href=\"/dashboard\" className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/dashboard/activity/page.tsx",
+        "line": 70,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/[period]/page.tsx",
+        "line": 136,
+        "content": "href=\"/dashboard/ai-reports\"",
+        "match": "\"/dashboard/ai-reports\""
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/[period]/page.tsx",
+        "line": 165,
+        "content": "href=\"/dashboard/ai-reports\"",
+        "match": "\"/dashboard/ai-reports\""
+      },
+      {
+        "file": "src/app/dashboard/ai-reports/page.tsx",
+        "line": 196,
+        "content": "href={`/dashboard/ai-reports/${periodYYYYMM}`}",
+        "match": "`/dashboard/ai-reports/${periodYYYYMM}`"
+      },
+      {
+        "file": "src/app/dashboard/case-studies/new/page.tsx",
+        "line": 37,
+        "content": "router.replace('/dashboard/case-studies');",
+        "match": "'/dashboard/case-studies'"
+      },
+      {
+        "file": "src/app/dashboard/case-studies/page.tsx",
+        "line": 124,
+        "content": "href=\"/dashboard/case-studies/new\"",
+        "match": "\"/dashboard/case-studies/new\""
+      },
+      {
+        "file": "src/app/dashboard/case-studies/page.tsx",
+        "line": 139,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/dashboard/case-studies/page.tsx",
+        "line": 178,
+        "content": "href=\"/dashboard/case-studies/new\"",
+        "match": "\"/dashboard/case-studies/new\""
+      },
+      {
+        "file": "src/app/dashboard/case-studies/page.tsx",
+        "line": 235,
+        "content": "href={`/dashboard/case-studies/${caseStudy.id}/edit`}",
+        "match": "`/dashboard/case-studies/${caseStudy.id}/edit`"
+      },
+      {
+        "file": "src/app/dashboard/components/DashboardActions.tsx",
+        "line": 95,
+        "content": "router.replace('/dashboard/settings');",
+        "match": "'/dashboard/settings'"
+      },
+      {
+        "file": "src/app/dashboard/components/DashboardActions.tsx",
+        "line": 99,
+        "content": "router.replace('/dashboard/help');",
+        "match": "'/dashboard/help'"
+      },
+      {
+        "file": "src/app/dashboard/components/DashboardActions.tsx",
+        "line": 103,
+        "content": "router.replace('/dashboard/activity');",
+        "match": "'/dashboard/activity'"
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "line": 263,
+        "content": "href=\"/dashboard/posts/new\"",
+        "match": "\"/dashboard/posts/new\""
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "line": 275,
+        "content": "href=\"/dashboard/services/new\"",
+        "match": "\"/dashboard/services/new\""
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "line": 287,
+        "content": "href=\"/dashboard/case-studies/new\"",
+        "match": "\"/dashboard/case-studies/new\""
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "line": 299,
+        "content": "href=\"/dashboard/faqs/new\"",
+        "match": "\"/dashboard/faqs/new\""
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "line": 349,
+        "content": "href={`/dashboard/${type}/new`}",
+        "match": "`/dashboard/${type}/new`"
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "line": 370,
+        "content": "href={`/dashboard/${type}/new`}",
+        "match": "`/dashboard/${type}/new`"
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "line": 400,
+        "content": "href={`/dashboard/${type}/${item.id}/edit`}",
+        "match": "`/dashboard/${type}/${item.id}/edit`"
+      },
+      {
+        "file": "src/app/dashboard/embed/EmbedPageClient.tsx",
+        "line": 227,
+        "content": "<Link href=\"/dashboard\" className=\"text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]\" replace>",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/dashboard/faqs/new/page.tsx",
+        "line": 32,
+        "content": "router.replace('/dashboard/faqs');",
+        "match": "'/dashboard/faqs'"
+      },
+      {
+        "file": "src/app/dashboard/faqs/page.tsx",
+        "line": 104,
+        "content": "href=\"/dashboard/faqs/new\"",
+        "match": "\"/dashboard/faqs/new\""
+      },
+      {
+        "file": "src/app/dashboard/faqs/page.tsx",
+        "line": 148,
+        "content": "href=\"/dashboard/faqs/new\"",
+        "match": "\"/dashboard/faqs/new\""
+      },
+      {
+        "file": "src/app/dashboard/faqs/page.tsx",
+        "line": 184,
+        "content": "<Link href={`/dashboard/faqs/${faq.id}/edit`}>",
+        "match": "`/dashboard/faqs/${faq.id}/edit`"
+      },
+      {
+        "file": "src/app/dashboard/interview/[sessionId]/page.tsx",
+        "line": 596,
+        "content": "href=\"/dashboard/interview\"",
+        "match": "\"/dashboard/interview\""
+      },
+      {
+        "file": "src/app/dashboard/interview/[sessionId]/page.tsx",
+        "line": 614,
+        "content": "<Link href=\"/dashboard/interview\" className=\"text-blue-600 hover:text-blue-500\">",
+        "match": "\"/dashboard/interview\""
+      },
+      {
+        "file": "src/app/dashboard/interview/[sessionId]/page.tsx",
+        "line": 798,
+        "content": "href=\"/dashboard/interview\"",
+        "match": "\"/dashboard/interview\""
+      },
+      {
+        "file": "src/app/dashboard/interview/history/page.tsx",
+        "line": 213,
+        "content": "router.push(`/dashboard/interview/${sessionId}`);",
+        "match": "`/dashboard/interview/${sessionId}`"
+      },
+      {
+        "file": "src/app/dashboard/interview/history/page.tsx",
+        "line": 217,
+        "content": "router.push(`/dashboard/interview/${sessionId}`);",
+        "match": "`/dashboard/interview/${sessionId}`"
+      },
+      {
+        "file": "src/app/dashboard/interview/history/page.tsx",
+        "line": 277,
+        "content": "<Link href=\"/dashboard/interview\">",
+        "match": "\"/dashboard/interview\""
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 210,
+        "content": "router.push(`/dashboard/interview/${result.sessionId}`);",
+        "match": "`/dashboard/interview/${result.sessionId}`"
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 265,
+        "content": "href=\"/dashboard/interview/history\"",
+        "match": "\"/dashboard/interview/history\""
+      },
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "line": 365,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/dashboard/materials/[id]/page.tsx",
+        "line": 157,
+        "content": "href=\"/dashboard/materials\"",
+        "match": "\"/dashboard/materials\""
+      },
+      {
+        "file": "src/app/dashboard/materials/[id]/page.tsx",
+        "line": 174,
+        "content": "href=\"/dashboard/materials\"",
+        "match": "\"/dashboard/materials\""
+      },
+      {
+        "file": "src/app/dashboard/materials/page.tsx",
+        "line": 140,
+        "content": "href={`/dashboard/materials/${material.id}`}",
+        "match": "`/dashboard/materials/${material.id}`"
+      },
+      {
+        "file": "src/app/dashboard/materials/page.tsx",
+        "line": 160,
+        "content": "href={`/dashboard/materials/${material.id}`}",
+        "match": "`/dashboard/materials/${material.id}`"
+      },
+      {
+        "file": "src/app/dashboard/posts/new/page.tsx",
+        "line": 64,
+        "content": "router.replace('/dashboard/posts');",
+        "match": "'/dashboard/posts'"
+      },
+      {
+        "file": "src/app/dashboard/posts/new/page.tsx",
+        "line": 157,
+        "content": "href=\"/dashboard/posts\"",
+        "match": "\"/dashboard/posts\""
+      },
+      {
+        "file": "src/app/dashboard/posts/page.tsx",
+        "line": 183,
+        "content": "href=\"/dashboard/posts/new\"",
+        "match": "\"/dashboard/posts/new\""
+      },
+      {
+        "file": "src/app/dashboard/posts/page.tsx",
+        "line": 227,
+        "content": "href=\"/dashboard/posts/new\"",
+        "match": "\"/dashboard/posts/new\""
+      },
+      {
+        "file": "src/app/dashboard/posts/page.tsx",
+        "line": 264,
+        "content": "<Link href={`/dashboard/posts/${post.id}/edit`}>",
+        "match": "`/dashboard/posts/${post.id}/edit`"
+      },
+      {
+        "file": "src/app/dashboard/services-info/page.tsx",
+        "line": 134,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/dashboard/services/[id]/edit/page.tsx",
+        "line": 120,
+        "content": "router.replace('/dashboard/services');",
+        "match": "'/dashboard/services'"
+      },
+      {
+        "file": "src/app/dashboard/services/[id]/edit/page.tsx",
+        "line": 161,
+        "content": "href=\"/dashboard/services\"",
+        "match": "\"/dashboard/services\""
+      },
+      {
+        "file": "src/app/dashboard/services/[id]/edit/page.tsx",
+        "line": 390,
+        "content": "href=\"/dashboard/services\"",
+        "match": "\"/dashboard/services\""
+      },
+      {
+        "file": "src/app/dashboard/services/new/page.tsx",
+        "line": 64,
+        "content": "router.replace('/dashboard/services');",
+        "match": "'/dashboard/services'"
+      },
+      {
+        "file": "src/app/dashboard/services/page.tsx",
+        "line": 103,
+        "content": "href=\"/dashboard/services/new\"",
+        "match": "\"/dashboard/services/new\""
+      },
+      {
+        "file": "src/app/dashboard/services/page.tsx",
+        "line": 147,
+        "content": "href=\"/dashboard/services/new\"",
+        "match": "\"/dashboard/services/new\""
+      },
+      {
+        "file": "src/app/dashboard/services/page.tsx",
+        "line": 194,
+        "content": "href={`/dashboard/services/${service.id}/edit`}",
+        "match": "`/dashboard/services/${service.id}/edit`"
+      },
+      {
+        "file": "src/app/dashboard/settings/page.tsx",
+        "line": 51,
+        "content": "<Link href=\"/dashboard\" replace className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/dashboard/settings/page.tsx",
+        "line": 151,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/management-console/layout.tsx",
+        "line": 24,
+        "content": "redirect('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/management-console/layout.tsx",
+        "line": 55,
+        "content": "<a href=\"/dashboard\" className=\"text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg text-sm\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/my/faqs/[id]/edit/page.tsx",
+        "line": 192,
+        "content": "<Link href=\"/dashboard\" className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/my/faqs/new/page.tsx",
+        "line": 115,
+        "content": "<Link href=\"/dashboard\" className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/o/[slug]/posts/[id]/page.tsx",
+        "line": 200,
+        "content": "href={`/dashboard`}",
+        "match": "`/dashboard`"
+      },
+      {
+        "file": "src/app/ops/probe/page.tsx",
+        "line": 317,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/ops/site/page.tsx",
+        "line": 28,
+        "content": "redirect('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/ops/verify/page.tsx",
+        "line": 170,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/case-studies/new/page.tsx",
+        "line": 52,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/case-studies/new/page.tsx",
+        "line": 56,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/case-studies/new/page.tsx",
+        "line": 145,
+        "content": "<Link href=\"/dashboard\" replace className=\"mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/case-studies/new/page.tsx",
+        "line": 160,
+        "content": "<Link href=\"/dashboard\" replace className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/faqs/[faqId]/page.tsx",
+        "line": 58,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/faqs/[faqId]/page.tsx",
+        "line": 81,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/faqs/[faqId]/page.tsx",
+        "line": 168,
+        "content": "<Link href=\"/dashboard\" replace className=\"mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/faqs/[faqId]/page.tsx",
+        "line": 183,
+        "content": "<Link href=\"/dashboard\" replace className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/faqs/new/page.tsx",
+        "line": 54,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/faqs/new/page.tsx",
+        "line": 62,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/faqs/new/page.tsx",
+        "line": 138,
+        "content": "<Link href=\"/dashboard\" replace className=\"mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/faqs/new/page.tsx",
+        "line": 153,
+        "content": "<Link href=\"/dashboard\" replace className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/hearing-request/page.tsx",
+        "line": 85,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/hearing-request/page.tsx",
+        "line": 113,
+        "content": "<Link href=\"/dashboard\" replace>",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/hearing-request/page.tsx",
+        "line": 132,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/hearing-request/page.tsx",
+        "line": 225,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/page.tsx",
+        "line": 134,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/page.tsx",
+        "line": 142,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/page.tsx",
+        "line": 395,
+        "content": "<Link href=\"/dashboard\" replace className=\"mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/page.tsx",
+        "line": 410,
+        "content": "<Link href=\"/dashboard\" replace className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/page.tsx",
+        "line": 1128,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/services/[serviceId]/page.tsx",
+        "line": 67,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/services/[serviceId]/page.tsx",
+        "line": 93,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/services/[serviceId]/page.tsx",
+        "line": 189,
+        "content": "<Link href=\"/dashboard\" className=\"mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/services/[serviceId]/page.tsx",
+        "line": 204,
+        "content": "<Link href=\"/dashboard\" className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/services/new/page.tsx",
+        "line": 67,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/services/new/page.tsx",
+        "line": 75,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/[id]/services/new/page.tsx",
+        "line": 173,
+        "content": "<Link href=\"/dashboard\" replace className=\"mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/[id]/services/new/page.tsx",
+        "line": 188,
+        "content": "<Link href=\"/dashboard\" replace className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/new/page.tsx",
+        "line": 386,
+        "content": "router.replace('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/app/organizations/new/page.tsx",
+        "line": 424,
+        "content": "<Link href=\"/dashboard\" replace className=\"text-gray-500 hover:text-gray-700\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/organizations/new/page.tsx",
+        "line": 898,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/app/qna/ask/page.tsx",
+        "line": 134,
+        "content": "router.push('/dashboard/my-questions');",
+        "match": "'/dashboard/my-questions'"
+      },
+      {
+        "file": "src/app/qna/ask/page.tsx",
+        "line": 167,
+        "content": "<Link href=\"/dashboard/my-questions\">",
+        "match": "\"/dashboard/my-questions\""
+      },
+      {
+        "file": "src/app/qna/ask/page.tsx",
+        "line": 328,
+        "content": "<Link href=\"/dashboard/my-questions\">",
+        "match": "\"/dashboard/my-questions\""
+      },
+      {
+        "file": "src/components/admin/error-log-viewer.tsx",
+        "line": 89,
+        "content": "url: '/dashboard',",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardBackLink.tsx",
+        "line": 10,
+        "content": "href = '/dashboard',",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 21,
+        "content": "{ name: 'ダッシュボード', href: '/dashboard', icon: HomeIcon },",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 22,
+        "content": "{ name: '記事管理', href: '/dashboard/posts', icon: DocumentTextIcon },",
+        "match": "'/dashboard/posts'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 23,
+        "content": "{ name: 'サービス管理', href: '/dashboard/services', icon: BriefcaseIcon },",
+        "match": "'/dashboard/services'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 24,
+        "content": "{ name: '事例管理', href: '/dashboard/case-studies', icon: UserGroupIcon },",
+        "match": "'/dashboard/case-studies'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 25,
+        "content": "{ name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },",
+        "match": "'/dashboard/faqs'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 26,
+        "content": "{ name: '企業専用AIチャット', href: '/dashboard/org-ai-chat', icon: DocumentPlusIcon },",
+        "match": "'/dashboard/org-ai-chat'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 27,
+        "content": "{ name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },",
+        "match": "'/dashboard/qna-stats'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 28,
+        "content": "{ name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },",
+        "match": "'/dashboard/analytics/ai-seo-report'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 29,
+        "content": "{ name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },",
+        "match": "'/dashboard/help'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 30,
+        "content": "{ name: '設定', href: '/dashboard/settings', icon: Cog6ToothIcon },",
+        "match": "'/dashboard/settings'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 36,
+        "content": "{ name: 'ダッシュボード', href: '/dashboard', icon: HomeIcon },",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 38,
+        "content": "{ name: '記事管理', href: '/dashboard/posts', icon: DocumentTextIcon },",
+        "match": "'/dashboard/posts'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 39,
+        "content": "{ name: 'サービス管理', href: '/dashboard/services', icon: BriefcaseIcon },",
+        "match": "'/dashboard/services'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 40,
+        "content": "{ name: '事例管理', href: '/dashboard/case-studies', icon: UserGroupIcon },",
+        "match": "'/dashboard/case-studies'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 41,
+        "content": "{ name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },",
+        "match": "'/dashboard/faqs'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 42,
+        "content": "{ name: '企業専用AIチャット', href: '/dashboard/org-ai-chat', icon: DocumentPlusIcon },",
+        "match": "'/dashboard/org-ai-chat'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 43,
+        "content": "{ name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },",
+        "match": "'/dashboard/qna-stats'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 44,
+        "content": "{ name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },",
+        "match": "'/dashboard/analytics/ai-seo-report'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 45,
+        "content": "{ name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },",
+        "match": "'/dashboard/help'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 46,
+        "content": "{ name: '設定', href: '/dashboard/settings', icon: Cog6ToothIcon },",
+        "match": "'/dashboard/settings'"
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 66,
+        "content": "<Link href=\"/dashboard\" className=\"text-xl font-bold text-[var(--aio-primary)]\">",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/dashboard/DashboardSidebar.tsx",
+        "line": 76,
+        "content": "(item.href !== '/dashboard' && pathname.startsWith(item.href));",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/dashboard/FirstTimeUserOnboarding.tsx",
+        "line": 41,
+        "content": "href=\"/dashboard/settings\"",
+        "match": "\"/dashboard/settings\""
+      },
+      {
+        "file": "src/components/header/AuthHeader.tsx",
+        "line": 20,
+        "content": "(pathname && (pathname.startsWith('/dashboard') || pathname.startsWith('/organizations')));",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/header/AuthHeader.tsx",
+        "line": 36,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/header/AuthHeader.tsx",
+        "line": 42,
+        "content": "href=\"/dashboard/billing\"",
+        "match": "\"/dashboard/billing\""
+      },
+      {
+        "file": "src/components/header/ClientAuthHeader.tsx",
+        "line": 65,
+        "content": "return hasOrganization ? '/dashboard' : '/organizations/new';",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/header/ClientAuthHeader.tsx",
+        "line": 143,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/header/DynamicHeader.tsx",
+        "line": 24,
+        "content": "<Link href=\"/dashboard\" className=\"text-gray-700 hover:text-gray-900\">ダッシュボード</Link>",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/header/I18nSafeAuthHeader.tsx",
+        "line": 118,
+        "content": "return hasOrganization ? '/dashboard' : '/organizations/new';",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/header/I18nSafeAuthHeader.tsx",
+        "line": 141,
+        "content": "onClick={() => window.location.href = '/dashboard'}",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/header/I18nSafeAuthHeader.tsx",
+        "line": 147,
+        "content": "href=\"/dashboard/billing\"",
+        "match": "\"/dashboard/billing\""
+      },
+      {
+        "file": "src/components/header/UserAvatarMenu.tsx",
+        "line": 63,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/header/UserAvatarMenu.tsx",
+        "line": 75,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/header/UserAvatarMenu.tsx",
+        "line": 98,
+        "content": "href=\"/dashboard/billing\"",
+        "match": "\"/dashboard/billing\""
+      },
+      {
+        "file": "src/components/interview/ContentGenerationPanel.tsx",
+        "line": 259,
+        "content": "router.push(`/dashboard/posts/${id}/edit`);",
+        "match": "`/dashboard/posts/${id}/edit`"
+      },
+      {
+        "file": "src/components/interview/ContentGenerationPanel.tsx",
+        "line": 262,
+        "content": "router.push(`/dashboard/qa/${id}/edit`);",
+        "match": "`/dashboard/qa/${id}/edit`"
+      },
+      {
+        "file": "src/components/interview/ContentGenerationPanel.tsx",
+        "line": 265,
+        "content": "router.push(`/dashboard/case-studies/${id}/edit`);",
+        "match": "`/dashboard/case-studies/${id}/edit`"
+      },
+      {
+        "file": "src/components/interview/ContentGenerationPanel.tsx",
+        "line": 269,
+        "content": "router.push(`/dashboard/admin/contents?filter=ai_generated`);",
+        "match": "`/dashboard/admin/contents?filter=ai_generated`"
+      },
+      {
+        "file": "src/components/LandingPage.tsx",
+        "line": 60,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/LandingPage.tsx",
+        "line": 94,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/LandingPage.tsx",
+        "line": 367,
+        "content": "href=\"/dashboard\"",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/LandingPage.tsx",
+        "line": 391,
+        "content": "<Link href=\"/dashboard\" className=\"text-gray-300 hover:text-white transition-colors\">マイページ</Link>",
+        "match": "\"/dashboard\""
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 30,
+        "content": "{ name: 'ダッシュボード', href: '/dashboard', icon: HomeIcon },",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 31,
+        "content": "{ name: '記事管理', href: '/dashboard/posts', icon: DocumentTextIcon },",
+        "match": "'/dashboard/posts'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 32,
+        "content": "{ name: 'サービス管理', href: '/dashboard/services', icon: BriefcaseIcon },",
+        "match": "'/dashboard/services'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 33,
+        "content": "{ name: '事例管理', href: '/dashboard/case-studies', icon: UserGroupIcon },",
+        "match": "'/dashboard/case-studies'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 34,
+        "content": "{ name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },",
+        "match": "'/dashboard/faqs'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 35,
+        "content": "{ name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },",
+        "match": "'/dashboard/qna-stats'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 36,
+        "content": "{ name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },",
+        "match": "'/dashboard/analytics/ai-seo-report'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 38,
+        "content": "{ name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },",
+        "match": "'/dashboard/help'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 39,
+        "content": "{ name: '設定', href: '/dashboard/settings', icon: Cog6ToothIcon },",
+        "match": "'/dashboard/settings'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 85,
+        "content": "const isDashboard = pathname.startsWith('/dashboard');",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/components/navigation/UnifiedMobileNav.tsx",
+        "line": 301,
+        "content": "(item.href !== '/dashboard' && pathname.startsWith(item.href));",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/lib/auth/flow-detection.ts",
+        "line": 89,
+        "content": "return '/dashboard';",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/lib/routes.ts",
+        "line": 10,
+        "content": "dashboard: '/dashboard',",
+        "match": "'/dashboard'"
+      },
+      {
+        "file": "src/lib/routes.ts",
+        "line": 11,
+        "content": "dashboardCompany: '/dashboard/company',",
+        "match": "'/dashboard/company'"
+      },
+      {
+        "file": "src/lib/routes.ts",
+        "line": 12,
+        "content": "dashboardEmbed: '/dashboard/embed',",
+        "match": "'/dashboard/embed'"
+      },
+      {
+        "file": "src/lib/routes.ts",
+        "line": 13,
+        "content": "dashboardMaterials: '/dashboard/materials',",
+        "match": "'/dashboard/materials'"
+      },
+      {
+        "file": "src/lib/routes.ts",
+        "line": 14,
+        "content": "dashboardServices: '/dashboard/services',",
+        "match": "'/dashboard/services'"
+      },
+      {
+        "file": "src/lib/routes.ts",
+        "line": 15,
+        "content": "dashboardFaqs: '/dashboard/faqs',",
+        "match": "'/dashboard/faqs'"
+      },
+      {
+        "file": "src/lib/routes.ts",
+        "line": 16,
+        "content": "dashboardBilling: '/dashboard/billing',",
+        "match": "'/dashboard/billing'"
+      },
+      {
+        "file": "src/lib/routes.ts",
+        "line": 17,
+        "content": "dashboardSettings: '/dashboard/settings',",
+        "match": "'/dashboard/settings'"
+      },
+      {
+        "file": "src/lib/utils/ai-crawler.ts",
+        "line": 52,
+        "content": "'/dashboard/',",
+        "match": "'/dashboard/'"
+      },
+      {
+        "file": "src/lib/utils/sitemap-generator.ts",
+        "line": 39,
+        "content": "excludePatterns: ['/api/', '/ops/', '/auth/', '/dashboard/'],",
+        "match": "'/dashboard/'"
+      },
+      {
+        "file": "src/lib/utils/sitemap-generator.ts",
+        "line": 290,
+        "content": "disallowedPaths = ['/api/', '/ops/', '/auth/', '/dashboard/', '/my/', '/organizations/new'],",
+        "match": "'/dashboard/'"
+      },
+      {
+        "file": "src/lib/utils/sitemap-generator.ts",
+        "line": 437,
+        "content": "'/dashboard/',",
+        "match": "'/dashboard/'"
+      }
+    ]
+  },
+  "serverClientBoundary": {
+    "count": 0,
+    "violations": []
+  }
+}

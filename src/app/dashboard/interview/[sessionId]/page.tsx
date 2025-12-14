@@ -10,6 +10,7 @@ import type { InterviewQuestion } from '@/types/interview-session';
 import { logger } from '@/lib/utils/logger';
 import { useAutoSaveDiffInterviewAnswers, type DiffAutoSaveStatus } from '@/hooks/useAutoSaveDiffInterviewAnswers';
 import ConflictDialog from '@/components/interview/ConflictDialog';
+import { ClipboardIcon, SearchIcon, BulbIcon, DocumentIcon } from '@/components/icons/HIGIcons';
 
 interface SessionData {
   id: string;
@@ -71,10 +72,10 @@ interface ContentSectionProps {
 function StructuredContent({ sections }: ContentSectionProps) {
   const getSectionIcon = (key: string) => {
     switch (key) {
-      case 'summary': return '📋';
-      case 'analysis': return '🔍';
-      case 'recommendation': return '💡';
-      default: return '📝';
+      case 'summary': return <ClipboardIcon className="w-5 h-5 text-blue-600" aria-hidden />;
+      case 'analysis': return <SearchIcon className="w-5 h-5 text-green-600" aria-hidden />;
+      case 'recommendation': return <BulbIcon className="w-5 h-5 text-yellow-600" aria-hidden />;
+      default: return <DocumentIcon className="w-5 h-5 text-gray-600" aria-hidden />;
     }
   };
 
@@ -365,11 +366,11 @@ export default function InterviewSessionPage() {
       // セッション情報を取得
       const sessionResponse = await fetch(`/api/my/interview/sessions/${sessionId}`);
       if (!sessionResponse.ok) {
-        const errorData = await sessionResponse.json();
+        const errorData = await sessionResponse.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to load session');
       }
 
-      const sessionResult = await sessionResponse.json();
+      const sessionResult = await sessionResponse.json().catch(() => ({ data: null }));
       if (!sessionResult.data) {
         throw new Error('Failed to load session data');
       }
@@ -393,11 +394,11 @@ export default function InterviewSessionPage() {
 
       const questionsResponse = await fetch(`/api/my/interview-questions?${params}`);
       if (!questionsResponse.ok) {
-        const errorData = await questionsResponse.json();
+        const errorData = await questionsResponse.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to load questions');
       }
 
-      const questionsResult = await questionsResponse.json();
+      const questionsResult = await questionsResponse.json().catch(() => ({ data: { questions: [] } }));
       const questionsList = questionsResult.data?.questions || [];
       setQuestions(questionsList);
 
@@ -453,7 +454,7 @@ export default function InterviewSessionPage() {
         body: JSON.stringify({ sessionId }), // Phase 2-3: セッションIDをbodyに含める
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ success: false, message: 'Invalid response format' }));
 
       // Phase 2-3: 統一エラーレスポンス処理
       if (!result.success) {

@@ -145,9 +145,9 @@ export async function PUT(
       .eq('id', postId)
       .eq('organization_id', orgId)
       .select()
-      .single();
+      .maybeSingle();
 
-    if (updateError) {
+    if (updateError || !updatedPost) {
       logger.error('[my/posts/update] Failed to update post', {
         userId,
         postId: postId,

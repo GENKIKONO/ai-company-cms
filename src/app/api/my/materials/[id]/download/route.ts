@@ -16,13 +16,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // ユーザーの企業IDを取得
-    const { data: organization, error: orgError } = await supabase
+    const { data: organizations, error: orgError } = await supabase
       .from('organizations')
       .select('id')
-      .eq('created_by', user.id)
-      .single();
+      .eq('created_by', user.id);
 
-    if (orgError || !organization) {
+    if (orgError) {
+      logger.error('[my/materials/[id]/download] Failed to fetch user organization', { data: orgError });
+      return NextResponse.json({ error: 'Failed to fetch user organization' }, { status: 500 });
+    }
+
+    const organization = organizations?.[0];
+    if (!organization) {
       return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
     }
 
@@ -49,14 +54,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // 営業資料の存在確認と権限チェック
-    const { data: material, error: materialError } = await supabase
+    const { data: materials, error: materialError } = await supabase
       .from('sales_materials')
       .select('*')
       .eq('id', id)
-      .eq('organization_id', organization.id)
-      .single();
+      .eq('organization_id', organization.id);
 
-    if (materialError || !material) {
+    if (materialError) {
+      logger.error('[my/materials/[id]/download] Failed to fetch material', { data: materialError });
+      return NextResponse.json({ error: 'Failed to fetch material' }, { status: 500 });
+    }
+
+    const material = materials?.[0];
+    if (!material) {
       return NextResponse.json({ error: 'Material not found or access denied' }, { status: 404 });
     }
 

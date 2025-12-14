@@ -12,6 +12,7 @@ import AIVisibilityCard from './AIVisibilityCard';
 import { FirstTimeUserOnboarding } from '@/components/dashboard/FirstTimeUserOnboarding';
 import { logger } from '@/lib/utils/logger';
 import { useEffect, useState } from 'react';
+import { LockIcon, AlertTriangleIcon, BuildingIcon, BarChartIcon, DocumentIcon, BriefcaseIcon, CheckIcon } from '@/components/icons/HIGIcons';
 
 interface DashboardStats {
   total: number;
@@ -74,7 +75,7 @@ export default function DashboardMain() {
       // 認証済みかつ組織がないことが確定した場合は統計ローディングを止める
       setStatsLoading(false);
     }
-  }, [currentOrganization?.id, isLoading, user]);
+  }, [currentOrganization, isLoading, user]);
 
   // ローディング中の判定を明確化
   if (isLoading) {
@@ -105,7 +106,7 @@ export default function DashboardMain() {
         <div className="max-w-lg w-full bg-white rounded-lg shadow-md p-6 mx-4">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🔒</span>
+              <LockIcon className="w-8 h-8 text-red-500" aria-hidden />
             </div>
             <h2 className="text-xl font-semibold text-red-600 mb-3">企業情報にアクセスできません</h2>
             <div className="text-left bg-red-50 rounded-lg p-4 mb-4">
@@ -201,7 +202,7 @@ export default function DashboardMain() {
         <div className="max-w-lg w-full bg-white rounded-lg shadow-md p-6 mx-4">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">⚠️</span>
+              <AlertTriangleIcon className="w-8 h-8 text-yellow-500" aria-hidden />
             </div>
             <h2 className="text-xl font-semibold text-yellow-600 mb-3">データベースエラー</h2>
             <div className="text-left bg-yellow-50 rounded-lg p-4 mb-4">
@@ -254,7 +255,7 @@ export default function DashboardMain() {
         <div className="max-w-lg w-full bg-white rounded-lg shadow-md p-6 mx-4">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🏢</span>
+              <BuildingIcon className="w-8 h-8 text-blue-500" aria-hidden />
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-3">企業情報をまだ登録していません</h2>
             <div className="text-left bg-blue-50 rounded-lg p-4 mb-4">
@@ -377,7 +378,7 @@ export default function DashboardMain() {
             {statsError ? (
               <div className="mt-12 max-w-md mx-auto">
                 <div className="glass-card p-6 text-center border-yellow-200 bg-yellow-50">
-                  <div className="text-2xl mb-2">⚠️</div>
+                  <div className="flex justify-center mb-2"><AlertTriangleIcon className="w-8 h-8 text-yellow-500" aria-hidden /></div>
                   <div className="text-sm text-gray-700 mb-3">{statsError}</div>
                   <button
                     onClick={() => window.location.reload()}
@@ -390,13 +391,13 @@ export default function DashboardMain() {
             ) : !statsLoading && (
               <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
                 {[
-                  { label: "総コンテンツ数", value: stats.total, icon: "📊" },
-                  { label: "公開済み", value: stats.published, icon: "✅" },
-                  { label: "下書き", value: stats.draft, icon: "📝" },
-                  { label: "事例", value: caseStudiesStats.total, icon: "💼" }
+                  { label: "総コンテンツ数", value: stats.total, icon: <BarChartIcon className="w-6 h-6 text-blue-500" aria-hidden /> },
+                  { label: "公開済み", value: stats.published, icon: <CheckIcon className="w-6 h-6 text-green-500" aria-hidden /> },
+                  { label: "下書き", value: stats.draft, icon: <DocumentIcon className="w-6 h-6 text-gray-500" aria-hidden /> },
+                  { label: "事例", value: caseStudiesStats.total, icon: <BriefcaseIcon className="w-6 h-6 text-purple-500" aria-hidden /> }
                 ].map((item, index) => (
                   <div key={index} className="glass-card p-6 text-center">
-                    <div className="text-2xl mb-2">{item.icon}</div>
+                    <div className="flex justify-center mb-2">{item.icon}</div>
                     <div className="text-2xl font-bold text-gray-900">{item.value}</div>
                     <div className="text-sm text-gray-500">{item.label}</div>
                   </div>

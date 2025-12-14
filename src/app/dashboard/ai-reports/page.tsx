@@ -36,7 +36,8 @@ export default function AiReportsPage() {
       const response = await fetch('/api/my/reports/monthly');
       
       if (!response.ok) {
-        throw new Error('レポート一覧の取得に失敗しました');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.details || errorData.message || 'レポート一覧の取得に失敗しました');
       }
 
       const data: ReportsListResponse = await response.json();

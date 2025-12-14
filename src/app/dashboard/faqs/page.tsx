@@ -27,10 +27,11 @@ export default function FAQsManagementPage() {
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        setError(`HTTP ${response.status}: ${response.statusText}`);
+        return;
       }
       
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
       setFaqs(result.data || []);
       setError(null);
     } catch (err) {
@@ -62,7 +63,8 @@ export default function FAQsManagementPage() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        alert('削除に失敗しました: HTTP ' + response.status + ': ' + response.statusText);
+        return;
       }
 
       setFaqs(faqs.filter(faq => faq.id !== id));

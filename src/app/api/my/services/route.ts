@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
       .from('organizations')
       .select('id, slug')
       .eq('id', body.organizationId)
-      .single();
+      .maybeSingle();
 
     if (orgError || !organization) {
       logger.error('[my/services] POST Organization data fetch failed', { 

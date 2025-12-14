@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { HIGButton } from '@/design-system';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { logger } from '@/lib/utils/logger';
+import { CelebrationIcon } from '@/components/icons/HIGIcons';
 
 interface TestResult {
   step: string;
@@ -173,7 +174,7 @@ export default function TestInterviewPage() {
         }
       }
 
-      addResult('🎉 End-to-Endテスト完了', true, {
+      addResult("End-to-Endテスト完了", true, {
         sessionId,
         totalSteps: results.length + 1
       });

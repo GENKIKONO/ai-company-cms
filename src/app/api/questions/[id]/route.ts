@@ -36,7 +36,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         answerer:app_users!questions_answered_by_fkey(full_name)
       `)
       .eq('id', questionId)
-      .single();
+      .maybeSingle();
 
     if (error || !question) {
       return NextResponse.json(
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         .select('id')
         .eq('created_by', user.id)
         .eq('id', question.company_id)
-        .single();
+        .maybeSingle();
       
       isCompanyUser = !!orgData;
     }
@@ -124,7 +124,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       .from('questions')
       .select('*')
       .eq('id', questionId)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingQuestion) {
       return NextResponse.json(
@@ -144,7 +144,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         .select('id')
         .eq('created_by', user.id)
         .eq('id', existingQuestion.company_id)
-        .single();
+        .maybeSingle();
       
       isCompanyUser = !!orgData;
     }
@@ -200,7 +200,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         organizations!questions_company_id_fkey(name),
         answerer:app_users!questions_answered_by_fkey(full_name)
       `)
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       apiLogger.error('PUT', `/api/questions/${questionId}`, updateError, { userId: user.id, questionId });

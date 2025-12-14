@@ -42,6 +42,8 @@ interface BotLogsResponse {
     offset: number;
     has_more: boolean;
   };
+  is_fallback?: boolean;
+  fallback_reason?: string;
 }
 
 // GET - AI Bot ログ一覧取得
@@ -67,7 +69,7 @@ export async function GET(request: NextRequest) {
       offset: parseInt(searchParams.get('offset') || '0'),
     };
 
-    // ベースクエリ構築
+    // FK制約ベースの単純なJOINクエリ
     let baseQuery = supabase
       .from('ai_bot_logs')
       .select(`
@@ -102,11 +104,28 @@ export async function GET(request: NextRequest) {
     }
 
     // ソート・ページネーション
-    const { data: logs, error: logsError, count } = await baseQuery
+    const { data: logs, count, error: logsError } = await baseQuery
       .order('accessed_at', { ascending: false })
       .range(query.offset, query.offset + query.limit - 1);
 
     if (logsError) {
+      // Check for missing table (fail-open)
+      if (logsError.code === '42P01' || logsError.message?.includes('does not exist')) {
+        logger.debug('ai_bot_logs table missing, returning empty data', { query });
+        const fallbackResponse: BotLogsResponse = {
+          logs: [],
+          total_count: 0,
+          pagination: {
+            limit: query.limit,
+            offset: query.offset,
+            has_more: false,
+          },
+          is_fallback: true,
+          fallback_reason: 'MISSING_TABLE'
+        };
+        return NextResponse.json(fallbackResponse);
+      }
+      
       logger.error('Error fetching bot logs:', { data: logsError });
       return NextResponse.json(
         { error: 'Database error', message: logsError.message },
@@ -114,20 +133,26 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // レスポンス整形
-    const formattedLogs: BotLogResponse[] = (logs || []).map(log => ({
-      id: log.id,
-      url: log.url,
-      bot_name: log.bot_name,
-      accessed_at: log.accessed_at,
-      user_agent: log.user_agent,
-      ip_address: log.ip_address,
-      response_status: log.response_status,
-      content_unit: log.ai_content_units && Array.isArray(log.ai_content_units) && log.ai_content_units.length > 0 ? {
-        title: log.ai_content_units[0].title,
-        content_type: log.ai_content_units[0].content_type,
-      } : null,
-    }));
+    // レスポンス整形（型安全な形でJOIN結果を処理）
+    const formattedLogs: BotLogResponse[] = (logs || []).map(log => {
+      // PostgREST JOINの結果をobject/arrayに関係なく処理
+      const nested = (log as any).ai_content_units;
+      const contentUnit = Array.isArray(nested) ? (nested[0] ?? null) : (nested ?? null);
+      
+      return {
+        id: log.id,
+        url: log.url,
+        bot_name: log.bot_name,
+        accessed_at: log.accessed_at,
+        user_agent: log.user_agent,
+        ip_address: log.ip_address,
+        response_status: log.response_status,
+        content_unit: contentUnit ? {
+          title: contentUnit.title,
+          content_type: contentUnit.content_type,
+        } : null,
+      };
+    });
 
     const totalCount = count || 0;
     const hasMore = query.offset + query.limit < totalCount;

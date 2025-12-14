@@ -42,7 +42,7 @@ export default function ReportsPage() {
         throw new Error('Failed to fetch reports');
       }
       
-      const data: ReportsResponse = await response.json();
+      const data: ReportsResponse = await response.json().catch(() => ({ success: false, data: [], pagination: { total: 0, limit: 50, offset: 0, has_more: false } }));
       setReports(data.data || []);
       setPagination(data.pagination);
     } catch (error) {
@@ -66,7 +66,7 @@ export default function ReportsPage() {
         body: JSON.stringify({ year, month }),
       });
       
-      const data = await response.json();
+      const data = await response.json().catch(() => ({ success: false, error: 'Failed to parse response' }));
       
       if (!response.ok) {
         throw new Error(data.error || 'Failed to generate report');

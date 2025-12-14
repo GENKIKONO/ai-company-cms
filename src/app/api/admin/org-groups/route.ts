@@ -130,9 +130,19 @@ export async function POST(request: NextRequest) {
       .from('organizations')
       .select('id, name, company_name')
       .eq('id', owner_organization_id)
-      .single();
+      .maybeSingle();
 
-    if (ownerError || !ownerOrg) {
+    if (ownerError) {
+      logger.error('Error fetching owner organization', {
+        component: 'org-groups-api',
+        operation: 'verify-owner',
+        ownerOrgId: owner_organization_id,
+        error: ownerError.message
+      });
+      return NextResponse.json({ error: 'Failed to verify owner organization' }, { status: 500 });
+    }
+
+    if (!ownerOrg) {
       return NextResponse.json({ error: 'Owner organization not found' }, { status: 404 });
     }
 
@@ -157,7 +167,7 @@ export async function POST(request: NextRequest) {
           company_name
         )
       `)
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('Error creating organization group', {
@@ -174,6 +184,16 @@ export async function POST(request: NextRequest) {
         }, { status: 409 });
       }
       
+      return NextResponse.json({ error: 'Failed to create group' }, { status: 500 });
+    }
+
+    if (!group) {
+      logger.error('Group creation succeeded but no data returned', {
+        component: 'org-groups-api',
+        operation: 'create',
+        groupName: name,
+        ownerOrgId: owner_organization_id
+      });
       return NextResponse.json({ error: 'Failed to create group' }, { status: 500 });
     }
 

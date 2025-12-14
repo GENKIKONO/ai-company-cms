@@ -105,7 +105,11 @@ export async function GET(request: NextRequest) {
     const { data: totalHits, error: totalError, count: totalCount } = await totalHitsQuery;
 
     if (totalError) {
-      throw totalError;
+      logger.error('Error fetching total bot hits:', { data: totalError });
+      return NextResponse.json(
+        { error: 'Database error', message: totalError.message },
+        { status: 500 }
+      );
     }
 
     // 2. ユニークURL数
@@ -122,7 +126,11 @@ export async function GET(request: NextRequest) {
     const { data: uniqueUrls, error: uniqueError } = await uniqueUrlsQuery;
 
     if (uniqueError) {
-      throw uniqueError;
+      logger.error('Error fetching unique URLs:', { data: uniqueError });
+      return NextResponse.json(
+        { error: 'Database error', message: uniqueError.message },
+        { status: 500 }
+      );
     }
 
     // 3. Bot別集計
@@ -139,7 +147,11 @@ export async function GET(request: NextRequest) {
     const { data: botBreakdown, error: botError } = await botBreakdownQuery;
 
     if (botError) {
-      throw botError;
+      logger.error('Error fetching bot breakdown:', { data: botError });
+      return NextResponse.json(
+        { error: 'Database error', message: botError.message },
+        { status: 500 }
+      );
     }
 
     // 4. トップアクセスコンテンツ（content_units結合）
@@ -164,7 +176,11 @@ export async function GET(request: NextRequest) {
     const { data: topContent, error: contentError } = await topContentQuery;
 
     if (contentError) {
-      throw contentError;
+      logger.error('Error fetching top content:', { data: contentError });
+      return NextResponse.json(
+        { error: 'Database error', message: contentError.message },
+        { status: 500 }
+      );
     }
 
     // データ集計処理

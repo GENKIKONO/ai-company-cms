@@ -1,0 +1,290 @@
+{
+  "generatedAt": "2025-12-14T00:04:24.978Z",
+  "baseline": {
+    "file": "/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/crash-vectors.baseline.json",
+    "totalViolations": 728
+  },
+  "categories": {
+    "throwError": {
+      "count": 67,
+      "description": "Client-side throw new Error (UI crashes)"
+    },
+    "responseJson": {
+      "count": 228,
+      "description": "Unguarded response.json() calls"
+    },
+    "supabaseSingle": {
+      "count": 257,
+      "description": "Supabase .single() usage (PGRST116 risk)"
+    },
+    "hardcodedDashboard": {
+      "count": 176,
+      "description": "Hardcoded /dashboard URLs"
+    },
+    "serverClientBoundary": {
+      "count": 0,
+      "description": "No violations"
+    }
+  },
+  "topFiles": [
+    {
+      "file": "src/components/dashboard/DashboardSidebar.tsx",
+      "count": 22
+    },
+    {
+      "file": "src/components/navigation/UnifiedMobileNav.tsx",
+      "count": 11
+    },
+    {
+      "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+      "count": 10
+    },
+    {
+      "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+      "count": 9
+    },
+    {
+      "file": "src/app/management-console/users/page.tsx",
+      "count": 9
+    },
+    {
+      "file": "src/app/api/my/organization/route.ts",
+      "count": 9
+    },
+    {
+      "file": "src/app/dashboard/interview/history/page.tsx",
+      "count": 8
+    },
+    {
+      "file": "src/app/api/my/qa/entries/[id]/route.ts",
+      "count": 8
+    },
+    {
+      "file": "src/lib/routes.ts",
+      "count": 8
+    },
+    {
+      "file": "src/app/dashboard/questions/page.tsx",
+      "count": 7
+    },
+    {
+      "file": "src/app/admin/questions/page.tsx",
+      "count": 7
+    },
+    {
+      "file": "src/app/api/admin/org-groups/[groupId]/members/route.ts",
+      "count": 7
+    },
+    {
+      "file": "src/app/api/my/qa/categories/[id]/route.ts",
+      "count": 7
+    },
+    {
+      "file": "src/lib/auth.ts",
+      "count": 7
+    },
+    {
+      "file": "src/app/dashboard/interview/[sessionId]/page.tsx",
+      "count": 6
+    },
+    {
+      "file": "src/components/ExtractionAssistant.tsx",
+      "count": 6
+    },
+    {
+      "file": "src/app/qna/ask/page.tsx",
+      "count": 6
+    },
+    {
+      "file": "src/lib/organizations.ts",
+      "count": 6
+    },
+    {
+      "file": "src/app/dashboard/admin/billing-links/page.tsx",
+      "count": 5
+    },
+    {
+      "file": "src/app/dashboard/org-ai-chat/components/DocumentList.tsx",
+      "count": 5
+    }
+  ],
+  "dashboard": {
+    "totalCount": 135,
+    "percentage": 19,
+    "topFiles": [
+      {
+        "file": "src/app/dashboard/interview/InterviewPageClient.tsx",
+        "count": 10
+      },
+      {
+        "file": "src/app/dashboard/components/TabbedDashboard.tsx",
+        "count": 9
+      },
+      {
+        "file": "src/app/dashboard/interview/history/page.tsx",
+        "count": 8
+      },
+      {
+        "file": "src/app/dashboard/questions/page.tsx",
+        "count": 7
+      },
+      {
+        "file": "src/app/dashboard/interview/[sessionId]/page.tsx",
+        "count": 6
+      },
+      {
+        "file": "src/app/dashboard/admin/billing-links/page.tsx",
+        "count": 5
+      },
+      {
+        "file": "src/app/dashboard/org-ai-chat/components/DocumentList.tsx",
+        "count": 5
+      },
+      {
+        "file": "src/app/dashboard/posts/page.tsx",
+        "count": 5
+      },
+      {
+        "file": "src/app/dashboard/case-studies/page.tsx",
+        "count": 5
+      },
+      {
+        "file": "src/app/dashboard/ai-citations/page.tsx",
+        "count": 4
+      }
+    ]
+  },
+  "singleHotspots": {
+    "totalCount": 257,
+    "apiCount": 178,
+    "topLocations": [
+      {
+        "file": "src/app/api/admin/alerts/route.ts",
+        "line": 42,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/alerts/route.ts",
+        "line": 221,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/apply-migration/route.ts",
+        "line": 72,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/billing-links/[id]/activate/route.ts",
+        "line": 25,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/billing-links/[id]/activate/route.ts",
+        "line": 55,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/billing-links/route.ts",
+        "line": 104,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/assets/route.ts",
+        "line": 22,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/assets/route.ts",
+        "line": 103,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/assets/route.ts",
+        "line": 146,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/assets/route.ts",
+        "line": 195,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/sections/route.ts",
+        "line": 22,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/sections/route.ts",
+        "line": 96,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/sections/route.ts",
+        "line": 137,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/sections/route.ts",
+        "line": 186,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/site-settings/route.ts",
+        "line": 24,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/site-settings/route.ts",
+        "line": 93,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/site-settings/route.ts",
+        "line": 124,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/cms/site-settings/route.ts",
+        "line": 173,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/contacts/route.ts",
+        "line": 21,
+        "content": ".single();",
+        "isApi": true
+      },
+      {
+        "file": "src/app/api/admin/feature-management/route.ts",
+        "line": 156,
+        "content": ".single();",
+        "isApi": true
+      }
+    ]
+  },
+  "recommendations": [
+    "Priority 1: Fix 257 .single() calls → .maybeSingle() (prevents 500 errors)",
+    "Priority 2: Handle 67 throw new Error in UI (prevents crashes)",
+    "Priority 3: Guard 228 response.json() calls (prevents parse errors)",
+    "Focus area: Dashboard routes contain 135 violations (high user impact)",
+    "Quick wins: Start with API .single() calls (clearer error handling, no UI impact)"
+  ]
+}

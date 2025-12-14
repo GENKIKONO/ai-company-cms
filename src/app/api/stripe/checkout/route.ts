@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       .from('organizations')
       .select('id, name, owner_user_id, email, status')
       .eq('id', organizationId)
-      .single();
+      .maybeSingle();
 
     if (orgError || !organization) {
       return NextResponse.json(

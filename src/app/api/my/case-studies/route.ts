@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
         .from('organizations')
         .select('id, plan')
         .eq('id', organizationId)
-        .single();
+        .maybeSingle();
 
       if (orgError || !orgData) {
         logger.error('[my/case-studies] POST Organization data fetch failed', { 
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
         .from('organizations')
         .select('id, plan')
         .eq('created_by', authData.user.id)
-        .single();
+        .maybeSingle();
 
       if (orgError || !orgData) {
         return createNotFoundError('Organization');

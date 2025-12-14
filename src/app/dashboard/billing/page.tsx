@@ -117,7 +117,11 @@ export default function BillingPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create checkout session');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || 'Failed to create checkout session';
+        logger.error('Checkout failed', { error: errorMessage, status: response.status });
+        setError(errorMessage);
+        return;
       }
 
       const { url } = await response.json();
@@ -138,7 +142,11 @@ export default function BillingPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create portal session');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || 'Failed to create portal session';
+        logger.error('Portal creation failed', { error: errorMessage, status: response.status });
+        setError(errorMessage);
+        return;
       }
 
       const { url } = await response.json();
@@ -297,7 +305,7 @@ export default function BillingPage() {
             <div className="flex flex-col gap-3">
               {hasDiscount && (
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                  <div className="text-sm font-medium text-blue-800 mb-1">🎉 特別キャンペーン適用</div>
+                  <div className="text-sm font-medium text-blue-800 mb-1">特別キャンペーン適用</div>
                   <div className="text-sm text-blue-700">{campaignDescription}</div>
                   {checkoutInfo?.is_fallback && (
                     <div className="text-xs text-blue-600 mt-1">※ 通常価格でのご案内となります</div>

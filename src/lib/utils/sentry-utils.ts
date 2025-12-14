@@ -1,5 +1,4 @@
-import * as Sentry from '@sentry/nextjs';
-
+// Stub implementation to avoid Sentry imports in App Router
 export interface SentryContext {
   userId?: string;
   organizationId?: string;
@@ -19,37 +18,20 @@ export interface SentryPerformanceMetric {
 
 export class SentryUtils {
   static setUserContext(userId: string, organizationId?: string, email?: string) {
-    Sentry.setUser({
-      id: userId,
-      email,
-      organizationId,
-    });
-    
-    Sentry.setTag('organization.id', organizationId || 'none');
+    // Stub - log to console instead
+    console.debug('SentryUtils.setUserContext', { userId, organizationId, email });
   }
 
   static clearUserContext() {
-    Sentry.setUser(null);
+    console.debug('SentryUtils.clearUserContext');
   }
 
   static captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', context?: SentryContext) {
-    if (context) {
-      this.withContext(context, () => {
-        Sentry.captureMessage(message, level);
-      });
-    } else {
-      Sentry.captureMessage(message, level);
-    }
+    console.debug('SentryUtils.captureMessage', { message, level, context });
   }
 
   static captureException(error: Error, context?: SentryContext) {
-    if (context) {
-      this.withContext(context, () => {
-        Sentry.captureException(error);
-      });
-    } else {
-      Sentry.captureException(error);
-    }
+    console.error('SentryUtils.captureException', error, context);
   }
 
   static captureAPIError(error: Error, request: {
@@ -59,17 +41,7 @@ export class SentryUtils {
     userId?: string;
     organizationId?: string;
   }) {
-    this.withContext({
-      api: {
-        method: request.method,
-        url: request.url,
-        statusCode: request.statusCode,
-      },
-      userId: request.userId,
-      organizationId: request.organizationId,
-    }, () => {
-      Sentry.captureException(error);
-    });
+    console.error('SentryUtils.captureAPIError', error, request);
   }
 
   static captureSSRError(error: Error, pageProps: {
@@ -78,49 +50,15 @@ export class SentryUtils {
     userId?: string;
     organizationId?: string;
   }) {
-    this.withContext({
-      ssr: {
-        route: pageProps.route,
-        params: pageProps.params,
-      },
-      userId: pageProps.userId,
-      organizationId: pageProps.organizationId,
-    }, () => {
-      Sentry.captureException(error);
-    });
+    console.error('SentryUtils.captureSSRError', error, pageProps);
   }
 
   static trackPerformance(metric: SentryPerformanceMetric) {
-    // Add as breadcrumb for context
-    Sentry.addBreadcrumb({
-      category: 'performance',
-      message: `${metric.name}: ${metric.value}${metric.unit}`,
-      level: 'info',
-      data: metric.tags,
-    });
-
-    // Set metric with tags
-    if (metric.tags) {
-      Object.entries(metric.tags).forEach(([key, value]) => {
-        Sentry.setTag(key, value);
-      });
-    }
+    console.debug('SentryUtils.trackPerformance', metric);
   }
 
   static startTransaction(name: string, operation: string, context?: SentryContext) {
-    // Add breadcrumb for transaction start
-    this.addBreadcrumb(`Starting ${operation}: ${name}`, 'transaction');
-    
-    if (context) {
-      Object.entries(context).forEach(([key, value]) => {
-        if (typeof value === 'string') {
-          Sentry.setTag(key, value);
-        } else {
-          Sentry.setContext(key, value);
-        }
-      });
-    }
-
+    console.debug('SentryUtils.startTransaction', { name, operation, context });
     return { name, operation, startTime: Date.now() };
   }
 
@@ -134,56 +72,28 @@ export class SentryUtils {
     
     return callback(transaction)
       .then(result => {
-        this.addBreadcrumb(`Completed ${operation}: ${name}`, 'transaction', {
-          duration: Date.now() - transaction.startTime,
-          status: 'success'
-        });
+        console.debug('SentryUtils.withTransaction completed', { name, operation, duration: Date.now() - transaction.startTime });
         return result;
       })
       .catch(error => {
         this.captureException(error, context);
-        this.addBreadcrumb(`Failed ${operation}: ${name}`, 'transaction', {
-          duration: Date.now() - transaction.startTime,
-          status: 'error'
-        });
+        console.debug('SentryUtils.withTransaction failed', { name, operation, duration: Date.now() - transaction.startTime });
         throw error;
       });
   }
 
   static addBreadcrumb(message: string, category: string, data?: Record<string, any>) {
-    Sentry.addBreadcrumb({
-      message,
-      category,
-      level: 'info',
-      data,
-    });
+    console.debug('SentryUtils.addBreadcrumb', { message, category, data });
   }
 
   static setTag(key: string, value: string) {
-    Sentry.setTag(key, value);
+    console.debug('SentryUtils.setTag', { key, value });
   }
 
   static setContext(key: string, context: Record<string, any>) {
-    Sentry.setContext(key, context);
+    console.debug('SentryUtils.setContext', { key, context });
   }
 
-  private static withContext(context: SentryContext, callback: () => void) {
-    Sentry.withScope(scope => {
-      Object.entries(context).forEach(([key, value]) => {
-        if (key === 'userId' && value) {
-          scope.setUser({ id: value });
-        } else if (typeof value === 'string') {
-          scope.setTag(key, value);
-        } else if (typeof value === 'object' && value !== null) {
-          scope.setContext(key, value);
-        }
-      });
-      
-      callback();
-    });
-  }
-
-  // API Route wrapper with automatic error tracking
   static wrapAPIHandler<T extends any[]>(
     handler: (...args: T) => Promise<Response>,
     options?: {
@@ -197,11 +107,12 @@ export class SentryUtils {
       const startTime = Date.now();
 
       try {
-        this.addBreadcrumb(`API Handler: ${operationName}`, 'http', context);
+        console.debug('SentryUtils.wrapAPIHandler start', { operationName, context });
         const result = await handler(...args);
         
-        this.addBreadcrumb(`API Success: ${operationName}`, 'http', {
-          ...context,
+        console.debug('SentryUtils.wrapAPIHandler success', {
+          operationName,
+          context,
           duration: Date.now() - startTime,
         });
         
@@ -218,42 +129,15 @@ export class SentryUtils {
     };
   }
 
-  // Webhook monitoring integration
   static trackWebhookEvent(eventType: string, success: boolean, context?: {
     eventId?: string;
     retryCount?: number;
     processingTime?: number;
   }) {
-    this.addBreadcrumb(
-      `Webhook ${eventType} ${success ? 'succeeded' : 'failed'}`,
-      'webhook',
-      context
-    );
-
-    if (context?.processingTime) {
-      this.trackPerformance({
-        name: 'webhook.processing_time',
-        value: context.processingTime,
-        unit: 'milliseconds',
-        tags: {
-          event_type: eventType,
-          success: success.toString(),
-        },
-      });
-    }
+    console.debug('SentryUtils.trackWebhookEvent', { eventType, success, context });
 
     if (!success) {
-      this.captureMessage(
-        `Webhook processing failed: ${eventType}`,
-        'warning',
-        {
-          webhook: {
-            eventType,
-            eventId: context?.eventId,
-            retryCount: context?.retryCount,
-          },
-        }
-      );
+      console.warn('SentryUtils.trackWebhookEvent failed', { eventType, context });
     }
   }
 }

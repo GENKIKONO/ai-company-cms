@@ -55,12 +55,14 @@ export async function GET(request: NextRequest) {
     // 現在のユーザーセッションを取得
     const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
     
-    console.log('[ME_DEBUG] Entry point:', { 
-      hasAuthUser: !!authUser, 
-      userId: authUser?.id,
-      userEmail: authUser?.email,
-      authError: authError?.message 
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[ME_DEBUG] Entry point:', { 
+        hasAuthUser: !!authUser, 
+        userId: authUser?.id,
+        userEmail: authUser?.email,
+        authError: authError?.message 
+      });
+    }
     
     if (authError || !authUser) {
       const response = NextResponse.json(
@@ -83,10 +85,12 @@ export async function GET(request: NextRequest) {
       full_name: authUser.user_metadata?.full_name || null
     };
 
-    console.log('[ME_DEBUG] user', {
-      id: authUser?.id,
-      email: authUser?.email,
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[ME_DEBUG] user', {
+        id: authUser?.id,
+        email: authUser?.email,
+      });
+    }
 
     let organizations: OrganizationSummary[] = [];
     let selectedOrganization: OrganizationSummary | null = null;
@@ -97,8 +101,17 @@ export async function GET(request: NextRequest) {
     const { data: orgRows, error: orgError } = await supabase
       .rpc('get_my_organizations_slim');
 
-    console.log('[ME_DEBUG] orgs_from_rpc', orgRows);
-    console.log('[ME_DEBUG] rpc_error', orgError);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[ME_DEBUG] orgs_from_rpc', orgRows);
+      console.log('[ME_DEBUG] rpc_error', orgError);
+      
+      // DEBUG: Check if id field is present in RPC response
+      if (orgRows && orgRows.length > 0) {
+        console.log('[ME_DEBUG] first_org_raw_fields', Object.keys(orgRows[0]));
+        console.log('[ME_DEBUG] first_org_id', orgRows[0].id);
+        console.log('[ME_DEBUG] first_org_full_object', orgRows[0]);
+      }
+    }
 
     if (orgError) {
       // RPCエラーは system_error として扱う（DB側は正常の前提）
@@ -111,22 +124,27 @@ export async function GET(request: NextRequest) {
       organizations = rawOrganizations.map(normalizeOrganizationSummary);
       selectedOrganization = organizations.length > 0 ? organizations[0] : null;
       
-      console.log('[ME_DEBUG] organizations mapped:', { 
-        userId: authUser.id, 
-        orgCount: organizations.length,
-        firstOrgId: organizations[0]?.id,
-        firstOrgName: organizations[0]?.name
-      });
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[ME_DEBUG] organizations mapped:', { 
+          userId: authUser.id, 
+          orgCount: organizations.length,
+          firstOrgId: organizations[0]?.id,
+          firstOrgName: organizations[0]?.name,
+          firstOrgFullMapped: organizations[0]
+        });
+      }
       
       // 0件でも正常（errorType: 'none' のまま）
       errorType = 'none';
       errorMessage = undefined;
     }
 
-    console.log('[ME_DEBUG] response_summary', {
-      organizationsLength: organizations.length,
-      errorType,
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[ME_DEBUG] response_summary', {
+        organizationsLength: organizations.length,
+        errorType,
+      });
+    }
 
     // レスポンス返却（キャッシュ防止ヘッダー付き）
     const responseData: MeApiResponseExtended = {
@@ -138,16 +156,25 @@ export async function GET(request: NextRequest) {
       errorType                        // 新規: 構造化エラー種別
     };
 
-    console.log('[ME_DEBUG] Final response:', { 
-      hasUser: !!user,
-      organizationsLength: organizations.length,
-      selectedOrgId: selectedOrganization?.id,
-      selectedOrgSlug: selectedOrganization?.slug,
-      selectedOrgPlan: selectedOrganization?.plan,
-      errorType,
-      hasError: !!errorMessage,
-      errorMessage: errorMessage
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[ME_DEBUG] Final response:', { 
+        hasUser: !!user,
+        organizationsLength: organizations.length,
+        selectedOrgId: selectedOrganization?.id,
+        selectedOrgSlug: selectedOrganization?.slug,
+        selectedOrgPlan: selectedOrganization?.plan,
+        organizationId: selectedOrganization?.id,  // Extra check for dashboard compatibility
+        errorType,
+        hasError: !!errorMessage,
+        errorMessage: errorMessage
+      });
+      
+      // Extra debug: log the complete response structure that will be sent
+      console.log('[ME_DEBUG] Complete response structure:');
+      console.log('[ME_DEBUG] - organizations[0]?.id:', organizations[0]?.id);
+      console.log('[ME_DEBUG] - selectedOrganization?.id:', selectedOrganization?.id);
+      console.log('[ME_DEBUG] - organization?.id:', selectedOrganization?.id);
+    }
     
     const response = NextResponse.json(responseData);
     

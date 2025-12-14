@@ -57,7 +57,7 @@ export default function DocumentUpload({
         body: formData,
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ success: false, error: 'Invalid response format' }));
 
       if (!response.ok || !result.success) {
         logger.error('[UPLOAD] API error:', { data: result });

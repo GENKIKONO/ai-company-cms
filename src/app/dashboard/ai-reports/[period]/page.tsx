@@ -52,7 +52,7 @@ export default function AiReportDetailPage() {
         throw new Error('レポートの取得に失敗しました');
       }
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({ report: null, error: 'Failed to parse response' }));
       setReport(data.report);
       setError(null);
     } catch (err) {

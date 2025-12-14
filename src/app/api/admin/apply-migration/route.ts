@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       .from('organizations')
       .select('id')
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (testOrgError || !testOrg) {
       return NextResponse.json({ 

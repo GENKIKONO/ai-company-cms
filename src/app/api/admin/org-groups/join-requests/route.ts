@@ -86,11 +86,20 @@ export async function GET(request: NextRequest) {
 
     // Check system admin role
     // TODO: [SUPABASE_TYPE_FOLLOWUP] profiles テーブルの型定義を Supabase client に追加
-    const { data: profile } = await (supabaseAdmin as any)
+    const { data: profile, error: profileError } = await (supabaseAdmin as any)
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
+
+    if (profileError) {
+      logger.error('Error fetching user profile', {
+        component: 'join-requests-api',
+        operation: 'list',
+        error: profileError.message
+      });
+      return NextResponse.json({ error: 'Failed to check user permissions' }, { status: 500 });
+    }
 
     const isSystemAdmin = profile?.role === 'admin';
 
@@ -186,9 +195,18 @@ export async function POST(request: NextRequest) {
         revoked_at
       `)
       .eq('code', inviteCode)
-      .single();
+      .maybeSingle();
 
-    if (inviteError || !invite) {
+    if (inviteError) {
+      logger.error('Error fetching invite code', {
+        component: 'join-requests-api',
+        operation: 'create',
+        error: inviteError.message
+      });
+      return NextResponse.json({ error: 'Failed to validate invite code' }, { status: 500 });
+    }
+
+    if (!invite) {
       logger.warn('Invalid invite code used for join request', {
         component: 'join-requests-api',
         operation: 'create',
@@ -220,12 +238,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if organization is already a member
-    const { data: existingMember } = await supabaseAdmin
+    const { data: existingMember, error: memberError } = await supabaseAdmin
       .from('org_group_members')
       .select('id')
       .eq('group_id', invite.group_id)
       .eq('organization_id', organizationId)
-      .single();
+      .maybeSingle();
+
+    if (memberError) {
+      logger.error('Error checking existing membership', {
+        component: 'join-requests-api',
+        operation: 'create',
+        error: memberError.message
+      });
+      return NextResponse.json({ error: 'Failed to check membership' }, { status: 500 });
+    }
 
     if (existingMember) {
       return NextResponse.json({ 
@@ -234,13 +261,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing pending request
-    const { data: existingRequest } = await supabaseAdmin
+    const { data: existingRequest, error: requestError } = await supabaseAdmin
       .from('org_group_join_requests')
       .select('id')
       .eq('group_id', invite.group_id)
       .eq('organization_id', organizationId)
       .eq('status', 'pending')
-      .single();
+      .maybeSingle();
+
+    if (requestError) {
+      logger.error('Error checking existing request', {
+        component: 'join-requests-api',
+        operation: 'create',
+        error: requestError.message
+      });
+      return NextResponse.json({ error: 'Failed to check existing request' }, { status: 500 });
+    }
 
     if (existingRequest) {
       return NextResponse.json({ 
@@ -284,7 +320,7 @@ export async function POST(request: NextRequest) {
           company_name
         )
       `)
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('Error creating join request', {
@@ -293,6 +329,16 @@ export async function POST(request: NextRequest) {
         groupId: invite.group_id,
         organizationId,
         error: error.message
+      });
+      return NextResponse.json({ error: 'Failed to create join request' }, { status: 500 });
+    }
+
+    if (!joinRequest) {
+      logger.error('Join request creation succeeded but no data returned', {
+        component: 'join-requests-api',
+        operation: 'create',
+        groupId: invite.group_id,
+        organizationId
       });
       return NextResponse.json({ error: 'Failed to create join request' }, { status: 500 });
     }

@@ -384,13 +384,17 @@ export default function AdminContentsDashboard() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+        const errorMessage = errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+        setDashboardState(prev => ({ ...prev, error: errorMessage }));
+        return;
       }
 
       const result: AdminContentApiResponse<AdminContentListResponse> = await response.json();
       
       if (!result.success) {
-        throw new Error((result as AdminContentApiError).message || 'Failed to fetch contents');
+        const errorMessage = (result as AdminContentApiError).message || 'Failed to fetch contents';
+        setDashboardState(prev => ({ ...prev, error: errorMessage }));
+        return;
       }
 
       const successResult = result as AdminContentListResponse;
@@ -478,7 +482,10 @@ export default function AdminContentsDashboard() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || '削除に失敗しました');
+        const errorMessage = errorData.message || '削除に失敗しました';
+        logger.error('Failed to delete content:', { error: errorMessage });
+        alert('削除に失敗しました: ' + errorMessage);
+        return;
       }
 
       // リストから削除

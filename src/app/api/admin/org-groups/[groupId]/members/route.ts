@@ -22,7 +22,7 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
       .from('organization_groups')
       .select('owner_organization_id')
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
 
     if (error || !group) {
       return false;
@@ -89,7 +89,7 @@ export async function POST(
       .from('organization_groups')
       .select('id, name, owner_organization_id')
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
 
     if (groupError || !group) {
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
@@ -100,7 +100,7 @@ export async function POST(
       .from('organizations')
       .select('id, name, company_name')
       .eq('id', organization_id)
-      .single();
+      .maybeSingle();
 
     if (orgError || !org) {
       return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
@@ -112,7 +112,7 @@ export async function POST(
       .select('id')
       .eq('group_id', groupId)
       .eq('organization_id', organization_id)
-      .single();
+      .maybeSingle();
 
     if (existingMember) {
       return NextResponse.json({ 
@@ -145,7 +145,7 @@ export async function POST(
           company_name
         )
       `)
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('Error adding member to organization group', {
@@ -232,7 +232,7 @@ export async function DELETE(
       .from('organization_groups')
       .select('name, owner_organization_id')
       .eq('id', groupId)
-      .single();
+      .maybeSingle();
 
     if (groupError || !group) {
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
@@ -259,7 +259,7 @@ export async function DELETE(
       `)
       .eq('group_id', groupId)
       .eq('organization_id', organization_id)
-      .single();
+      .maybeSingle();
 
     if (!member) {
       return NextResponse.json({ error: 'Member not found' }, { status: 404 });
