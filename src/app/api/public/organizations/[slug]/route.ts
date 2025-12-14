@@ -35,10 +35,18 @@ export async function GET(
       .select('*')
       .eq('slug', slug)
       .eq('is_published', true)
-      .single();
+      .maybeSingle();
 
-    if (orgError || !organization) {
-      logger.warn(`[API] Organization not found for slug: ${slug}`, { data: orgError });
+    if (orgError) {
+      logger.error(`[API] Database error for slug: ${slug}`, { data: orgError });
+      return NextResponse.json(
+        { error: 'Internal server error' },
+        { status: 500 }
+      );
+    }
+
+    if (!organization) {
+      logger.warn(`[API] Organization not found for slug: ${slug}`);
       return NextResponse.json(
         { error: 'Organization not found' },
         { status: 404 }
@@ -138,9 +146,13 @@ export async function HEAD(
       .select('id, name, updated_at')
       .eq('slug', slug)
       .eq('is_published', true)
-      .single();
+      .maybeSingle();
 
-    if (error || !data) {
+    if (error) {
+      return new NextResponse(null, { status: 500 });
+    }
+
+    if (!data) {
       return new NextResponse(null, { status: 404 });
     }
 
