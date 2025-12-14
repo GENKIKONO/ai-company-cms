@@ -10,6 +10,7 @@ export default async function OrganizationsLayout({
 }: {
   children: React.ReactNode;
 }) {
+  
   // 🌐 企業ディレクトリは公開ページとして設定
   // このlayoutは /organizations (一覧) のみに適用される
   // /organizations/[id] などの編集ページは別のlayoutで処理される

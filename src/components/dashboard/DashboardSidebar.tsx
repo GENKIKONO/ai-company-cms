@@ -61,7 +61,7 @@ export function DashboardSidebar() {
   const navigation = getNavigation(organization);
 
   return (
-    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 border-r border-gray-200">
+    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 border-r border-gray-200" data-testid="dashboard-sidenav">
       <div className="flex h-16 shrink-0 items-center">
         <Link href="/dashboard" className="text-xl font-bold text-[var(--aio-primary)]">
           AIO Hub

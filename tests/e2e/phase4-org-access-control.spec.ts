@@ -2,7 +2,7 @@
  * フェーズ4: 組織アクセス制御統合テスト (P0シナリオ)
  * validate_org_access RPC + useOrganization 状態マシンの検証
  * 
- * NOTE: playwright.config.ts で baseURL が設定されている前提（通常は http://localhost:3000）
+ * NOTE: playwright.config.ts で baseURL が設定されている前提（通常は http://localhost:3099）
  * 開発時にポートが変更される場合は PLAYWRIGHT_BASE_URL 環境変数で調整してください
  */
 

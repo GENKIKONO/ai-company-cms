@@ -10,6 +10,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  
   // Get user profile with account status
   const userProfile = await getServerUserWithStatus();
   
