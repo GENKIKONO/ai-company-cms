@@ -53,7 +53,7 @@ export default defineConfig({
   webServer: {
     command: process.env.CI ? 'npm run start:e2e' : 'PORT=3099 npm run dev',
     url: 'http://localhost:3099',
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     timeout: 120000,
   },
 
