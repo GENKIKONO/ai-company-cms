@@ -38,15 +38,19 @@ export default function DocumentList({ organizationId }: DocumentListProps) {
         const errorData = await response.json().catch(() => ({ error: 'Invalid response format' }));
         
         if (response.status === 401) {
-          throw new Error('認証が必要です。ログインし直してください。');
+          setError('認証が必要です。ログインし直してください。');
+          return;
         } else if (response.status === 403) {
-          throw new Error('アクセス権限がありません。');
+          setError('アクセス権限がありません。');
+          return;
         } else if (response.status >= 500) {
           const errorMsg = errorData.error || 'サーバーエラーが発生しました。';
-          throw new Error(errorMsg);
+          setError(errorMsg);
+          return;
         } else {
           const errorMsg = errorData.error || errorData.message || response.statusText;
-          throw new Error(`HTTP ${response.status}: ${errorMsg}`);
+          setError(`HTTP ${response.status}: ${errorMsg}`);
+          return;
         }
       }
 
@@ -55,7 +59,8 @@ export default function DocumentList({ organizationId }: DocumentListProps) {
       if (result.success) {
         setDocuments(result.documents || []);
       } else {
-        throw new Error(result.error || '文書一覧の取得に失敗しました。');
+        setError(result.error || '文書一覧の取得に失敗しました。');
+        return;
       }
 
     } catch (error) {
