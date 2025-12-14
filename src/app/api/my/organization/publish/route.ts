@@ -89,7 +89,7 @@ export async function PUT(request: NextRequest) {
       .from('organizations')
       .select('id, slug, is_published, status')
       .eq('created_by', user.id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existingOrg) {
       logger.warn('[my/organization/publish] Organization not found', { data: { userId: user.id, error: fetchError } });
@@ -170,11 +170,22 @@ export async function PUT(request: NextRequest) {
       .eq('id', existingOrg.id)
       .eq('created_by', user.id) // セキュリティのため二重チェック
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('[my/organization/publish] Database error', { data: error instanceof Error ? error : new Error(String(error)) });
       return handleApiError(error);
+    }
+
+    if (!data) {
+      logger.error('[my/organization/publish] Update failed - no data returned');
+      return NextResponse.json(
+        { 
+          error: 'Update failed', 
+          message: 'Organization publication update failed'
+        },
+        { status: 500 }
+      );
     }
 
     // ✅ 統一キャッシュ無効化
