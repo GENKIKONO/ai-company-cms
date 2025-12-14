@@ -152,10 +152,22 @@ export async function POST(request: NextRequest) {
     await supabase.rpc('set_admin_email_context');
 
     // 既存のレコードがあるかチェック
-    const { data: existing } = await supabase
+    const { data: existing, error: fetchError } = await supabase
       .from('site_settings')
       .select('id')
       .maybeSingle();
+
+    if (fetchError) {
+      logger.error('Database lookup error', { data: fetchError instanceof Error ? fetchError : new Error(String(fetchError)) });
+      return NextResponse.json(
+        { 
+          code: 'DATABASE_ERROR',
+          reason: 'Failed to lookup existing site settings',
+          details: fetchError.message
+        },
+        { status: 500 }
+      );
+    }
 
     let result;
     if (existing) {
