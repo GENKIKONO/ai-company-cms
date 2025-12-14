@@ -56,19 +56,20 @@ export async function GET(
         )
       `)
       .eq('id', postId)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Post not found' },
-          { status: 404 }
-        );
-      }
       logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
       return NextResponse.json(
         { error: 'Internal server error', message: error.message },
         { status: 500 }
+      );
+    }
+
+    if (!data) {
+      return NextResponse.json(
+        { error: 'Post not found' },
+        { status: 404 }
       );
     }
 
@@ -131,19 +132,20 @@ export async function PUT(
           slug
         )
       `)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Post not found' },
-          { status: 404 }
-        );
-      }
       logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
       return NextResponse.json(
         { error: 'Failed to update post', message: error.message },
         { status: 500 }
+      );
+    }
+
+    if (!data) {
+      return NextResponse.json(
+        { error: 'Post not found' },
+        { status: 404 }
       );
     }
 
@@ -173,7 +175,7 @@ export async function DELETE(
       .from('posts')
       .select('id, title')
       .eq('id', postId)
-      .single();
+      .maybeSingle();
 
     if (checkError || !post) {
       return NextResponse.json(
