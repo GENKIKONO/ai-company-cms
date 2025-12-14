@@ -84,11 +84,11 @@ export default function CompanyQuestionsPage() {
           setError('この機能を利用する権限がありません。企業管理者に連絡してください。');
           return;
         }
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ error: '応答の解析に失敗しました' }));
         throw new Error(errorData.error || '質問の取得に失敗しました');
       }
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ data: [], stats: { total: 0, open: 0, answered: 0, closed: 0 }, company: null }));
       setQuestions(result.data || []);
       setStats(result.stats || { total: 0, open: 0, answered: 0, closed: 0 });
       setCompany(result.company || null);
@@ -156,7 +156,7 @@ export default function CompanyQuestionsPage() {
       });
 
       if (response.ok) {
-        const result = await response.json();
+        const result = await response.json().catch(() => ({ data: null }));
         
         // 質問リストを更新
         setQuestions(prev => prev.map(q => 
@@ -182,7 +182,7 @@ export default function CompanyQuestionsPage() {
         } else if (response.status === 401) {
           errorMessage = 'ログインが必要です';
         } else {
-          const errorData = await response.json();
+          const errorData = await response.json().catch(() => ({ error: '応答の解析に失敗しました' }));
           errorMessage = errorData.error || errorMessage;
         }
         alert(errorMessage);
@@ -206,7 +206,7 @@ export default function CompanyQuestionsPage() {
       });
 
       if (response.ok) {
-        const result = await response.json();
+        const result = await response.json().catch(() => ({ data: null }));
         
         // 質問リストを更新
         setQuestions(prev => prev.map(q => 
@@ -224,7 +224,7 @@ export default function CompanyQuestionsPage() {
         } else if (response.status === 401) {
           errorMessage = 'ログインが必要です';
         } else {
-          const errorData = await response.json();
+          const errorData = await response.json().catch(() => ({ error: '応答の解析に失敗しました' }));
           errorMessage = errorData.error || errorMessage;
         }
         alert(errorMessage);
