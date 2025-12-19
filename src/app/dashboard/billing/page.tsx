@@ -8,6 +8,7 @@ import type { Organization } from '@/types/legacy/database';;
 import { HIGButton } from '@/design-system';
 import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { logger } from '@/lib/utils/logger';
+import { handleMaybeSingleResult } from '@/lib/error-mapping';
 import { 
   fetchActiveCheckoutForOrg, 
   calculateDiscountedPrice,
@@ -56,13 +57,16 @@ export default function BillingPage() {
       }
 
       // Get user's organization (Single-Org Mode)
-      const { data: org, error: orgError } = await supabase
+      const orgResult = await supabase
         .from('organizations')
         .select('*')
         .eq('created_by', user.id)
-        .single();
+        .maybeSingle();
 
-      if (orgError || !org) {
+      let org;
+      try {
+        org = handleMaybeSingleResult(orgResult, '組織');
+      } catch (error) {
         // 組織が見つからない場合は企業作成ページにリダイレクト
         router.push('/organizations/new');
         return;

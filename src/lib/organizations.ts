@@ -4,6 +4,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { vLog, logger } from '@/lib/utils/logger';
 import type { Organization } from '@/types/legacy/database';
 import type { OrganizationFormData, OrganizationWithOwner } from '@/types/domain/organizations';
+import { handleMaybeSingleResult } from '@/lib/error-mapping';
 
 // 企業一覧取得
 export async function getOrganizations(options: {
@@ -72,7 +73,7 @@ export async function getOrganization(id: string) {
 
     // 🔥 FIX: Use direct organizations table to ensure fresh data after saves
     // Instead of organizations_with_owner view which may have stale data
-    const { data, error } = await supabaseBrowser
+    const result = await supabaseBrowser
       .from('organizations')
       .select(`
         *,
@@ -82,9 +83,9 @@ export async function getOrganization(id: string) {
       `)
       .eq('id', id)
       .eq('created_by', user.id)  // 🔥 Explicit user filter for RLS consistency
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    const data = handleMaybeSingleResult(result, '組織');
     return { data, error: null };
   } catch (error) {
     logger.error('Error fetching organization', { data: error instanceof Error ? error : new Error(String(error)) });
@@ -101,7 +102,7 @@ export async function createOrganization(organizationData: OrganizationFormData)
       throw new Error('Not authenticated');
     }
 
-    const { data, error } = await supabaseBrowser
+    const result = await supabaseBrowser
       .from('organizations')
       .insert({
         ...organizationData,
@@ -109,9 +110,9 @@ export async function createOrganization(organizationData: OrganizationFormData)
         status: 'draft'
       })
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    const data = handleMaybeSingleResult(result, '新しい組織');
     return { data, error: null };
   } catch (error) {
     logger.error('Error creating organization', { data: error instanceof Error ? error : new Error(String(error)) });
@@ -262,7 +263,7 @@ export async function getOrganizationStats() {
 // スラッグから企業取得（公開ページ用）
 export async function getOrganizationBySlug(slug: string) {
   try {
-    const { data, error } = await supabaseBrowser
+    const result = await supabaseBrowser
       .from('organizations')
       .select(`
         *,
@@ -272,9 +273,9 @@ export async function getOrganizationBySlug(slug: string) {
       `)
       .eq('slug', slug)
       .eq('status', 'published')
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    const data = handleMaybeSingleResult(result, '企業');
     return { data, error: null };
   } catch (error) {
     logger.error('Error fetching organization by slug', { data: error instanceof Error ? error : new Error(String(error)) });

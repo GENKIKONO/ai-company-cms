@@ -7,6 +7,7 @@ import type { UserRole } from '@/types/utils/database';;
 import type { DatabaseResult, TableRow, TableUpdate } from '@/types/database.types';
 import type { ApiResponse, createApiResponse, createErrorResponse } from '@/types/api.types';
 import { authLogger, logger } from '@/lib/utils/logger';
+import { handleMaybeSingleResult } from '@/lib/error-mapping';
 
 // Profile update interface
 interface ProfileUpdates {
@@ -282,15 +283,14 @@ export const profile = {
     if (updates.avatar_url !== undefined) profileUpdates.avatar_url = updates.avatar_url;
 
     const supabase = await createClient();
-    const { data, error } = await supabase
+    const result = await supabase
       .from('profiles')
       .update(profileUpdates)
       .eq('id', userId)
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
-    return data;
+    return handleMaybeSingleResult(result, 'プロフィール');
   },
 };
 
@@ -312,7 +312,7 @@ export const savedSearches = {
   // 検索条件保存
   save: async (userId: string, name: string, searchParams: SearchParams) => {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    const result = await supabase
       .from('user_saved_searches')
       .insert({
         user_id: userId,
@@ -320,16 +320,15 @@ export const savedSearches = {
         search_params: searchParams,
       })
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
-    return data;
+    return handleMaybeSingleResult(result, '保存された検索条件');
   },
 
   // 検索条件更新
   update: async (id: string, updates: SavedSearchUpdates) => {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    const result = await supabase
       .from('user_saved_searches')
       .update({
         ...updates,
@@ -337,10 +336,9 @@ export const savedSearches = {
       })
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
-    return data;
+    return handleMaybeSingleResult(result, '保存された検索条件');
   },
 
   // 検索条件削除
@@ -376,17 +374,16 @@ export const favorites = {
   // お気に入りに追加
   add: async (userId: string, organizationId: string) => {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    const result = await supabase
       .from('user_favorites')
       .insert({
         user_id: userId,
         organization_id: organizationId,
       })
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
-    return data;
+    return handleMaybeSingleResult(result, 'お気に入り');
   },
 
   // お気に入りから削除
@@ -409,9 +406,10 @@ export const favorites = {
       .select('id')
       .eq('user_id', userId)
       .eq('organization_id', organizationId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') throw error;
+    // エラーがある場合は0件として扱う（お気に入りしていない）
+    if (error) return false;
     return !!data;
   },
 };
@@ -425,16 +423,17 @@ export const preferences = {
       .from('user_preferences')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') throw error;
-    return data || {};
+    // 設定が見つからない場合はデフォルト値を返す
+    if (error || !data) return {};
+    return data;
   },
 
   // 設定更新
   update: async (userId: string, preferences: UserPreferences) => {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    const result = await supabase
       .from('user_preferences')
       .upsert({
         user_id: userId,
@@ -442,9 +441,8 @@ export const preferences = {
         updated_at: new Date().toISOString(),
       })
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
-    return data;
+    return handleMaybeSingleResult(result, 'ユーザー設定');
   },
 };

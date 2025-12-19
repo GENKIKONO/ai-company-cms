@@ -1,6 +1,7 @@
 import { supabaseBrowser } from '@/lib/supabase/client';
 import type { Service } from '@/types/legacy/database';
 import type { ServiceFormData } from '@/types/domain/content';;
+import { handleMaybeSingleResult } from '@/lib/error-mapping';
 
 export interface GetServicesOptions {
   search?: string;
@@ -53,7 +54,7 @@ export async function getServices(options: GetServicesOptions = {}) {
 }
 
 export async function getService(id: string) {
-  return await supabaseBrowser
+  const result = await supabaseBrowser
     .from('services')
     .select(`
       *,
@@ -66,11 +67,14 @@ export async function getService(id: string) {
       )
     `)
     .eq('id', id)
-    .single();
+    .maybeSingle();
+  
+  const data = handleMaybeSingleResult(result, 'サービス');
+  return { data, error: null };
 }
 
 export async function getServiceBySlug(organizationSlug: string, serviceSlug: string) {
-  return await supabaseBrowser
+  const result = await supabaseBrowser
     .from('services')
     .select(`
       *,
@@ -84,28 +88,33 @@ export async function getServiceBySlug(organizationSlug: string, serviceSlug: st
     `)
     .eq('slug', serviceSlug)
     .eq('organizations.slug', organizationSlug)
-    .single();
+    .maybeSingle();
+  
+  const data = handleMaybeSingleResult(result, 'サービス');
+  return { data, error: null };
 }
 
 export async function createService(data: ServiceFormData) {
-  const { data: service, error } = await supabaseBrowser
+  const result = await supabaseBrowser
     .from('services')
     .insert([data])
     .select()
-    .single();
+    .maybeSingle();
 
-  return { data: service, error };
+  const service = handleMaybeSingleResult(result, '新しいサービス');
+  return { data: service, error: null };
 }
 
 export async function updateService(id: string, data: Partial<ServiceFormData>) {
-  const { data: service, error } = await supabaseBrowser
+  const result = await supabaseBrowser
     .from('services')
     .update(data)
     .eq('id', id)
     .select()
-    .single();
+    .maybeSingle();
 
-  return { data: service, error };
+  const service = handleMaybeSingleResult(result, 'サービス');
+  return { data: service, error: null };
 }
 
 export async function deleteService(id: string) {
@@ -198,7 +207,7 @@ export async function generateServiceSlug(name: string, organizationId: string):
       .select('id')
       .eq('slug', slug)
       .eq('organization_id', organizationId)
-      .single();
+      .maybeSingle();
 
     if (!data) break;
 
