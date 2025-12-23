@@ -22,8 +22,8 @@ export function DashboardLayoutContent({ children, accountStatus }: DashboardLay
   // active/warned/suspended users see normal dashboard
   return (
     <div className="min-h-screen bg-[var(--aio-page-bg, #f3f4f6)]">
-      {/* デスクトップ用サイドバー */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+      {/* デスクトップ用サイドバー - z-indexを明示的に設定して常に表示 */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col">
         <DashboardSidebar />
       </div>
 
