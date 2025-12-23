@@ -15,7 +15,7 @@ on:
       - 'supabase/migrations/*enforcement*'
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '24'
   # Mock/Test environment variables (no real DB connection needed for core tests)
   NEXT_PUBLIC_SUPABASE_URL: 'https://mock-project.supabase.co'
   SUPABASE_SERVICE_ROLE_KEY: 'mock_service_role_key'

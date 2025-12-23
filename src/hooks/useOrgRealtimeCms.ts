@@ -91,13 +91,19 @@ export function useOrgRealtimeCms(options: UseOrgRealtimeCmsOptions) {
   // Realtimeチャンネル接続
   const connect = useCallback(async () => {
     if (!organizationId || channel) return;
-    
+
     const supabase = supabaseBrowser;
-    
+
     try {
-      // 組織専用チャンネルに接続
+      // Realtime認証を設定
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        await supabase.realtime.setAuth(session.access_token);
+      }
+
+      // 組織専用チャンネルに接続（命名規約: org:{orgId}:{entity}）
       const newChannel = supabase
-        .channel(`org_cms:${organizationId}`)
+        .channel(`org:${organizationId}:cms`, { config: { private: true } })
         .on(
           'postgres_changes',
           {
@@ -288,7 +294,7 @@ export function useOrgRealtimeCms(options: UseOrgRealtimeCmsOptions) {
     
     // メタデータ
     organizationId,
-    channelName: `org_cms:${organizationId}`
+    channelName: `org:${organizationId}:cms`
   };
 }
 

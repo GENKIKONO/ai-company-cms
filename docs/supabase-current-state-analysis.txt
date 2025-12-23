@@ -1,0 +1,575 @@
+================================================================================
+SUPABASE 現状分析レポート
+================================================================================
+作成日: 2024-12-22
+分析方法: src/types/supabase.ts + コード走査 + Edge Functions分析
+================================================================================
+
+【重要】本ドキュメントはコード側から観測した情報に基づいています。
+実際のDB定義との差異がある可能性があります。
+
+================================================================================
+1. テーブル構造分析
+================================================================================
+
+## 1.1 パーティション分割テーブル（確認済み）
+
+以下のテーブルは月次パーティションが設定されている：
+- activities (activities_202511 等)
+- ai_bot_logs (ai_bot_logs_202511 等)
+- ai_usage_events
+- audit_logs (audit_logs_default)
+- analytics_events
+
+関連Edge Functions:
+- partition-maintenance
+- partition-maintenance-cron-trigger
+
+関連RPC:
+- admin_create_month_partition
+- admin_create_next_month_partitions
+- admin_drop_old_partitions
+
+## 1.2 レポート関連テーブル（★要優先確認）
+
+### ai_monthly_reports テーブル（コードから推測）
+確認済みカラム:
+- id: string (PK)
+- organization_id: string (FK → organizations)
+- period_start: string (DATE形式想定)
+- period_end: string (DATE形式想定)
+- status: string ('generating', 'completed', 'failed')
+- level: string ('basic', 'advanced'?)
+- plan_id: string (FK → plans?)
+- summary_text: string
+- metrics: Json
+- sections: Json | null
+- suggestions: Json | null
+- created_at: string
+- updated_at: string
+
+使用箇所:
+- supabase/functions/monthly-report-generate/index.ts: upsert使用
+- supabase/functions/monthly-report-scheduler/index.ts: select使用
+- supabase/functions/reports-api/index.ts: select使用
+- src/lib/reports/monthly-report-service.ts（存在する場合）
+
+問題点:
+- upsert時の onConflict: 'organization_id,period_start' はユニーク制約必要
+- status のCHECK制約未確認
+
+### monthly_reports テーブル（旧形式？）
+確認済みカラム（supabase.tsより）:
+- id: string
+- organization_id: string
+- period_start: string
+- period_end: string
+- status: string
+- metrics: Json
+- created_at: string
+- updated_at: string
+
+問題点:
+- ai_monthly_reports との役割分担不明
+- cron/monthly-report/route.ts が year/month カラムを期待（存在しない）
+
+### monthly_report_sections テーブル
+確認済みカラム:
+- id: string
+- report_id: string (FK)
+- section_key: string
+- content: Json | string
+- created_at: string
+
+問題点:
+- report_id の参照先が ai_monthly_reports なのか monthly_reports なのか不明
+
+### monthly_report_jobs テーブル
+確認済みカラム:
+- id: string
+- organization_id: string
+- status: string ('queued', 'running', 'succeeded', 'failed')
+- scheduled_at: string
+- completed_at: string | null
+- error: string | null
+- created_at: string
+
+必要インデックス:
+- (status, scheduled_at) - ジョブキュー処理用
+
+## 1.3 AIインタビュー関連テーブル
+
+### ai_interview_sessions テーブル
+確認済みカラム:
+- id: string (PK)
+- organization_id: string | null (FK)
+- user_id: string | null
+- content_type: interview_content_type (enum)
+- status: interview_session_status (enum: 'draft' | 'in_progress' | 'completed')
+- answers: Json
+- notes: string | null
+- meta: Json | null
+- generated_content: string | null
+- generated_content_json: Json | null
+- version: number (楽観的ロック用)
+- created_at: string
+- updated_at: string
+- deleted_at: string | null (ソフトデリート)
+
+answersのJSON構造（新形式）:
+{
+  "questionId": {
+    "question": "質問テキスト",
+    "answer": "回答テキスト"
+  }
+}
+
+関連RPC:
+- aiis_save_answers_with_version: バージョン管理付き更新
+
+### ai_interview_messages テーブル
+- id: number (PK)
+- session_id: string (FK → ai_interview_sessions)
+- role: string ('user' | 'assistant')
+- content: Json
+- created_at: string
+
+### ai_interview_questions テーブル
+- id: string (PK)
+- axis_id: string (FK → ai_interview_axes)
+- content_type: interview_content_type
+- question_text: string
+- keywords: string[] | null
+- lang: string (FK → supported_languages)
+- is_active: boolean
+- sort_order: number
+- created_at: string
+- updated_at: string
+
+### ai_interview_axes テーブル
+- id: string (PK)
+- code: string (UNIQUE)
+- label_ja: string | null
+- label_en: string | null
+- description_ja: string | null
+- description_en: string | null
+- is_active: boolean
+- sort_order: number
+- created_at: string
+- updated_at: string
+
+## 1.4 AI引用分析テーブル
+
+### ai_citations_responses テーブル
+- id: string (PK)
+- organization_id: string | null (FK)
+- session_id: string | null (FK → ai_interview_sessions)
+- user_id: string | null
+- request_id: string | null
+- model_name: string | null
+- prompt_tokens: number | null
+- completion_tokens: number | null
+- output_tokens: number | null
+- quoted_chars: number | null
+- quoted_tokens: number | null
+- created_at: string
+
+### ai_citations_items テーブル
+- id: string (PK)
+- response_id: string (FK → ai_citations_responses)
+- content_unit_id: string (FK → ai_content_units)
+- fragment_hint: string | null
+- locale: string | null
+- quoted_chars: number | null
+- quoted_tokens: number | null
+- weight: number | null
+- created_at: string
+
+関連ビュー:
+- v_ai_citations_aggregates
+- v_ai_response_groups_v2
+
+関連RPC:
+- ai_citations_summary_v1
+
+## 1.5 CMSコンテンツテーブル
+
+共通構造パターン:
+- id: string (PK)
+- organization_id: string (FK)
+- slug: string
+- status: cms_content_status ('draft' | 'published' | 'archived')
+- is_published: boolean (計算列？)
+- published_at: string | null
+- deleted_at: string | null
+- created_at: string
+- updated_at: string
+
+翻訳テーブル共通構造:
+- id: string (PK)
+- {parent}_id: string (FK)
+- lang: string (FK → supported_languages)
+- title: string
+- content: string
+- created_at: string
+- updated_at: string
+
+テーブル一覧:
+- case_studies / case_study_translations
+- faqs / faq_translations
+- posts / post_translations
+- news / news_translations
+- products / product_translations
+- services / service_translations（未確認）
+
+公開用テーブル:
+- public_case_studies
+- public_faqs
+- public_posts
+- public_news
+- public_products
+
+同期RPC:
+- sync_public_case_studies_tbl
+- sync_public_faqs_tbl
+- sync_public_posts_tbl
+- sync_public_news_tbl
+- sync_public_products_tbl
+- sync_all_public_content
+
+## 1.6 組織・ユーザーテーブル
+
+### organizations テーブル
+- id: string (PK)
+- name: string
+- slug: string (UNIQUE)
+- is_active: boolean
+- plan_id: string | null
+- branding: Json | null
+- status: organization_status
+- data_status: organization_data_status
+- created_at: string
+- updated_at: string
+- deleted_at: string | null
+
+### org_memberships テーブル
+- id: string (PK)
+- organization_id: string (FK)
+- user_id: string (FK → auth.users)
+- role: user_role ('admin' | 'editor' | 'viewer')
+- created_at: string
+- updated_at: string
+
+### profiles テーブル
+- id: string (PK, FK → auth.users)
+- email: string
+- display_name: string | null
+- avatar_url: string | null
+- created_at: string
+- updated_at: string
+
+## 1.7 課金関連テーブル
+
+### plan_features テーブル
+- id: string (PK)
+- plan_id: string
+- feature_key: string
+- feature_value: Json
+- created_at: string
+
+### orders テーブル
+- id: string (PK)
+- organization_id: string (FK)
+- status: string
+- total_amount: number
+- currency: string
+- stripe_payment_intent_id: string | null
+- created_at: string
+- updated_at: string
+
+### order_items テーブル
+- id: string (PK)
+- order_id: string (FK → orders)
+- product_id: string | null
+- quantity: number
+- unit_price: number
+- created_at: string
+
+### billing_checkout_links テーブル
+- id: string (PK)
+- organization_id: string (FK)
+- stripe_price_id: string
+- url: string
+- expires_at: string | null
+- created_at: string
+
+## 1.8 セキュリティ関連テーブル
+
+### blocked_ips テーブル
+- id: string (PK)
+- ip_address: inet
+- reason: string
+- blocked_at: string
+- expires_at: string | null
+- blocked_by: string | null
+
+### ip_blocklist テーブル
+- id: string (PK)
+- ip_cidr: cidr
+- reason: string
+- source: string
+- created_at: string
+- expires_at: string | null
+
+### intrusion_detection_rules テーブル
+- id: string (PK)
+- rule_name: string
+- pattern: string
+- action: string
+- is_active: boolean
+- created_at: string
+
+### intrusion_detection_alerts テーブル
+- id: string (PK)
+- rule_id: string (FK)
+- ip_address: inet
+- details: Json
+- created_at: string
+
+================================================================================
+2. RPC関数分析
+================================================================================
+
+## 2.1 認証・認可系
+- _assert_actor_is_org_admin: 組織管理者確認
+- _guard_admin: サイト管理者確認
+- _validate_org_role: ロール検証
+- validate_org_access: 組織アクセス検証
+- user_role: 現在ユーザーのロール取得
+
+## 2.2 レポート系
+- get_plan_features: プラン機能取得
+- count_report_regenerations: 再生成回数カウント
+- upsert_monthly_report: レポートupsert
+- seed_ai_monthly_reports_last_month: テストデータ生成
+
+## 2.3 AI系
+- ai_citations_summary_v1: 引用サマリー
+- ai_normalize_canonical: URL正規化
+- ai_resolve_canonical_base: 正規化ベース解決
+- ai_validate_hreflang_group: hreflang検証
+- aiis_save_answers_with_version: 回答保存（バージョン付き）
+
+## 2.4 コンテンツ系
+- content_search_i18n_v1/v2: 多言語コンテンツ検索
+- build_public_url: 公開URL構築
+- sync_to_public: 公開テーブル同期
+- can_insert_content: コンテンツ挿入可否
+
+## 2.5 管理系
+- admin_get_audit_logs: 監査ログ取得
+- admin_create_month_partition: パーティション作成
+- admin_drop_old_partitions: 古いパーティション削除
+- admin_soft_delete/hard_delete/restore: データ管理
+- admin_backfill_canonical: 正規URL補完
+
+## 2.6 セキュリティ系
+- auto_block_ip: IP自動ブロック
+- check_rate_limit_db: レート制限チェック
+- check_rate_limit_violation: 違反チェック
+- cleanup_rate_limit_data: クリーンアップ
+
+## 2.7 分析系
+- activities_daily_7d: 7日間アクティビティ
+- ai_bot_daily_7d: 7日間ボットアクセス
+- analytics_events_daily_7d: 7日間分析イベント
+- analyze_behavioral_patterns: 行動パターン分析
+
+================================================================================
+3. ビュー分析
+================================================================================
+
+## 3.1 メトリクス系
+- _activities_recent_30d_v2
+- _ai_bot_logs_recent_30d_v2
+- _analytics_events_recent_30d_v2
+- _content_metrics_recent_v2
+- _org_content_counts_v2
+- _org_content_metrics_v2
+- _user_activity_snap_v2
+
+## 3.2 組織系
+- organizations_overview_v2
+- organizations_with_owner
+- v_org_feature_flags
+- v_orgs_visible
+- view_org_plans
+- view_organizations
+
+## 3.3 公開コンテンツ系
+- public_organizations
+- v_public_organizations
+
+## 3.4 AI分析系
+- v_ai_citations_aggregates
+- v_ai_response_groups_v2
+- v_ai_interview_session_metrics
+- view_ai_content_units
+
+## 3.5 レポート系
+- view_report_regen_limit_current
+- ai_monthly_reports_compat（存在する場合）
+
+## 3.6 その他
+- _auth_audit
+- _translation_fk_hints
+- ai_interview_question_catalog_v1
+
+================================================================================
+4. Edge Functions分析
+================================================================================
+
+## 4.1 レポート生成パイプライン
+
+monthly-report-scheduler
+  ↓ 全アクティブ組織を取得
+  ↓ 既存レポート確認（冪等性）
+  ↓ 各組織に対してmonthly-report-generateを呼び出し
+
+monthly-report-generate
+  ↓ バリデーション
+  ↓ 既存レポート確認
+  ↓ ai_monthly_reports に upsert（status: 'generating'）
+  ↓ EdgeRuntime.waitUntil で非同期KPI計算
+  ↓ 完了後 status: 'completed' に更新
+
+reports-api
+  ↓ GET /my/reports/monthly: レポート取得
+  ↓ POST /my/reports/monthly/regenerate: 再生成リクエスト
+  ↓ プラン機能チェック
+  ↓ 再生成回数制限チェック
+  ↓ job_runs_v2 にジョブ登録
+
+reports-worker（推測）
+  ↓ job_runs_v2 から pending ジョブ取得
+  ↓ レポート再生成実行
+  ↓ ステータス更新
+
+## 4.2 AI処理パイプライン
+
+ai-interview-finalize
+  ↓ セッション完了処理
+  ↓ コンテンツ生成
+  ↓ ai_generated_drafts に保存
+
+ghostwriter
+  ↓ AIテキスト生成
+  ↓ 対象コンテンツへ保存
+
+embedding-runner
+  ↓ テキスト埋め込み生成
+  ↓ embeddings テーブルに保存
+
+translation-runner
+  ↓ 翻訳処理
+  ↓ 翻訳テーブルに保存
+
+## 4.3 メンテナンス系
+
+partition-maintenance
+  ↓ 次月パーティション作成
+  ↓ 古いパーティション削除
+
+content-refresh-orchestrator
+  ↓ content_refresh_queue から取得
+  ↓ コンテンツ更新処理
+
+cache-purge
+  ↓ キャッシュ無効化処理
+
+nightly-schema-diff
+  ↓ スキーマ差分チェック
+  ↓ アラート送信
+
+================================================================================
+5. 確認された問題点まとめ
+================================================================================
+
+## 5.1 重大（即時対応必要）
+
+1. cron/monthly-report/route.ts のスキーマ不一致
+   - year, month, format, data_summary カラムは存在しない
+   - period_start/period_end 形式への修正が必要
+
+2. テーブル二重管理
+   - monthly_reports と ai_monthly_reports の役割が不明確
+   - コードによって使用テーブルが異なる
+
+## 5.2 中（早期対応推奨）
+
+3. monthly_report_jobs.status の制約なし
+   - CHECK制約またはenum化が推奨
+
+4. ユニーク制約の確認
+   - ai_monthly_reports の (organization_id, period_start) 制約
+
+5. インデックスの確認
+   - monthly_report_jobs (status, scheduled_at)
+
+## 5.3 軽微（改善推奨）
+
+6. report_regeneration_logs.month_bucket の型
+   - DATE型への正規化推奨
+
+7. テーブル・カラムコメントの不足
+   - ドキュメント性向上のため追加推奨
+
+================================================================================
+6. UI実装との対応関係
+================================================================================
+
+## 6.1 API Routes（src/app/api/）から確認
+
+### レポート関連
+- /api/my/reports/route.ts（存在する場合）
+- /api/public/reports/route.ts
+
+### AI関連
+- /api/my/ai-interviewer/
+- /api/my/qa/search/route.ts
+- /api/my/qna-stats/route.ts
+- /api/my/ai-citations/（存在する場合）
+
+### 管理関連
+- /api/admin/ai-visibility/
+- /api/admin/billing-analytics/
+- /api/admin/feature-management/
+- /api/admin/users/
+
+### 課金関連
+- /api/billing/portal/route.ts
+- /api/webhooks/stripe/route.ts
+
+### セキュリティ関連
+- /api/enforcement/
+- /api/security/audit/route.ts
+
+## 6.2 UIコンポーネントとの対応（要確認）
+
+Dashboard関連:
+- 月次レポートカード
+- AI分析サマリー
+- アクティビティフィード
+
+管理画面関連:
+- ユーザー管理
+- 組織設定
+- プラン管理
+- セキュリティ設定
+
+コンテンツ管理関連:
+- CMS編集画面
+- 翻訳管理
+- 公開設定
+
+================================================================================

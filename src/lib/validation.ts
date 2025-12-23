@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { OrganizationData, ServiceData, FAQData, CaseStudyData } from './jsonld';
 
 // バリデーションスキーマ定義
 export const organizationSchema = z.object({

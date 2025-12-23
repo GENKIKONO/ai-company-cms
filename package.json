@@ -59,6 +59,9 @@
     "test:e2e:dashboard:ci": "node scripts/kill-port.mjs 3099 && npm run build:e2e && NODE_ENV=production next start -p 3099 & sleep 2 && npx wait-on http://localhost:3099/ --timeout 120000 && CI=1 PLAYWRIGHT_BASE_URL=http://localhost:3099 npx playwright test tests/e2e/dashboard-routes-smoke.spec.ts --reporter=line",
     "test:e2e:billing": "playwright test segment-billing.spec.ts",
     "test:e2e:admin": "playwright test admin-console.spec.ts",
+    "test:e2e:admin-dashboard": "playwright test tests/e2e/admin-dashboard-smoke.spec.ts",
+    "test:e2e:admin-dashboard:auth": "playwright test --config=tests/e2e-admin/playwright.config.ts",
+    "test:admin-audit": "node scripts/test-admin-audit-edge-function.mjs",
     "test:setup": "playwright install",
     "test:production": "node scripts/production-test.js",
     "test:auth": "node scripts/auth-test.js",
@@ -128,7 +131,6 @@
     "@tailwindcss/forms": "^0.5.7",
     "@types/jsdom": "^21.1.7",
     "@types/lodash": "^4.17.20",
-    "@types/node": "^20.8.0",
     "@types/nodemailer": "^7.0.1",
     "@types/react": "^18.2.25",
     "@types/react-dom": "^18.2.10",
@@ -159,7 +161,6 @@
     "swr": "^2.3.6",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^3.3.5",
-    "typescript": "^5.2.2",
     "web-vitals": "^5.1.0",
     "zod": "^3.25.76"
   },
@@ -175,6 +176,7 @@
     "@types/glob": "^8.1.0",
     "@types/jest": "^30.0.0",
     "@types/marked": "^5.0.2",
+    "@types/node": "^24.10.4",
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
@@ -195,6 +197,8 @@
     "supabase": "^2.45.2",
     "supertest": "^7.1.4",
     "ts-jest": "^29.1.1",
+    "typescript": "^5.9.3",
+    "typescript-language-server": "^5.1.3",
     "wait-on": "^7.2.0"
   }
 }

@@ -442,7 +442,8 @@ export function toApiResponse<T>(result: DatabaseResult<T>): ApiResponse<T> {
 // =====================================================
 
 /**
- * Type-safe real-time subscription
+ * Type-safe real-time subscription with organization scope
+ * 命名規約: org:{orgId}:{tableName}
  */
 export function subscribeToTable<T extends keyof SupabaseDatabase['public']['Tables']>(
   tableName: T,
@@ -451,14 +452,26 @@ export function subscribeToTable<T extends keyof SupabaseDatabase['public']['Tab
     new?: TableRow<T>
     old?: TableRow<T>
   }) => void,
-  filters?: Record<string, unknown>
+  options: {
+    organizationId: string
+    filters?: Record<string, unknown>
+  }
 ): () => void {
+  const { organizationId, filters } = options;
+
+  if (!organizationId) {
+    throw new Error('subscribeToTable requires organizationId for RLS-scoped realtime');
+  }
+
+  // 組織スコープのトピック名（RLS対応）
+  const topic = `org:${organizationId}:${tableName}`;
+
   const subscription = supabase
-    .channel(`public:${tableName}`)
-    .on('postgres_changes', 
-      { 
-        event: '*', 
-        schema: 'public', 
+    .channel(topic, { config: { private: true } })
+    .on('postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
         table: tableName,
         filter: filters ? Object.entries(filters).map(([key, value]) => `${key}=eq.${value}`).join('&') : undefined
       },

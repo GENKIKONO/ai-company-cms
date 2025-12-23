@@ -1,0 +1,193 @@
+# Supabase Phase 2 検証依頼書
+
+## 背景
+Phase 2（UI強化）の実装を進めています。コードベース棚卸しの結果、以下が判明しました：
+
+### 現状のコード実装状況
+
+#### 1. 既存API構成
+```
+/api/my/reports/route.ts              - 一覧/生成（簡易版・Phase2で強化済み）
+/api/my/reports/monthly/route.ts      - 一覧（canUseFeature付き）
+/api/my/reports/monthly/[period]/route.ts - 詳細（ai_monthly_reports直参照済み）
+/api/my/reports/monthly/[period]/regenerate/route.ts - 再生成
+/api/my/reports/monthly/[period]/pdf/route.ts - PDF
+```
+
+#### 2. 詳細API（既存）の実装内容
+`/api/my/reports/monthly/[period]/route.ts` は既に以下を実装済み：
+- `ai_monthly_reports` テーブル直参照
+- `organization_members` テーブルでメンバーシップ確認
+- `canUseFeature(organizationId, 'ai_reports')` でプランチェック
+- 返却: id, plan_id, level, period_start, period_end, status, summary_text, metrics, sections, suggestions
+
+#### 3. Realtime基盤（既存）
+```
+src/lib/realtime/channel.ts  - 組織スコープチャンネル生成（private:true）
+src/lib/realtime/topics.ts   - トピック命名
+src/lib/realtime/client.ts   - クライアントユーティリティ
+src/hooks/useOrgRealtimeCms.ts - React Hook
+```
+
+#### 4. 型定義（supabase.ts より抽出）
+```typescript
+ai_monthly_reports: {
+  Row: {
+    id: string
+    organization_id: string
+    plan_id: string
+    level: string
+    period_start: string
+    period_end: string
+    month_bucket: string | null  // トリガで自動算出
+    status: report_status  // enum: pending | generating | completed | failed
+    summary_text: string
+    metrics: Json
+    sections: Json
+    suggestions: Json
+    created_at: string
+    updated_at: string
+  }
+}
+```
+
+---
+
+## 検証・実行依頼
+
+### 1. DB構造の確認（SELECT実行）
+
+以下のSQLを実行して、現在のDB状態を報告してください：
+
+```sql
+-- ai_monthly_reports テーブル構造確認
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_name = 'ai_monthly_reports'
+ORDER BY ordinal_position;
+
+-- ユニーク制約の確認
+SELECT constraint_name, column_name
+FROM information_schema.constraint_column_usage
+WHERE table_name = 'ai_monthly_reports'
+  AND constraint_name LIKE '%unique%' OR constraint_name LIKE '%key%';
+
+-- organization_members テーブル存在確認
+SELECT EXISTS (
+  SELECT FROM information_schema.tables
+  WHERE table_name = 'organization_members'
+);
+
+-- report_status enum 値確認
+SELECT enumlabel FROM pg_enum
+WHERE enumtypid = (SELECT oid FROM pg_type WHERE typname = 'report_status');
+```
+
+### 2. 既存トリガの確認
+
+```sql
+-- ai_monthly_reports に設定されているトリガ一覧
+SELECT trigger_name, event_manipulation, action_statement
+FROM information_schema.triggers
+WHERE event_object_table = 'ai_monthly_reports';
+```
+
+### 3. RLSポリシーの確認
+
+```sql
+-- ai_monthly_reports の RLS ポリシー
+SELECT policyname, cmd, qual, with_check
+FROM pg_policies
+WHERE tablename = 'ai_monthly_reports';
+```
+
+### 4. Realtime broadcast トリガの導入（提案されたSQL）
+
+もし既存のbroadcastトリガがなければ、以下を適用してください：
+
+```sql
+-- Realtime broadcast 用トリガ関数
+CREATE OR REPLACE FUNCTION report_broadcast_trigger()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  PERFORM realtime.broadcast_changes(
+    'report:' || COALESCE(NEW.organization_id, OLD.organization_id)::text
+      || ':' || COALESCE(NEW.plan_id, OLD.plan_id)
+      || ':' || COALESCE(NEW.level, OLD.level),
+    TG_OP,
+    TG_OP,
+    TG_TABLE_NAME,
+    TG_TABLE_SCHEMA,
+    NEW,
+    OLD
+  );
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+-- INSERT/UPDATE時にbroadcast
+CREATE TRIGGER ai_monthly_reports_broadcast
+AFTER INSERT OR UPDATE ON ai_monthly_reports
+FOR EACH ROW EXECUTE FUNCTION report_broadcast_trigger();
+```
+
+### 5. Realtime RLSポリシー（必要であれば）
+
+```sql
+-- realtime.messages テーブルに組織メンバー限定ポリシー
+-- 注: user_organizations または organization_members テーブル名を確認後に調整
+
+-- 受信: orgメンバーのみ
+CREATE POLICY "org_members_can_receive_report_updates" ON realtime.messages
+FOR SELECT TO authenticated
+USING (
+  topic LIKE 'report:%' AND
+  EXISTS (
+    SELECT 1
+    FROM organization_members om
+    WHERE om.user_id = auth.uid()
+      AND om.organization_id = (split_part(topic, ':', 2))::uuid
+  )
+);
+```
+
+---
+
+## 報告フォーマット
+
+以下の形式で差分と結果を報告してください：
+
+```
+## DB構造確認結果
+- ai_monthly_reports カラム: [一覧]
+- ユニーク制約: [制約名と対象カラム]
+- organization_members テーブル: 存在する/しない
+- report_status enum: [値一覧]
+
+## 既存トリガ
+- [トリガ名]: [操作]
+
+## RLSポリシー
+- [ポリシー名]: [操作] - [条件概要]
+
+## 適用した変更（あれば）
+- [ ] broadcast トリガ作成
+- [ ] RLSポリシー追加
+
+## 不整合・問題点
+- [あれば記載]
+```
+
+---
+
+## 補足：コードとDBの整合性チェックポイント
+
+1. **onConflict制約**: コードでは `organization_id,month_bucket,plan_id,level` を使用
+2. **month_bucket**: トリガで period_start から自動算出されているか
+3. **sections/suggestions**: JSONB型でnull許容か
+4. **feature_flags対応**: canUseFeature('ai_reports') の判定ロジック
+
+以上の確認をお願いします。

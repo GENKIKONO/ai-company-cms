@@ -213,14 +213,48 @@ export async function POST(
           }
         }
 
-        // Increment invite code usage
-        // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_invites テーブルの型定義を Supabase client に追加
-        await (supabaseAdmin as any)
-          .from('org_group_invites')
-          .update({ 
-            used_count: (supabaseAdmin as any).rpc('increment_used_count', { invite_code: joinRequest.invite_code })
-          })
-          .eq('code', joinRequest.invite_code);
+        // Increment invite code usage via RPC
+        // RPC: increment_used_count(p_code text) RETURNS void
+        // - Increments used_count by 1
+        // - Throws exception if code not found, expired, or max uses reached
+        if (joinRequest.invite_code) {
+          const { error: incrementError } = await supabaseAdmin.rpc('increment_used_count', {
+            p_code: joinRequest.invite_code
+          });
+
+          if (incrementError) {
+            // Parse DB exception to user-friendly message
+            const errorMessage = incrementError.message || '';
+            let userMessage = '招待コードの使用回数更新に失敗しました';
+            let errorCategory = 'unknown';
+
+            if (errorMessage.includes('not found') || errorMessage.includes('存在しません')) {
+              userMessage = '招待コードが見つかりません';
+              errorCategory = 'not_found';
+            } else if (errorMessage.includes('expired') || errorMessage.includes('期限')) {
+              userMessage = '招待コードの有効期限が切れています';
+              errorCategory = 'expired';
+            } else if (errorMessage.includes('max') || errorMessage.includes('上限')) {
+              userMessage = '招待コードの使用回数上限に達しています';
+              errorCategory = 'max_uses_reached';
+            }
+
+            // Log with structured data for monitoring
+            logger.warn('Failed to increment invite code usage', {
+              component: 'join-request-decision-api',
+              operation: 'approve',
+              requestId,
+              inviteCode: joinRequest.invite_code,
+              error: incrementError.message,
+              code: incrementError.code,
+              errorCategory,
+              userMessage
+            });
+
+            // Note: Approval still succeeds since membership was already created
+            // The invite code limitation is a secondary concern
+          }
+        }
       }
 
       // Update join request status

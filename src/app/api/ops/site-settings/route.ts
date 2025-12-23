@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
 
     // サイト設定を取得
     const { data, error } = await supabase
-      .from('site_settings')
+      .from('cms_site_settings')
       .select('*')
       .maybeSingle();
 
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
 
     // 既存のレコードがあるかチェック
     const { data: existing, error: fetchError } = await supabase
-      .from('site_settings')
+      .from('cms_site_settings')
       .select('id')
       .maybeSingle();
 
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       // 更新
       const { data, error } = await supabase
-        .from('site_settings')
+        .from('cms_site_settings')
         .update(validatedData)
         .eq('id', existing.id)
         .select()
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
     } else {
       // 新規作成
       const { data, error } = await supabase
-        .from('site_settings')
+        .from('cms_site_settings')
         .insert([validatedData])
         .select()
         .maybeSingle();
@@ -285,7 +285,7 @@ export async function DELETE(request: NextRequest) {
 
     // 全てのサイト設定を削除
     const { error } = await supabase
-      .from('site_settings')
+      .from('cms_site_settings')
       .delete()
       .neq('id', '00000000-0000-0000-0000-000000000000'); // 全削除
 

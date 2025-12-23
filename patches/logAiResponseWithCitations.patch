@@ -1,0 +1,185 @@
+--- a/src/lib/ai/logAiResponseWithCitations.ts
++++ b/src/lib/ai/logAiResponseWithCitations.ts
+@@ -12,8 +12,8 @@ export interface LogAiResponseParams {
+   sessionId: string;
+   organizationId: string | null;
+   userId: string;
+-  model: string;
+-  inputTokens: number;
++  modelName: string;  // DB列名: model_name
++  inputTokens: number; 
+   outputTokens: number;
+   durationMs: number;
+   success: boolean;
+@@ -25,7 +25,7 @@ export interface LogAiResponseParams {
+ export interface LogGenerationStatsParams {
+   sessionId: string;
+   organizationId: string | null;
+   userId: string;
+-  model: string;
++  modelName: string;  // DB列名: model_name
+   inputTokens: number;
+   outputTokens: number;
+   durationMs: number;
+@@ -48,7 +48,7 @@ export async function logAiResponseWithCitations(params: LogAiResponseParams):
+       sessionId,
+       organizationId,
+       userId,
+-      model,
++      modelName,
+       inputTokens,
+       outputTokens,
+       durationMs,
+@@ -62,7 +62,7 @@ export async function logAiResponseWithCitations(params: LogAiResponseParams):
+       .from('ai_citations_responses')
+       .insert({
+         session_id: sessionId,
+         organization_id: organizationId,
+         user_id: userId,
+-        model,
++        model_name: modelName,  // DB列名準拠
+         input_tokens: inputTokens,
+         output_tokens: outputTokens,
+         duration_ms: durationMs,
+@@ -78,7 +78,7 @@ export async function logAiResponseWithCitations(params: LogAiResponseParams):
+       logger.error('Failed to log AI citations response', {
+         sessionId,
+         error: responseError,
+-        model,
++        modelName,
+         success
+       });
+       throw responseError;
+@@ -92,7 +92,7 @@ export async function logAiResponseWithCitations(params: LogAiResponseParams):
+       const citationItems = citations.map(citation => ({
+         response_id: responseId,
+         source_type: citation.type,
+-        source_id: citation.sourceId || null,
++        content_unit_id: citation.contentUnitId || null,  // DB列名準拠
+         uri: citation.uri || null,
+         title: citation.title || null,
+         snippet: citation.snippet || null,
+@@ -125,7 +125,7 @@ export async function logAiResponseWithCitations(params: LogAiResponseParams):
+     logger.info('AI response with citations logged', {
+       sessionId,
+       responseId,
+-      model,
++      modelName,
+       success,
+       inputTokens,
+       outputTokens,
+@@ -136,7 +136,7 @@ export async function logAiResponseWithCitations(params: LogAiResponseParams):
+   } catch (error) {
+     logger.error('Failed to log AI response with citations', {
+       sessionId: params.sessionId,
+-      model: params.model,
++      modelName: params.modelName,
+       error: error instanceof Error ? error.message : error
+     });
+     // ログ保存失敗は本体処理をブロックしない
+@@ -154,7 +154,7 @@ export async function logGenerationStats(params: LogGenerationStatsParams): Pro
+       sessionId,
+       organizationId,
+       userId,
+-      model,
++      modelName,
+       inputTokens,
+       outputTokens,
+       durationMs,
+@@ -169,7 +169,7 @@ export async function logGenerationStats(params: LogGenerationStatsParams): Pro
+         session_id: sessionId,
+         organization_id: organizationId,
+         user_id: userId,
+-        model,
++        model_name: modelName,  // DB列名準拠
+         input_tokens: inputTokens,
+         output_tokens: outputTokens,
+         duration_ms: durationMs,
+@@ -183,7 +183,7 @@ export async function logGenerationStats(params: LogGenerationStatsParams): Pro
+     if (statsError) {
+       logger.error('Failed to log generation stats', {
+         sessionId,
+-        model,
++        modelName,
+         success,
+         error: statsError
+       });
+@@ -193,7 +193,7 @@ export async function logGenerationStats(params: LogGenerationStatsParams): Pro
+ 
+     logger.debug('Generation stats logged successfully', {
+       sessionId,
+-      model,
++      modelName,
+       success,
+       inputTokens,
+       outputTokens,
+@@ -204,7 +204,7 @@ export async function logGenerationStats(params: LogGenerationStatsParams): Pro
+   } catch (error) {
+     logger.error('Failed to log generation stats', {
+       sessionId: params.sessionId,
+-      model: params.model,
++      modelName: params.modelName,
+       error: error instanceof Error ? error.message : error
+     });
+     // ログ保存失敗は本体処理をブロックしない
+@@ -293,7 +293,7 @@ export async function logFinalizeResult(params: {
+       organizationId,
+       userId,
+-      model: finalizeResult.usedModel,
++      modelName: finalizeResult.usedModel,
+       inputTokens: finalizeResult.inputTokens,
+       outputTokens: finalizeResult.outputTokens,
+       durationMs: finalizeResult.durationMs,
+@@ -308,7 +308,7 @@ export async function logFinalizeResult(params: {
+       organizationId,
+       userId,
+-      model: 'failed',
++      modelName: 'failed',
+       inputTokens: 0,
+       outputTokens: 0,
+       durationMs: 0,
+@@ -331,7 +331,7 @@ export async function logCompleteAiResponse(params: {
+   sessionId: string;
+   organizationId: string | null;
+   userId: string;
+-  model: string;
++  modelName: string;
+   inputTokens: number;
+   outputTokens: number;
+   durationMs: number;
+@@ -347,7 +347,7 @@ export async function logCompleteAiResponse(params: {
+     sessionId,
+     organizationId,
+     userId,
+-    model,
++    modelName,
+     inputTokens,
+     outputTokens,
+     durationMs,
+@@ -362,7 +362,7 @@ export async function logCompleteAiResponse(params: {
+       sessionId,
+       organizationId,
+       userId,
+-      model,
++      modelName,
+       inputTokens,
+       outputTokens,
+       durationMs,
+@@ -375,7 +375,7 @@ export async function logCompleteAiResponse(params: {
+       sessionId,
+       organizationId,
+       userId,
+-      model,
++      modelName,
+       inputTokens,
+       outputTokens,
+       durationMs,
+@@ -404,7 +404,7 @@ export async function logCompleteAiResponse(params: {
+ 
+   logger.info('AI response logging completed', {
+     sessionId,
+-    model,
++    modelName,
+     success,
+     citationsCount: citations.length,
+     contentSectionsCount: contentSections.length

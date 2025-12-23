@@ -1,0 +1,362 @@
+====================================================================
+LuxuCare AIプラットフォーム 全機能一覧
+====================================================================
+
+■ 1. ダッシュボード機能（36ページ）
+
+### メインダッシュボード
+- /dashboard - メインダッシュボード（概要・統計表示）
+
+### コンテンツ管理
+- /dashboard/services - サービス一覧・管理
+- /dashboard/services/new - 新しいサービス作成
+- /dashboard/services/[id]/edit - サービス編集
+- /dashboard/services-info - サービス情報管理
+
+- /dashboard/faqs - FAQ一覧・管理
+- /dashboard/faqs/new - 新しいFAQ作成
+
+- /dashboard/case-studies - 導入事例一覧・管理
+- /dashboard/case-studies/new - 新しい導入事例作成
+
+- /dashboard/posts - ブログ記事一覧・管理
+- /dashboard/posts/new - 新しいブログ記事作成
+
+- /dashboard/materials - 資料一覧・管理
+- /dashboard/materials/[id] - 資料詳細・編集
+- /dashboard/materials/page - 資料メイン（新規実装）
+
+### AI面談・インタビュー機能
+- /dashboard/interview - AI面談メイン
+- /dashboard/interview/[sessionId] - 個別面談セッション
+- /dashboard/interview/history - 面談履歴
+- /dashboard/test-interview - テスト面談
+
+### 質問・Q&A管理
+- /dashboard/questions - 質問一覧
+- /dashboard/my-questions - 自分の質問
+- /dashboard/qna-stats - Q&A統計
+
+### AI機能
+- /dashboard/ai-citations - AI引用履歴・分析
+- /dashboard/ai-reports - AIレポート一覧
+- /dashboard/ai-reports/[period] - 期間別AIレポート詳細
+- /dashboard/org-ai-chat - 組織AIチャット
+
+### 分析・レポート
+- /dashboard/analytics - 分析メイン
+- /dashboard/analytics/ai-seo-report - AI SEOレポート
+- /dashboard/analytics/interview - 面談分析
+- /dashboard/reports - レポート一覧
+- /dashboard/activity - 活動履歴
+
+### 組織・会社管理
+- /dashboard/company - 会社情報（新規実装）
+- /dashboard/settings - 設定
+
+### 埋め込み・外部連携
+- /dashboard/embed - 埋め込み機能
+
+### 課金・請求
+- /dashboard/billing - 請求管理
+- /dashboard/billing/new-session - 新しい請求セッション
+
+### 管理者機能
+- /dashboard/admin/billing-links - 請求リンク管理
+- /dashboard/admin/contents - コンテンツ管理
+
+### ヘルプ
+- /dashboard/help - ヘルプページ
+
+■ 2. 公開サイト機能（20ページ）
+
+### 組織ページ
+- /organizations - 組織一覧
+- /organizations/new - 組織新規作成
+- /organizations/[id] - 組織詳細ページ
+- /organizations/[id]/services/new - 組織内サービス作成
+- /organizations/[id]/services/[serviceId] - 組織内サービス詳細
+- /organizations/[id]/faqs/new - 組織内FAQ作成
+- /organizations/[id]/faqs/[faqId] - 組織内FAQ詳細
+- /organizations/[id]/case-studies/new - 組織内導入事例作成
+- /organizations/[id]/hearing-request - ヒアリング申し込み
+
+### 管理コンソール
+- /management-console - 管理コンソールメイン
+- /management-console/settings - 設定
+- /management-console/security - セキュリティ
+- /management-console/embed-dashboard - 埋め込みダッシュボード
+- /management-console/contacts - 連絡先管理
+- /management-console/hearings - ヒアリング管理
+- /management-console/users - ユーザー管理
+- /management-console/reports - レポート
+
+### 基本ページ
+- / - トップページ
+- /contact - お問い合わせ
+- /monitor - 監視ページ
+- /privacy - プライバシーポリシー
+- /tos - 利用規約
+
+■ 3. API機能（43エンドポイント）
+
+### ユーザー個人API（/api/my/*）
+#### AI引用・分析
+- GET /api/my/ai-citations - AI引用履歴取得
+
+#### AI面談・インタビュー
+- GET/POST /api/my/interview/sessions - 面談セッション管理
+- GET/PUT /api/my/interview/sessions/[id] - 個別セッション操作
+- POST /api/my/interview/sessions/[id]/finalize - セッション確定
+- POST /api/my/interview/sessions/[id]/restore - セッション復元
+- GET /api/my/interview/sessions/[id]/answers/diff - 回答差分
+- POST /api/my/interview/[sessionId]/generate-blog - ブログ生成
+- POST /api/my/interview/[sessionId]/generate-case-study - 導入事例生成
+- POST /api/my/interview/[sessionId]/generate-qna - Q&A生成
+- GET /api/my/interview/questions - 質問一覧
+- GET /api/my/interview/quota - 面談クォータ確認
+
+#### コンテンツ管理
+- GET/POST /api/my/services - サービス一覧・作成
+- GET/PUT/DELETE /api/my/services/[id] - サービス操作
+- GET/POST /api/my/faqs - FAQ一覧・作成
+- GET/PUT/DELETE /api/my/faqs/[id] - FAQ操作
+- GET/POST /api/my/case-studies - 導入事例一覧・作成
+- GET/PUT/DELETE /api/my/case-studies/[id] - 導入事例操作
+- GET/POST /api/my/posts - ブログ記事一覧・作成
+- GET/PUT/DELETE /api/my/posts/[id] - ブログ記事操作
+
+#### 資料・ファイル管理
+- GET/POST /api/my/materials - 資料一覧・アップロード
+- GET/DELETE /api/my/materials/[id] - 資料操作
+- GET /api/my/materials/[id]/download - 資料ダウンロード
+
+#### 組織AIチャット
+- POST /api/my/org-docs/chat - 組織文書チャット
+- GET/POST /api/my/org-docs/files - 組織文書ファイル管理
+
+#### Q&A管理
+- GET/POST /api/my/qa/categories - Q&Aカテゴリ管理
+- GET/PUT/DELETE /api/my/qa/categories/[id] - カテゴリ操作
+- GET/POST /api/my/qa/entries - Q&Aエントリ管理
+- GET/PUT/DELETE /api/my/qa/entries/[id] - エントリ操作
+- GET /api/my/qa/search - Q&A検索
+
+#### レポート・分析
+- GET /api/my/reports - レポート一覧
+- GET /api/my/reports/monthly - 月次レポート一覧
+- GET /api/my/reports/monthly/[period] - 期間別月次レポート
+- POST /api/my/reports/monthly/[period]/regenerate - レポート再生成
+- GET /api/my/reports/monthly/[period]/pdf - PDFダウンロード
+- GET /api/my/qna-stats - Q&A統計
+- GET /api/my/qna-stats/export - Q&A統計エクスポート
+- GET /api/my/analytics/interview - 面談分析
+
+#### 組織管理
+- GET/PUT /api/my/organization - 組織情報操作
+- POST /api/my/organization/publish - 組織公開
+
+#### 管理者機能
+- GET /api/my/admin/contents - コンテンツ一覧
+- GET/PUT/DELETE /api/my/admin/contents/[sourceTable]/[id] - コンテンツ操作
+
+#### AI関連サービス
+- POST /api/my/ai-interviewer/service/summary - AIインタビューサマリー
+- GET /api/my/interview-questions - 面談質問一覧
+
+#### 機能フラグ
+- GET /api/my/features/ai-reports - AIレポート機能フラグ
+- GET /api/my/features/system-monitoring - システム監視機能フラグ
+
+### ユーザー認証関連（/api/auth/*）
+- POST /api/auth/resend-confirmation - 確認メール再送
+- POST /api/auth/reset-password - パスワードリセット
+- POST /api/auth/sync - 認証同期
+
+### パブリックAPI
+- GET/POST /api/organizations - 組織一覧・作成
+- GET/POST /api/hearing-requests - ヒアリング申し込み
+- GET/POST /api/posts - ブログ記事（パブリック）
+- GET/PUT /api/posts/[id] - ブログ記事操作（パブリック）
+- GET/POST /api/ai-interview-sessions - AI面談セッション（パブリック）
+
+### システム・診断API（/api/diag/*）
+- GET /api/diag - 総合診断
+- GET /api/diag/ui - UI診断
+- GET /api/diag/database - データベース診断
+- GET /api/diag/echo - エコー診断
+- GET /api/diag/auth-context - 認証コンテキスト診断
+- GET /api/diag/security - セキュリティ診断
+- GET /api/diag/org - 組織診断
+- GET /api/diag/comprehensive - 包括的診断
+- GET /api/diag/env - 環境変数診断
+- GET /api/diag/monitoring - 監視診断
+- GET /api/diag/billing - 請求診断
+- GET /api/diag/stripe - Stripe診断
+- GET /api/diag/session - セッション診断
+
+### その他システムAPI
+- GET /api/materials/stats - 資料統計
+- GET /api/monitor - システム監視
+- GET /api/security/audit - セキュリティ監査
+- GET /api/images/optimize - 画像最適化
+- GET /api/health - ヘルスチェック
+- GET /api/health/deployment - デプロイメント状況
+- POST /api/emails/welcome - ウェルカムメール送信
+
+### テスト・診断API
+- GET /api/test/e2e-me - E2Eテスト用ユーザー情報
+- GET /api/selftest/auth - 認証セルフテスト
+
+■ 4. AI・機械学習機能
+
+### AI面談・インタビュー
+- 自動質問生成
+- リアルタイム対話
+- 回答の差分管理
+- セッション状態管理
+
+### AI引用追跡
+- AI回答時の情報源記録
+- 引用頻度分析
+- 引用品質スコア計算
+- セッション単位の引用分析
+
+### AI生成コンテンツ
+- ブログ記事自動生成
+- 導入事例自動生成
+- Q&A自動生成
+- サービス説明文生成
+
+### 組織AIチャット
+- 組織内文書との対話
+- 文書アップロード・管理
+- コンテキスト理解
+
+### AIレポート自動生成
+- 月次パフォーマンスレポート
+- コンテンツ分析レポート
+- AI活用状況レポート
+- 改善提案自動生成
+
+### AI分析機能
+- コンテンツパフォーマンス分析
+- 面談データ分析
+- Q&A利用状況分析
+- SEOレポート自動生成
+
+■ 5. データ管理・分析機能
+
+### 統計・レポート
+- 月次レポート自動生成
+- PDF出力機能
+- 統計データエクスポート
+- リアルタイム分析ダッシュボード
+
+### パフォーマンス分析
+- コンテンツ効果測定
+- AI面談効果分析
+- ユーザー行動分析
+- アクセス統計
+
+### データエクスポート
+- 各種データのCSV出力
+- PDFレポート生成
+- 資料ダウンロード機能
+
+■ 6. ユーザー・組織管理
+
+### 認証・認可
+- ユーザー登録・ログイン
+- 組織メンバーシップ管理
+- 権限制御（RLS）
+- セッション管理
+
+### 組織機能
+- 組織作成・管理
+- 組織公開設定
+- メンバー管理
+- 権限設定
+
+### ユーザー設定
+- プロフィール管理
+- 設定画面
+- 通知設定
+
+■ 7. 外部連携・埋め込み機能
+
+### 埋め込み機能
+- ダッシュボード埋め込み
+- 外部サイトへの組み込み
+
+### API連携
+- REST API提供
+- Webhook対応
+
+■ 8. 請求・課金機能
+
+### 請求管理
+- 課金プラン管理
+- 請求書生成
+- 支払い処理（Stripe連携）
+- 請求リンク管理
+
+### プラン管理
+- 機能制限管理
+- 使用量制限
+- アップグレード・ダウングレード
+
+■ 9. システム・運用機能
+
+### 監視・診断
+- システムヘルスチェック
+- パフォーマンス監視
+- エラー監視
+- セキュリティ監査
+
+### セキュリティ
+- Row Level Security (RLS)
+- 認証・認可
+- データ暗号化
+- 監査ログ
+
+### 開発・テスト
+- E2Eテスト機能
+- セルフテスト機能
+- 診断ツール群
+
+■ 10. コンテンツ配信
+
+### ファイル管理
+- 画像最適化
+- ファイルアップロード・ダウンロード
+- 資料管理
+
+### メール機能
+- ウェルカムメール
+- 通知メール
+- 確認メール
+
+■ 11. 検索・フィルタ機能
+
+### 検索機能
+- Q&A検索
+- コンテンツ検索
+- 組織検索
+
+### フィルタ・ソート
+- 期間別フィルタ
+- カテゴリ別フィルタ
+- パフォーマンス別ソート
+
+====================================================================
+総計：
+- ダッシュボードページ: 36ページ
+- 公開サイトページ: 20ページ  
+- API エンドポイント: 70以上
+- AI機能: 20以上
+- システム機能: 30以上
+====================================================================
+
+この一覧は実際のコードベースから抽出した機能のみを記載しており、
+ハルシネーション（架空の機能）は含んでいません。

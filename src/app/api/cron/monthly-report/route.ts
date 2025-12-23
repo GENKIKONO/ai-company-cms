@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { collectMonthlyData, generateHTMLReport, saveReportToStorage } from '@/lib/report-generator';
 import { logger } from '@/lib/utils/logger';
-import type { MonthlyReport } from '@/types/domain/reports';;
+import { toPeriodStart, toPeriodEnd } from '@/types/domain/reports';
 
 // Monthly Report Generation Cron
 // Schedule: Monthly on 1st at 5:00 AM JST (20:00 UTC on previous day)
@@ -23,7 +23,11 @@ export async function GET(request: NextRequest) {
     // Calculate previous month
     const targetMonth = now.getMonth() === 0 ? 12 : now.getMonth();
     const targetYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-    
+
+    // Compute period_start and period_end for DB queries
+    const periodStart = toPeriodStart(targetYear, targetMonth);
+    const periodEnd = toPeriodEnd(targetYear, targetMonth);
+
     const results = {
       targetPeriod: `${targetYear}-${targetMonth.toString().padStart(2, '0')}`,
       organizationsProcessed: 0,
@@ -40,8 +44,8 @@ export async function GET(request: NextRequest) {
     
     const { data: organizations, error: orgsError } = await supabase
       .from('organizations')
-      .select('id, name, plan')
-      .eq('is_published', true);
+      .select('id, name, plan_id')
+      .eq('is_active', true);
 
     if (orgsError) {
       logger.error('[Monthly Cron] Failed to fetch organizations', { data: orgsError });
@@ -59,32 +63,36 @@ export async function GET(request: NextRequest) {
       
       try {
         // Check if report already exists for this period
+        // Using ai_monthly_reports directly (monthly_reports view delegates to it)
+        // period_start triggers auto-compute of month_bucket
         const { data: existingReport } = await supabase
-          .from('monthly_reports')
+          .from('ai_monthly_reports')
           .select('id, status')
           .eq('organization_id', org.id)
-          .eq('year', targetYear)
-          .eq('month', targetMonth)
-          .single();
+          .eq('period_start', periodStart)
+          .maybeSingle();
 
-        if (existingReport) {
-          logger.info(`[Monthly Cron] Report already exists for ${org.name} (${results.targetPeriod})`);
+        if (existingReport && (existingReport.status === 'completed' || existingReport.status === 'generating')) {
+          logger.info(`[Monthly Cron] Report already exists for ${org.name} (${results.targetPeriod}) - status: ${existingReport.status}`);
           results.reportsSkipped++;
           continue;
         }
 
         // Create report record in generating status
-        const reportId = crypto.randomUUID();
-        const { error: insertError } = await supabase
-          .from('monthly_reports')
-          .insert({
-            id: reportId,
+        // Using ai_monthly_reports with upsert for idempotency
+        // DB trigger computes month_bucket from period_start automatically
+        const plan_id = org.plan_id ?? 'free';
+        const { data: upsertData, error: insertError } = await supabase
+          .from('ai_monthly_reports')
+          .upsert({
             organization_id: org.id,
-            year: targetYear,
-            month: targetMonth,
+            period_start: periodStart,
+            period_end: periodEnd,
+            plan_id,
+            level: 'basic',
             status: 'generating',
-            format: 'html',
-            data_summary: {
+            summary_text: '',
+            metrics: {
               ai_visibility_score: 0,
               total_bot_hits: 0,
               unique_bots: 0,
@@ -92,7 +100,11 @@ export async function GET(request: NextRequest) {
               top_performing_urls: 0,
               improvement_needed_urls: 0
             }
-          });
+          }, { onConflict: 'organization_id,period_start,period_end' })
+          .select('id')
+          .single();
+
+        const reportId = upsertData?.id ?? crypto.randomUUID();
 
         if (insertError) {
           logger.error(`[Monthly Cron] Failed to create report record for ${org.name}`, { data: insertError });
@@ -106,10 +118,10 @@ export async function GET(request: NextRequest) {
         
         if (!reportData) {
           await supabase
-            .from('monthly_reports')
+            .from('ai_monthly_reports')
             .update({
               status: 'failed',
-              error_message: 'Failed to collect monthly data'
+              updated_at: new Date().toISOString()
             })
             .eq('id', reportId);
           
@@ -127,10 +139,10 @@ export async function GET(request: NextRequest) {
         
         if (!fileUrl) {
           await supabase
-            .from('monthly_reports')
+            .from('ai_monthly_reports')
             .update({
               status: 'failed',
-              error_message: 'Failed to save report to storage'
+              updated_at: new Date().toISOString()
             })
             .eq('id', reportId);
           
@@ -141,21 +153,23 @@ export async function GET(request: NextRequest) {
         }
 
         // Update report record with completion
+        // Using ai_monthly_reports with metrics (not data_summary)
         const { error: updateError } = await supabase
-          .from('monthly_reports')
+          .from('ai_monthly_reports')
           .update({
             status: 'completed',
-            file_url: fileUrl,
-            file_size: Buffer.byteLength(htmlContent, 'utf8'),
-            data_summary: {
+            summary_text: `Monthly report for ${org.name} (${results.targetPeriod})`,
+            metrics: {
               ai_visibility_score: reportData.aiVisibilityData.overall_score,
               total_bot_hits: reportData.botLogsData.total_count,
               unique_bots: reportData.botLogsData.unique_bots,
               analyzed_urls: reportData.aiVisibilityData.summary.total_analyzed_urls,
               top_performing_urls: reportData.aiVisibilityData.summary.top_performing_urls,
-              improvement_needed_urls: reportData.aiVisibilityData.summary.improvement_needed_urls
+              improvement_needed_urls: reportData.aiVisibilityData.summary.improvement_needed_urls,
+              file_url: fileUrl,
+              file_size: Buffer.byteLength(htmlContent, 'utf8')
             },
-            generated_at: new Date().toISOString()
+            updated_at: new Date().toISOString()
           })
           .eq('id', reportId);
 
@@ -176,18 +190,17 @@ export async function GET(request: NextRequest) {
         logger.error(`[Monthly Cron] Error processing ${org.name}`, { data: error });
         results.errors.push(`${org.name}: ${errorMsg}`);
         results.reportsFailed++;
-        
+
         // Ensure report is marked as failed if it was created
         try {
           await supabase
-            .from('monthly_reports')
+            .from('ai_monthly_reports')
             .update({
               status: 'failed',
-              error_message: errorMsg
+              updated_at: new Date().toISOString()
             })
             .eq('organization_id', org.id)
-            .eq('year', targetYear)
-            .eq('month', targetMonth);
+            .eq('period_start', periodStart);
         } catch (updateError) {
           logger.error(`[Monthly Cron] Failed to mark report as failed for ${org.name}`, { data: updateError });
         }

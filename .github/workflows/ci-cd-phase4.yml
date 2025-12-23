@@ -17,7 +17,7 @@ on:
 
 # 環境変数の定義
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '24'
   PNPM_VERSION: '8'
   # E2Eテスト用設定
   PLAYWRIGHT_BASE_URL: 'http://localhost:3000'

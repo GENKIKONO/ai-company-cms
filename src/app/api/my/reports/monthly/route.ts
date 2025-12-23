@@ -51,7 +51,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 直近12ヶ月のレポート一覧を取得
+    // クエリパラメータ取得
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get('limit') ?? '12', 10);
+
+    // 直近のレポート一覧を取得
     const { data: reports, error } = await supabase
       .from('ai_monthly_reports')
       .select(`
@@ -61,12 +65,14 @@ export async function GET(request: NextRequest) {
         period_start,
         period_end,
         status,
+        metrics,
+        summary_text,
         created_at,
         updated_at
       `)
       .eq('organization_id', organizationId)
       .order('period_start', { ascending: false })
-      .limit(12);
+      .limit(Math.min(limit, 50));
 
     if (error) {
       console.error('Failed to query ai_monthly_reports:', error);

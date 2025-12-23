@@ -5,13 +5,14 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
-// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
+import type { Database } from '@/types/supabase';
 
 // Supabase型定義のエイリアス
-type CitationsResponseRow = any;
-type CitationsResponseInsert = any;
-type CitationsItemRow = any;
-type CitationsItemInsert = any;
+type Tables = Database['public']['Tables'];
+type CitationsResponseRow = Tables['ai_citations_responses']['Row'];
+type CitationsResponseInsert = Tables['ai_citations_responses']['Insert'];
+type CitationsItemRow = Tables['ai_citations_items']['Row'];
+type CitationsItemInsert = Tables['ai_citations_items']['Insert'];
 
 // エクスポート用の型定義
 export interface AiCitationItemInput {
@@ -124,11 +125,12 @@ export async function logAiResponseWithCitations(input: LogAiResponseInput): Pro
       throw new Error(`Failed to insert response record: ${responseError.message}`);
     }
 
-    if (!responseRow || !responseRow.id) {
+    const typedRow = responseRow as { id: string } | null;
+    if (!typedRow || !typedRow.id) {
       throw new Error('Failed to get response ID after insertion');
     }
 
-    const responseId = responseRow.id;
+    const responseId = typedRow.id;
     
     // 2) itemsが空の場合はここで終了
     if (input.items.length === 0) {
@@ -228,6 +230,7 @@ export async function getCitationsSummary(responseId: string): Promise<Citations
       .from('ai_citations_responses')
       .select('*')
       .eq('id', responseId)
+      .returns<CitationsResponseRow>()
       .single();
 
     if (error) {

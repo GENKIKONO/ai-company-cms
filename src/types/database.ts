@@ -77,8 +77,16 @@ export type {
 // Re-export other domain types
 export type {
   ReportStatus,
-  ReportFormat,
-  MonthlyReport
+  ReportLevel,
+  MonthlyReport,
+  MonthlyReportMetrics,
+  LegacyMonthlyReport
+} from './domain/reports';
+
+export {
+  toPeriodStart,
+  toPeriodEnd,
+  fromPeriodStart
 } from './domain/reports';
 
 export type {

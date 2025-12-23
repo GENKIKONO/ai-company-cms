@@ -238,8 +238,8 @@ export async function ensureMembership(
         .select('id')
         .eq('created_by', userId)
         .maybeSingle();
-        
-      const org = handleMaybeSingleResult(result, '所属組織');
+
+      const org = handleMaybeSingleResult<{ id: string }>(result, '所属組織');
       targetOrgId = org.id;
     }
     

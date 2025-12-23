@@ -1,0 +1,19 @@
+--- a/src/lib/ai/openai-interview.ts
++++ b/src/lib/ai/openai-interview.ts
+@@ -19,7 +19,7 @@ export type CitationType = 'url' | 'post' | 'faq' | 'other';
+ 
+ export interface CitationItem {
+   type: CitationType;
+-  sourceId?: string;
++  contentUnitId?: string;  // content_unit_id 列対応
+   uri?: string;
+   title?: string;
+   snippet?: string;
+@@ -180,7 +180,7 @@ export async function finalizeInterviewSession(params: FinalizeParams): Promise
+       citations: citations.map(c => ({
+         type: c.type,
+-        sourceId: questionId,
++        contentUnitId: questionId,  // content_unit_id 対応
+         title: c.title,
+         snippet: c.snippet,
+         uri: c.uri,

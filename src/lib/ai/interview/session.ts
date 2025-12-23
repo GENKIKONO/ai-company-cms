@@ -1,19 +1,58 @@
 import { createClient } from '@/lib/supabase/server';
-// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
-import type { 
+import type {
   InterviewSession,
   CreateInterviewSessionInput,
   SaveAnswerInput,
   FinalizeSessionInput,
   InterviewAnswersJson
 } from '@/types/interview-session';
-// P1-2: 移行後は Supabase Database enum型を使用
+import type { Database } from '@/types/supabase';
 import { maskPII, validateAndMaskAnswer } from '@/lib/utils/pii-mask';
 import { logAiResponseWithCitations } from '@/lib/ai/citations';
 import { logger } from '@/lib/utils/logger';
 
-type InterviewSessionRow = any;
-type InterviewSessionInsert = any;
+// Supabase生成型を使用
+type Tables = Database['public']['Tables'];
+type InterviewSessionRow = Tables['ai_interview_sessions']['Row'];
+type InterviewSessionInsert = Tables['ai_interview_sessions']['Insert'];
+type InterviewSessionStatus = Database['public']['Enums']['interview_session_status'];
+type InterviewContentType = Database['public']['Enums']['interview_content_type'];
+
+// =====================================================
+// ANSWERS FORMAT NORMALIZATION
+// =====================================================
+
+/**
+ * 新形式の回答オブジェクト型
+ * { questionId: { answer: string, confidence?: number } }
+ */
+type NewAnswersFormat = Record<string, { answer: string; confidence?: number }>;
+
+/**
+ * 新形式かどうかを判定
+ */
+function isNewAnswersFormat(x: unknown): x is NewAnswersFormat {
+  if (!x || typeof x !== 'object') return false;
+  const entries = Object.entries(x as Record<string, unknown>);
+  if (entries.length === 0) return true; // 空オブジェクトは新形式扱い
+  return entries.every(([_, v]) =>
+    typeof v === 'object' && v !== null && 'answer' in v && typeof (v as { answer: unknown }).answer === 'string'
+  );
+}
+
+/**
+ * 旧形式 { questionId: "answer" } を新形式に変換
+ */
+function toNewAnswersFormat(x: unknown): NewAnswersFormat {
+  if (isNewAnswersFormat(x)) return x;
+  const obj = (x ?? {}) as Record<string, unknown>;
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [
+      k,
+      typeof v === 'string' ? { answer: v } : { answer: String(v ?? '') }
+    ])
+  );
+}
 
 /**
  * 新しいインタビューセッションを作成
@@ -27,18 +66,21 @@ export async function createInterviewSession(input: CreateInterviewSessionInput)
       throw new Error('At least one question must be selected');
     }
 
-    // 初期回答オブジェクト作成
-    const initialAnswers: Record<string, string> = {};
+    // 初期回答オブジェクト作成（新形式）
+    const initialAnswersRaw: Record<string, string> = {};
     input.questionIds.forEach(questionId => {
-      initialAnswers[questionId] = '';
+      initialAnswersRaw[questionId] = '';
     });
+    // 新形式に正規化してから保存
+    const normalizedAnswers = toNewAnswersFormat(initialAnswersRaw);
 
+    const status: InterviewSessionStatus = 'draft';
     const sessionData: InterviewSessionInsert = {
       organization_id: input.organizationId,
       user_id: input.userId,
-      content_type: input.contentType,
-      status: "draft" as any,
-      answers: initialAnswers as any, // JSONB型
+      content_type: input.contentType as InterviewContentType,
+      status,
+      answers: normalizedAnswers,
       generated_content: null
     };
 
@@ -48,23 +90,24 @@ export async function createInterviewSession(input: CreateInterviewSessionInput)
       .select('id')
       .single();
 
-    if (error) {
-      logger.error('Failed to create interview session', { 
+    const typedData = data as { id: string } | null;
+    if (error || !typedData) {
+      logger.error('Failed to create interview session', {
         data: { error, input: { ...input, questionIds: `[${input.questionIds.length} questions]` } }
       });
-      throw new Error(`Failed to create session: ${error.message}`);
+      throw new Error(`Failed to create session: ${error?.message ?? 'No data returned'}`);
     }
 
     logger.info('Interview session created', {
       data: {
-        sessionId: data.id,
+        sessionId: typedData.id,
         organizationId: input.organizationId,
         contentType: input.contentType,
         questionCount: input.questionIds.length
       }
     });
 
-    return { sessionId: data.id };
+    return { sessionId: typedData.id };
 
   } catch (error) {
     logger.error('Create interview session error', { data: error });
@@ -100,18 +143,20 @@ export async function saveInterviewAnswer(input: SaveAnswerInput): Promise<void>
       throw new Error('Cannot modify completed session');
     }
 
-    // 回答をマージ
-    const updatedAnswers = {
-      ...currentSession.answers,
-      [input.questionId]: validation.maskedText
+    // 既存の回答を新形式に正規化してからマージ
+    const existingAnswers = toNewAnswersFormat(currentSession.answers);
+    const updatedAnswers: NewAnswersFormat = {
+      ...existingAnswers,
+      [input.questionId]: { answer: validation.maskedText }
     };
 
     // データベース更新
+    const inProgressStatus: InterviewSessionStatus = 'in_progress';
     const { error: updateError } = await supabase
       .from('ai_interview_sessions')
       .update({
-        answers: updatedAnswers as any, // JSONB型
-        status: "in_progress" as any,
+        answers: updatedAnswers,
+        status: inProgressStatus,
         updated_at: new Date().toISOString()
       })
       .eq('id', input.sessionId);
@@ -173,16 +218,20 @@ export async function finalizeInterviewSession(input: FinalizeSessionInput): Pro
       return { generatedContent: session.generated_content || '' };
     }
 
-    // 回答データの準備
-    const answers = session.answers as Record<string, string>;
-    const answeredQuestions = Object.entries(answers).filter(([_, answer]) => answer.trim() !== '');
+    // 回答データの準備（新形式に正規化）
+    const normalizedAnswers = toNewAnswersFormat(session.answers);
+    const answeredQuestions = Object.entries(normalizedAnswers).filter(
+      ([, v]) => typeof v?.answer === 'string' && v.answer.trim() !== ''
+    );
 
     if (answeredQuestions.length === 0) {
       throw new Error('No answers provided');
     }
 
-    // 回答データを直接渡してAI生成実行
-    const answersMap = Object.fromEntries(answeredQuestions);
+    // 回答データを直接渡してAI生成実行（answer文字列のみ抽出）
+    const answersMap = Object.fromEntries(
+      answeredQuestions.map(([k, v]) => [k, v.answer])
+    );
     const generatedContent = await generateContentWithAI(answersMap, session.content_type);
 
     // 引用ログを記録
@@ -195,12 +244,12 @@ export async function finalizeInterviewSession(input: FinalizeSessionInput): Pro
       completionTokens: estimateTokens(generatedContent),
       totalTokens: estimateTokens('AI generation prompt') + estimateTokens(generatedContent),
       quotedTokensTotal: answeredQuestions.length * 50, // 概算
-      quotedCharsTotal: answeredQuestions.reduce((sum, [_, answer]) => sum + answer.length, 0),
-      items: answeredQuestions.map(([questionId, answer]) => ({
+      quotedCharsTotal: answeredQuestions.reduce((sum, [, v]) => sum + v.answer.length, 0),
+      items: answeredQuestions.map(([questionId, v]) => ({
         contentUnitId: questionId, // 実際のcontent_unit_idマッピングが必要
         weight: 1.0 / answeredQuestions.length,
-        quotedTokens: estimateTokens(answer),
-        quotedChars: answer.length,
+        quotedTokens: estimateTokens(v.answer),
+        quotedChars: v.answer.length,
         fragmentHint: `question-${questionId}`,
         locale: 'ja'
       })),
@@ -213,10 +262,11 @@ export async function finalizeInterviewSession(input: FinalizeSessionInput): Pro
     });
 
     // セッション完了として保存
+    const completedStatus: InterviewSessionStatus = 'completed';
     const { error: updateError } = await supabase
       .from('ai_interview_sessions')
       .update({
-        status: "completed" as any,
+        status: completedStatus,
         generated_content: generatedContent,
         updated_at: new Date().toISOString()
       })

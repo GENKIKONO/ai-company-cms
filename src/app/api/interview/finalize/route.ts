@@ -302,8 +302,9 @@ export async function GET(request: NextRequest) {
     }
 
     // インタビューステータス確認 (RLS適用下で)
+    // ai_interviews → ai_interview_sessions に移行済み
     const { data: interview, error } = await supabase
-      .from('ai_interviews')
+      .from('ai_interview_sessions')
       .select('id, status, finalized_at, finalized_by')
       .eq('id', interviewId)
       .eq('created_by', session.user.id) // 作成者のみ参照可能

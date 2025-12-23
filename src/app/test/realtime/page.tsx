@@ -115,9 +115,15 @@ export default function RealtimeTestPage() {
         channelRef.current.unsubscribe();
       }
 
-      // 新しいチャンネル作成
+      // Realtime認証を設定
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        await supabase.realtime.setAuth(session.access_token);
+      }
+
+      // 新しいチャンネル作成（命名規約: org:{orgId}:{entity}）
       const channel = supabase
-        .channel(`test_realtime:${organizationId}`)
+        .channel(`org:${organizationId}:test`, { config: { private: true } })
         
         // Posts テーブル監視
         .on(

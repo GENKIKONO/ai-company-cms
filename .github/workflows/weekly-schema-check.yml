@@ -24,7 +24,7 @@ on:
         default: '#alerts'
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '24'
   POSTGRES_VERSION: '15'
 
 jobs:

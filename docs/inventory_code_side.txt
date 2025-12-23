@@ -1,0 +1,907 @@
+================================================================================
+                        コードベース DB接続棚卸し
+                        (inventory_code_side.txt)
+
+                        生成日: 2024-12-22
+                        更新日: 2024-12-23
+                        DB検証日: 2024-12-23（Supabaseアシスタント確認済み）
+                        統合レポート: docs/db_reconciliation_report.md
+
+  ※ 本ドキュメントは実DBスナップショットと統合済み
+  ※ 差分詳細・ToDo一覧は db_reconciliation_report.md を参照
+================================================================================
+
+================================================================================
+1. 概要
+================================================================================
+
+スキャン範囲:
+- src/ 配下の全TypeScript/TSXファイル
+- supabase/functions/ 配下のEdge Functions
+- src/types/supabase.ts の型定義
+- src/types/rpc.ts のRPC/View型定義（新規追加）
+- src/lib/realtime/constants.ts のRealtime定数（新規追加）
+
+スキャン対象パターン:
+- supabase.from('テーブル名')
+- supabase.rpc('関数名')
+- supabase.channel('トピック名')
+- supabase.storage.from('バケット名')
+
+注意点:
+- 型定義ファイル(supabase.ts)はDB実態を反映
+- RPC/View型定義(rpc.ts)は手動管理、supabase gen typesで更新されない
+- コード側で呼び出されていてもDBに存在しない可能性あり
+- 監査ログに痕跡がないテーブルは未稼働の可能性あり
+
+追加型定義ファイル（2024-12-23）:
+- src/types/rpc.ts: RPC関数の引数/戻り値型、View型、Type Predicates
+- src/lib/realtime/constants.ts: Realtimeトピック/イベント/設定定数
+- src/lib/qna-stats/service.ts: Q&A Stats抽象化レイヤー（DB移行準備）
+
+================================================================================
+1.5 DB検証結果サマリー（2024-12-23）
+================================================================================
+
+【🔴 早急に対応が必要】
+1. increment_org_interview_stats - RPC関数が未実装（アプリがブロックされる）
+2. ai_interview_logs - テーブル名不一致（正しくは ai_interview_messages）
+3. fn_build_monthly_kpis - public と analytics に重複（どちらを使うか統一必要）
+
+【🟡 存在しないが運用影響は限定的】
+- organization_groups テーブル
+- qna_stats テーブル（qna_events は存在）
+- user_violation_stats テーブル
+- ai_citation_kpis_daily テーブル
+- ai_citation_integrity_daily テーブル
+- site_settings テーブル（cms_site_settings で代替可能）
+
+【🟢 確認済み・問題なし】
+- RPC関数: get_plan_features, count_report_regenerations, increment_used_count,
+           log_service_role_action, get_database_stats, auto_block_ip,
+           check_rate_limit_db, enqueue_embedding_job, enqueue_cache_invalidation
+- View: user_organizations, view_org_plans, view_ai_starter_caps_current,
+        view_report_regen_limit_current, v_ai_citations_aggregates,
+        mv_ai_citations_org_period
+- Realtime: RLS有効、broadcast_changes存在、privateチャンネルポリシー設定済み
+
+【⚠️ 仕様確認が必要】
+- auto_block_ip の戻り値が uuid（コード側で void 想定の可能性）
+- report_jobs と monthly_report_jobs が両方存在（役割の明確化が必要）
+
+================================================================================
+2. 接続マップ（重要）
+================================================================================
+
+--------------------------------------------------------------------------------
+2.1 HIGH優先度: 月次レポート/ジョブ/Realtime
+--------------------------------------------------------------------------------
+
+■ public.ai_monthly_reports
+  コード参照元:
+  - src/lib/reports/client.ts: getReportsList(), getReportByPeriod(), getLatestReport()
+  - src/lib/reports/realtime.ts: useReportRealtime() (postgres_changes)
+  - src/app/api/my/reports/monthly/route.ts: GET
+  - src/app/api/my/reports/monthly/[period]/route.ts: GET
+  - src/app/api/my/reports/monthly/[period]/pdf/route.ts: GET
+  - supabase/functions/monthly-report-generate/index.ts: upsert, update
+  - supabase/functions/reports-worker/index.ts: update
+  - supabase/functions/reports-get-current/index.ts: select
+  - supabase/functions/reports-api/index.ts: select
+  - supabase/functions/monthly-reports/index.ts: select, insert
+  - supabase/functions/monthly-report-scheduler/index.ts: select
+  状態: ✅ 接続済み、稼働中
+
+■ public.monthly_report_jobs
+  コード参照元:
+  - src/lib/reports/client.ts: getJobsList(), checkActiveJob()
+  - src/lib/reports/realtime.ts: useJobRealtime() (postgres_changes)
+  - supabase/functions/monthly-report-generate/index.ts: insert, update, select
+  状態: ✅ 接続済み
+
+■ public.report_jobs (レガシー?)
+  コード参照元:
+  - supabase/functions/monthly-reports/index.ts: select, insert, update
+  状態: ⚠️ monthly_report_jobs との重複可能性、要確認
+
+■ public.report_regeneration_logs
+  コード参照元:
+  - supabase/functions/reports-api/index.ts: select, insert
+  - supabase/functions/monthly-reports/index.ts: insert
+  状態: ✅ 接続済み
+
+■ Realtime トピック
+  定数管理: src/lib/realtime/constants.ts (CHANNEL_TOPICS, BROADCAST_EVENTS)
+  - org:{orgId}:monthly_reports
+    使用: src/lib/reports/realtime.ts, src/hooks/useMonthlyReportRealtime.ts
+    購読テーブル: ai_monthly_reports (postgres_changes / broadcast)
+    イベント: REPORT_CHANGE, REPORT_PUBLISHED
+  - report:{orgId}:jobs
+    使用: src/lib/reports/realtime.ts
+    購読テーブル: monthly_report_jobs (postgres_changes / broadcast)
+    イベント: JOB_CHANGE, JOB_ENQUEUED, JOB_COMPLETED
+  - org:{orgId}:cms
+    使用: src/hooks/useOrgRealtimeCms.ts
+  - org:{orgId}:test
+    使用: src/app/test/realtime/page.tsx (テスト用)
+  状態: ✅ private チャンネル設定済み、setAuth()対応済み
+  環境変数:
+  - NEXT_PUBLIC_REALTIME_BROADCAST_MODE: broadcast切替
+  - NEXT_PUBLIC_REALTIME_DEBUG: デバッグログ
+  - NEXT_PUBLIC_REALTIME_DISABLE_RECONNECT: 再接続無効（テスト用）
+  再接続: 指数バックオフ（500ms * 1.8^n, max 3回）
+
+--------------------------------------------------------------------------------
+2.2 MEDIUM優先度: 組織/RLS基盤、CMS、QA
+--------------------------------------------------------------------------------
+
+■ public.organizations
+  コード参照元:
+  - src/app/api/organizations/route.ts
+  - src/app/api/my/organization/route.ts
+  - src/app/api/public/organizations/route.ts
+  - src/app/o/[slug]/page.tsx
+  - supabase/functions/ghostwriter/index.ts
+  - supabase/functions/monthly-report-scheduler/index.ts
+  - supabase/functions/content-refresh-orchestrator/index.ts
+  - (他多数)
+  状態: ✅ 高頻度使用
+
+■ public.organization_members
+  コード参照元:
+  - src/app/api/test/e2e-me/route.ts
+  - src/app/api/my/services/route.ts
+  - src/app/api/my/interview-questions/route.ts
+  - src/app/api/my/reports/monthly/[period]/server-action/route.ts
+  - src/app/api/admin/my-organizations/route.ts
+  状態: ✅ RLS基盤として稼働
+
+■ public.posts
+  コード参照元:
+  - src/app/api/posts/route.ts, [id]/route.ts
+  - src/app/api/my/posts/route.ts, [id]/route.ts
+  - src/app/api/public/o/[slug]/posts/[postId]/route.ts
+  - src/app/feed.xml/route.ts
+  - src/app/sitemap-news.xml/route.ts
+  状態: ✅ 監査ログ有り、高頻度
+
+■ public.services
+  コード参照元:
+  - src/app/api/my/services/route.ts, [id]/route.ts
+  - src/app/api/public/organizations/route.ts
+  - src/app/api/public/services/route.ts
+  - src/app/o/[slug]/page.tsx
+  - supabase/functions/ghostwriter/index.ts
+  状態: ✅ 監査ログ有り、高頻度
+
+■ public.products / product_translations
+  コード参照元:
+  - 型定義あり (src/types/supabase.ts)
+  - 直接クエリ: 検出されず
+  状態: ⚠️ 型定義のみ、コード接続なし
+
+■ public.qa_entries
+  コード参照元:
+  - src/app/api/my/qa/entries/route.ts, [id]/route.ts
+  - src/app/api/my/qa/search/route.ts
+  - src/app/api/qa/public/route.ts
+  - src/app/test/realtime/page.tsx
+  - src/app/o/[slug]/page.tsx
+  状態: ✅ 監査ログ有り
+
+■ public.qa_categories
+  コード参照元:
+  - src/app/api/my/qa/categories/route.ts, [id]/route.ts
+  - src/app/api/my/qa/entries/[id]/route.ts
+  - src/app/api/qa/public/route.ts
+  状態: ✅ 接続済み
+
+■ public.case_studies
+  コード参照元:
+  - src/app/api/cases/route.ts
+  - src/app/api/my/case-studies/route.ts, [id]/route.ts
+  - src/app/api/public/case-studies/route.ts
+  - src/app/o/[slug]/page.tsx
+  状態: ✅ 監査ログ有り
+
+■ public.faqs
+  コード参照元:
+  - src/app/api/faqs/route.ts
+  - src/app/api/my/faqs/route.ts, [id]/route.ts
+  - src/app/api/public/faqs/route.ts
+  - src/app/faqs/[slug]/page.tsx
+  - supabase/functions/ghostwriter/index.ts
+  状態: ✅ 接続済み
+
+■ public.cms_site_settings
+  コード参照元:
+  - src/app/api/admin/cms/site-settings/route.ts
+  - src/app/api/public/cms/route.ts
+  状態: ✅ 接続済み
+
+■ public.cms_sections (cms_assets も)
+  コード参照元:
+  - src/app/api/admin/cms/sections/route.ts
+  - src/app/api/admin/cms/assets/route.ts
+  状態: ✅ 接続済み
+
+--------------------------------------------------------------------------------
+2.3 LOW/UNKNOWN優先度: 未接続/部分接続
+--------------------------------------------------------------------------------
+
+■ AIインタビュー関連
+  - public.ai_interview_sessions
+    コード参照元:
+    - src/app/api/ai-interview-sessions/route.ts
+    - src/app/api/my/interview/sessions/route.ts, [id]/route.ts
+    - src/app/api/my/ai-citations/route.ts
+    - supabase/functions/ai-interview-finalize/index.ts
+    状態: ✅ 接続済み
+
+  - public.ai_interview_messages
+    型定義: あり
+    コード参照: 直接クエリなし（sessions経由で取得？）
+    状態: ⚠️ 要確認
+
+  - public.ai_interview_axes / ai_interview_questions
+    コード参照元:
+    - src/app/api/my/interview-questions/route.ts
+    - src/app/api/my/interview/questions/route.ts
+    状態: ✅ 接続済み
+
+■ AI引用/可視化関連
+  - public.ai_citations_items / ai_citations_responses
+    型定義: あり
+    コード参照: 直接クエリなし
+    状態: ❌ 未接続（DB存在するがコード側で未使用）
+
+  - public.v_ai_citations_aggregates (View)
+    コード参照元:
+    - src/app/api/my/ai-citations/route.ts
+    状態: ✅ 接続済み
+
+  - public.mv_ai_citations_org_period (Materialized View)
+    コード参照元:
+    - src/app/api/my/ai-citations/route.ts
+    状態: ✅ 接続済み
+
+  - public.ai_visibility_logs
+    コード参照元:
+    - src/app/api/admin/ai-visibility/latest/route.ts
+    - src/app/api/admin/ai-visibility/run/route.ts
+    状態: ✅ 接続済み
+
+■ 翻訳/埋め込み関連
+  - public.embeddings
+    コード参照元:
+    - src/app/api/search/vector/route.ts
+    状態: ✅ 接続済み
+
+  - public.embedding_jobs
+    型定義: あり
+    コード参照: RPC enqueue_embedding_job 経由のみ
+    状態: ⚠️ 直接クエリなし
+
+  - public.translation_jobs
+    型定義: あり
+    コード参照: 直接クエリなし
+    状態: ❌ 未接続
+
+■ レート制御/侵入検知関連
+  - public.rate_limit_configs / rate_limit_logs / rate_limit_requests / rate_limit_rules
+    型定義: あり
+    コード参照: 直接クエリなし（RPC check_rate_limit_db 経由）
+    状態: ⚠️ RPC経由のみ
+
+  - public.intrusion_detection_alerts / intrusion_detection_rules
+    型定義: あり
+    コード参照: 直接クエリなし
+    状態: ❌ 未接続
+
+■ 公開パブリッシュ関連
+  - public.public_*_tbl (posts, services, faqs, case_studies, products, news, organizations)
+    型定義: あり
+    コード参照: RPC sync_public_*_tbl 経由
+    状態: ⚠️ 直接アクセスなし、トリガ/RPC依存
+
+■ ストレージ関連
+  バケット使用:
+  - assets: src/app/api/admin/upload-logo/route.ts
+  - org-docs: src/app/api/my/org-docs/files/route.ts
+  - (その他): management-console/settings/page.tsx
+  状態: ✅ 部分接続
+
+  - public.storage_access_logs
+    型定義: あり
+    コード参照: 直接クエリなし
+    状態: ❌ 未接続
+
+■ 課金関連
+  - public.billing_checkout_links / billing_checkout_link_activations
+    コード参照元:
+    - src/app/api/admin/billing-links/route.ts, [id]/activate/route.ts
+    - src/app/api/public/active-checkout/route.ts
+    状態: ✅ 接続済み
+
+  - public.stripe_customers / subscriptions / customers
+    型定義: あり
+    コード参照: 直接クエリなし
+    状態: ❌ 未接続
+
+■ RLSテスト関連
+  - public.rls_test_runs / rls_test_users / rls_test_scenarios / rls_test_results
+    コード参照元:
+    - supabase/functions/rls-tester/index.ts
+    状態: ✅ Edge Function経由で接続
+
+■ スケジューラ/キュー関連
+  - public.cache_invalidation_queue
+    型定義: あり
+    コード参照: RPC enqueue_cache_invalidation 経由
+    状態: ⚠️ RPC依存
+
+  - public.content_refresh_queue
+    コード参照元:
+    - supabase/functions/content-refresh-orchestrator/index.ts
+    状態: ✅ Edge Function接続
+
+■ サイト/通報関連
+  - public.ai_sites / ai_site_url_rules / ai_hreflang
+    型定義: あり
+    コード参照: 直接クエリなし
+    状態: ❌ 未接続
+
+  - public.ip_reports / ip_report_actions / ip_blocklist / blocked_ips
+    型定義: あり
+    コード参照: 直接クエリなし（RPC auto_block_ip 等経由）
+    状態: ⚠️ RPC依存
+
+================================================================================
+3. 未接続/未実装リスト（重要・詳細）
+================================================================================
+
+--------------------------------------------------------------------------------
+3.1 コードが呼び出しているがDBに存在しない可能性があるもの
+--------------------------------------------------------------------------------
+
+【RPC関数】
+
+■ get_plan_features (p_org_id)
+  呼び出し元: supabase/functions/reports-api/index.ts
+  型定義: src/types/rpc.ts (GetPlanFeaturesArgs, PlanFeaturesResult)
+  Type Guard: isPlanFeaturesMap()
+  状態: ✅ 型定義あり、呼び出し実装済み（フォールバック付き）
+  戻り値: jsonb → PlanFeaturesResult
+
+■ count_report_regenerations (p_org_id, p_period_start, p_period_end)
+  呼び出し元: supabase/functions/reports-api/index.ts
+  型定義: src/types/rpc.ts (CountReportRegenerationsArgs)
+  状態: ✅ 型定義あり、呼び出し実装済み（フォールバック付き）
+  戻り値: number
+
+■ increment_used_count (p_code)
+  呼び出し元: src/app/api/admin/org-groups/join-requests/[requestId]/route.ts
+  型定義: src/types/rpc.ts (IncrementUsedCountArgs)
+  状態: ✅ 型定義あり、呼び出し実装済み
+  エラーハンドリング: not_found, expired, max_uses_reached の3パターン対応
+  戻り値: void (エラー時は例外)
+
+■ log_service_role_action (p_job_name, p_request_id, p_expected_row_count, p_affected_row_count, p_error_code, p_meta)
+  呼び出し元: supabase/functions/content-refresh-orchestrator/index.ts:444
+  状態: ✅ DB確認済み（2024-12-23）
+  定義: 引数 (text, text, integer, integer, text, jsonb)、戻り値 void
+
+■ increment_org_interview_stats (...)
+  呼び出し元: supabase/functions/ai-interview-finalize/index.ts:91
+  状態: 🔴 DB未実装（2024-12-23確認）
+  対応: 【要作成】organization_ai_usage の統計インクリメント関数
+
+■ get_database_stats ()
+  呼び出し元: src/lib/monitoring/production-monitoring.ts:485
+  状態: ✅ DB確認済み（2024-12-23）
+  定義: 引数なし、戻り値 jsonb
+
+■ auto_block_ip (target_ip, block_reason, block_duration_minutes)
+  呼び出し元: RPC経由（ip_reports/ip_blocklist関連）
+  状態: ✅ DB確認済み（2024-12-23）
+  定義: 引数 (inet, text, integer)、戻り値 uuid
+  注意: ⚠️ 戻り値は uuid（void ではない）。ブロック記録のIDを返却
+
+■ check_rate_limit_db (limit_key, window_seconds, max_requests)
+  呼び出し元: RPC経由（レート制限関連）
+  状態: ✅ DB確認済み（2024-12-23）
+  定義: 引数 (text, integer, integer)、戻り値 jsonb
+
+■ enqueue_embedding_job (p_org_id, p_source_table, p_source_id, p_source_field, p_content_text, p_chunk_strategy, p_embedding_model, p_priority)
+  呼び出し元: RPC経由（埋め込みジョブ関連）
+  状態: ✅ DB確認済み（2024-12-23）
+  定義: 引数 (uuid, text, uuid, text, text, text, text, smallint)、戻り値 uuid
+
+■ enqueue_cache_invalidation (_path, _source_id) / (p_scope, p_path, p_org_id, p_lang, p_source_table, p_source_id)
+  呼び出し元: RPC経由（キャッシュ無効化関連）
+  状態: ✅ DB確認済み（2024-12-23）
+  定義: 2つのオーバーロードあり、いずれも戻り値 void
+
+■ fn_build_monthly_kpis (p_org_id, p_period_start, p_period_end)
+  呼び出し元: supabase/functions/monthly-report-generate/index.ts
+  型定義: src/types/rpc.ts (FnBuildMonthlyKpisArgs, MonthlyKpisResult)
+  Type Guard: isMonthlyKpis()
+  状態: ⚠️ DB確認済み（2024-12-23）- 重複問題あり
+  定義: 引数 (uuid, date, date)、戻り値 jsonb
+  問題: public.fn_build_monthly_kpis と analytics.fn_build_monthly_kpis が重複
+  対応: 【要統一】どちらを正式版にするか決定し、片方を削除
+
+【テーブル/ビュー】
+
+■ view_ai_starter_caps_current
+  呼び出し元: supabase/functions/monthly-reports/index.ts:27
+  状態: ✅ DB確認済み（2024-12-23）
+  カラム: organization_id uuid, monthly_limit integer, used_count integer, remaining integer
+
+■ view_report_regen_limit_current
+  呼び出し元: supabase/functions/monthly-reports/index.ts:46
+  状態: ✅ DB確認済み（2024-12-23）
+  カラム: organization_id uuid, monthly_limit integer, used_count bigint, remaining bigint
+
+■ view_org_plans
+  呼び出し元: supabase/functions/monthly-reports/index.ts
+  型定義: src/types/rpc.ts (ViewOrgPlansRow)
+  Type Guard: isViewOrgPlansRow()
+  状態: ✅ 型定義あり
+  カラム: organization_id, plan_id, features (jsonb)
+
+■ ai_interviews (レガシー)
+  呼び出し元:
+  - src/app/api/interview/finalize/route.ts:306
+  - supabase/functions/example-finalize/index.ts:313, 355
+  状態: ✅ DB確認済み（2024-12-23）- 移行完了
+  結果: ai_interviews は存在しない。ai_interview_sessions に完全移行済み
+  対応: コード側の参照を ai_interview_sessions に修正する必要あり
+
+■ reports (レガシー)
+  呼び出し元: src/app/api/public/reports/route.ts:166
+  状態: ✅ DB確認済み（2024-12-23）
+  結果: reports は存在しない。monthly_reports_legacy がレガシーバックアップ
+        ai_monthly_reports が現行テーブル
+  対応: コード側の参照を ai_monthly_reports に修正する必要あり
+
+■ user_organizations (ビュー)
+  呼び出し元:
+  - src/app/monitor/page.tsx
+  - src/app/test/realtime/page.tsx
+  - src/app/test/admin-api/page.tsx
+  - src/app/dashboard/settings/page.tsx
+  - src/app/dashboard/admin/contents/page.tsx
+  - src/app/dashboard/case-studies/page.tsx
+  - src/app/dashboard/org-ai-chat/page.tsx
+  - src/app/api/admin/upload-logo/route.ts
+  - src/app/api/admin/cms/*/route.ts
+  - src/lib/ai/group-context.ts
+  型定義: src/types/rpc.ts (UserOrganizationRow)
+  Type Guard: isUserOrganizationRow()
+  状態: ✅ 型定義あり
+  カラム: user_id, organization_id, role, name, slug, plan_id, feature_flags,
+          entitlements, is_published, org_created_at
+
+■ organization_groups
+  呼び出し元: src/app/api/admin/org-groups/*/route.ts (多数)
+  状態: 🔴 DB確認済み（2024-12-23）- 存在しない
+  対応: 必要であればテーブル作成、不要であればコード側の参照を削除
+
+■ qna_stats
+  呼び出し元:
+  - src/app/api/admin/qna-stats/route.ts
+  - src/app/api/my/qna-stats/route.ts
+  - src/app/api/qna/stats/route.ts
+  状態: 🔴 DB確認済み（2024-12-23）- 存在しない
+  備考: qna_events テーブルは存在
+  対応: qna_events から集計するか、qna_stats テーブルを作成
+
+■ sales_materials_stats
+  呼び出し元:
+  - src/app/api/materials/stats/route.ts
+  - src/app/api/admin/material-stats/route.ts
+  - src/app/api/admin/material-stats/export/route.ts
+  状態: ✅ 型定義あり
+
+■ violations
+  呼び出し元: src/app/api/enforcement/users/[id]/status/route.ts:78
+  状態: ✅ DB確認済み（2024-12-23）- 存在する
+
+■ user_violation_stats
+  呼び出し元: src/app/api/enforcement/users/[id]/status/route.ts:78
+  状態: 🔴 DB確認済み（2024-12-23）- 存在しない
+  対応: 必要なら集計ビュー/テーブルとして定義
+
+■ analytics
+  呼び出し元: src/app/api/dashboard/stats/route.ts:159
+  状態: ⚠️ DB確認済み（2024-12-23）
+  結果: analytics スキーマに集計ビュー群は存在、publicにanalyticsテーブルはなし
+  対応: 要件に応じてテーブルかビューかを定義
+
+■ news
+  呼び出し元: src/app/api/admin/news/page.tsx (コメントアウト)
+  状態: ✅ 型定義あり、コード側未使用
+
+■ ai_citation_kpis_daily
+  呼び出し元: supabase/functions/reports/index.ts:169
+  状態: 🔴 DB確認済み（2024-12-23）- 存在しない
+  対応: 必要なら集計マテビューorテーブルを設計
+
+■ ai_citation_integrity_daily
+  呼び出し元: supabase/functions/reports/index.ts:197
+  状態: 🔴 DB確認済み（2024-12-23）- 存在しない
+  対応: 必要なら集計マテビューorテーブルを設計
+
+■ site_settings
+  呼び出し元: src/app/api/ops/site-settings/route.ts
+  状態: ⚠️ DB確認済み（2024-12-23）- 存在しない
+  備考: cms_site_settings が代替として存在
+  対応: 現行がcms_site_settingsで問題なければOK、別用途なら作成
+
+■ site_admins
+  呼び出し元: supabase/functions/reports/index.ts:152
+  状態: ✅ DB確認済み（2024-12-23）- 存在する
+
+--------------------------------------------------------------------------------
+3.2 DBに存在するがコードから未接続のテーブル
+--------------------------------------------------------------------------------
+
+【完全未接続】
+- ai_answers: 型定義あり、コード接続なし
+- ai_bot_logs: 型定義あり、直接クエリなし
+- ai_chunks: 型定義あり、コード接続なし
+- ai_content_units: 型定義あり、コード接続なし
+- ai_conversations: 型定義あり、コード接続なし
+- ai_disclosure_documents: 型定義あり、コード接続なし
+- ai_exports: 型定義あり、コード接続なし
+- ai_feedback: 型定義あり、コード接続なし
+- ai_generated_drafts: 型定義あり、コード接続なし
+- ai_jsonld_versions: 型定義あり、コード接続なし
+- ai_manifest_settings: 型定義あり、コード接続なし（RPC経由？）
+- ai_messages: 型定義あり、コード接続なし
+- ai_queries: 型定義あり、コード接続なし
+- ai_retrievals: 型定義あり、コード接続なし
+- ai_sections: 型定義あり、コード接続なし
+- ai_sources: 型定義あり、コード接続なし
+- ai_usage_events: Edge Function経由のみ
+- ai_visibility_config: 型定義あり、コード接続なし
+- ai_visibility_scores: 型定義あり、コード接続なし
+- alert_events: 型定義あり、コード接続なし
+- alert_source_allowlist: 型定義あり、コード接続なし
+- alert_sources: 型定義あり、コード接続なし
+- alert_thresholds: 型定義あり、コード接続なし
+- analytics_events: 型定義あり、コード接続なし（パーティション）
+- chatbot_interactions: 型定義あり、コード接続なし
+- chatbots: 型定義あり、コード接続なし
+- comments: 型定義あり、コード接続なし
+- contract_violations: Edge Function経由のみ
+- crawler_policies: 型定義あり、コード接続なし
+- customers: 型定義あり、コード接続なし
+- design_versions: 型定義あり、コード接続なし
+- designs: 型定義あり、コード接続なし
+- enforcement_audit: 型定義あり、コード接続なし
+- intrusion_detection_alerts: 型定義あり、コード接続なし
+- intrusion_detection_rules: 型定義あり、コード接続なし
+- ip_blocklist: 型定義あり、コード接続なし
+- ip_report_actions: 型定義あり、コード接続なし
+- ip_reports: 型定義あり、コード接続なし
+- job_runs: 型定義あり、コード接続なし（job_runs_v2 使用）
+- monthly_report_sections: 型定義あり、コード接続なし
+- monthly_reports_legacy: 型定義あり、コード接続なし
+- news_translations: 型定義あり、コード接続なし
+- object_prefixes: 型定義あり、コード接続なし
+- ops_audit: 型定義あり、コード接続なし
+- order_items: 型定義あり、コード接続なし
+- orders: 型定義あり、コード接続なし
+- org_memberships: 型定義あり、コード接続なし
+- org_roles: 型定義あり、コード接続なし
+- organization_addons: 型定義あり、コード接続なし
+- organization_ai_usage: 型定義あり、コード接続なし
+- organization_verifications: 型定義あり、コード接続なし
+- partners: 型定義あり、コード接続なし
+- projects: 型定義あり、コード接続なし
+- qa_question_templates: 型定義あり、コード接続なし
+- rate_limit_configs: 型定義あり、RPC経由のみ
+- rate_limit_logs: 型定義あり、RPC経由のみ
+- rate_limit_requests: 型定義あり、RPC経由のみ
+- rate_limit_rules: 型定義あり、RPC経由のみ
+- review_queue: 型定義あり、コード接続なし
+- rls_denied_events: Edge Function経由のみ
+- role_change_audit: 型定義あり、コード接続なし
+- room_members: 型定義あり、コード接続なし
+- rooms: 型定義あり、コード接続なし
+- security_incidents: 型定義あり、コード接続なし（パーティション）
+- sensitive_data_patterns: 型定義あり、コード接続なし
+- storage_access_logs: 型定義あり、コード接続なし
+- stripe_customers: 型定義あり、コード接続なし
+- subscriptions: 型定義あり、コード接続なし
+- supported_languages: 型定義あり、コード接続なし
+- tasks: 型定義あり、コード接続なし
+- tenants: 型定義あり、コード接続なし
+- translation_jobs: 型定義あり、コード接続なし
+- user_favorites: 型定義あり、コード接続なし
+- user_profiles: 型定義あり、コード接続なし
+- user_saved_searches: 型定義あり、コード接続なし
+
+================================================================================
+4. 優先度付きアクションプラン（90日ロードマップ）
+================================================================================
+
+--------------------------------------------------------------------------------
+フェーズ1（2週間）：既存Medium領域の結線強化
+--------------------------------------------------------------------------------
+
+【Week 1】
+□ products / product_translations の接続
+  - src/app/api/my/products/route.ts 作成
+  - src/app/api/public/products/route.ts 作成
+  - RLS ポリシー確認
+
+✅ 不足RPC関数の型定義作成（2024-12-23完了）
+  - get_plan_features(p_org_id) → src/types/rpc.ts
+  - count_report_regenerations(p_org_id, p_period_start, p_period_end) → src/types/rpc.ts
+  - increment_used_count(p_code) → src/types/rpc.ts
+  - fn_build_monthly_kpis(p_org_id, p_period_start, p_period_end) → src/types/rpc.ts
+  ⚠️ 残タスク: DBに関数が存在することの確認
+
+✅ View型定義作成（2024-12-23完了）
+  - user_organizations → src/types/rpc.ts (UserOrganizationRow)
+  - view_org_plans → src/types/rpc.ts (ViewOrgPlansRow)
+  ⚠️ 残タスク: DBにビューが存在することの確認
+
+□ レガシーテーブル/ビュー確認
+  - reports vs ai_monthly_reports 整理
+  - ai_interviews vs ai_interview_sessions 整理
+
+✅ Realtime定数集中管理（2024-12-23完了）
+  - src/lib/realtime/constants.ts 作成
+  - CHANNEL_TOPICS, BROADCAST_EVENTS, CHANNEL_CONFIG, RECONNECT_CONFIG
+  - 環境変数による機能フラグ対応
+  - setAuth() 対応（private チャンネル認可）
+
+【Week 2】
+□ 翻訳パイプライン接続
+  - translation_jobs 監視UI追加
+  - embedding_jobs 監視UI追加
+  - src/app/dashboard/jobs/ ページ作成
+
+□ 監査連携強化
+  - service_role_audit ダッシュボード
+  - ops_audit_simple 統合
+
+✅ Q&A Stats 抽象化レイヤー（2024-12-23完了）
+  - src/lib/qna-stats/service.ts 作成
+  - src/lib/qna-stats/index.ts 作成
+  - 将来の qna_stats テーブル移行に備えた抽象化
+
+--------------------------------------------------------------------------------
+フェーズ2（4週間）：AIインタビュー/引用のMVP接続
+--------------------------------------------------------------------------------
+
+【Week 3-4】
+□ ai_interview_messages 直接接続
+  - src/app/api/my/interview/sessions/[id]/messages/route.ts
+  - Realtime 購読追加
+
+□ ai_citations_items / ai_citations_responses 接続
+  - src/lib/ai/citations.ts 実装完了
+  - src/app/dashboard/ai-citations/ 強化
+
+【Week 5-6】
+□ AI可視化ダッシュボード
+  - ai_visibility_scores 表示
+  - ai_bot_logs 集計表示
+
+□ usage計測強化
+  - ai_usage_events UIからの可視化
+  - organization_ai_usage ダッシュボード
+
+--------------------------------------------------------------------------------
+フェーズ3（4週間）：レート制御/侵入検知/運用実装
+--------------------------------------------------------------------------------
+
+【Week 7-8】
+□ レート制御UI
+  - rate_limit_configs 管理画面
+  - rate_limit_logs 監視ダッシュボード
+
+□ 侵入検知UI
+  - intrusion_detection_alerts 一覧
+  - intrusion_detection_rules 管理
+
+【Week 9-10】
+□ 通報/ブロックUI
+  - ip_reports 管理
+  - ip_blocklist 管理
+  - blocked_ips 確認
+
+□ サイト設定UI
+  - ai_sites 管理
+  - ai_site_url_rules 管理
+  - ai_hreflang 管理
+
+================================================================================
+5. 付録
+================================================================================
+
+--------------------------------------------------------------------------------
+5.1 抽出正規表現テンプレ（grep用）
+--------------------------------------------------------------------------------
+
+# テーブル参照
+grep -rE "\.from\(['\"]([a-z_]+)['\"]\)" src/ --include="*.ts" --include="*.tsx"
+
+# RPC呼び出し
+grep -rE "\.rpc\(['\"]([a-z_]+)['\"]" src/ --include="*.ts" --include="*.tsx"
+
+# Realtimeチャンネル
+grep -rE "\.channel\(['\"]" src/ --include="*.ts" --include="*.tsx"
+
+# ストレージ
+grep -rE "storage\.from\(['\"]" src/ --include="*.ts" --include="*.tsx"
+
+--------------------------------------------------------------------------------
+5.2 RLSテストシナリオ雛形
+--------------------------------------------------------------------------------
+
+GIVEN: 未認証ユーザー (anon)
+WHEN: SELECT * FROM ai_monthly_reports
+THEN: 0件返却
+
+GIVEN: 認証済み、組織メンバーでない
+WHEN: SELECT * FROM ai_monthly_reports WHERE organization_id = 'xxx'
+THEN: 0件返却
+
+GIVEN: 認証済み、組織メンバー (viewer)
+WHEN: SELECT * FROM ai_monthly_reports WHERE organization_id = 'xxx'
+THEN: 自組織のレポートのみ返却
+
+GIVEN: 認証済み、組織メンバー (admin)
+WHEN: UPDATE ai_monthly_reports SET status = 'completed'
+THEN: 自組織のレポートのみ更新可能
+
+--------------------------------------------------------------------------------
+5.3 Realtime実装指針（2024-12-23更新）
+--------------------------------------------------------------------------------
+
+定数管理: src/lib/realtime/constants.ts
+- CHANNEL_TOPICS: トピック生成関数
+- BROADCAST_EVENTS: イベント名定数
+- CHANNEL_CONFIG: チャンネル設定デフォルト
+- RECONNECT_CONFIG: 再接続設定
+- REALTIME_TABLES: Realtime対象テーブル名
+
+推奨設定:
+```typescript
+import { CHANNEL_CONFIG, calculateBackoffDelay } from '@/lib/realtime/constants';
+
+// setAuth を subscribe 前に実行（private チャンネル必須）
+const { data: { session } } = await supabase.auth.getSession();
+await supabase.realtime.setAuth(session.access_token);
+
+// チャンネル作成
+const channel = supabase.channel(`org:${orgId}:topic`, {
+  config: {
+    private: true,           // 認証必須
+    broadcast: { ack: true } // 配信確認
+  }
+});
+```
+
+トピック命名規則 (CHANNEL_TOPICS):
+- org:{orgId}:monthly_reports - レポート更新
+- org:{orgId}:ai_interview_sessions - AIインタビュー
+- org:{orgId}:qna_stats - Q&A統計（将来対応）
+- report:{orgId}:jobs - レポートジョブ進捗
+
+イベント名 (BROADCAST_EVENTS):
+- REPORT_CHANGE, REPORT_PUBLISHED - レポート
+- JOB_CHANGE, JOB_ENQUEUED, JOB_COMPLETED - ジョブ
+- INTERVIEW_SESSION_CHANGE - AIインタビュー
+- MESSAGE_CREATED - メッセージング
+
+再接続設定 (RECONNECT_CONFIG):
+- maxAttempts: 3
+- baseDelayMs: 500
+- backoffMultiplier: 1.8
+- 計算例: 500ms → 900ms → 1620ms
+
+環境変数:
+- NEXT_PUBLIC_REALTIME_BROADCAST_MODE: broadcast有効化
+- NEXT_PUBLIC_REALTIME_DEBUG: デバッグログ有効化
+- NEXT_PUBLIC_REALTIME_DISABLE_RECONNECT: 再接続無効（テスト用）
+
+クライアント清掃:
+```typescript
+useEffect(() => {
+  const channel = supabase.channel(...);
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
+```
+
+--------------------------------------------------------------------------------
+5.4 実装ガイドライン
+--------------------------------------------------------------------------------
+
+■ Supabaseベストプラクティス
+- RLSは常に有効化、USING/WITH CHECK を明示
+- auth.uid() は SELECT 関数でラップ
+- インデックスは (organization_id, status, updated_at desc) 形式推奨
+
+■ Edge Functions
+- Deno標準APIを優先
+- npm依存は最小限
+- @supabase/supabase-js はバージョン固定
+
+■ 監査/ログ
+- service_role 使用時は service_role_audit に記録
+- 重要操作は ops_audit_simple に記録
+
+■ Idempotency
+- monthly_report_jobs: idempotency_key = hash(org, month_bucket, plan, level)
+- translation_jobs: job_id + source_table + source_id
+- embedding_jobs: content_hash
+
+--------------------------------------------------------------------------------
+5.5 RPC型定義・Type Predicates（2024-12-23追加）
+--------------------------------------------------------------------------------
+
+型定義ファイル: src/types/rpc.ts
+
+■ RPC関数型
+- GetPlanFeaturesArgs / PlanFeaturesResult
+- CountReportRegenerationsArgs
+- IncrementUsedCountArgs
+- FnBuildMonthlyKpisArgs / MonthlyKpisResult
+
+■ View型
+- UserOrganizationRow: user_organizations ビュー
+- ViewOrgPlansRow: view_org_plans ビュー
+
+■ Type Predicates (型ガード)
+```typescript
+import { isPlanFeaturesMap, isMonthlyKpis } from '@/types/rpc';
+
+const data = await supabase.rpc('get_plan_features', { p_org_id: orgId });
+if (isPlanFeaturesMap(data)) {
+  // data は PlanFeaturesResult 型として扱える
+}
+```
+
+■ ユーティリティ関数
+- snakeToCamel<T>(): DB jsonb のsnake_case → camelCase変換
+- isValidDateFormat(): 'YYYY-MM-DD' 形式の日付検証
+- validatePeriodArgs(): RPC引数の期間バリデーション
+
+--------------------------------------------------------------------------------
+5.6 Q&A Stats 抽象化レイヤー（2024-12-23追加）
+--------------------------------------------------------------------------------
+
+ファイル: src/lib/qna-stats/index.ts, src/lib/qna-stats/service.ts
+
+目的: 将来の qna_stats テーブル移行に備えた抽象化
+
+■ 主要エクスポート
+- getQnaStats(): 統計データ取得
+- aggregateDailyStats(): 日次集計
+- analyzeUserAgents(): UA分析
+
+■ 環境変数
+- USE_QNA_STATS_VIEW: true でView使用、false でテーブル使用
+
+■ 使用例
+```typescript
+import { getQnaStats } from '@/lib/qna-stats';
+
+const { data, error } = await getQnaStats({
+  organizationId,
+  dateRange: { start, end }
+});
+```
+
+================================================================================
+END OF DOCUMENT
+================================================================================
