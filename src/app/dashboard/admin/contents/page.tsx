@@ -307,6 +307,7 @@ export default function AdminContentsDashboard() {
     error: null,
     aiGeneratedFilter: 'all'
   });
+  const [sortOption, setSortOption] = useState<string>('updated_desc');
 
   const [contents, setContents] = useState<AdminContentListItem[]>([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -375,6 +376,9 @@ export default function AdminContentsDashboard() {
         params.set('generationSource', dashboardState.aiGeneratedFilter);
       }
 
+      // ソート
+      params.set('sort', sortOption);
+
       const response = await fetch(`/api/my/admin/contents?${params}`, {
         cache: 'no-store',
         headers: {
@@ -417,7 +421,7 @@ export default function AdminContentsDashboard() {
     } finally {
       setDashboardState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [organizationId, dashboardState.selectedGroup, dashboardState.selectedStatus, dashboardState.searchQuery, dashboardState.currentPage, dashboardState.pageSize, dashboardState.aiGeneratedFilter]);
+  }, [organizationId, dashboardState.selectedGroup, dashboardState.selectedStatus, dashboardState.searchQuery, dashboardState.currentPage, dashboardState.pageSize, dashboardState.aiGeneratedFilter, sortOption]);
 
   // データ取得（依存関係変更時）
   useEffect(() => {
@@ -449,9 +453,9 @@ export default function AdminContentsDashboard() {
     }));
   };
 
-  const handleSortChange = (sortOption: string) => {
-    // ソート機能は今後の実装で対応
-    logger.info('Sort change requested:', { sortOption });
+  const handleSortChange = (newSortOption: string) => {
+    setSortOption(newSortOption);
+    setDashboardState(prev => ({ ...prev, currentPage: 1 }));
   };
 
   const handleAiGeneratedFilterChange = (filter: 'all' | 'ai_only' | 'manual_only') => {
@@ -467,8 +471,27 @@ export default function AdminContentsDashboard() {
   };
 
   const handleEdit = (item: AdminContentListItem) => {
-    // 編集機能は今後の実装で対応
-    logger.info('Edit requested:', { itemId: item.id, sourceTable: item.source_table });
+    // コンテンツタイプに応じて適切な編集ページへナビゲート
+    const editRoutes: Record<string, string> = {
+      posts: `/dashboard/posts/${item.id}/edit`,
+      news: `/dashboard/news/${item.id}/edit`,
+      faqs: `/my/faqs/${item.id}/edit`,
+      case_studies: `/dashboard/case-studies/${item.id}/edit`,
+      qa_entries: `/dashboard/qa/${item.id}/edit`,
+      sales_materials: `/dashboard/materials/${item.id}/edit`,
+      ai_interview_sessions: `/dashboard/interviews/${item.id}/edit`,
+      services: `/dashboard/services/${item.id}/edit`
+    };
+
+    const editPath = editRoutes[item.source_table];
+    if (editPath) {
+      window.location.href = editPath;
+    } else {
+      // 汎用編集ページへのフォールバック
+      window.location.href = `/dashboard/admin/contents/${item.source_table}/${item.id}/edit?orgId=${organizationId}`;
+    }
+
+    logger.info('Edit navigation:', { itemId: item.id, sourceTable: item.source_table });
   };
 
   const handleDelete = async (item: AdminContentListItem) => {
@@ -571,7 +594,7 @@ export default function AdminContentsDashboard() {
                 onStatusChange={handleStatusChange}
                 searchQuery={dashboardState.searchQuery}
                 onSearchChange={handleSearchChange}
-                sortOption="updated_desc"
+                sortOption={sortOption}
                 onSortChange={handleSortChange}
                 onRefresh={handleRefresh}
                 isLoading={dashboardState.isLoading}

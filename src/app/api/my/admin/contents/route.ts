@@ -16,14 +16,29 @@ import type {
   CmsContentStatus
 } from '@/types/cms-content';
 
+// Valid sort options
+const VALID_SORT_OPTIONS = [
+  'updated_desc', 'updated_asc',
+  'created_desc', 'created_asc',
+  'title_asc', 'title_desc',
+  'published_desc', 'published_asc'
+] as const;
+
+type SortOption = typeof VALID_SORT_OPTIONS[number];
+
 /**
  * クエリパラメータの検証とパース
  */
-function parseQueryParams(url: URL): AdminContentListQuery {
+function parseQueryParams(url: URL): AdminContentListQuery & { sort?: SortOption } {
   const orgId = url.searchParams.get('orgId');
   if (!orgId) {
     throw new Error('orgId parameter is required');
   }
+
+  const sortParam = url.searchParams.get('sort');
+  const sort = VALID_SORT_OPTIONS.includes(sortParam as SortOption)
+    ? (sortParam as SortOption)
+    : 'updated_desc';
 
   return {
     orgId,
@@ -31,8 +46,26 @@ function parseQueryParams(url: URL): AdminContentListQuery {
     status: (url.searchParams.get('status') as CmsContentStatus) || undefined,
     q: url.searchParams.get('q') || undefined,
     page: parseInt(url.searchParams.get('page') || '1'),
-    pageSize: Math.min(parseInt(url.searchParams.get('pageSize') || '20'), 100) // 最大100件制限
+    pageSize: Math.min(parseInt(url.searchParams.get('pageSize') || '20'), 100), // 最大100件制限
+    sort
   };
+}
+
+/**
+ * ORDER BY句の構築
+ */
+function buildOrderByClause(sort: SortOption): string {
+  const sortMap: Record<SortOption, string> = {
+    updated_desc: 'updated_at DESC NULLS LAST',
+    updated_asc: 'updated_at ASC NULLS FIRST',
+    created_desc: 'created_at DESC',
+    created_asc: 'created_at ASC',
+    title_asc: 'title ASC NULLS LAST',
+    title_desc: 'title DESC NULLS LAST',
+    published_desc: 'published_at DESC NULLS LAST',
+    published_asc: 'published_at ASC NULLS FIRST',
+  };
+  return sortMap[sort] || 'updated_at DESC NULLS LAST';
 }
 
 /**
@@ -122,9 +155,12 @@ export async function GET(request: NextRequest) {
     const offset = (query.page - 1) * query.pageSize;
     const hasMore = offset + query.pageSize < total;
 
+    // ORDER BY構築
+    const orderBy = buildOrderByClause(query.sort || 'updated_desc');
+
     // データ取得クエリ
     const dataQuery = `
-      SELECT 
+      SELECT
         id,
         organization_id,
         content_type,
@@ -139,9 +175,9 @@ export async function GET(request: NextRequest) {
         base_path,
         meta,
         source_table
-      FROM v_admin_contents 
+      FROM v_admin_contents
       WHERE ${whereClause}
-      ORDER BY updated_at DESC, created_at DESC
+      ORDER BY ${orderBy}, id DESC
       LIMIT $${params.length + 1} OFFSET $${params.length + 2}
     `;
 

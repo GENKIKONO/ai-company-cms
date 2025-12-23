@@ -1,286 +1,311 @@
-/* eslint-disable no-console */
+/**
+ * Admin Alerts API
+ * GET /api/admin/alerts - アラート一覧取得
+ * GET /api/admin/alerts?type=rules - ルール一覧取得
+ * POST /api/admin/alerts - アラート作成
+ * POST /api/admin/alerts?type=rules - ルール作成
+ *
+ * DB Schema:
+ * public.alert_rules: id, name, description, is_active, severity, channel[], condition jsonb
+ * public.alerts: id, rule_id, status, payload jsonb, created_at
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import { z } from 'zod';
-import type { Alert, AlertRule, MonitoringFilters, CreateAlertRuleRequest } from '@/lib/monitoring/types';
 
-const alertRuleSchema = z.object({
-  name: z.string().min(1, 'Alert rule name is required').max(100),
-  description: z.string().max(500).optional(),
-  metric_name: z.string().min(1, 'Metric name is required'),
-  condition: z.object({
-    operator: z.enum(['gt', 'gte', 'lt', 'lte', 'eq', 'ne']),
-    aggregation: z.enum(['avg', 'sum', 'min', 'max', 'count']),
-    time_window: z.number().min(60).max(86400), // 1 minute to 24 hours
-    group_by: z.array(z.string()).optional()
-  }),
-  threshold: z.number(),
-  severity: z.enum(['info', 'warning', 'error', 'critical']),
-  evaluation_interval: z.number().min(60).max(3600).default(300), // 1 minute to 1 hour
-  evaluation_duration: z.number().min(60).max(7200).default(300), // 1 minute to 2 hours
-  notification_channels: z.array(z.string()).min(1, 'At least one notification channel is required'),
-  organization_id: z.string().uuid().optional(),
-  labels: z.record(z.string(), z.string()).default({}),
-  annotations: z.record(z.string(), z.string()).default({})
+// Validation schemas
+const createRuleSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(200),
+  description: z.string().max(1000).optional().nullable(),
+  is_active: z.boolean().default(true),
+  severity: z.enum(['low', 'medium', 'high', 'critical']),
+  channel: z.array(z.string()).default(['broadcast']),
+  condition: z.record(z.any()).default({}),
 });
 
+const createAlertSchema = z.object({
+  rule_id: z.string().uuid().optional().nullable(),
+  status: z.enum(['open', 'acknowledged', 'resolved']).default('open'),
+  payload: z.record(z.any()).default({}),
+});
+
+// GET - アラートまたはルール一覧取得
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
+
+    // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: userProfile, error: profileError } = await supabase
+    const url = new URL(request.url);
+    const type = url.searchParams.get('type');
+    const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 100);
+    const offset = Math.max(parseInt(url.searchParams.get('offset') || '0'), 0);
+
+    if (type === 'rules') {
+      // Alert Rules
+      return await getAlertRules(supabase, url, limit, offset, user.id);
+    } else {
+      // Alerts
+      return await getAlerts(supabase, url, limit, offset, user.id);
+    }
+
+  } catch (error) {
+    logger.error('[Alerts API] Unexpected error in GET', {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// Alert Rules一覧取得
+async function getAlertRules(
+  supabase: any,
+  url: URL,
+  limit: number,
+  offset: number,
+  userId: string
+) {
+  const isActive = url.searchParams.get('is_active');
+  const severity = url.searchParams.get('severity');
+
+  let query = supabase
+    .from('alert_rules')
+    .select('*', { count: 'exact' })
+    .order('updated_at', { ascending: false });
+
+  if (isActive !== null && isActive !== '') {
+    query = query.eq('is_active', isActive === 'true');
+  }
+
+  if (severity) {
+    query = query.eq('severity', severity);
+  }
+
+  query = query.range(offset, offset + limit - 1);
+
+  const { data: rules, error, count } = await query;
+
+  if (error) {
+    logger.error('[Alerts API] Rules query error', { error: error.message });
+
+    if (error.code === 'PGRST205' || error.message?.includes('does not exist')) {
+      return NextResponse.json({
+        success: true,
+        data: [],
+        pagination: { total: 0, limit, offset, has_more: false },
+        message: 'alert_rules table not found'
+      });
+    }
+
+    return NextResponse.json({ error: 'Failed to fetch rules' }, { status: 500 });
+  }
+
+  logger.info('[Alerts API] Rules fetched', { user_id: userId, count: rules?.length });
+
+  return NextResponse.json({
+    success: true,
+    data: rules || [],
+    pagination: {
+      total: count || 0,
+      limit,
+      offset,
+      has_more: offset + limit < (count || 0)
+    }
+  });
+}
+
+// Alerts一覧取得
+async function getAlerts(
+  supabase: any,
+  url: URL,
+  limit: number,
+  offset: number,
+  userId: string
+) {
+  const ruleId = url.searchParams.get('rule_id');
+  const status = url.searchParams.get('status');
+  const createdFrom = url.searchParams.get('created_from');
+  const createdTo = url.searchParams.get('created_to');
+
+  let query = supabase
+    .from('alerts')
+    .select('*, alert_rules(name, severity)', { count: 'exact' })
+    .order('created_at', { ascending: false });
+
+  if (ruleId) {
+    query = query.eq('rule_id', ruleId);
+  }
+
+  if (status) {
+    query = query.eq('status', status);
+  }
+
+  if (createdFrom) {
+    query = query.gte('created_at', createdFrom);
+  }
+
+  if (createdTo) {
+    query = query.lte('created_at', createdTo);
+  }
+
+  query = query.range(offset, offset + limit - 1);
+
+  const { data: alerts, error, count } = await query;
+
+  if (error) {
+    logger.error('[Alerts API] Alerts query error', { error: error.message });
+
+    if (error.code === 'PGRST205' || error.message?.includes('does not exist')) {
+      return NextResponse.json({
+        success: true,
+        data: [],
+        pagination: { total: 0, limit, offset, has_more: false },
+        message: 'alerts table not found'
+      });
+    }
+
+    return NextResponse.json({ error: 'Failed to fetch alerts' }, { status: 500 });
+  }
+
+  logger.info('[Alerts API] Alerts fetched', { user_id: userId, count: alerts?.length });
+
+  return NextResponse.json({
+    success: true,
+    data: alerts || [],
+    pagination: {
+      total: count || 0,
+      limit,
+      offset,
+      has_more: offset + limit < (count || 0)
+    }
+  });
+}
+
+// POST - アラートまたはルール作成
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    // 認証チェック
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Admin権限チェック
+    const { data: userProfile } = await supabase
       .from('app_users')
       .select('role')
       .eq('id', user.id)
-      .maybeSingle();
+      .single();
 
-    if (profileError || !userProfile || (userProfile as any).role !== 'admin') {
+    if (userProfile?.role !== 'admin' && userProfile?.role !== 'super_admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
     const url = new URL(request.url);
-    const type = url.searchParams.get('type') || 'active'; // 'active', 'rules', 'history'
-    const severity = url.searchParams.get('severity');
-    const status = url.searchParams.get('status');
-    const organization_id = url.searchParams.get('organization_id');
-    const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 200);
-    const offset = Math.max(parseInt(url.searchParams.get('offset') || '0'), 0);
+    const type = url.searchParams.get('type');
+    const body = await request.json();
 
     if (type === 'rules') {
-      // Return alert rules
-      const mockRules: AlertRule[] = [
-        {
-          id: 'rule-1',
-          name: 'High Error Rate',
-          description: 'Alert when error rate exceeds 5% over 5 minutes',
-          metric_name: 'http_errors_total',
-          condition: {
-            operator: 'gt',
-            aggregation: 'avg',
-            time_window: 300,
-            group_by: ['endpoint']
-          },
-          threshold: 0.05,
-          severity: 'error',
-          evaluation_interval: 60,
-          evaluation_duration: 300,
-          labels: { team: 'platform' },
-          annotations: { runbook: 'https://docs.example.com/runbooks/error-rate' },
-          notification_channels: ['slack-alerts', 'email-oncall'],
-          suppress_notifications: false,
-          notification_cooldown: 3600,
-          applies_to: 'all',
-          enabled: true,
-          created_at: '2024-01-01T00:00:00Z',
-          updated_at: '2024-11-01T00:00:00Z',
-          created_by: user.id,
-          last_evaluated_at: new Date().toISOString()
-        },
-        {
-          id: 'rule-2',
-          name: 'Slow Response Time',
-          description: 'Alert when P95 response time exceeds 2 seconds',
-          metric_name: 'http_request_duration',
-          condition: {
-            operator: 'gt',
-            aggregation: 'avg',
-            time_window: 600,
-            group_by: ['endpoint']
-          },
-          threshold: 2.0,
-          severity: 'warning',
-          evaluation_interval: 120,
-          evaluation_duration: 600,
-          labels: { team: 'platform' },
-          annotations: {},
-          notification_channels: ['slack-performance'],
-          suppress_notifications: false,
-          notification_cooldown: 1800,
-          applies_to: 'all',
-          enabled: true,
-          created_at: '2024-01-01T00:00:00Z',
-          updated_at: '2024-11-01T00:00:00Z',
-          created_by: user.id,
-          last_evaluated_at: new Date().toISOString()
-        }
-      ];
-
-      // Apply filters
-      const filteredRules = mockRules.filter(rule => {
-        if (severity && rule.severity !== severity) return false;
-        if (organization_id && rule.organization_id !== organization_id) return false;
-        return true;
-      });
-
-      return NextResponse.json({
-        success: true,
-        data: filteredRules.slice(offset, offset + limit),
-        pagination: {
-          total: filteredRules.length,
-          limit,
-          offset,
-          has_more: filteredRules.length > offset + limit
-        }
-      });
+      // Create Alert Rule
+      return await createAlertRule(supabase, body, user.id);
+    } else {
+      // Create Alert
+      return await createAlert(supabase, body, user.id);
     }
 
-    // Return active/historical alerts
-    const mockAlerts: Alert[] = [
-      {
-        id: 'alert-1',
-        rule_id: 'rule-1',
-        name: 'High Error Rate',
-        description: 'Error rate is 7.2% over the last 5 minutes',
-        severity: 'error',
-        status: 'active',
-        source: 'application',
-        triggered_at: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-        current_value: 0.072,
-        threshold_value: 0.05,
-        metric_name: 'http_errors_total',
-        labels: { endpoint: '/api/analytics', team: 'platform' },
-        created_at: new Date(Date.now() - 1800000).toISOString(),
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: 'alert-2',
-        rule_id: 'rule-2',
-        name: 'Slow Response Time',
-        description: 'P95 response time is 2.8 seconds',
-        severity: 'warning',
-        status: 'resolved',
-        source: 'application',
-        triggered_at: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-        resolved_at: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-        current_value: 1.2,
-        threshold_value: 2.0,
-        metric_name: 'http_request_duration',
-        labels: { endpoint: '/api/reports', team: 'platform' },
-        created_at: new Date(Date.now() - 7200000).toISOString(),
-        updated_at: new Date(Date.now() - 3600000).toISOString()
-      }
-    ];
-
-    // Apply filters
-    const filteredAlerts = mockAlerts.filter(alert => {
-      if (severity && alert.severity !== severity) return false;
-      if (status && alert.status !== status) return false;
-      if (type === 'active' && alert.status !== 'active') return false;
-      return true;
-    });
-
-    logger.info('[Alerts API] Alerts list requested', {
-      user_id: user.id,
-      type,
-      filters: { severity, status, organization_id },
-      result_count: filteredAlerts.length
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: filteredAlerts.slice(offset, offset + limit),
-      pagination: {
-        total: filteredAlerts.length,
-        limit,
-        offset,
-        has_more: filteredAlerts.length > offset + limit
-      }
-    });
-
   } catch (error) {
-    logger.error('[Alerts API] Unexpected error in GET', { data: error instanceof Error ? error : new Error(String(error)) });
-    
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    logger.error('[Alerts API] Unexpected error in POST', {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+// Alert Rule作成
+async function createAlertRule(supabase: any, body: any, userId: string) {
+  const validation = createRuleSchema.safeParse(body);
 
-    const { data: userProfile, error: profileError } = await supabase
-      .from('app_users')
-      .select('role, full_name')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (profileError || !userProfile || (userProfile as any).role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
-
-    const body = await request.json();
-    const validation = alertRuleSchema.safeParse(body);
-    
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request data', details: validation.error.errors },
-        { status: 400 }
-      );
-    }
-
-    const ruleData = validation.data;
-
-    // TODO: Implement actual database insertion
-    // This would create a new record in the 'alert_rules' table
-    const mockRule: AlertRule = {
-      id: `rule-${Date.now()}`,
-      name: ruleData.name,
-      description: ruleData.description || '',
-      metric_name: ruleData.metric_name,
-      condition: ruleData.condition,
-      threshold: ruleData.threshold,
-      severity: ruleData.severity,
-      evaluation_interval: ruleData.evaluation_interval,
-      evaluation_duration: ruleData.evaluation_duration,
-      labels: ruleData.labels,
-      annotations: ruleData.annotations,
-      notification_channels: ruleData.notification_channels,
-      suppress_notifications: false,
-      notification_cooldown: 3600, // 1 hour default
-      organization_id: ruleData.organization_id,
-      applies_to: ruleData.organization_id ? 'organization' : 'all',
-      enabled: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      created_by: user.id
-    };
-
-    logger.info('[Alerts API] Alert rule created', {
-      rule_id: mockRule.id,
-      rule_name: ruleData.name,
-      metric_name: ruleData.metric_name,
-      severity: ruleData.severity,
-      created_by: userProfile && 'full_name' in userProfile ? (userProfile as { full_name: string }).full_name : user.id
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: 'Alert rule created successfully',
-      data: mockRule
-    });
-
-  } catch (error) {
-    logger.error('[Alerts API] Unexpected error in POST', { data: error instanceof Error ? error : new Error(String(error)) });
-    
+  if (!validation.success) {
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: 'Invalid request data', details: validation.error.flatten().fieldErrors },
+      { status: 400 }
     );
   }
+
+  const ruleData = {
+    ...validation.data,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data: newRule, error } = await supabase
+    .from('alert_rules')
+    .insert(ruleData)
+    .select()
+    .single();
+
+  if (error) {
+    logger.error('[Alerts API] Rule insert error', { error: error.message });
+    return NextResponse.json({ error: 'Failed to create rule' }, { status: 500 });
+  }
+
+  logger.info('[Alerts API] Rule created', {
+    rule_id: newRule.id,
+    name: newRule.name,
+    created_by: userId
+  });
+
+  return NextResponse.json({
+    success: true,
+    message: 'Alert rule created successfully',
+    data: newRule
+  }, { status: 201 });
+}
+
+// Alert作成
+async function createAlert(supabase: any, body: any, userId: string) {
+  const validation = createAlertSchema.safeParse(body);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: 'Invalid request data', details: validation.error.flatten().fieldErrors },
+      { status: 400 }
+    );
+  }
+
+  const alertData = {
+    ...validation.data,
+    created_at: new Date().toISOString(),
+  };
+
+  const { data: newAlert, error } = await supabase
+    .from('alerts')
+    .insert(alertData)
+    .select('*, alert_rules(name, severity)')
+    .single();
+
+  if (error) {
+    logger.error('[Alerts API] Alert insert error', { error: error.message });
+    return NextResponse.json({ error: 'Failed to create alert' }, { status: 500 });
+  }
+
+  logger.info('[Alerts API] Alert created', {
+    alert_id: newAlert.id,
+    rule_id: newAlert.rule_id,
+    created_by: userId
+  });
+
+  return NextResponse.json({
+    success: true,
+    message: 'Alert created successfully',
+    data: newAlert
+  }, { status: 201 });
 }

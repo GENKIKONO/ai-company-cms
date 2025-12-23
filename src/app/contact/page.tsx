@@ -5,6 +5,17 @@ import Link from 'next/link';
 import { BackLink } from '@/components/ui/back-link';
 import { HIGButton } from '@/design-system';
 
+// Map form subject to API category
+const SUBJECT_TO_CATEGORY: Record<string, string> = {
+  general: 'general',
+  technical: 'support',
+  billing: 'sales',
+  feature: 'other',
+  bug: 'support',
+  partnership: 'partnership',
+  other: 'other',
+};
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
@@ -15,17 +26,40 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // TODO: Implement actual form submission to support@luxucare.com
-    // For now, show success message after simulated delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setSubmitted(true);
-    setIsSubmitting(false);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company || undefined,
+          category: SUBJECT_TO_CATEGORY[formData.subject] || 'general',
+          message: formData.message,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'お問い合わせの送信に失敗しました');
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '予期しないエラーが発生しました');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -199,7 +233,18 @@ export default function ContactPage() {
                 詳細は <Link href="/privacy" className="text-[var(--aio-primary)] hover:text-blue-500 underline font-medium transition-colors duration-200">プライバシーポリシー</Link> をご確認ください。
               </p>
             </div>
-            
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 p-4 rounded-2xl">
+                <p className="text-sm text-red-700 flex items-center gap-2">
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {error}
+                </p>
+              </div>
+            )}
+
             <div className="pt-4">
               <HIGButton
                 type="submit"
