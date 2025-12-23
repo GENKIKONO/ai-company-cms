@@ -12,6 +12,9 @@ import { logger } from '@/lib/log';
 import { isStandardError, type StandardError } from '@/lib/error-mapping';
 import { HIGButton } from '@/design-system';
 
+// アクション種別の一元管理
+type ActionKind = 'login' | 'back' | 'reload' | 'retry';
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -76,7 +79,13 @@ export class DashboardErrorBoundary extends Component<Props, State> {
     }
   }
 
-  private getErrorDisplay(error: StandardError | Error) {
+  private getErrorDisplay(error: StandardError | Error): {
+    title: string;
+    message: string;
+    showDetails: boolean;
+    details?: string;
+    action: ActionKind;
+  } {
     if (isStandardError(error)) {
       return {
         title: this.getErrorTitle(error.status),
@@ -113,7 +122,7 @@ export class DashboardErrorBoundary extends Component<Props, State> {
     }
   }
 
-  private getErrorAction(status: number): 'login' | 'back' | 'reload' | 'retry' {
+  private getErrorAction(status: number): ActionKind {
     switch (status) {
       case 401:
         return 'login';
@@ -128,7 +137,7 @@ export class DashboardErrorBoundary extends Component<Props, State> {
     }
   }
 
-  private handleAction(action: 'login' | 'back' | 'reload' | 'retry') {
+  private handleAction(action: ActionKind) {
     switch (action) {
       case 'login':
         window.location.href = '/auth/login';
@@ -212,7 +221,7 @@ export class DashboardErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 
-  private getActionLabel(action: 'login' | 'back' | 'reload' | 'retry'): string {
+  private getActionLabel(action: ActionKind): string {
     switch (action) {
       case 'login':
         return 'ログインページへ';
