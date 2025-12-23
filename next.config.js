@@ -63,29 +63,8 @@ const nextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains; preload',
           }] : []),
-          // Content Security Policy
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              isProduction 
-                ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://vercel.live"
-                : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://vercel.live http://localhost:*",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://*.supabase.co https://*.aiohub.jp https://vercel.com",
-              isProduction
-                ? "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live"
-                : "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live http://localhost:* ws://localhost:*",
-              "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://vercel.live",
-              "media-src 'self' https://*.supabase.co",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self' https://checkout.stripe.com",
-              "frame-ancestors 'none'",
-              ...(isProduction ? ["upgrade-insecure-requests"] : [])
-            ].join('; '),
-          },
+          // Content Security Policy は middleware.ts で一元管理
+          // （ここで定義するとmiddlewareと重複し、不整合の原因になるため削除）
           // Permissions Policy
           {
             key: 'Permissions-Policy',

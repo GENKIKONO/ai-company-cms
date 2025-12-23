@@ -839,14 +839,17 @@ function addSecurityHeaders(response: NextResponse, isProduction: boolean) {
   response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
   
-  // Content Security Policy
+  // Content Security Policy (一元管理: middleware.tsのみ)
+  // 本番オリジンを明示的に含める（'self'だけでは不十分な場合がある）
+  const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.jp';
+
   const cspDirectives = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://vercel.live",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https://*.supabase.co https://*.aiohub.jp https://vercel.com",
-    "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live",
+    `connect-src 'self' ${siteOrigin} https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live`,
     "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://vercel.live",
     "media-src 'self' https://*.supabase.co",
     "object-src 'none'",
@@ -855,11 +858,11 @@ function addSecurityHeaders(response: NextResponse, isProduction: boolean) {
     "frame-ancestors 'none'",
     "upgrade-insecure-requests"
   ];
-  
+
   if (!isProduction) {
     // Development adjustments
     cspDirectives[1] = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://vercel.live http://localhost:*";
-    cspDirectives[5] = "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live http://localhost:* ws://localhost:*";
+    cspDirectives[5] = `connect-src 'self' ${siteOrigin} https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co https://vercel.live http://localhost:* ws://localhost:*`;
   }
   
   response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
