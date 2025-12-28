@@ -1,46 +1,30 @@
 # Pull Request
 
-## 概要
-<!-- 変更内容の概要を記載 -->
+## What changed?
+<!-- Brief description of changes -->
 
-## 変更内容
-- [ ] 新機能追加
-- [ ] バグ修正
-- [ ] リファクタリング
-- [ ] ドキュメント更新
-- [ ] テスト追加・修正
-- [ ] その他: 
+## Which shell?
+- [ ] Info (public pages)
+- [ ] Dashboard (org context)
+- [ ] Account (user context)
+- [ ] Admin (site_admin)
+- [ ] N/A (docs/config only)
 
-## 関連Issue
-<!-- 関連するIssue番号を記載 -->
-Fixes #
+## Boundaries check
+- [ ] No new Auth exceptions (Check X)
+- [ ] No new plan/feature_flags exceptions (Check 10-12)
+- [ ] Allowlist counts unchanged (Check 14)
 
-## テスト
-- [ ] 単体テストを追加・更新した
-- [ ] 統合テストを追加・更新した
-- [ ] 手動テストを実施した
-- [ ] E2Eテストが通る
-- [ ] `npm run test` が通る
+> If any exception added, explain why:
 
-## AIO要件チェック ⚡
-<!-- REQ-AIO-00〜07 の遵守確認 -->
-- [ ] **AIO要件（REQ-AIO-00〜07）を満たしている**
-- [ ] **ダミーデータを使用していない**（`npm run check:no-mock` パス済）
-- [ ] **構造化データが正しく出力される**（該当する場合）
-- [ ] **OpenAPIスキーマを更新済み**（APIエンドポイント変更時）
-- [ ] **RSS/サイトマップが正しく生成される**（コンテンツ変更時）
+## Commands run
+- [ ] `npm run typecheck` PASS
+- [ ] `npm run check:architecture` PASS
 
-## 品質チェック
-- [ ] ESLint エラーがない（`npm run lint`）
-- [ ] TypeScript エラーがない（`npm run typecheck`）
-- [ ] ビルドが成功する（`npm run build`）
-- [ ] AIOテストが通る（`npm run aio:test`）
+## Manual smoke (if applicable)
+- [ ] Dashboard → Interview
+- [ ] Dashboard → Embed
+- [ ] Dashboard → Billing
 
-## レビュー観点
-<!-- レビュアーに確認してほしい点を記載 -->
-
-## スクリーンショット
-<!-- UIに変更がある場合はスクリーンショットを添付 -->
-
-## 備考
-<!-- その他の補足事項 -->
+## Notes
+<!-- Any additional context -->
