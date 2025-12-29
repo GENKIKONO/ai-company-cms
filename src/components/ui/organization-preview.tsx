@@ -77,16 +77,16 @@ export function OrganizationPreview({
   return (
     <div className="space-y-4">
       {/* Preview Section */}
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+      <div className="bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)] rounded-md p-4">
         <div className="flex items-start justify-between">
           <div className="flex">
-            <svg className="w-5 h-5 text-blue-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 text-[var(--aio-info)] mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">公開ページプレビュー</h3>
-              <p className="text-sm text-blue-700 mt-1">
+              <h3 className="text-sm font-medium text-[var(--aio-info)]">公開ページプレビュー</h3>
+              <p className="text-sm text-[var(--aio-info)] opacity-80 mt-1">
                 組織の公開ページをプレビューしたり、SEO情報を確認できます。
               </p>
             </div>
@@ -95,7 +95,7 @@ export function OrganizationPreview({
             <Link
               href={`/o/${organizationSlug}`}
               target="_blank"
-              className="inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-sm font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50"
+              className="inline-flex items-center px-3 py-1 border border-[var(--aio-info-border)] shadow-sm text-sm font-medium rounded-md text-[var(--aio-info)] bg-white hover:bg-[var(--aio-info-surface)]"
             >
               <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -103,11 +103,11 @@ export function OrganizationPreview({
               公開ページを開く
             </Link>
             {jsonLdData.length > 0 && (
-              <JsonLdModal 
+              <JsonLdModal
                 jsonLdData={jsonLdData}
                 organizationName={organizationName}
                 trigger={
-                  <button className="inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-sm font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50">
+                  <button className="inline-flex items-center px-3 py-1 border border-[var(--aio-info-border)] shadow-sm text-sm font-medium rounded-md text-[var(--aio-info)] bg-white hover:bg-[var(--aio-info-surface)]">
                     <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
@@ -125,7 +125,7 @@ export function OrganizationPreview({
         <Link
           href={`/o/${organizationSlug}/posts`}
           target="_blank"
-          className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+          className="block p-4 border border-gray-200 rounded-lg hover:border-[var(--aio-info-border)] hover:bg-[var(--aio-info-surface)] transition-colors"
         >
           <div className="flex items-center">
             <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -137,7 +137,7 @@ export function OrganizationPreview({
         <Link
           href={`/o/${organizationSlug}/services`}
           target="_blank"
-          className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+          className="block p-4 border border-gray-200 rounded-lg hover:border-[var(--aio-info-border)] hover:bg-[var(--aio-info-surface)] transition-colors"
         >
           <div className="flex items-center">
             <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -149,7 +149,7 @@ export function OrganizationPreview({
         <Link
           href={`/o/${organizationSlug}/case-studies`}
           target="_blank"
-          className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+          className="block p-4 border border-gray-200 rounded-lg hover:border-[var(--aio-info-border)] hover:bg-[var(--aio-info-surface)] transition-colors"
         >
           <div className="flex items-center">
             <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -161,7 +161,7 @@ export function OrganizationPreview({
         <Link
           href={`/o/${organizationSlug}/faq`}
           target="_blank"
-          className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+          className="block p-4 border border-gray-200 rounded-lg hover:border-[var(--aio-info-border)] hover:bg-[var(--aio-info-surface)] transition-colors"
         >
           <div className="flex items-center">
             <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

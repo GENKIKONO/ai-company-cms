@@ -1,5 +1,9 @@
 # Realtime CMS統合ガイド
 
+> **用語注記（2024-12-25追記）**:
+> - 本文書中の `user_organizations` は `organization_members` テーブルを指します
+> - 詳細は `docs/core-architecture.md` を参照
+
 ## 📋 概要
 
 Supabase AssistantによるRealtime機能とEdge Function (admin-api) を統合した、リアルタイムCMSシステムが実装されました。

@@ -1,3 +1,14 @@
+/**
+ * @deprecated このファイルはレガシーです。
+ * 正本は @/lib/core/error-boundary を使用してください。
+ *
+ * 移行方法:
+ * - import { ErrorBoundary } from '@/components/ErrorBoundary'
+ * + import { ErrorBoundary } from '@/lib/core/error-boundary'
+ *
+ * このファイルは後方互換性のため残存していますが、
+ * 新規コードでの使用は禁止です。
+ */
 'use client';
 
 import React, { Component, ReactNode, ErrorInfo } from 'react';

@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { HIGButton } from '@/design-system';
-import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
+import { DashboardPageShell } from '@/components/dashboard';
+import { DashboardButton } from '@/components/dashboard/ui';
 import ContentGenerationPanel from '@/components/interview/ContentGenerationPanel';
 import type { InterviewQuestion } from '@/types/interview-session';
 import { logger } from '@/lib/utils/logger';
@@ -72,7 +72,7 @@ interface ContentSectionProps {
 function StructuredContent({ sections }: ContentSectionProps) {
   const getSectionIcon = (key: string) => {
     switch (key) {
-      case 'summary': return <ClipboardIcon className="w-5 h-5 text-blue-600" aria-hidden />;
+      case 'summary': return <ClipboardIcon className="w-5 h-5 text-[var(--aio-info)]" aria-hidden />;
       case 'analysis': return <SearchIcon className="w-5 h-5 text-green-600" aria-hidden />;
       case 'recommendation': return <BulbIcon className="w-5 h-5 text-yellow-600" aria-hidden />;
       default: return <DocumentIcon className="w-5 h-5 text-gray-600" aria-hidden />;
@@ -81,7 +81,7 @@ function StructuredContent({ sections }: ContentSectionProps) {
 
   const getSectionColor = (key: string) => {
     switch (key) {
-      case 'summary': return 'bg-blue-50 border-blue-200';
+      case 'summary': return 'bg-[var(--aio-muted)] border-[var(--aio-primary)]/30';
       case 'analysis': return 'bg-green-50 border-green-200';
       case 'recommendation': return 'bg-orange-50 border-orange-200';
       default: return 'bg-gray-50 border-gray-200';
@@ -130,8 +130,8 @@ function AutoSaveStatus({ status, errorMessage, isCompact, conflictLatest, onRes
 
   if (status === 'saving') {
     return (
-      <div className={`flex items-center space-x-2 text-blue-600 ${isCompact ? 'text-xs' : ''}`}>
-        <div className={`border-2 border-blue-600 border-t-transparent rounded-full animate-spin ${isCompact ? 'w-3 h-3' : 'w-4 h-4'}`}></div>
+      <div className={`flex items-center space-x-2 text-[var(--aio-primary)] ${isCompact ? 'text-xs' : ''}`}>
+        <div className={`border-2 border-[var(--aio-primary)] border-t-transparent rounded-full animate-spin ${isCompact ? 'w-3 h-3' : 'w-4 h-4'}`}></div>
         <span className={isCompact ? 'text-xs' : 'text-sm'}>保存中...</span>
       </div>
     );
@@ -283,7 +283,7 @@ function AnswerEditor({ question, answer, onAnswerChange, autoSaveStatus, autoSa
               {question.question_text}
             </h2>
             {question.content_type && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--aio-muted)] text-[var(--aio-primary)]">
                 {question.content_type}
               </span>
             )}
@@ -319,7 +319,7 @@ function AnswerEditor({ question, answer, onAnswerChange, autoSaveStatus, autoSa
           {!isGenerating && (
             <>
               {autoSaveStatus === 'saving' && (
-                <p className="text-xs text-blue-600">保存中...</p>
+                <p className="text-xs text-[var(--aio-info)]">保存中...</p>
               )}
               {autoSaveStatus === 'saved' && (
                 <p className="text-xs text-green-600">✓ 保存済み</p>
@@ -333,6 +333,14 @@ function AnswerEditor({ question, answer, onAnswerChange, autoSaveStatus, autoSa
 }
 
 export default function InterviewSessionPage() {
+  return (
+    <DashboardPageShell title="AIインタビューセッション" requiredRole="viewer">
+      <InterviewSessionContent />
+    </DashboardPageShell>
+  );
+}
+
+function InterviewSessionContent() {
   const router = useRouter();
   const params = useParams();
   const sessionId = params.sessionId as string;
@@ -586,7 +594,12 @@ export default function InterviewSessionPage() {
       <div className="">
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <DashboardBackLink variant="button" className="mb-4" />
+            <Link
+              href="/dashboard/interview"
+              className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4"
+            >
+              ← インタビューに戻る
+            </Link>
             <h1 className="text-3xl font-bold text-gray-900">エラーが発生しました</h1>
           </div>
           <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -611,7 +624,7 @@ export default function InterviewSessionPage() {
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">セッションが見つかりません</h1>
-            <Link href="/dashboard/interview" className="text-blue-600 hover:text-blue-500">
+            <Link href="/dashboard/interview" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)]">
               新しいインタビューを開始
             </Link>
           </div>
@@ -630,7 +643,12 @@ export default function InterviewSessionPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <DashboardBackLink variant="button" className="mb-4" />
+              <Link
+                href="/dashboard/interview"
+                className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4"
+              >
+                ← インタビューに戻る
+              </Link>
               <h1 className="text-3xl font-bold text-gray-900">AIインタビュー</h1>
               <p className="text-lg text-gray-600 mt-2">
                 質問に答えてAIにまとめてもらいましょう
@@ -650,14 +668,14 @@ export default function InterviewSessionPage() {
 
         {/* Phase 2-3: 生成中ステータス */}
         {isGenerating && (
-          <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="mb-8 bg-[var(--aio-muted)] border border-[var(--aio-primary)]/30 rounded-lg p-6">
             <div className="flex items-center">
-              <div className="w-6 h-6 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mr-4"></div>
+              <div className="w-6 h-6 border-3 border-[var(--aio-primary)] border-t-transparent rounded-full animate-spin mr-4"></div>
               <div>
-                <h2 className="text-xl font-semibold text-blue-800 mb-1">
+                <h2 className="text-xl font-semibold text-[var(--aio-primary)] mb-1">
                   AIが文章を生成しています...
                 </h2>
-                <p className="text-blue-700">
+                <p className="text-[var(--aio-primary)]">
                   回答内容を分析し、包括的なレポートを作成中です。しばらくお待ちください。
                 </p>
               </div>
@@ -777,7 +795,7 @@ export default function InterviewSessionPage() {
 
           <div className="flex space-x-4">
             {!isGenerated && (
-              <HIGButton
+              <DashboardButton
                 onClick={handleFinalize}
                 disabled={isGenerating || answeredCount === 0}
                 variant="primary"
@@ -791,7 +809,7 @@ export default function InterviewSessionPage() {
                 ) : (
                   `AIにまとめてもらう (${answeredCount}問回答済み)`
                 )}
-              </HIGButton>
+              </DashboardButton>
             )}
             {isGenerated && (
               <Link

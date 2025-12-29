@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserFullWithClient } from '@/lib/core/auth-state';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { apiLogger } from '@/lib/utils/logger';
 import type { QuestionAnswerData, QuestionWithDetails } from '@/types/domain/questions';;
@@ -17,9 +18,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const resolvedParams = await params;
     const questionId = resolvedParams.id;
 
-    // 認証チェック（管理者または質問者本人のみ）
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // 認証チェック（Core経由）
+    const user = await getUserFullWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -106,9 +107,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const resolvedParams = await params;
     const questionId = resolvedParams.id;
 
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // 認証チェック（Core経由）
+    const user = await getUserFullWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }

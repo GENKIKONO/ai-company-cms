@@ -126,3 +126,12 @@
 .pricing-scroll {
   gap: 1.5rem;
 }
+
+/* === Layout Boundaries (Phase B Fix) === */
+/* NOTE: CSS-based header/footer hiding removed.
+   Layout boundaries are now enforced via App Router route groups:
+   - (public)/ routes get header/footer from (public)/layout.tsx
+   - dashboard/ routes get sidebar from dashboard/layout.tsx
+   - No CSS hacks needed.
+   See: docs/architecture/boundaries.md
+*/

@@ -1,7 +1,19 @@
 'use client';
 
+/**
+ * AI Reports Page - 新アーキテクチャ版
+ */
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { DashboardPageShell } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardContent,
+  DashboardAlert,
+  DashboardButton,
+} from '@/components/dashboard/ui';
 import { Brain, Calendar, FileText, AlertCircle, RefreshCw } from 'lucide-react';
 import { RegenerateButton } from './components/RegenerateButton';
 
@@ -22,6 +34,17 @@ interface ReportsListResponse {
 }
 
 export default function AiReportsPage() {
+  return (
+    <DashboardPageShell
+      title="AI月次レポート"
+      requiredRole="viewer"
+    >
+      <AiReportsContent />
+    </DashboardPageShell>
+  );
+}
+
+function AiReportsContent() {
   const [reports, setReports] = useState<MonthlyReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -213,9 +236,9 @@ export default function AiReportsPage() {
         </div>
 
         {/* フッター情報 */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h4 className="font-medium text-blue-900 mb-2">レポートについて</h4>
-          <ul className="text-sm text-blue-800 space-y-1">
+        <div className="mt-6 p-4 bg-[var(--aio-muted)] rounded-lg">
+          <h4 className="font-medium text-[var(--aio-primary)] mb-2">レポートについて</h4>
+          <ul className="text-sm text-[var(--aio-primary)] space-y-1">
             <li>• レポートは毎月1日に自動生成されます</li>
             <li>• 過去12ヶ月分のレポートを閲覧できます</li>
             <li>• 各レポートはPDF形式でダウンロード可能です</li>

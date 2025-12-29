@@ -42,7 +42,7 @@ const HeroSection: React.FC<{ section: CMSSection }> = ({ section }) => {
             <div className="flex gap-4 justify-center">
               <Link 
                 href={ctaUrl}
-                className="inline-block bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-4 rounded-md font-medium transition-colors"
+                className="inline-block bg-white text-[var(--aio-primary)] hover:bg-[var(--aio-info-surface)] text-lg px-8 py-4 rounded-md font-medium transition-colors"
               >
                 {ctaText}
               </Link>
@@ -138,7 +138,7 @@ const PricingTableSection: React.FC<{ section: CMSSection }> = ({ section }) => 
             <Card 
               key={index} 
               className={`relative text-center hover:shadow-xl transition-all ${
-                plan.highlighted ? 'ring-2 ring-blue-500 transform scale-105' : ''
+                plan.highlighted ? 'ring-2 ring-[var(--aio-info)] transform scale-105' : ''
               }`}
             >
               {plan.highlighted && (
@@ -166,10 +166,10 @@ const PricingTableSection: React.FC<{ section: CMSSection }> = ({ section }) => 
                     </li>
                   ))}
                 </ul>
-                <Button 
+                <Button
                   className={`w-full ${
-                    plan.highlighted 
-                      ? 'bg-blue-600 hover:bg-blue-700' 
+                    plan.highlighted
+                      ? 'bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)]'
                       : 'bg-gray-800 hover:bg-gray-900'
                   }`}
                 >

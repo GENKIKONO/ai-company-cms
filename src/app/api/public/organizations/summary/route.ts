@@ -25,10 +25,10 @@ export async function GET() {
       }
     );
 
-    // public_organizations ビューから件数取得
+    // public_organizations_tbl テーブルから件数取得
     const result = await withTimeout(
       supabase
-        .from('public_organizations')
+        .from('public_organizations_tbl')
         .select('*', { count: 'exact', head: true })
         .then((res: { count: number | null; error: any }) => res),
       5000

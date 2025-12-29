@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { env } from '@/lib/env';
 import { logger } from '@/lib/utils/logger';
 
@@ -38,10 +39,10 @@ export async function checkOpsAdmin(): Promise<OpsGuardResult> {
   try {
     // Supabase SSR認証確認
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
-    if (error || !user) {
-      logger.error('[checkOpsAdmin] Missing Supabase session:', { data: error?.message || 'no user' });
+    const user = await getUserWithClient(supabase);
+
+    if (!user) {
+      logger.error('[checkOpsAdmin] Missing Supabase session:', { data: 'no user' });
       return {
         isAuthorized: false,
         reason: 'MISSING_SESSION'
@@ -125,17 +126,17 @@ export async function requireOpsAdminAPI(request?: NextRequest): Promise<NextRes
 export async function getOpsAdminStatus() {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
+    const user = await getUserWithClient(supabase);
+
     const cookieStore = await cookies();
     const opsAdminCookie = cookieStore.get('ops_admin');
-    
+
     return {
       supabaseAuth: {
-        authenticated: !!user && !error,
+        authenticated: !!user,
         email: user?.email || null,
         userId: user?.id || null,
-        error: error?.message || null
+        error: null
       },
       adminCheck: {
         isAdminEmail: isAdmin(user?.email),
@@ -147,7 +148,7 @@ export async function getOpsAdminStatus() {
         isValid: opsAdminCookie?.value === '1'
       },
       overall: {
-        isAuthorized: !!user && !error && isAdmin(user.email) && opsAdminCookie?.value === '1'
+        isAuthorized: !!user && isAdmin(user.email) && opsAdminCookie?.value === '1'
       }
     };
   } catch (error) {

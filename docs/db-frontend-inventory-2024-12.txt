@@ -1,0 +1,451 @@
+================================================================================
+コード側棚卸し回答書（DB連携ヒアリング）
+作成日: 2024-12-24
+================================================================================
+
+【目次】
+1) 権限と組織コンテキスト
+2) 管理系ページが参照するテーブルの実リスト
+3) 公開フローとファイルスキャンの事実関係
+4) 集計・ログのRLS要件
+5) インデックス・パフォーマンス
+6) DB側への質問事項
+
+================================================================================
+1) 権限と組織コンテキスト
+================================================================================
+
+■ 現在の requiredRole 判定方式
+
+【DashboardPageShell（新実装）】
+ファイル: src/components/dashboard/DashboardPageShell.tsx
+
+- RPC呼び出し: user_has_org_role(org_id, min_role)
+- RPC呼び出し: is_site_admin()
+- フォールバック: organization_members テーブル直接参照
+
+コード抜粋:
+```typescript
+// 権限チェック via DB RPC (line 266-275)
+if (requiredRole !== 'viewer') {
+  const hasPermission = await hasOrgRole(supabase, org.id, mappedRole);
+  if (!hasPermission) {
+    setPermissionError(...);
+    return;
+  }
+}
+
+// サイト管理者チェック (line 183-190)
+if (siteAdminOnly || (requiredRole === 'admin' && !organization)) {
+  const isAdmin = await isSiteAdmin(supabase);
+  if (!isAdmin) {
+    setPermissionError('このページにアクセスするにはサイト管理者権限が必要です');
+    return;
+  }
+}
+```
+
+【authzユーティリティ（新実装）】
+ファイル: src/lib/authz.ts
+
+- hasOrgRole(supabase, orgId, minRole) → rpc('user_has_org_role')
+- isSiteAdmin(supabase) → rpc('is_site_admin')
+- mapRequiredRole(role) → 'viewer' | 'editor' | 'admin'
+
+■ サイト全体の管理権限経路（複数存在）
+
+【経路1】環境変数 ADMIN_EMAIL
+ファイル: src/lib/auth/admin-auth.ts:115-117
+```typescript
+if (email && env.ADMIN_EMAIL && email === env.ADMIN_EMAIL) {
+  return true;
+}
+```
+
+【経路2】環境変数 ADMIN_EMAILS（カンマ区切り）
+ファイル: src/lib/auth/admin-auth.ts:120-125
+```typescript
+if (email && process.env.ADMIN_EMAILS) {
+  const adminEmails = process.env.ADMIN_EMAILS.split(',').map(e => e.trim());
+  if (adminEmails.includes(email)) {
+    return true;
+  }
+}
+```
+
+【経路3】profiles.role = 'admin'
+ファイル: src/lib/auth/admin-auth.ts:169-171
+```typescript
+if (!isAdmin && profile?.role === 'admin') {
+  isAdmin = true;
+}
+```
+
+【経路4】site_admins テーブル
+ファイル: src/lib/auth/admin-auth.ts:174-184
+```typescript
+if (!isAdmin) {
+  const { data: siteAdmin } = await supabase
+    .from('site_admins')
+    .select('id')
+    .eq('id', userId)  // ← 注意: user_id ではなく id
+    .single();
+  if (siteAdmin) {
+    isAdmin = true;
+  }
+}
+```
+
+【経路5】site_admins テーブル（別実装）
+ファイル: src/lib/auth/require-admin.ts:62-67
+```typescript
+const { data: adminCheck, error: adminError } = await supabase
+  .from('site_admins')
+  .select('id')
+  .eq('user_id', user.id)  // ← こちらは user_id
+  .single();
+```
+
+■ テーブル名の不整合
+
+コード内で2つのテーブル名が使用されている:
+- organization_members: 43箇所で参照
+- user_organizations: 16箇所で参照
+
+参照箇所の例:
+- organization_members: DashboardPageShell, API routes
+- user_organizations: admin/cms, test files, ai/group-context
+
+================================================================================
+2) 管理系ページが参照するテーブルの実リスト
+================================================================================
+
+■ /dashboard/admin/* 配下のページと参照テーブル
+
+【全体管理（site_adminsスコープ）】
+
+| ページ | テーブル | クエリ方式 |
+|--------|----------|------------|
+| /admin/audit | service_role_audit | 直接クエリ |
+| /admin/audit | ops_audit | API経由(/api/admin/audit) |
+| /admin/security | ip_reports | 直接クエリ |
+| /admin/security | ip_blocklist | 直接クエリ |
+| /admin/security | intrusion_alerts | API経由(/api/admin/security/alerts) |
+| /admin/storage-logs | storage_access_logs | 直接クエリ |
+
+【組織スコープ（organization_id）】
+
+| ページ | テーブル | スコープキー |
+|--------|----------|--------------|
+| /admin/ai-visibility | ai_visibility_scores | organization_id |
+| /admin/ai-visibility | ai_visibility_config | organization_id |
+| /admin/ai-visibility | ai_bot_logs | organization_id |
+| /admin/ai-usage | organization_ai_usage | organization_id |
+| /admin/jobs | translation_jobs | organization_id |
+| /admin/jobs | embedding_jobs | organization_id |
+| /admin/contents | user_organizations | user_id |
+
+■ コード上で参照されていないが存在するテーブル
+
+- security_incidents（パーティションテーブルとして存在）
+- intrusion_detection_rules
+- blocked_ips（コードではip_blocklistを使用）
+
+■ 監査系テーブルの整理
+
+| テーブル名 | 用途 | 書き込み元 |
+|------------|------|------------|
+| service_role_audit | Edge Function操作記録 | Edge Functions |
+| ops_audit | 運用操作記録 | Edge Functions, API |
+| ops_audit_simple | 簡易監査記録 | Edge Functions |
+| audit_logs | 一般監査（パーティション） | 不明 |
+
+================================================================================
+3) 公開フローとファイルスキャンの事実関係
+================================================================================
+
+■ 公開対象テーブルのファイル関連カラム
+
+【posts テーブル】
+```typescript
+// src/types/supabase.ts:8024-8041
+posts: {
+  Row: {
+    meta: Json | null           // ← 画像パス等を含む可能性あり
+    base_path: string | null
+    is_published: boolean
+    status: 'draft' | 'published'
+    published_at: string | null
+    featured_image_url?: string | null  // 一部ビューで使用
+  }
+}
+```
+
+【services テーブル】
+```typescript
+// src/types/supabase.ts:11114-11131
+services: {
+  Row: {
+    image_url: string | null    // 単一画像URL
+    base_path: string | null
+    is_published: boolean
+  }
+}
+```
+
+【sales_materials テーブル】
+```typescript
+// src/types/supabase.ts:10448-10514
+sales_materials: {
+  Row: {
+    file_path: string           // ファイルパス
+    file_url: string | null     // ダウンロードURL
+    thumbnail_url: string | null
+    is_published: boolean
+  }
+}
+```
+
+【case_studies テーブル】
+```typescript
+featured_image_url: string | null
+thumbnail_url: string | null
+is_published: boolean
+```
+
+■ file_scans テーブルについて
+
+【現状】
+- コード上に file_scans への参照は存在しない
+- .ccpaste/supabase-response.txt（このヒアリング文書）のみで言及
+- ensure_assets_scanned() 関数も存在しない
+
+【公開フロー（現在の実装）】
+```typescript
+// src/app/api/my/posts/route.ts:95-97
+{
+  status: validatedData.is_published ? 'published' : validatedData.status,
+  is_published: true,  // 作成されたポストは即座に公開対象
+  published_at: publishedAt,
+}
+```
+
+→ ファイルスキャン結果による公開ブロック機能は未実装
+
+■ 公開状態制御の現状
+
+1. is_published: boolean フラグで制御
+2. status: 'draft' | 'published' で制御（一部テーブル）
+3. published_at: 公開日時
+4. deleted_at: ソフトデリート
+
+ファイル安全性チェックなし
+
+================================================================================
+4) 集計・ログのRLS要件
+================================================================================
+
+■ パーティション化テーブル一覧
+
+【Edge Function定義より】
+ファイル: supabase/functions/partition-maintenance/index.ts:17-25
+
+```typescript
+const PARTITION_TABLES = [
+  "audit_logs",
+  "activities",
+  "ai_bot_logs",
+  "analytics_events",
+  "rate_limit_requests",
+  "rate_limit_logs",
+  "security_incidents",
+] as const;
+```
+
+■ 各テーブルのスコープキーと閲覧ロール
+
+【activities テーブル】
+```typescript
+// src/types/supabase.ts:35-82
+activities: {
+  Row: {
+    organization_id: string      // ← スコープキー
+    user_id: string | null
+    type: string
+    action: string | null
+  }
+}
+```
+閲覧ロール: viewer以上（推定）
+
+【ai_bot_logs テーブル】
+```typescript
+// src/types/supabase.ts:169-225
+ai_bot_logs: {
+  Row: {
+    organization_id: string | null  // ← スコープキー（nullable）
+    bot_name: string
+    url: string
+  }
+}
+```
+閲覧ロール: viewer以上（推定）
+
+【audit_logs テーブル】
+- スコープキー: 不明（types/supabase.tsに定義なし）
+- 閲覧ロール: admin以上（推定）
+
+【analytics_events テーブル】
+- スコープキー: 不明
+- 閲覧ロール: viewer以上（推定）
+
+【rate_limit_requests / rate_limit_logs テーブル】
+- スコープキー: なし（システムテーブル）
+- 閲覧ロール: admin以上
+
+【security_incidents テーブル】
+- スコープキー: なし（システムテーブル）
+- 閲覧ロール: admin以上
+
+■ 現在存在するパーティション（types/supabase.tsより）
+
+- activities_202511
+- ai_bot_logs_202511
+
+================================================================================
+5) インデックス・パフォーマンス
+================================================================================
+
+■ 頻繁に実行されるクエリ
+
+【DashboardPageShell - 全ページロード時】
+```sql
+-- organization_members からロール取得
+SELECT organization_id, role
+FROM organization_members
+WHERE user_id = $1;
+
+-- または v_current_user_orgs ビュー
+SELECT organization_id, role
+FROM v_current_user_orgs;
+
+-- organizations から詳細取得
+SELECT id, name, slug, plan
+FROM organizations
+WHERE id = $1;
+
+-- RPC呼び出し
+SELECT user_has_org_role($org_id, $min_role);
+SELECT is_site_admin();
+```
+
+【監査ログページ】
+```sql
+-- ops_audit クエリ（インデックス考慮済み）
+SELECT * FROM ops_audit
+WHERE created_at >= $from AND created_at <= $to
+  AND action = $action
+  AND actor_id ILIKE $actor
+ORDER BY created_at DESC
+LIMIT 50;
+```
+
+■ 遅いと報告されているクエリ
+
+現時点でコード上で明示的な問題報告なし
+
+■ インデックス推奨
+
+| テーブル | カラム | 理由 |
+|----------|--------|------|
+| organization_members | user_id | 頻繁なロール取得 |
+| organizations | id | 主キーだが念のため確認 |
+| ops_audit | (action, created_at DESC) | フィルター+ソート |
+| activities | (organization_id, created_at) | 組織別アクティビティ |
+| ai_bot_logs | (organization_id, created_at) | 組織別ログ |
+
+================================================================================
+6) DB側への質問事項
+================================================================================
+
+【必須確認】
+
+Q1. user_has_org_role(org_id, min_role) RPC関数は存在しますか？
+    → コード側は呼び出し済み。存在しない場合は全Dashboard権限チェックが失敗します。
+
+Q2. is_site_admin() RPC関数は存在しますか？
+    → コード側は呼び出し済み。存在しない場合はAdmin系ページアクセス不可になります。
+
+Q3. v_current_user_orgs ビューは存在しますか？
+    → フォールバックがあるため動作はしますが、推奨ビューとして存在確認をお願いします。
+
+【テーブル名の不整合】
+
+Q4. organization_members と user_organizations は同じテーブルですか？
+    → コード内で両方使用されています。どちらが正式名称か確認をお願いします。
+
+【site_admins チェックの不整合】
+
+Q5. site_admins テーブルのカラム構造を教えてください。
+    → コード側で2種類のクエリが存在:
+      - .eq('user_id', user.id) ← require-admin.ts
+      - .eq('id', userId)       ← admin-auth.ts
+
+【管理者権限の一本化】
+
+Q6. サイト管理者権限を site_admins テーブルに一本化しますか？
+    現在の経路:
+    - 環境変数 ADMIN_EMAIL
+    - 環境変数 ADMIN_EMAILS
+    - profiles.role = 'admin'
+    - site_admins テーブル
+
+    → 一本化する場合、コード側の調整が必要です。
+
+【ファイルスキャン】
+
+Q7. file_scans テーブルは存在しますか？
+    → コード上で参照がないため、未実装の可能性があります。
+
+Q8. 公開時のファイル安全性チェック（ensure_assets_scanned）は必要ですか？
+    → 必要な場合、以下の情報が必要です:
+      - file_scans テーブルのスキーマ
+      - スキャン判定のステータス値（passed/blocked/failed/pending）
+      - 公開許可条件（passed のみ？）
+
+【RLSポリシー確認】
+
+Q9. 以下のテーブルにRLSポリシーは設定済みですか？
+    - service_role_audit
+    - ops_audit
+    - ip_reports
+    - ip_blocklist
+    - intrusion_detection_alerts
+    - storage_access_logs
+
+Q10. パーティションテーブル（activities_YYYYMM等）にRLSは適用されていますか？
+     → 親テーブルのRLSは子テーブルに継承されますか？
+
+【パフォーマンス】
+
+Q11. 以下のインデックスは存在しますか？
+     - organization_members(user_id)
+     - ops_audit(action, created_at DESC)
+     - activities(organization_id, created_at)
+     - ai_bot_logs(organization_id, created_at)
+
+================================================================================
+【次のアクション】
+================================================================================
+
+DB側で上記質問に回答いただければ、以下を実行できます:
+
+1. RPC関数の存在確認 → 不足分の作成
+2. ビューの存在確認 → v_current_user_orgs 作成
+3. テーブル名の統一 → コード側修正
+4. site_admins 一本化 → コード側修正
+5. file_scans 実装 → テーブル作成 + ensure_assets_scanned() 関数
+6. パーティションRLS適用 → 親子テーブルへのポリシー設定
+7. インデックス追加 → 必要なインデックス作成
+
+================================================================================

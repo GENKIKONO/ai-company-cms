@@ -31,7 +31,7 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
       case 'trends':
         return <TrendingUp className="w-5 h-5 text-purple-600" />;
       case 'ai_content_effect':
-        return <Brain className="w-5 h-5 text-blue-600" />;
+        return <Brain className="w-5 h-5 text-[var(--aio-info)]" />;
       case 'interview_insights':
         return <Users className="w-5 h-5 text-indigo-600" />;
       default:
@@ -83,7 +83,7 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
               <div key={item.id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                    <span className="px-2 py-1 bg-[var(--aio-muted)] text-[var(--aio-primary)] text-xs rounded">
                       {getContentTypeLabel(item.type)}
                     </span>
                     <span className="text-sm font-medium text-neutral-900">{item.title}</span>
@@ -208,21 +208,21 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
         return (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <div className="text-lg font-bold text-blue-600">
+              <div className="p-4 bg-[var(--aio-muted)] rounded-lg">
+                <div className="text-lg font-bold text-[var(--aio-primary)]">
                   {((data.ai_generated_ratio || 0) * 100).toFixed(1)}%
                 </div>
-                <div className="text-sm text-blue-800">AI生成コンテンツ割合</div>
+                <div className="text-sm text-[var(--aio-primary)]">AI生成コンテンツ割合</div>
               </div>
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <div className="text-lg font-bold text-blue-600">
+              <div className="p-4 bg-[var(--aio-muted)] rounded-lg">
+                <div className="text-lg font-bold text-[var(--aio-primary)]">
                   {((data.ai_generated_views_ratio || 0) * 100).toFixed(1)}%
                 </div>
-                <div className="text-sm text-blue-800">AI生成コンテンツPV割合</div>
+                <div className="text-sm text-[var(--aio-primary)]">AI生成コンテンツPV割合</div>
               </div>
             </div>
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <p className="text-blue-800">{data.description || 'AI生成コンテンツの効果を分析中です'}</p>
+            <div className="p-4 bg-[var(--aio-muted)] rounded-lg">
+              <p className="text-[var(--aio-primary)]">{data.description || 'AI生成コンテンツの効果を分析中です'}</p>
             </div>
           </div>
         );

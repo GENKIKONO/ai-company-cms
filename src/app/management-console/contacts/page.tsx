@@ -100,7 +100,7 @@ export default function ContactsPage() {
   const getStatusBadge = (status: Contact['status']) => {
     const styles = {
       unread: 'bg-red-100 text-red-800',
-      read: 'bg-blue-100 text-blue-800',
+      read: 'bg-[var(--aio-info-muted)] text-[var(--aio-info)]',
       replied: 'bg-green-100 text-green-800',
       archived: 'bg-gray-100 text-gray-800',
     };
@@ -203,7 +203,7 @@ export default function ContactsPage() {
                       }
                     }}
                     className={`bg-white rounded-lg shadow p-6 cursor-pointer transition-all hover:shadow-md ${
-                      selectedContact?.id === contact.id ? 'ring-2 ring-blue-500' : ''
+                      selectedContact?.id === contact.id ? 'ring-2 ring-[var(--aio-info)]' : ''
                     } ${contact.status === 'unread' ? 'border-l-4 border-red-500' : ''}`}
                   >
                     <div className="flex items-start justify-between">
@@ -284,7 +284,7 @@ export default function ContactsPage() {
                   {selectedContact.reply_message && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">返信内容</label>
-                      <div className="bg-blue-50 rounded-lg p-3">
+                      <div className="bg-[var(--aio-info-surface)] rounded-lg p-3">
                         <p className="text-gray-900 whitespace-pre-wrap">{selectedContact.reply_message}</p>
                         <p className="text-xs text-gray-600 mt-2">
                           返信日時: {selectedContact.replied_at && new Date(selectedContact.replied_at).toLocaleString('ja-JP')}

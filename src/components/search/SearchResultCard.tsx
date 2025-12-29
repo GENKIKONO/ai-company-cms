@@ -162,7 +162,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
                 {onShare && (
                   <button
                     onClick={() => handleShareClick(org)}
-                    className="p-2 text-slate-600 hover:text-[var(--aio-primary)] hover:bg-blue-50  rounded-full transition-colors"
+                    className="p-2 text-slate-600 hover:text-[var(--aio-primary)] hover:bg-[var(--aio-info-surface)]  rounded-full transition-colors"
                     aria-label="共有する"
                   >
                     <Share2 className="w-5 h-5" />
@@ -244,7 +244,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
             {onShare && (
               <button
                 onClick={() => handleShareClick(service)}
-                className="p-2 text-slate-600 hover:text-[var(--aio-primary)] hover:bg-blue-50  rounded-full transition-colors"
+                className="p-2 text-slate-600 hover:text-[var(--aio-primary)] hover:bg-[var(--aio-info-surface)]  rounded-full transition-colors"
                 aria-label="共有する"
               >
                 <Share2 className="w-4 h-4" />
@@ -333,7 +333,7 @@ export default function SearchResultCard(props: SearchResultCardProps) {
             {onShare && (
               <button
                 onClick={() => handleShareClick(caseStudy)}
-                className="p-2 text-slate-600 hover:text-[var(--aio-primary)] hover:bg-blue-50  rounded-full transition-colors"
+                className="p-2 text-slate-600 hover:text-[var(--aio-primary)] hover:bg-[var(--aio-info-surface)]  rounded-full transition-colors"
                 aria-label="共有する"
               >
                 <Share2 className="w-4 h-4" />

@@ -7,8 +7,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
+import { getUserFullWithClient } from '@/lib/core/auth-state';
 
 // admin-rpc.tsから移行した型定義
 interface ContentRefreshHistoryItem {
@@ -41,33 +41,21 @@ interface ContentRefreshHistoryParams {
 // 履歴取得
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
-      }
-    );
+    const supabase = await createClient();
 
-    // Super Admin権限チェック（既存のmetricsAPIと同パターン）
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    
-    if (authError || !session) {
+    // Super Admin権限チェック（Core経由）
+    const user = await getUserFullWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const { data: user } = await supabase.auth.getUser();
-    const userRole = user.user?.user_metadata?.role || 
-                     user.user?.app_metadata?.role;
-    
+    const userRole = (user.user_metadata?.role as string) ||
+                     (user.app_metadata?.role as string) ||
+                     user.app_role;
+
     if (userRole !== 'super_admin') {
       return NextResponse.json(
         { error: 'Super admin privileges required' },
@@ -117,33 +105,21 @@ export async function GET(request: NextRequest) {
 // 再実行トリガー
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
-      }
-    );
+    const supabase = await createClient();
 
-    // Super Admin権限チェック
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    
-    if (authError || !session) {
+    // Super Admin権限チェック（Core経由）
+    const user = await getUserFullWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const { data: user } = await supabase.auth.getUser();
-    const userRole = user.user?.user_metadata?.role || 
-                     user.user?.app_metadata?.role;
-    
+    const userRole = (user.user_metadata?.role as string) ||
+                     (user.app_metadata?.role as string) ||
+                     user.app_role;
+
     if (userRole !== 'super_admin') {
       return NextResponse.json(
         { error: 'Super admin privileges required' },

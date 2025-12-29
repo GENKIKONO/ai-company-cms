@@ -32,6 +32,7 @@ import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
 import { normalizePayload, normalizeDateFields, normalizeForInsert, findEmptyDateFields } from '@/lib/utils/payload-normalizer';
 import { buildOrgInsert } from '@/lib/utils/org-whitelist';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient, getUserFullWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/log';
 
 // デバッグモード判定関数
@@ -103,15 +104,12 @@ export async function GET(request: NextRequest) {
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await createClient();
 
-    // 認証ユーザー取得（Cookieベース）
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    // 認証ユーザー取得（Core経由）
+    const user = await getUserWithClient(supabase);
 
-    logger.debug(`[my/organization] user = ${user?.id || null}, error = ${authError?.message || null}`);
+    logger.debug(`[my/organization] user = ${user?.id || null}`);
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
@@ -161,25 +159,22 @@ export async function POST(request: NextRequest) {
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await createClient();
 
-    // 認証ユーザー取得（Cookieベース）
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    // 認証ユーザー取得（Core経由 - user_metadata必要）
+    const user = await getUserFullWithClient(supabase);
 
-    logger.debug(`[my/organization] user = ${user?.id || null}, error = ${authError?.message || null}`);
+    logger.debug(`[my/organization] user = ${user?.id || null}`);
     logger.debug('[my/organization] user details =', {
       id: user?.id,
       email: user?.email,
       created_at: user?.created_at
     });
 
-    // ユーザーIDをログに出力して確認
-    logger.debug(`[my/organization] Current user ID: ${user.id}`);
-
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
+
+    // ユーザーIDをログに出力して確認
+    logger.debug(`[my/organization] Current user ID: ${user.id}`);
 
     // ✅ 外部キー制約の詳細チェック: public.users にユーザーが存在するか確認し、必要に応じて作成
     try {
@@ -643,14 +638,11 @@ export async function PUT(request: NextRequest) {
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await createClient();
 
-    // 認証ユーザー取得（Cookieベース）
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    // 認証ユーザー取得（Core経由）
+    const user = await getUserWithClient(supabase);
 
-    if (authError || !user) {
-      logger.warn('[my/organization] PUT Not authenticated', { data: { authError, hasUser: !!user } });
+    if (!user) {
+      logger.warn('[my/organization] PUT Not authenticated');
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
@@ -852,14 +844,11 @@ export async function DELETE(request: NextRequest) {
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await createClient();
 
-    // 認証ユーザー取得（Cookieベース）
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    // 認証ユーザー取得（Core経由）
+    const user = await getUserWithClient(supabase);
 
-    if (authError || !user) {
-      logger.warn('[my/organization] DELETE Not authenticated', { data: { authError, hasUser: !!user } });
+    if (!user) {
+      logger.warn('[my/organization] DELETE Not authenticated');
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 

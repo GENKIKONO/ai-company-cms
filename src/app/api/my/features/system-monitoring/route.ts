@@ -1,8 +1,9 @@
 // システム監視機能アクセス制御専用API: /api/my/features/system-monitoring
-// effective-features をサーバーサイドで安全に使用
+// NOTE: [FEATUREGATE_PHASE2] featureGate(Subject型API)をサーバーサイドで安全に使用
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { canUseFeature } from '@/lib/org-features';
+import { getUserWithClient } from '@/lib/core/auth-state';
+import { getEffectiveFeatures, getFeatureEnabled } from '@/lib/featureGate';
 import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 
@@ -12,9 +13,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -22,33 +24,34 @@ export async function GET(request: NextRequest) {
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select('id, plan')
-      .eq('created_by', authData.user.id)
+      .eq('created_by', user.id)
       .single();
 
     if (orgError || !orgData) {
-      logger.debug('[system-monitoring] Organization not found', { 
-        userId: authData.user.id, 
-        error: orgError?.message 
+      logger.debug('[system-monitoring] Organization not found', {
+        userId: user.id,
+        error: orgError?.message
       });
-      return NextResponse.json({ 
+      return NextResponse.json({
         hasAccess: false,
         plan: null,
         reason: 'organization_not_found'
       });
     }
 
-    // effective-features でアクセス制御チェック（サーバーサイド）
+    // NOTE: [FEATUREGATE_PHASE2] featureGate(Subject型API)でアクセス制御チェック
     try {
-      const hasAccess = await canUseFeature(orgData.id, 'system_monitoring');
-      
-      logger.debug('[system-monitoring] Feature access check', {
-        userId: authData.user.id,
+      const features = await getEffectiveFeatures(supabase, { type: 'org', id: orgData.id });
+      const hasAccess = getFeatureEnabled(features, 'system_monitoring');
+
+      logger.debug('[system-monitoring] Feature access check via featureGate', {
+        userId: user.id,
         organizationId: orgData.id,
         hasAccess,
         plan: orgData.plan
       });
 
-      return NextResponse.json({ 
+      return NextResponse.json({
         hasAccess,
         plan: orgData.plan || 'trial',
         organizationId: orgData.id,
@@ -56,12 +59,12 @@ export async function GET(request: NextRequest) {
       });
 
     } catch (featureError) {
-      logger.error('[system-monitoring] effective-features error, denying access', featureError, {
-        userId: authData.user.id,
+      logger.error('[system-monitoring] featureGate error, denying access', featureError, {
+        userId: user.id,
         organizationId: orgData.id
       });
-      
-      return NextResponse.json({ 
+
+      return NextResponse.json({
         hasAccess: false,
         plan: orgData.plan || 'trial',
         reason: 'feature_check_error'

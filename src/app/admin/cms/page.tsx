@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCmsData } from '@/hooks/useCmsData';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { getUserClient } from '@/lib/core/auth-state.client';
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -75,23 +76,23 @@ export default function CMSAdminPage() {
   // 組織ID取得
   useEffect(() => {
     const getOrganizationId = async () => {
-      const supabase = supabaseBrowser;
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const user = await getUserClient();
+
       if (user) {
+        const supabase = supabaseBrowser;
         const { data: userOrg } = await supabase
-          .from('user_organizations')
+          .from('organization_members')
           .select('organization_id')
           .eq('user_id', user.id)
           .eq('role', 'owner')
           .single();
-        
+
         if (userOrg && 'organization_id' in userOrg) {
           setOrganizationId((userOrg as { organization_id: string }).organization_id);
         }
       }
     };
-    
+
     getOrganizationId();
   }, []);
 

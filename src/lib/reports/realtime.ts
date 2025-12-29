@@ -31,6 +31,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { getReportTopic, getJobTopic, type MonthlyReportRow, type MonthlyReportJobRow } from './client';
+import { getSessionClient } from '@/lib/core/auth-state.client';
 import {
   BROADCAST_EVENTS,
   CHANNEL_CONFIG,
@@ -209,7 +210,7 @@ export function useReportRealtime(options: UseReportRealtimeOptions): RealtimeSt
 
     try {
       // setAuth for private channel (required before subscribe)
-      const { data: { session } } = await supabase.auth.getSession();
+      const session = await getSessionClient();
       if (!session && mountedRef.current) {
         throw new Error('Authentication required for private channel');
       }
@@ -395,7 +396,7 @@ export function useJobRealtime(options: UseJobRealtimeOptions): RealtimeState {
     cleanup();
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const session = await getSessionClient();
       if (!session && mountedRef.current) {
         throw new Error('Authentication required for private channel');
       }

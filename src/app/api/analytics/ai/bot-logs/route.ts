@@ -52,11 +52,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     
     // 管理者認証チェック（テスト用に一時無効化）
-    // TODO: 本格運用時は有効化
-    // const { data: authData, error: authError } = await supabase.auth.getUser();
-    // if (authError || !authData.user) {
-    //   return createAuthError();
-    // }
+    // TODO: 本格運用時は requireUserWithClient 経由の認証チェックを有効化
 
     // クエリパラメータ解析
     const { searchParams } = new URL(request.url);

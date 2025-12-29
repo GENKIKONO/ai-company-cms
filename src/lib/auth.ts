@@ -1,22 +1,20 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
-import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import type { AppUser } from '@/types/legacy/database';
 import type { UserRole } from '@/types/utils/database';;
 import type { DatabaseResult, TableRow, TableUpdate } from '@/types/database.types';
 import type { ApiResponse, createApiResponse, createErrorResponse } from '@/types/api.types';
 import { authLogger, logger } from '@/lib/utils/logger';
 import { handleMaybeSingleResult } from '@/lib/error-mapping';
+import { getCurrentUserClient, getRawUserClient } from '@/lib/core/auth-state.client';
 
 // Profile update interface
 interface ProfileUpdates {
   full_name?: string;
   avatar_url?: string;
 }
-
-// Auth callback type
-type AuthCallback = (event: AuthChangeEvent, session: Session | null) => void;
 
 // Search params interface
 interface SearchParams {
@@ -55,47 +53,12 @@ export function hasPermission(userRole: UserRole, requiredRole: UserRole): boole
   return roleHierarchy[userRole] >= roleHierarchy[requiredRole]
 }
 
-// 現在のユーザー情報を取得
-export async function getCurrentUser(): Promise<AppUser | null> {
-  try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) return null
-
-    // migrated from users → app_users → profiles
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('id, full_name, avatar_url, created_at')
-      .eq('id', user.id)
-      .maybeSingle()
-
-    if (error) {
-      authLogger.error('fetch user profile', error);
-      return null
-    }
-
-    if (!profile) {
-      authLogger.error('user profile not found', new Error('Profile not found'), { userId: user.id });
-      return null
-    }
-
-    // Combine profile data with auth.users data for complete AppUser
-    return {
-      id: profile.id,
-      email: user.email || '',
-      full_name: profile.full_name,
-      avatar_url: profile.avatar_url,
-      role: (user.app_metadata?.role as UserRole) || 'viewer',
-      created_at: profile.created_at,
-      updated_at: profile.created_at, // profiles doesn't have updated_at
-      email_verified: !!user.email_confirmed_at
-    }
-  } catch (error) {
-    authLogger.error('get current user', error instanceof Error ? error : new Error(String(error)));
-    return null
-  }
-}
+/**
+ * 現在のユーザー情報を取得
+ *
+ * @deprecated `@/lib/core/auth-state.client` の `getCurrentUserClient` を使用してください
+ */
+export { getCurrentUserClient as getCurrentUser } from '@/lib/core/auth-state.client';
 
 // 認証関連の関数
 export const auth = {
@@ -205,18 +168,16 @@ export const auth = {
     return data;
   },
 
-  // 現在のユーザー取得
+  // 現在のユーザー取得（Supabase User型を返すため Core wrapper 経由）
   getCurrentUser: async (): Promise<User | null> => {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
+    return getRawUserClient();
   },
 
   // プロフィール更新
   updateProfile: async (updates: Partial<AppUser>) => {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const user = await getCurrentUserClient();
+
     if (!user) throw new Error('Not authenticated')
 
     // migrated from users → app_users → profiles
@@ -233,11 +194,8 @@ export const auth = {
     if (error) throw error
   },
 
-  // 認証状態の監視
-  onAuthStateChange: async (callback: AuthCallback) => {
-    const supabase = await createClient();
-    return supabase.auth.onAuthStateChange(callback);
-  },
+  // NOTE: onAuthStateChange は Core正本 (src/lib/core/auth-state.client.ts) の
+  // onAuthChangeClient を使用してください。このモジュールからは削除しました。
 };
 
 // プロフィール管理
@@ -259,8 +217,8 @@ export const profile = {
     if (!profile) return null; // レコードが見つからない
 
     // Get email from auth.users since it's not in profiles
-    const { data: { user } } = await supabase.auth.getUser();
-    const email = user?.id === userId ? user.email || '' : ''; // Only return email if it's current user
+    const currentUser = await getCurrentUserClient();
+    const email = currentUser?.id === userId ? currentUser.email || '' : ''; // Only return email if it's current user
     
     return {
       id: profile.id,
@@ -270,7 +228,7 @@ export const profile = {
       role: 'viewer', // Default role since profiles doesn't store role
       created_at: profile.created_at,
       updated_at: profile.created_at, // profiles doesn't have updated_at
-      email_verified: !!user?.email_confirmed_at
+      email_verified: currentUser?.email_verified ?? false
     };
   },
 

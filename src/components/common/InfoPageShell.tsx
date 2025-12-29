@@ -59,7 +59,7 @@ export default function InfoPageShell({
               {section.items && (
                 <div className={isPolicy ? 'space-y-8' : 'space-y-4'}>
                   {section.items.map((item, itemIndex) => (
-                    <div key={itemIndex} className={isPolicy ? 'mb-6' : 'border-l-4 border-blue-200 pl-4'}>
+                    <div key={itemIndex} className={isPolicy ? 'mb-6' : 'border-l-4 border-[var(--aio-info-border)] pl-4'}>
                       <h3 className={`text-title3 text-gray-900 mb-3 ${isPolicy ? 'font-semibold' : ''}`}>
                         {item.title}
                       </h3>

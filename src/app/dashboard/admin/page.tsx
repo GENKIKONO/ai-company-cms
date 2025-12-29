@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * Admin Index Page - 新アーキテクチャ版
+ */
+
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
@@ -16,6 +20,17 @@ import {
   CheckCircleIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline';
+import {
+  DashboardPageShell,
+} from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardHeader,
+  DashboardCardContent,
+  DashboardLoadingState,
+  DashboardBadge,
+} from '@/components/dashboard/ui';
 
 interface AdminTool {
   title: string;
@@ -32,14 +47,7 @@ interface MetricCard {
   threshold?: number;
 }
 
-interface DashboardMetrics {
-  cards: MetricCard[];
-  loading: boolean;
-  error: string | null;
-}
-
 const adminTools: AdminTool[] = [
-  // AI & コンテンツ
   {
     title: 'AI使用量',
     description: '組織別のAI利用統計を確認',
@@ -61,7 +69,6 @@ const adminTools: AdminTool[] = [
     icon: DocumentTextIcon,
     category: 'AI & コンテンツ',
   },
-  // システム監視
   {
     title: 'ジョブ監視',
     description: '翻訳・埋め込みジョブの状態監視',
@@ -83,7 +90,6 @@ const adminTools: AdminTool[] = [
     icon: CircleStackIcon,
     category: 'システム監視',
   },
-  // セキュリティ
   {
     title: 'セキュリティ',
     description: '侵入検知・IPブロック管理',
@@ -91,7 +97,6 @@ const adminTools: AdminTool[] = [
     icon: ShieldCheckIcon,
     category: 'セキュリティ',
   },
-  // 組織管理
   {
     title: '組織グループ',
     description: '組織グループと招待管理',
@@ -99,7 +104,6 @@ const adminTools: AdminTool[] = [
     icon: UserGroupIcon,
     category: '組織管理',
   },
-  // 課金
   {
     title: '課金リンク',
     description: 'Stripe課金リンクの管理',
@@ -109,16 +113,16 @@ const adminTools: AdminTool[] = [
   },
 ];
 
-function getSeverityColor(severity?: string) {
+function getSeverityBadge(severity?: string) {
   switch (severity) {
     case 'critical':
-      return 'bg-red-100 text-red-800 border-red-200';
+      return <DashboardBadge variant="error">Critical</DashboardBadge>;
     case 'high':
-      return 'bg-orange-100 text-orange-800 border-orange-200';
+      return <DashboardBadge variant="warning">High</DashboardBadge>;
     case 'medium':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      return <DashboardBadge variant="info">Medium</DashboardBadge>;
     default:
-      return 'bg-green-100 text-green-800 border-green-200';
+      return <DashboardBadge variant="success">Normal</DashboardBadge>;
   }
 }
 
@@ -143,8 +147,23 @@ function MetricIcon({ severity }: { severity?: string }) {
 }
 
 export default function AdminIndexPage() {
+  return (
+    <DashboardPageShell
+      title="管理"
+      requiredRole="admin"
+    >
+      <AdminContent />
+    </DashboardPageShell>
+  );
+}
+
+function AdminContent() {
   const categories = [...new Set(adminTools.map((tool) => tool.category))];
-  const [metrics, setMetrics] = useState<DashboardMetrics>({
+  const [metrics, setMetrics] = useState<{
+    cards: MetricCard[];
+    loading: boolean;
+    error: string | null;
+  }>({
     cards: [],
     loading: true,
     error: null,
@@ -175,106 +194,94 @@ export default function AdminIndexPage() {
   }, []);
 
   return (
-    <div className="py-6">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex mb-6" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-2">
-            <li>
-              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
-                ダッシュボード
-              </Link>
-            </li>
-            <li>
-              <span className="text-gray-500">/</span>
-            </li>
-            <li className="text-gray-900 font-medium">管理</li>
-          </ol>
-        </nav>
+    <>
+      <DashboardPageHeader
+        title="管理ツール"
+        description="システム管理・監視ツール一覧"
+        backLink={{ href: '/dashboard', label: 'ダッシュボード' }}
+      />
 
-        {/* Metrics Overview */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">システム概要</h2>
-            <p className="text-sm text-gray-500">過去4週間のメトリクス</p>
-          </div>
-          <div className="p-6">
-            {metrics.loading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                <span className="ml-2 text-gray-500">読み込み中...</span>
-              </div>
-            ) : metrics.error ? (
-              <div className="text-center py-8 text-gray-500">
-                メトリクスの取得に失敗しました
-              </div>
-            ) : metrics.cards.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                データがありません
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {metrics.cards.map((card) => (
-                  <div
-                    key={card.key}
-                    className={`p-4 rounded-lg border ${getSeverityColor(card.severity)}`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">{getMetricLabel(card.key)}</span>
-                      <MetricIcon severity={card.severity} />
-                    </div>
-                    <div className="text-2xl font-bold">
-                      {card.key.includes('rate') ? `${card.value}%` : card.value}
-                    </div>
-                    {card.threshold && (
-                      <div className="text-xs mt-1 opacity-75">
-                        閾値: {card.key.includes('rate') ? `${card.threshold}%` : card.threshold}
-                      </div>
-                    )}
+      {/* Metrics Overview */}
+      <DashboardCard className="mb-6">
+        <DashboardCardHeader>
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">システム概要</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">過去4週間のメトリクス</p>
+        </DashboardCardHeader>
+        <DashboardCardContent>
+          {metrics.loading ? (
+            <DashboardLoadingState message="メトリクスを読み込み中..." />
+          ) : metrics.error ? (
+            <div className="text-center py-8 text-[var(--color-text-secondary)]">
+              メトリクスの取得に失敗しました
+            </div>
+          ) : metrics.cards.length === 0 ? (
+            <div className="text-center py-8 text-[var(--color-text-secondary)]">
+              データがありません
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {metrics.cards.map((card) => (
+                <div
+                  key={card.key}
+                  className={`p-4 rounded-lg border ${
+                    card.severity === 'critical' || card.severity === 'high'
+                      ? 'bg-[var(--status-error-bg)] border-[var(--status-error)] text-[var(--status-error)]'
+                      : card.severity === 'medium'
+                      ? 'bg-[var(--status-warning-bg)] border-[var(--status-warning)] text-[var(--status-warning)]'
+                      : 'bg-[var(--status-success-bg)] border-[var(--status-success)] text-[var(--status-success)]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">{getMetricLabel(card.key)}</span>
+                    <MetricIcon severity={card.severity} />
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Admin Tools */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">管理ツール</h1>
-            <p className="text-sm text-gray-500 mt-1">システム管理・監視ツール一覧</p>
-          </div>
-
-          <div className="p-6">
-            {categories.map((category) => (
-              <div key={category} className="mb-8 last:mb-0">
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">{category}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {adminTools
-                    .filter((tool) => tool.category === category)
-                    .map((tool) => {
-                      const Icon = tool.icon;
-                      return (
-                        <Link
-                          key={tool.href}
-                          href={tool.href}
-                          className="block p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200"
-                        >
-                          <div className="flex items-start gap-3">
-                            <Icon className="h-6 w-6 text-gray-600 flex-shrink-0" />
-                            <div>
-                              <h3 className="font-medium text-gray-900">{tool.title}</h3>
-                              <p className="text-sm text-gray-500 mt-1">{tool.description}</p>
-                            </div>
-                          </div>
-                        </Link>
-                      );
-                    })}
+                  <div className="text-2xl font-bold">
+                    {card.key.includes('rate') ? `${card.value}%` : card.value}
+                  </div>
+                  {card.threshold && (
+                    <div className="text-xs mt-1 opacity-75">
+                      閾値: {card.key.includes('rate') ? `${card.threshold}%` : card.threshold}
+                    </div>
+                  )}
                 </div>
+              ))}
+            </div>
+          )}
+        </DashboardCardContent>
+      </DashboardCard>
+
+      {/* Admin Tools */}
+      <DashboardCard>
+        <DashboardCardContent>
+          {categories.map((category) => (
+            <div key={category} className="mb-8 last:mb-0">
+              <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">{category}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {adminTools
+                  .filter((tool) => tool.category === category)
+                  .map((tool) => {
+                    const Icon = tool.icon;
+                    return (
+                      <Link
+                        key={tool.href}
+                        href={tool.href}
+                        className="block p-4 rounded-lg border border-[var(--dashboard-card-border)] hover:border-[var(--aio-primary)] hover:shadow-md transition-all duration-200 bg-[var(--dashboard-card-bg)]"
+                      >
+                        <div className="flex items-start gap-3">
+                          <Icon className="h-6 w-6 text-[var(--color-text-secondary)] flex-shrink-0" />
+                          <div>
+                            <h3 className="font-medium text-[var(--color-text-primary)]">{tool.title}</h3>
+                            <p className="text-sm text-[var(--color-text-secondary)] mt-1">{tool.description}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+            </div>
+          ))}
+        </DashboardCardContent>
+      </DashboardCard>
+    </>
   );
 }

@@ -1,0 +1,91 @@
+name: E2E Admin Access Control
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/app/admin/**'
+      - 'src/components/admin/**'
+      - 'src/lib/core/auth-state.ts'
+      - 'tests/e2e/admin-access-control.spec.ts'
+      - '.github/workflows/e2e-admin-access.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/app/admin/**'
+      - 'src/components/admin/**'
+      - 'src/lib/core/auth-state.ts'
+      - 'tests/e2e/admin-access-control.spec.ts'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  PLAYWRIGHT_BASE_URL: http://localhost:3099
+
+jobs:
+  e2e-admin-access:
+    name: Admin Access Control E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Validate E2E credentials
+        run: |
+          if [ -z "${{ secrets.ADMIN_TEST_EMAIL }}" ] || [ -z "${{ secrets.ADMIN_TEST_PASSWORD }}" ]; then
+            echo "::error::Missing ADMIN_TEST_EMAIL or ADMIN_TEST_PASSWORD secrets"
+            exit 1
+          fi
+          if [ -z "${{ secrets.USER_TEST_EMAIL }}" ] || [ -z "${{ secrets.USER_TEST_PASSWORD }}" ]; then
+            echo "::error::Missing USER_TEST_EMAIL or USER_TEST_PASSWORD secrets"
+            exit 1
+          fi
+          echo "✅ All E2E credentials are set"
+
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Run E2E Admin Access Tests
+        run: npx playwright test tests/e2e/admin-access-control.spec.ts --reporter=list
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ADMIN_TEST_EMAIL: ${{ secrets.ADMIN_TEST_EMAIL }}
+          ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+          USER_TEST_EMAIL: ${{ secrets.USER_TEST_EMAIL }}
+          USER_TEST_PASSWORD: ${{ secrets.USER_TEST_PASSWORD }}
+          CI: true
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-admin-access
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-admin-access
+          path: test-results/
+          retention-days: 7

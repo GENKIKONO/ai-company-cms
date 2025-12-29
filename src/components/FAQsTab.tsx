@@ -221,7 +221,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
                     <div className="flex items-center mb-2">
                       <h3 className="text-lg font-medium text-gray-900">Q. {faq.question}</h3>
                       {faq.category && (
-                        <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                        <span className="ml-2 px-2 py-1 bg-[var(--aio-info-muted)] text-[var(--aio-info)] text-xs rounded">
                           {faq.category}
                         </span>
                       )}
@@ -238,7 +238,7 @@ export default function FAQsTab({ organizationId }: FAQsTabProps) {
                   <div className="flex space-x-2 ml-4">
                     <button
                       onClick={() => handleEdit(faq)}
-                      className="text-[var(--aio-primary)] hover:text-blue-900"
+                      className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
                     >
                       <PencilIcon className="h-4 w-4" />
                     </button>

@@ -3,16 +3,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  ArrowLeft, 
-  Brain, 
-  Calendar, 
-  TrendingUp, 
-  Users, 
+import {
+  ArrowLeft,
+  Brain,
+  Calendar,
+  TrendingUp,
+  Users,
   FileText,
   AlertCircle,
   Crown
 } from 'lucide-react';
+import { DashboardPageShell } from '@/components/dashboard';
 import { ReportSection } from '../components/ReportSection';
 import { PdfDownloadButton } from '../components/PdfDownloadButton';
 import { RegenerateButton } from '../components/RegenerateButton';
@@ -33,6 +34,14 @@ interface ReportData {
 }
 
 export default function AiReportDetailPage() {
+  return (
+    <DashboardPageShell title="AIレポート詳細" requiredRole="viewer">
+      <AiReportDetailContent />
+    </DashboardPageShell>
+  );
+}
+
+function AiReportDetailContent() {
   const params = useParams();
   const period = params?.period as string; // YYYY-MM
 
@@ -209,11 +218,11 @@ export default function AiReportDetailPage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600 mb-1">
+            <div className="p-4 bg-[var(--aio-muted)] rounded-lg">
+              <div className="text-2xl font-bold text-[var(--aio-primary)] mb-1">
                 {report.metrics?.total_page_views?.toLocaleString() || 0}
               </div>
-              <div className="text-sm text-blue-800">月間ページビュー</div>
+              <div className="text-sm text-[var(--aio-primary)]">月間ページビュー</div>
             </div>
 
             <div className="p-4 bg-green-50 rounded-lg">

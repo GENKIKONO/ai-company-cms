@@ -3,6 +3,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import type { QAStatsAction } from '@/types/domain/qa-system';;
 import { logger } from '@/lib/utils/logger';
@@ -55,17 +56,18 @@ export async function POST(request: NextRequest) {
     let company_id: string | null = null;
 
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (!authError && user) {
-        user_id = user.id;
-        
+      // 認証チェック（Core経由、オプショナル）
+      const authUser = await getUserWithClient(supabase);
+      if (authUser) {
+        user_id = authUser.id;
+
         // ユーザーの企業IDを取得
         const { data: orgData } = await supabase
           .from('organizations')
           .select('id')
-          .eq('created_by', user.id)
+          .eq('created_by', authUser.id)
           .single();
-        
+
         if (orgData) {
           company_id = orgData.id;
         }
@@ -120,10 +122,10 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // 管理者権限チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+
+    // 管理者権限チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

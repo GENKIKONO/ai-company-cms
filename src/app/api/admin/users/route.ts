@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserFullWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
@@ -8,8 +9,8 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     
     // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserFullWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

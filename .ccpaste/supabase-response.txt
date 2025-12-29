@@ -1,171 +1,79 @@
-目的
+You are Claude Code working in a Next.js + Supabase + Vercel repo.
 
-TypeScriptビルドエラー「Property 'id' does not exist on type 'unknown'.」を解消する。
-handleMaybeSingleResult の戻り値に適切な型を付与し、呼び出し側で org.id にアクセス可能にする。
-既存の型運用方針に合わせつつ最小差分で修正する。
-前提
+GOAL
+- Prepare a production release by (1) applying DB migrations to production, then (2) pushing to origin/main to trigger Vercel.
+- Do NOT change any UI/feature behavior in this task. This task is release orchestration only.
 
-Supabaseクライアントは createClient() で型パラメータが設定済み、または可能であれば設定する。
-handleMaybeSingleResult は共通エラーハンドリングユーティリティとして利用中。
-タスクA（推奨・最小差分）
+STRICT RULES
+- No new features. No refactors. No style/UI changes. No "cleanup".
+- Only allowed changes: release notes / docs for release, and scripts that help release safety (but prefer zero code changes).
+- If any unexpected diffs are found, STOP and report clearly instead of "fixing".
 
-handleMaybeSingleResult をジェネリクス対応に変更
-ファイル: src/lib/error-mapping.ts（または定義元ファイル）
-変更内容: 下記の関数定義で置き換える（Postgrest型への依存は最小限）
-コード
+STEP 0: REPO STATE CHECK (must output)
+1) Print:
+   - git status (short)
+   - current branch
+   - last 5 commits (oneline)
+2) Count how many files changed and list top-level directories affected.
+3) Identify whether there are DB migrations staged/unstaged:
+   - Look for supabase/migrations/*.sql
+   - Summarize each migration filename and what it does (short).
 
-// src/lib/error-mapping.ts
+STEP 1: VERIFY BUILD / ARCHITECTURE GUARDS (must run)
+Run and report results:
+- npm run typecheck
+- npm run check:architecture
+If either fails: STOP and report.
 
-import
- 
-type
- { PostgrestError } 
-from
- 
-'@supabase/supabase-js'
-;
-// 共通のMaybeSingle型（必要に応じて実際の戻り値型に調整）
+STEP 2: DB CHANGE DECISION (must be explicit)
+If there is at least one new migration file that is not yet applied to production:
+- Set DB_CHANGE = YES
+Else:
+- Set DB_CHANGE = NO
 
-type
- MaybeSingleResult<T> =
-  | { 
-data
-: T | 
-null
-; error: 
-null
- }
-  | { 
-data
-: 
-null
-; error: PostgrestError };
-export
- 
-function
- 
-handleMaybeSingleResult
-<
-T
->(
+STEP 3: PRODUCE A SAFE RELEASE PLAN (must output as checklist)
+Output a checklist with exact commands, in the correct order:
 
-  result: MaybeSingleResult<T>,
-  label: 
-string
+If DB_CHANGE = YES:
+A) Confirm Supabase project linkage (show the command you will use to verify).
+B) Apply migrations to production using:
+   npx supabase db push --linked
+C) After DB push, re-run:
+   npm run typecheck
+   npm run check:architecture
+D) Commit (if there are uncommitted changes intended for release)
+E) Push:
+   git push origin main
+F) Provide post-deploy verification checklist (URLs and key flows).
+G) Provide rollback plan:
+   - Code rollback (git revert)
+   - DB rollback note (explain that DB rollback needs a down migration or manual revert).
 
-): 
-T
- 
-{
-  
-if
- (
-'error'
- 
-in
- result && result.error) {
-    
-throw
- 
-new
- 
-Error
-(
-`
-${label}
-: 
-${result.error.message}
-`
-);
-  }
-  
-if
- (!(
-'data'
- 
-in
- result) || !result.data) {
-    
-throw
- 
-new
- 
-Error
-(
-`
-${label}
-: not found`
-);
-  }
-  
-return
- result.data;
-}
+If DB_CHANGE = NO:
+Skip DB steps and proceed with commit+push.
 
-呼び出し側をジェネリック指定に更新
-エラー箇所付近（org.id にアクセスしている箇所）で、対象レコードの型を最小定義し、handleMaybeSingleResult に型引数を渡す。
-例（実コードに合わせてフィールドを最小限で定義）
+STEP 4: RELEASE NOTES (must output)
+Create a concise RELEASE_NOTES.md draft (do not add it to git unless asked).
+Include:
+- Scope summary (what changed)
+- Verification commands passed
+- DB change summary (YES/NO, migration names)
+- Known risks (short)
+- Manual smoke checks
 
-type
- OrgMin = { 
-id
-: 
-string
- };
-const
- result = 
-await
- supabase
-  .from(
-'organizations'
-)
-  .select(
-'id'
-)
-  .eq(
-'id'
-, targetOrgId)
-  .maybeSingle();
-const
- org = handleMaybeSingleResult<OrgMin>(result, 
-'所属組織'
-);
-targetOrgId = org.id;
+STEP 5: VERCEL DOES NOT DEPLOY TROUBLESHOOT (must output)
+If Vercel still does not trigger after pushing:
+Provide a short checklist to verify:
+- Vercel project connected to correct GitHub repo
+- Production branch is main
+- Git integration is active
+- "Deploy Hooks" if used
+- Vercel build logs location
 
-備考
-
-もし supabase-js の戻り値型と型定義がズレている場合は、MaybeSingleResult を下記いずれかに合わせて微調整
-{ data: T | null; error: PostgrestError | null }
-PostgrestMaybeSingleResponse に合わせる（型をimportして利用）
-組織テーブルの型が既に Database 型に含まれている場合は、その型を OrgMin の代わりに参照してもよい（厳密化）。
-タスクB（オプション・応急処置）
-
-どうしてもAが適用できない一時的状況では、呼び出し側で型アサーションを入れる。
-ただし最終的にはAに戻す。
-例
-
-const
- org = handleMaybeSingleResult(result, 
-'所属組織'
-) 
-as
- { 
-id
-: 
-string
- };
-targetOrgId = org.id;
-
-検証
-
-npm run typecheck / build が通ること
-既存の handleMaybeSingleResult 呼び出し箇所が破壊されないこと（型引数未指定の場合も既存挙動を維持）
-追加のTSエラーが出た場合は、同様にジェネリック型パターンで段階的に解消
-出力
-
-変更差分（該当ファイルのパッチ or 完全コード）
-追加で発生した型エラーがあれば一覧と最小修正案 [Claude Prompt 終了]
-必要なら、Supabaseクライアントの型強化（createClient()）も併せて実施してください。
-
-
-
+FINAL OUTPUT FORMAT
+- "DB_CHANGE: YES/NO"
+- "READY_TO_PUSH: YES/NO" (YES only if checks passed)
+- Command checklist
+- Release notes draft
+- Troubleshooting checklist
+- Nothing else

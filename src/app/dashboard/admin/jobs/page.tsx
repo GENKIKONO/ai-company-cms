@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { DashboardPageShell } from '@/components/dashboard';
 
 interface TranslationJob {
   id: string;
@@ -30,6 +31,14 @@ interface EmbeddingJob {
 type TabType = 'translation' | 'embedding';
 
 export default function JobsMonitorPage() {
+  return (
+    <DashboardPageShell title="ジョブ監視" requiredRole="admin">
+      <JobsMonitorContent />
+    </DashboardPageShell>
+  );
+}
+
+function JobsMonitorContent() {
   const [activeTab, setActiveTab] = useState<TabType>('translation');
   const [translationJobs, setTranslationJobs] = useState<TranslationJob[]>([]);
   const [embeddingJobs, setEmbeddingJobs] = useState<EmbeddingJob[]>([]);
@@ -72,7 +81,7 @@ export default function JobsMonitorPage() {
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
       pending: 'bg-yellow-100 text-yellow-800',
-      processing: 'bg-blue-100 text-blue-800',
+      processing: 'bg-[var(--aio-muted)] text-[var(--aio-primary)]',
       completed: 'bg-green-100 text-green-800',
       failed: 'bg-red-100 text-red-800',
     };
@@ -113,7 +122,7 @@ export default function JobsMonitorPage() {
                 onClick={() => setActiveTab('translation')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'translation'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -123,7 +132,7 @@ export default function JobsMonitorPage() {
                 onClick={() => setActiveTab('embedding')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'embedding'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -135,7 +144,7 @@ export default function JobsMonitorPage() {
           <div className="p-6" data-testid="jobs-list">
             {loading ? (
               <div className="text-center py-12">
-                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+                <div className="animate-spin h-8 w-8 border-4 border-[var(--aio-primary)] border-t-transparent rounded-full mx-auto"></div>
                 <p className="text-gray-500 mt-4">読み込み中...</p>
               </div>
             ) : error ? (

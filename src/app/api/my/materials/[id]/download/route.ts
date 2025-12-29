@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/utils/logger';
 import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
@@ -8,10 +9,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const supabase = await createClient();
     const { id } = await params;
-    
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

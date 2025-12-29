@@ -275,7 +275,7 @@ export default function DiagnosticsPage() {
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">推奨事項</h2>
                 <div className="space-y-4">
                   {diagnosticResult.recommendations.slice(0, 8).map((rec, index) => (
-                    <div key={index} className="border-l-4 border-[var(--aio-primary)] bg-blue-50 p-4">
+                    <div key={index} className="border-l-4 border-[var(--aio-primary)] bg-[var(--aio-info-surface)] p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center mb-2">

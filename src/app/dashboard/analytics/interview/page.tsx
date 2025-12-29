@@ -6,6 +6,7 @@
 import { Suspense } from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getSessionWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
 import type { InterviewAnalyticsResponse } from '@/types/interview-analytics';
 import InterviewAnalyticsDashboard from './InterviewAnalyticsDashboard';
@@ -153,15 +154,14 @@ async function fetchInitialData(orgId: string, period: '7d' | '30d' | '90d' = '3
 export default async function InterviewAnalyticsPage({ searchParams }: PageProps) {
   // 認証チェック
   const supabase = await createClient();
-  const { data: { session }, error: authError } = await supabase.auth.getSession();
-  
-  if (authError || !session) {
+  const session = await getSessionWithClient(supabase);
+  if (!session) {
     redirect('/auth/login');
   }
 
   // 組織ID取得
   const { data: userOrg, error: orgError } = await supabase
-    .from('user_organizations')
+    .from('organization_members')
     .select('organization_id')
     .eq('user_id', session.user.id)
     .eq('role', 'owner')

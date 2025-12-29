@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { JSDOM } from 'jsdom';
 import { logger } from '@/lib/utils/logger';
 
@@ -102,10 +103,10 @@ async function extractFromPDF(buffer: Buffer): Promise<ExtractionResult> {
 export async function POST(request: NextRequest) {
   try {
     const supabaseBrowser = await createClient();
-    
+
     // ユーザー認証確認
-    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabaseBrowser);
+    if (!user) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }

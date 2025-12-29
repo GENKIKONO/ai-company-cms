@@ -12,6 +12,7 @@ import {
   TrashIcon,
   EnvelopeIcon,
 } from '@heroicons/react/24/outline';
+import { DashboardPageShell } from '@/components/dashboard';
 
 interface Organization {
   id: string;
@@ -46,6 +47,14 @@ interface JoinRequest {
 }
 
 export default function OrgGroupsPage() {
+  return (
+    <DashboardPageShell title="組織グループ" requiredRole="admin">
+      <OrgGroupsContent />
+    </DashboardPageShell>
+  );
+}
+
+function OrgGroupsContent() {
   const [groups, setGroups] = useState<OrgGroup[]>([]);
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -279,7 +288,7 @@ export default function OrgGroupsPage() {
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-[var(--aio-primary)] text-white rounded-lg hover:bg-[var(--aio-primary-hover)] transition-colors"
               >
                 <PlusIcon className="h-4 w-4" />
                 新規作成
@@ -297,7 +306,7 @@ export default function OrgGroupsPage() {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="グループ名で検索..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--aio-primary)] focus:border-[var(--aio-primary)]"
                 />
               </div>
               <button
@@ -313,7 +322,7 @@ export default function OrgGroupsPage() {
           <div className="p-6">
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
                 <span className="ml-3 text-gray-500">読み込み中...</span>
               </div>
             ) : error ? (
@@ -321,7 +330,7 @@ export default function OrgGroupsPage() {
                 <p className="text-red-600">{error}</p>
                 <button
                   onClick={fetchGroups}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="mt-4 px-4 py-2 bg-[var(--aio-primary)] text-white rounded-lg hover:bg-[var(--aio-primary-hover)]"
                 >
                   再試行
                 </button>
@@ -338,7 +347,7 @@ export default function OrgGroupsPage() {
                 {groups.map((group) => (
                   <div
                     key={group.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                    className="border border-gray-200 rounded-lg p-4 hover:border-[var(--aio-primary)]/30 transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div>
@@ -359,7 +368,7 @@ export default function OrgGroupsPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/dashboard/admin/org-groups/${group.id}/invites`}
-                          className="flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
+                          className="flex items-center gap-1 px-3 py-1.5 text-sm bg-[var(--aio-muted)] text-[var(--aio-primary)] rounded hover:bg-[var(--aio-muted)]"
                         >
                           <UserPlusIcon className="h-4 w-4" />
                           招待
@@ -424,7 +433,7 @@ export default function OrgGroupsPage() {
                     type="text"
                     value={createForm.name}
                     onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--aio-primary)]"
                     required
                     minLength={2}
                     maxLength={100}
@@ -437,7 +446,7 @@ export default function OrgGroupsPage() {
                   <textarea
                     value={createForm.description}
                     onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--aio-primary)]"
                     rows={3}
                     maxLength={500}
                   />
@@ -452,7 +461,7 @@ export default function OrgGroupsPage() {
                     onChange={(e) =>
                       setCreateForm((f) => ({ ...f, owner_organization_id: e.target.value }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--aio-primary)]"
                     required
                     placeholder="UUID形式"
                   />
@@ -471,7 +480,7 @@ export default function OrgGroupsPage() {
                   <button
                     type="submit"
                     disabled={creating || !createForm.name || !createForm.owner_organization_id}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                    className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-lg hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
                   >
                     {creating ? '作成中...' : '作成'}
                   </button>

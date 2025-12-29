@@ -67,7 +67,7 @@ function GenerationButton({
           </div>
           <div className="flex-shrink-0">
             {isThisGenerating ? (
-              <div className="flex items-center space-x-2 text-blue-600">
+              <div className="flex items-center space-x-2 text-[var(--aio-info)]">
                 <LoadingSpinner className="w-4 h-4" />
                 <span className="text-sm">生成中...</span>
               </div>
@@ -344,15 +344,15 @@ export default function ContentGenerationPanel({ sessionId, sessionStatus, class
 
           {/* 生成中の全体ローディング */}
           {generationState.isGenerating && (
-            <Alert className="border-blue-200 bg-blue-50">
+            <Alert className="border-[var(--aio-info-border)] bg-[var(--aio-info-surface)]">
               <AlertDescription>
                 <div className="flex items-center space-x-3">
                   <LoadingSpinner className="w-5 h-5" />
                   <div>
-                    <p className="font-medium text-blue-800">
+                    <p className="font-medium text-[var(--aio-info)]">
                       {CONTENT_TYPE_METADATA[generationState.selectedType!].label}を生成中...
                     </p>
-                    <p className="text-sm text-blue-700 mt-1">
+                    <p className="text-sm text-[var(--aio-info)] mt-1">
                       AIがインタビュー内容を分析してコンテンツを作成しています。しばらくお待ちください。
                     </p>
                   </div>

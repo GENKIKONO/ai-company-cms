@@ -18,7 +18,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { canUseFeature } from '@/lib/org-features';
+import { getUserWithClient } from '@/lib/core/auth-state';
+import { canUseFeature } from '@/lib/featureGate';
 
 interface RouteParams {
   params: Promise<{ period: string }>;
@@ -29,9 +30,9 @@ interface RouteParams {
 // =====================================================
 
 async function getAuthorizedOrganization(supabase: Awaited<ReturnType<typeof createClient>>) {
-  // 1. Get authenticated user
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
+  // 1. Get authenticated user（Core経由）
+  const user = await getUserWithClient(supabase);
+  if (!user) {
     return { organizationId: null, error: 'Unauthorized', status: 401 };
   }
 
@@ -39,7 +40,7 @@ async function getAuthorizedOrganization(supabase: Awaited<ReturnType<typeof cre
   const { data: membership } = await supabase
     .from('organization_members')
     .select('organization_id')
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .maybeSingle();
 
   if (!membership?.organization_id) {

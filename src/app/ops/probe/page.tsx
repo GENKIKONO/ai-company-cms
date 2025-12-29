@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createClient } from "@/lib/supabase/server"
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireOpsAdminPage } from '@/lib/ops-guard';
 import { logger } from '@/lib/utils/logger';
 
@@ -32,8 +33,8 @@ interface StatusData {
 async function getOpsStatus(): Promise<StatusData | null> {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const user = await getUserWithClient(supabase);
+
     if (!user) return null;
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://aiohub.jp'}/api/ops/status`, {
@@ -258,9 +259,9 @@ export default async function OpsProbe() {
                   {status.env.hasValidAppUrl ? 'aiohub.jp' : (status.env.appUrl || '未設定')}
                 </div>
               </div>
-              <div className="p-3 rounded border bg-blue-50 border-blue-200">
+              <div className="p-3 rounded border bg-[var(--aio-info-surface)] border-[var(--aio-info-border)]">
                 <div className="text-sm font-medium">Cookie Domain</div>
-                <div className="text-xs text-[var(--aio-primary)]">
+                <div className="text-xs text-[var(--aio-info)]">
                   {status.cookie.domainUsed}
                 </div>
               </div>

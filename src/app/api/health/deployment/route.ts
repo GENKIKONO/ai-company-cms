@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import fs from 'fs';
 import path from 'path';
 
@@ -159,17 +160,16 @@ async function checkSupabaseConnection(): Promise<HealthCheckResult> {
 async function checkAuthSystem(): Promise<HealthCheckResult> {
   try {
     const supabase = await createClient();
-    
+
     // getUser()の実行可否をチェック（未ログインでもOK）
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
+    const user = await getUserWithClient(supabase);
+
     return {
       ok: true,
       reason: 'Auth system functional',
-      details: { 
+      details: {
         loggedIn: !!user,
-        userCheckSuccessful: !error,
-        error: error?.message
+        userCheckSuccessful: true
       }
     };
   } catch (error) {

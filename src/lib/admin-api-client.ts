@@ -1,6 +1,6 @@
 'use client';
 
-import { supabaseBrowser } from '@/lib/supabase/client';
+import { getSessionClient } from '@/lib/core/auth-state.client';
 
 interface AdminApiResponse<T = any> {
   success: boolean;
@@ -32,17 +32,16 @@ export class AdminApiClient {
   }
 
   /**
-   * 認証トークン取得
+   * 認証トークン取得（Core経由）
    */
   private async getAuthToken(): Promise<string | null> {
-    const supabase = supabaseBrowser;
-    const { data: { session }, error } = await supabase.auth.getSession();
-    
-    if (error || !session?.access_token) {
-      // [AdminApi] 認証トークンの取得に失敗: error?.message
+    const session = await getSessionClient();
+
+    if (!session?.access_token) {
+      // [AdminApi] 認証トークンの取得に失敗
       return null;
     }
-    
+
     return session.access_token;
   }
 

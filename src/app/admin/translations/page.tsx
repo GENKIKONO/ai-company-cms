@@ -120,7 +120,7 @@ export default function TranslationsManagementPage() {
       case 'pending':
         return 'text-yellow-600 bg-yellow-50';
       case 'in_progress':
-        return 'text-blue-600 bg-blue-50';
+        return 'text-[var(--aio-info)] bg-[var(--aio-info-surface)]';
       case 'completed':
         return 'text-green-600 bg-green-50';
       case 'failed':
@@ -151,7 +151,7 @@ export default function TranslationsManagementPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--aio-primary)]"></div>
       </div>
     );
   }
@@ -179,7 +179,7 @@ export default function TranslationsManagementPage() {
               <button
                 onClick={handleDrainJobs}
                 disabled={processingDrain}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
               >
                 <PlayIcon className="w-4 h-4 mr-2" />
                 {processingDrain ? '処理中...' : 'バッチ処理実行'}
@@ -203,7 +203,7 @@ export default function TranslationsManagementPage() {
             
             <div className="bg-white rounded-lg shadow p-6">
               <div className="text-sm font-medium text-gray-600">処理中</div>
-              <div className="text-2xl font-bold text-blue-600">{metrics.in_progress_jobs.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-[var(--aio-info)]">{metrics.in_progress_jobs.toLocaleString()}</div>
             </div>
             
             <div className="bg-white rounded-lg shadow p-6">
@@ -228,7 +228,7 @@ export default function TranslationsManagementPage() {
                 <select
                   value={filter.status || ''}
                   onChange={(e) => updateFilter('status', e.target.value || undefined)}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-info)] focus:ring-[var(--aio-info)]"
                 >
                   <option value="">すべて</option>
                   <option value="pending">待機中</option>
@@ -244,7 +244,7 @@ export default function TranslationsManagementPage() {
                 <select
                   value={filter.source_table || ''}
                   onChange={(e) => updateFilter('source_table', e.target.value || undefined)}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-info)] focus:ring-[var(--aio-info)]"
                 >
                   <option value="">すべて</option>
                   <option value="posts">投稿</option>
@@ -260,7 +260,7 @@ export default function TranslationsManagementPage() {
                 <select
                   value={filter.target_lang || ''}
                   onChange={(e) => updateFilter('target_lang', e.target.value || undefined)}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-info)] focus:ring-[var(--aio-info)]"
                 >
                   <option value="">すべて</option>
                   <option value="en">英語</option>
@@ -277,7 +277,7 @@ export default function TranslationsManagementPage() {
                   max="10"
                   value={filter.priority_min || ''}
                   onChange={(e) => updateFilter('priority_min', e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-info)] focus:ring-[var(--aio-info)]"
                   placeholder="1-10"
                 />
               </div>
@@ -287,7 +287,7 @@ export default function TranslationsManagementPage() {
                 <select
                   value={filter.limit || 50}
                   onChange={(e) => updateFilter('limit', parseInt(e.target.value))}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-info)] focus:ring-[var(--aio-info)]"
                 >
                   <option value="25">25件</option>
                   <option value="50">50件</option>
@@ -352,7 +352,7 @@ export default function TranslationsManagementPage() {
                       {job.source_lang} → {job.target_lang}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-[var(--aio-info-muted)] text-[var(--aio-info)]">
                         {job.priority}
                       </span>
                     </td>

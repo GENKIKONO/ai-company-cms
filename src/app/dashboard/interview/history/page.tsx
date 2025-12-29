@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { HIGButton } from '@/design-system';
-import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
+import { DashboardPageShell } from '@/components/dashboard';
+import { DashboardButton } from '@/components/dashboard/ui';
 import type { InterviewSession, SessionListResponse } from '@/types/interview-session';
 import { logger } from '@/lib/utils/logger';
 
@@ -32,7 +32,7 @@ function SessionTable({ sessions, onResume, onView, onDelete, loading }: Session
       case 'draft':
         return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">下書き</span>;
       case 'in_progress':
-        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">進行中</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--aio-muted)] text-[var(--aio-primary)]">進行中</span>;
       case 'completed':
         return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">完了</span>;
       default:
@@ -117,14 +117,14 @@ function SessionTable({ sessions, onResume, onView, onDelete, loading }: Session
                     {session.status === 'completed' ? (
                       <button
                         onClick={() => onView(session.id)}
-                        className="text-blue-600 hover:text-blue-900 font-medium"
+                        className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)] font-medium"
                       >
                         閲覧
                       </button>
                     ) : (
                       <button
                         onClick={() => onResume(session.id)}
-                        className="text-blue-600 hover:text-blue-900 font-medium"
+                        className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)] font-medium"
                       >
                         再開
                       </button>
@@ -147,11 +147,19 @@ function SessionTable({ sessions, onResume, onView, onDelete, loading }: Session
 }
 
 export default function InterviewHistoryPage() {
+  return (
+    <DashboardPageShell title="インタビュー履歴" requiredRole="viewer">
+      <InterviewHistoryContent />
+    </DashboardPageShell>
+  );
+}
+
+function InterviewHistoryContent() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
-  
+
   // フィルター状態
   const [filters, setFilters] = useState({
     organizationId: '',
@@ -273,11 +281,16 @@ export default function InterviewHistoryPage() {
               </p>
             </div>
             <div className="flex space-x-4">
-              <DashboardBackLink variant="button" className="mb-0" />
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              >
+                ← ダッシュボードに戻る
+              </Link>
               <Link href="/dashboard/interview">
-                <HIGButton variant="primary">
+                <DashboardButton variant="primary">
                   新しいインタビューを開始
-                </HIGButton>
+                </DashboardButton>
               </Link>
             </div>
           </div>

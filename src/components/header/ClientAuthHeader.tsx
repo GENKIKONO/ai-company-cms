@@ -78,7 +78,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
             {/* ロゴは常に / に遷移 */}
             <Link 
               href="/" 
-              className="text-2xl font-bold text-gray-900 hover:text-blue-600"
+              className="text-2xl font-bold text-gray-900 hover:text-[var(--aio-primary)]"
             >
               AIO Hub AI企業CMS
             </Link>
@@ -184,7 +184,7 @@ export default function ClientAuthHeader({ initialUser, initialHasOrganization, 
                 <div className="hidden md:flex items-center space-x-4">
                   <Link
                     href="/auth/login"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    className="bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white px-4 py-2 rounded-md text-sm font-medium"
                   >
                     ログイン
                   </Link>

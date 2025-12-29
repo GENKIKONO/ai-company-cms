@@ -60,7 +60,7 @@ export function FeatureMatrixRow({ feature, onValueUpdate }: FeatureMatrixRowPro
   // カテゴリカラー
   function getCategoryColor(category: string): string {
     switch (category) {
-      case 'content': return 'text-blue-600';
+      case 'content': return 'text-[var(--aio-info)]';
       case 'business': return 'text-green-600';
       case 'analytics': return 'text-purple-600';
       default: return 'text-[var(--aio-text-muted)]';

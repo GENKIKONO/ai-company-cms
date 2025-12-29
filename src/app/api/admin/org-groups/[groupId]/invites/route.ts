@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
 import { isUserAdminOfOrg } from '@/lib/utils/org-permissions';
@@ -62,8 +63,8 @@ export async function GET(
     const { groupId } = await params;
 
     // Get current user
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabaseAdmin);
+    if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
@@ -176,8 +177,8 @@ export async function POST(
     const { expiresAt, maxUses, note, customCode } = validation.data;
 
     // Get current user
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabaseAdmin);
+    if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 

@@ -80,7 +80,7 @@ export default function SystemHealthPanel({ health }: SystemHealthPanelProps) {
         </div>
         <div className="text-right">
           <div className="mb-2">{getHealthBadge(health.overall)}</div>
-          <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+          <button className="text-sm text-[var(--aio-primary)] hover:text-[var(--aio-primary)] font-medium">
             Refresh
           </button>
         </div>

@@ -63,7 +63,7 @@ export default function ReportFilters({
             <FunnelIcon className="h-5 w-5 text-gray-400" />
             <h3 className="text-sm font-medium text-gray-900">フィルター</h3>
             {hasActiveFilters && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--aio-info-muted)] text-[var(--aio-info)]">
                 {Object.values(filters).filter(v => v !== undefined && v !== '').length}件適用中
               </span>
             )}
@@ -105,7 +105,7 @@ export default function ReportFilters({
                 value={filters.search || ''}
                 onChange={(e) => updateFilter('search', e.target.value)}
                 placeholder="組織名、レビュアー、理由で検索..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[var(--aio-info)] focus:border-[var(--aio-info)] sm:text-sm"
               />
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function ReportFilters({
               <select
                 value={filters.status || ''}
                 onChange={(e) => updateFilter('status', e.target.value)}
-                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-[var(--aio-info)] focus:border-[var(--aio-info)] sm:text-sm rounded-md"
               >
                 <option value="">すべて</option>
                 {STATUS_OPTIONS.map((option) => (
@@ -138,7 +138,7 @@ export default function ReportFilters({
               <select
                 value={filters.category || ''}
                 onChange={(e) => updateFilter('category', e.target.value)}
-                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-[var(--aio-info)] focus:border-[var(--aio-info)] sm:text-sm rounded-md"
               >
                 <option value="">すべて</option>
                 {CATEGORY_OPTIONS.map((option) => (
@@ -162,7 +162,7 @@ export default function ReportFilters({
                   type="date"
                   value={filters.date_from || ''}
                   onChange={(e) => updateFilter('date_from', e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)] focus:border-[var(--aio-info)] sm:text-sm"
                 />
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function ReportFilters({
                   type="date"
                   value={filters.date_to || ''}
                   onChange={(e) => updateFilter('date_to', e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)] focus:border-[var(--aio-info)] sm:text-sm"
                 />
               </div>
             </div>
@@ -193,11 +193,11 @@ export default function ReportFilters({
         <div className="px-4 py-3 border-t border-gray-200">
           <div className="flex flex-wrap gap-2">
             {filters.status && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--aio-info-muted)] text-[var(--aio-info)]">
                 ステータス: {STATUS_OPTIONS.find(opt => opt.value === filters.status)?.label}
                 <button
                   onClick={() => updateFilter('status', '')}
-                  className="ml-1.5 h-3 w-3 text-blue-600 hover:text-blue-700"
+                  className="ml-1.5 h-3 w-3 text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
                 >
                   <XMarkIcon className="h-3 w-3" />
                 </button>

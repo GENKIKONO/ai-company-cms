@@ -1,20 +1,27 @@
 /**
- * P2-5: AI引用ログ可視化ダッシュボード
+ * P2-5: AI引用ログ可視化ダッシュボード - 新アーキテクチャ版
  * 組織管理者向け：組織の引用データを期間別に表示
  */
 
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { logger } from '@/lib/utils/logger';
+import { DashboardPageShell, useDashboardPageContext } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardHeader,
+  DashboardCardContent,
+  DashboardButton,
+  DashboardAlert,
+  DashboardBadge,
+  DashboardSelect,
+  DashboardLoadingState,
+} from '@/components/dashboard/ui';
 import { supabaseBrowser } from '@/lib/supabase/client';
-import type { 
+import { getCurrentUserClient } from '@/lib/core/auth-state.client';
+import { logger } from '@/lib/utils/logger';
+import type {
   OrgCitationsPeriodResponse,
   AICitationSource,
   AICitationsApiResponse,
@@ -121,9 +128,9 @@ function CitationSourceRow({ source, index }: { source: AICitationSource; index:
         </div>
       </td>
       <td className="py-3 px-4 text-center">
-        <Badge variant="outline">
+        <DashboardBadge variant="default">
           {formatNumber(source.citationsCount)}
-        </Badge>
+        </DashboardBadge>
       </td>
       <td className="py-3 px-4 text-center hig-text-code">
         {formatNumber(source.totalQuotedTokens)}
@@ -139,6 +146,18 @@ function CitationSourceRow({ source, index }: { source: AICitationSource; index:
 }
 
 export default function AICitationsDashboardPage() {
+  return (
+    <DashboardPageShell
+      title="AI引用ログダッシュボード"
+      requiredRole="admin"
+    >
+      <AICitationsContent />
+    </DashboardPageShell>
+  );
+}
+
+function AICitationsContent() {
+  const { organization } = useDashboardPageContext();
   const [state, setState] = useState<DashboardState>({
     organizationId: null,
     data: null,
@@ -157,7 +176,7 @@ export default function AICitationsDashboardPage() {
     const getOrganizationId = async () => {
       try {
         const supabase = supabaseBrowser;
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getCurrentUserClient();
         
         if (!user) {
           setState(prev => ({ 
@@ -318,71 +337,55 @@ export default function AICitationsDashboardPage() {
 
         {/* エラー表示 */}
         {state.error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertDescription>
+          <DashboardAlert variant="error" className="mb-6">
+            <p>
               {state.error}
               {state.organizationId && (
-                <button 
+                <button
                   onClick={handleRefresh}
                   className="ml-2 underline hover:no-underline"
                 >
                   再試行
                 </button>
               )}
-            </AlertDescription>
-          </Alert>
+            </p>
+          </DashboardAlert>
         )}
 
         {/* コントロール */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="hig-text-h3 hig-jp-heading">フィルター</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <DashboardCard className="mb-6">
+          <DashboardCardHeader>
+            <h3 className="hig-text-h3 hig-jp-heading">フィルター</h3>
+          </DashboardCardHeader>
+          <DashboardCardContent>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <label className="hig-text-body hig-jp-body">期間:</label>
-                <Select
-                  value={state.selectedPreset}
-                  onValueChange={handlePresetChange}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(presetLabels).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <Button
-                variant="outline"
+              <DashboardSelect
+                label="期間"
+                value={state.selectedPreset}
+                onChange={(e) => handlePresetChange(e.target.value as PeriodPreset)}
+                options={Object.entries(presetLabels).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+                className="w-40"
+              />
+
+              <DashboardButton
+                variant="secondary"
                 onClick={handleRefresh}
-                disabled={state.isLoading}
-                className="flex items-center gap-2"
+                loading={state.isLoading}
               >
-                {state.isLoading ? (
-                  <LoadingSpinner className="w-4 h-4" />
-                ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                )}
                 更新
-              </Button>
+              </DashboardButton>
             </div>
-          </CardContent>
-        </Card>
+          </DashboardCardContent>
+        </DashboardCard>
 
         {/* サマリー */}
         {state.data && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card>
-              <CardContent className="p-4">
+            <DashboardCard>
+              <DashboardCardContent>
                 <div className="text-center">
                   <div className="hig-text-h2 text-[var(--color-primary)]">
                     {formatNumber(state.data.totals.totalCitations)}
@@ -391,11 +394,11 @@ export default function AICitationsDashboardPage() {
                     総引用回数
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
+              </DashboardCardContent>
+            </DashboardCard>
+
+            <DashboardCard>
+              <DashboardCardContent>
                 <div className="text-center">
                   <div className="hig-text-h2 text-[var(--color-primary)]">
                     {formatNumber(state.data.totals.uniqueSources)}
@@ -404,11 +407,11 @@ export default function AICitationsDashboardPage() {
                     引用元数
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
+              </DashboardCardContent>
+            </DashboardCard>
+
+            <DashboardCard>
+              <DashboardCardContent>
                 <div className="text-center">
                   <div className="hig-text-h2 text-[var(--color-primary)]">
                     {formatNumber(state.data.totals.totalQuotedTokens)}
@@ -417,11 +420,11 @@ export default function AICitationsDashboardPage() {
                     総引用トークン数
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
+              </DashboardCardContent>
+            </DashboardCard>
+
+            <DashboardCard>
+              <DashboardCardContent>
                 <div className="text-center">
                   <div className="hig-text-h2 text-[var(--color-primary)]">
                     {formatNumber(Math.round(state.data.totals.totalWeight))}
@@ -430,31 +433,26 @@ export default function AICitationsDashboardPage() {
                     総重み
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </DashboardCardContent>
+            </DashboardCard>
           </div>
         )}
 
         {/* 引用元一覧テーブル */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="hig-text-h3 hig-jp-heading">
+        <DashboardCard>
+          <DashboardCardHeader>
+            <h3 className="hig-text-h3 hig-jp-heading">
               引用元詳細
               {state.data && (
                 <span className="ml-2 hig-text-body text-[var(--color-text-secondary)]">
                   ({sortedSources.length}件)
                 </span>
               )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </h3>
+          </DashboardCardHeader>
+          <DashboardCardContent>
             {state.isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <LoadingSpinner />
-                <span className="ml-2 hig-text-body text-[var(--color-text-secondary)]">
-                  データを読み込んでいます...
-                </span>
-              </div>
+              <DashboardLoadingState message="データを読み込んでいます" />
             ) : sortedSources.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -482,10 +480,10 @@ export default function AICitationsDashboardPage() {
                   </thead>
                   <tbody>
                     {sortedSources.map((source, index) => (
-                      <CitationSourceRow 
-                        key={source.sourceKey} 
-                        source={source} 
-                        index={index} 
+                      <CitationSourceRow
+                        key={source.sourceKey}
+                        source={source}
+                        index={index}
                       />
                     ))}
                   </tbody>
@@ -503,8 +501,8 @@ export default function AICitationsDashboardPage() {
                 </div>
               </div>
             ) : null}
-          </CardContent>
-        </Card>
+          </DashboardCardContent>
+        </DashboardCard>
       </div>
     </div>
   );

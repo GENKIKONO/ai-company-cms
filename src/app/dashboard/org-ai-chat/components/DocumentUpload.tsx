@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { HIGButton } from '@/design-system';
+import { DashboardButton } from '@/components/dashboard/ui';
 import { useToast } from '@/components/ui/toast';
 import { logger } from '@/lib/utils/logger';
 
@@ -194,9 +194,9 @@ export default function DocumentUpload({
             <p className="text-xs text-gray-500 mb-4">
               または クリックして選択
             </p>
-            <HIGButton size="sm" disabled={uploading}>
+            <DashboardButton size="sm" disabled={uploading}>
               ファイルを選択
-            </HIGButton>
+            </DashboardButton>
           </div>
         )}
       </div>

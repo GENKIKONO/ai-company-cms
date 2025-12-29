@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
 import { 
   createErrorResponse,
@@ -20,10 +21,10 @@ import type {
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // ユーザー認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+
+    // ユーザー認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createErrorResponse('Authentication required', 401);
     }
 

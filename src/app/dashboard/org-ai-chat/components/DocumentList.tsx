@@ -88,7 +88,7 @@ export default function DocumentList({ organizationId }: DocumentListProps) {
   const getStatusDisplay = (status: Document['status']) => {
     switch (status) {
       case 'uploaded':
-        return { text: 'アップロード済み', color: 'bg-blue-100 text-blue-800' };
+        return { text: 'アップロード済み', color: 'bg-[var(--aio-muted)] text-[var(--aio-primary)]' };
       case 'processing':
         return { text: '処理中', color: 'bg-yellow-100 text-yellow-800' };
       case 'ready':

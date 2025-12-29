@@ -122,7 +122,7 @@ export default function OpsLoginForm() {
       <div className="text-center">
         <a
           href="/auth/login"
-          className="text-sm text-[var(--aio-primary)] hover:text-blue-800"
+          className="text-sm text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
         >
           ← 一般ログインに戻る
         </a>

@@ -220,6 +220,57 @@ export async function isOrgOwner(userId: string, orgId: string): Promise<boolean
   return checkOrgRole(userId, orgId, ['owner']);
 }
 
+/**
+ * ユーザーが所属する全ての組織を取得
+ * P1-1: Server Gate用 - ユーザーがいずれかの組織に所属していることを確認
+ *
+ * @param userId - ユーザーID
+ * @returns 組織一覧（空配列の場合は組織なし）
+ */
+export async function getUserOrganizations(userId: string): Promise<Array<{
+  id: string;
+  name: string;
+  slug: string;
+  role: OrgRole;
+}>> {
+  try {
+    const supabase = await createServerSupabase();
+
+    // organization_members経由で所属組織を取得
+    const { data, error } = await supabase
+      .from('organization_members')
+      .select(`
+        role,
+        organizations!inner (
+          id,
+          name,
+          slug
+        )
+      `)
+      .eq('user_id', userId);
+
+    if (error) {
+      logger.error('Error fetching user organizations', { userId, error: error.message });
+      return [];
+    }
+
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    // フラット化して返す
+    return data.map((membership: any) => ({
+      id: membership.organizations.id,
+      name: membership.organizations.name,
+      slug: membership.organizations.slug,
+      role: membership.role as OrgRole,
+    }));
+  } catch (error) {
+    logger.error('Exception in getUserOrganizations', { userId, error });
+    return [];
+  }
+}
+
 //
 // P1-3 最終エクスポート: 本番で使用する組織ロール関数
 //

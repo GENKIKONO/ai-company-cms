@@ -11,10 +11,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { 
-  GetMyOrganizationsSlimRow, 
-  OrganizationSummary, 
-  normalizeOrganizationSummary 
+import { getUserFullWithClient } from '@/lib/core/auth-state';
+import {
+  GetMyOrganizationsSlimRow,
+  OrganizationSummary,
+  normalizeOrganizationSummary
 } from '@/types/organization-summary';
 
 import { logger } from '@/lib/log';
@@ -51,38 +52,37 @@ interface MeApiResponseExtended {
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // 現在のユーザーセッションを取得
-    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-    
+
+    // 現在のユーザーセッションを取得（Core経由、user_metadataを含む完全版）
+    const authUser = await getUserFullWithClient(supabase);
+
     if (process.env.NODE_ENV !== 'production') {
-      console.log('[ME_DEBUG] Entry point:', { 
-        hasAuthUser: !!authUser, 
+      console.log('[ME_DEBUG] Entry point:', {
+        hasAuthUser: !!authUser,
         userId: authUser?.id,
         userEmail: authUser?.email,
-        authError: authError?.message 
       });
     }
-    
-    if (authError || !authUser) {
+
+    if (!authUser) {
       const response = NextResponse.json(
-        { error: 'unauthorized' }, 
+        { error: 'unauthorized' },
         { status: 401 }
       );
-      
+
       // キャッシュ防止ヘッダー（エラー応答でも）
       response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
       response.headers.set('Pragma', 'no-cache');
       response.headers.set('Expires', '0');
-      
+
       return response;
     }
 
-    // ユーザー情報を準備（Auth情報から）
+    // ユーザー情報を準備（Core経由で取得したAuth情報から）
     const user = {
       id: authUser.id,
       email: authUser.email || null,
-      full_name: authUser.user_metadata?.full_name || null
+      full_name: (authUser.user_metadata?.full_name as string) || null
     };
 
     if (process.env.NODE_ENV !== 'production') {

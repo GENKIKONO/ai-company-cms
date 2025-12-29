@@ -1,0 +1,281 @@
+{
+  "audit_version": "v1.0",
+  "audit_date": "2024-12-29",
+  "source_documents": [
+    "docs/architecture/ui-reachability-inventory.md",
+    "docs/architecture/product-surface-inventory.md",
+    "docs/architecture/ui-exposure-gaps.md"
+  ],
+  "rules": {
+    "no_implementation": true,
+    "no_ui_change": true,
+    "human_decision_required": true,
+    "notes": "This audit is READ-ONLY. No code changes allowed. All decisions must be made by humans."
+  },
+  "summary": {
+    "total_items": 25,
+    "reachable": 18,
+    "conditional": 7,
+    "not_reachable": 0,
+    "undecided": 25
+  },
+  "items": [
+    {
+      "route": "/dashboard",
+      "label": "ダッシュボード",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/activity",
+      "label": "アクティビティ",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/posts",
+      "label": "記事管理",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/services",
+      "label": "サービス管理",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/case-studies",
+      "label": "事例管理",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/faqs",
+      "label": "FAQ管理",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/materials",
+      "label": "営業資料",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/org-ai-chat",
+      "label": "企業専用AIチャット",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/interview",
+      "label": "AIインタビュー",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/qna-stats",
+      "label": "Q&A統計",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/analytics/ai-seo-report",
+      "label": "分析レポート",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/ai-reports",
+      "label": "AIレポート",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/ai-citations",
+      "label": "AI引用",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/embed",
+      "label": "埋め込み設定",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/billing",
+      "label": "請求管理",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/help",
+      "label": "ヘルプ",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/settings",
+      "label": "設定",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/dashboard/admin",
+      "label": "管理",
+      "area": "dashboard",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "CONDITIONAL",
+      "condition": "isSiteAdmin",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/account",
+      "label": "アカウント",
+      "area": "account",
+      "ui_entry": ["sidebar", "drawer"],
+      "device": ["desktop", "mobile"],
+      "status": "REACHABLE",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/admin",
+      "label": "Admin Top",
+      "area": "admin",
+      "ui_entry": ["sidebar"],
+      "device": ["desktop", "mobile"],
+      "status": "CONDITIONAL",
+      "condition": "isSiteAdmin",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/admin/cms",
+      "label": "CMS管理",
+      "area": "admin",
+      "ui_entry": ["admin-nav"],
+      "device": ["desktop", "mobile"],
+      "status": "CONDITIONAL",
+      "condition": "isSiteAdmin",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/admin/console",
+      "label": "運用コンソール",
+      "area": "admin",
+      "ui_entry": ["admin-nav"],
+      "device": ["desktop", "mobile"],
+      "status": "CONDITIONAL",
+      "condition": "isSuperAdmin",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/management-console",
+      "label": "運用コンソール",
+      "area": "management-console",
+      "ui_entry": ["ops-auth"],
+      "device": ["desktop", "mobile"],
+      "status": "CONDITIONAL",
+      "condition": "opsAuth",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/management-console/users",
+      "label": "ユーザー管理",
+      "area": "management-console",
+      "ui_entry": ["management-console-nav"],
+      "device": ["desktop", "mobile"],
+      "status": "CONDITIONAL",
+      "condition": "opsAuth",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    },
+    {
+      "route": "/management-console/reports",
+      "label": "レポート",
+      "area": "management-console",
+      "ui_entry": ["management-console-nav"],
+      "device": ["desktop", "mobile"],
+      "status": "CONDITIONAL",
+      "condition": "opsAuth",
+      "human_decision": "UNDECIDED",
+      "notes": ""
+    }
+  ]
+}

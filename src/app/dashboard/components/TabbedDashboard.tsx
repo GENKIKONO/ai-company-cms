@@ -2,11 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import type { Post, Service, CaseStudy, FAQ } from '@/types/legacy/database';;
-import { ErrorDisplay } from '@/components/ui/error-display';
-import { LoadingSkeleton, EmptyState } from '@/components/ui/loading-skeleton';
+import type { Post, Service, CaseStudy, FAQ } from '@/types/legacy/database';
 import { OrganizationPreview } from '@/components/ui/organization-preview';
-import { useApiList } from '@/hooks/useApiClient';
 import { useSuccessToast, useErrorToast } from '@/components/ui/toast';
 import { logger } from '@/lib/log';
 
@@ -214,7 +211,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
 
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-[var(--aio-muted)] rounded-lg">
               <svg className="w-5 h-5 text-[var(--aio-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
@@ -273,9 +270,9 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
 
           <Link
             href="/dashboard/services/new"
-            className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-[var(--aio-primary)] hover:bg-blue-50 transition-colors"
+            className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-[var(--aio-primary)] hover:bg-[var(--aio-muted)] transition-colors"
           >
-            <div className="p-2 bg-blue-100 rounded-lg mr-3">
+            <div className="p-2 bg-[var(--aio-muted)] rounded-lg mr-3">
               <svg className="w-5 h-5 text-[var(--aio-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -463,7 +460,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
               {tab.label}
               {tab.count !== null && (
                 <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  activeTab === tab.id ? 'bg-blue-100 text-[var(--aio-primary)]' : 'bg-gray-100 text-gray-600'
+                  activeTab === tab.id ? 'bg-[var(--aio-muted)] text-[var(--aio-primary)]' : 'bg-gray-100 text-gray-600'
                 }`}>
                   {tab.count}
                 </span>

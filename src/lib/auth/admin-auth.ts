@@ -171,13 +171,14 @@ async function checkAdminPermissionWithStatus(userId: string, email?: string): P
     }
 
     // site_admins テーブルでの管理者権限チェック（追加）
+    // 主キーは user_id（DB確認済み）
     if (!isAdmin) {
       const { data: siteAdmin } = await supabase
         .from('site_admins')
-        .select('id')
-        .eq('id', userId)
+        .select('user_id')
+        .eq('user_id', userId)
         .single();
-      
+
       if (siteAdmin) {
         isAdmin = true;
       }

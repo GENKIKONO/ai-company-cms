@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { HIGButton } from '@/design-system';
-import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
+import { DashboardPageShell } from '@/components/dashboard';
+import { DashboardButton } from '@/components/dashboard/ui';
 import type { InterviewQuestion, InterviewAxis } from '@/types/interview-session';
 import { logger } from '@/lib/utils/logger';
 import { OrgQuotaBadge, type SimpleQuotaProps } from '@/components/quota/OrgQuotaBadge';
@@ -78,7 +78,7 @@ function QuestionSelector({ axes, questions, selectedQuestions, onQuestionToggle
                     {question.question_text}
                   </p>
                   {question.content_type && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-2">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--aio-muted)] text-[var(--aio-primary)] mt-2">
                       {question.content_type}
                     </span>
                   )}
@@ -103,11 +103,19 @@ function QuestionSelector({ axes, questions, selectedQuestions, onQuestionToggle
 }
 
 export default function InterviewPageClient({ aiInterviewQuota }: InterviewPageClientProps) {
+  return (
+    <DashboardPageShell title="AIインタビュー" requiredRole="viewer">
+      <InterviewPageContent aiInterviewQuota={aiInterviewQuota} />
+    </DashboardPageShell>
+  );
+}
+
+function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-  
+
   // データ
   const [axes, setAxes] = useState<InterviewAxis[]>([]);
   const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
@@ -267,7 +275,12 @@ export default function InterviewPageClient({ aiInterviewQuota }: InterviewPageC
               >
                 履歴を見る
               </Link>
-              <DashboardBackLink variant="button" className="mb-0" />
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              >
+                ← ダッシュボードに戻る
+              </Link>
             </div>
           </div>
         </div>
@@ -367,13 +380,13 @@ export default function InterviewPageClient({ aiInterviewQuota }: InterviewPageC
             >
               キャンセル
             </Link>
-            <HIGButton
+            <DashboardButton
               onClick={handleStartInterview}
               disabled={selectedQuestions.length === 0 || creating || isInterviewLimitReached || isInterviewDisabledByPlan}
               variant="primary"
             >
               {creating ? 'セッション作成中...' : 'インタビューを開始'}
-            </HIGButton>
+            </DashboardButton>
           </div>
         </div>
       </main>

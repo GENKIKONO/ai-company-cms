@@ -1,0 +1,53 @@
+# CODEOWNERS - コードオーナー定義
+#
+# このファイルは、特定のファイル/ディレクトリに変更があった場合に
+# 自動的にレビューを要求するオーナーを定義します。
+#
+# 注意: 以下のオーナー名はプレースホルダです。
+# 実際のGitHubユーザー名/チーム名に置き換えてください。
+#
+# プレースホルダ一覧:
+#   @REPO_OWNER    - リポジトリ管理者
+#   @ARCH_OWNER    - アーキテクチャ責任者
+#   @CORE_OWNER    - Core実装責任者
+#   @SECURITY_OWNER - セキュリティ/認証責任者
+#
+# 使用方法:
+#   1. プレースホルダを実際のGitHubユーザー名に置換
+#   2. 例: @REPO_OWNER → @your-github-username
+#   3. チームの場合: @org/team-name 形式
+#
+# 参照: docs/architecture/review-gates.md
+
+# ─────────────────────────────────────────────────────────────
+# リポジトリ設定・CI/CD
+# ─────────────────────────────────────────────────────────────
+.github/**                                    @REPO_OWNER
+
+# ─────────────────────────────────────────────────────────────
+# アーキテクチャ・ガードレール
+# ─────────────────────────────────────────────────────────────
+scripts/check-architecture.sh                 @ARCH_OWNER
+docs/architecture/boundaries.md               @ARCH_OWNER
+docs/architecture/review-gates.md             @ARCH_OWNER
+src/lib/featureGate.ts                        @ARCH_OWNER
+src/config/plans.ts                           @ARCH_OWNER
+src/config/features.ts                        @ARCH_OWNER
+
+# ─────────────────────────────────────────────────────────────
+# Core実装
+# ─────────────────────────────────────────────────────────────
+src/lib/core/**                               @CORE_OWNER
+
+# ─────────────────────────────────────────────────────────────
+# 認証・セキュリティ
+# ─────────────────────────────────────────────────────────────
+docs/auth/**                                  @SECURITY_OWNER
+src/lib/auth/**                               @SECURITY_OWNER
+src/middleware.ts                             @SECURITY_OWNER
+
+# ─────────────────────────────────────────────────────────────
+# コアドキュメント
+# ─────────────────────────────────────────────────────────────
+docs/core-architecture.md                     @ARCH_OWNER
+CLAUDE.md                                     @ARCH_OWNER

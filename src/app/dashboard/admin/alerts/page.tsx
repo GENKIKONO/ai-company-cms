@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { DashboardPageShell } from '@/components/dashboard';
 
 interface MetricsSummary {
   rls_denied_count: number;
@@ -63,6 +64,14 @@ const THRESHOLDS = {
 };
 
 export default function AlertsDashboardPage() {
+  return (
+    <DashboardPageShell title="アラート" requiredRole="admin">
+      <AlertsContent />
+    </DashboardPageShell>
+  );
+}
+
+function AlertsContent() {
   const [metrics, setMetrics] = useState<MetricsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,7 +143,7 @@ export default function AlertsDashboardPage() {
               <select
                 value={range}
                 onChange={(e) => setRange(e.target.value as '1w' | '4w' | '12w')}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-[var(--aio-primary)] focus:border-[var(--aio-primary)]"
               >
                 <option value="1w">過去1週間</option>
                 <option value="4w">過去4週間</option>
@@ -146,7 +155,7 @@ export default function AlertsDashboardPage() {
           <div className="p-6" data-testid="alerts-list">
             {loading ? (
               <div className="text-center py-12">
-                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+                <div className="animate-spin h-8 w-8 border-4 border-[var(--aio-primary)] border-t-transparent rounded-full mx-auto"></div>
                 <p className="text-gray-500 mt-4">読み込み中...</p>
               </div>
             ) : error ? (
@@ -324,7 +333,7 @@ export default function AlertsDashboardPage() {
                         return (
                           <div key={idx} className="flex-1 flex flex-col items-center">
                             <div
-                              className={`w-full rounded-t ${count > THRESHOLDS.rls_denied_count ? 'bg-red-400' : 'bg-blue-400'}`}
+                              className={`w-full rounded-t ${count > THRESHOLDS.rls_denied_count ? 'bg-red-400' : 'bg-[var(--aio-primary)]'}`}
                               style={{ height: `${Math.max(heightPct, 5)}%` }}
                             />
                             <div className="text-xs text-gray-500 mt-1">{formatDate(week.week_start_utc)}</div>

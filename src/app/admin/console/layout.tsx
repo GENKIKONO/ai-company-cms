@@ -78,7 +78,7 @@ export default function AdminConsoleLayout({
               {/* Back to Admin */}
               <a
                 href="/admin"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-sm text-[var(--aio-primary)] hover:text-[var(--aio-primary)] font-medium"
               >
                 ← Back to Admin
               </a>

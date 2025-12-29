@@ -2,7 +2,9 @@
  * Admin Audit Log API
  *
  * GET /api/admin/audit - ops_audit テーブルから監査ログを取得
- * Query params:
+ * POST /api/admin/audit - admin_audit_logs テーブルに監査ログを記録
+ *
+ * Query params (GET):
  *   - from: ISO日付 (開始日)
  *   - to: ISO日付 (終了日)
  *   - action: アクションタイプでフィルター
@@ -19,9 +21,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { ok, err, ErrorCodes } from '@/lib/api/response';
+import { writeAdminAuditLog, AuditLogEntry } from '@/lib/admin/audit';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
+
+// POST用バリデーション
+const auditLogSchema = z.object({
+  actor_user_id: z.string().uuid(),
+  action: z.string().min(1).max(100),
+  entity_type: z.string().min(1).max(50),
+  entity_id: z.string().min(1).max(100),
+  before: z.record(z.unknown()).nullable().optional(),
+  after: z.record(z.unknown()).nullable().optional(),
+  org_id: z.string().uuid().nullable().optional(),
+});
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
@@ -100,6 +116,68 @@ export async function GET(request: NextRequest) {
     );
   } catch (e) {
     console.error('Audit API error:', e);
+    return NextResponse.json(
+      err(ErrorCodes.INTERNAL_ERROR, e instanceof Error ? e.message : 'Internal server error'),
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST: 監査ログを記録（admin_audit_logs テーブル）
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    // 認証確認（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
+      return NextResponse.json(
+        err(ErrorCodes.UNAUTHORIZED, '認証が必要です'),
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const validated = auditLogSchema.parse(body);
+
+    // actor_user_idが現在のユーザーと一致するか、管理者であることを確認
+    if (validated.actor_user_id !== user.id) {
+      const authResult = await requireAdmin();
+      if (!isAuthorized(authResult)) {
+        return authResult.response;
+      }
+    }
+
+    const entry: AuditLogEntry = {
+      actor_user_id: validated.actor_user_id,
+      action: validated.action,
+      entity_type: validated.entity_type,
+      entity_id: validated.entity_id,
+      before: validated.before || null,
+      after: validated.after || null,
+      org_id: validated.org_id || null,
+    };
+
+    const success = await writeAdminAuditLog(supabase, entry);
+
+    if (!success) {
+      // テーブルがない場合でも成功として扱う（警告はログに出力済み）
+      return NextResponse.json(
+        ok({ logged: false, message: 'Audit log table may not exist yet' })
+      );
+    }
+
+    return NextResponse.json(ok({ logged: true }));
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      return NextResponse.json(
+        err(ErrorCodes.VALIDATION_ERROR, '入力データが無効です'),
+        { status: 400 }
+      );
+    }
+    console.error('Audit POST error:', e);
     return NextResponse.json(
       err(ErrorCodes.INTERNAL_ERROR, e instanceof Error ? e.message : 'Internal server error'),
       { status: 500 }

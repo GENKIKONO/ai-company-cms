@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { canUseFeature } from '@/lib/org-features';
+import { getUserWithClient } from '@/lib/core/auth-state';
+import { canUseFeature } from '@/lib/featureGate';
 
 // レポート詳細取得
 export async function GET(
@@ -10,10 +11,10 @@ export async function GET(
   try {
     const resolvedParams = await params;
     const supabase = await createClient();
-    
-    // 認証チェック
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -21,7 +22,7 @@ export async function GET(
     const { data: membershipData } = await supabase
       .from('organization_members')
       .select('organization_id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (!membershipData?.organization_id) {

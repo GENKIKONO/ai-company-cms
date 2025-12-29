@@ -20,8 +20,8 @@ export default function SummaryCards({ summary }: SummaryCardsProps) {
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center">
           <div className="flex-shrink-0">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-8 h-8 bg-[var(--aio-info-muted)] rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-[var(--aio-info)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zm-3-8h8m-8 4h8M3 7V3h4" />
               </svg>
             </div>

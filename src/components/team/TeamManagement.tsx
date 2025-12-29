@@ -190,7 +190,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
         <div className="flex items-center gap-3">
           <Users className="w-6 h-6 text-[var(--aio-primary)]" />
           <h3 className="text-lg font-semibold text-neutral-900">チーム管理</h3>
-          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+          <span className="px-2 py-1 bg-[var(--aio-info-muted)] text-[var(--aio-info)] text-sm rounded-full">
             {members.length}名
           </span>
         </div>
@@ -208,7 +208,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
 
       {/* 招待フォーム */}
       {showInviteForm && (
-        <div className="mb-6 p-4 rounded-lg bg-blue-50 border border-blue-200">
+        <div className="mb-6 p-4 rounded-lg bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)]">
           <h4 className="font-medium text-neutral-900 mb-3">新しいメンバーを招待</h4>
           <div className="space-y-3">
             <div>

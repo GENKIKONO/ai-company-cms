@@ -5,6 +5,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import type { PlanType } from '@/config/plans';
 import { logger } from '@/lib/log';
 
@@ -24,11 +25,11 @@ export interface UserPlanInfo {
 export async function getUserPlan(): Promise<UserPlanInfo> {
   try {
     const supabase = await createClient();
-    
+
     // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+
+    if (!user) {
       logger.warn('[getUserPlan] No authenticated user');
       return { plan: 'trial', isActive: false };
     }

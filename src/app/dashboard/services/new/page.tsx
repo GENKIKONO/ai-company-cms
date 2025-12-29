@@ -1,10 +1,33 @@
 'use client';
 
+/**
+ * New Service Page - 新アーキテクチャ版
+ */
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { DashboardPageShell } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardContent,
+  DashboardButton,
+  DashboardAlert,
+} from '@/components/dashboard/ui';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
 
 export default function NewServicePage() {
+  return (
+    <DashboardPageShell
+      title="新しいサービス"
+      requiredRole="editor"
+    >
+      <NewServiceContent />
+    </DashboardPageShell>
+  );
+}
+
+function NewServiceContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -235,7 +258,7 @@ export default function NewServicePage() {
             <button
               type="button"
               onClick={() => setFeatures([...features, ''])}
-              className="px-4 py-2 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] border border-[var(--aio-primary)] rounded-md hover:bg-blue-50"
+              className="px-4 py-2 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] border border-[var(--aio-primary)] rounded-md hover:bg-[var(--aio-muted)]"
             >
               + 機能を追加
             </button>

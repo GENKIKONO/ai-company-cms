@@ -154,7 +154,7 @@ export default function SchemaDiffPanel({ className }: SchemaDiffPanelProps) {
     switch (status) {
       case 'success': return 'text-green-600';
       case 'failed': return 'text-red-600';
-      case 'running': return 'text-blue-600';
+      case 'running': return 'text-[var(--aio-info)]';
       default: return 'text-gray-400';
     }
   };
@@ -239,7 +239,7 @@ export default function SchemaDiffPanel({ className }: SchemaDiffPanelProps) {
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-[var(--aio-info)]">
                 {stats.total_diffs_24h}
               </div>
               <div className="text-sm text-muted-foreground">検知数</div>

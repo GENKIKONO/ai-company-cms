@@ -1,0 +1,292 @@
+# AIOHub 統一アーキテクチャ プロンプト v2.0（最適解）
+
+## 概要
+
+このプロンプトは2つのアプローチを統合：
+- **トップダウン（GPT版）**: 原則・継承モデル・管理要件
+- **ボトムアップ（Claude版）**: 実装詳細・コード例・マッピング
+
+---
+
+## Part 1: 目的と原則（なぜこれをやるのか）
+
+### 1.1 目的
+AIOHubを「膨大でも壊れない・迷子にならない」プロダクトにする：
+- どのページも見た目・動き・ルールが統一されている
+- 上位の変更が配下に自動適用される（継承）
+- 新しいページを追加しても管理方法は同じ
+- UIの都合でDB/RLSを崩さない
+
+### 1.2 絶対原則
+1. **ページは自由に作らない** - 必ず `PageShell → Header → Blocks` の3層構造
+2. **ルールは上で決めて下へ継承** - 権限・エラー・ローディング・監査は上位で統一
+3. **領域を跨がない** - DashboardとPublic Pagesで異なるコンポーネント体系
+
+---
+
+## Part 2: 二領域アーキテクチャ（どこで何を使うか）
+
+| 領域 | パス | シェル | コンポーネント体系 |
+|------|------|--------|-------------------|
+| Public Pages | `/`, `/pricing`, `/about`, `/o/**` 等 | なし（将来: PublicPageShell） | AioSection, HIGButton, HIGCard |
+| Dashboard | `/dashboard/**` | DashboardPageShell | DashboardCard, DashboardButton |
+
+**重要: 領域を跨いでコンポーネントを使用しない**
+
+---
+
+## Part 3: 3層構造（全ページ共通の骨格）
+
+### Layer 1: PageShell（必須・外枠）
+PageShellが担う責務：
+- 認証チェック（ログイン必要かどうか）
+- 権限チェック（役割/プラン/組織）
+- 機能フラグ（この機能はON/OFFか）
+- エラーハンドリング（統一表示）
+- ローディング状態（統一スケルトン）
+- 監査ログ（重要操作の記録）
+
+```tsx
+// Dashboard領域
+import { DashboardPageShell } from '@/components/dashboard';
+
+export default function XxxPage() {
+  return (
+    <DashboardPageShell
+      title="ページタイトル"
+      requiredRole="viewer"
+      featureFlag="xxx_feature"  // 将来拡張
+    >
+      <XxxContent />
+    </DashboardPageShell>
+  );
+}
+```
+
+### Layer 2: Header（必須・ページ上部）
+- ページタイトル・説明文
+- アクションボタン（新規作成、公開、エクスポート等）
+- 状態表示（draft/published/エラー等）
+
+```tsx
+import { DashboardPageHeader } from '@/components/dashboard/ui';
+
+<DashboardPageHeader
+  title="記事一覧"
+  description="公開記事を管理します"
+  actions={[
+    { label: '新規作成', href: '/dashboard/posts/new', variant: 'primary' }
+  ]}
+/>
+```
+
+### Layer 3: Blocks（複数・機能単位）
+1ページは複数ブロックで構成。各ブロックは：
+- 表示条件（権限/プラン/状態）
+- データ参照（Data Source経由）
+- 操作（CRUD + 公開/エクスポート等）
+- 監査・計測
+
+---
+
+## Part 4: コンポーネントマッピング（何を何に置き換えるか）
+
+### Dashboard領域
+
+| 旧形式 | 新形式 |
+|--------|--------|
+| `HIGCard` | `DashboardCard` |
+| `HIGCardHeader` | `DashboardCardHeader` |
+| `HIGCardTitle` | `<h2>` or `<h3>` |
+| `HIGCardContent` | `DashboardCardContent` |
+| `HIGCardGrid` | `<div className="grid grid-cols-...">` |
+| `HIGButton` | `DashboardButton` |
+| `Card` (ShadCN) | `DashboardCard` |
+| `Button` (ShadCN) | `DashboardButton` |
+| `Alert` (ShadCN) | `DashboardAlert` |
+| `Badge` (ShadCN) | `DashboardBadge` |
+
+### インポート形式
+```tsx
+import { DashboardPageShell, useDashboardPageContext } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardHeader,
+  DashboardCardContent,
+  DashboardButton,
+  DashboardAlert,
+  DashboardBadge,
+  DashboardLoadingState,
+  DashboardEmptyState,
+} from '@/components/dashboard/ui';
+```
+
+---
+
+## Part 5: データ取得の統一（どこから取るか）
+
+### 5.1 統一フック
+```tsx
+import { useDashboardData, useDashboardMutation } from '@/hooks/dashboard';
+
+const { data, loading, error, refetch } = useDashboardData('posts');
+const { mutate, loading: mutating } = useDashboardMutation('posts');
+```
+
+### 5.2 データソース定義
+`src/config/data-sources.ts` で一元管理：
+```tsx
+export const DATA_SOURCES = {
+  posts: {
+    table: 'posts',
+    columns: ['id', 'title', 'content', 'status', 'created_at'],
+    orderBy: { column: 'created_at', ascending: false },
+    defaultFilters: { status: 'published' },
+  },
+};
+```
+
+---
+
+## Part 6: SEO/AI引用性（AIOHubの価値）
+
+### 公開ページ必須要件
+1. **canonical URL**: 正規URL定義（重複回避）
+2. **構造化データ (JSON-LD)**: ページ種別ごとにテンプレ
+   - Organization, FAQ, Article, Service 等
+3. **引用単位**: URL#anchor で指せる見出し構造
+4. **エクスポート可能**: JSON/Markdown形式で出力可能な設計
+
+```tsx
+// 公開ページの標準パターン
+import { generateOrganizationJsonLd } from '@/lib/json-ld';
+
+export const metadata: Metadata = {
+  alternates: { canonical: `${baseUrl}/o/${slug}` },
+};
+
+// JSON-LDはページ内でレンダリング
+<script type="application/ld+json">
+  {JSON.stringify(generateOrganizationJsonLd(org))}
+</script>
+```
+
+---
+
+## Part 7: 継承モデル（上位の変更が自動適用）
+
+### 継承レベル
+1. **Global**: 全ページ共通（エラー/ローディング/監査/デザイントークン）
+2. **Area**: 領域別（Public/Dashboard/Admin）
+3. **PageTemplate**: ページ型（一覧/詳細/編集/設定）
+
+```
+Global Settings
+    └── Dashboard Area
+         ├── ListPageTemplate
+         │    ├── /dashboard/posts
+         │    ├── /dashboard/services
+         │    └── /dashboard/faqs
+         └── DetailPageTemplate
+              └── /dashboard/posts/[id]
+```
+
+---
+
+## Part 8: スタイルルール（見た目がズレない）
+
+### 8.1 色指定
+```tsx
+// NG: Tailwind直書き
+className="bg-blue-500 text-white"
+
+// OK: CSS変数使用
+className="bg-[var(--aio-primary)] text-[var(--color-text-primary)]"
+```
+
+### 8.2 アイコン配置
+```tsx
+// 旧: leftIcon prop
+<HIGButton leftIcon={<Plus />}>追加</HIGButton>
+
+// 新: 子要素として配置
+<DashboardButton><Plus className="h-4 w-4 mr-2" />追加</DashboardButton>
+```
+
+### 8.3 React Hooks ルール
+```tsx
+// NG: 条件付きHook
+const inputId = id || React.useId();
+
+// OK: 常にHook呼び出し
+const generatedId = React.useId();
+const inputId = id ?? generatedId;
+```
+
+---
+
+## Part 9: 完了条件チェックリスト
+
+### Phase 1: Dashboard統一（完了判定）
+- [x] 全ページで `DashboardPageShell` 使用
+- [x] 旧 HIG 系コンポーネント完全削除
+- [x] ShadCN UI直接使用を Dashboard UI に置き換え
+- [ ] データ取得を統一フックに移行（一部完了）
+
+### Phase 2: Public Pages統一
+- [ ] セクション構造を `AioSection` に統一
+- [ ] ボタン・カードを適切なコンポーネントに統一
+- [ ] 色指定をCSS変数に統一
+
+### Phase 3: SEO/AI引用性
+- [x] JSON-LD実装（82ファイル）
+- [x] canonical URL実装
+- [ ] 引用単位（anchor）標準化
+
+### Phase 4: 継承・管理
+- [ ] 機能フラグ統合
+- [ ] 監査ログ統合
+- [ ] 管理画面でのページ構成管理
+
+### 共通検証
+- [x] `npm run typecheck` 通過
+- [ ] `npm run lint` 通過（警告のみ許容）
+- [x] `npm run build` 成功
+- [ ] 全ページで表示確認
+
+---
+
+## Part 10: 作業手順
+
+### Step 1: 現状調査
+```bash
+# Dashboard: 旧形式の残存確認
+grep -r "HIGCard\|HIGButton" src/app/dashboard --include="*.tsx"
+grep -r "from '@/components/ui/" src/app/dashboard --include="*.tsx"
+
+# Public: AioSection使用状況
+grep -r "AioSection" src/app --include="*.tsx"
+```
+
+### Step 2: 優先度付け
+1. Tier 1: 主要ページ（posts, services, faqs, company）
+2. Tier 2: 機能ページ（analytics, billing, admin）
+3. Tier 3: 補助ページ（help, settings）
+
+### Step 3: 検証
+```bash
+npm run typecheck  # 型チェック
+npm run lint       # Lintチェック
+npm run build      # ビルド確認
+```
+
+---
+
+## 参照ドキュメント
+- `DESIGN_SYSTEM.md` - デザインシステム詳細
+- `docs/implementation.md` - 実装ガイドライン
+- `src/components/dashboard/ui/` - Dashboard UIコンポーネント
+- `src/components/dashboard/templates/` - ページテンプレート
+- `src/config/data-sources.ts` - データソース定義
+- `src/lib/json-ld/` - 構造化データ生成

@@ -7,6 +7,7 @@ import { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { env } from '@/lib/env';
+import { getUserFullWithClient } from '@/lib/core/auth-state';
 import { determineUserFlow, calculateUserAccess, canAccessApiEndpoint } from '@/lib/auth/flow-detection';
 import { unauthorizedError, forbiddenError } from './error-responses';
 import { createApiUsageMiddleware, BusinessEventLogger, logSecurityEvent } from './audit-logger';
@@ -45,15 +46,15 @@ export async function requireAuth(request: NextRequest): Promise<AuthContext | R
       }
     );
 
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const user = await getUserFullWithClient(supabase);
 
-    if (error || !user) {
+    if (!user) {
       // セキュリティイベントログ
       logSecurityEvent('auth_failed', {
         endpoint: new URL(request.url).pathname,
         userAgent: request.headers.get('user-agent'),
         ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
-        error: error?.message
+        error: 'No authenticated user'
       });
       return unauthorizedError('Authentication required');
     }
@@ -64,7 +65,7 @@ export async function requireAuth(request: NextRequest): Promise<AuthContext | R
       .select('organization_id, role')
       .eq('user_id', user.id);
 
-    const userRole = user.user_metadata?.role || 'org_owner';
+    const userRole = (user.user_metadata?.role as string) || 'org_owner';
     const userAccess = calculateUserAccess(
       userRole,
       (organizations || []).map(org => ({

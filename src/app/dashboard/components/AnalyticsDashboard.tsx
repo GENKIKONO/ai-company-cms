@@ -6,10 +6,17 @@ import StructuredDataScore from '@/components/analytics/StructuredDataScore';
 import AIVisibilityReport from '@/components/analytics/AIVisibilityReport';
 import TeamManagement from '@/components/team/TeamManagement';
 import { getTrialStatus, type TrialStatus } from '@/lib/trial-manager';
-import type { Organization } from '@/types/legacy/database';;
+import type { Organization } from '@/types/legacy/database';
 import { PLAN_LIMITS } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
-import { canUseFeatureFromOrg } from '@/lib/org-features';
+import { createClient } from '@/lib/supabase/client';
+import {
+  getEffectiveFeatures,
+  getFeatureEnabled,
+  getPlanUiLimitsFromFeatures,
+  type EffectiveFeature,
+  type PlanUiLimits,
+} from '@/lib/featureGate';
 
 interface AnalyticsDashboardProps {
   organization: Organization;
@@ -36,14 +43,34 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
   const [loading, setLoading] = useState(true);
   const [trialStatus, setTrialStatus] = useState<TrialStatus | null>(null);
 
+  // NOTE: [FEATUREGATE_PHASE2] featureGate 経由で機能フラグ・制限を取得
+  const [features, setFeatures] = useState<EffectiveFeature[]>([]);
+  const [uiLimits, setUiLimits] = useState<PlanUiLimits | null>(null);
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        
+
         // Check trial status
         const trial = getTrialStatus(organization);
         setTrialStatus(trial);
+
+        // featureGate 経由で機能フラグを取得（Subject型API）
+        if (organization.id) {
+          try {
+            const supabase = createClient();
+            const effectiveFeatures = await getEffectiveFeatures(supabase, {
+              type: 'org',
+              id: organization.id,
+            });
+            setFeatures(effectiveFeatures);
+            setUiLimits(getPlanUiLimitsFromFeatures(effectiveFeatures));
+          } catch (err) {
+            logger.warn('Failed to fetch features from featureGate, using fallback', { error: err });
+            // フォールバック: 空配列のままにして PLAN_LIMITS を使用
+          }
+        }
 
         // Mock analytics data - in real implementation, fetch from API
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -74,15 +101,18 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
     fetchDashboardData();
   }, [organization]);
 
-  const planLimits = PLAN_LIMITS[organization.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.starter;
-  
-  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
-  // 構造化データ機能
-  const hasStructuredScoreFeature = canUseFeatureFromOrg(organization, 'structured_data_output');
-  // AI可視性機能
-  const hasAIVisibilityFeature = canUseFeatureFromOrg(organization, 'ai_visibility_analytics');
-  // チーム管理機能
-  const hasTeamManagement = canUseFeatureFromOrg(organization, 'team_management');
+  // NOTE: [FEATUREGATE_PHASE2] featureGate 優先、フォールバックで PLAN_LIMITS
+  const staticPlanLimits = PLAN_LIMITS[organization.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.starter;
+  const planLimits = {
+    services: uiLimits?.services ?? staticPlanLimits.services,
+    qa_items: uiLimits?.qa_items ?? staticPlanLimits.qa_items,
+    case_studies: uiLimits?.case_studies ?? staticPlanLimits.case_studies,
+  };
+
+  // NOTE: [FEATUREGATE_PHASE2] featureGate 経由で機能判定、フォールバックなし（DB未対応なら false）
+  const hasStructuredScoreFeature = getFeatureEnabled(features, 'structured_data_output');
+  const hasAIVisibilityFeature = getFeatureEnabled(features, 'ai_visibility_analytics');
+  const hasTeamManagement = getFeatureEnabled(features, 'team_management');
 
   if (loading) {
     return (
@@ -111,7 +141,7 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
             ? 'bg-red-50 border-red-200' 
             : trialStatus.daysRemaining <= 3 
               ? 'bg-yellow-50 border-yellow-200' 
-              : 'bg-blue-50 border-blue-200'
+              : 'bg-[var(--aio-muted)] border-[var(--aio-primary)]/30'
         }`}>
           <div className="flex items-center gap-3">
             <AlertCircle className={`w-5 h-5 ${
@@ -204,7 +234,7 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
               {stats.recentActivity.map((activity, index) => (
                 <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
                   <div className={`w-2 h-2 rounded-full ${
-                    activity.type === 'service' ? 'bg-blue-500' :
+                    activity.type === 'service' ? 'bg-[var(--aio-primary)]' :
                     activity.type === 'faq' ? 'bg-green-500' : 'bg-purple-500'
                   }`} />
                   <div className="flex-1">
@@ -263,8 +293,8 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
           </div>
 
           {(!hasAIVisibilityFeature || !hasTeamManagement) && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
+            <div className="mt-4 p-3 bg-[var(--aio-muted)] rounded-lg">
+              <p className="text-sm text-[var(--aio-primary)]">
                 より多くの機能をご利用いただくにはBusinessプランにアップグレードしてください。
               </p>
             </div>

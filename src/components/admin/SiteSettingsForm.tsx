@@ -241,7 +241,7 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
               <div className={`border-2 border-dashed border-gray-300 rounded-xl p-8 text-center transition-all duration-200 ${
                 isUploading 
                   ? 'bg-gray-50 border-gray-200' 
-                  : 'hover:border-blue-400 hover:bg-blue-50/50'
+                  : 'hover:border-[var(--aio-info)] hover:bg-[var(--aio-info-surface)]'
               }`}>
                 {isUploading ? (
                   <div className="space-y-4">
@@ -296,7 +296,7 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
             value={settings.seo_title || ''}
             onChange={(e) => handleInputChange('seo_title', e.target.value)}
             placeholder="AIOHub - AI Visibility Platform"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--aio-info)]/20 focus:border-[var(--aio-info)] transition-all duration-200 bg-white/50 backdrop-blur-sm"
             maxLength={60}
           />
           <p className="text-xs text-gray-500 mt-1">最大60文字（検索結果での表示に最適化）</p>
@@ -313,7 +313,7 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
             onChange={(e) => handleInputChange('seo_description', e.target.value)}
             placeholder="AIによるコンテンツ可視性最適化プラットフォーム。検索エンジンでの露出を最大化し、ビジネス成長を加速します。"
             rows={3}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm resize-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--aio-info)]/20 focus:border-[var(--aio-info)] transition-all duration-200 bg-white/50 backdrop-blur-sm resize-none"
             maxLength={160}
           />
           <p className="text-xs text-gray-500 mt-1">最大160文字（検索結果のスニペットに表示）</p>
@@ -338,7 +338,7 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
               onChange={(e) => handleInputChange('theme_color', e.target.value)}
               placeholder="#3B82F6"
               pattern="^#[0-9A-Fa-f]{6}$"
-              className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm font-mono text-sm"
+              className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--aio-info)]/20 focus:border-[var(--aio-info)] transition-all duration-200 bg-white/50 backdrop-blur-sm font-mono text-sm"
             />
           </div>
           <p className="text-xs text-gray-500 mt-1">ブランドカラーをHEX形式で指定（例: #3B82F6）</p>
@@ -350,7 +350,7 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-[var(--aio-info)]/20 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSaving ? (
             <>

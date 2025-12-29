@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import type { SalesAction } from '@/types/domain/sales';;
 import { logger } from '@/lib/utils/logger';
@@ -43,8 +44,8 @@ export async function POST(request: NextRequest) {
     let company_id: string | null = null;
 
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (!authError && user) {
+      const user = await getUserWithClient(supabase);
+      if (user) {
         user_id = user.id;
         
         // ユーザーの企業IDを取得
@@ -107,10 +108,10 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
+
     // 管理者権限チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

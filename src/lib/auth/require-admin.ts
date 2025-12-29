@@ -59,10 +59,10 @@ export async function checkAdminAuth(): Promise<AdminCheckResult> {
       };
     }
 
-    // site_admins チェック
+    // site_admins チェック（主キーは user_id、DB確認済み）
     const { data: adminCheck, error: adminError } = await supabase
       .from('site_admins')
-      .select('id')
+      .select('user_id')
       .eq('user_id', user.id)
       .single();
 

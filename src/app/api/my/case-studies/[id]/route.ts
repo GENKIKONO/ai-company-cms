@@ -2,8 +2,14 @@
 // 個別事例の更新・削除API
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { CaseStudyFormData } from '@/types/domain/content';;
+import { getUserWithClient } from '@/lib/core/auth-state';
+import type { CaseStudyFormData } from '@/types/domain/content';
 import { normalizeCaseStudyPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import {
+  validateFilesForPublish,
+  extractImageUrlsFromCaseStudy,
+} from '@/lib/file-scan';
+import { logger } from '@/lib/utils/logger';
 
 async function logErrorToDiag(errorInfo: any) {
   try {
@@ -32,8 +38,8 @@ export async function GET(
     const { id } = await params;
     const supabase = await createClient();
     
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -90,8 +96,8 @@ export async function PUT(
     const { id } = await params;
     const supabase = await createClient();
     
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -101,11 +107,12 @@ export async function PUT(
     const { organizationId, ...restBody } = body;
 
     // 存在確認 + RLS チェック（created_by を含む）
+    // is_publishedと画像フィールドもファイルスキャン用に取得
     const { data: existingCaseStudy, error: fetchError } = await supabase
       .from('case_studies')
-      .select('id, organization_id, created_by')
+      .select('id, organization_id, created_by, is_published, featured_image, thumbnail_url, image_url, images')
       .eq('id', id)
-      .eq('created_by', authData.user.id) // RLS compliance: 作成者のみ更新可能
+      .eq('created_by', user.id) // RLS compliance: 作成者のみ更新可能
       .maybeSingle();
 
     if (fetchError || !existingCaseStudy) {
@@ -129,6 +136,33 @@ export async function PUT(
       ...normalizedData,
       updated_at: new Date().toISOString(),
     };
+
+    // 公開時のファイルスキャンバリデーション
+    const isBecomingPublished =
+      (updateData.is_published === true && existingCaseStudy.is_published !== true);
+
+    if (isBecomingPublished) {
+      // 更新データと既存データを合わせて画像URLを抽出
+      const mergedData = { ...existingCaseStudy, ...updateData };
+      const imageUrls = extractImageUrlsFromCaseStudy(mergedData as Record<string, unknown>);
+
+      if (imageUrls.length > 0) {
+        const scanResult = await validateFilesForPublish(supabase, imageUrls);
+
+        if (!scanResult.valid) {
+          logger.warn('[my/case-studies/update] File scan validation failed for publish', {
+            userId: user.id,
+            caseStudyId: id,
+            failedPaths: scanResult.failedPaths,
+          });
+          return NextResponse.json({
+            error: 'ファイルのスキャンが完了していないため公開できません',
+            code: 'FILE_SCAN_VALIDATION_FAILED',
+            failedPaths: scanResult.failedPaths,
+          }, { status: 422 });
+        }
+      }
+    }
 
     const { data, error } = await supabase
       .from('case_studies')
@@ -178,8 +212,8 @@ export async function DELETE(
     const { id } = await params;
     const supabase = await createClient();
     
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -188,7 +222,7 @@ export async function DELETE(
       .from('case_studies')
       .select('id, created_by')
       .eq('id', id)
-      .eq('created_by', authData.user.id) // RLS compliance: 作成者のみ削除可能
+      .eq('created_by', user.id) // RLS compliance: 作成者のみ削除可能
       .maybeSingle();
 
     if (fetchError || !existingCaseStudy) {
@@ -202,7 +236,7 @@ export async function DELETE(
       .from('case_studies')
       .delete()
       .eq('id', id)
-      .eq('created_by', authData.user.id); // 削除時にも created_by チェック
+      .eq('created_by', user.id); // 削除時にも created_by チェック
 
     if (error) {
       return NextResponse.json(

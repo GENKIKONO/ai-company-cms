@@ -1,34 +1,45 @@
 import React from 'react';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import { type PlanType } from '@/config/plans';
-import { canUseFeatureFromOrg } from '@/lib/org-features/features';
-// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
 
-type OrganizationRow = any;
+/**
+ * VerifiedBadge - 認証済みバッジ表示コンポーネント
+ *
+ * 責務: 純粋なUI表示のみ。feature_flags等の判定ロジックは持たない。
+ *
+ * 使用方法:
+ * 1. 推奨: isEligible propで事前計算済みの判定結果を渡す
+ * 2. 後方互換: plan propでプランベースの判定（business/pro/enterprise）
+ *
+ * @note [2024-12] feature_flags直読みを廃止。Check11準拠。
+ */
 
 interface VerifiedBadgeProps {
+  /** 企業が認証済みかどうか（DBのverifiedフラグ） */
   verified?: boolean;
-  // 新しい正規ルート用
-  organization?: OrganizationRow;
-  // 既存の後方互換性用（deprecated）
+  /** 事前計算済みの表示可否（推奨：呼び出し側でfeatureGate等で判定） */
+  isEligible?: boolean;
+  /** プラン（後方互換：isEligibleが未指定時のフォールバック） */
   plan?: PlanType;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   showLabel?: boolean;
 }
 
-export function VerifiedBadge({ 
-  verified = false, 
-  organization,
+export function VerifiedBadge({
+  verified = false,
+  isEligible,
   plan = 'starter',
   className = '',
   size = 'md',
   showLabel = false
 }: VerifiedBadgeProps) {
-  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
-  const isEligibleForVerification = organization
-    ? canUseFeatureFromOrg(organization, 'verified_badge')
-    : plan === 'business' || plan === 'pro' || plan === 'enterprise'; // 既存の後方互換性
+  // 表示可否の判定
+  // 優先順位: 1. isEligible prop（推奨） 2. plan-based判定（後方互換）
+  const isEligibleForVerification = isEligible !== undefined
+    ? isEligible
+    : plan === 'business' || plan === 'pro' || plan === 'enterprise';
+
   const shouldShowBadge = verified && isEligibleForVerification;
 
   if (!shouldShowBadge) {
@@ -49,7 +60,7 @@ export function VerifiedBadge({
 
   return (
     <div className={`inline-flex items-center gap-1 ${className}`}>
-      <CheckBadgeIcon 
+      <CheckBadgeIcon
         className={`${sizeClasses[size]} text-blue-600 flex-shrink-0`}
         title="認証済み企業"
       />
@@ -64,25 +75,24 @@ export function VerifiedBadge({
 
 interface VerifiedStatusProps {
   verified?: boolean;
-  // 新しい正規ルート用
-  organization?: OrganizationRow;
-  // 既存の後方互換性用（deprecated）
+  isEligible?: boolean;
   plan?: PlanType;
   organizationName: string;
   className?: string;
 }
 
-export function VerifiedStatus({ 
-  verified = false, 
-  organization,
+export function VerifiedStatus({
+  verified = false,
+  isEligible,
   plan = 'starter',
   organizationName,
   className = ''
 }: VerifiedStatusProps) {
-  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
-  const isEligibleForVerification = organization
-    ? canUseFeatureFromOrg(organization, 'verified_badge')
-    : plan === 'business' || plan === 'pro' || plan === 'enterprise'; // 既存の後方互換性
+  // 表示可否の判定
+  const isEligibleForVerification = isEligible !== undefined
+    ? isEligible
+    : plan === 'business' || plan === 'pro' || plan === 'enterprise';
+
   const shouldShowBadge = verified && isEligibleForVerification;
 
   return (
@@ -91,9 +101,9 @@ export function VerifiedStatus({
         {organizationName}
       </h1>
       {shouldShowBadge && (
-        <VerifiedBadge 
+        <VerifiedBadge
           verified={verified}
-          organization={organization}
+          isEligible={isEligible}
           plan={plan}
           size="md"
           showLabel={false}

@@ -68,7 +68,7 @@ export default function TranslationAnalyticsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--aio-primary)]"></div>
       </div>
     );
   }
@@ -104,7 +104,7 @@ export default function TranslationAnalyticsPage() {
                   onClick={() => setSelectedDateRange(range)}
                   className={`px-3 py-2 text-sm font-medium rounded-md ${
                     selectedDateRange === range
-                      ? 'bg-blue-100 text-blue-700'
+                      ? 'bg-[var(--aio-info-surface)] text-[var(--aio-info)]'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
@@ -283,7 +283,7 @@ export default function TranslationAnalyticsPage() {
                 </div>
                 <div className="text-sm text-gray-600">処理中のジョブ</div>
                 <div className="mt-2">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--aio-info-muted)] text-[var(--aio-info)]">
                     実行中
                   </span>
                 </div>

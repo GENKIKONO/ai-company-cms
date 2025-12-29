@@ -4,7 +4,7 @@ import { requireAuthUser, requireOrgMember } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import type { SessionListResponse, SessionListParams, InterviewAnswersJson } from '@/types/interview-session';
-import { isFeatureQuotaLimitReached } from '@/lib/org-features/quota';
+import { isFeatureQuotaLimitReached } from '@/lib/featureGate';
 
 const SessionListParamsSchema = z.object({
   organization_id: z.string().uuid().optional(),

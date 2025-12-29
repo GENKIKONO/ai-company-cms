@@ -7,7 +7,7 @@
  */
 
 import { getCurrentUserOrganization } from '@/lib/organizations-server';
-import { fetchOrgQuotaUsage } from '@/lib/org-features';
+import { fetchOrgQuotaUsage } from '@/lib/featureGate';
 import { logger } from '@/lib/utils/logger';
 import type { SimpleQuotaProps } from '@/components/quota/OrgQuotaBadge';
 import InterviewPageClient from './InterviewPageClient';

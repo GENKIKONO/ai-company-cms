@@ -2,7 +2,8 @@
 // effective-features をサーバーサイドで安全に使用
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { canUseFeature, getFeatureLevel } from '@/lib/org-features';
+import { getUserWithClient } from '@/lib/core/auth-state';
+import { canUseFeature, getFeatureLevel } from '@/lib/featureGate';
 import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 
@@ -12,9 +13,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -22,15 +24,15 @@ export async function GET(request: NextRequest) {
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select('id, plan')
-      .eq('created_by', authData.user.id)
+      .eq('created_by', user.id)
       .single();
 
     if (orgError || !orgData) {
-      logger.debug('[ai-reports] Organization not found', { 
-        userId: authData.user.id, 
-        error: orgError?.message 
+      logger.debug('[ai-reports] Organization not found', {
+        userId: user.id,
+        error: orgError?.message
       });
-      return NextResponse.json({ 
+      return NextResponse.json({
         hasAccess: false,
         level: null,
         plan: null,
@@ -42,16 +44,16 @@ export async function GET(request: NextRequest) {
     try {
       const hasAccess = await canUseFeature(orgData.id, 'ai_reports');
       const level = await getFeatureLevel(orgData.id, 'ai_reports');
-      
+
       logger.debug('[ai-reports] Feature access check', {
-        userId: authData.user.id,
+        userId: user.id,
         organizationId: orgData.id,
         hasAccess,
         level,
         plan: orgData.plan
       });
 
-      return NextResponse.json({ 
+      return NextResponse.json({
         hasAccess,
         level: level || null,
         plan: orgData.plan || 'trial',
@@ -61,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     } catch (featureError) {
       logger.error('[ai-reports] effective-features error, denying access', featureError, {
-        userId: authData.user.id,
+        userId: user.id,
         organizationId: orgData.id
       });
       

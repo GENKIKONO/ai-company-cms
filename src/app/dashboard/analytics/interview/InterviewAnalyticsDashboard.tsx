@@ -6,11 +6,14 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
+import Link from 'next/link';
+import {
+  DashboardCard,
+  DashboardCardContent,
+  DashboardCardHeader,
+  DashboardButton,
+  DashboardAlert,
+} from '@/components/dashboard/ui';
 import { logger } from '@/lib/utils/logger';
 import type {
   InterviewAnalyticsResponse,
@@ -216,8 +219,8 @@ function SummaryCard({ summary }: { summary: AnalyticsSummary }) {
   };
 
   return (
-    <Card>
-      <CardContent className="p-6">
+    <DashboardCard>
+      <DashboardCardContent className="p-6">
         <div className="flex items-center">
           <div className="flex-shrink-0">
             {getIconElement()}
@@ -240,8 +243,8 @@ function SummaryCard({ summary }: { summary: AnalyticsSummary }) {
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </DashboardCardContent>
+    </DashboardCard>
   );
 }
 
@@ -322,39 +325,42 @@ export default function InterviewAnalyticsDashboard({
   return (
     <div className="space-y-6">
       {/* ナビゲーション */}
-      <DashboardBackLink />
+      <Link
+        href="/dashboard"
+        className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+      >
+        ← ダッシュボードに戻る
+      </Link>
 
       {/* エラー表示 */}
       {error && (
-        <Alert variant="destructive">
-          <AlertDescription>
-            {error}
-            <button 
-              onClick={handleRefresh}
-              className="ml-2 underline hover:no-underline"
-              disabled={isLoading}
-            >
-              再試行
-            </button>
-          </AlertDescription>
-        </Alert>
+        <DashboardAlert variant="error">
+          {error}
+          <button
+            onClick={handleRefresh}
+            className="ml-2 underline hover:no-underline"
+            disabled={isLoading}
+          >
+            再試行
+          </button>
+        </DashboardAlert>
       )}
 
       {/* 期間選択とリフレッシュ */}
-      <Card>
-        <CardContent className="p-4">
+      <DashboardCard>
+        <DashboardCardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex space-x-1">
               {PERIOD_OPTIONS.map((option) => (
-                <Button
+                <DashboardButton
                   key={option.value}
-                  variant={selectedPeriod === option.value ? "default" : "outline"}
+                  variant={selectedPeriod === option.value ? "primary" : "secondary"}
                   size="sm"
                   onClick={() => handlePeriodChange(option.value)}
                   disabled={isLoading}
                 >
                   {option.label}
-                </Button>
+                </DashboardButton>
               ))}
             </div>
 
@@ -364,26 +370,26 @@ export default function InterviewAnalyticsDashboard({
                   更新: {lastRefreshedAt.toLocaleTimeString('ja-JP')}
                 </span>
               )}
-              <Button
-                variant="outline"
+              <DashboardButton
+                variant="secondary"
                 size="sm"
                 onClick={handleRefresh}
                 disabled={isLoading}
                 className="flex items-center gap-2"
               >
                 {isLoading ? (
-                  <LoadingSpinner className="w-4 h-4" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
                 ) : (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                 )}
                 更新
-              </Button>
+              </DashboardButton>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </DashboardCardContent>
+      </DashboardCard>
 
       {/* ローディング状態 */}
       {isLoading && !data && (
@@ -409,35 +415,35 @@ export default function InterviewAnalyticsDashboard({
 
           {/* チャート */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardContent className="p-6">
+            <DashboardCard>
+              <DashboardCardContent className="p-6">
                 <SimpleBarChart
                   data={chartData}
                   title="日別セッション数"
                   valueKey="sessionCount"
-                  color="bg-blue-500"
+                  color="bg-[var(--aio-primary)]"
                 />
-              </CardContent>
-            </Card>
+              </DashboardCardContent>
+            </DashboardCard>
 
-            <Card>
-              <CardContent className="p-6">
+            <DashboardCard>
+              <DashboardCardContent className="p-6">
                 <SimpleBarChart
                   data={chartData}
                   title="日別AI呼び出し数"
                   valueKey="aiCallCount"
                   color="bg-orange-500"
                 />
-              </CardContent>
-            </Card>
+              </DashboardCardContent>
+            </DashboardCard>
           </div>
 
           {/* データテーブル */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="hig-text-h3 hig-jp-heading">日別詳細データ</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <DashboardCard>
+            <DashboardCardHeader>
+              <h3 className="hig-text-h3 hig-jp-heading">日別詳細データ</h3>
+            </DashboardCardHeader>
+            <DashboardCardContent>
               {data.days.length === 0 ? (
                 <div className="text-center py-8 text-[var(--color-text-secondary)]">
                   指定期間のデータがありません
@@ -477,13 +483,13 @@ export default function InterviewAnalyticsDashboard({
                   </table>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </DashboardCardContent>
+          </DashboardCard>
 
           {/* メタデータ情報 */}
           {data.metadata && (
-            <Card>
-              <CardContent className="p-4">
+            <DashboardCard>
+              <DashboardCardContent className="p-4">
                 <div className="flex items-center justify-between text-sm text-[var(--color-text-secondary)]">
                   <div>
                     データソース: {data.metadata.dataSource === 'materialized_view' ? 'MATERIALIZED VIEW' : 'VIEW'}
@@ -492,8 +498,8 @@ export default function InterviewAnalyticsDashboard({
                     クエリ時間: {data.metadata.queryTimeMs}ms | レコード数: {data.metadata.recordCount}件
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </DashboardCardContent>
+            </DashboardCard>
           )}
         </>
       )}

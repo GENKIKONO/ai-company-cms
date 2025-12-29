@@ -11,11 +11,65 @@
   --aio-surface: #F5F5F7;           /* Apple Gray - 背景面 */
   --aio-muted: #f8f9fa;             /* 軽いグレー */
   --text-on-primary: #ffffff;       /* プライマリ上のテキスト */
-  
+
   /* === Enhanced Color System === */
   --color-text-primary: #1D1D1F;    /* Apple標準黒 */
   --color-text-secondary: #636366;  /* AA準拠グレー */
   --color-text-tertiary: #767680;   /* 薄いグレー */
+
+  /* === Dashboard Specific Tokens === */
+  --dashboard-bg: #f3f4f6;          /* ダッシュボード背景 (gray-100) */
+  --dashboard-card-bg: #ffffff;     /* カード背景 */
+  --dashboard-card-border: #e5e7eb; /* カードボーダー (gray-200) */
+  --dashboard-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --dashboard-card-shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  /* === Status Colors === */
+  --status-success: #22c55e;        /* green-500 */
+  --status-success-bg: #dcfce7;     /* green-100 */
+  --status-warning: #eab308;        /* yellow-500 */
+  --status-warning-bg: #fef9c3;     /* yellow-100 */
+  --status-error: #ef4444;          /* red-500 */
+  --status-error-bg: #fee2e2;       /* red-100 */
+  --status-info: #3b82f6;           /* blue-500 */
+  --status-info-bg: #dbeafe;        /* blue-100 */
+
+  /* === Semantic Color Tokens (aio-* naming for Tailwind arbitrary value) === */
+  --aio-info: #1e40af;              /* blue-800 - info badge text */
+  --aio-info-muted: #dbeafe;        /* blue-100 - info badge background */
+  --aio-info-surface: #eff6ff;      /* blue-50 - info box background */
+  --aio-info-border: #bfdbfe;       /* blue-200 - info box border */
+  --aio-success: #166534;           /* green-800 - success badge text */
+  --aio-success-muted: #dcfce7;     /* green-100 - success badge background */
+  --aio-warning: #854d0e;           /* yellow-800 - warning badge text */
+  --aio-warning-muted: #fef9c3;     /* yellow-100 - warning badge background */
+  --aio-danger: #991b1b;            /* red-800 - danger badge text */
+  --aio-danger-muted: #fee2e2;      /* red-100 - danger badge background */
+
+  /* === Stripe-inspired Interaction Tokens === */
+  --focus-ring: 0 0 0 3px rgba(0, 122, 255, 0.25);
+  --focus-ring-error: 0 0 0 3px rgba(239, 68, 68, 0.25);
+  --input-border: #d1d5db;          /* gray-300 */
+  --input-border-hover: #9ca3af;    /* gray-400 */
+  --input-border-focus: var(--aio-primary);
+  --input-bg: #ffffff;
+  --input-bg-disabled: #f9fafb;     /* gray-50 */
+  --input-placeholder: #9ca3af;     /* gray-400 */
+
+  /* === Button Interaction States === */
+  --btn-primary-bg: var(--aio-primary);
+  --btn-primary-hover: var(--aio-primary-hover);
+  --btn-primary-active: #0051b3;
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-border: var(--dashboard-card-border);
+  --btn-secondary-hover: #f9fafb;
+  --btn-danger-bg: var(--status-error);
+  --btn-danger-hover: #dc2626;
+
+  /* === Table Tokens === */
+  --table-header-bg: #f9fafb;       /* gray-50 */
+  --table-row-hover: #f3f4f6;       /* gray-100 */
+  --table-border: var(--dashboard-card-border);
   
   /* === Shadow System (iCloud調) === */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);

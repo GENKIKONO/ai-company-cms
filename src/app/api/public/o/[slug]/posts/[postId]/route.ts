@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { createError, errorToResponse } from '@/lib/error-handler';
+import { getUserFromTokenWithClient } from '@/lib/core/auth-state';
 import crypto from 'crypto';
 import { logger } from '@/lib/log';
 
@@ -38,8 +39,8 @@ export async function GET(
       if (authHeader) {
         try {
           const token = authHeader.replace('Bearer ', '');
-          const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-          
+          const { user, error: authError } = await getUserFromTokenWithClient(supabase, token);
+
           if (!authError && user) {
             // Check if user has access to the organization
             const { data: orgAccess, error: orgAccessError } = await supabase

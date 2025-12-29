@@ -5,7 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getFeatureLimit } from '@/lib/org-features';
+import { getUserWithClient } from '@/lib/core/auth-state';
+import { getOrgFeatureLimit as getFeatureLimit } from '@/lib/featureGate';
 import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
@@ -16,10 +17,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     // validateOrgAccessでメンバーシップ確認
     try {
-      await validateOrgAccess(organizationId, authData.user.id, 'read');
+      await validateOrgAccess(organizationId, user.id, 'read');
     } catch (error) {
       if (error instanceof OrgAccessError) {
         return NextResponse.json({ 
@@ -81,10 +82,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
 
     // validateOrgAccessでメンバーシップ確認
     try {
-      await validateOrgAccess(body.organizationId, authData.user.id, 'write');
+      await validateOrgAccess(body.organizationId, user.id, 'write');
     } catch (error) {
       if (error instanceof OrgAccessError) {
         return NextResponse.json({ 
@@ -127,8 +128,8 @@ export async function POST(request: NextRequest) {
       .eq('id', body.organizationId);
 
     if (orgError) {
-      logger.error('[my/materials] POST Organization data fetch failed', { 
-        userId: authData.user.id, 
+      logger.error('[my/materials] POST Organization data fetch failed', {
+        userId: user.id,
         organizationId: body.organizationId,
         error: orgError?.message 
       });
@@ -190,7 +191,7 @@ export async function POST(request: NextRequest) {
       file_path: body.file_path,
       file_type: body.file_type || null,
       file_size: body.file_size || null,
-      uploaded_by: authData.user.id
+      uploaded_by: user.id
     };
 
     const { data, error } = await supabase

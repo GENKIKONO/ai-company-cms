@@ -1,15 +1,15 @@
 'use client';
 
-import { auth } from '@/lib/auth';
+import { signOutClient } from '@/lib/core/auth-state.client';
 import { logger } from '@/lib/utils/logger';
 
 export default function SignOutButton() {
   const handleSignOut = async () => {
     try {
       logger.debug('[SignOutButton] Complete logout starting...');
-      
-      // 完全なログアウト処理
-      await auth.signOut();
+
+      // 完全なログアウト処理（Core経由）
+      await signOutClient();
       
       logger.debug('[SignOutButton] Logout completed, redirecting to home...');
       

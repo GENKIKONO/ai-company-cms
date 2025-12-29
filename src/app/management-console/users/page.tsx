@@ -124,7 +124,7 @@ const roleLabels = {
 
 const roleColors = {
   admin: 'bg-red-100 text-red-800',
-  user: 'bg-blue-100 text-blue-800'
+  user: 'bg-[var(--aio-info-muted)] text-[var(--aio-info)]'
 };
 
 export default function UsersManagementPage() {
@@ -477,7 +477,7 @@ export default function UsersManagementPage() {
                 onClick={() => setRoleFilter(role)}
                 className={`px-3 py-2 text-sm rounded-md transition-colors ${
                   roleFilter === role
-                    ? 'bg-blue-100 text-blue-800'
+                    ? 'bg-[var(--aio-info-muted)] text-[var(--aio-info)]'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -656,7 +656,7 @@ export default function UsersManagementPage() {
                   </div>
 
                   {/* 統計情報 */}
-                  <div className="bg-blue-50 rounded-lg p-4">
+                  <div className="bg-[var(--aio-info-surface)] rounded-lg p-4">
                     <h4 className="text-md font-semibold text-gray-900 mb-3">コンテンツ統計</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="text-center">
@@ -690,7 +690,7 @@ export default function UsersManagementPage() {
                       <CreditCard className="h-4 w-4 mr-2" />
                       プラン・機能設定
                     </h4>
-                    <div className="border rounded-lg p-4 bg-blue-50">
+                    <div className="border rounded-lg p-4 bg-[var(--aio-info-surface)]">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-gray-900">

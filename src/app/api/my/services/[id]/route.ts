@@ -2,8 +2,14 @@
 // 個別サービスの更新・削除API
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { ServiceFormData } from '@/types/domain/content';;
+import { getUserWithClient } from '@/lib/core/auth-state';
+import type { ServiceFormData } from '@/types/domain/content';
 import { normalizeServicePayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import {
+  validateFilesForPublish,
+  extractImageUrlsFromService,
+} from '@/lib/file-scan';
+import { logger } from '@/lib/utils/logger';
 
 async function logErrorToDiag(errorInfo: any) {
   try {
@@ -31,9 +37,10 @@ export async function GET(
   try {
     const { id } = await params;
     const supabase = await createClient();
-    
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -41,7 +48,7 @@ export async function GET(
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('id')
-      .eq('created_by', authData.user.id)
+      .eq('created_by', user.id)
       .maybeSingle();
 
     if (orgError || !organization) {
@@ -54,7 +61,7 @@ export async function GET(
       .select('*')
       .eq('id', id)
       .eq('organization_id', organization.id)
-      .eq('created_by', authData.user.id)
+      .eq('created_by', user.id)
       .maybeSingle();
 
     if (error) {
@@ -92,8 +99,9 @@ export async function PUT(
     const { id } = await params;
     const supabase = await createClient();
     
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -103,7 +111,7 @@ export async function PUT(
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('id')
-      .eq('created_by', authData.user.id)
+      .eq('created_by', user.id)
       .maybeSingle();
 
     if (orgError || !organization) {
@@ -111,12 +119,13 @@ export async function PUT(
     }
 
     // RLS compliance: check both organization ownership and created_by
+    // is_publishedと画像フィールドもファイルスキャン用に取得
     const { data: existingService, error: fetchError } = await supabase
       .from('services')
-      .select('id')
+      .select('id, is_published, image_url, thumbnail_url, media')
       .eq('id', id)
       .eq('organization_id', organization.id)
-      .eq('created_by', authData.user.id)
+      .eq('created_by', user.id)
       .maybeSingle();
 
     if (fetchError) {
@@ -137,13 +146,40 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     };
 
+    // 公開時のファイルスキャンバリデーション
+    const isBecomingPublished =
+      (updateData.is_published === true && existingService.is_published !== true);
+
+    if (isBecomingPublished) {
+      // 更新データと既存データを合わせて画像URLを抽出
+      const mergedData = { ...existingService, ...updateData };
+      const imageUrls = extractImageUrlsFromService(mergedData as Record<string, unknown>);
+
+      if (imageUrls.length > 0) {
+        const scanResult = await validateFilesForPublish(supabase, imageUrls);
+
+        if (!scanResult.valid) {
+          logger.warn('[my/services/update] File scan validation failed for publish', {
+            userId: user.id,
+            serviceId: id,
+            failedPaths: scanResult.failedPaths,
+          });
+          return NextResponse.json({
+            error: 'ファイルのスキャンが完了していないため公開できません',
+            code: 'FILE_SCAN_VALIDATION_FAILED',
+            failedPaths: scanResult.failedPaths,
+          }, { status: 422 });
+        }
+      }
+    }
+
     // Update with RLS compliance: both organization_id and created_by filters
     const { data, error } = await supabase
       .from('services')
       .update(updateData)
       .eq('id', id)
       .eq('organization_id', organization.id)
-      .eq('created_by', authData.user.id)
+      .eq('created_by', user.id)
       .select()
       .maybeSingle();
 
@@ -178,8 +214,9 @@ export async function DELETE(
     const { id } = await params;
     const supabase = await createClient();
     
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -187,7 +224,7 @@ export async function DELETE(
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('id')
-      .eq('created_by', authData.user.id)
+      .eq('created_by', user.id)
       .maybeSingle();
 
     if (orgError || !organization) {
@@ -200,7 +237,7 @@ export async function DELETE(
       .select('id')
       .eq('id', id)
       .eq('organization_id', organization.id)
-      .eq('created_by', authData.user.id)
+      .eq('created_by', user.id)
       .maybeSingle();
 
     if (fetchError) {
@@ -220,7 +257,7 @@ export async function DELETE(
       .delete()
       .eq('id', id)
       .eq('organization_id', organization.id)
-      .eq('created_by', authData.user.id);
+      .eq('created_by', user.id);
 
     if (error) {
       return NextResponse.json(

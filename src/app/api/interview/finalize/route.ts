@@ -10,8 +10,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
+import { getSessionWithClient, getUserWithClient } from '@/lib/core/auth-state';
 import { z } from 'zod';
 import { recordContractViolationAsync, ContractViolationHelpers } from '@/lib/contract-violations';
 
@@ -50,29 +50,17 @@ interface EdgeFunctionResponse {
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
-  
+
   try {
     // ============================================
-    // 1. Next.js での認証確認 (Q19)
+    // 1. Next.js での認証確認 (Q19)（Core経由）
     // ============================================
-    
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
-      }
-    );
 
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    
-    if (authError || !session?.access_token) {
-      console.log('Authentication failed in Next.js Route', { error: authError?.message });
+    const supabase = await createClient();
+
+    const session = await getSessionWithClient(supabase);
+    if (!session?.access_token) {
+      console.log('Authentication failed in Next.js Route');
       return NextResponse.json(
         { success: false, error: 'Authentication required', code: 'UNAUTHENTICATED' },
         { status: 401 }
@@ -278,23 +266,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // 認証確認 (GETでも必要)
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
-      }
-    );
+    // 認証確認 (GETでも必要)（Core経由）
+    const supabase = await createClient();
 
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    
-    if (authError || !session) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -307,7 +283,7 @@ export async function GET(request: NextRequest) {
       .from('ai_interview_sessions')
       .select('id, status, finalized_at, finalized_by')
       .eq('id', interviewId)
-      .eq('created_by', session.user.id) // 作成者のみ参照可能
+      .eq('created_by', user.id) // 作成者のみ参照可能
       .single();
 
     if (error) {

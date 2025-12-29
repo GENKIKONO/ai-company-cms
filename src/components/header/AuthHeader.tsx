@@ -1,6 +1,7 @@
 // Server Component: 認証状態を毎回SSRで評価するヘッダー
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
+import { getUserFullWithClient } from '@/lib/core/auth-state';
 import SignOutButton from './SignOutButton';
 
 interface AuthHeaderProps {
@@ -11,9 +12,10 @@ interface AuthHeaderProps {
 export default async function AuthHeader({ currentPage, pathname }: AuthHeaderProps) {
   // サーバーサイドで認証状態を取得
   const supabase = await supabaseServer();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const user = await getUserFullWithClient(supabase);
 
-  const isAuthenticated = !error && !!user;
+  const isAuthenticated = !!user;
+  const displayName = (user?.user_metadata?.full_name as string) || user?.email || 'U';
 
   // ✅ マイページ領域のアクティブ判定強化（組織編集も含む）
   const isMyPageActive = currentPage === 'dashboard' || 
@@ -55,11 +57,11 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
                 <div className="hidden md:flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                     <span className="text-sm font-medium text-gray-700">
-                      {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
+                      {displayName.charAt(0).toUpperCase()}
                     </span>
                   </div>
                   <span className="text-sm text-gray-700 truncate max-w-[120px]">
-                    {user?.user_metadata?.full_name || user?.email}
+                    {displayName}
                   </span>
                 </div>
                 <div className="hidden md:block">
@@ -71,13 +73,13 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
                   <details className="group">
                     <summary className="focus-clean flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300">
                       <span className="text-sm font-medium text-gray-700">
-                        {(user?.user_metadata?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
+                        {displayName.charAt(0).toUpperCase()}
                       </span>
                     </summary>
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                       <div className="py-1">
                         <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
-                          {user?.user_metadata?.full_name || user?.email}
+                          {displayName}
                         </div>
                         <div className="px-4 py-2">
                           <SignOutButton />

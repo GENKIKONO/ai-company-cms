@@ -1,13 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DashboardPageShell } from '@/components/dashboard';
+import {
+  DashboardCard,
+  DashboardCardHeader,
+  DashboardCardContent,
+  DashboardCardFooter,
+  DashboardButton,
+  DashboardInput,
+  DashboardTextarea,
+  DashboardAlert,
+} from '@/components/dashboard/ui';
 
 interface CheckoutRequest {
   organization_id: string;
@@ -17,6 +21,14 @@ interface CheckoutRequest {
 }
 
 export default function CheckoutSessionManager() {
+  return (
+    <DashboardPageShell title="チェックアウト管理" requiredRole="admin">
+      <CheckoutSessionManagerContent />
+    </DashboardPageShell>
+  );
+}
+
+function CheckoutSessionManagerContent() {
   const [formData, setFormData] = useState<CheckoutRequest>({
     organization_id: '',
     setup_fee_amount: 50000, // Default 50,000 JPY
@@ -73,98 +85,101 @@ export default function CheckoutSessionManager() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Checkout Session</CardTitle>
-          <CardDescription>
+      <DashboardCard>
+        <DashboardCardHeader>
+          <h2 className="text-xl font-semibold">Create Checkout Session</h2>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
             Generate a Stripe checkout session with optional setup fee
-          </CardDescription>
-        </CardHeader>
+          </p>
+        </DashboardCardHeader>
 
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-6">
+          <DashboardCardContent className="space-y-6">
             {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
+              <DashboardAlert variant="error">
+                {error}
+              </DashboardAlert>
             )}
 
             {success && (
-              <Alert>
-                <AlertDescription>{success}</AlertDescription>
-              </Alert>
+              <DashboardAlert variant="success">
+                {success}
+              </DashboardAlert>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="organization_id">Organization ID</Label>
-              <Input
-                id="organization_id"
-                type="text"
-                value={formData.organization_id}
-                onChange={(e) => setFormData(prev => ({ ...prev, organization_id: e.target.value }))}
-                placeholder="Enter organization UUID"
-                required
-              />
-            </div>
+            <DashboardInput
+              id="organization_id"
+              label="Organization ID"
+              type="text"
+              value={formData.organization_id}
+              onChange={(e) => setFormData(prev => ({ ...prev, organization_id: e.target.value }))}
+              placeholder="Enter organization UUID"
+              required
+            />
 
             <div className="space-y-4">
-              <Label>Plan Type</Label>
-              <RadioGroup
-                value={formData.plan_type}
-                onValueChange={(value) => 
-                  setFormData(prev => ({ ...prev, plan_type: value as 'with_setup' | 'monthly_only' }))
-                }
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="with_setup" id="with_setup" />
-                  <Label htmlFor="with_setup" className="cursor-pointer">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)]">
+                Plan Type
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="plan_type"
+                    value="with_setup"
+                    checked={formData.plan_type === 'with_setup'}
+                    onChange={(e) => setFormData(prev => ({ ...prev, plan_type: e.target.value as 'with_setup' | 'monthly_only' }))}
+                    className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)]"
+                  />
+                  <span className="text-sm text-[var(--color-text-primary)]">
                     Setup Fee + Monthly Subscription
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="monthly_only" id="monthly_only" />
-                  <Label htmlFor="monthly_only" className="cursor-pointer">
+                  </span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="plan_type"
+                    value="monthly_only"
+                    checked={formData.plan_type === 'monthly_only'}
+                    onChange={(e) => setFormData(prev => ({ ...prev, plan_type: e.target.value as 'with_setup' | 'monthly_only' }))}
+                    className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)]"
+                  />
+                  <span className="text-sm text-[var(--color-text-primary)]">
                     Monthly Subscription Only
-                  </Label>
-                </div>
-              </RadioGroup>
+                  </span>
+                </label>
+              </div>
             </div>
 
             {formData.plan_type === 'with_setup' && (
-              <div className="space-y-2">
-                <Label htmlFor="setup_fee">Setup Fee Amount (JPY)</Label>
-                <Input
-                  id="setup_fee"
-                  type="number"
-                  min="1000"
-                  step="1000"
-                  value={formData.setup_fee_amount}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    setup_fee_amount: parseInt(e.target.value) || 0 
-                  }))}
-                  required
-                />
-                <p className="text-sm text-gray-500">
-                  Preview: {formatCurrency(formData.setup_fee_amount)}
-                </p>
-              </div>
+              <DashboardInput
+                id="setup_fee"
+                label="Setup Fee Amount (JPY)"
+                type="number"
+                min={1000}
+                step={1000}
+                value={formData.setup_fee_amount}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  setup_fee_amount: parseInt(e.target.value) || 0
+                }))}
+                description={`Preview: ${formatCurrency(formData.setup_fee_amount)}`}
+                required
+              />
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes (Optional)</Label>
-              <Textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="Add any notes about this subscription..."
-                rows={3}
-              />
-            </div>
+            <DashboardTextarea
+              id="notes"
+              label="Notes (Optional)"
+              value={formData.notes}
+              onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+              placeholder="Add any notes about this subscription..."
+              rows={3}
+            />
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-medium text-gray-900 mb-2">Checkout Summary</h4>
-              <div className="space-y-1 text-sm text-gray-600">
+            <div className="bg-[var(--color-surface-secondary)] p-4 rounded-lg">
+              <h4 className="font-medium text-[var(--color-text-primary)] mb-2">Checkout Summary</h4>
+              <div className="space-y-1 text-sm text-[var(--color-text-secondary)]">
                 {formData.plan_type === 'with_setup' && (
                   <div className="flex justify-between">
                     <span>Setup Fee:</span>
@@ -176,26 +191,27 @@ export default function CheckoutSessionManager() {
                   <span>¥10,000 /month</span>
                 </div>
                 {formData.plan_type === 'with_setup' && (
-                  <div className="flex justify-between font-medium border-t pt-1">
+                  <div className="flex justify-between font-medium border-t border-[var(--color-border)] pt-1">
                     <span>First Payment:</span>
                     <span>{formatCurrency(formData.setup_fee_amount + 10000)}</span>
                   </div>
                 )}
               </div>
             </div>
-          </CardContent>
+          </DashboardCardContent>
 
-          <CardFooter>
-            <Button 
-              type="submit" 
+          <DashboardCardFooter>
+            <DashboardButton
+              type="submit"
               disabled={loading || !formData.organization_id}
+              variant="primary"
               className="w-full"
             >
               {loading ? 'Creating...' : 'Create Checkout Session'}
-            </Button>
-          </CardFooter>
+            </DashboardButton>
+          </DashboardCardFooter>
         </form>
-      </Card>
+      </DashboardCard>
     </div>
   );
 }

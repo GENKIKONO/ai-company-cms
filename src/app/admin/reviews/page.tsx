@@ -192,7 +192,7 @@ export default function AdminReviewsPage() {
                   <div className="flex items-center gap-2">
                     {getStatusBadge(org.status)}
                     {org.verified && (
-                      <Badge variant="default" className="bg-blue-100 text-blue-800">
+                      <Badge variant="default" className="bg-[var(--aio-info-muted)] text-[var(--aio-info)]">
                         認証済み
                       </Badge>
                     )}

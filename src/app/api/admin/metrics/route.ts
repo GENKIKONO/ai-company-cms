@@ -7,32 +7,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
+import { getUserFullWithClient } from '@/lib/core/auth-state';
 import type { AdminMetricsResponse, MetricsApiParams } from '@/types/admin-metrics';
 
 export async function GET(request: NextRequest) {
   try {
     // ============================================
-    // 1. 認証確認（Super Admin限定）
+    // 1. 認証確認（Super Admin限定）（Core経由）
     // ============================================
-    
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
-      }
-    );
 
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    
-    if (authError || !session) {
+    const supabase = await createClient();
+
+    const user = await getUserFullWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -40,10 +28,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Super Admin権限チェック
-    const { data: user } = await supabase.auth.getUser();
-    const userRole = user.user?.user_metadata?.role || 
-                     user.user?.app_metadata?.role;
-    
+    const userRole = (user.user_metadata?.role as string) ||
+                     (user.app_metadata?.role as string) ||
+                     user.app_role;
+
     if (userRole !== 'super_admin') {
       return NextResponse.json(
         { error: 'Super admin privileges required' },
@@ -63,7 +51,7 @@ export async function GET(request: NextRequest) {
     if (orgId && orgId !== 'all') {
       // 特定組織を指定している場合は、その組織へのアクセス権限をチェック
       // 現在はSuper Adminなので全組織アクセス可能だが、将来の拡張性のため記載
-      console.debug('Organization-specific metrics request:', { orgId, user_id: user.user?.id });
+      console.debug('Organization-specific metrics request:', { orgId, user_id: user.id });
     }
 
     // ============================================

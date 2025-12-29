@@ -2,27 +2,29 @@
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Q&A Stats Page - 新アーキテクチャ版
+ */
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  HIGCard,
-  HIGCardHeader,
-  HIGCardTitle,
-  HIGCardContent,
-  HIGCardGrid
-} from '@/components/ui/HIGCard';
-import { HIGButton } from '@/components/ui/HIGButton';
+import { DashboardPageShell } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardHeader,
+  DashboardCardContent,
+  DashboardButton,
+} from '@/components/dashboard/ui';
 import { logger } from '@/lib/utils/logger';
-import { 
-  BarChart3, 
-  Download, 
-  Eye, 
+import {
+  BarChart3,
+  Download,
+  Eye,
   MessageSquare,
-  Calendar,
   RefreshCw,
   FileText,
   Filter,
   TrendingUp,
-  Users,
   Hash,
   Building
 } from 'lucide-react';
@@ -34,6 +36,17 @@ import {
 } from '@/lib/qna-stats';
 
 export default function CompanyQAStatsPage() {
+  return (
+    <DashboardPageShell
+      title="Q&A統計分析"
+      requiredRole="viewer"
+    >
+      <QAStatsContent />
+    </DashboardPageShell>
+  );
+}
+
+function QAStatsContent() {
   // State管理
   const [stats, setStats] = useState<QAStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -153,17 +166,17 @@ export default function CompanyQAStatsPage() {
   // ローディング状態
   if (loading) {
     return (
-      <div className=" p-6">
+      <div className="p-6">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse space-y-6">
             <div className="h-10 bg-[var(--color-background-secondary)] rounded w-1/3"></div>
-            <HIGCardGrid columns={3} gap="lg">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[...Array(3)].map((_, i) => (
-                <HIGCard key={i} className="h-32">
-                  <div className="h-full bg-[var(--color-background-secondary)] rounded"></div>
-                </HIGCard>
+                <DashboardCard key={i}>
+                  <div className="h-32 bg-[var(--color-background-secondary)] rounded"></div>
+                </DashboardCard>
               ))}
-            </HIGCardGrid>
+            </div>
             <div className="h-96 bg-[var(--color-background-secondary)] rounded"></div>
           </div>
         </div>
@@ -172,9 +185,9 @@ export default function CompanyQAStatsPage() {
   }
 
   return (
-    <div className=" p-6">
+    <div className="p-6">
       <div className="max-w-7xl mx-auto space-y-8">
-        
+
         {/* ヘッダー */}
         <div className="flex items-center justify-between">
           <div>
@@ -187,26 +200,26 @@ export default function CompanyQAStatsPage() {
             </p>
           </div>
           <div className="flex gap-3">
-            <HIGButton
+            <DashboardButton
               variant="secondary"
-              leftIcon={<RefreshCw className="h-4 w-4" />}
               onClick={loadStats}
               loading={loading}
             >
+              <RefreshCw className="h-4 w-4 mr-2" />
               更新
-            </HIGButton>
+            </DashboardButton>
           </div>
         </div>
 
         {/* フィルター */}
-        <HIGCard>
-          <HIGCardHeader>
-            <HIGCardTitle level={2}>
+        <DashboardCard>
+          <DashboardCardHeader>
+            <h2 className="text-lg font-semibold">
               <Filter className="h-5 w-5 inline mr-2" />
               期間フィルター
-            </HIGCardTitle>
-          </HIGCardHeader>
-          <HIGCardContent>
+            </h2>
+          </DashboardCardHeader>
+          <DashboardCardContent>
             <div className="space-y-4">
               {/* プリセット期間 */}
               <div>
@@ -215,7 +228,7 @@ export default function CompanyQAStatsPage() {
                 </label>
                 <div className="flex gap-2">
                   {(['7d', '30d', '90d'] as const).map((preset) => (
-                    <HIGButton
+                    <DashboardButton
                       key={preset}
                       variant={selectedPreset === preset ? 'primary' : 'secondary'}
                       size="sm"
@@ -224,7 +237,7 @@ export default function CompanyQAStatsPage() {
                       {preset === '7d' && '過去7日間'}
                       {preset === '30d' && '過去30日間'}
                       {preset === '90d' && '過去90日間'}
-                    </HIGButton>
+                    </DashboardButton>
                   ))}
                 </div>
               </div>
@@ -239,7 +252,7 @@ export default function CompanyQAStatsPage() {
                     type="date"
                     value={filters.from || ''}
                     onChange={(e) => handleCustomDateChange('from', e.target.value)}
-                    className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg 
+                    className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg
                              bg-[var(--color-background)] text-[var(--color-text-primary)]
                              focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                   />
@@ -252,31 +265,31 @@ export default function CompanyQAStatsPage() {
                     type="date"
                     value={filters.to || ''}
                     onChange={(e) => handleCustomDateChange('to', e.target.value)}
-                    className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg 
+                    className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg
                              bg-[var(--color-background)] text-[var(--color-text-primary)]
                              focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                   />
                 </div>
               </div>
             </div>
-          </HIGCardContent>
-        </HIGCard>
+          </DashboardCardContent>
+        </DashboardCard>
 
         {/* エラー表示 */}
         {error && (
-          <HIGCard variant="filled" className="border-l-4 border-l-[var(--color-error)]">
-            <HIGCardContent>
+          <DashboardCard className="border-l-4 border-l-[var(--color-error)]">
+            <DashboardCardContent>
               <p className="text-[var(--color-error)]">{error}</p>
-            </HIGCardContent>
-          </HIGCard>
+            </DashboardCardContent>
+          </DashboardCard>
         )}
 
         {stats && (
           <>
             {/* KPI カード */}
-            <HIGCardGrid columns={3} gap="lg">
-              <HIGCard variant="elevated">
-                <HIGCardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <DashboardCard>
+                <DashboardCardContent>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="hig-text-caption text-[var(--color-text-secondary)]">総閲覧数</p>
@@ -289,11 +302,11 @@ export default function CompanyQAStatsPage() {
                     </div>
                     <Eye className="h-8 w-8 text-[var(--color-primary)] opacity-60" />
                   </div>
-                </HIGCardContent>
-              </HIGCard>
+                </DashboardCardContent>
+              </DashboardCard>
 
-              <HIGCard variant="elevated">
-                <HIGCardContent>
+              <DashboardCard>
+                <DashboardCardContent>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="hig-text-caption text-[var(--color-text-secondary)]">対象Q&A数</p>
@@ -306,16 +319,16 @@ export default function CompanyQAStatsPage() {
                     </div>
                     <Hash className="h-8 w-8 text-[var(--color-secondary)] opacity-60" />
                   </div>
-                </HIGCardContent>
-              </HIGCard>
+                </DashboardCardContent>
+              </DashboardCard>
 
-              <HIGCard variant="elevated">
-                <HIGCardContent>
+              <DashboardCard>
+                <DashboardCardContent>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="hig-text-caption text-[var(--color-text-secondary)]">平均閲覧数</p>
                       <p className="hig-text-h2 text-[var(--color-tertiary)] mt-1">
-                        {stats.totals.entries > 0 
+                        {stats.totals.entries > 0
                           ? (stats.totals.views / stats.totals.entries).toFixed(1)
                           : '0.0'
                         }
@@ -326,56 +339,56 @@ export default function CompanyQAStatsPage() {
                     </div>
                     <TrendingUp className="h-8 w-8 text-[var(--color-tertiary)] opacity-60" />
                   </div>
-                </HIGCardContent>
-              </HIGCard>
-            </HIGCardGrid>
+                </DashboardCardContent>
+              </DashboardCard>
+            </div>
 
             {/* CSVエクスポート */}
-            <HIGCard>
-              <HIGCardHeader>
-                <HIGCardTitle level={2}>
+            <DashboardCard>
+              <DashboardCardHeader>
+                <h2 className="text-lg font-semibold">
                   <Download className="h-5 w-5 inline mr-2" />
                   データエクスポート
-                </HIGCardTitle>
-              </HIGCardHeader>
-              <HIGCardContent>
+                </h2>
+              </DashboardCardHeader>
+              <DashboardCardContent>
                 <div className="flex flex-wrap gap-4">
-                  <HIGButton
+                  <DashboardButton
                     variant="secondary"
-                    leftIcon={<FileText className="h-4 w-4" />}
                     onClick={() => handleExport('daily')}
                     loading={exporting === 'daily'}
                     disabled={!!exporting}
                   >
+                    <FileText className="h-4 w-4 mr-2" />
                     日別統計をCSVでエクスポート
-                  </HIGButton>
-                  
-                  <HIGButton
+                  </DashboardButton>
+
+                  <DashboardButton
                     variant="secondary"
-                    leftIcon={<FileText className="h-4 w-4" />}
                     onClick={() => handleExport('byQNA')}
                     loading={exporting === 'byQNA'}
                     disabled={!!exporting}
                   >
+                    <FileText className="h-4 w-4 mr-2" />
                     Q&A別統計をCSVでエクスポート
-                  </HIGButton>
+                  </DashboardButton>
                 </div>
                 <p className="hig-text-caption text-[var(--color-text-secondary)] mt-3">
                   ※ あなたの企業のQ&Aデータのみエクスポートされます
                 </p>
-              </HIGCardContent>
-            </HIGCard>
+              </DashboardCardContent>
+            </DashboardCard>
 
             {/* 人気Q&Aランキング */}
             {stats.topEntries.length > 0 && (
-              <HIGCard>
-                <HIGCardHeader>
-                  <HIGCardTitle level={2}>
+              <DashboardCard>
+                <DashboardCardHeader>
+                  <h2 className="text-lg font-semibold">
                     <TrendingUp className="h-5 w-5 inline mr-2" />
                     人気Q&Aランキング (TOP {stats.topEntries.length})
-                  </HIGCardTitle>
-                </HIGCardHeader>
-                <HIGCardContent>
+                  </h2>
+                </DashboardCardHeader>
+                <DashboardCardContent>
                   <div className="space-y-4">
                     {stats.topEntries.map((entry, index) => (
                       <div key={entry.qnaId} className="flex items-center gap-4 p-4 bg-[var(--color-background-secondary)] rounded-lg">
@@ -403,20 +416,20 @@ export default function CompanyQAStatsPage() {
                       </div>
                     ))}
                   </div>
-                </HIGCardContent>
-              </HIGCard>
+                </DashboardCardContent>
+              </DashboardCard>
             )}
 
             {/* Q&A別詳細統計 */}
             {stats.byQNA.length > 0 && (
-              <HIGCard>
-                <HIGCardHeader>
-                  <HIGCardTitle level={2}>
+              <DashboardCard>
+                <DashboardCardHeader>
+                  <h2 className="text-lg font-semibold">
                     <BarChart3 className="h-5 w-5 inline mr-2" />
                     Q&A別詳細統計
-                  </HIGCardTitle>
-                </HIGCardHeader>
-                <HIGCardContent>
+                  </h2>
+                </DashboardCardHeader>
+                <DashboardCardContent>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -451,14 +464,14 @@ export default function CompanyQAStatsPage() {
                       </tbody>
                     </table>
                   </div>
-                </HIGCardContent>
-              </HIGCard>
+                </DashboardCardContent>
+              </DashboardCard>
             )}
 
             {/* データが空の場合のメッセージ */}
             {stats.totals.views === 0 && (
-              <HIGCard>
-                <HIGCardContent>
+              <DashboardCard>
+                <DashboardCardContent>
                   <div className="text-center py-8">
                     <MessageSquare className="h-12 w-12 text-[var(--color-text-tertiary)] mx-auto mb-4" />
                     <h3 className="hig-text-h3 text-[var(--color-text-secondary)] mb-2">
@@ -469,8 +482,8 @@ export default function CompanyQAStatsPage() {
                       Q&Aコンテンツを充実させて、ユーザーのエンゲージメントを高めましょう。
                     </p>
                   </div>
-                </HIGCardContent>
-              </HIGCard>
+                </DashboardCardContent>
+              </DashboardCard>
             )}
           </>
         )}

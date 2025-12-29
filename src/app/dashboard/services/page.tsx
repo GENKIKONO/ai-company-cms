@@ -1,214 +1,248 @@
 'use client';
 
-import { useState, useEffect , useCallback} from 'react';
+/**
+ * Services Management Page - 新アーキテクチャ版
+ */
+
 import Link from 'next/link';
-import type { Service } from '@/types/legacy/database';;
-import PublicPageLinks from '../components/PublicPageLinks';
-import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
-import { useOrganization } from '@/lib/hooks/useOrganization';
-import { logger } from '@/lib/utils/logger';
+import { useCallback } from 'react';
+import type { Service } from '@/types/legacy/database';
+import {
+  DashboardPageShell,
+  useDashboardPageContext,
+} from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardHeader,
+  DashboardCardContent,
+  DashboardButton,
+  DashboardAlert,
+  DashboardEmptyState,
+  DashboardLoadingCard,
+  DashboardBadge,
+} from '@/components/dashboard/ui';
+import { useDashboardData, useDashboardMutation } from '@/hooks/dashboard';
+
+// =====================================================
+// ICONS
+// =====================================================
+
+const PlusIcon = () => (
+  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+  </svg>
+);
+
+const ServiceIcon = () => (
+  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+  </svg>
+);
+
+const ExternalLinkIcon = () => (
+  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+  </svg>
+);
+
+// =====================================================
+// MAIN PAGE
+// =====================================================
 
 export default function ServicesManagementPage() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  const { organization, isLoading: orgLoading, error: orgError } = useOrganization();
-  const organizationId = organization?.id || '';
+  return (
+    <DashboardPageShell
+      title="サービス管理"
+      requiredRole="viewer"
+      loadingSkeleton={<ListLoadingSkeleton />}
+    >
+      <ServicesContent />
+    </DashboardPageShell>
+  );
+}
 
-  const fetchServices = useCallback(async () => {
-    if (!organizationId || orgLoading) return;
-    
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/my/services?organizationId=${organizationId}`, {
-        cache: 'no-store'
-      });
-      
-      if (!response.ok) {
-        setError(`HTTP ${response.status}: ${response.statusText}`);
-        return;
-      }
-      
-      const result = await response.json().catch(() => ({}));
-      setServices(result.data || []);
-      setError(null);
-    } catch (err) {
-      logger.error('Failed to fetch services:', { data: err });
-      setError(err instanceof Error ? err.message : 'Failed to fetch services');
-    } finally {
-      setLoading(false);
-    }
-  }, [organizationId, orgLoading]);
+// =====================================================
+// CONTENT
+// =====================================================
 
-  useEffect(() => {
-    if (organizationId && !orgLoading) {
-      fetchServices();
-    }
-  }, [organizationId, orgLoading, fetchServices]);
+function ServicesContent() {
+  const { organizationId, organization, userRole } = useDashboardPageContext();
 
-  useEffect(() => {
-    if (orgError) {
-      setError('組織情報の取得に失敗しました');
-    }
-  }, [orgError]);
+  const {
+    data: services,
+    isLoading,
+    error: fetchError,
+    isEmpty,
+    totalCount,
+    refresh,
+  } = useDashboardData<Service>('services', {
+    organizationId: organizationId || undefined,
+    userRole,
+  });
+
+  const {
+    remove,
+    isDeleting,
+    error: mutationError,
+    canDelete,
+    clearError,
+  } = useDashboardMutation('services', {
+    organizationId: organizationId || undefined,
+    userRole,
+    onSuccess: () => refresh(),
+  });
 
   const handleDelete = useCallback(async (id: string) => {
     if (!confirm('このサービスを削除しますか？')) return;
+    await remove(id);
+  }, [remove]);
 
-    try {
-      const response = await fetch(`/api/my/services/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) {
-        alert('削除に失敗しました: HTTP ' + response.status + ': ' + response.statusText);
-        return;
-      }
-
-      setServices(services.filter(service => service.id !== id));
-    } catch (err) {
-      logger.error('Failed to delete service:', { data: err });
-      alert('削除に失敗しました: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    }
-  }, [services]);
-
-  if (loading || orgLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const error = fetchError || mutationError;
+  const publicUrl = organization?.slug ? `/o/${organization.slug}/services` : null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* ヘッダー */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">サービス管理</h1>
-            <p className="text-lg text-gray-600 mt-2">提供サービスを管理します</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <PublicPageLinks contentType="services" />
-            <Link
-              href="/dashboard/services/new"
-              className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              新しいサービス
+    <>
+      <DashboardPageHeader
+        title="サービス管理"
+        description="提供サービスを管理します"
+        backLink={{ href: '/dashboard', label: 'ダッシュボード' }}
+        actions={
+          <>
+            {publicUrl && (
+              <a href={publicUrl} target="_blank" rel="noopener noreferrer">
+                <DashboardButton variant="secondary" leftIcon={<ExternalLinkIcon />}>
+                  サービス一覧を表示
+                </DashboardButton>
+              </a>
+            )}
+            <Link href="/dashboard/services/new">
+              <DashboardButton variant="primary" leftIcon={<PlusIcon />}>
+                新しいサービス
+              </DashboardButton>
             </Link>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      {/* ナビゲーション */}
-      <DashboardBackLink />
+      {error && (
+        <DashboardAlert
+          variant="error"
+          title="エラーが発生しました"
+          description={error}
+          action={{ label: 'クリア', onClick: clearError }}
+          className="mb-6"
+        />
+      )}
 
-        {/* エラー表示 */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="flex">
-              <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* サービス一覧 */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">サービス一覧 ({services.length}件)</h2>
-          </div>
-
-          {services.length === 0 ? (
-            <div className="p-12 text-center">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <h3 className="mt-4 text-sm font-medium text-gray-900">サービスがありません</h3>
-              <p className="mt-2 text-sm text-gray-500">最初のサービスを作成してみましょう。</p>
-              <div className="mt-6">
-                <Link
-                  href="/dashboard/services/new"
-                  className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  サービスを作成
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-200">
+      {isLoading ? (
+        <ListLoadingSkeleton />
+      ) : isEmpty ? (
+        <DashboardEmptyState
+          icon={<ServiceIcon />}
+          title="サービスがありません"
+          description="最初のサービスを作成してみましょう。"
+          action={{ label: 'サービスを作成', href: '/dashboard/services/new' }}
+        />
+      ) : (
+        <DashboardCard padding="none">
+          <DashboardCardHeader className="px-6 py-4">
+            <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
+              サービス一覧 ({totalCount}件)
+            </h2>
+          </DashboardCardHeader>
+          <DashboardCardContent className="pt-0">
+            <div className="divide-y divide-[var(--dashboard-card-border)]">
               {services.map((service) => (
-                <div key={service.id} className="p-6 hover:bg-gray-50">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-medium text-gray-900 truncate">
-                        {service.name}
-                      </h3>
-                      {service.description && (
-                        <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-                          {service.description}
-                        </p>
-                      )}
-                      <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
-                        {service.category && (
-                          <span className="bg-slate-200 text-slate-800 px-2 py-1 text-xs rounded-full">
-                            {service.category}
-                          </span>
-                        )}
-                        {service.price && (
-                          <span>価格: ¥{service.price.toLocaleString()}</span>
-                        )}
-                        {service.duration_months && (
-                          <span>期間: {service.duration_months}ヶ月</span>
-                        )}
-                      </div>
-                      <div className="mt-2 text-sm text-gray-500">
-                        <span>作成: {new Date(service.created_at).toLocaleDateString()}</span>
-                        {service.updated_at !== service.created_at && (
-                          <span className="ml-4">更新: {new Date(service.updated_at).toLocaleDateString()}</span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 ml-4">
-                      <Link
-                        href={`/dashboard/services/${service.id}/edit`}
-                        className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
-                      >
-                        編集
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(service.id)}
-                        className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
-                      >
-                        削除
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <ServiceListItem
+                  key={service.id}
+                  service={service}
+                  onDelete={handleDelete}
+                  isDeleting={isDeleting}
+                  canDelete={canDelete}
+                />
               ))}
             </div>
+          </DashboardCardContent>
+        </DashboardCard>
+      )}
+    </>
+  );
+}
+
+// =====================================================
+// LIST ITEM
+// =====================================================
+
+interface ServiceListItemProps {
+  service: Service;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
+  canDelete: boolean;
+}
+
+function ServiceListItem({ service, onDelete, isDeleting, canDelete }: ServiceListItemProps) {
+  return (
+    <div className="p-6 hover:bg-[var(--aio-muted)]/50 transition-colors">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-medium text-[var(--color-text-primary)] truncate">
+            {service.name}
+          </h3>
+          {service.description && (
+            <p className="mt-1 text-sm text-[var(--color-text-secondary)] line-clamp-2">
+              {service.description}
+            </p>
+          )}
+          <div className="mt-2 flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
+            {service.category && (
+              <DashboardBadge variant="default">{service.category}</DashboardBadge>
+            )}
+            {service.price && (
+              <span>価格: ¥{service.price.toLocaleString()}</span>
+            )}
+            {service.duration_months && (
+              <span>期間: {service.duration_months}ヶ月</span>
+            )}
+          </div>
+          <div className="mt-2 text-sm text-[var(--color-text-tertiary)]">
+            <span>作成: {new Date(service.created_at).toLocaleDateString('ja-JP')}</span>
+            {service.updated_at !== service.created_at && (
+              <span className="ml-4">更新: {new Date(service.updated_at).toLocaleDateString('ja-JP')}</span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Link href={`/dashboard/services/${service.id}/edit`}>
+            <DashboardButton variant="primary" size="sm">編集</DashboardButton>
+          </Link>
+          {canDelete && (
+            <DashboardButton
+              variant="danger"
+              size="sm"
+              onClick={() => onDelete(service.id)}
+              loading={isDeleting}
+            >
+              削除
+            </DashboardButton>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// =====================================================
+// LOADING SKELETON
+// =====================================================
+
+function ListLoadingSkeleton() {
+  return (
+    <div className="space-y-4">
+      <DashboardLoadingCard lines={2} showHeader />
+      <DashboardLoadingCard lines={2} showHeader />
+      <DashboardLoadingCard lines={2} showHeader />
     </div>
   );
 }

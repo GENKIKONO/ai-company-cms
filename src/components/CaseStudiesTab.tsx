@@ -218,7 +218,7 @@ export default function CaseStudiesTab({ organizationId }: CaseStudiesTabProps) 
                   <div className="flex space-x-2 ml-4">
                     <button
                       onClick={() => handleEdit(caseStudy)}
-                      className="text-[var(--aio-primary)] hover:text-blue-900"
+                      className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
                     >
                       <PencilIcon className="h-4 w-4" />
                     </button>

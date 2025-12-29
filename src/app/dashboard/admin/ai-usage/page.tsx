@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { DashboardPageShell } from '@/components/dashboard';
 
 interface AiUsageData {
   organization_id: string;
@@ -17,6 +18,14 @@ interface AiUsageData {
 }
 
 export default function AiUsagePage() {
+  return (
+    <DashboardPageShell title="AI使用量" requiredRole="admin">
+      <AiUsageContent />
+    </DashboardPageShell>
+  );
+}
+
+function AiUsageContent() {
   const [usageData, setUsageData] = useState<AiUsageData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +83,7 @@ export default function AiUsagePage() {
           <div className="p-6" data-testid="ai-usage-list">
             {loading ? (
               <div className="text-center py-12">
-                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+                <div className="animate-spin h-8 w-8 border-4 border-[var(--aio-primary)] border-t-transparent rounded-full mx-auto"></div>
                 <p className="text-gray-500 mt-4">読み込み中...</p>
               </div>
             ) : error ? (

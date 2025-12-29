@@ -8,8 +8,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 
 interface SchemaDiffStats {
   total_diffs_24h: number;
@@ -26,25 +26,13 @@ interface SchemaDiffStats {
 export async function GET(request: NextRequest) {
   try {
     // ============================================
-    // 1. 認証確認
+    // 1. 認証確認（Core経由）
     // ============================================
-    
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
-      }
-    );
 
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    
-    if (authError || !session) {
+    const supabase = await createClient();
+
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }

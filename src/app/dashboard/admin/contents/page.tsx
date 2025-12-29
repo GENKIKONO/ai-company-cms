@@ -6,13 +6,19 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
+import Link from 'next/link';
+import { DashboardPageShell } from '@/components/dashboard';
+import {
+  DashboardCard,
+  DashboardCardContent,
+  DashboardCardHeader,
+  DashboardBadge,
+  DashboardButton,
+  DashboardLoadingState,
+  DashboardAlert,
+} from '@/components/dashboard/ui';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { getCurrentUserClient } from '@/lib/core/auth-state.client';
 import { logger } from '@/lib/utils/logger';
 import type {
   AdminContentListResponse,
@@ -154,22 +160,22 @@ function FilterBar({
       </div>
 
       {/* 更新ボタン */}
-      <Button
-        variant="outline"
+      <DashboardButton
+        variant="secondary"
         size="sm"
         onClick={onRefresh}
         disabled={isLoading}
         className="flex items-center gap-2"
       >
         {isLoading ? (
-          <LoadingSpinner className="w-3 h-3" />
+          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current" />
         ) : (
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         )}
         更新
-      </Button>
+      </DashboardButton>
     </div>
   );
 }
@@ -217,16 +223,6 @@ function ContentListItem({
     });
   };
 
-  type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
-  
-  const getStatusBadgeVariant = (status: CmsContentStatus): BadgeVariant => {
-    const variants: Record<CmsContentStatus, BadgeVariant> = {
-      draft: 'secondary',
-      published: 'default',
-      archived: 'outline'
-    };
-    return variants[status] || 'secondary';
-  };
 
   return (
     <div className="p-4 border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-background-hover)]">
@@ -236,19 +232,16 @@ function ContentListItem({
             <h4 className="hig-text-body-bold hig-jp-body truncate">
               {item.title || 'タイトルなし'}
             </h4>
-            <Badge className="text-xs">
+            <DashboardBadge variant="default" size="sm">
               {CMS_CONTENT_TYPE_LABELS[item.content_type]}
-            </Badge>
-            <Badge variant={getStatusBadgeVariant(item.status)} className="text-xs">
+            </DashboardBadge>
+            <DashboardBadge variant={item.status === 'published' ? 'success' : item.status === 'archived' ? 'warning' : 'default'} size="sm">
               {CMS_CONTENT_STATUS_LABELS[item.status]}
-            </Badge>
+            </DashboardBadge>
             {item.generation_source && item.generation_source !== 'manual' && (
-              <Badge 
-                variant="outline"
-                className={`text-xs ${getGenerationSourceBadgeColor(item.generation_source)}`}
-              >
+              <DashboardBadge variant="info" size="sm">
                 {getGenerationSourceLabel(item.generation_source)}
-              </Badge>
+              </DashboardBadge>
             )}
           </div>
           
@@ -272,20 +265,20 @@ function ContentListItem({
         </div>
 
         <div className="flex items-center gap-2 ml-4">
-          <Button
-            variant="outline"
+          <DashboardButton
+            variant="secondary"
             size="sm"
             onClick={() => onEdit(item)}
           >
             編集
-          </Button>
-          <Button
-            variant="destructive"
+          </DashboardButton>
+          <DashboardButton
+            variant="danger"
             size="sm"
             onClick={() => onDelete(item)}
           >
             削除
-          </Button>
+          </DashboardButton>
         </div>
       </div>
     </div>
@@ -296,6 +289,14 @@ function ContentListItem({
  * メインダッシュボード
  */
 export default function AdminContentsDashboard() {
+  return (
+    <DashboardPageShell title="コンテンツ管理" requiredRole="admin">
+      <AdminContentsContent />
+    </DashboardPageShell>
+  );
+}
+
+function AdminContentsContent() {
   const [organizationId, setOrganizationId] = useState<string>('');
   const [dashboardState, setDashboardState] = useState<AdminContentDashboardState>({
     selectedGroup: 'all',
@@ -318,11 +319,11 @@ export default function AdminContentsDashboard() {
     const getOrganizationId = async () => {
       try {
         const supabase = supabaseBrowser;
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getCurrentUserClient();
         
         if (user) {
           const { data: userOrg } = await supabase
-            .from('user_organizations')
+            .from('organization_members')
             .select('organization_id')
             .eq('user_id', user.id)
             .eq('role', 'owner')
@@ -527,12 +528,7 @@ export default function AdminContentsDashboard() {
     return (
       <div className="">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center py-12">
-            <LoadingSpinner />
-            <span className="ml-2 hig-text-body text-[var(--color-text-secondary)]">
-              コンテンツを読み込んでいます...
-            </span>
-          </div>
+          <DashboardLoadingState message="コンテンツを読み込んでいます..." />
         </main>
       </div>
     );
@@ -554,21 +550,24 @@ export default function AdminContentsDashboard() {
         </div>
 
         {/* ナビゲーション */}
-        <DashboardBackLink />
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4"
+        >
+          ← ダッシュボードに戻る
+        </Link>
 
         {/* エラー表示 */}
         {dashboardState.error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertDescription>
-              {dashboardState.error}
-              <button 
-                onClick={handleRefresh}
-                className="ml-2 underline hover:no-underline"
-              >
-                再試行
-              </button>
-            </AlertDescription>
-          </Alert>
+          <DashboardAlert variant="error" className="mb-6">
+            {dashboardState.error}
+            <button
+              onClick={handleRefresh}
+              className="ml-2 underline hover:no-underline"
+            >
+              再試行
+            </button>
+          </DashboardAlert>
         )}
 
         {/* メインコンテンツ */}
@@ -581,12 +580,12 @@ export default function AdminContentsDashboard() {
 
           {/* メインエリア */}
           <div className="flex-1">
-            <Card>
-              <CardHeader>
-                <CardTitle className="hig-text-h3 hig-jp-heading">
+            <DashboardCard>
+              <DashboardCardHeader>
+                <h3 className="hig-text-h3 hig-jp-heading">
                   コンテンツ一覧 ({totalItems}件)
-                </CardTitle>
-              </CardHeader>
+                </h3>
+              </DashboardCardHeader>
 
               {/* フィルタバー */}
               <FilterBar
@@ -602,7 +601,7 @@ export default function AdminContentsDashboard() {
                 onAiGeneratedFilterChange={handleAiGeneratedFilterChange}
               />
 
-              <CardContent className="p-0">
+              <DashboardCardContent className="p-0">
                 {contents.length === 0 ? (
                   <div className="p-12 text-center">
                     <div className="space-y-3">
@@ -628,22 +627,22 @@ export default function AdminContentsDashboard() {
                     {/* ページネーション */}
                     {hasMore && (
                       <div className="p-4 text-center border-t border-[var(--color-border)]">
-                        <Button
-                          variant="outline"
-                          onClick={() => setDashboardState(prev => ({ 
-                            ...prev, 
-                            currentPage: prev.currentPage + 1 
+                        <DashboardButton
+                          variant="secondary"
+                          onClick={() => setDashboardState(prev => ({
+                            ...prev,
+                            currentPage: prev.currentPage + 1
                           }))}
                           disabled={dashboardState.isLoading}
                         >
                           さらに読み込む
-                        </Button>
+                        </DashboardButton>
                       </div>
                     )}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </DashboardCardContent>
+            </DashboardCard>
           </div>
         </div>
       </main>

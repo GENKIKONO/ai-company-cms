@@ -2,17 +2,30 @@ export const dynamic = 'force-dynamic';
 
 import type { Metadata } from "next";
 import "./globals.css";
-import { UnifiedMobileNav } from "@/components/navigation/UnifiedMobileNav";
-import Footer from "@/components/layout/Footer";
-import DynamicHeader from "@/components/header/DynamicHeader";
 import { ToastProvider } from "@/components/ui/toast";
+import { UIProvider } from "@/lib/core/ui-provider";
+import { ErrorBoundary } from "@/lib/core/error-boundary";
 
 export const metadata: Metadata = {
   title: "AIO Hub",
-  description: "AIに正しく理解されるためのCMS",
-  robots: "index, follow", // AI フレンドリーなデフォルト設定
+  description: "AI-optimized CMS for enterprise visibility",
+  robots: "index, follow",
 };
 
+/**
+ * Root Layout - Providers Only
+ *
+ * This layout provides global context (UIProvider, ToastProvider, ErrorBoundary)
+ * but does NOT render any UI chrome (header/footer/nav).
+ *
+ * Layout boundaries:
+ * - (public)/ routes: Public header + footer via (public)/layout.tsx
+ * - dashboard/     : Dashboard sidebar via dashboard/layout.tsx
+ * - admin/         : Admin shell via admin/layout.tsx
+ * - account/       : User shell via account/layout.tsx
+ *
+ * See: docs/architecture/boundaries.md
+ */
 export default function RootLayout({
   children,
 }: {
@@ -21,12 +34,13 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className="min-h-dvh antialiased">
-        <ToastProvider>
-          <DynamicHeader />
-          <main className="min-h-dvh pb-0">{children}</main>
-          <Footer />
-          <UnifiedMobileNav />
-        </ToastProvider>
+        <UIProvider>
+          <ToastProvider>
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
+          </ToastProvider>
+        </UIProvider>
       </body>
     </html>
   );

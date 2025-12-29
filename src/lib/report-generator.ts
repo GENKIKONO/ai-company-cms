@@ -4,10 +4,10 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { PLAN_LIMITS, type PlanType } from '@/config/plans';
+import { type PlanType } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
-import { canUseFeatureFromOrg } from '@/lib/org-features';
 import type { MonthlyReport } from '@/types/domain/reports';
+import { getEffectiveFeatures, getFeatureEnabled, type EffectiveFeature } from '@/lib/featureGate';
 // TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
 
 type OrganizationRow = any;
@@ -17,8 +17,8 @@ interface ReportData {
     id: string;
     name: string;
     plan: PlanType;
-    // NOTE: [FEATURE_MIGRATION] 新しい正規ルート用：フル組織情報を含む
-    fullOrganization?: OrganizationRow;
+    // NOTE: [FEATUREGATE] featureGate 経由で取得した有効機能一覧
+    effectiveFeatures: EffectiveFeature[];
   };
   period: {
     year: number;
@@ -124,12 +124,23 @@ export async function collectMonthlyData(
     const aiVisibilityData = processAIVisibilityData(aiScores || []);
     const botLogsData = processBotLogsData(botLogs || []);
 
+    // NOTE: [FEATUREGATE] featureGate 経由で機能設定を取得（正本化）
+    let effectiveFeatures: EffectiveFeature[] = [];
+    try {
+      effectiveFeatures = await getEffectiveFeatures(supabase, { type: 'org', id: org.id });
+    } catch (featureError) {
+      logger.warn('Failed to get effective features, using empty array as fallback', {
+        organizationId: org.id,
+        error: featureError
+      });
+    }
+
     return {
       organization: {
         id: org.id,
         name: org.name,
         plan: (org.plan as PlanType) || 'starter',
-        fullOrganization: org
+        effectiveFeatures
       },
       period: {
         year,
@@ -225,11 +236,12 @@ function processBotLogsData(botLogs: any[]) {
 export function generateHTMLReport(data: ReportData): string {
   const { organization, period, aiVisibilityData, botLogsData } = data;
   const plan = organization.plan;
-  
-  // NOTE: [FEATURE_MIGRATION] 新しい正規ルートに移行、既存ロジック保持
-  const showAdvanced = organization.fullOrganization
-    ? canUseFeatureFromOrg(organization.fullOrganization, 'ai_reports')
-    : plan === 'pro' || plan === 'business' || plan === 'enterprise'; // 既存の後方互換性
+
+  // NOTE: [FEATUREGATE] featureGate 経由で機能判定（正本化）
+  // フォールバック: features が空の場合は plan ベースで判定
+  const showAdvanced = organization.effectiveFeatures.length > 0
+    ? getFeatureEnabled(organization.effectiveFeatures, 'ai_reports')
+    : plan === 'pro' || plan === 'business' || plan === 'enterprise';
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('ja-JP', {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
 import type { PartnerDashboardData, Partner, PartnerMetrics } from '@/lib/types/partner';
 
@@ -7,9 +8,8 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -224,9 +224,8 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

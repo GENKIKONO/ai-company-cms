@@ -306,7 +306,7 @@ export default function AdminOrgGroupsPage() {
                   <div>
                     <Link 
                       href={`/admin/org-groups/${group.id}`}
-                      className="font-medium text-blue-600 hover:text-blue-800"
+                      className="font-medium text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
                     >
                       {group.name}
                     </Link>

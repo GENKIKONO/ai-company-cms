@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { extractionRateLimit } from '@/lib/rate-limit';
 import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
 import { logger } from '@/lib/utils/logger';
@@ -23,9 +24,8 @@ export async function POST(request: NextRequest) {
 
     // 認証チェック
     const supabaseBrowser = await createClient();
-    const { data: { user }, error: authError } = await supabaseBrowser.auth.getUser();
-    
-    if (authError || !user) {
+    const user = await getUserWithClient(supabaseBrowser);
+    if (!user) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from "@/lib/supabase/server"
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireOpsAdminPage, getOpsAdminStatus } from '@/lib/ops-guard';
 import { logger } from '@/lib/utils/logger';
 
@@ -13,7 +14,7 @@ export default async function OpsVerifyPage() {
   // 管理者状態の詳細情報を取得
   const opsStatus = await getOpsAdminStatus();
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getUserWithClient(supabase);
   
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -52,11 +53,11 @@ export default async function OpsVerifyPage() {
               </p>
             </div>
             
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-blue-800 mb-2">
+            <div className="bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)] rounded-lg p-6">
+              <h2 className="text-lg font-semibold text-[var(--aio-info)] mb-2">
                 🔧 Admin Gate Status
               </h2>
-              <div className="text-blue-700 text-sm space-y-1">
+              <div className="text-[var(--aio-info)] text-sm space-y-1">
                 <div>Email: {opsStatus.adminCheck?.isAdminEmail ? '✅' : '❌'} {opsStatus.supabaseAuth?.email}</div>
                 <div>Ops Cookie: {opsStatus.opsAdmin?.isValid ? '✅' : '❌'} {opsStatus.opsAdmin?.cookieValue || 'N/A'}</div>
                 <div>Authorized: {opsStatus.overall?.isAuthorized ? '✅' : '❌'}</div>
@@ -77,7 +78,7 @@ export default async function OpsVerifyPage() {
                   <span className="text-sm text-gray-600">Signout (POST):</span>
                   <a
                     href="/auth/signout"
-                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800"
+                    className="text-xs text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
                     onClick={(e) => {
                       e.preventDefault();
                       fetch('/auth/signout', { method: 'POST', credentials: 'include' })
@@ -94,7 +95,7 @@ export default async function OpsVerifyPage() {
                     href="/api/diag/session"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800"
+                    className="text-xs text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
                   >
                     View Details
                   </a>
@@ -112,7 +113,7 @@ export default async function OpsVerifyPage() {
                     href="/api/my/organization?debug=1"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800"
+                    className="text-xs text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
                   >
                     GET ?debug=1
                   </a>
@@ -123,7 +124,7 @@ export default async function OpsVerifyPage() {
                     href="/organizations/new"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800"
+                    className="text-xs text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
                   >
                     Test UI
                   </a>
@@ -140,7 +141,7 @@ export default async function OpsVerifyPage() {
                         })
                         .catch(err => alert(`Error: ${err.message}`));
                     }}
-                    className="text-xs text-[var(--aio-primary)] hover:text-blue-800 underline"
+                    className="text-xs text-[var(--aio-primary)] hover:text-[var(--aio-primary)] underline"
                   >
                     Test API
                   </button>

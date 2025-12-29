@@ -140,7 +140,7 @@ export default function BulkTranslationPage() {
               <select
                 value={selectedOrgId}
                 onChange={(e) => setSelectedOrgId(e.target.value)}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-info)] focus:ring-[var(--aio-info)]"
               >
                 <option value="">組織を選択してください</option>
                 {organizations.map((org) => (
@@ -176,7 +176,7 @@ export default function BulkTranslationPage() {
                             setSelectedContentTypes(selectedContentTypes.filter(t => t !== type.value));
                           }
                         }}
-                        className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="mt-1 rounded border-gray-300 text-[var(--aio-info)] focus:ring-[var(--aio-info)]"
                       />
                       <div className="ml-3">
                         <div className="text-sm font-medium text-gray-900">{type.label}</div>
@@ -211,7 +211,7 @@ export default function BulkTranslationPage() {
                             setSelectedLanguages(selectedLanguages.filter(l => l !== lang.value));
                           }
                         }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 text-[var(--aio-info)] focus:ring-[var(--aio-info)]"
                       />
                       <div className="ml-3">
                         <div className="text-sm font-medium text-gray-900">
@@ -252,7 +252,7 @@ export default function BulkTranslationPage() {
               <button
                 onClick={handleBulkEnqueue}
                 disabled={loading || !selectedOrgId || selectedContentTypes.length === 0 || selectedLanguages.length === 0}
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>

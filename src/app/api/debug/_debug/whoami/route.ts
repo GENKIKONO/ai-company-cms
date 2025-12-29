@@ -1,95 +1,45 @@
-// Debug endpoint for session and organization verification
+/**
+ * Whoami診断API（委譲版）
+ *
+ * Phase 14: Auth直叩きを /api/diag/auth に集約
+ * このファイルは URL 互換のため残し、処理を委譲
+ */
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { env } from '@/lib/env';
-import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
+  // 集約先エンドポイントにリダイレクト（mode=whoami）
+  const url = new URL(request.url);
+  const baseUrl = `${url.protocol}//${url.host}`;
+  const diagUrl = `${baseUrl}/api/diag/auth?mode=whoami`;
+
   try {
-    const cookieStore = await cookies();
-    const cookieNames = cookieStore.getAll().map(c => c.name);
-    
-    const supabase = createServerClient(
-      env.SUPABASE_URL,
-      env.SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch (error) {
-              logger.warn('Debug whoami cookie set error', { data: error });
-            }
-          },
-        },
+    const response = await fetch(diagUrl, {
+      headers: {
+        'Cookie': request.headers.get('cookie') || '',
+        'User-Agent': request.headers.get('user-agent') || '',
+        'Accept': request.headers.get('accept') || 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    // 元のレスポンス形式に近づける（mode フィールドは除去）
+    const { mode, ...rest } = data;
+
+    return NextResponse.json(rest, {
+      status: response.status,
+      headers: {
+        'X-Delegated-To': '/api/diag/auth?mode=whoami'
       }
-    );
-
-    // ユーザー取得
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    // User info logged for debug purposes only in development
-    logger.debug('Whoami user check', { userId: user?.id, authError: authError?.message });
-
-    // 組織の存在確認（RLS回避のため直接クエリ）
-    let orgProbe = { found: false, id: null, created_by: null };
-    
-    if (user) {
-      try {
-        const { data: orgData, error: orgError } = await supabase
-          .from('organizations')
-          .select('id, created_by')
-          .eq('created_by', user.id)
-          .limit(1)
-          .maybeSingle();
-          
-        if (orgData) {
-          orgProbe = {
-            found: true,
-            id: orgData.id,
-            created_by: orgData.created_by
-          };
-        }
-        
-        if (orgError) {
-          logger.warn('Whoami org query error', { data: orgError });
-        }
-      } catch (error) {
-        logger.error('Whoami org probe failed', { data: error instanceof Error ? error : new Error(String(error)) });
-      }
-    }
-
-    const result = {
-      cookieNames: cookieNames.filter(name => name.startsWith('sb-')),
-      user: user ? { id: user.id, email: user.email } : null,
-      orgProbe,
-      timestamp: new Date().toISOString()
-    };
-
-    logger.debug('Whoami result', result);
-
-    return NextResponse.json(result);
-
+    });
   } catch (error) {
-    logger.error('Whoami endpoint error', { data: error instanceof Error ? error : new Error(String(error)) });
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      }, 
-      { status: 500 }
-    );
+    return NextResponse.json({
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }

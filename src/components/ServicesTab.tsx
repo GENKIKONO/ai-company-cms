@@ -302,7 +302,7 @@ export default function ServicesTab({ organizationId }: ServicesTabProps) {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => handleEdit(service)}
-                        className="text-[var(--aio-primary)] hover:text-blue-900 mr-4"
+                        className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)] mr-4"
                       >
                         <PencilIcon className="h-4 w-4" />
                       </button>

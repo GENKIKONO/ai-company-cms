@@ -67,7 +67,7 @@ export default function ReviewHistory({
       case 'request_changes':
         return <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600" />;
       case 'reopen':
-        return <ArrowPathIcon className="h-5 w-5 text-blue-600" />;
+        return <ArrowPathIcon className="h-5 w-5 text-[var(--aio-info)]" />;
       default:
         return <ClockIcon className="h-5 w-5 text-gray-600" />;
     }
@@ -112,7 +112,7 @@ export default function ReviewHistory({
       case 'pending':
         return 'text-yellow-600 bg-yellow-50';
       case 'under_review':
-        return 'text-blue-600 bg-blue-50';
+        return 'text-[var(--aio-info)] bg-[var(--aio-info-surface)]';
       default:
         return 'text-gray-600 bg-gray-50';
     }
@@ -139,7 +139,7 @@ export default function ReviewHistory({
           <p className="text-red-600 text-sm">{error}</p>
           <button
             onClick={fetchHistory}
-            className="mt-2 text-blue-600 hover:text-blue-500 text-sm font-medium"
+            className="mt-2 text-[var(--aio-primary)] hover:text-[var(--aio-primary)] text-sm font-medium"
           >
             再試行
           </button>

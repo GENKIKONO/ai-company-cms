@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { z } from 'zod';
 import { logger } from '@/lib/utils/logger';
 
@@ -15,11 +16,10 @@ const changePasswordSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
+
     // 認証状態確認
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized', message: 'ログインが必要です' },
         { status: 401 }

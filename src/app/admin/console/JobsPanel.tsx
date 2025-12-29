@@ -81,7 +81,7 @@ export default function JobsPanel({ jobs, stats, isPreview = false }: JobsPanelP
             </p>
           </div>
           {!isPreview && (
-            <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
+            <button className="px-4 py-2 text-sm font-medium text-white bg-[var(--aio-primary)] rounded hover:bg-[var(--aio-primary-hover)]">
               View All Jobs
             </button>
           )}
@@ -98,7 +98,7 @@ export default function JobsPanel({ jobs, stats, isPreview = false }: JobsPanelP
             <div className="text-xs text-gray-500">Failure</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-[var(--aio-info)]">
               {Math.round(stats.failureRate * 100)}%
             </div>
             <div className="text-xs text-gray-500">Failure Rate</div>
@@ -113,7 +113,7 @@ export default function JobsPanel({ jobs, stats, isPreview = false }: JobsPanelP
             <select 
               value={filters.jobName || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, jobName: e.target.value || undefined }))}
-              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)]"
             >
               <option value="">All Job Names</option>
               {availableJobNames.map(name => (
@@ -125,7 +125,7 @@ export default function JobsPanel({ jobs, stats, isPreview = false }: JobsPanelP
             <select 
               value={filters.status || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as 'success' | 'error' || undefined }))}
-              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)]"
             >
               <option value="">All Status</option>
               {availableStatuses.map(status => (
@@ -140,14 +140,14 @@ export default function JobsPanel({ jobs, stats, isPreview = false }: JobsPanelP
               type="date"
               value={filters.dateFrom || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value || undefined }))}
-              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)]"
               placeholder="From"
             />
             <input
               type="date"
               value={filters.dateTo || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value || undefined }))}
-              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)]"
               placeholder="To"
             />
 
@@ -239,7 +239,7 @@ export default function JobsPanel({ jobs, stats, isPreview = false }: JobsPanelP
                   <div className="flex items-center ml-4">
                     <button
                       onClick={() => setShowDetails(showDetails === job.id ? null : job.id)}
-                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                      className="text-xs text-[var(--aio-primary)] hover:text-[var(--aio-primary)] font-medium"
                     >
                       {showDetails === job.id ? 'Hide' : 'Details'}
                     </button>
@@ -253,7 +253,7 @@ export default function JobsPanel({ jobs, stats, isPreview = false }: JobsPanelP
 
       {isPreview && filteredJobs.length > 5 && (
         <div className="p-4 border-t border-gray-200 text-center">
-          <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
+          <button className="text-sm font-medium text-[var(--aio-primary)] hover:text-[var(--aio-primary)]">
             View All {filteredJobs.length} Jobs
           </button>
         </div>

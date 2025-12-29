@@ -22,12 +22,9 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const supabase = await createClient();
-    
+
     // 管理者認証チェック（テスト用に一時無効化）
-    // const { data: authData, error: authError } = await supabase.auth.getUser();
-    // if (authError || !authData.user) {
-    //   return createAuthError();
-    // }
+    // TODO: 本番環境では認証チェックを有効化すること
 
     // feature_registry 取得
     const { data: features, error: featuresError } = await supabase
@@ -78,12 +75,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
+
     // 管理者認証チェック（テスト用に一時無効化）
-    // const { data: authData, error: authError } = await supabase.auth.getUser();
-    // if (authError || !authData.user) {
-    //   return createAuthError();
-    // }
+    // TODO: 本番環境では認証チェックを有効化すること
 
     const body: FeatureManagementUpdateRequest = await request.json();
 

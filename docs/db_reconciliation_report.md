@@ -5,6 +5,10 @@
 **検証方法**: Supabaseアシスタントによる実DB確認
 **基準**: 実DBの確定情報を最優先の事実として扱う
 
+> **用語注記（2024-12-25追記）**:
+> - 本文書中の `user_organizations` は `organization_members` テーブル/Viewを指します
+> - 現行アーキテクチャは `docs/core-architecture.md` を参照
+
 ---
 
 ## A. 差分サマリー（誤→正、全件）

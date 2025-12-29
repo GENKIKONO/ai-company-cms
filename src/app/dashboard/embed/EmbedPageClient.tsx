@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect , useCallback} from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ROUTES } from '@/lib/routes';
 import { WidgetPreview } from '@/components/embed/WidgetPreview';
-import { getCurrentUser } from '@/lib/auth';
-import { HIGButton } from '@/design-system';
+import { getCurrentUserClient as getCurrentUser } from '@/lib/core/auth-state.client';
+import { DashboardPageShell } from '@/components/dashboard';
+import { DashboardButton } from '@/components/dashboard/ui';
 import { getOrganization } from '@/lib/organizations';
-import type { Organization, Service } from '@/types/legacy/database';;
+import type { Organization, Service } from '@/types/legacy/database';
 import Link from 'next/link';
-import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
 import { logger } from '@/lib/utils/logger';
 import { OrgQuotaBadge, type SimpleQuotaProps } from '@/components/quota/OrgQuotaBadge';
 
@@ -17,6 +17,14 @@ interface EmbedPageClientProps {
 }
 
 export default function EmbedPageClient({ embedsQuota }: EmbedPageClientProps) {
+  return (
+    <DashboardPageShell title="埋め込みウィジェット" requiredRole="viewer">
+      <EmbedPageContent embedsQuota={embedsQuota} />
+    </DashboardPageShell>
+  );
+}
+
+function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
@@ -256,7 +264,12 @@ export default function EmbedPageClient({ embedsQuota }: EmbedPageClientProps) {
                 企業情報をWebサイトに埋め込むためのWidgetコードを生成します
               </p>
             </div>
-            <DashboardBackLink variant="button" className="mb-0" />
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+            >
+              ← ダッシュボードに戻る
+            </Link>
           </div>
         </div>
 
@@ -424,14 +437,14 @@ export default function EmbedPageClient({ embedsQuota }: EmbedPageClientProps) {
           <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900">埋め込みコード</h2>
-              <HIGButton
+              <DashboardButton
                 onClick={copyToClipboard}
                 variant="primary"
                 size="sm"
                 disabled={isEmbedsLimitReached || isEmbedsDisabledByPlan}
               >
                 コードをコピー
-              </HIGButton>
+              </DashboardButton>
             </div>
             
             {/* Phase 4-C: Quota警告表示 */}

@@ -41,8 +41,8 @@ const iconComponents = {
 const getColorClasses = (color: string) => {
   const colors = {
     blue: {
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
+      bg: 'bg-[var(--aio-info-surface)]',
+      border: 'border-[var(--aio-info-border)]',
       icon: 'text-[var(--aio-primary)]',
       step: 'bg-[var(--aio-primary)]',
       accent: 'text-[var(--aio-primary)]'
@@ -168,7 +168,7 @@ export default function FlowSection({ title, description, steps, beforeAfter }: 
               </div>
               <div className="space-y-3">
                 {beforeAfter.after.items.map((item, index) => (
-                  <div key={index} className="bg-blue-50 rounded p-3 border-l-4 border-blue-400 font-mono text-xs sm:text-sm leading-5">
+                  <div key={index} className="bg-[var(--aio-info-surface)] rounded p-3 border-l-4 border-[var(--aio-info)] font-mono text-xs sm:text-sm leading-5">
                     {item}
                   </div>
                 ))}

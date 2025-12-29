@@ -33,7 +33,7 @@ interface MetricsResponse {
 
 const STATUS_STYLES = {
   pending: 'bg-yellow-100 text-yellow-800',
-  processing: 'bg-blue-100 text-blue-800',
+  processing: 'bg-[var(--aio-info-muted)] text-[var(--aio-info)]',
   completed: 'bg-green-100 text-green-800',
   failed: 'bg-red-100 text-red-800',
   cancelled: 'bg-gray-100 text-gray-800'
@@ -158,7 +158,7 @@ export default function EmbeddingManagementPage() {
               <button
                 onClick={handleDrainJobs}
                 disabled={drainingJobs || !hasActiveJobs}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
               >
                 <PlayIcon className="w-4 h-4 mr-2" />
                 {drainingJobs ? '処理中...' : 'バッチ処理実行'}
@@ -244,7 +244,7 @@ export default function EmbeddingManagementPage() {
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="rounded-md border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="rounded-md border-gray-300 text-sm focus:border-[var(--aio-info)] focus:ring-[var(--aio-info)]"
                 >
                   <option value="all">すべて</option>
                   <option value="pending">待機中</option>
@@ -259,7 +259,7 @@ export default function EmbeddingManagementPage() {
                 <select
                   value={selectedTable}
                   onChange={(e) => setSelectedTable(e.target.value)}
-                  className="rounded-md border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="rounded-md border-gray-300 text-sm focus:border-[var(--aio-info)] focus:ring-[var(--aio-info)]"
                 >
                   <option value="all">すべて</option>
                   {metrics && Object.keys(metrics.jobs_by_table).map(table => (
@@ -281,7 +281,7 @@ export default function EmbeddingManagementPage() {
 
           {loading ? (
             <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)] mx-auto"></div>
               <p className="mt-2 text-sm text-gray-500">読み込み中...</p>
             </div>
           ) : (

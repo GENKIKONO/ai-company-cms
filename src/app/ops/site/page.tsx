@@ -4,6 +4,7 @@
  */
 import { redirect } from 'next/navigation';
 import { createClient } from "@/lib/supabase/server"
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { env } from '@/lib/env';
 import SiteSettingsForm from './SiteSettingsForm';
 import { logger } from '@/lib/utils/logger';
@@ -15,11 +16,11 @@ function isAdmin(userEmail?: string): boolean {
 
 export default async function SiteSettingsPage() {
   const supabase = await createClient();
-  
+
   // 認証確認
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
-  if (error || !user) {
+  const user = await getUserWithClient(supabase);
+
+  if (!user) {
     redirect('/auth/login?redirect=%2Fops%2Fsite');
   }
   

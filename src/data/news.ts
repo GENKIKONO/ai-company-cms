@@ -1,5 +1,6 @@
 // News/Announcements Data
-// 管理者編集場所: このファイルまたは将来的にSupabaseテーブル
+// 正本（Source of Truth）: このファイル（src/data/news.ts）
+// 変更はGit管理下でファイル編集→デプロイで反映
 // 日付は実際の開発日または未来ではない日付のみを使用
 
 export interface NewsItem {
@@ -42,7 +43,7 @@ export const newsData: NewsItem[] = [
 export const getCategoryStyle = (category: NewsItem['category']) => {
   switch (category) {
     case 'general':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-[var(--aio-info-muted)] text-[var(--aio-info)]';
     case 'release':
       return 'bg-green-100 text-green-800';
     case 'maintenance':

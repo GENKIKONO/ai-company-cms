@@ -1,16 +1,25 @@
 'use client';
 
-import { useState, useEffect , useCallback} from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import type { SalesMaterial } from '@/types/domain/sales';;
+import { DashboardPageShell } from '@/components/dashboard';
+import type { SalesMaterial } from '@/types/domain/sales';
 import { logger } from '@/lib/utils/logger';
 
 export default function MaterialViewPage() {
+  return (
+    <DashboardPageShell title="営業資料" requiredRole="viewer">
+      <MaterialViewContent />
+    </DashboardPageShell>
+  );
+}
+
+function MaterialViewContent() {
   const params = useParams();
   const router = useRouter();
   const materialId = params.id as string;
-  
+
   const [material, setMaterial] = useState<SalesMaterial | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -227,7 +236,7 @@ export default function MaterialViewPage() {
                   <button
                     onClick={handleDownload}
                     disabled={downloading}
-                    className="w-full bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-md inline-flex items-center justify-center"
+                    className="w-full bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] disabled:opacity-50 text-white font-medium py-3 px-4 rounded-md inline-flex items-center justify-center"
                   >
                     {downloading ? (
                       <>

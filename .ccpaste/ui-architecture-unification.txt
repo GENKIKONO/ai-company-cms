@@ -1,0 +1,310 @@
+# 全ページUI/機能アーキテクチャ統一化プロンプト
+
+## 目的
+アプリケーション全体のUI/機能を統一されたブロック（コンポーネント）で構成し、保守性・一貫性・開発効率を向上させる。
+
+---
+
+## 二領域アーキテクチャ
+
+本プロジェクトは2つの領域に分かれており、それぞれ専用のコンポーネント体系を使用する。
+
+| 領域 | パス | コンポーネント体系 |
+|------|------|-------------------|
+| Public Pages | `/`, `/pricing`, `/about` 等 | AioSection, HIGButton |
+| Dashboard | `/dashboard/**` | DashboardPageShell, DashboardCard, DashboardButton |
+
+**重要: 領域を跨いでコンポーネントを使用しない**
+
+---
+
+## Part 1: Dashboard領域の統一化
+
+### 1.1 ページシェル
+全ダッシュボードページを `DashboardPageShell` でラップ:
+```tsx
+import { DashboardPageShell } from '@/components/dashboard';
+
+export default function XxxPage() {
+  return (
+    <DashboardPageShell title="ページタイトル" requiredRole="viewer">
+      <XxxContent />
+    </DashboardPageShell>
+  );
+}
+```
+
+### 1.2 コンポーネント置き換えマッピング
+
+| 旧形式 | 新形式 |
+|--------|--------|
+| `HIGCard` | `DashboardCard` |
+| `HIGCardHeader` | `DashboardCardHeader` |
+| `HIGCardTitle` | `<h2>` or `<h3>` |
+| `HIGCardContent` | `DashboardCardContent` |
+| `HIGCardGrid` | `<div className="grid grid-cols-...">` |
+| `HIGButton` | `DashboardButton` |
+| `Card` (ShadCN) | `DashboardCard` |
+| `CardHeader` | `DashboardCardHeader` |
+| `CardTitle` | `<h2>` or `<h3>` |
+| `CardContent` | `DashboardCardContent` |
+| `Button` (ShadCN) | `DashboardButton` |
+| `Alert` (ShadCN) | `DashboardAlert` |
+
+### 1.3 Dashboardインポート形式
+```tsx
+import { DashboardPageShell, useDashboardPageContext } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardHeader,
+  DashboardCardContent,
+  DashboardButton,
+  DashboardAlert,
+  DashboardLoadingState,
+  DashboardEmptyState,
+} from '@/components/dashboard/ui';
+```
+
+### 1.4 Dashboard対象ページ一覧
+```
+src/app/dashboard/
+├── activity/
+├── admin/
+├── ai-citations/
+├── ai-reports/
+├── analytics/
+├── billing/
+├── case-studies/
+├── company/
+├── embed/
+├── faqs/
+├── help/
+├── interview/
+├── materials/
+├── my-questions/
+├── org-ai-chat/
+├── posts/
+├── qna-stats/
+├── questions/
+├── reports/
+├── services/
+├── services-info/
+├── settings/
+└── test-interview/
+```
+
+---
+
+## Part 2: Public Pages領域の統一化
+
+### 2.1 セクション構造
+公開ページは `AioSection` でセクションを構成:
+```tsx
+import { AioSection } from '@/components/sections/AioSection';
+
+<AioSection variant="hero" spacing="xl">
+  {/* Hero content */}
+</AioSection>
+
+<AioSection variant="features" spacing="lg">
+  {/* Features content */}
+</AioSection>
+```
+
+### 2.2 Public Pagesコンポーネント
+
+| 用途 | コンポーネント |
+|------|---------------|
+| セクション | `AioSection` |
+| ボタン | `HIGButton` |
+| カード | `HIGCard` |
+| ナビゲーション | `Header`, `Footer` |
+| CTA | `AioCTA` |
+
+### 2.3 Public Pages対象ページ一覧
+```
+src/app/
+├── page.tsx (トップページ)
+├── about/
+├── pricing/
+├── features/
+├── contact/
+├── privacy/
+├── terms/
+├── support/
+└── [その他公開ページ]
+```
+
+---
+
+## Part 3: 共通ルール
+
+### 3.1 色指定
+```tsx
+// NG: Tailwind直書き
+className="bg-blue-500 text-white"
+
+// OK: CSS変数使用
+className="bg-[var(--aio-primary)] text-[var(--color-text-primary)]"
+```
+
+### 3.2 アイコン配置
+```tsx
+// 旧: leftIcon prop
+<HIGButton leftIcon={<Plus />}>追加</HIGButton>
+
+// 新: 子要素として配置
+<DashboardButton><Plus className="h-4 w-4 mr-2" />追加</DashboardButton>
+```
+
+### 3.3 グリッドレイアウト
+```tsx
+// 旧: 専用コンポーネント
+<HIGCardGrid columns={4} gap="lg">
+
+// 新: Tailwind Grid
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+```
+
+### 3.4 サーバー/クライアント境界
+```tsx
+// NG: Client ComponentからServer Componentをインポート
+'use client';
+import ServerComponent from './ServerComponent'; // server-only使用
+
+// OK: Server Componentをpage.tsxで直接使用
+// page.tsx (Server Component)
+import ServerComponent from './ServerComponent';
+export default function Page() {
+  return <ServerComponent />;
+}
+```
+
+### 3.5 React Hooks ルール
+```tsx
+// NG: 条件付きHook呼び出し
+const inputId = id || React.useId();
+
+// OK: 常にHookを呼び出す
+const generatedId = React.useId();
+const inputId = id ?? generatedId;
+```
+
+---
+
+## Part 4: 機能ブロック化
+
+### 4.1 データ取得の統一
+```tsx
+// Dashboard: 統一フック使用
+import { useDashboardData, useDashboardMutation } from '@/hooks/dashboard';
+
+const { data, loading, error, refetch } = useDashboardData('posts');
+const { mutate, loading: mutating } = useDashboardMutation('posts');
+```
+
+### 4.2 データソース定義
+`src/config/data-sources.ts` でテーブル設定を一元管理:
+```tsx
+export const DATA_SOURCES = {
+  posts: {
+    table: 'posts',
+    columns: ['id', 'title', 'content', 'status', 'created_at'],
+    orderBy: { column: 'created_at', ascending: false },
+  },
+  // ...
+};
+```
+
+### 4.3 ページテンプレート
+一覧ページ用テンプレート:
+```tsx
+import { DashboardListPageTemplate } from '@/components/dashboard/templates';
+
+<DashboardListPageTemplate
+  resourceKey="posts"
+  title="記事一覧"
+  createPath="/dashboard/posts/new"
+  columns={columns}
+  renderActions={renderActions}
+/>
+```
+
+---
+
+## Part 5: 作業手順
+
+### Step 1: 現状調査
+```bash
+# 旧形式コンポーネントの使用箇所を特定
+grep -r "HIGCard\|HIGButton\|HIGCardGrid" src/app --include="*.tsx"
+grep -r "import.*from '@/components/ui/card'" src/app --include="*.tsx"
+grep -r "import.*from '@/components/ui/button'" src/app --include="*.tsx"
+```
+
+### Step 2: Dashboard領域の移行
+1. 各ページを `DashboardPageShell` でラップ
+2. 旧コンポーネントを新コンポーネントに置き換え
+3. インポート文を整理
+
+### Step 3: Public Pages領域の移行
+1. セクション構造を `AioSection` に統一
+2. ボタン・カードを適切なコンポーネントに置き換え
+3. スタイルをCSS変数に統一
+
+### Step 4: 検証
+```bash
+npm run typecheck  # 型チェック
+npm run lint       # Lintチェック
+npm run build      # ビルド確認
+```
+
+---
+
+## Part 6: 注意事項
+
+1. **領域違反禁止**
+   - DashboardでHIGButton使用 NG
+   - Public PagesでDashboardCard使用 NG
+
+2. **新規作成前に既存確認**
+   - 既存コンポーネントで対応できないか確認
+   - 新規作成が必要な場合は提案してから実装
+
+3. **インラインスタイル禁止**
+   - `style={{ color: 'red' }}` NG
+   - CSS変数またはTailwindクラス使用
+
+4. **Tailwind色直書き禁止**
+   - `bg-blue-500` NG
+   - `bg-[var(--aio-primary)]` OK
+
+---
+
+## 完了条件チェックリスト
+
+### Dashboard
+- [ ] 全ページで `DashboardPageShell` 使用
+- [ ] 旧 HIG 系コンポーネント完全削除
+- [ ] ShadCN UI直接使用を Dashboard UI に置き換え
+- [ ] データ取得を統一フックに移行
+
+### Public Pages
+- [ ] セクション構造を `AioSection` に統一
+- [ ] ボタン・カードを適切なコンポーネントに統一
+- [ ] 色指定をCSS変数に統一
+
+### 共通
+- [ ] `npm run typecheck` 通過
+- [ ] `npm run lint` 通過（警告のみ許容）
+- [ ] `npm run build` 成功
+- [ ] 全ページで表示確認
+
+---
+
+## 参照ドキュメント
+- `DESIGN_SYSTEM.md` - デザインシステム詳細
+- `docs/implementation.md` - 実装ガイドライン
+- `src/components/dashboard/ui/` - Dashboard UIコンポーネント
+- `src/config/data-sources.ts` - データソース定義

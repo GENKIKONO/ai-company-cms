@@ -5,9 +5,6 @@ import { newsData, NewsItem, getCategoryStyle, getCategoryLabel } from '@/data/n
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 
-// Note: This will be replaced with Supabase queries later
-// For now, we're using the local news data and simulating saves
-
 interface NewsFormData {
   date: string;
   category: NewsItem['category'];
@@ -49,16 +46,7 @@ export default function AdminNewsPage() {
   };
 
   const handleSave = async () => {
-    // TODO: Replace this with Supabase mutation when database is ready
-    // const { data, error } = await supabase
-    //   .from('news')
-    //   .upsert({
-    //     id: selectedNews?.id || generateId(),
-    //     ...formData,
-    //     last_modified: new Date().toISOString().split('T')[0]
-    //   });
-    
-    // For now, show a toast with instructions
+    // ニュースはファイル運用のため、編集内容をJSON形式で表示
     const newsJson = JSON.stringify({
       id: selectedNews?.id || `${formData.date}-${Date.now()}`,
       ...formData,
@@ -68,7 +56,7 @@ export default function AdminNewsPage() {
     addToast({
       type: 'info',
       title: '保存方法',
-      message: `現在はファイルベースです。以下の内容を src/data/news.ts に反映してください：\n\n${newsJson}`,
+      message: `ニュースはファイル（src/data/news.ts）で管理しています。以下の内容をファイルに反映してデプロイしてください：\n\n${newsJson}`,
       duration: 10000
     });
   };
@@ -80,7 +68,7 @@ export default function AdminNewsPage() {
         <div className="mb-8">
           <h1 className="text-title1 text-gray-900 mb-2">ニュース管理</h1>
           <p className="text-body-large text-gray-600">
-            公開サイトに表示されるお知らせ・ニュースをここで管理します。今はファイルベースで管理しています。
+            ニュースはファイル（src/data/news.ts）で管理しています。変更はGit管理下のファイル編集→デプロイで反映されます。
           </p>
         </div>
 

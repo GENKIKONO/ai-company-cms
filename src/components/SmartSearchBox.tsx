@@ -146,7 +146,7 @@ export default function SmartSearchBox({
             <button
               onClick={() => handleSearch(query)}
               disabled={!query.trim()}
-              className="p-1 text-[var(--aio-primary)] hover:text-blue-800 disabled:text-gray-400"
+              className="p-1 text-[var(--aio-primary)] hover:text-[var(--aio-primary)] disabled:text-gray-400"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -164,7 +164,7 @@ export default function SmartSearchBox({
               key={index}
               onClick={() => handleSuggestionClick(suggestion)}
               className={`w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 ${
-                index === selectedIndex ? 'bg-blue-50 text-blue-900' : 'text-gray-900'
+                index === selectedIndex ? 'bg-[var(--aio-info-surface)] text-[var(--aio-info)]' : 'text-gray-900'
               }`}
             >
               <div className="flex items-center space-x-2">
@@ -180,13 +180,13 @@ export default function SmartSearchBox({
 
       {/* クエリ解析プレビュー */}
       {query.length > 3 && (
-        <div className="absolute z-40 w-full mt-1 bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
+        <div className="absolute z-40 w-full mt-1 bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)] rounded-lg p-3 text-sm">
           <div className="flex items-start space-x-2">
             <svg className="w-4 h-4 text-[var(--aio-primary)] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p className="text-blue-900 font-medium">AI解析結果</p>
+              <p className="text-[var(--aio-info)] font-medium">AI解析結果</p>
               {(() => {
                 const parsed = smartSearchEngine.parseQuery(query);
                 const hints: string[] = [];
@@ -205,9 +205,9 @@ export default function SmartSearchBox({
                 }
                 
                 return hints.length > 0 ? (
-                  <p className="text-blue-700 text-xs mt-1">{hints.join(' | ')}</p>
+                  <p className="text-[var(--aio-info)] text-xs mt-1">{hints.join(' | ')}</p>
                 ) : (
-                  <p className="text-blue-700 text-xs mt-1">より具体的に入力すると精度が向上します</p>
+                  <p className="text-[var(--aio-info)] text-xs mt-1">より具体的に入力すると精度が向上します</p>
                 );
               })()}
             </div>

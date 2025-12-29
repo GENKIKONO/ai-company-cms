@@ -2,8 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { DashboardPageShell } from '@/components/dashboard';
 
 export default function NewCaseStudyPage() {
+  return (
+    <DashboardPageShell title="新規導入事例" requiredRole="editor">
+      <NewCaseStudyContent />
+    </DashboardPageShell>
+  );
+}
+
+function NewCaseStudyContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();

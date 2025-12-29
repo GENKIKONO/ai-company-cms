@@ -1,0 +1,43 @@
+Test started at: Sat Dec 27 04:00:49 JST 2025
+RUST_BACKTRACE: full
+
+----------------------------------------
+Test: Normal (default)
+Args: 
+
+）
+あ）い
+短い行）
+これは長い行です。全角括弧）を含む長い文字列をテストします。複数のバイト境界パターンを検証。
+）だけの行
+複数）の）括弧）を含む
+English text with ） in the middle
+Mixed: abc）def）123
+行末に括弧）
+）先頭に括弧
+タブ	）	タブ
+スペース ） スペース
+
+Result: OK (exit code 0)
+
+----------------------------------------
+Test: JSON output
+Args: --json
+
+{"type":"begin","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"}}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"）\n"},"line_number":1,"absolute_offset":0,"submatches":[{"match":{"text":"）"},"start":0,"end":3}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"あ）い\n"},"line_number":2,"absolute_offset":4,"submatches":[{"match":{"text":"）"},"start":3,"end":6}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"短い行）\n"},"line_number":3,"absolute_offset":14,"submatches":[{"match":{"text":"）"},"start":9,"end":12}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"これは長い行です。全角括弧）を含む長い文字列をテストします。複数のバイト境界パターンを検証。\n"},"line_number":4,"absolute_offset":27,"submatches":[{"match":{"text":"）"},"start":39,"end":42}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"）だけの行\n"},"line_number":5,"absolute_offset":166,"submatches":[{"match":{"text":"）"},"start":0,"end":3}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"複数）の）括弧）を含む\n"},"line_number":6,"absolute_offset":182,"submatches":[{"match":{"text":"）"},"start":6,"end":9},{"match":{"text":"）"},"start":12,"end":15},{"match":{"text":"）"},"start":21,"end":24}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"English text with ） in the middle\n"},"line_number":7,"absolute_offset":216,"submatches":[{"match":{"text":"）"},"start":18,"end":21}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"Mixed: abc）def）123\n"},"line_number":8,"absolute_offset":252,"submatches":[{"match":{"text":"）"},"start":10,"end":13},{"match":{"text":"）"},"start":16,"end":19}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"行末に括弧）\n"},"line_number":9,"absolute_offset":275,"submatches":[{"match":{"text":"）"},"start":15,"end":18}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"）先頭に括弧\n"},"line_number":10,"absolute_offset":294,"submatches":[{"match":{"text":"）"},"start":0,"end":3}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"タブ\t）\tタブ\n"},"line_number":11,"absolute_offset":313,"submatches":[{"match":{"text":"）"},"start":7,"end":10}]}}
+{"type":"match","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"lines":{"text":"スペース ） スペース\n"},"line_number":12,"absolute_offset":331,"submatches":[{"match":{"text":"）"},"start":13,"end":16}]}}
+{"type":"end","data":{"path":{"text":"/Users/kounogenki/Documents/LuxuCare株式会社/開発/scripts/repro/utf8-paren.txt"},"binary_offset":null,"stats":{"elapsed":{"secs":0,"nanos":123084,"human":"0.000123s"},"searches":1,"searches_with_match":1,"bytes_searched":361,"bytes_printed":3588,"matched_lines":12,"matches":15}}}
+{"data":{"elapsed_total":{"human":"0.001608s","nanos":1608208,"secs":0},"stats":{"bytes_printed":3588,"bytes_searched":361,"elapsed":{"human":"0.000123s","nanos":123084,"secs":0},"matched_lines":12,"matches":15,"searches":1,"searches_with_match":1}},"type":"summary"}
+
+Result: OK (exit code 0)

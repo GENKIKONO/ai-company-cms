@@ -1,59 +1,39 @@
-// src/app/api/debug/whoami/route.ts
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createServerClient } from '@supabase/ssr';
+/**
+ * Whoami診断API（委譲版）
+ *
+ * Phase 14: Auth直叩きを /api/diag/auth に集約
+ * このファイルは URL 互換のため残し、処理を委譲
+ */
 
-export async function GET() {
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  // 集約先エンドポイントにリダイレクト（mode=whoami）
+  const url = new URL(request.url);
+  const baseUrl = `${url.protocol}//${url.host}`;
+  const diagUrl = `${baseUrl}/api/diag/auth?mode=whoami`;
+
   try {
-    // 環境変数の防御的チェック
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      return NextResponse.json({
-        cookieKeys: [],
-        user: null,
-        error: 'Missing Supabase configuration'
-      }, { status: 200 });
-    }
+    const response = await fetch(diagUrl, {
+      headers: {
+        'Cookie': request.headers.get('cookie') || '',
+        'User-Agent': request.headers.get('user-agent') || '',
+        'Accept': request.headers.get('accept') || 'application/json',
+      },
+    });
 
-    const jar = await cookies();
+    const data = await response.json();
 
-    // ★ server 側の Supabase クライアントを Cookie 連携ありで作る
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          get(name: string) {
-            return jar.get(name)?.value;
-          },
-          set(name: string, value: string, options: any) {
-            // Next.js Route Handler では set/remove は try-catch で包むのが安全
-            try {
-              jar.set({ name, value, ...options });
-            } catch (_) {}
-          },
-          remove(name: string, options: any) {
-            try {
-              jar.set({ name, value: '', ...options, maxAge: 0 });
-            } catch (_) {}
-          }
-        }
+    // 元のレスポンス形式に近づける（mode フィールドは除去）
+    const { mode, ...rest } = data;
+
+    return NextResponse.json(rest, {
+      status: response.status,
+      headers: {
+        'X-Delegated-To': '/api/diag/auth?mode=whoami'
       }
-    );
-
-    const allCookieNames = jar.getAll().map((c) => c.name);
-    const sbCookies = allCookieNames.filter((n) => n.startsWith('sb-'));
-
-    const { data, error } = await supabase.auth.getUser();
-
-    return NextResponse.json({
-      cookieKeys: sbCookies,
-      user: data?.user
-        ? { id: data.user.id, email: data.user.email }
-        : null,
-      error: error?.message ?? null
     });
   } catch (error) {
-    // 例外時は JSON エラーを返す（HTML エラーを避ける）
     return NextResponse.json({
       cookieKeys: [],
       user: null,

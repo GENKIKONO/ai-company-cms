@@ -72,7 +72,7 @@ export default function SlowQueriesPanel({ queries, isPreview = false }: SlowQue
             <button 
               className={`px-4 py-2 text-sm font-medium rounded ${
                 hasData
-                  ? 'text-white bg-blue-600 hover:bg-blue-700'
+                  ? 'text-white bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)]'
                   : 'text-gray-400 bg-gray-100 cursor-not-allowed'
               }`}
               disabled={!hasData}
@@ -138,9 +138,9 @@ export default function SlowQueriesPanel({ queries, isPreview = false }: SlowQue
             </ul>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h5 className="font-medium text-blue-900 mb-2">Implementation Status:</h5>
-            <div className="text-sm text-blue-700">
+          <div className="bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)] rounded-lg p-4">
+            <h5 className="font-medium text-[var(--aio-info)] mb-2">Implementation Status:</h5>
+            <div className="text-sm text-[var(--aio-info)]">
               <div className="flex items-center mb-1">
                 <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
                 <span>pg_stat_statements setup - Pending</span>
@@ -159,7 +159,7 @@ export default function SlowQueriesPanel({ queries, isPreview = false }: SlowQue
 
         {isPreview && (
           <div className="mt-6">
-            <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
+            <button className="text-sm font-medium text-[var(--aio-primary)] hover:text-[var(--aio-primary)]">
               Learn More About Slow Query Monitoring
             </button>
           </div>
@@ -170,7 +170,7 @@ export default function SlowQueriesPanel({ queries, isPreview = false }: SlowQue
       {/* Preview モードでの「View All」ボタン */}
       {isPreview && hasData && queries.length > 3 && (
         <div className="p-4 border-t border-gray-200 text-center">
-          <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
+          <button className="text-sm font-medium text-[var(--aio-primary)] hover:text-[var(--aio-primary)]">
             View All {queries.length} Slow Queries
           </button>
         </div>

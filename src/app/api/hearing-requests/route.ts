@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
@@ -42,10 +43,9 @@ export async function POST(request: NextRequest) {
     // Supabaseクライアント初期化
     const supabase = await createClient();
 
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'UNAUTHORIZED', message: 'ログインが必要です' },
         { status: 401 }
@@ -160,10 +160,9 @@ export async function GET(request: NextRequest) {
     // Supabaseクライアント初期化
     const supabase = await createClient();
 
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'UNAUTHORIZED', message: 'ログインが必要です' },
         { status: 401 }

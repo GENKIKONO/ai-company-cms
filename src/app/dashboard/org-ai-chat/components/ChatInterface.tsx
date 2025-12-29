@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { HIGButton } from '@/design-system';
+import { DashboardButton } from '@/components/dashboard/ui';
 import { logger } from '@/lib/utils/logger';
 
 interface ChatMessage {
@@ -244,7 +244,7 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
             rows={2}
             disabled={isLoading}
           />
-          <HIGButton
+          <DashboardButton
             onClick={handleSendMessage}
             disabled={!inputValue.trim() || isLoading}
             size="sm"
@@ -254,7 +254,7 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
             ) : (
               '送信'
             )}
-          </HIGButton>
+          </DashboardButton>
         </div>
         
         <div className="mt-2 text-xs text-gray-500">

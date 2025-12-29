@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
@@ -16,10 +17,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const supabase = await createClient();
     const { id } = await params;
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const { data: userProfiles, error: profileError } = await supabase
       .from('app_users')
       .select('organization_id')
-      .eq('id', authData.user.id);
+      .eq('id', user.id);
 
     if (profileError) {
       logger.error('[my/materials/[id]] Failed to fetch user profile', { data: profileError });
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     // validateOrgAccessでメンバーシップ確認
     try {
-      await validateOrgAccess(organizationId, authData.user.id, 'read');
+      await validateOrgAccess(organizationId, user.id, 'read');
     } catch (error) {
       if (error instanceof OrgAccessError) {
         return NextResponse.json({ 

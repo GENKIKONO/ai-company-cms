@@ -1,21 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
+
     // Admin authentication check
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Admin role check
     // TODO: [SUPABASE_TYPE_FOLLOWUP] user_organizations テーブルの型定義を Supabase client に追加
     const { data: userOrg, error: orgError } = await (supabase as any)
-      .from('user_organizations')
+      .from('organization_members')
       .select('role')
       .eq('user_id', user.id)
       .single();

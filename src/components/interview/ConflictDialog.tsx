@@ -91,9 +91,9 @@ export default function ConflictDialog({ isOpen, onResolve, conflictInfo }: Conf
         </div>
 
         {/* 注意事項 */}
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-blue-800">
-            <span className="font-medium">💡 ヒント:</span> 
+        <div className="mt-4 p-3 bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)] rounded-lg">
+          <p className="text-xs text-[var(--aio-info)]">
+            <span className="font-medium">💡 ヒント:</span>
             「現在の編集を保持」を選択すると、次回の保存時に現在の内容で上書きされます。
             「最新の内容を取得」を選択すると、現在の編集内容は失われます。
           </p>

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/log';
 
 // GET - ユーザーのサービスを取得
@@ -10,9 +11,9 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       logger.debug('[my/services] Not authenticated');
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
@@ -86,9 +87,9 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    // Authentication check
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // Authentication check（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       logger.debug('[my/services] POST Not authenticated');
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }

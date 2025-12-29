@@ -16,6 +16,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client';
+import { getSessionClient } from '@/lib/core/auth-state.client';
 import type { Database } from '@/types/supabase';
 import {
   toPeriodStart,
@@ -338,13 +339,14 @@ export async function enqueueReport(params: {
 
     if (error) {
       // If RPC doesn't exist, call Edge Function directly
+      const session = await getSessionClient();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/monthly-report-generate`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+            'Authorization': `Bearer ${session?.access_token}`
           },
           body: JSON.stringify({
             organization_id: params.organizationId,
@@ -415,13 +417,14 @@ export async function requestRegenerate(params: {
 
     if (error) {
       // If RPC doesn't exist, call Edge Function with force=true
+      const session = await getSessionClient();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/monthly-report-generate`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+            'Authorization': `Bearer ${session?.access_token}`
           },
           body: JSON.stringify({
             organization_id: params.organizationId,

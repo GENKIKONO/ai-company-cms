@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { User } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
-import { auth } from '@/lib/auth';
+import { signOutClient, onAuthChangeClient, getCurrentUserClient } from '@/lib/core/auth-state.client';
 import { logger } from '@/lib/utils/logger';
 
 interface I18nSafeAuthHeaderProps {
@@ -32,7 +32,7 @@ export default function I18nSafeAuthHeader({
         logger.debug('[I18nSafeAuthHeader] Checking auth state...');
         
         // クライアント側の実際の認証状態を確認
-        const { data: { user: currentUser } } = await supabaseBrowser.auth.getUser();
+        const currentUser = await getCurrentUserClient();
         const actuallyAuthenticated = !!currentUser;
         
         logger.debug('[I18nSafeAuthHeader] Auth state check', {
@@ -55,7 +55,7 @@ export default function I18nSafeAuthHeader({
                 document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
               });
               
-              await auth.signOut();
+              await signOutClient();
               
               // ローカルストレージもクリア
               localStorage.clear();
@@ -90,18 +90,25 @@ export default function I18nSafeAuthHeader({
     
     // 初回チェック
     checkAuthState();
-    
-    // 認証状態変更のリスナー
-    const { data: { subscription } } = supabaseBrowser.auth.onAuthStateChange((event, session) => {
-      logger.debug(`[I18nSafeAuthHeader] Auth state changed: ${event}, session: ${!!session}`);
-      if (mounted) {
-        setActualAuthState(!!session);
-      }
-    });
-    
+
+    // 認証状態変更のリスナー（Core正本経由）
+    let subscription: { unsubscribe: () => void } | null = null;
+
+    const setupAuthListener = async () => {
+      const result = await onAuthChangeClient((event, session) => {
+        logger.debug(`[I18nSafeAuthHeader] Auth state changed: ${event}, session: ${!!session}`);
+        if (mounted) {
+          setActualAuthState(!!session);
+        }
+      });
+      subscription = result.data.subscription;
+    };
+
+    setupAuthListener();
+
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, [isAuthenticated, user]);
 

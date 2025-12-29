@@ -60,7 +60,7 @@ export function OrgQuotaBadge({ label, quota, className = '' }: OrgQuotaBadgePro
   const isAtLimit = effectiveLimit > 0 && usage >= effectiveLimit;
 
   // 使用状況に応じたスタイル
-  let statusClasses = 'bg-blue-50 text-blue-700 border-blue-200';
+  let statusClasses = 'bg-[var(--aio-info-surface)] text-[var(--aio-info)] border-[var(--aio-info-border)]';
   let dotClasses = 'bg-blue-400';
 
   if (isAtLimit) {

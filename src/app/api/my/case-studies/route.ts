@@ -1,9 +1,10 @@
 // Single-Org Mode API: /api/my/case-studies
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import type { CaseStudy } from '@/types/legacy/database';
 import type { CaseStudyFormData } from '@/types/domain/content';;
-import { getFeatureLimit } from '@/lib/org-features';
+import { getOrgFeatureLimit as getFeatureLimit } from '@/lib/featureGate';
 import { normalizeCaseStudyPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
@@ -25,9 +26,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -43,17 +45,17 @@ export async function GET(request: NextRequest) {
 
     // 組織アクセス権限チェック（validate_org_access RPC使用）
     try {
-      await validateOrgAccess(organizationId, authData.user.id);
+      await validateOrgAccess(organizationId, user.id);
     } catch (error) {
       if (error instanceof OrgAccessError) {
-        return NextResponse.json({ 
-          error: error.code, 
-          message: error.message 
+        return NextResponse.json({
+          error: error.code,
+          message: error.message
         }, { status: error.statusCode });
       }
-      
-      logger.error('[my/case-studies] GET Unexpected org access validation error', { 
-        userId: authData.user.id, 
+
+      logger.error('[my/case-studies] GET Unexpected org access validation error', {
+        userId: user.id,
         organizationId,
         error: error instanceof Error ? error.message : error 
       });
@@ -101,9 +103,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -120,17 +123,17 @@ export async function POST(request: NextRequest) {
     if (organizationId) {
       // organizationId が指定されている場合は、組織アクセス権限チェック（validate_org_access RPC使用）
       try {
-        await validateOrgAccess(organizationId, authData.user.id);
+        await validateOrgAccess(organizationId, user.id);
       } catch (error) {
         if (error instanceof OrgAccessError) {
-          return NextResponse.json({ 
-            error: error.code, 
-            message: error.message 
+          return NextResponse.json({
+            error: error.code,
+            message: error.message
           }, { status: error.statusCode });
         }
-        
-        logger.error('[my/case-studies] POST Unexpected org access validation error', { 
-          userId: authData.user.id, 
+
+        logger.error('[my/case-studies] POST Unexpected org access validation error', {
+          userId: user.id,
           organizationId,
           error: error instanceof Error ? error.message : error 
         });
@@ -148,10 +151,10 @@ export async function POST(request: NextRequest) {
         .maybeSingle();
 
       if (orgError || !orgData) {
-        logger.error('[my/case-studies] POST Organization data fetch failed', { 
-          userId: authData.user.id, 
+        logger.error('[my/case-studies] POST Organization data fetch failed', {
+          userId: user.id,
           organizationId,
-          error: orgError?.message 
+          error: orgError?.message
         });
         return NextResponse.json({ 
           error: 'INTERNAL_ERROR', 
@@ -165,7 +168,7 @@ export async function POST(request: NextRequest) {
       const { data: orgData, error: orgError } = await supabase
         .from('organizations')
         .select('id, plan')
-        .eq('created_by', authData.user.id)
+        .eq('created_by', user.id)
         .maybeSingle();
 
       if (orgError || !orgData) {
@@ -174,17 +177,17 @@ export async function POST(request: NextRequest) {
 
       // ユーザー所有組織への権限チェック
       try {
-        await validateOrgAccess(orgData.id, authData.user.id);
+        await validateOrgAccess(orgData.id, user.id);
       } catch (error) {
         if (error instanceof OrgAccessError) {
-          return NextResponse.json({ 
-            error: error.code, 
-            message: error.message 
+          return NextResponse.json({
+            error: error.code,
+            message: error.message
           }, { status: error.statusCode });
         }
-        
-        logger.error('[my/case-studies] POST Unexpected org access validation error (user org)', { 
-          userId: authData.user.id, 
+
+        logger.error('[my/case-studies] POST Unexpected org access validation error (user org)', {
+          userId: user.id,
           organizationId: orgData.id,
           error: error instanceof Error ? error.message : error 
         });
@@ -237,10 +240,10 @@ export async function POST(request: NextRequest) {
     // organizationId を除去したbodyデータを正規化
     const normalizedData = normalizeCaseStudyPayload(restBody);
     // RLS compliance: include both organization_id and created_by
-    const caseStudyData = { 
-      ...normalizedData, 
+    const caseStudyData = {
+      ...normalizedData,
       organization_id: targetOrgData.id,
-      created_by: authData.user.id
+      created_by: user.id
     };
 
     const { data, error } = await supabase

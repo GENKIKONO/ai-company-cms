@@ -168,7 +168,7 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
   const getScoreColor = (score: number | undefined): string => {
     if (score === undefined || score === null) return 'text-gray-400';
     if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-blue-600';
+    if (score >= 60) return 'text-[var(--aio-info)]';
     if (score >= 40) return 'text-yellow-600';
     return 'text-red-600';
   };
@@ -176,7 +176,7 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
   const getScoreBgColor = (score: number | undefined): string => {
     if (score === undefined || score === null) return 'bg-gray-100';
     if (score >= 80) return 'bg-green-100';
-    if (score >= 60) return 'bg-blue-100';
+    if (score >= 60) return 'bg-[var(--aio-muted)]';
     if (score >= 40) return 'bg-yellow-100';
     return 'bg-red-100';
   };
@@ -266,9 +266,9 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
             {/* プラン制限メッセージ */}
             {!showAdvancedFeatures && (
               <div className="border-t border-gray-100 pt-4">
-                <div className="bg-blue-50 rounded-lg p-3 text-sm">
-                  <p className="text-blue-800 font-medium mb-1">詳細分析を利用するには</p>
-                  <p className="text-blue-600">Proプラン以上で、AI×SEO相関分析やトレンド分析などの高度な機能をご利用いただけます。</p>
+                <div className="bg-[var(--aio-muted)] rounded-lg p-3 text-sm">
+                  <p className="text-[var(--aio-primary)] font-medium mb-1">詳細分析を利用するには</p>
+                  <p className="text-[var(--aio-primary)]">Proプラン以上で、AI×SEO相関分析やトレンド分析などの高度な機能をご利用いただけます。</p>
                 </div>
               </div>
             )}

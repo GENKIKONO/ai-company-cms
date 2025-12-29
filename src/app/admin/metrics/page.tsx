@@ -68,7 +68,7 @@ export default async function AdminMetricsPage({ searchParams }: MetricsPageProp
           {/* Footer Note */}
           <div className="mt-12 text-center text-sm text-gray-500">
             <p>All metrics are calculated in UTC timezone. Data updates weekly.</p>
-            <p>For real-time alerts, refer to the <a href="/admin/console" className="text-blue-600 hover:underline">Admin Console</a>.</p>
+            <p>For real-time alerts, refer to the <a href="/admin/console" className="text-[var(--aio-primary)] hover:underline">Admin Console</a>.</p>
           </div>
         </div>
       </div>

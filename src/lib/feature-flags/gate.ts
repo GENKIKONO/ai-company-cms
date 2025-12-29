@@ -1,6 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
 import { vLog, vErr } from '@/lib/utils/logger';
-import { canUseFeature } from '@/lib/org-features';
+import { createClient } from '@/lib/supabase/server';
+import { getEffectiveFeatures, getFeatureEnabled } from '@/lib/featureGate';
 
 export type FeatureKey = 'monitoring' | 'business_matching_beta' | 'advanced_embed' | 'service_gallery' | 'service_video';
 
@@ -47,7 +47,9 @@ export async function hasEntitlement(orgId: string, key: FeatureKey): Promise<bo
     }
 
     // Use effective-features for feature check (DB-driven with fallbacks)
-    const hasAccess = await canUseFeature(orgId, mappedFeatureKey);
+    const supabase = await createClient();
+    const features = await getEffectiveFeatures(supabase, { type: 'org', id: orgId });
+    const hasAccess = getFeatureEnabled(features, mappedFeatureKey);
     
     vLog('[Gate]', { 
       orgId, 

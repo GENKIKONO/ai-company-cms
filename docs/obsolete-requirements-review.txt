@@ -1,0 +1,222 @@
+=============================================================================
+要件定義 廃止・修正対象箇所レビュー
+=============================================================================
+作成日: 2024-12-25
+目的: 新DB正アーキテクチャ(4領域/Subject統一)導入に伴い、
+      旧要件定義で不整合となる箇所を洗い出し、精査・削除を検討する
+
+★ = 削除候補
+◆ = 修正必須
+○ = 要確認
+
+=============================================================================
+【1】セルフサーブ＋代理店併存モデル（大幅見直し対象）
+=============================================================================
+旧概念: "セルフサーブモード（1ユーザー=1組織）" と "代理店モード（partnerロール）"
+新概念: Subject統一（org主体 / user主体）、領域別アクセス制御
+
+★ docs/requirements_overview.md
+  - L9: "セルフサーブ＋代理店併存モデル"
+  - L11: "セルフサーブモード（1ユーザー=1組織）"
+  - L16: "代理店モード（partner ロール）"
+  - L47-48: "セルフサーブ：created_by 1:1 保護" / "代理店：partner ロールでの適切な権限分離"
+  → 4領域アーキテクチャ + Subject統一に書き換え必要
+
+★ docs/requirements_business.md
+  - L6: "セルフサーブと代理店の両導線"
+  - L10-30: "セルフサーブユーザー" / "代理店ユーザー（partner ロール）" セクション全体
+  - L42: "セルフサーブフロー" セクション
+  - L98-99: "RLS適用: セルフサーブはcreated_by 1:1、代理店はpartner権限"
+  → Subject + 領域ベースの記述に刷新
+
+★ docs/requirements_changelog.md
+  - L6: "セルフサーブ＋代理店併存モデルへの移行"
+  - L15-20: 変更比較表（セルフサーブ関連すべて）
+  - L28: "セルフサーブの1:1保護"
+  - L38-39: "B2B2C前提 → セルフサーブ導入により不要"
+  - L47-99: セルフサーブ関連の変更点すべて
+  → 履歴として残すか、新要件で置き換えるか判断
+
+★ docs/migrations_plan.md
+  - L6: "セルフサーブ＋代理店併存モデルに移行"
+  - L34: "セルフサーブ対応のスキーマ拡張"
+  - L70-79: "セルフサーブポリシー" SQL
+  - L175-207: セルフサーブ課金関連
+  - L260-261: "セルフサーブ機能リリース"
+  → マイグレーション計画自体が旧アーキテクチャ前提
+
+★ docs/requirements_system.md
+  - L539: "セルフサーブモード（1ユーザー=1組織）"
+  - L547-550: "partner_organizations_policy" SQL
+  - L564: "セルフサーブ専用API"
+  - L615: "フロー判定（self_serve / partner / admin）"
+  - L645: "requirePartnerAccess()" 関数
+  → 既に更新済みだが、残存するセルフサーブ記述を確認
+
+=============================================================================
+【2】user_organizations テーブル参照（organization_members に統一）
+=============================================================================
+旧概念: user_organizations（View）
+新概念: organization_members テーブルを直接参照
+
+◆ docs/inventory_code_side.txt
+  - L63, L468, L649, L861: user_organizations 参照
+  → organization_members に用語統一
+
+◆ docs/db-frontend-inventory-2024-12.txt
+  - L113: "user_organizations: 16箇所で参照"
+  - L117: "user_organizations: admin/cms, test files, ai/group-context"
+  - L146: user_organizations参照
+  - L384: "organization_members と user_organizations は同じテーブルですか？"
+  → 統一後の棚卸し更新
+
+◆ docs/dashboard-architecture-reform-2024-12.md
+  - L35, L42, L61: user_organizations クエリ例
+  - L140, L147-158: user_organizations RLSポリシー例
+  - L178, L225, L230, L234: user_organizations 参照
+  → organization_members に書き換え
+
+◆ docs/realtime-cms-integration.md
+  - L97: user_organizations クエリ
+  → organization_members に修正
+
+◆ docs/db_reconciliation_report.md
+  - L68, L121: user_organizations View記述
+  → 現状との整合性確認
+
+◆ docs/backend/Supabase_Operations_Architecture_AIOHub.md
+  - L86: user_organizations テーブル定義
+  → organization_members に統一
+
+=============================================================================
+【3】orgId?: string | null パラメータ（Subject型に統一）
+=============================================================================
+旧概念: orgId? パラメータで曖昧にorg/user切り替え
+新概念: Subject型 { type: 'org' | 'user', id: string } で明示的に指定
+
+◆ docs/plans-architecture.md
+  - L238-241: "orgId?: string | null" パラメータ説明
+  → Subject型パラメータに更新
+
+○ src/lib/billing/index.ts
+  - L173, L216, L250, L298, L321, L346: orgId? パラメータ
+  → コード側は後方互換のため残す可能性あり（要検討）
+
+○ src/lib/featureGate.ts
+  - L81, L91, L95, L130, L200, L269 他多数: orgId? パラメータ
+  → 既に Subject ベース API 追加済み、レガシーは段階的移行
+
+○ 他のsrc/lib/*, src/app/api/*, src/app/admin/* ファイル
+  → コード側は新API移行完了後に削除検討
+
+=============================================================================
+【4】partner ロール関連（現行アーキテクチャで位置づけ不明確）
+=============================================================================
+旧概念: partner ロールによる複数組織管理
+新概念: org_role（organization_members.role）による権限管理
+
+★ docs/requirements_business.md
+  - L16-24: "代理店ユーザー（partner ロール）" セクション
+  - L59-65: "代理店フロー"
+  - L78: "partner権限の管理"
+
+★ docs/acceptance_criteria.md
+  - L70-93: "代理店機能（Partner）" セクション全体
+  - partner権限テストケース
+
+★ docs/test_plan.md
+  - L85-129: test/e2e/partner-flow.spec.ts 関連
+
+★ docs/sprints.md
+  - L6: "Partner/代理店ダッシュボード"
+  - L40: "partner単位・org_owner単位のCRUD制御"
+  - L52-57: partner招待機能
+
+★ docs/mvp_setup_guide.md
+  - L112, L176-177: partner_id カラム
+  - L181-182: partners テーブル
+  - L259-378: partner関連RLSポリシー全体
+  → 現行DBスキーマとの整合性確認必要
+
+★ docs/supabase対応_要件定義書.md
+  - L22, L60-61: Phase 4 パートナー機能
+  - L187-238: パートナー機能 SQL全体
+  - L290-301: パートナー関連チェックリスト
+
+=============================================================================
+【5】created_by = auth.uid() RLSパターン（領域別RLSに統一）
+=============================================================================
+旧概念: created_by による1:1保護（セルフサーブ専用）
+新概念: 領域別RLS（Dashboard=org_member, Account=auth.uid, Admin=site_admins）
+
+○ docs/security-audit-complete.md
+  - L1422-1434: created_by = auth.uid() ポリシー例
+  → Account領域用として残す可能性、ただし領域明記必要
+
+○ docs/specifications/requirements-v2.3.md
+  - L76: "created_by = auth.uid()" RLS説明
+  → 新アーキテクチャでの位置づけ明記
+
+○ docs/requirements_mvp.md
+  - L80-81: created_by ベースRLS
+  → 4領域RLSに更新
+
+○ docs/supabase対応_要件定義書.md
+  - L153: created_by サブクエリ
+  → 領域別RLSに更新
+
+=============================================================================
+【6】その他の不整合・重複
+=============================================================================
+
+○ docs/requirements_revision_proposal.txt
+  - 全体的に旧概念（セルフサーブ＋代理店）ベース
+  - L42, L163, L178-179: セルフサーブ関連
+  → 採用/不採用の判断後に削除またはアーカイブ
+
+○ docs/production_verification_guide.md
+  - L29: "セルフサーブ導線確認"
+  - L61: "セルフサーブフロー確認"
+  - L155-156: ENABLE_SELF_SERVE, ENABLE_PARTNER_FLOW 環境変数
+  → 検証ガイドの更新
+
+○ docs/requirements_ux.md
+  - L63-66: "セルフサーブ" / "パートナー" ラベル
+  → 4領域ベースの画面遷移に更新
+
+○ docs/implementation_todo_list.md
+  - L57: "セルフサーブ限定制限"
+  - L61: "partnerユーザー"
+  → 実装TODOリストの更新
+
+=============================================================================
+【推奨アクション】
+=============================================================================
+
+1. 【優先度: 高】要件定義書の統一
+   - requirements_overview.md → 4領域アーキテクチャベースに刷新
+   - requirements_business.md → Subject/領域ベースに刷新
+   - requirements_system.md → 既存更新を確認、残存を削除
+
+2. 【優先度: 高】スキーマ/SQL関連
+   - user_organizations → organization_members に統一
+   - partner関連テーブル → 現行DBとの差異確認
+
+3. 【優先度: 中】テスト/検証ガイド
+   - partner-flow.spec.ts 関連 → 現行に合わせて更新または削除
+   - production_verification_guide.md → 4領域検証に更新
+
+4. 【優先度: 低】アーカイブ候補
+   - requirements_changelog.md → 履歴として保持、新規参照禁止
+   - migrations_plan.md → 完了済みなら削除、未完了なら更新
+   - requirements_revision_proposal.txt → 提案書のためアーカイブ
+
+=============================================================================
+【注意事項】
+=============================================================================
+- 本リストは機械的な検索結果に基づく
+- 各ファイルの実際の使用状況を確認の上、削除/修正を判断すること
+- 特にRLS関連はセキュリティ影響があるため慎重に対応
+- コード側(src/)は後方互換を考慮し段階的に移行
+
+=============================================================================

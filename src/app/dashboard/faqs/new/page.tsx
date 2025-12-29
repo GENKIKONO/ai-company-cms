@@ -1,9 +1,32 @@
 'use client';
 
+/**
+ * New FAQ Page - 新アーキテクチャ版
+ */
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { DashboardPageShell } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardContent,
+  DashboardButton,
+  DashboardAlert,
+} from '@/components/dashboard/ui';
 
 export default function NewFAQPage() {
+  return (
+    <DashboardPageShell
+      title="新しいFAQ"
+      requiredRole="editor"
+    >
+      <NewFAQContent />
+    </DashboardPageShell>
+  );
+}
+
+function NewFAQContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();

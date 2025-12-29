@@ -45,7 +45,7 @@ export async function getAIGroupScope(userId: string): Promise<AIGroupScope | nu
 
     // Get user's organization
     const { data: userOrg, error: userOrgError } = await supabase
-      .from('user_organizations')
+      .from('organization_members')
       .select(`
         organization_id,
         role,

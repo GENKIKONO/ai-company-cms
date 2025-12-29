@@ -212,8 +212,8 @@ export function InterviewSessionsRealtime({
 
       {/* 更新通知 */}
       {updateNotification && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <p className="text-blue-800 text-sm">{updateNotification}</p>
+        <div className="mb-4 p-3 bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)] rounded-md">
+          <p className="text-[var(--aio-info)] text-sm">{updateNotification}</p>
         </div>
       )}
 

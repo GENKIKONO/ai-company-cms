@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
@@ -30,10 +31,10 @@ function generateServiceSlug(name: string): string {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // ユーザー認証
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+
+    // ユーザー認証（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({
         error: '認証が必要です'
       }, { status: 401 });

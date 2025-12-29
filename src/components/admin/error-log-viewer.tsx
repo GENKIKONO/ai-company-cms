@@ -43,7 +43,7 @@ interface ErrorLogEntry {
 
 // 重要度によるカラーマッピング
 const severityColors = {
-  [ErrorSeverity.LOW]: 'bg-blue-50 text-blue-800 border-blue-200',
+  [ErrorSeverity.LOW]: 'bg-[var(--aio-info-surface)] text-[var(--aio-info)] border-[var(--aio-info-border)]',
   [ErrorSeverity.MEDIUM]: 'bg-yellow-50 text-yellow-800 border-yellow-200',
   [ErrorSeverity.HIGH]: 'bg-orange-50 text-orange-800 border-orange-200',
   [ErrorSeverity.CRITICAL]: 'bg-red-50 text-red-800 border-red-200'

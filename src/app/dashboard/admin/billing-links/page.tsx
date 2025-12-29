@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/utils/logger';
 import { LockIcon } from '@/components/icons/HIGIcons';
+import { DashboardPageShell } from '@/components/dashboard';
 
 interface CheckoutLink {
   id: string;
@@ -33,12 +34,20 @@ interface FormData {
 }
 
 export default function BillingLinksAdminPage() {
+  return (
+    <DashboardPageShell title="課金リンク管理" requiredRole="admin">
+      <BillingLinksContent />
+    </DashboardPageShell>
+  );
+}
+
+function BillingLinksContent() {
   const router = useRouter();
   const [links, setLinks] = useState<CheckoutLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // 新規追加フォーム用state
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -349,7 +358,7 @@ export default function BillingLinksAdminPage() {
                           </span>
                         )}
                         {link.discount_rate > 0 && (
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                          <span className="px-2 py-1 bg-[var(--aio-muted)] text-[var(--aio-primary)] text-xs font-medium rounded-full">
                             {link.discount_rate}% OFF
                           </span>
                         )}
@@ -378,7 +387,7 @@ export default function BillingLinksAdminPage() {
                       )}
                       <button
                         onClick={() => copyLinkToClipboard(link)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                        className="px-3 py-1 bg-[var(--aio-primary)] text-white rounded text-sm hover:bg-[var(--aio-primary-hover)]"
                       >
                         {link.is_public ? 'リンクコピー' : <><LockIcon className="w-3 h-3 inline mr-1" aria-hidden /> プライベートリンクコピー</>}
                       </button>

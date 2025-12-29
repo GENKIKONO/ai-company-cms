@@ -148,7 +148,7 @@ export default function UserSearch({ onUserSelect, loading = false }: UserSearch
                           : user.account_status === 'suspended'
                           ? 'bg-orange-100 text-orange-800'
                           : user.account_status === 'frozen'
-                          ? 'bg-blue-100 text-blue-800'
+                          ? 'bg-[var(--aio-info-muted)] text-[var(--aio-info)]'
                           : 'bg-red-100 text-red-800'
                       }`}>
                         {user.account_status}

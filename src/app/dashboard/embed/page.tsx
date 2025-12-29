@@ -1,10 +1,9 @@
 /**
- * Embed Page - Server Component Entry Point (Phase 4-B)
- * 
+ * Embed Page - 新アーキテクチャ版
+ *
  * NOTE: [PHASE_4B_QUOTA_DISPLAY]
- * - Server Componentで quota 情報を取得
- * - Client Componentで UI 表示
- * - 制限ロジックは一切変更せず、表示のみ追加
+ * サーバーコンポーネントとして EmbedPageWithQuota を呼び出す
+ * DashboardPageShellはEmbedPageWithQuota内で適用済み
  */
 
 import EmbedPageWithQuota from './EmbedPageWithQuota';

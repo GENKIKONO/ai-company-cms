@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { DashboardPageShell } from '@/components/dashboard';
 
 interface StorageAccessLog {
   id: string;
@@ -17,6 +18,14 @@ interface StorageAccessLog {
 }
 
 export default function StorageLogsPage() {
+  return (
+    <DashboardPageShell title="ストレージログ" requiredRole="admin">
+      <StorageLogsContent />
+    </DashboardPageShell>
+  );
+}
+
+function StorageLogsContent() {
   const [logs, setLogs] = useState<StorageAccessLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +76,7 @@ export default function StorageLogsPage() {
 
   const getActionBadge = (action: string) => {
     const styles: Record<string, string> = {
-      read: 'bg-blue-100 text-blue-800',
+      read: 'bg-[var(--aio-muted)] text-[var(--aio-primary)]',
       write: 'bg-green-100 text-green-800',
       delete: 'bg-red-100 text-red-800',
       list: 'bg-purple-100 text-purple-800',
@@ -110,7 +119,7 @@ export default function StorageLogsPage() {
                 <select
                   value={filterBucket}
                   onChange={(e) => setFilterBucket(e.target.value)}
-                  className="block w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                  className="block w-40 rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-primary)] focus:ring-[var(--aio-primary)] text-sm"
                 >
                   <option value="">全て</option>
                   <option value="assets">assets</option>
@@ -123,7 +132,7 @@ export default function StorageLogsPage() {
                 <select
                   value={filterAction}
                   onChange={(e) => setFilterAction(e.target.value)}
-                  className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                  className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-primary)] focus:ring-[var(--aio-primary)] text-sm"
                 >
                   <option value="">全て</option>
                   <option value="read">read</option>
@@ -138,7 +147,7 @@ export default function StorageLogsPage() {
           <div className="p-6" data-testid="storage-logs-list">
             {loading ? (
               <div className="text-center py-12">
-                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+                <div className="animate-spin h-8 w-8 border-4 border-[var(--aio-primary)] border-t-transparent rounded-full mx-auto"></div>
                 <p className="text-gray-500 mt-4">読み込み中...</p>
               </div>
             ) : error ? (

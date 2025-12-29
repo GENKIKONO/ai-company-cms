@@ -44,7 +44,7 @@ function LoadingCard({ title, description }: { title: string; description: strin
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--aio-info)]"></div>
       </div>
       <p className="text-sm text-gray-600">{description}</p>
       <div className="mt-4 space-y-2">
@@ -207,7 +207,7 @@ export default function ContentRefreshKpiCards({
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <Database className="h-6 w-6 text-blue-500 mr-2" />
+                <Database className="h-6 w-6 text-[var(--aio-primary)] mr-2" />
                 <h3 className="text-lg font-semibold text-gray-900">public_*更新遅延</h3>
               </div>
               {publicFreshness.length > 0 && (

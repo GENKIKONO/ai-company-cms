@@ -6,6 +6,11 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/log';
 import { z } from 'zod';
 import { withOrgAuth } from '@/lib/auth/org-middleware';
+import {
+  validateFilesForPublish,
+  extractImageUrlsFromPostMeta,
+  FileScanValidationError,
+} from '@/lib/file-scan';
 
 // POST request schema
 const updatePostSchema = z.object({
@@ -131,10 +136,39 @@ export async function PUT(
           slug: slug,
           existingPostId: duplicatePost.id
         });
-        return NextResponse.json({ 
+        return NextResponse.json({
           error: 'このスラッグは既に使用されています',
           code: 'DUPLICATE_SLUG'
         }, { status: 400 });
+      }
+    }
+
+    // 公開時のファイルスキャンバリデーション
+    const isBecomingPublished =
+      (updateData.status === 'published' && existingPost.status !== 'published') ||
+      (updateData.is_published === true && existingPost.is_published !== true);
+
+    if (isBecomingPublished) {
+      // metaフィールドから画像URLを抽出
+      const meta = existingPost.meta as Record<string, unknown> | null;
+      const imageUrls = extractImageUrlsFromPostMeta(meta);
+
+      if (imageUrls.length > 0) {
+        const scanResult = await validateFilesForPublish(supabase, imageUrls);
+
+        if (!scanResult.valid) {
+          logger.warn('[my/posts/update] File scan validation failed for publish', {
+            userId,
+            postId,
+            orgId,
+            failedPaths: scanResult.failedPaths,
+          });
+          return NextResponse.json({
+            error: 'ファイルのスキャンが完了していないため公開できません',
+            code: 'FILE_SCAN_VALIDATION_FAILED',
+            failedPaths: scanResult.failedPaths,
+          }, { status: 422 });
+        }
       }
     }
 

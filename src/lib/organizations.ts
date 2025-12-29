@@ -2,6 +2,7 @@
 
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { vLog, logger } from '@/lib/utils/logger';
+import { getUserClient } from '@/lib/core/auth-state.client';
 import type { Organization } from '@/types/legacy/database';
 import type { OrganizationFormData, OrganizationWithOwner } from '@/types/domain/organizations';
 import { handleMaybeSingleResult } from '@/lib/error-mapping';
@@ -65,8 +66,8 @@ export async function getOrganizations(options: {
 // 企業詳細取得
 export async function getOrganization(id: string) {
   try {
-    // 🔥 FIX: Ensure authenticated user access for consistent RLS behavior
-    const { data: { user } } = await supabaseBrowser.auth.getUser();
+    // 🔥 FIX: Ensure authenticated user access for consistent RLS behavior (Core正本経由)
+    const user = await getUserClient();
     if (!user) {
       throw new Error('Not authenticated');
     }
@@ -93,11 +94,11 @@ export async function getOrganization(id: string) {
   }
 }
 
-// 企業作成
+// 企業作成（Core正本経由）
 export async function createOrganization(organizationData: OrganizationFormData) {
   try {
-    const { data: { user } } = await supabaseBrowser.auth.getUser();
-    
+    const user = await getUserClient();
+
     if (!user) {
       throw new Error('Not authenticated');
     }

@@ -8,6 +8,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserFullWithClient } from '@/lib/core/auth-state';
 import { env } from '@/lib/env';
 import { z } from 'zod';
 import { logger } from '@/lib/utils/logger';
@@ -36,13 +37,13 @@ const siteSettingsSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserFullWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
-        { 
-          code: 'UNAUTHORIZED', 
+        {
+          code: 'UNAUTHORIZED',
           reason: 'Authentication required for site settings access'
         },
         { status: 401 }
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 管理者チェック
-    if (!isAdmin(authData.user.email)) {
+    if (!isAdmin(user.email)) {
       return NextResponse.json(
         { 
           code: 'FORBIDDEN', 
@@ -106,13 +107,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserFullWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
-        { 
-          code: 'UNAUTHORIZED', 
+        {
+          code: 'UNAUTHORIZED',
           reason: 'Authentication required for site settings update'
         },
         { status: 401 }
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 管理者チェック
-    if (!isAdmin(authData.user.email)) {
+    if (!isAdmin(user.email)) {
       return NextResponse.json(
         { 
           code: 'FORBIDDEN', 
@@ -256,13 +257,13 @@ export const PUT = POST;
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // 認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証チェック（Core経由）
+    const user = await getUserFullWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
-        { 
-          code: 'UNAUTHORIZED', 
+        {
+          code: 'UNAUTHORIZED',
           reason: 'Authentication required for site settings reset'
         },
         { status: 401 }
@@ -270,7 +271,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // 管理者チェック
-    if (!isAdmin(authData.user.email)) {
+    if (!isAdmin(user.email)) {
       return NextResponse.json(
         { 
           code: 'FORBIDDEN', 

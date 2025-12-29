@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, Globe, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabaseBrowser } from '@/lib/supabase/client';
+import { getSessionClient } from '@/lib/core/auth-state.client';
 
 interface GhostwriterInputProps {
   organizationId: string;
@@ -77,9 +77,7 @@ export function GhostwriterInput({ organizationId, organizationSlug }: Ghostwrit
       }, 2000);
 
       // Get Supabase session for auth token
-      const supabase = supabaseBrowser;
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const session = await getSessionClient();
       if (!session) {
         throw new Error('認証が必要です');
       }
@@ -174,7 +172,7 @@ export function GhostwriterInput({ organizationId, organizationSlug }: Ghostwrit
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://your-company.com"
               disabled={isLoading}
-              className="w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 text-gray-900 placeholder-gray-500 shadow-inner"
+              className="w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--aio-info)]/50 focus:border-[var(--aio-info)]/50 transition-all duration-200 text-gray-900 placeholder-gray-500 shadow-inner"
               onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleGenerate()}
             />
           </div>

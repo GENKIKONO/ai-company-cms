@@ -187,7 +187,7 @@ export default function LandingPage({ stats }: Props) {
                           {organization.industries.slice(0, 2).map((industry) => (
                             <span
                               key={industry}
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--aio-info-muted)] text-[var(--aio-info)]"
                             >
                               {industry}
                             </span>

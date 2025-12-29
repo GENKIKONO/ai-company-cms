@@ -9,6 +9,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { cookies } from 'next/headers';
 import { env, getCookieDomain } from '@/lib/env';
 import { logger } from '@/lib/utils/logger';
@@ -34,9 +35,9 @@ export async function GET(request: NextRequest) {
   try {
     // Supabase SSR 認証確認
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const user = await getUserWithClient(supabase);
 
-    const hasSession = !authError && !!user;
+    const hasSession = !!user;
     const userEmail = user?.email || null;
     const isAdminEmail = hasSession && isAdmin(userEmail || undefined);
 

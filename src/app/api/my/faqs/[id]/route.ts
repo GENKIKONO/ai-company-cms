@@ -2,6 +2,7 @@
 // 個別FAQの更新・削除API
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import type { FAQFormData } from '@/types/domain/content';;
 import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 
@@ -31,9 +32,10 @@ export async function GET(
   try {
     const { id } = await params;
     const supabase = await createClient();
-    
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+
+    // 認証（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -78,8 +80,9 @@ export async function PUT(
     const { id } = await params;
     const supabase = await createClient();
     
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -141,8 +144,9 @@ export async function DELETE(
     const { id } = await params;
     const supabase = await createClient();
     
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    // 認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 

@@ -114,7 +114,7 @@ export default function AdminHearingsPage() {
       case 'pending':
         return <AlertCircle className="w-5 h-5 text-yellow-500" />;
       case 'in_progress':
-        return <Clock className="w-5 h-5 text-blue-500" />;
+        return <Clock className="w-5 h-5 text-[var(--aio-info)]" />;
       case 'completed':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
       case 'cancelled':
@@ -435,8 +435,8 @@ export default function AdminHearingsPage() {
             <button
               onClick={() => setStatusFilter('in_progress')}
               className={`px-3 py-1 rounded-full text-sm ${
-                statusFilter === 'in_progress' 
-                  ? 'bg-blue-200 text-blue-900' 
+                statusFilter === 'in_progress'
+                  ? 'bg-[var(--aio-info-muted)] text-[var(--aio-info)]'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -631,14 +631,14 @@ export default function AdminHearingsPage() {
                   <div className="space-y-4">
                     <h4 className="text-lg font-medium text-gray-900 border-b pb-2">🚀 代行コンテンツ作成</h4>
                     
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)] rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <svg className="w-5 h-5 text-[var(--aio-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span className="text-sm font-medium text-blue-800">自動コンテンツ生成</span>
+                        <span className="text-sm font-medium text-[var(--aio-info)]">自動コンテンツ生成</span>
                       </div>
-                      <p className="text-sm text-blue-700 mb-4">
+                      <p className="text-sm text-[var(--aio-info)] mb-4">
                         ヒアリング結果を基に、選択したコンテンツタイプの下書きを自動生成します。
                         生成後、クライアントに承認依頼が送信されます。
                       </p>
@@ -706,7 +706,7 @@ export default function AdminHearingsPage() {
                         </div>
                       </div>
 
-                      <div className="mt-4 pt-4 border-t border-blue-200">
+                      <div className="mt-4 pt-4 border-t border-[var(--aio-info-border)]">
                         <HIGButton
                           onClick={handleCreateContent}
                           disabled={isCreatingContent || !interviewSummary.trim()}

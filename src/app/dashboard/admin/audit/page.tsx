@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { DashboardPageShell } from '@/components/dashboard';
 
 interface AuditLog {
   id: string;
@@ -36,6 +37,14 @@ interface Filters {
 }
 
 export default function AuditLogPage() {
+  return (
+    <DashboardPageShell title="監査ログ" requiredRole="admin">
+      <AuditLogContent />
+    </DashboardPageShell>
+  );
+}
+
+function AuditLogContent() {
   const [activeTab, setActiveTab] = useState<TabType>('ops');
   const [serviceRoleLogs, setServiceRoleLogs] = useState<AuditLog[]>([]);
   const [opsLogs, setOpsLogs] = useState<OpsAuditLog[]>([]);
@@ -207,7 +216,7 @@ export default function AuditLogPage() {
                 onClick={() => setActiveTab('ops')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'ops'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -217,7 +226,7 @@ export default function AuditLogPage() {
                 onClick={() => setActiveTab('service_role')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'service_role'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -236,7 +245,7 @@ export default function AuditLogPage() {
                     type="date"
                     value={filters.from}
                     onChange={(e) => handleFilterChange('from', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-[var(--aio-primary)] focus:border-[var(--aio-primary)]"
                   />
                 </div>
                 <div>
@@ -245,7 +254,7 @@ export default function AuditLogPage() {
                     type="date"
                     value={filters.to}
                     onChange={(e) => handleFilterChange('to', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-[var(--aio-primary)] focus:border-[var(--aio-primary)]"
                   />
                 </div>
                 <div>
@@ -253,7 +262,7 @@ export default function AuditLogPage() {
                   <select
                     value={filters.action}
                     onChange={(e) => handleFilterChange('action', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-[var(--aio-primary)] focus:border-[var(--aio-primary)]"
                   >
                     <option value="">全て</option>
                     {actionOptions.map((action) => (
@@ -268,7 +277,7 @@ export default function AuditLogPage() {
                     placeholder="部分一致"
                     value={filters.actor}
                     onChange={(e) => handleFilterChange('actor', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-[var(--aio-primary)] focus:border-[var(--aio-primary)]"
                   />
                 </div>
                 <div>
@@ -278,14 +287,14 @@ export default function AuditLogPage() {
                     placeholder="部分一致"
                     value={filters.target}
                     onChange={(e) => handleFilterChange('target', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-[var(--aio-primary)] focus:border-[var(--aio-primary)]"
                   />
                 </div>
                 <div className="flex items-end">
                   <button
                     onClick={handleSearch}
                     disabled={loading}
-                    className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2 bg-[var(--aio-primary)] text-white text-sm font-medium rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     検索
                   </button>
@@ -302,7 +311,7 @@ export default function AuditLogPage() {
           <div className="p-6" data-testid="audit-logs-list">
             {loading && opsLogs.length === 0 && serviceRoleLogs.length === 0 ? (
               <div className="text-center py-12">
-                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+                <div className="animate-spin h-8 w-8 border-4 border-[var(--aio-primary)] border-t-transparent rounded-full mx-auto"></div>
                 <p className="text-gray-500 mt-4">読み込み中...</p>
               </div>
             ) : error ? (
@@ -406,7 +415,7 @@ export default function AuditLogPage() {
                                   {formatDate(log.created_at)}
                                 </td>
                                 <td className="px-4 py-4">
-                                  <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                  <span className="px-2 py-1 text-xs font-medium rounded-full bg-[var(--aio-muted)] text-[var(--aio-primary)]">
                                     {log.action}
                                   </span>
                                 </td>

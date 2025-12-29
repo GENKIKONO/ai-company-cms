@@ -1,20 +1,44 @@
-export const dynamic = 'force-dynamic';
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+/**
+ * 認証セルフテストAPI（委譲版）
+ *
+ * Phase 14: Auth直叩きを /api/diag/auth に集約
+ * このファイルは URL 互換のため残し、処理を委譲
+ */
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  // 集約先エンドポイントにリダイレクト（mode=simple）
+  const url = new URL(request.url);
+  const baseUrl = `${url.protocol}//${url.host}`;
+  const diagUrl = `${baseUrl}/api/diag/auth?mode=simple`;
+
   try {
-    const sb = await createClient();
-    const { data, error } = await sb.auth.getUser();
-    
-    if (error) {
-      return NextResponse.json({ ok: false, error: error.message }, { status: 200 });
-    }
-    
-    const user = data?.user ? { id: data.user.id, email: data.user.email } : null;
-    return NextResponse.json({ ok: true, provider: 'supabase', user });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message ?? 'unknown' }, { status: 200 });
+    const response = await fetch(diagUrl, {
+      headers: {
+        'Cookie': request.headers.get('cookie') || '',
+        'User-Agent': request.headers.get('user-agent') || '',
+        'Accept': request.headers.get('accept') || 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    // 元のレスポンス形式を維持（mode フィールドは除去）
+    const { mode, ...rest } = data;
+
+    return NextResponse.json(rest, {
+      status: response.status,
+      headers: {
+        'X-Delegated-To': '/api/diag/auth?mode=simple'
+      }
+    });
+  } catch (error) {
+    return NextResponse.json({
+      ok: false,
+      error: error instanceof Error ? error.message : 'unknown'
+    }, { status: 200 });
   }
 }
 

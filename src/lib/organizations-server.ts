@@ -3,6 +3,7 @@ import 'server-only';
 import { createClient } from '@/lib/supabase/server';
 import { unstable_cache } from 'next/cache';
 import { logger } from '@/lib/log';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import type { Organization } from '@/types/legacy/database';;
 
 export type OrgLite = {
@@ -39,15 +40,14 @@ export type OrgFull = OrgLite & {
 export async function getCurrentUserOrganization(): Promise<Organization | null> {
   // 🚫 ここでは unstable_cache・headers・cookies を使わない
   const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
+  const user = await getUserWithClient(supabase);
+
   logger.debug('[getCurrentUserOrganization] Auth check', {
     hasUser: !!user,
-    userId: user?.id,
-    authError: authError?.message
+    userId: user?.id
   });
-  
-  if (authError || !user) {
+
+  if (!user) {
     logger.debug('[getCurrentUserOrganization] No user authenticated');
     return null;
   }
@@ -96,7 +96,7 @@ export const getOrganizationByIdCached = (orgId: string) =>
   unstable_cache(
     async (): Promise<OrgFull | null> => {
       const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getUserWithClient(supabase);
       if (!user) return null;
 
       const { data, error } = await supabase
@@ -123,7 +123,7 @@ export const getOrganizationByUserIdCached = (userId: string) =>
   unstable_cache(
     async (): Promise<OrgLite | null> => {
       const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getUserWithClient(supabase);
       if (!user || user.id !== userId) return null;
 
       const { data, error } = await supabase

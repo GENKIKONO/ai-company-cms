@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthUser, requireOrgMember } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
-import { fetchOrgQuotaUsage } from '@/lib/org-features/quota';
+import { fetchOrgQuotaUsage } from '@/lib/featureGate';
 
 /**
  * インタビュー質問数の使用状況取得API

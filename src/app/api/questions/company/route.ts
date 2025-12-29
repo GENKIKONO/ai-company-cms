@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import type { QuestionWithDetails } from '@/types/domain/questions';;
 import { logger } from '@/lib/utils/logger';
 
@@ -7,10 +8,10 @@ import { logger } from '@/lib/utils/logger';
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // ユーザー認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+
+    // ユーザー認証チェック（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }

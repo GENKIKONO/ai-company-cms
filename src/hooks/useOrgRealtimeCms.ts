@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { getSessionClient } from '@/lib/core/auth-state.client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface CMSRealtimeData {
@@ -96,7 +97,7 @@ export function useOrgRealtimeCms(options: UseOrgRealtimeCmsOptions) {
 
     try {
       // Realtime認証を設定
-      const { data: { session } } = await supabase.auth.getSession();
+      const session = await getSessionClient();
       if (session?.access_token) {
         await supabase.realtime.setAuth(session.access_token);
       }

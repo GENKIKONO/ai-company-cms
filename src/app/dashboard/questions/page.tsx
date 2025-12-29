@@ -1,18 +1,22 @@
 'use client';
 
+/**
+ * Company Questions Page - 新アーキテクチャ版
+ */
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  HIGCard,
-  HIGCardHeader,
-  HIGCardTitle,
-  HIGCardContent,
-  HIGCardGrid
-} from '@/components/ui/HIGCard';
-import { HIGButton } from '@/components/ui/HIGButton';
-import { 
-  MessageSquare, 
-  Clock, 
-  CheckCircle, 
+import { DashboardPageShell } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardHeader,
+  DashboardCardContent,
+  DashboardButton,
+} from '@/components/dashboard/ui';
+import {
+  MessageSquare,
+  Clock,
+  CheckCircle,
   XCircle,
   User,
   Calendar,
@@ -23,7 +27,7 @@ import {
   Building,
   Hash
 } from 'lucide-react';
-import type { QuestionWithDetails } from '@/types/domain/questions';;
+import type { QuestionWithDetails } from '@/types/domain/questions';
 import { translateQuestionStatus } from '@/lib/qna-stats';
 import { logger } from '@/lib/utils/logger';
 
@@ -40,6 +44,17 @@ interface CompanyInfo {
 }
 
 export default function CompanyQuestionsPage() {
+  return (
+    <DashboardPageShell
+      title="質問管理"
+      requiredRole="admin"
+    >
+      <QuestionsContent />
+    </DashboardPageShell>
+  );
+}
+
+function QuestionsContent() {
   // State管理
   const [questions, setQuestions] = useState<QuestionWithDetails[]>([]);
   const [stats, setStats] = useState<QuestionStats>({ total: 0, open: 0, answered: 0, closed: 0 });
@@ -268,17 +283,17 @@ export default function CompanyQuestionsPage() {
   // ローディング状態
   if (loading) {
     return (
-      <div className=" p-6">
+      <div className="p-6">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse space-y-6">
             <div className="h-10 bg-[var(--color-background-secondary)] rounded w-1/3"></div>
-            <HIGCardGrid columns={4} gap="lg">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
-                <HIGCard key={i} className="h-24">
-                  <div className="h-full bg-[var(--color-background-secondary)] rounded"></div>
-                </HIGCard>
+                <DashboardCard key={i}>
+                  <div className="h-24 bg-[var(--color-background-secondary)] rounded"></div>
+                </DashboardCard>
               ))}
-            </HIGCardGrid>
+            </div>
             <div className="h-96 bg-[var(--color-background-secondary)] rounded"></div>
           </div>
         </div>
@@ -287,9 +302,9 @@ export default function CompanyQuestionsPage() {
   }
 
   return (
-    <div className=" p-6">
+    <div className="p-6">
       <div className="max-w-6xl mx-auto space-y-8">
-        
+
         {/* ヘッダー */}
         <div className="flex items-center justify-between">
           <div>
@@ -302,21 +317,21 @@ export default function CompanyQuestionsPage() {
             </p>
           </div>
           <div className="flex gap-3">
-            <HIGButton
+            <DashboardButton
               variant="secondary"
-              leftIcon={<RefreshCw className="h-4 w-4" />}
               onClick={loadQuestions}
               loading={loading}
             >
+              <RefreshCw className="h-4 w-4 mr-2" />
               更新
-            </HIGButton>
+            </DashboardButton>
           </div>
         </div>
 
         {/* 統計カード */}
-        <HIGCardGrid columns={4} gap="lg">
-          <HIGCard variant="elevated">
-            <HIGCardContent>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <DashboardCard>
+            <DashboardCardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="hig-text-caption text-[var(--color-text-secondary)]">総質問数</p>
@@ -326,11 +341,11 @@ export default function CompanyQuestionsPage() {
                 </div>
                 <Hash className="h-8 w-8 text-[var(--color-primary)] opacity-60" />
               </div>
-            </HIGCardContent>
-          </HIGCard>
+            </DashboardCardContent>
+          </DashboardCard>
 
-          <HIGCard variant="elevated">
-            <HIGCardContent>
+          <DashboardCard>
+            <DashboardCardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="hig-text-caption text-[var(--color-text-secondary)]">未回答</p>
@@ -340,11 +355,11 @@ export default function CompanyQuestionsPage() {
                 </div>
                 <Clock className="h-8 w-8 text-orange-500 opacity-60" />
               </div>
-            </HIGCardContent>
-          </HIGCard>
+            </DashboardCardContent>
+          </DashboardCard>
 
-          <HIGCard variant="elevated">
-            <HIGCardContent>
+          <DashboardCard>
+            <DashboardCardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="hig-text-caption text-[var(--color-text-secondary)]">回答済み</p>
@@ -354,11 +369,11 @@ export default function CompanyQuestionsPage() {
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-500 opacity-60" />
               </div>
-            </HIGCardContent>
-          </HIGCard>
+            </DashboardCardContent>
+          </DashboardCard>
 
-          <HIGCard variant="elevated">
-            <HIGCardContent>
+          <DashboardCard>
+            <DashboardCardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="hig-text-caption text-[var(--color-text-secondary)]">完了</p>
@@ -368,19 +383,19 @@ export default function CompanyQuestionsPage() {
                 </div>
                 <XCircle className="h-8 w-8 text-gray-500 opacity-60" />
               </div>
-            </HIGCardContent>
-          </HIGCard>
-        </HIGCardGrid>
+            </DashboardCardContent>
+          </DashboardCard>
+        </div>
 
         {/* フィルター */}
-        <HIGCard>
-          <HIGCardHeader>
-            <HIGCardTitle level={2}>
+        <DashboardCard>
+          <DashboardCardHeader>
+            <h2 className="text-lg font-semibold">
               <Filter className="h-5 w-5 inline mr-2" />
               フィルター
-            </HIGCardTitle>
-          </HIGCardHeader>
-          <HIGCardContent>
+            </h2>
+          </DashboardCardHeader>
+          <DashboardCardContent>
             <div className="flex gap-2">
               {[
                 { value: 'all', label: '全て' },
@@ -388,35 +403,35 @@ export default function CompanyQuestionsPage() {
                 { value: 'answered', label: '回答済み' },
                 { value: 'closed', label: '完了' }
               ].map((filter) => (
-                <HIGButton
+                <DashboardButton
                   key={filter.value}
                   variant={statusFilter === filter.value ? 'primary' : 'secondary'}
                   size="sm"
                   onClick={() => setStatusFilter(filter.value)}
                 >
                   {filter.label}
-                </HIGButton>
+                </DashboardButton>
               ))}
             </div>
-          </HIGCardContent>
-        </HIGCard>
+          </DashboardCardContent>
+        </DashboardCard>
 
         {/* エラー表示 */}
         {error && (
-          <HIGCard variant="filled" className="border-l-4 border-l-[var(--color-error)]">
-            <HIGCardContent>
+          <DashboardCard className="border-l-4 border-l-[var(--color-error)]">
+            <DashboardCardContent>
               <p className="text-[var(--color-error)]">{error}</p>
-            </HIGCardContent>
-          </HIGCard>
+            </DashboardCardContent>
+          </DashboardCard>
         )}
 
         {/* 質問一覧 */}
         {filteredQuestions.length > 0 ? (
           <div className="space-y-4">
             {filteredQuestions.map((question) => (
-              <HIGCard key={question.id} className="hover:shadow-md transition-shadow">
-                <HIGCardContent>
-                  
+              <DashboardCard key={question.id} className="hover:shadow-md transition-shadow">
+                <DashboardCardContent>
+
                   {/* 質問ヘッダー */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -439,21 +454,21 @@ export default function CompanyQuestionsPage() {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <HIGButton
+                      <DashboardButton
                         variant="ghost"
                         size="sm"
-                        leftIcon={<Eye className="h-4 w-4" />}
                         onClick={() => toggleExpanded(question.id)}
                       >
+                        <Eye className="h-4 w-4 mr-1" />
                         {expandedQuestions.has(question.id) ? '閉じる' : '詳細'}
-                      </HIGButton>
+                      </DashboardButton>
                     </div>
                   </div>
 
                   {/* 展開時の詳細情報 */}
                   {expandedQuestions.has(question.id) && (
                     <div className="border-t border-[var(--color-border-secondary)] pt-4 space-y-4">
-                      
+
                       {/* 質問全文 */}
                       <div>
                         <h4 className="hig-text-caption font-semibold text-[var(--color-text-secondary)] mb-2">
@@ -483,13 +498,13 @@ export default function CompanyQuestionsPage() {
                           </h4>
                           <textarea
                             value={answerTexts[question.id] || ''}
-                            onChange={(e) => setAnswerTexts(prev => ({ 
-                              ...prev, 
-                              [question.id]: e.target.value 
+                            onChange={(e) => setAnswerTexts(prev => ({
+                              ...prev,
+                              [question.id]: e.target.value
                             }))}
                             placeholder="質問者への回答を入力してください..."
                             rows={6}
-                            className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg 
+                            className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg
                                      bg-[var(--color-background)] text-[var(--color-text-primary)]
                                      focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent resize-vertical"
                             maxLength={2000}
@@ -499,24 +514,24 @@ export default function CompanyQuestionsPage() {
                               {answerTexts[question.id]?.length || 0}/2000
                             </p>
                             <div className="flex gap-2">
-                              <HIGButton
+                              <DashboardButton
                                 variant="secondary"
                                 size="sm"
                                 onClick={() => cancelAnswering(question.id)}
                                 disabled={submitting === question.id}
                               >
                                 キャンセル
-                              </HIGButton>
-                              <HIGButton
+                              </DashboardButton>
+                              <DashboardButton
                                 variant="primary"
                                 size="sm"
-                                leftIcon={<Send className="h-4 w-4" />}
                                 onClick={() => submitAnswer(question.id)}
                                 loading={submitting === question.id}
                                 disabled={!answerTexts[question.id]?.trim()}
                               >
+                                <Send className="h-4 w-4 mr-1" />
                                 回答を送信
-                              </HIGButton>
+                              </DashboardButton>
                             </div>
                           </div>
                         </div>
@@ -535,28 +550,28 @@ export default function CompanyQuestionsPage() {
                                 {question.answered_at && question.answerer_name && (
                                   <div className="mt-3 pt-3 border-t border-green-200">
                                     <p className="hig-text-caption text-[var(--color-text-secondary)]">
-                                      回答者: {question.answerer_name} • 
+                                      回答者: {question.answerer_name} •
                                       回答日: {new Date(question.answered_at).toLocaleDateString('ja-JP')}
                                     </p>
                                   </div>
                                 )}
                               </div>
                               <div className="flex gap-2 mt-3">
-                                <HIGButton
+                                <DashboardButton
                                   variant="secondary"
                                   size="sm"
                                   onClick={() => startAnswering(question.id)}
                                 >
                                   回答を編集
-                                </HIGButton>
+                                </DashboardButton>
                                 {question.status !== 'closed' && (
-                                  <HIGButton
+                                  <DashboardButton
                                     variant="secondary"
                                     size="sm"
                                     onClick={() => updateQuestionStatus(question.id, 'closed')}
                                   >
                                     完了にする
-                                  </HIGButton>
+                                  </DashboardButton>
                                 )}
                               </div>
                             </div>
@@ -565,41 +580,41 @@ export default function CompanyQuestionsPage() {
                               <p className="hig-text-body text-orange-700 mb-3">
                                 まだ回答していません
                               </p>
-                              <HIGButton
+                              <DashboardButton
                                 variant="primary"
                                 size="sm"
-                                leftIcon={<Send className="h-4 w-4" />}
                                 onClick={() => startAnswering(question.id)}
                               >
+                                <Send className="h-4 w-4 mr-1" />
                                 回答する
-                              </HIGButton>
+                              </DashboardButton>
                             </div>
                           )}
                         </div>
                       )}
                     </div>
                   )}
-                </HIGCardContent>
-              </HIGCard>
+                </DashboardCardContent>
+              </DashboardCard>
             ))}
           </div>
         ) : (
-          <HIGCard>
-            <HIGCardContent>
+          <DashboardCard>
+            <DashboardCardContent>
               <div className="text-center py-12">
                 <MessageSquare className="h-16 w-16 text-[var(--color-text-tertiary)] mx-auto mb-4" />
                 <h3 className="hig-text-h3 text-[var(--color-text-secondary)] mb-2">
                   {statusFilter === 'all' ? '質問がありません' : `${statusFilter === 'open' ? '未回答' : statusFilter === 'answered' ? '回答済み' : '完了'}の質問がありません`}
                 </h3>
                 <p className="hig-text-body text-[var(--color-text-secondary)]">
-                  {statusFilter === 'all' 
+                  {statusFilter === 'all'
                     ? 'まだユーザーからの質問がありません。Q&Aコンテンツを充実させて、ユーザーの関心を高めましょう。'
                     : '他のフィルターで質問を確認してください。'
                   }
                 </p>
               </div>
-            </HIGCardContent>
-          </HIGCard>
+            </DashboardCardContent>
+          </DashboardCard>
         )}
       </div>
     </div>

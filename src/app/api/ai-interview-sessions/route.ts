@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getUserFullWithClient } from '@/lib/core/auth-state'
 import { InterviewSessionService } from '@/lib/utils/enum-migration-helpers'
 import { logContractViolation } from '@/lib/utils/contract-violations'
 import { logger } from '@/lib/utils/logger'
@@ -30,16 +31,16 @@ const InterviewSessionUpdateSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
+    // 認証（Core経由、user_metadataを含む完全版）
+    const user = await getUserFullWithClient(supabase)
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // P1-2: Feature Flag対応での読み取り
-    const sessionService = new InterviewSessionService({ 
+    const sessionService = new InterviewSessionService({
       userId: user.id,
-      organizationId: user.user_metadata?.organization_id 
+      organizationId: user.user_metadata?.organization_id as string | undefined
     })
 
     const { data: sessions, error } = await supabase
@@ -80,14 +81,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
+    // 認証（Core経由、user_metadataを含む完全版）
+    const user = await getUserFullWithClient(supabase)
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
-    
+
     // P1-2: 型安全な入力検証
     const validationResult = InterviewSessionCreateSchema.safeParse(body)
     if (!validationResult.success) {
@@ -97,25 +98,25 @@ export async function POST(request: NextRequest) {
         table_name: 'ai_interview_sessions',
         column_name: 'validation',
         violation_type: 'FORMAT_INVALID',
-        payload: { 
+        payload: {
           errors: validationResult.error.errors,
-          input: body 
+          input: body
         },
         actor_user_id: user.id
       })
-      
-      return NextResponse.json({ 
-        error: 'Validation failed', 
-        details: validationResult.error.errors 
+
+      return NextResponse.json({
+        error: 'Validation failed',
+        details: validationResult.error.errors
       }, { status: 400 })
     }
 
     const validData = validationResult.data
 
     // P1-2: Feature Flag対応での書き込み
-    const sessionService = new InterviewSessionService({ 
+    const sessionService = new InterviewSessionService({
       userId: user.id,
-      organizationId: validData.organization_id || user.user_metadata?.organization_id 
+      organizationId: validData.organization_id || (user.user_metadata?.organization_id as string | undefined)
     })
 
     const statusData = await sessionService.writeStatus(validData.status)
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
     // P1-2: enum移行対応のInsertデータ構築
     const insertData = {
       user_id: user.id,
-      organization_id: validData.organization_id || user.user_metadata?.organization_id,
+      organization_id: validData.organization_id || (user.user_metadata?.organization_id as string | undefined),
       title: validData.title,
       description: validData.description,
       ...statusData,        // status, status_enum_temp (Feature Flag次第)
@@ -172,9 +173,9 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
+    // 認証（Core経由、user_metadataを含む完全版）
+    const user = await getUserFullWithClient(supabase)
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

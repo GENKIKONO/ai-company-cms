@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/utils/logger';
 
@@ -16,14 +17,14 @@ interface FileMetadata {
 
 export async function POST(request: NextRequest) {
   try {
-    // 認証チェック (Server-side)
+    // 認証チェック（Core経由）
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Authentication required' 
+    const user = await getUserWithClient(supabase);
+
+    if (!user) {
+      return NextResponse.json({
+        success: false,
+        error: 'Authentication required'
       }, { status: 401 });
     }
 
@@ -206,14 +207,14 @@ export async function POST(request: NextRequest) {
 // GET: 組織の文書一覧取得
 export async function GET(request: NextRequest) {
   try {
-    // 認証チェック
+    // 認証チェック（Core経由）
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Authentication required' 
+    const user = await getUserWithClient(supabase);
+
+    if (!user) {
+      return NextResponse.json({
+        success: false,
+        error: 'Authentication required'
       }, { status: 401 });
     }
 

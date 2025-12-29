@@ -25,7 +25,7 @@ export default async function DynamicHeader() {
                 <SignOutButton />
               </>
             ) : (
-              <Link href="/auth/login" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">ログイン</Link>
+              <Link href="/auth/login" className="bg-[var(--aio-primary)] text-white px-4 py-2 rounded-md hover:bg-[var(--aio-primary-hover)]">ログイン</Link>
             )}
           </div>
         </div>

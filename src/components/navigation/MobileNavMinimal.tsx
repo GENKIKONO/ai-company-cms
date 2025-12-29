@@ -54,7 +54,7 @@ function MobileNavMinimalInner() {
       aria-expanded={open}
       aria-controls="mobile-drawer"
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(v => !v); }}
-      className="fixed bottom-4 right-4 z-60 inline-flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400"
+      className="fixed bottom-4 right-4 z-60 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--aio-primary)] text-white shadow-lg hover:bg-[var(--aio-primary-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aio-info)]"
     >
       {open ? (
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">

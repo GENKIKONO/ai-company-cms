@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { DashboardPageShell } from '@/components/dashboard';
 
 interface VisibilityScore {
   id: string;
@@ -38,6 +39,14 @@ interface BotLog {
 type TabType = 'scores' | 'config' | 'bot_logs';
 
 export default function AiVisibilityPage() {
+  return (
+    <DashboardPageShell title="AI可視性" requiredRole="admin">
+      <AiVisibilityContent />
+    </DashboardPageShell>
+  );
+}
+
+function AiVisibilityContent() {
   const [activeTab, setActiveTab] = useState<TabType>('scores');
   const [scores, setScores] = useState<VisibilityScore[]>([]);
   const [configs, setConfigs] = useState<VisibilityConfig[]>([]);
@@ -130,7 +139,7 @@ export default function AiVisibilityPage() {
                 onClick={() => setActiveTab('scores')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'scores'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -140,7 +149,7 @@ export default function AiVisibilityPage() {
                 onClick={() => setActiveTab('config')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'config'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -150,7 +159,7 @@ export default function AiVisibilityPage() {
                 onClick={() => setActiveTab('bot_logs')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'bot_logs'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -162,7 +171,7 @@ export default function AiVisibilityPage() {
           <div className="p-6" data-testid="ai-visibility-list">
             {loading ? (
               <div className="text-center py-12">
-                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+                <div className="animate-spin h-8 w-8 border-4 border-[var(--aio-primary)] border-t-transparent rounded-full mx-auto"></div>
                 <p className="text-gray-500 mt-4">読み込み中...</p>
               </div>
             ) : error ? (

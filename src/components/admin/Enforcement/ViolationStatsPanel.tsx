@@ -202,9 +202,9 @@ export default function ViolationStatsPanel({
 
           {/* 違反統計グリッド */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="text-center p-3 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{violationStats.total_violations}</div>
-              <div className="text-xs text-blue-700">総違反数</div>
+            <div className="text-center p-3 bg-[var(--aio-info-surface)] rounded-lg">
+              <div className="text-2xl font-bold text-[var(--aio-info)]">{violationStats.total_violations}</div>
+              <div className="text-xs text-[var(--aio-info)]">総違反数</div>
             </div>
             <div className="text-center p-3 bg-green-50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">{violationStats.violations_1y}</div>

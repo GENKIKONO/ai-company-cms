@@ -1,6 +1,7 @@
 // CMS アセット管理 API
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
 
 // アセット一覧取得
@@ -9,14 +10,14 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     
     // 管理者認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 管理者権限チェック
     const { data: userOrg, error: orgError } = await supabase
-      .from('user_organizations')
+      .from('organization_members')
       .select('role')
       .eq('user_id', user.id)
       .single();
@@ -90,14 +91,14 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     
     // 管理者認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 管理者権限チェック
     const { data: userOrg, error: orgError } = await supabase
-      .from('user_organizations')
+      .from('organization_members')
       .select('role')
       .eq('user_id', user.id)
       .single();
@@ -182,14 +183,14 @@ export async function DELETE(request: NextRequest) {
     const supabase = await createClient();
     
     // 管理者認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 管理者権限チェック
     const { data: userOrg, error: orgError } = await supabase
-      .from('user_organizations')
+      .from('organization_members')
       .select('role')
       .eq('user_id', user.id)
       .single();

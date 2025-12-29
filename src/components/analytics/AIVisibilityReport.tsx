@@ -143,10 +143,10 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-blue-50">
+        <div className="p-4 rounded-lg bg-[var(--aio-info-surface)]">
           <div className="flex items-center gap-3 mb-2">
             <Search className="w-5 h-5 text-[var(--aio-primary)]" />
-            <span className="text-sm font-medium text-blue-900">検索可視性</span>
+            <span className="text-sm font-medium text-[var(--aio-info)]">検索可視性</span>
           </div>
           <div className={`text-2xl font-bold ${getScoreColor(metrics.searchVisibilityScore)}`}>
             {metrics.searchVisibilityScore}/100
@@ -208,8 +208,8 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
         <h4 className="font-medium text-neutral-900 mb-3">推奨アクション</h4>
         <div className="space-y-2">
           {metrics.recommendations.map((rec, index) => (
-            <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50">
-              <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-[var(--aio-info-surface)]">
+              <div className="w-6 h-6 rounded-full bg-[var(--aio-muted)] flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-xs font-medium text-[var(--aio-primary)]">{index + 1}</span>
               </div>
               <span className="text-sm text-neutral-700">{rec}</span>

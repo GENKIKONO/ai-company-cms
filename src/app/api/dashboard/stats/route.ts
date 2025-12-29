@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { hasEntitlement } from '@/lib/feature-flags/gate';
 import { logger } from '@/lib/log';
 
@@ -34,10 +35,10 @@ interface StatsResponse {
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // ユーザー認証とorg取得
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+
+    // ユーザー認証とorg取得（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({
         ok: false,
         error: 'Unauthorized',

@@ -6,6 +6,9 @@
 - [実装ガイドライン](docs/implementation.md)
 - [タスク分解（スプリント計画）](docs/sprints.md)
 - **[MVPセットアップガイド（Cursor + Claude Code）](docs/mvp_setup_guide.md)** ⭐
+- **[デザインシステム v2.0](DESIGN_SYSTEM.md)** ⭐ ← UI/デザイン関連は必読
+- **[コアアーキテクチャ要件定義](docs/core-architecture.md)** ⭐ ← Shell/Core/Policy設計の正規文書
+- [プラン・機能アーキテクチャ](docs/plans-architecture.md)
 
 ---
 
@@ -20,16 +23,34 @@
 
 ## ⚡ AIコーディング齟齬防止ルール
 
+### 4領域アーキテクチャ（重要）
+```
+Info（/, /pricing, /terms等）  → InfoPageShell   → 認証なし
+Dashboard（/dashboard/**）    → DashboardPageShell → org_role権限
+Account（/account/**）        → UserShell       → user_id権限（将来）
+Admin（/admin/**）            → AdminPageShell  → site_admin権限
+```
+**領域を間違えないこと！** 詳細は `docs/core-architecture.md` 参照
+
+### UI領域（デザイン）
+```
+Public Pages → AioSection, HIGButton
+Dashboard   → DashboardCard, DashboardButton
+Admin       → AdminPageShell内のコンポーネント
+```
+詳細は `DESIGN_SYSTEM.md` 参照
+
 ### 必須確認事項
 - ボタン/CTA関連 → `DESIGN_SYSTEM.md` の既存コンポーネント確認
-- セクション/レイアウト → デザイントークン・既存セクションクラス確認  
-- 色指定 → CSS変数確認
+- セクション/レイアウト → デザイントークン・既存セクションクラス確認
+- 色指定 → CSS変数経由（`var(--aio-primary)` 等）
 - **新規作成前に既存資産確認と提案を必ず行う**
 
 ### 禁止事項
-- className直書き禁止
+- className色直書き禁止（`bg-blue-500` NG）
 - インラインスタイル禁止
 - 確認なしの新規コンポーネント作成禁止
+- 領域違反（DashboardでHIGButton使用、AdminでDashboardPageShell使用等）禁止
 
 ## 開発着手時の手順
 1. `docs/mvp_setup_guide.md` の手順をコピペで実行

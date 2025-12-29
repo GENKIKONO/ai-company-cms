@@ -156,7 +156,7 @@ export default function AdminReportsPage() {
               onClick={() => setFilter(status)}
               className={`px-3 py-1 text-sm rounded-full transition-colors ${
                 filter === status
-                  ? 'bg-blue-100 text-blue-800'
+                  ? 'bg-[var(--aio-info-muted)] text-[var(--aio-info)]'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >

@@ -160,7 +160,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
             onClick={() => handleOptionChange('type', type.value)}
             className={`p-3 text-sm rounded-md border transition-colors ${
               options.type === type.value
-                ? 'bg-blue-50 border-[var(--aio-primary)] text-blue-700'
+                ? 'bg-[var(--aio-info-surface)] border-[var(--aio-primary)] text-[var(--aio-info)]'
                 : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
             }`}
           >
@@ -305,7 +305,7 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
             className={`px-3 py-1 text-sm rounded-md transition-colors ${
               copySuccess
                 ? 'bg-green-100 text-green-700 border border-green-300'
-                : 'bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200'
+                : 'bg-[var(--aio-info-surface)] text-[var(--aio-info)] border border-[var(--aio-info-border)] hover:bg-[var(--aio-info-surface)]'
             }`}
           >
             {copySuccess ? '✅ コピー完了' : '📋 コピー'}
@@ -319,8 +319,8 @@ export function EmbedCodeGenerator({ organization, services = [], baseUrl }: Emb
           className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm focus:outline-none"
         />
         
-        <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <p className="text-sm text-blue-800">
+        <div className="mt-2 p-3 bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)] rounded-md">
+          <p className="text-sm text-[var(--aio-info)]">
             <strong>使用方法:</strong> 上記のコードをHTMLページに貼り付けてください。
             {options.type === 'widget' && ' JavaScriptが有効な環境で動作します。'}
             {options.type === 'iframe' && ' セキュアな環境でも安全に動作します。'}

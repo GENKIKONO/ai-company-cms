@@ -235,7 +235,7 @@ export default function PostsTab({ organizationId, organizationSlug }: PostsTabP
                     )}
                     <button
                       onClick={() => handleEdit(post)}
-                      className="text-[var(--aio-primary)] hover:text-blue-900"
+                      className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)]"
                     >
                       <PencilIcon className="h-4 w-4" />
                     </button>

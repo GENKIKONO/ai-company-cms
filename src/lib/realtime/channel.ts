@@ -4,6 +4,7 @@
  */
 
 import type { SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
+import { getSessionWithClient } from '@/lib/core/auth-state';
 import { orgTopic } from './topics';
 
 interface ChannelConfig {
@@ -37,7 +38,7 @@ export function channelForOrgEntity(
  * JWTトークンをRealtimeサーバーに送信
  */
 export async function ensureRealtimeAuth(supabase: SupabaseClient): Promise<void> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const session = await getSessionWithClient(supabase);
   if (session?.access_token) {
     await supabase.realtime.setAuth(session.access_token);
   }

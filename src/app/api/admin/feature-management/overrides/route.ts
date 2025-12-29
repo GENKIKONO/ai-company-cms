@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 
@@ -18,8 +19,8 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
 
     // 管理者認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -76,8 +77,8 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // 管理者認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
       config: config || {},
       expires_at: expires_at || null,
       updated_at: new Date().toISOString(),
-      updated_by: authData.user.id
+      updated_by: user.id
     };
 
     const { data, error } = await (supabase
@@ -150,8 +151,8 @@ export async function DELETE(request: NextRequest) {
     const supabase = await createClient();
 
     // 管理者認証チェック
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return createAuthError();
     }
 

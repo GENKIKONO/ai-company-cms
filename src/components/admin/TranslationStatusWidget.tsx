@@ -83,7 +83,7 @@ export default function TranslationStatusWidget() {
           <h3 className="text-sm font-medium text-gray-900">翻訳ジョブ状況</h3>
           <Link
             href="/admin/translations"
-            className="text-xs text-blue-600 hover:text-blue-500 flex items-center"
+            className="text-xs text-[var(--aio-primary)] hover:text-[var(--aio-primary)] flex items-center"
           >
             詳細
             <ArrowRightIcon className="w-3 h-3 ml-1" />
@@ -123,10 +123,10 @@ export default function TranslationStatusWidget() {
           {metrics.in_progress_jobs > 0 && (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <PlayIcon className="w-4 h-4 text-blue-500 mr-2" />
+                <PlayIcon className="w-4 h-4 text-[var(--aio-info)] mr-2" />
                 <span className="text-sm text-gray-700">処理中</span>
               </div>
-              <span className="text-sm font-medium text-blue-600">
+              <span className="text-sm font-medium text-[var(--aio-info)]">
                 {metrics.in_progress_jobs.toLocaleString()}
               </span>
             </div>
@@ -159,8 +159,8 @@ export default function TranslationStatusWidget() {
 
         {/* アクティブなジョブがある場合の注意表示 */}
         {hasActiveJobs && (
-          <div className="mt-3 p-2 bg-blue-50 rounded-lg">
-            <p className="text-xs text-blue-700">
+          <div className="mt-3 p-2 bg-[var(--aio-info-surface)] rounded-lg">
+            <p className="text-xs text-[var(--aio-info)]">
               翻訳処理が実行中です。数分間隔でバッチ処理されます。
             </p>
           </div>

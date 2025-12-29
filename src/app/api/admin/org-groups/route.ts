@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
 import { isUserAdminOfOrg } from '@/lib/utils/org-permissions';
@@ -106,8 +107,8 @@ export async function POST(request: NextRequest) {
     const { name, description, owner_organization_id } = validation.data;
 
     // Get current user from auth
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabaseAdmin);
+    if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 

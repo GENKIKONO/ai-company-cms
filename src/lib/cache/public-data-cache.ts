@@ -55,7 +55,7 @@ async function getOrganizationPublicPaths(): Promise<string[]> {
   const orgPaths: string[] = [];
 
   try {
-    // 公開中の組織を取得（簡易版、実際は public_organizations から取得）
+    // 公開中の組織を取得（簡易版、実際は public_organizations_tbl から取得）
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

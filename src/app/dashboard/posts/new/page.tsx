@@ -1,11 +1,33 @@
 'use client';
 
+/**
+ * New Post Page - 新アーキテクチャ版
+ */
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
+import { DashboardPageShell } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardCard,
+  DashboardCardContent,
+  DashboardButton,
+  DashboardAlert,
+} from '@/components/dashboard/ui';
 
 export default function NewPostPage() {
+  return (
+    <DashboardPageShell
+      title="新しい記事"
+      requiredRole="editor"
+    >
+      <NewPostContent />
+    </DashboardPageShell>
+  );
+}
+
+function NewPostContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -74,8 +96,13 @@ export default function NewPostPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <DashboardBackLink variant="button" className="mb-2" />
-      
+      <Link
+        href="/dashboard/posts"
+        className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4"
+      >
+        ← 記事一覧に戻る
+      </Link>
+
       <div className="mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">新しい記事</h1>

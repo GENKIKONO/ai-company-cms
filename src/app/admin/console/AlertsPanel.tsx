@@ -46,7 +46,7 @@ export default function AlertsPanel({ alerts, stats, isPreview = false }: Alerts
   const getSeverityBadge = (severity: string) => {
     const variant = getSeverityVariant(severity);
     const configs = {
-      info: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Info' },
+      info: { bg: 'bg-[var(--aio-info-muted)]', text: 'text-[var(--aio-info)]', label: 'Info' },
       warning: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Warning' },
       critical: { bg: 'bg-red-100', text: 'text-red-800', label: 'Critical' }
     };
@@ -76,7 +76,7 @@ export default function AlertsPanel({ alerts, stats, isPreview = false }: Alerts
             </p>
           </div>
           {!isPreview && (
-            <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
+            <button className="px-4 py-2 text-sm font-medium text-white bg-[var(--aio-primary)] rounded hover:bg-[var(--aio-primary-hover)]">
               View All Alerts
             </button>
           )}
@@ -85,7 +85,7 @@ export default function AlertsPanel({ alerts, stats, isPreview = false }: Alerts
         {/* 統計サマリー（stats は既存ロジックを流用） */}
         <div className="mt-4 grid grid-cols-3 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-[var(--aio-info)]">
               {stats.bySeverity['info'] || 0}
             </div>
             <div className="text-xs text-gray-500">Info</div>
@@ -112,7 +112,7 @@ export default function AlertsPanel({ alerts, stats, isPreview = false }: Alerts
             <select 
               value={filters.eventType || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, eventType: e.target.value || undefined }))}
-              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)]"
             >
               <option value="">All Event Types</option>
               {availableEventTypes.map(type => (
@@ -124,7 +124,7 @@ export default function AlertsPanel({ alerts, stats, isPreview = false }: Alerts
             <select 
               value={filters.severity || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, severity: e.target.value || undefined }))}
-              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)]"
             >
               <option value="">All Severities</option>
               {availableSeverities.map(severity => (
@@ -139,14 +139,14 @@ export default function AlertsPanel({ alerts, stats, isPreview = false }: Alerts
               type="date"
               value={filters.dateFrom || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value || undefined }))}
-              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)]"
               placeholder="From"
             />
             <input
               type="date"
               value={filters.dateTo || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value || undefined }))}
-              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[var(--aio-info)]"
               placeholder="To"
             />
 
@@ -222,7 +222,7 @@ export default function AlertsPanel({ alerts, stats, isPreview = false }: Alerts
                 <div className="flex items-center ml-4">
                   <button
                     onClick={() => setShowDetails(showDetails === alert.id ? null : alert.id)}
-                    className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-xs text-[var(--aio-primary)] hover:text-[var(--aio-primary)] font-medium"
                   >
                     {showDetails === alert.id ? 'Hide' : 'Details'}
                   </button>
@@ -235,7 +235,7 @@ export default function AlertsPanel({ alerts, stats, isPreview = false }: Alerts
 
       {isPreview && filteredAlerts.length > 5 && (
         <div className="p-4 border-t border-gray-200 text-center">
-          <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
+          <button className="text-sm font-medium text-[var(--aio-primary)] hover:text-[var(--aio-primary)]">
             View All {filteredAlerts.length} Alerts
           </button>
         </div>

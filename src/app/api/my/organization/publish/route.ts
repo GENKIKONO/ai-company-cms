@@ -6,9 +6,10 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { handleApiError, validationError, notFoundError } from '@/lib/api/error-responses';
 import { logger } from '@/lib/utils/logger';
-import { isFeatureQuotaLimitReached } from '@/lib/org-features/quota';
+import { isFeatureQuotaLimitReached } from '@/lib/featureGate';
 
 // パブリケーション状態スキーマ
 const publishStatusSchema = z.object({
@@ -60,14 +61,10 @@ export async function PUT(request: NextRequest) {
     // ✅ 統一されたサーバーサイドSupabaseクライアント
     const supabase = await createClient();
 
-    // 認証ユーザー取得（Cookieベース）
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      logger.warn('[my/organization/publish] PUT Not authenticated', { data: { authError, hasUser: !!user } });
+    // 認証ユーザー取得（Core経由）
+    const user = await getUserWithClient(supabase);
+    if (!user) {
+      logger.warn('[my/organization/publish] PUT Not authenticated');
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 

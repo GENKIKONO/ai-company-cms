@@ -17,6 +17,115 @@
 - **権限管理**: role-based access control
 - **API保護**: 統一認証ミドルウェア
 
+---
+
+## 🏗️ UI/ページアーキテクチャ基準
+
+> **目的**: 全ページを統一構造で構成し、保守性・一貫性・開発効率を向上させる
+> **詳細**: `docs/core-architecture.md` を参照
+
+### 基本原則
+
+1. **ページは自由に作らない** - 必ず `PageShell → Header → Blocks` の3層構造
+2. **ルールは上で決めて下へ継承** - 権限・エラー・ローディング・監査は上位で統一
+3. **領域を跨がない** - 4領域で異なるコンポーネント体系を使用
+
+### 4領域アーキテクチャ（DB正対応）
+
+| 領域 | パス | シェル | 主体 | コンポーネント体系 |
+|------|------|--------|------|-------------------|
+| Info | `/`, `/pricing`, `/terms` 等 | InfoPageShell | - | AioSection, HIGButton, HIGCard |
+| Dashboard | `/dashboard/**` | DashboardPageShell | org（組織） | DashboardCard, DashboardButton |
+| Account | `/account/**` | UserShell | user（個人） | （将来実装） |
+| Admin | `/admin/**` | AdminPageShell | site | AdminPageShell内コンポーネント |
+
+**重要: 領域を跨いでコンポーネントを使用しない**
+
+### 主体（Subject）の統一
+
+- **標準の課金・機能判定の主体は `org`（組織）**
+- 個人機能は例外として `user` 主体を許容
+- すべてのRPCは `subject_type ('org'|'user')` と `subject_id (uuid)` を必須引数に持つ
+
+### 3層構造
+
+#### Layer 1: PageShell（必須・外枠）
+責務：認証・権限・機能フラグ・エラー・ローディング・監査
+
+```tsx
+// Dashboard領域
+import { DashboardPageShell } from '@/components/dashboard';
+
+export default function XxxPage() {
+  return (
+    <DashboardPageShell title="ページタイトル" requiredRole="viewer">
+      <XxxContent />
+    </DashboardPageShell>
+  );
+}
+```
+
+#### Layer 2: Header（必須・ページ上部）
+責務：タイトル・説明・アクションボタン・状態表示
+
+```tsx
+import { DashboardPageHeader } from '@/components/dashboard/ui';
+
+<DashboardPageHeader
+  title="記事一覧"
+  description="公開記事を管理します"
+  actions={[{ label: '新規作成', href: '/dashboard/posts/new', variant: 'primary' }]}
+/>
+```
+
+#### Layer 3: Blocks（複数・機能単位）
+責務：表示条件・データ参照・操作・監査
+
+### コンポーネントマッピング（Dashboard領域）
+
+| 旧形式 | 新形式 |
+|--------|--------|
+| `HIGCard` / `Card` (ShadCN) | `DashboardCard` |
+| `HIGButton` / `Button` (ShadCN) | `DashboardButton` |
+| `Alert` (ShadCN) | `DashboardAlert` |
+| `Badge` (ShadCN) | `DashboardBadge` |
+
+### データ取得の統一
+
+```tsx
+import { useDashboardData, useDashboardMutation } from '@/hooks/dashboard';
+
+const { data, loading, error, refetch } = useDashboardData('posts');
+const { mutate, loading: mutating } = useDashboardMutation('posts');
+```
+
+データソース定義: `src/config/data-sources.ts`
+
+### SEO/AI引用性（公開ページ必須）
+
+1. **canonical URL**: 正規URL定義
+2. **構造化データ (JSON-LD)**: ページ種別ごとにテンプレート
+3. **引用単位**: URL#anchor で指せる見出し構造
+
+### スタイルルール
+
+```tsx
+// NG: Tailwind色直書き
+className="bg-blue-500 text-white"
+
+// OK: CSS変数使用
+className="bg-[var(--aio-primary)] text-[var(--color-text-primary)]"
+```
+
+### 参照ドキュメント
+- `DESIGN_SYSTEM.md` - デザインシステム詳細
+- `src/components/dashboard/ui/` - Dashboard UIコンポーネント
+- `src/components/dashboard/templates/` - ページテンプレート
+- `src/config/data-sources.ts` - データソース定義
+- `.ccpaste/unified-architecture-optimal.txt` - 完全版プロンプト
+
+---
+
 ## 🚨 Supabase 運用方針および開発禁止事項
 
 ### 重要: Supabase Auth スキーマ操作の厳格な禁止
@@ -353,73 +462,113 @@ CREATE TABLE subscriptions (
 
 ## Row Level Security (RLS) ポリシー
 
-### セルフサーブモード（1ユーザー=1組織）
+> **詳細**: `docs/core-architecture.md` セクション7を参照
+
+### 基本方針
+
+- すべてのアプリ公開テーブルにRLSを有効化（`auth.uid` 基準）
+- 主要ポリシー条件列にインデックス必須（`user_id`, `organization_id`, `is_published`, `status` など）
+
+### 領域別ポリシー（DB正対応）
+
+#### Dashboard領域（org主体）
+
+- `org_member` のみ SELECT
+- role で UPDATE/DELETE を制御（owner/admin＞editor＞viewer）
+- 公開データは anon への SELECT を許可するか、公開ビュー/複製テーブルに分離
 
 ```sql
--- organizations: セルフサーブユーザーは自分が作成した組織のみ
-CREATE POLICY "selfserve_organizations_policy" ON organizations
-  FOR ALL USING (
-    auth.uid() = created_by AND
-    (auth.jwt()->>'user_metadata'->>'role' IS NULL OR 
-     auth.jwt()->>'user_metadata'->>'role' IN ('org_owner', 'org_editor'))
+-- organizations: org_memberのみアクセス
+CREATE POLICY "dashboard_org_access" ON organizations
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM organization_members om
+      WHERE om.organization_id = id
+      AND om.user_id = auth.uid()
+    )
   );
 
--- services: 組織オーナーのみ
-CREATE POLICY "selfserve_services_policy" ON services
+-- 更新・削除はroleで制御
+CREATE POLICY "dashboard_org_write" ON organizations
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM organizations o 
-      WHERE o.id = organization_id 
-      AND o.created_by = auth.uid()
+      SELECT 1 FROM organization_members om
+      WHERE om.organization_id = id
+      AND om.user_id = auth.uid()
+      AND om.role IN ('owner', 'admin')
     )
   );
 ```
 
-### 代理店モード（partner ロール）
+#### Account領域（user主体）
+
+- `auth.uid` = 対象 user の行のみ SELECT/UPDATE
 
 ```sql
--- organizations: partner権限で管理組織へのアクセス
-CREATE POLICY "partner_organizations_policy" ON organizations
-  FOR ALL USING (
-    auth.jwt()->>'user_metadata'->>'role' = 'partner' AND
-    EXISTS (
-      SELECT 1 FROM organization_profiles op
-      WHERE op.organization_id = id 
-      AND op.user_id = auth.uid()
-      AND op.role IN ('org_owner', 'org_editor')
-    )
-  );
+-- profiles: 本人のみアクセス
+CREATE POLICY "account_user_access" ON profiles
+  FOR ALL USING (auth.uid() = id);
 ```
 
-### 管理者モード（admin ロール）
+#### Admin領域（site主体）
+
+- 読み出し・変更は `site_admins` に限定
+- SECURITY DEFINER RPC で越権防止
 
 ```sql
--- 全テーブル: admin権限で全アクセス
+-- site_adminsのみ全アクセス
 CREATE POLICY "admin_full_access" ON organizations
-  FOR ALL USING (auth.jwt()->>'user_metadata'->>'role' = 'admin');
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM site_admins sa
+      WHERE sa.user_id = auth.uid()
+    )
+  );
 ```
+
+### SECURITY DEFINER
+
+- 複雑な所属判定・集約は SECURITY DEFINER 関数で実装し、EXECUTE 権限を厳格化
+- 関数内でも対象主体のアクセス検証を明示
+
+### レガシー互換（廃止済み）
+
+> ⚠️ **以下のポリシーは廃止されました（2024-12-25）**
+>
+> セルフサーブ/代理店モデルは、4領域アーキテクチャ + Subject統一に置き換え済み。
+> 現行RLSは上記の「領域別ポリシー」セクションを参照。
+
+<!--
+旧ポリシー（参考用、適用しないこと）：
+
+```sql
+-- 旧: セルフサーブモード（1ユーザー=1組織）- 廃止
+CREATE POLICY "selfserve_organizations_policy" ON organizations ...
+
+-- 旧: 代理店モード（partner ロール）- 廃止
+CREATE POLICY "partner_organizations_policy" ON organizations ...
+```
+-->
 
 ## API設計
 
-### エンドポイント体系
+### エンドポイント体系（4領域対応）
 
-#### セルフサーブ専用API
+#### Dashboard API（org主体）
 ```
 GET/POST/PUT/DELETE /api/my/organization
 GET/POST/PUT/DELETE /api/my/services
 GET/POST/PUT/DELETE /api/my/case-studies
 GET/POST/PUT/DELETE /api/my/faqs
 GET/POST/PUT/DELETE /api/my/posts
+GET/POST/PUT/DELETE /api/dashboard/*
 ```
 
-#### 代理店専用API
+#### Account API（user主体、将来実装）
 ```
-GET/POST /api/organizations
-GET/POST/PUT/DELETE /api/organizations/[id]
-GET/POST/PUT/DELETE /api/organizations/[id]/services
-GET/POST/PUT/DELETE /api/organizations/[id]/case-studies
-GET/POST/PUT/DELETE /api/organizations/[id]/faqs
-GET/POST/PUT/DELETE /api/organizations/[id]/posts
+GET/PUT /api/account/profile
+GET/PUT /api/account/settings
+GET/POST /api/account/billing
 ```
 
 #### 公開API（認証不要）
@@ -429,11 +578,12 @@ GET /api/public/organizations/[slug]
 GET /api/public/health
 ```
 
-#### 管理者API
+#### 管理者API（site_admin主体）
 ```
 GET /ops/verify
 GET /ops/probe
 POST /ops/actions/[action]
+GET/POST/PUT /api/admin/*
 ```
 
 ### 認証・認可フロー
@@ -453,9 +603,10 @@ export async function requireAuth(request: NextRequest): Promise<AuthContext | R
   
   // 3. 権限判定（app_metadataまたはprofiles.roleから）
   const userRole = user.app_metadata?.role || 'viewer';
-  
-  // 4. フロー判定（self_serve / partner / admin）
-  // 5. 権限計算・アクセス可能組織リスト生成
+
+  // 4. 領域判定（Dashboard / Account / Admin）
+  // 5. Subject解決（org_id or user_id）
+  // 6. 権限計算・アクセス可能組織リスト生成
 }
 
 // ✅ 安全なユーザー情報取得パターン

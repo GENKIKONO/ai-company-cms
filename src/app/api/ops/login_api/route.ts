@@ -9,6 +9,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import { timingSafeEqual } from 'crypto';
 import { env, getCookieDomain } from '@/lib/env';
 import { logger } from '@/lib/utils/logger';
@@ -82,10 +83,10 @@ export async function POST(request: NextRequest) {
 
     // Supabase SSR 認証確認
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const user = await getUserWithClient(supabase);
 
-    if (authError || !user) {
-      logger.error('[OPS_LOGIN] Missing Supabase session:', { data: authError?.message || 'no user' });
+    if (!user) {
+      logger.error('[OPS_LOGIN] Missing Supabase session:', { data: 'no user' });
       return NextResponse.json(
         {
           code: 'MISSING_SESSION',

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { DashboardPageShell } from '@/components/dashboard';
 
 // フェッチヘルパー（レスポンス規約対応）
 async function fetchAdminApi<T>(url: string): Promise<{ success: boolean; data?: T; error?: string }> {
@@ -60,6 +61,14 @@ interface ScanSummary {
 type TabType = 'overview' | 'alerts' | 'reports' | 'blocklist';
 
 export default function SecurityDashboardPage() {
+  return (
+    <DashboardPageShell title="セキュリティ" requiredRole="admin">
+      <SecurityDashboardContent />
+    </DashboardPageShell>
+  );
+}
+
+function SecurityDashboardContent() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [alerts, setAlerts] = useState<IntrusionAlert[]>([]);
   const [reports, setReports] = useState<IpReport[]>([]);
@@ -165,7 +174,7 @@ export default function SecurityDashboardPage() {
       critical: 'bg-red-100 text-red-800',
       high: 'bg-orange-100 text-orange-800',
       medium: 'bg-yellow-100 text-yellow-800',
-      low: 'bg-blue-100 text-blue-800',
+      low: 'bg-[var(--aio-muted)] text-[var(--aio-primary)]',
     };
     return styles[severity?.toLowerCase()] || 'bg-gray-100 text-gray-800';
   };
@@ -371,7 +380,7 @@ export default function SecurityDashboardPage() {
                                       className={`px-2 py-1 text-xs rounded-full ${
                                         scan.action === 'security_scan_manual'
                                           ? 'bg-purple-100 text-purple-800'
-                                          : 'bg-blue-100 text-blue-800'
+                                          : 'bg-[var(--aio-muted)] text-[var(--aio-primary)]'
                                       }`}
                                     >
                                       {scan.action === 'security_scan_manual' ? '手動' : '自動'}

@@ -1,10 +1,13 @@
 'use client';
 
+/**
+ * Test Interview Page - 新アーキテクチャ版
+ */
+
 import { useState } from 'react';
-import { HIGButton } from '@/design-system';
-import DashboardBackLink from '@/components/dashboard/DashboardBackLink';
+import { DashboardPageShell } from '@/components/dashboard';
+import { DashboardPageHeader, DashboardCard, DashboardCardHeader, DashboardCardContent, DashboardButton, DashboardAlert } from '@/components/dashboard/ui';
 import { logger } from '@/lib/utils/logger';
-import { CelebrationIcon } from '@/components/icons/HIGIcons';
 
 interface TestResult {
   step: string;
@@ -15,6 +18,17 @@ interface TestResult {
 }
 
 export default function TestInterviewPage() {
+  return (
+    <DashboardPageShell
+      title="AIインタビュー E2Eテスト"
+      requiredRole="admin"
+    >
+      <TestInterviewContent />
+    </DashboardPageShell>
+  );
+}
+
+function TestInterviewContent() {
   const [testing, setTesting] = useState(false);
   const [results, setResults] = useState<TestResult[]>([]);
 
@@ -191,27 +205,27 @@ export default function TestInterviewPage() {
   const failCount = results.filter(r => !r.success).length;
 
   return (
-    <div className="">
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <DashboardBackLink variant="button" className="mb-4" />
-          <h1 className="text-3xl font-bold text-gray-900">AIインタビュー E2Eテスト</h1>
-          <p className="text-lg text-gray-600 mt-2">
-            認証済みユーザーでのエンドツーエンド動作確認
-          </p>
-        </div>
+    <>
+      <DashboardPageHeader
+        title="AIインタビュー E2Eテスト"
+        description="認証済みユーザーでのエンドツーエンド動作確認"
+        backLink={{ href: '/dashboard', label: 'ダッシュボード' }}
+      />
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">テスト実行</h2>
-            <HIGButton
+      <DashboardCard className="mb-6">
+        <DashboardCardHeader>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">テスト実行</h2>
+            <DashboardButton
               onClick={runEndToEndTest}
-              disabled={testing}
+              loading={testing}
               variant="primary"
             >
-              {testing ? 'テスト実行中...' : 'E2Eテスト開始'}
-            </HIGButton>
+              E2Eテスト開始
+            </DashboardButton>
           </div>
+        </DashboardCardHeader>
+        <DashboardCardContent>
 
           {results.length > 0 && (
             <div className="mb-4 p-4 bg-gray-50 rounded-lg">
@@ -223,7 +237,7 @@ export default function TestInterviewPage() {
             </div>
           )}
 
-          <div className="text-sm text-gray-600 mb-4">
+          <div className="text-sm text-[var(--color-text-secondary)]">
             <p><strong>テスト項目:</strong></p>
             <ol className="list-decimal list-inside ml-4">
               <li>質問一覧取得 (GET /api/my/interview-questions)</li>
@@ -234,74 +248,74 @@ export default function TestInterviewPage() {
               <li>最終状態確認</li>
             </ol>
           </div>
-        </div>
+        </DashboardCardContent>
+      </DashboardCard>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">テスト結果</h3>
-          </div>
-          <div className="p-6">
-            {results.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">
-                テストを実行してください
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {results.map((result, index) => (
-                  <div
-                    key={index}
-                    className={`p-4 rounded-lg border-l-4 ${
-                      result.success
-                        ? 'bg-green-50 border-green-400'
-                        : 'bg-red-50 border-red-400'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <span className={`text-sm font-medium ${
-                          result.success ? 'text-green-800' : 'text-red-800'
-                        }`}>
-                          {result.success ? '✅' : '❌'} {result.step}
-                        </span>
-                        <span className="text-xs text-gray-500 ml-2">
-                          {result.timestamp}
-                        </span>
-                      </div>
+      <DashboardCard className="mb-6">
+        <DashboardCardHeader>
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">テスト結果</h3>
+        </DashboardCardHeader>
+        <DashboardCardContent>
+          {results.length === 0 ? (
+            <p className="text-[var(--color-text-secondary)] text-center py-8">
+              テストを実行してください
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {results.map((result, index) => (
+                <div
+                  key={index}
+                  className={`p-4 rounded-lg border-l-4 ${
+                    result.success
+                      ? 'bg-[var(--status-success-bg)] border-[var(--status-success)]'
+                      : 'bg-[var(--status-error-bg)] border-[var(--status-error)]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <span className={`text-sm font-medium ${
+                        result.success ? 'text-[var(--status-success)]' : 'text-[var(--status-error)]'
+                      }`}>
+                        {result.success ? '✅' : '❌'} {result.step}
+                      </span>
+                      <span className="text-xs text-[var(--color-text-tertiary)] ml-2">
+                        {result.timestamp}
+                      </span>
                     </div>
-                    
-                    {result.data && (
-                      <div className="mt-2">
-                        <details className="text-xs">
-                          <summary className="cursor-pointer text-gray-600">データ詳細</summary>
-                          <pre className="mt-2 bg-gray-100 p-2 rounded text-gray-800 overflow-auto">
-                            {JSON.stringify(result.data, null, 2)}
-                          </pre>
-                        </details>
-                      </div>
-                    )}
-                    
-                    {result.error && (
-                      <div className="mt-2 text-sm text-red-700">
-                        <strong>エラー:</strong> {result.error}
-                      </div>
-                    )}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
 
-        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-yellow-800 mb-2">注意事項</h4>
-          <ul className="text-xs text-yellow-700 space-y-1">
-            <li>• このテストは認証済みユーザーでのみ実行可能です</li>
-            <li>• テストデータとして実際のセッションが作成されます</li>
-            <li>• OpenAI API キーが設定されていない場合、フォールバック生成が使用されます</li>
-            <li>• 失敗した場合は、各ステップのエラー詳細を確認してください</li>
-          </ul>
-        </div>
-      </main>
-    </div>
+                  {result.data && (
+                    <div className="mt-2">
+                      <details className="text-xs">
+                        <summary className="cursor-pointer text-[var(--color-text-secondary)]">データ詳細</summary>
+                        <pre className="mt-2 bg-[var(--aio-muted)] p-2 rounded text-[var(--color-text-primary)] overflow-auto">
+                          {JSON.stringify(result.data, null, 2)}
+                        </pre>
+                      </details>
+                    </div>
+                  )}
+
+                  {result.error && (
+                    <div className="mt-2 text-sm text-[var(--status-error)]">
+                      <strong>エラー:</strong> {result.error}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </DashboardCardContent>
+      </DashboardCard>
+
+      <DashboardAlert variant="warning">
+        <h4 className="text-sm font-medium text-[var(--status-warning)] mb-2">注意事項</h4>
+        <ul className="text-xs text-[var(--color-text-secondary)] space-y-1">
+          <li>• このテストは認証済みユーザーでのみ実行可能です</li>
+          <li>• テストデータとして実際のセッションが作成されます</li>
+          <li>• OpenAI API キーが設定されていない場合、フォールバック生成が使用されます</li>
+          <li>• 失敗した場合は、各ステップのエラー詳細を確認してください</li>
+        </ul>
+      </DashboardAlert>
+    </>
   );
 }
