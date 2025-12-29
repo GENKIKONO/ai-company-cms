@@ -210,6 +210,19 @@ export function withErrorHandling<T extends any[], R>(
   }) as (...args: T) => Promise<R>;
 }
 
+// Stripeエラーを安全に分類（秘密情報を出さない）
+function categorizeStripeError(err: unknown): 'timeout' | 'invalid_key' | 'permission' | 'network' | 'unknown' {
+  if (!(err instanceof Error)) return 'unknown';
+  const msg = err.message.toLowerCase();
+
+  if (msg.includes('stripe_timeout') || msg.includes('timeout')) return 'timeout';
+  if (msg.includes('invalid api key') || msg.includes('api_key_invalid')) return 'invalid_key';
+  if (msg.includes('permission') || msg.includes('forbidden') || msg.includes('unauthorized')) return 'permission';
+  if (msg.includes('network') || msg.includes('econnrefused') || msg.includes('enotfound') || msg.includes('fetch failed')) return 'network';
+
+  return 'unknown';
+}
+
 // ヘルスチェック
 export async function healthCheck(): Promise<{
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -238,24 +251,29 @@ export async function healthCheck(): Promise<{
       if (process.env.STRIPE_SECRET_KEY) {
         const stripe = (await import('stripe')).default;
         const stripeClient = new stripe(process.env.STRIPE_SECRET_KEY);
-        
-        // タイムアウト付きでAPI呼び出し
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Stripe timeout')), 5000)
+
+        // タイムアウト付きでAPI呼び出し（Edge環境考慮で10秒に延長）
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('STRIPE_TIMEOUT')), 10000)
         );
-        
+
         await Promise.race([
           stripeClient.products.list({ limit: 1 }),
           timeoutPromise
         ]);
         checks.stripe = true;
+        console.log('[healthCheck] Stripe OK');
       } else {
         // 設定されていない場合はスキップ（健康とみなす）
         checks.stripe = true;
+        console.log('[healthCheck] Stripe skipped (no key configured)');
       }
-    } catch {
+    } catch (err) {
       // Stripe失敗は degraded であり unhealthy ではない
       checks.stripe = false;
+      // エラーを分類してログ出力（秘密情報は出さない）
+      const category = categorizeStripeError(err);
+      console.error(`[healthCheck] Stripe FAILED category=${category}`);
     }
 
     // Resend接続チェック（オプショナルサービス、タイムアウト付き）
