@@ -11,9 +11,27 @@
  * - 内部でget_effective_org_features RPCを呼び、plan_features + entitlementsをマージ
  */
 
-import { supabaseAdmin } from '@/lib/supabase-admin-client';
-import { createClient } from '@/lib/supabase/server';
+// NOTE: [CLIENT_IMPORT_CHAIN_FIX] server-only モジュールを静的インポートすると
+// クライアントコンポーネントからインポートされた場合にビルドエラーになる。
+// webpackIgnore を使用してビルド時のモジュール解析を回避する。
 import { PLAN_LIMITS, PLAN_FEATURE_MAP, type PlanType } from '@/config/plans';
+
+// 動的インポートヘルパー（webpackIgnore でビルド時解析を回避）
+const getSupabaseAdmin = async () => {
+  if (typeof window !== 'undefined') {
+    throw new Error('getSupabaseAdmin can only be called on the server side');
+  }
+  const mod = await import(/* webpackIgnore: true */ '@/lib/supabase-admin-client');
+  return mod.supabaseAdmin;
+};
+
+const getSupabaseClient = async () => {
+  if (typeof window !== 'undefined') {
+    throw new Error('getSupabaseClient can only be called on the server side');
+  }
+  const mod = await import(/* webpackIgnore: true */ '@/lib/supabase/server');
+  return mod.createClient();
+};
 import { logger } from '@/lib/utils/logger';
 import type { 
   FeatureKey, 
@@ -149,8 +167,8 @@ export async function fetchEffectiveOrgFeatures(
   organizationId: string
 ): Promise<FetchOrgFeaturesResult> {
   try {
-    const supabase = await createClient();
-    
+    const supabase = await getSupabaseClient();
+
     const { data, error } = await supabase.rpc('get_effective_org_features', {
       p_org_id: organizationId,
     });
@@ -381,7 +399,8 @@ async function getEffectiveOrgFeaturesFromEntitlements(orgId: string): Promise<E
 
   try {
     logger.debug('Trying entitlements fallback', undefined, context);
-    
+
+    const supabaseAdmin = await getSupabaseAdmin();
     const { data: org, error } = await supabaseAdmin
       .from('organizations')
       .select('plan, entitlements')

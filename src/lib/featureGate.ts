@@ -22,8 +22,21 @@
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import { cache } from 'react';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+
+// NOTE: [CLIENT_IMPORT_CHAIN_FIX] サーバーサイドモジュールを静的インポートすると
+// supabase-admin-client.ts (server-only) も引き込まれ、クライアントコンポーネント
+// からインポートされた場合にビルドエラーになる。
+// webpackIgnore を使用してビルド時のモジュール解析を回避。
+const getSupabaseClient = async () => {
+  const mod = await import(/* webpackIgnore: true */ '@/lib/supabase/server');
+  return mod.createClient();
+};
+
+// auth-state.ts も supabase/server.ts を静的インポートするため動的インポートでラップ
+const getUserWithClientDynamic = async (supabase: SupabaseClient) => {
+  const mod = await import(/* webpackIgnore: true */ '@/lib/core/auth-state');
+  return mod.getUserWithClient(supabase);
+};
 
 // =============================================================================
 // Types (DB正対応)
@@ -118,7 +131,7 @@ const fetchEffectiveFeaturesRPC = cache(async (
   subjectType: 'org' | 'user',
   subjectId: string
 ): Promise<{ data: unknown; error: { code?: string; message?: string } | null }> => {
-  const supabase = await createClient();
+  const supabase = await getSupabaseClient();
   return supabase.rpc('get_effective_feature_set', {
     subject_type: subjectType,
     subject_id: subjectId,
@@ -135,7 +148,7 @@ const fetchFeatureSetForUserRPC = cache(async (
   userId: string,
   orgId: string | null
 ): Promise<{ data: unknown; error: { code?: string; message?: string } | null }> => {
-  const supabase = await createClient();
+  const supabase = await getSupabaseClient();
   return supabase.rpc('get_effective_feature_set', {
     p_user_id: userId,
     p_org_id: orgId,
@@ -193,7 +206,7 @@ export async function getFeatureSetForUser(
     // userIdが指定されていない場合は現在のユーザーを取得（Core正本経由）
     let targetUserId = userId;
     if (!targetUserId) {
-      const user = await getUserWithClient(supabase);
+      const user = await getUserWithClientDynamic(supabase);
       if (!user) return null;
       targetUserId = user.id;
     }
@@ -399,7 +412,7 @@ export async function checkAndConsumeQuota(
     // userIdが指定されていない場合は現在のユーザーを取得（Core正本経由）
     let targetUserId = userId;
     if (!targetUserId) {
-      const user = await getUserWithClient(supabase);
+      const user = await getUserWithClientDynamic(supabase);
       if (!user) {
         return { ok: false, code: 'USER_MISMATCH' };
       }
@@ -966,22 +979,119 @@ export function getPlanUiLimitsFromFeatures(
 // Re-exports from org-features (for migration)
 // NOTE: [FEATUREGATE_MIGRATION] org-features からの直接 import を廃止するための re-export
 // これらは org-features 廃止後に削除予定
+// NOTE: [CLIENT_IMPORT_CHAIN_FIX] quota.ts が supabase/server.ts を静的インポートするため、
+// 関数は動的インポートでラップする必要がある
 // =============================================================================
 
-export { fetchOrgQuotaUsage, isFeatureQuotaLimitReached } from '@/lib/org-features/quota';
-export type { FetchOrgQuotaUsageResult } from '@/lib/org-features/quota';
-export type { NormalizedOrgQuotaUsage } from '@/types/features';
+// Type re-exports（型はランタイムに影響しないため静的エクスポートで問題ない）
+import type { NormalizedOrgQuotaUsage as _NormalizedOrgQuotaUsage, SupabaseFeatureKey as _SupabaseFeatureKey } from '@/types/features';
+export type { NormalizedOrgQuotaUsage, SupabaseFeatureKey } from '@/types/features';
 
-// Feature check functions (org-features/effective-features からの re-export)
-export {
-  canUseFeature,
-  getFeatureLimit as getOrgFeatureLimit,  // 名前衝突を避けるためエイリアス
-  getFeatureLevel
-} from '@/lib/org-features/effective-features';
+// FetchOrgQuotaUsageResult の型定義（動的インポートのため再定義）
+export interface FetchOrgQuotaUsageResult {
+  data?: _NormalizedOrgQuotaUsage;
+  error?: {
+    type: 'permission' | 'not_found' | 'network' | 'unknown';
+    message: string;
+    code?: string;
+  };
+}
 
-// Type re-exports (org-features/effective-features からの re-export)
-export type {
-  EffectiveOrgFeatures,
-  FeatureConfig,
-  FeatureKey as OrgFeatureKey,  // 名前衝突を避けるためエイリアス
-} from '@/lib/org-features/effective-features';
+/**
+ * 組織の機能使用量を取得（サーバーサイド専用）
+ * @param organizationId 組織UUID
+ * @param featureKey 機能キー
+ */
+export async function fetchOrgQuotaUsage(
+  organizationId: string,
+  featureKey: string
+): Promise<FetchOrgQuotaUsageResult> {
+  if (typeof window !== 'undefined') {
+    throw new Error('fetchOrgQuotaUsage can only be called on the server side');
+  }
+  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/quota');
+  return mod.fetchOrgQuotaUsage(organizationId, featureKey as any);
+}
+
+/**
+ * 機能の上限到達判定（サーバーサイド専用）
+ * @param organizationId 組織UUID
+ * @param featureKey 機能キー
+ */
+export async function isFeatureQuotaLimitReached(
+  organizationId: string,
+  featureKey: string
+): Promise<boolean> {
+  if (typeof window !== 'undefined') {
+    throw new Error('isFeatureQuotaLimitReached can only be called on the server side');
+  }
+  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/quota');
+  return mod.isFeatureQuotaLimitReached(organizationId, featureKey as any);
+}
+
+// =============================================================================
+// Feature check functions (dynamic import wrappers)
+// NOTE: [CLIENT_IMPORT_CHAIN_FIX] effective-features.ts が supabase-admin-client.ts
+// (server-only) を参照するため、静的 re-export はクライアントコンポーネントから
+// インポートされた場合にビルドエラーを引き起こす。
+// これらの関数はサーバーサイドでのみ実行可能なため、動的インポートでラップする。
+// =============================================================================
+
+/**
+ * 特定機能の利用可否チェック（サーバーサイド専用）
+ * @param orgId 組織ID
+ * @param featureKey 機能キー
+ * @returns 機能が利用可能かどうか
+ */
+export async function canUseFeature(orgId: string, featureKey: string): Promise<boolean> {
+  if (typeof window !== 'undefined') {
+    throw new Error('canUseFeature can only be called on the server side');
+  }
+  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/effective-features');
+  return mod.canUseFeature(orgId, featureKey);
+}
+
+/**
+ * 特定機能の制限値取得（サーバーサイド専用）
+ * @param orgId 組織ID
+ * @param featureKey 機能キー
+ * @returns 制限値 または null
+ */
+export async function getOrgFeatureLimit(orgId: string, featureKey: string): Promise<number | null> {
+  if (typeof window !== 'undefined') {
+    throw new Error('getOrgFeatureLimit can only be called on the server side');
+  }
+  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/effective-features');
+  return mod.getFeatureLimit(orgId, featureKey);
+}
+
+/**
+ * 特定機能のレベル取得（サーバーサイド専用）
+ * @param orgId 組織ID
+ * @param featureKey 機能キー
+ * @returns 機能レベル または null
+ */
+export async function getFeatureLevel(orgId: string, featureKey: string): Promise<string | null> {
+  if (typeof window !== 'undefined') {
+    throw new Error('getFeatureLevel can only be called on the server side');
+  }
+  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/effective-features');
+  return mod.getFeatureLevel(orgId, featureKey);
+}
+
+// Type re-exports (サーバーサイドモジュールへの依存を避けるため @/types/features から取得)
+// NOTE: [CLIENT_IMPORT_CHAIN_FIX] effective-features.ts からの型インポートは
+// バンドラーがモジュール解析時に server-only を検出するため避ける
+export type { FeatureConfig, FeatureKey as OrgFeatureKey } from '@/types/features';
+
+// EffectiveOrgFeatures はローカルで定義（effective-features.ts に依存しないため）
+import type { FeatureConfig as _FeatureConfig, FeatureKey as _FeatureKey } from '@/types/features';
+export interface EffectiveOrgFeatures {
+  features: Partial<Record<_FeatureKey, _FeatureConfig>>;
+  _meta?: {
+    source: 'rpc' | 'entitlements_fallback' | 'plan_limits_fallback';
+    retrieved_at: string;
+    organization_id: string;
+    warnings?: string[];
+  };
+}
