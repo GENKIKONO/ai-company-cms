@@ -1,9 +1,9 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
 // TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
 
 export const createClient = async () => {
+  const { cookies } = await import('next/headers');
   const cookieStore = await cookies();
 
   return createServerClient<any>(
