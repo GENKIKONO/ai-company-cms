@@ -47,7 +47,7 @@ export default async function DashboardLayout({
     const userOrgs = await getUserOrganizations(userProfile.id);
 
     if (userOrgs.length === 0) {
-      redirect('/onboarding/organization');
+      redirect('/organizations/new');
     }
   }
 
