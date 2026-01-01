@@ -1,13 +1,20 @@
-// TODO: [SUPABASE_ORG_GROUP_MIGRATION] 新しい型をインポートして段階的に移行
-// import type { OrganizationGroupWithMembersAndOwner, OrgGroupMemberRow } from '@/types/org-groups-supabase';
-
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/adminClient';
+import { supabaseAdmin, supabaseAdminUntyped } from '@/lib/supabase/adminClient';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
 import { isUserAdminOfOrg } from '@/lib/utils/org-permissions';
 import { z } from 'zod';
+import type {
+  OrgGroup,
+  OrgGroupMemberWithOrg,
+} from '@/lib/types/supabase-helpers';
+
+// Extended type for GET response with members
+type OrgGroupWithMembersAndOwner = OrgGroup & {
+  owner_organization: { id: string; name: string; company_name: string } | null;
+  members: OrgGroupMemberWithOrg[] | null;
+};
 
 // Validation schemas
 const updateGroupSchema = z.object({
@@ -21,7 +28,7 @@ async function canManageGroup(groupId: string, userId: string): Promise<boolean>
     // Get all organizations in this group
     const { data: members, error } = await supabaseAdmin
       .from('org_group_members')
-      .select('organization_id') // TODO: [SUPABASE_ORG_GROUP_MIGRATION] org_id → organization_id に修正
+      .select('organization_id')
       .eq('group_id', groupId);
 
     if (error || !members) {
@@ -30,19 +37,20 @@ async function canManageGroup(groupId: string, userId: string): Promise<boolean>
 
     // Check if user is admin of any organization in this group
     for (const member of members) {
-      const isAdmin = await isUserAdminOfOrg((member as any).organization_id, userId);
+      const isAdmin = await isUserAdminOfOrg(member.organization_id, userId);
       if (isAdmin) {
         return true;
       }
     }
 
     return false;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Error checking group management permission', {
       component: 'org-groups-detail-api',
       groupId,
       userId,
-      error: error.message
+      error: errorMessage
     });
     return false;
   }
@@ -67,17 +75,18 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
       return false;
     }
 
-    if (!group) {
+    if (!group || !group.owner_organization_id) {
       return false;
     }
 
-    return await isUserAdminOfOrg((group as any).owner_organization_id, userId);
-  } catch (error: any) {
+    return await isUserAdminOfOrg(group.owner_organization_id, userId);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Error checking group ownership', {
       component: 'org-groups-detail-api',
       groupId,
       userId,
-      error: error.message
+      error: errorMessage
     });
     return false;
   }
@@ -93,8 +102,8 @@ export async function GET(
 
     const { groupId } = await params;
 
-    // Get group with full details
-    const { data: group, error } = await supabaseAdmin
+    // Get group with full details - use untyped for schema-drift columns
+    const { data: group, error } = await supabaseAdminUntyped
       .from('org_groups')
       .select(`
         id,
@@ -145,15 +154,18 @@ export async function GET(
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
     }
 
+    // Type assertion for the query result
+    const typedGroup = group as unknown as OrgGroupWithMembersAndOwner;
+
     logger.info('Organization group details retrieved', {
       component: 'org-groups-detail-api',
       operation: 'get',
       groupId,
-      groupName: (group as any).name,
-      memberCount: (group as any).members?.length || 0
+      groupName: typedGroup.name,
+      memberCount: typedGroup.members?.length || 0
     });
 
-    return NextResponse.json({ data: group });
+    return NextResponse.json({ data: typedGroup });
 
   } catch (error: any) {
     logger.error('Unexpected error in GET org-group details', {
@@ -208,8 +220,8 @@ export async function PATCH(
       }, { status: 403 });
     }
 
-    // Update the group
-    const { data: group, error } = await (supabaseAdmin as any)
+    // Update the group - use untyped for schema-drift columns
+    const { data: group, error } = await supabaseAdminUntyped
       .from('org_groups')
       .update({
         ...updateData,
@@ -260,7 +272,7 @@ export async function PATCH(
       component: 'org-groups-detail-api',
       operation: 'update',
       groupId,
-      groupName: (group as any).name,
+      groupName: group.name,
       userId: user.id
     });
 
@@ -348,8 +360,8 @@ export async function DELETE(
       component: 'org-groups-detail-api',
       operation: 'delete',
       groupId,
-      groupName: (group as any).name,
-      ownerOrgId: (group as any).owner_organization_id,
+      groupName: group.name,
+      ownerOrgId: group.owner_organization_id,
       userId: user.id
     });
 

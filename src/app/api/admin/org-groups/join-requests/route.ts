@@ -5,6 +5,7 @@ import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
 import { isUserAdminOfOrg, getUserOrganizations } from '@/lib/utils/org-permissions';
 import { z } from 'zod';
+import type { OrgGroupJoinRequestInsert } from '@/lib/types/supabase-helpers';
 
 // Validation schemas
 const createJoinRequestSchema = z.object({
@@ -28,9 +29,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // Build query
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
-    let query = (supabaseAdmin as any)
+    // Build query for join requests with relations
+    let query = supabaseAdmin
       .from('org_group_join_requests')
       .select(`
         id,
@@ -86,8 +86,7 @@ export async function GET(request: NextRequest) {
       .map(org => org.organization_id);
 
     // Check system admin role
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] profiles テーブルの型定義を Supabase client に追加
-    const { data: profile, error: profileError } = await (supabaseAdmin as any)
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -183,8 +182,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify and validate invite code
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_invites テーブルの型定義を Supabase client に追加
-    const { data: invite, error: inviteError } = await (supabaseAdmin as any)
+    const { data: invite, error: inviteError } = await supabaseAdmin
       .from('org_group_invites')
       .select(`
         id,
@@ -286,17 +284,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Create join request
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
-    const { data: joinRequest, error } = await (supabaseAdmin as any)
+    const joinRequestPayload: OrgGroupJoinRequestInsert = {
+      group_id: invite.group_id,
+      organization_id: organizationId,
+      status: 'pending',
+      invite_code: inviteCode,
+      requested_by: user.id,
+      reason: reason || null
+    };
+    const { data: joinRequest, error } = await supabaseAdmin
       .from('org_group_join_requests')
-      .insert({
-        group_id: invite.group_id,
-        organization_id: organizationId,
-        status: 'pending',
-        invite_code: inviteCode,
-        requested_by: user.id,
-        reason: reason || null
-      })
+      .insert(joinRequestPayload)
       .select(`
         id,
         group_id,

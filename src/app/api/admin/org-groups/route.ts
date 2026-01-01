@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/adminClient';
+import { supabaseAdmin, supabaseAdminUntyped } from '@/lib/supabase/adminClient';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
 import { isUserAdminOfOrg } from '@/lib/utils/org-permissions';
 import { z } from 'zod';
+import type { OrgGroupMemberInsert } from '@/lib/types/supabase-helpers';
 
 // Validation schemas
 const createGroupSchema = z.object({
@@ -23,7 +24,8 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 100);
     const search = url.searchParams.get('search');
 
-    let query = supabaseAdmin
+    // Use untyped client for complex JOIN queries with schema-drift columns
+    let query = supabaseAdminUntyped
       .from('org_groups')
       .select(`
         id,
@@ -147,12 +149,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Owner organization not found' }, { status: 404 });
     }
 
-    // Create the group
-    const { data: group, error } = await (supabaseAdmin as any)
+    // Create the group - use untyped client for schema-drift columns
+    const { data: group, error } = await supabaseAdminUntyped
       .from('org_groups')
       .insert({
         name,
-        description,
+        description: description ?? null,
         owner_organization_id: owner_organization_id
       })
       .select(`
@@ -198,15 +200,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Add owner organization as admin member
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_members テーブルの型定義を Supabase client に追加
-    const { error: memberError } = await (supabaseAdmin as any)
+    const memberPayload: OrgGroupMemberInsert = {
+      group_id: group.id,
+      organization_id: owner_organization_id,
+      role: 'admin',
+      added_by: owner_organization_id
+    };
+    const { error: memberError } = await supabaseAdmin
       .from('org_group_members')
-      .insert({
-        group_id: group.id,
-        organization_id: owner_organization_id,
-        role: 'admin',
-        added_by: owner_organization_id
-      });
+      .insert(memberPayload);
 
     if (memberError) {
       logger.error('Error adding owner as group member', {

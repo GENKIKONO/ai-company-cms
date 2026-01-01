@@ -21,21 +21,18 @@ async function isGroupOwnerAdmin(groupId: string, userId: string): Promise<boole
       .eq('id', groupId)
       .maybeSingle();
 
-    if (error) {
+    if (error || !group || !group.owner_organization_id) {
       return false;
     }
 
-    if (!group) {
-      return false;
-    }
-
-    return await isUserAdminOfOrg((group as any).owner_organization_id, userId);
-  } catch (error: any) {
+    return await isUserAdminOfOrg(group.owner_organization_id, userId);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Error checking group owner admin', {
       component: 'group-invite-manage-api',
       groupId,
       userId,
-      error: error.message
+      error: errorMessage
     });
     return false;
   }
@@ -124,8 +121,7 @@ export async function PATCH(
     }
 
     // Update invite
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_invites テーブルの型定義を Supabase client に追加
-    const { data: invite, error } = await (supabaseAdmin as any)
+    const { data: invite, error } = await supabaseAdmin
       .from('org_group_invites')
       .update(updateData)
       .eq('id', inviteId)

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/adminClient';
+import { supabaseAdmin, supabaseAdminUntyped } from '@/lib/supabase/adminClient';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
 import { isUserAdminOfOrg } from '@/lib/utils/org-permissions';
 import { z } from 'zod';
+import type { OrganizationBasic } from '@/lib/types/supabase-helpers';
 
 // Validation schemas
 const addMemberSchema = z.object({
@@ -25,17 +26,18 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
       .eq('id', groupId)
       .maybeSingle();
 
-    if (error || !group) {
+    if (error || !group || !group.owner_organization_id) {
       return false;
     }
 
-    return await isUserAdminOfOrg((group as any).owner_organization_id, userId);
-  } catch (error: any) {
+    return await isUserAdminOfOrg(group.owner_organization_id, userId);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Error checking group ownership', {
       component: 'org-group-members-api',
       groupId,
       userId,
-      error: error.message
+      error: errorMessage
     });
     return false;
   }
@@ -95,8 +97,8 @@ export async function POST(
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
     }
 
-    // Verify organization exists
-    const { data: org, error: orgError } = await supabaseAdmin
+    // Verify organization exists - use untyped for schema-drift columns
+    const { data: org, error: orgError } = await supabaseAdminUntyped
       .from('organizations')
       .select('id, name, company_name')
       .eq('id', organization_id)
@@ -120,16 +122,15 @@ export async function POST(
       }, { status: 409 });
     }
 
-    // Add member
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_members テーブルの型定義を Supabase client に追加
-    const { data: member, error } = await supabaseAdmin
+    // Add member - use untyped for schema-drift columns
+    const { data: member, error } = await supabaseAdminUntyped
       .from('org_group_members')
       .insert({
         group_id: groupId,
         organization_id: organization_id,
         role,
-        added_by: (group as any).owner_organization_id
-      } as any)
+        added_by: group.owner_organization_id
+      })
       .select(`
         id,
         role,
@@ -162,9 +163,9 @@ export async function POST(
       component: 'org-group-members-api',
       operation: 'add',
       groupId,
-      groupName: (group as any).name,
+      groupName: group.name,
       orgId: organization_id,
-      orgName: (org as any).name || (org as any).company_name,
+      orgName: org.name,
       role,
       userId: user.id
     });
@@ -239,14 +240,14 @@ export async function DELETE(
     }
 
     // Prevent removing the owner organization
-    if (organization_id === (group as any).owner_organization_id) {
-      return NextResponse.json({ 
-        error: 'Cannot remove the owner organization from the group' 
+    if (organization_id === group.owner_organization_id) {
+      return NextResponse.json({
+        error: 'Cannot remove the owner organization from the group'
       }, { status: 403 });
     }
 
-    // Get member info before deletion
-    const { data: member } = await supabaseAdmin
+    // Get member info before deletion - use untyped for schema-drift columns
+    const { data: member } = await supabaseAdminUntyped
       .from('org_group_members')
       .select(`
         id,
@@ -284,16 +285,17 @@ export async function DELETE(
     }
 
     // Handle organization data which might be array or object
-    const memberData = member as any;
-    const org = Array.isArray(memberData.organization) 
-      ? memberData.organization[0] 
+    type MemberWithOrg = typeof member & { organization: OrganizationBasic | OrganizationBasic[] | null };
+    const memberData = member as MemberWithOrg;
+    const org = Array.isArray(memberData.organization)
+      ? memberData.organization[0]
       : memberData.organization;
 
     logger.info('Member removed from organization group successfully', {
       component: 'org-group-members-api',
       operation: 'remove',
       groupId,
-      groupName: (group as any).name,
+      groupName: group.name,
       orgId: organization_id,
       orgName: org?.name || org?.company_name,
       role: memberData.role,
