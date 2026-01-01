@@ -1,0 +1,385 @@
+{
+  "generated_at": "2025-12-30T10:30:00Z",
+  "methodology": "Static analysis of supabase/migrations/*.sql and src/**/*.{ts,tsx}",
+  "summary": {
+    "expected_tables_from_migrations": 36,
+    "tables_referenced_by_app": 166,
+    "rls_enabled_tables": 25,
+    "total_indexes_expected": 67,
+    "total_functions_expected": 44,
+    "total_triggers_expected": 43,
+    "gaps_detected": 130
+  },
+  "tables": [
+    {
+      "name": "organizations",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": "gen_random_uuid()"},
+        {"name": "name", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "slug", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "legal_form", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "representative_name", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "founded", "type": "DATE", "nullable": true, "default": null},
+        {"name": "capital", "type": "NUMERIC", "nullable": true, "default": null},
+        {"name": "employees", "type": "INTEGER", "nullable": true, "default": null},
+        {"name": "description", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "address_country", "type": "TEXT", "nullable": false, "default": "'JP'"},
+        {"name": "address_region", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "address_locality", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "street_address", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "postal_code", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "telephone", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "email", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "email_public", "type": "BOOLEAN", "nullable": true, "default": "false"},
+        {"name": "url", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "logo_url", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "same_as", "type": "JSONB", "nullable": true, "default": "'[]'::jsonb"},
+        {"name": "gbp_url", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "industries", "type": "JSONB", "nullable": true, "default": "'[]'::jsonb"},
+        {"name": "eeat", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "status", "type": "TEXT", "nullable": false, "default": "'draft'"},
+        {"name": "owner_user_id", "type": "UUID", "nullable": true, "default": null},
+        {"name": "partner_id", "type": "UUID", "nullable": true, "default": null},
+        {"name": "created_by", "type": "UUID", "nullable": true, "default": null},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "updated_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "feature_flags", "type": "JSONB", "nullable": true, "default": "'{}'::jsonb"},
+        {"name": "entitlements", "type": "JSONB", "nullable": true, "default": "'{}'::jsonb"},
+        {"name": "is_published", "type": "BOOLEAN", "nullable": true, "default": null},
+        {"name": "default_locale", "type": "TEXT", "nullable": true, "default": null}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "unique": ["slug", "created_by"],
+        "check": [
+          "status IN ('draft','waiting_approval','published','paused','archived')",
+          "slug !~ '^(o|s|admin|api|assets|static|sitemap|robots|login|signup)$'",
+          "default_locale IS NULL OR default_locale IN ('ja', 'en')"
+        ],
+        "foreign_keys": [
+          {"column": "partner_id", "references": "partners(id)", "on_delete": "SET NULL"},
+          {"column": "created_by", "references": "auth.users(id)"}
+        ]
+      },
+      "rls": {"enabled": true, "policies": ["org_admin_select", "org_owner_select", "anon_published_select"]}
+    },
+    {
+      "name": "services",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": "gen_random_uuid()"},
+        {"name": "organization_id", "type": "UUID", "nullable": false, "default": null},
+        {"name": "name", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "summary", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "description", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "features", "type": "JSONB", "nullable": true, "default": "'[]'::jsonb"},
+        {"name": "price", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "duration_months", "type": "INTEGER", "nullable": true, "default": null},
+        {"name": "category", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "media", "type": "JSONB", "nullable": true, "default": "'[]'::jsonb"},
+        {"name": "cta_url", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "status", "type": "TEXT", "nullable": true, "default": "'draft'"},
+        {"name": "created_by", "type": "UUID", "nullable": true, "default": null},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "updated_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "check": ["status IN ('draft','published')"],
+        "foreign_keys": [
+          {"column": "organization_id", "references": "organizations(id)", "on_delete": "CASCADE"},
+          {"column": "created_by", "references": "auth.users(id)"}
+        ]
+      },
+      "rls": {"enabled": true, "policies": ["svc_admin_select", "svc_owner_select", "anon_published_select"]}
+    },
+    {
+      "name": "posts",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": "gen_random_uuid()"},
+        {"name": "organization_id", "type": "UUID", "nullable": false, "default": null},
+        {"name": "title", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "slug", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "content_markdown", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "content_html", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "status", "type": "TEXT", "nullable": false, "default": "'draft'"},
+        {"name": "published_at", "type": "TIMESTAMPTZ", "nullable": true, "default": null},
+        {"name": "created_by", "type": "UUID", "nullable": true, "default": null},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": false, "default": "now()"},
+        {"name": "updated_at", "type": "TIMESTAMPTZ", "nullable": false, "default": "now()"}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "unique": ["(organization_id, slug)"],
+        "check": ["status IN ('draft', 'published')"],
+        "foreign_keys": [
+          {"column": "organization_id", "references": "organizations(id)", "on_delete": "CASCADE"},
+          {"column": "created_by", "references": "auth.users(id)"}
+        ]
+      },
+      "rls": {"enabled": true, "policies": ["Users can view own org posts", "Anyone can view published posts"]}
+    },
+    {
+      "name": "case_studies",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": "gen_random_uuid()"},
+        {"name": "organization_id", "type": "UUID", "nullable": false, "default": null},
+        {"name": "title", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "client_type", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "client_name", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "problem", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "solution", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "outcome", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "result", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "metrics", "type": "JSONB", "nullable": true, "default": "'[]'::jsonb"},
+        {"name": "tags", "type": "TEXT[]", "nullable": true, "default": null},
+        {"name": "published_at", "type": "DATE", "nullable": true, "default": null},
+        {"name": "status", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "created_by", "type": "UUID", "nullable": true, "default": null},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "updated_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "foreign_keys": [
+          {"column": "organization_id", "references": "organizations(id)", "on_delete": "CASCADE"},
+          {"column": "created_by", "references": "auth.users(id)"}
+        ]
+      },
+      "rls": {"enabled": true, "policies": ["cs_admin_select", "cs_owner_select"]}
+    },
+    {
+      "name": "faqs",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": "gen_random_uuid()"},
+        {"name": "organization_id", "type": "UUID", "nullable": false, "default": null},
+        {"name": "question", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "answer", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "category", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "sort_order", "type": "INTEGER", "nullable": true, "default": "0"},
+        {"name": "status", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "created_by", "type": "UUID", "nullable": true, "default": null},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "updated_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "foreign_keys": [
+          {"column": "organization_id", "references": "organizations(id)", "on_delete": "CASCADE"},
+          {"column": "created_by", "references": "auth.users(id)"}
+        ]
+      },
+      "rls": {"enabled": true, "policies": ["faq_admin_select", "faq_owner_select"]}
+    },
+    {
+      "name": "app_users",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": null},
+        {"name": "role", "type": "TEXT", "nullable": false, "default": "'org_owner'"},
+        {"name": "partner_id", "type": "UUID", "nullable": true, "default": null},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "updated_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "check": ["role IN ('admin','partner','org_owner','org_editor','viewer')"],
+        "foreign_keys": [
+          {"column": "id", "references": "auth.users(id)", "on_delete": "CASCADE"},
+          {"column": "partner_id", "references": "partners(id)", "on_delete": "SET NULL"}
+        ]
+      },
+      "rls": {"enabled": true, "policies": []}
+    },
+    {
+      "name": "partners",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": "gen_random_uuid()"},
+        {"name": "name", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "contact_email", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "brand_logo_url", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "subdomain", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "commission_rate_init", "type": "NUMERIC", "nullable": true, "default": "0"},
+        {"name": "commission_rate_mrr", "type": "NUMERIC", "nullable": true, "default": "0"},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "unique": ["subdomain"]
+      },
+      "rls": {"enabled": false, "policies": []}
+    },
+    {
+      "name": "subscriptions",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": "gen_random_uuid()"},
+        {"name": "org_id", "type": "UUID", "nullable": false, "default": null},
+        {"name": "plan", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "status", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "stripe_customer_id", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "stripe_subscription_id", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "setup_fee_amount", "type": "INTEGER", "nullable": true, "default": null},
+        {"name": "setup_fee_paid_at", "type": "TIMESTAMPTZ", "nullable": true, "default": null},
+        {"name": "notes", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "updated_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "check": ["plan IN ('basic','pro')", "status IN ('active','paused','cancelled')"],
+        "foreign_keys": [
+          {"column": "org_id", "references": "organizations(id)", "on_delete": "CASCADE"}
+        ]
+      },
+      "rls": {"enabled": true, "policies": []}
+    },
+    {
+      "name": "organization_members",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": "gen_random_uuid()"},
+        {"name": "organization_id", "type": "UUID", "nullable": false, "default": null},
+        {"name": "user_id", "type": "UUID", "nullable": false, "default": null},
+        {"name": "role", "type": "TEXT", "nullable": false, "default": "'member'"},
+        {"name": "invited_by", "type": "UUID", "nullable": true, "default": null},
+        {"name": "invited_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "joined_at", "type": "TIMESTAMPTZ", "nullable": true, "default": null},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "updated_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "unique": ["(organization_id, user_id)"],
+        "check": ["role IN ('owner', 'admin', 'member', 'viewer')"],
+        "foreign_keys": [
+          {"column": "organization_id", "references": "organizations(id)", "on_delete": "CASCADE"},
+          {"column": "user_id", "references": "auth.users(id)", "on_delete": "CASCADE"},
+          {"column": "invited_by", "references": "auth.users(id)"}
+        ]
+      },
+      "rls": {"enabled": true, "policies": ["members_view_own_membership"]}
+    },
+    {
+      "name": "organization_groups",
+      "schema": "public",
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "default": "gen_random_uuid()"},
+        {"name": "name", "type": "TEXT", "nullable": false, "default": null},
+        {"name": "owner_org_id", "type": "UUID", "nullable": false, "default": null},
+        {"name": "description", "type": "TEXT", "nullable": true, "default": null},
+        {"name": "created_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"},
+        {"name": "updated_at", "type": "TIMESTAMPTZ", "nullable": true, "default": "now()"}
+      ],
+      "constraints": {
+        "primary_key": "id",
+        "unique": ["(owner_org_id, name)"],
+        "check": ["length(name) >= 2 AND length(name) <= 100", "length(description) <= 500"],
+        "foreign_keys": [
+          {"column": "owner_org_id", "references": "organizations(id)", "on_delete": "CASCADE"}
+        ]
+      },
+      "rls": {"enabled": true, "policies": ["Groups: members read access"]}
+    }
+  ],
+  "referenced_by_app": {
+    "note": "Tables referenced in src/ that are NOT in migrations - potential gaps",
+    "confirmed_in_migrations": [
+      "organizations", "services", "posts", "case_studies", "faqs", "app_users",
+      "partners", "subscriptions", "organization_members", "organization_groups",
+      "org_group_members", "org_group_invites", "org_group_join_requests",
+      "audit_logs", "audit_log", "qa_entries", "qa_categories", "qa_content_logs",
+      "qa_question_templates", "ai_visibility_logs", "ai_visibility_config",
+      "blocked_ips", "rate_limit_logs", "partner_organizations", "reports",
+      "hearing_requests", "webhook_events", "stripe_products", "stripe_customers",
+      "contact_points", "approval_history", "redirects", "idempotency_keys",
+      "payment_history", "email_logs"
+    ],
+    "potential_gaps": [
+      {"table": "ai_interview_sessions", "references": 32, "reason": "No migration found defining this table"},
+      {"table": "ai_monthly_reports", "references": 20, "reason": "No migration found defining this table"},
+      {"table": "profiles", "references": 24, "reason": "No migration found - may be auth.users view or missing"},
+      {"table": "plans", "references": 13, "reason": "No migration found - may need billing schema"},
+      {"table": "features", "references": 8, "reason": "No migration found - may need feature flags schema"},
+      {"table": "analytics_events", "references": 14, "reason": "No migration found - analytics schema needed"},
+      {"table": "job_runs_v2", "references": 12, "reason": "No migration found - job system schema needed"},
+      {"table": "ai_bot_logs", "references": 12, "reason": "No migration found - AI logging schema needed"},
+      {"table": "monthly_report_jobs", "references": 10, "reason": "No migration found - reports schema needed"},
+      {"table": "materials", "references": 8, "reason": "No migration found - may be sales_materials alias"},
+      {"table": "intrusion_events", "references": 6, "reason": "No migration found - security schema needed"},
+      {"table": "alert_events", "references": 5, "reason": "No migration found - alerting schema needed"},
+      {"table": "site_settings", "references": 5, "reason": "No migration found - settings schema needed"},
+      {"table": "cms_sections", "references": 4, "reason": "No migration found - CMS schema needed"},
+      {"table": "translations", "references": 4, "reason": "No migration found - i18n schema needed"},
+      {"table": "embeddings", "references": 3, "reason": "No migration found - vector schema needed"}
+    ]
+  },
+  "gaps": [
+    {
+      "type": "missing_table",
+      "name": "ai_interview_sessions",
+      "severity": "critical",
+      "reason": "Referenced 32 times in app but no CREATE TABLE in migrations",
+      "evidence": ["src/app/api/ai-interview-sessions/route.ts", "src/lib/ai/interview/session.ts"]
+    },
+    {
+      "type": "missing_table",
+      "name": "ai_monthly_reports",
+      "severity": "critical",
+      "reason": "Referenced 20 times in app but no CREATE TABLE in migrations",
+      "evidence": ["src/app/dashboard/ai-reports/page.tsx", "src/lib/reports/monthly-report-service.ts"]
+    },
+    {
+      "type": "missing_table",
+      "name": "profiles",
+      "severity": "high",
+      "reason": "Referenced 24 times - may be auth.users extension or missing table",
+      "evidence": ["src/lib/auth.ts", "src/app/api/me/route.ts"]
+    },
+    {
+      "type": "missing_table",
+      "name": "plans",
+      "severity": "high",
+      "reason": "Referenced 13 times for billing features",
+      "evidence": ["src/lib/user-plan.ts", "src/app/dashboard/billing/page.tsx"]
+    },
+    {
+      "type": "schema_conflict",
+      "name": "audit_logs vs audit_log",
+      "severity": "medium",
+      "reason": "Two audit tables exist with different schemas - may cause confusion",
+      "evidence": ["0001_init.sql (audit_logs)", "20250927_add_audit_logging.sql (audit_log)"]
+    },
+    {
+      "type": "column_alias_conflict",
+      "name": "services.org_id vs services.organization_id",
+      "severity": "medium",
+      "reason": "Multiple migrations reference different column names",
+      "evidence": ["001_initial_schema.sql", "20250927_add_subresource_tables.sql"]
+    }
+  ],
+  "rpc_functions_expected": [
+    "get_user_role", "get_user_organization_id", "is_admin", "is_organization_owner",
+    "user_role", "is_editor_or_admin", "cleanup_old_audit_logs", "log_audit",
+    "auto_block_ip", "cleanup_old_logs", "generate_qa_content_hash",
+    "is_partner_with_access", "get_partner_organizations", "has_partner_permission",
+    "assign_partner_to_organization", "is_organization_member", "get_user_organizations",
+    "has_organization_role", "is_org_in_group", "get_group_sibling_orgs",
+    "validate_invite_code", "process_enforcement_deadlines", "cleanup_expired_idempotency_keys"
+  ],
+  "rpc_functions_referenced_by_app": [
+    "user_has_org_role", "has_org_role", "is_site_admin", "validate_org_access",
+    "get_effective_feature_set", "get_current_plan", "check_and_consume_quota",
+    "generate_monthly_report", "enqueue_monthly_report", "get_billing_summary",
+    "refresh_ai_quotes_summary_mv", "generate_ai_quotes_aggregation",
+    "admin_get_content_refresh_history_guarded", "admin_get_rls_denies_top5",
+    "execute_intrusion_detection", "detect_service_role_anomalies",
+    "search_embeddings", "get_my_organizations_slim", "get_org_member",
+    "audit_log_write", "analytics_event_write", "patch_org_feature_flags"
+  ]
+}

@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { isAiCrawler, isPublicPath, isInternalPath } from '@/lib/utils/ai-crawler';
+import * as Sentry from '@sentry/nextjs';
 // import { rateLimitMiddleware } from './src/middleware/rateLimit';
 
 // ⚡ 注意: 公開パス定義は ai-crawler.ts に一元化済み
@@ -452,6 +453,10 @@ async function logSecurityIncident(
       });
   } catch (error) {
     console.error('Error logging security incident:', error);
+    Sentry.captureException(error, {
+      tags: { component: 'rate_limit_logging', table: 'security_incidents' },
+      extra: { ip, path, method, incidentType, reason },
+    });
   }
 }
 
@@ -479,6 +484,10 @@ async function logRateLimitRequest(
       });
   } catch (error) {
     console.error('Error logging rate limit request:', error);
+    Sentry.captureException(error, {
+      tags: { component: 'rate_limit_logging', table: 'rate_limit_requests' },
+      extra: { ip, path, method, isBot },
+    });
   }
 }
 
@@ -817,6 +826,10 @@ async function logAccess(
   } catch (error) {
     // Don't throw errors for logging failures
     console.error('Error logging access:', error);
+    Sentry.captureException(error, {
+      tags: { component: 'rate_limit_logging', table: 'rate_limit_logs' },
+      extra: { ip, pathname, method, statusCode, action },
+    });
   }
 }
 

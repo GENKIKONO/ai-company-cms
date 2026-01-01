@@ -1,0 +1,1113 @@
+================================================================================
+              実DBに基づくデータベース要件定義書
+              AIO Hub プロダクションデータベース構造仕様
+================================================================================
+
+作成日: 2024-12-31
+データソース: Supabase Production Database (CSVエクスポート)
+検証方法: SQL Editorからの直接エクスポート (tables.csv, columns.csv,
+          constraints.csv, indexes.csv)
+
+================================================================================
+1. エグゼクティブサマリー
+================================================================================
+
+■ 結論（事実のみ）
+- 実DBには100以上のテーブルが存在（パーティション含む）
+- 月次パーティショニングが4つの主要ログテーブルに適用済み
+- 外部キー制約は適切に設定されている（636件の制約定義確認）
+- CHECK制約によるステータス・型バリデーションが充実
+- 命名規則は概ね統一されている（例外3件を後述）
+
+■ 健全な点
+- JSONBカラムに対するjsonb_typeof CHECKが網羅的
+- パーティション子テーブルに同一インデックスが展開済み
+- EXCLUDE制約による期間重複防止（user_subscriptions）
+- RLSテスト基盤（rls_test_*, rls_denied_events）の存在
+
+■ 要対応点
+- 一部の冗長インデックス（書き込みコスト増）
+- org_id vs organization_id の混在（3テーブル）
+- public_*_tbl テーブルの用途不明
+
+================================================================================
+1.5 移行差分確定の目的・方針
+================================================================================
+
+--------------------------------------------------------------------------------
+1.5.1 目的とスコープ
+--------------------------------------------------------------------------------
+
+■ 本書の位置付け
+  - 本書は「実DBの現物仕様」を記録したものである
+  - supabase/migrations（期待値）との突合・差分確定は次フェーズで実施
+
+■ 差分の定義（3区分）
+  1. Missing in migrations
+     - 現物（実DB）にあるが migrations に定義がない
+     - 例: ai_monthly_reports, embeddings, chatbots など
+
+  2. Missing in DB
+     - migrations に定義があるが現物にない
+     - ※ Supabase managed オブジェクト（auth.*, storage.*）は除外
+
+  3. Definition mismatch
+     - 同名のオブジェクトだが定義が不一致
+     - 例: CHECK制約の値リスト差異、カラム追加漏れ
+
+■ 本フェーズの制限
+  - 「事実把握」に限定し、最適化・再設計は行わない
+  - 推測や評価を含めない
+
+--------------------------------------------------------------------------------
+1.5.2 分類タグ（Diff用）
+--------------------------------------------------------------------------------
+
+■ 優先度分類（Tier）
+
+  Tier A: コアビジネス（必須）
+    - organizations, users, profiles, subscriptions, plans
+    - services, posts, faqs, case_studies, news
+    - organization_members
+
+  Tier B: 主要機能（重要）
+    - ai_interview_sessions, ai_monthly_reports, embeddings
+    - billing_checkout_links, user_subscriptions
+    - alerts, enforcement_actions
+
+  Tier C: 運用補助（任意）
+    - job_runs, idempotency_keys, cache_invalidation_queue
+    - rls_test_*, intrusion_detection_*
+
+  Tier D: 特別扱い（差分無視候補）
+    - 下記参照
+
+■ Tier D: 特別扱い対象（原則差分無視）
+
+  1. _*_v2（derived/cache/view/mview候補）
+     - _activities_recent_30d_v2, _org_content_counts_v2 など
+     - 理由: ビューまたはマテビューの可能性、migrations不要
+
+  2. public_*_tbl（用途要調査）
+     - public_case_studies_tbl, public_posts_tbl など
+     - 理由: 用途不明、移行前に調査必須
+
+  3. *_legacy / _backup（移行・保全用途）
+     - monthly_reports_legacy, audit_logs_legacy_backup_*
+     - 理由: 過渡期データ、移行完了後に判断
+
+  4. パーティション子テーブル（*_YYYYMM）
+     - activities_202511, audit_logs_202512 など
+     - 理由: 親テーブル定義のみで十分、子は自動生成
+
+--------------------------------------------------------------------------------
+1.5.3 移行方針（安全制約）
+--------------------------------------------------------------------------------
+
+■ 絶対禁止事項
+  - 既存 migration ファイルの編集（履歴改変禁止）
+  - 破壊的変更の実装
+    - DROP TABLE / DROP COLUMN / DROP INDEX
+    - DELETE / UPDATE
+    - 既存カラムの型変更
+    - NULL許容 → NOT NULL への変更
+
+■ 許可される操作
+  - 新規 migration ファイルの追加
+  - CREATE TABLE IF NOT EXISTS
+  - CREATE INDEX IF NOT EXISTS / CREATE INDEX CONCURRENTLY
+  - ALTER TABLE ADD COLUMN（新規カラム追加）
+  - ALTER TABLE ADD CONSTRAINT（新規制約追加）
+  - CREATE EXTENSION IF NOT EXISTS
+
+■ 別フェーズ扱い（今回対象外）
+  - カラム/テーブルの削除・統合・リネーム
+  - 冗長インデックスの削除
+  - レガシーテーブルの廃止
+
+--------------------------------------------------------------------------------
+1.5.4 追加調査が必要な論点（判断保留）
+--------------------------------------------------------------------------------
+
+■ monthly_reports_legacy と ai_monthly_reports の関係
+  - monthly_report_jobs は monthly_reports_legacy を参照
+  - report_jobs は ai_monthly_reports を参照
+  - 確認事項: どちらが主系統か、legacy は廃止可能か
+
+■ public_*_tbl の参照有無と更新経路
+  - 7テーブル存在（case_studies, faqs, news, organizations, posts,
+    products, services）
+  - 確認事項: アプリコードでの参照有無、更新トリガーの有無
+
+■ _*_v2 の実体と更新手段
+  - 11オブジェクト確認
+  - 確認事項: view / materialized view / table のどれか
+  - 確認事項: 更新はトリガー / cron / 手動のどれか
+
+================================================================================
+2. テーブル分類と構造
+================================================================================
+
+【凡例】
+  relkind: p = パーティション親, r = 通常テーブル
+  サイズは参考値（インデックス含む）
+
+--------------------------------------------------------------------------------
+2.1 コアビジネステーブル
+--------------------------------------------------------------------------------
+
+■ organizations (r, PRIMARY KEY: id)
+  - 組織マスタ
+  - CHECK: availability_status IN ('available','waitlist','unavailable')
+  - CHECK: discount_group IN ('test_user_30off','early_user_20off',NULL)
+  - CHECK: lat範囲 20-50, lng範囲 120-150（日本国内限定）
+  - UNIQUE: slug, corporate_number
+  - FK: created_by -> users(id), partner_id -> partners(id)
+
+■ users (r, PRIMARY KEY: id)
+  - ユーザーマスタ（auth.usersと連携）
+  - FK: id -> auth.users(id) ON DELETE CASCADE
+  - FK: organization_id -> organizations(id)
+  - UNIQUE: email
+
+■ profiles (r, PRIMARY KEY: id)
+  - ユーザープロファイル（enforcement用）
+  - CHECK: account_status IN ('active','warned','suspended','frozen','deleted')
+  - CHECK: next_violation_action IN ('suspend','warn','none')
+  - FK: id -> auth.users(id) ON DELETE CASCADE
+
+■ organization_members (r, PRIMARY KEY: id)
+  - 組織メンバーシップ
+  - CHECK: role IN ('owner','admin','member','viewer')
+  - UNIQUE: (organization_id, user_id)
+  - FK: organization_id -> organizations(id), user_id -> auth.users(id)
+
+■ subscriptions (r, PRIMARY KEY: id)
+  - 組織サブスクリプション
+  - CHECK: status IN ('active','past_due','canceled','unpaid','incomplete',
+           'trialing','paused')
+  - UNIQUE: stripe_subscription_id
+  - FK: organization_id -> organizations(id)
+
+■ plans (r, PRIMARY KEY: id)
+  - プランマスタ
+  - CHECK: status IN ('active','deprecated')
+  - UNIQUE: name
+
+■ features (r, PRIMARY KEY: id)
+  - 機能マスタ
+  - CHECK: status IN ('active','deprecated')
+  - UNIQUE: key
+
+--------------------------------------------------------------------------------
+2.2 コンテンツテーブル
+--------------------------------------------------------------------------------
+
+■ services (r, 328 kB)
+  - サービス情報
+  - CHECK: status IN ('active','inactive','deleted')
+  - FK: organization_id -> organizations(id)
+  - FK: created_by -> auth.users(id)
+
+■ posts (r)
+  - ブログ記事
+  - CHECK: status IN ('draft','published','archived')
+  - CHECK: meta IS NULL OR jsonb_typeof(meta) = 'object'
+  - FK: organization_id -> organizations(id)
+  - FK: interview_session_id -> ai_interview_sessions(id)
+
+■ faqs (r, 272 kB)
+  - FAQ
+  - CHECK: status IN ('draft','published','archived')
+  - CHECK: meta IS NULL OR jsonb_typeof(meta) = 'object'
+  - FK: organization_id -> organizations(id)
+  - FK: service_id -> services(id)
+  - FK: interview_session_id -> ai_interview_sessions(id)
+
+■ case_studies (r, 328 kB)
+  - 導入事例
+  - CHECK: status IN ('draft','published','archived')
+  - CHECK: availability_status IN ('available','waitlist','unavailable')
+  - CHECK: meta IS NULL OR jsonb_typeof(meta) = 'object'
+  - FK: organization_id -> organizations(id)
+  - FK: service_id -> services(id)
+  - FK: interview_session_id -> ai_interview_sessions(id)
+
+■ news (r)
+  - ニュース記事
+  - CHECK: status IN ('draft','published','archived') (cms_content_status型)
+  - CHECK: meta IS NULL OR jsonb_typeof(meta) = 'object'
+  - FK: organization_id -> organizations(id)
+
+■ products (r)
+  - 商品マスタ
+  - UNIQUE: sku
+
+■ 翻訳テーブル（*_translations）
+  - service_translations: PK (service_id, lang)
+  - post_translations: PK (post_id, lang)
+  - faq_translations: PK (faq_id, lang)
+  - case_study_translations: PK (case_study_id, lang)
+  - news_translations: PK (news_id, lang)
+  - product_translations: PK (product_id, lang)
+  - 全て FK: lang -> supported_languages(code)
+
+--------------------------------------------------------------------------------
+2.3 AI機能テーブル
+--------------------------------------------------------------------------------
+
+■ ai_interview_sessions (r, 104 kB)
+  - AIインタビューセッション
+  - コメント: "PII非保存（アプリ側マスキング前提）"
+  - CHECK: jsonb_typeof(answers) = 'object'
+  - CHECK: generated_content IS NULL OR btrim(generated_content) <> ''
+  - CHECK: generated_content_json IS NULL OR jsonb_typeof(...) = 'object'
+  - CHECK: meta IS NULL OR jsonb_typeof(meta) = 'object'
+  - FK: organization_id -> organizations(id)
+  - FK: user_id -> auth.users(id)
+
+■ ai_interview_axes (r, 64 kB)
+  - 質問軸マスタ
+  - CHECK: code ~ '^[a-z0-9_]+$'
+  - UNIQUE: code
+
+■ ai_interview_questions (r, 96 kB)
+  - 質問テンプレート
+  - CHECK: btrim(question_text) <> ''
+  - UNIQUE: (axis_id, content_type, lang, question_text)
+  - FK: axis_id -> ai_interview_axes(id)
+  - FK: lang -> supported_languages(code)
+
+■ ai_monthly_reports (r, 296 kB)
+  - 月次レポート（AI生成）
+  - コメント: "AI-generated monthly report artifacts"
+  - CHECK: jsonb_typeof(metrics) = 'object'
+  - CHECK: jsonb_typeof(sections) = 'object'
+  - CHECK: jsonb_typeof(suggestions) = 'array'
+  - CHECK: status IN ('pending','generating','completed','failed')
+  - CHECK: period_start <= period_end
+  - UNIQUE: (organization_id, month_bucket, plan_id, level)
+  - UNIQUE: (organization_id, period_start)
+
+■ ai_citations_responses (r, 80 kB)
+  - LLM引用レスポンス
+  - UNIQUE: request_id
+  - FK: organization_id -> organizations(id)
+  - FK: session_id -> ai_interview_sessions(id)
+  - FK: user_id -> auth.users(id)
+
+■ ai_citations_items (r, 64 kB)
+  - 引用明細
+  - CHECK: weight IS NULL OR (weight >= 0 AND weight <= 1)
+  - UNIQUE: (response_id, content_unit_id)
+  - FK: response_id -> ai_citations_responses(id) CASCADE
+  - FK: content_unit_id -> ai_content_units(id)
+
+■ ai_content_units (r, 40 kB)
+  - コンテンツ単位
+  - FK: organization_id -> organizations(id)
+
+■ ai_visibility_scores (r, 56 kB)
+  - AI可視性スコア
+  - CHECK: 各スコア >= 0 AND <= 100
+
+■ ai_usage_events (r, 64 kB)
+  - AI利用イベント
+  - CHECK: usage_type IN ('interview','generation','citation')
+  - FK: organization_id -> organizations(id)
+
+■ embeddings (r, 1680 kB) ← 最大サイズ
+  - ベクトル埋め込み
+  - UNIQUE: (organization_id, source_table, source_id, source_field, chunk_index)
+  - FK: organization_id -> organizations(id)
+
+■ embedding_jobs (r, 56 kB)
+  - 埋め込みジョブ
+  - CHECK: status IN ('pending','in_progress','completed','failed','cancelled')
+  - UNIQUE: idempotency_key
+
+■ chatbots (r, 48 kB)
+  - チャットボット設定
+  - CHECK: bot_type IN ('embedded','hub','system')
+  - CHECK: status IN ('active','inactive')
+  - CHECK: jsonb_typeof(settings) = 'object'
+  - FK: organization_id -> organizations(id)
+
+■ chatbot_interactions (r, 56 kB)
+  - チャットログ
+  - コメント: "PIIマスキング済みのみ保存"
+  - CHECK: btrim(question_text) <> ''
+  - CHECK: btrim(answer_text) <> ''
+  - CHECK: metadata IS NULL OR jsonb_typeof(metadata) = 'object'
+  - FK: bot_id -> chatbots(id), organization_id -> organizations(id)
+
+--------------------------------------------------------------------------------
+2.4 パーティションテーブル（月次分割）
+--------------------------------------------------------------------------------
+
+■ activities (p, 親テーブル)
+  - PRIMARY KEY: (created_at, id)
+  - 子テーブル例: activities_202511 (112 kB)
+  - インデックス: (organization_id, created_at), (user_id), (type)
+
+■ ai_bot_logs (p, 親テーブル)
+  - PRIMARY KEY: (created_at, id)
+  - 子テーブル例: ai_bot_logs_202511 (80 kB)
+  - FK: content_unit_id -> ai_content_units(id)
+  - インデックス: (organization_id, created_at), (id), (content_unit_id)
+
+■ analytics_events (p, 親テーブル)
+  - PRIMARY KEY: (created_at, id)
+  - CHECK: event_key長さ 3-64, パターン '^[a-z0-9_]+$'
+  - CHECK: pg_column_size(properties) <= 8192
+  - 子テーブル例: analytics_events_202511 (64 kB)
+
+■ audit_logs (p, 親テーブル)
+  - コメント: "パーティション化された監査ログ親テーブル"
+  - PRIMARY KEY: (id, created_at)
+  - CHECK: action IN ('INSERT','UPDATE','DELETE')
+  - 子テーブル: 202412〜202603（15パーティション確認）
+  - audit_logs_202511: 360 kB（最大）
+  - レガシーバックアップ: audit_logs_legacy_backup_20251204
+
+■ rate_limit_logs (p, 親テーブル)
+  - PRIMARY KEY: (created_at, id)
+  - 子テーブル例: rate_limit_logs_202511
+
+■ rate_limit_requests (p, 親テーブル)
+  - PRIMARY KEY: (created_at, id)
+  - 子テーブル例: rate_limit_requests_202511
+
+■ security_incidents (p, 親テーブル)
+  - PRIMARY KEY: (created_at, id)
+  - 子テーブル例: security_incidents_202511
+
+--------------------------------------------------------------------------------
+2.5 運用・監視テーブル
+--------------------------------------------------------------------------------
+
+■ admin_audit_logs (r)
+  - 管理者操作ログ
+
+■ enforcement_actions (r, 96 kB)
+  - CHECK: action IN ('warn','suspend','freeze','reinstate','delete')
+  - FK: user_id -> profiles(id) CASCADE
+
+■ enforcement_audit (r, 64 kB)
+  - FK: user_id -> profiles(id) CASCADE
+
+■ alerts / alert_rules / alert_events / alert_thresholds / alert_sources
+  - アラートシステム
+  - CHECK: severity IN ('low','medium','high','critical')
+  - CHECK: status IN ('open','acknowledged','resolved')
+
+■ intrusion_detection_rules / intrusion_detection_alerts
+  - 侵入検知
+  - CHECK: rule_type IN ('signature','anomaly','behavioral','ml_based')
+  - CHECK: rule_category IN ('network','application','authentication','data_access')
+  - CHECK: risk_score >= 0 AND <= 100
+
+■ contract_violations (r, 88 kB)
+  - 契約違反ログ
+  - CHECK: severity IN ('error','warn')
+  - CHECK: source IN ('api','edge','job','ui','batch','webhook','sync',
+           'import','export','cron','partner_api')
+
+■ rls_denied_events (r)
+  - RLS拒否イベント
+  - CHECK: operation IN ('SELECT','INSERT','UPDATE','DELETE','RPC')
+  - CHECK: source IN ('api','edge','ui')
+
+■ rls_test_scenarios / rls_test_results / rls_test_runs / rls_test_users
+  - RLSテスト基盤
+
+■ job_runs / job_runs_v2
+  - ジョブ実行ログ
+  - CHECK: status IN ('success','error') /
+    ('pending','running','succeeded','failed','cancelled','timeout','skipped')
+
+■ idempotency_keys (r, 72 kB)
+  - 冪等性キー
+  - CHECK: status IN ('pending','completed','failed')
+  - UNIQUE: (function_name, key)
+
+■ cache_invalidation_queue (r, 112 kB)
+  - キャッシュ無効化キュー
+  - CHECK: scope IN ('url','prefix','all')
+  - CHECK: status IN ('pending','success','failed')
+
+--------------------------------------------------------------------------------
+2.6 課金・決済テーブル
+--------------------------------------------------------------------------------
+
+■ billing_checkout_links (r, 144 kB)
+  - Stripe Checkoutリンク
+  - CHECK: plan_type IN ('starter','pro','business','enterprise')
+  - CHECK: campaign_type IN ('test_user','early_user','regular')
+  - CHECK: discount_rate >= 0 AND <= 100
+  - EXCLUDE: 同一plan_type+campaign_typeでis_active=trueは1件のみ
+
+■ billing_checkout_link_activations (r, 48 kB)
+  - リンク有効化履歴
+  - FK: checkout_link_id -> billing_checkout_links(id)
+
+■ stripe_customers (r)
+  - UNIQUE: stripe_customer_id
+
+■ user_subscriptions (r)
+  - CHECK: status IN ('active','canceled','past_due','trialing')
+  - CHECK: ends_at IS NULL OR starts_at < ends_at
+  - EXCLUDE USING gist: 期間重複防止（btree_gist使用）
+
+■ customers (r, 80 kB)
+  - CHECK: email形式 '^[^\s@]+@[^\s@]+\.[^\s@]+$'
+
+--------------------------------------------------------------------------------
+2.7 キャッシュ・集計ビュー（_*_v2テーブル）
+--------------------------------------------------------------------------------
+
+※ 全カラムがNULLABLE → ビューまたはマテリアライズドビュー
+
+■ _activities_recent_30d_v2
+  - 直近30日アクティビティ
+
+■ _ai_bot_logs_recent_30d_v2
+  - 直近30日AIボットログ
+
+■ _analytics_events_recent_30d_v2
+  - 直近30日分析イベント
+
+■ _content_metrics_recent_v2
+  - コンテンツメトリクス（views_7d, views_30d, ai_hits_7d, ai_hits_30d）
+
+■ _org_content_counts_v2
+  - 組織別コンテンツ数
+
+■ _org_content_metrics_v2
+  - 組織別コンテンツメトリクス
+
+■ _user_activity_snap_v2
+  - ユーザーアクティビティスナップショット
+
+■ _user_content_created_counts_v2
+  - ユーザー作成コンテンツ数
+
+■ _user_content_reach_v2
+  - ユーザーコンテンツリーチ
+
+■ _user_publish_funnel_v2
+  - ユーザー公開ファネル
+
+■ _user_violation_enforcement_snap_v2
+  - 違反・強制措置スナップショット
+
+--------------------------------------------------------------------------------
+2.8 その他のテーブル
+--------------------------------------------------------------------------------
+
+■ public_*_tbl テーブル群
+  - public_case_studies_tbl, public_faqs_tbl, public_news_tbl
+  - public_organizations_tbl, public_posts_tbl, public_products_tbl
+  - public_services_tbl
+  - 用途: 不明（公開用キャッシュまたはレガシー？）
+  - 注意: 同様のCHECK制約あり、要調査
+
+■ monthly_reports_legacy (r)
+  - レガシー月次レポート（ai_monthly_reportsへ移行中？）
+  - FK: organization_id -> organizations(id)
+
+■ monthly_report_jobs (r)
+  - レポートジョブ
+  - FK: report_id -> monthly_reports_legacy(id)
+  - 注意: ai_monthly_reportsではなくlegacyを参照
+
+■ report_jobs (r)
+  - FK: report_id -> ai_monthly_reports(id)
+  - 注意: こちらは新しい方を参照
+
+================================================================================
+3. 命名規則
+================================================================================
+
+--------------------------------------------------------------------------------
+3.1 カラム命名規則
+--------------------------------------------------------------------------------
+
+■ 標準パターン（遵守されている）
+  - 主キー: id (uuid)
+  - 外部キー: {テーブル名単数形}_id（例: organization_id, user_id）
+  - タイムスタンプ: created_at, updated_at, deleted_at (soft delete)
+  - ステータス: status (text + CHECK制約)
+  - メタデータ: meta, metadata, properties (jsonb)
+
+■ 例外（不整合）
+
+  1. org_id（organization_idではない）
+     - ai_hreflang: org_id
+     - ai_sites: org_id
+     - qna_events: org_id
+     影響: JOINやRLSポリシー作成時に注意が必要
+
+  2. tenant_id（organization_idの別名）
+     - org_memberships: tenant_id
+     - org_roles: tenant_id
+     影響: レガシーマルチテナント設計の名残
+
+  3. created_by / author の揺れ
+     - 標準: created_by (auth.users参照)
+     - 問題なし: 一貫して使用されている
+
+--------------------------------------------------------------------------------
+3.2 テーブル命名規則
+--------------------------------------------------------------------------------
+
+■ 基本ルール（遵守）
+  - 複数形（services, posts, users）
+  - スネークケース（case_studies, ai_interview_sessions）
+  - 翻訳テーブル: {元テーブル}_translations
+
+■ プレフィックス
+  - ai_: AI機能関連
+  - _: キャッシュ/ビュー（例: _activities_recent_30d_v2）
+  - public_*_tbl: 用途不明（要調査）
+  - rls_test_*: RLSテスト用
+
+■ パーティション子テーブル
+  - {親テーブル}_{YYYYMM}（例: audit_logs_202511）
+
+================================================================================
+4. 制約パターン
+================================================================================
+
+--------------------------------------------------------------------------------
+4.1 CHECK制約パターン
+--------------------------------------------------------------------------------
+
+■ ステータスENUM（文字列ベース）
+  CHECK (status = ANY (ARRAY['draft','published','archived']))
+
+  使用箇所: posts, faqs, case_studies, news, services, plans, featuresなど
+
+  注意: PostgreSQL ENUM型ではなくtext + CHECKを使用
+        → 値追加時にALTER TYPE不要で柔軟
+
+■ JSONB型検証
+  CHECK (jsonb_typeof(meta) = 'object')
+  CHECK (jsonb_typeof(answers) = 'object')
+  CHECK (jsonb_typeof(suggestions) = 'array')
+
+  使用箇所: ai_monthly_reports, ai_interview_sessions, chatbotsなど
+
+  メリット: 不正なJSON構造を防止
+
+■ 数値範囲
+  CHECK (risk_score >= 0 AND risk_score <= 100)
+  CHECK (weight >= 0 AND weight <= 1)
+  CHECK (discount_rate >= 0 AND discount_rate <= 100)
+
+  使用箇所: スコア系、比率系カラム
+
+■ 文字列パターン
+  CHECK (code ~ '^[a-z0-9_]+$')
+  CHECK (event_key ~ '^[a-z0-9_]+$')
+  CHECK (email ~* '^[^\s@]+@[^\s@]+\.[^\s@]+$')
+
+  使用箇所: 識別子、キー、メールアドレス
+
+■ 期間整合性
+  CHECK (period_start <= period_end)
+  CHECK (ends_at IS NULL OR starts_at < ends_at)
+
+--------------------------------------------------------------------------------
+4.2 EXCLUDE制約（排他制約）
+--------------------------------------------------------------------------------
+
+■ user_subscriptions
+  EXCLUDE USING gist (
+    user_id WITH =,
+    tstzrange(starts_at, COALESCE(ends_at, 'infinity')) WITH &&
+  ) WHERE (status = 'active')
+
+  目的: 同一ユーザーのアクティブサブスクリプション期間重複を防止
+  前提: btree_gist拡張が必要
+
+■ billing_checkout_links
+  EXCLUDE USING btree (
+    plan_type WITH =,
+    campaign_type WITH =
+  ) WHERE (is_active = true)
+
+  目的: 同一plan_type+campaign_typeでアクティブリンクは1つのみ
+
+--------------------------------------------------------------------------------
+4.3 外部キー制約パターン
+--------------------------------------------------------------------------------
+
+■ ON DELETE CASCADE（完全削除）
+  - organization_members.user_id -> auth.users(id)
+  - *_translations.{entity}_id -> {entity}(id)
+  - ai_generated_drafts.session_id -> ai_interview_sessions(id)
+
+■ ON DELETE SET NULL（参照保持）
+  - ai_interview_sessions.organization_id -> organizations(id)
+  - ai_citations_responses.session_id -> ai_interview_sessions(id)
+  - posts.interview_session_id -> ai_interview_sessions(id)
+
+■ ON DELETE RESTRICT（削除禁止）
+  - case_studies.organization_id -> organizations(id)
+  - posts.organization_id -> organizations(id)
+  - services.organization_id -> organizations(id)
+
+  注意: コンテンツがある組織は削除不可
+
+================================================================================
+5. インデックス戦略
+================================================================================
+
+--------------------------------------------------------------------------------
+5.1 パーティションテーブルのインデックス
+--------------------------------------------------------------------------------
+
+■ 親テーブルに定義（子に継承）
+  - activities: (organization_id, created_at)
+  - ai_bot_logs: (organization_id, created_at)
+
+■ 子テーブル固有インデックス
+  - activities_202511: (created_at), (type), (user_id)
+  - ai_bot_logs_202511: (id), (content_unit_id)
+
+■ 推奨事項
+  - 全パーティションで同一インデックスセットを維持
+  - 月次パーティション自動作成時にインデックスも付与
+
+--------------------------------------------------------------------------------
+5.2 複合インデックスパターン
+--------------------------------------------------------------------------------
+
+■ 組織 + 時系列（RLS対応）
+  (organization_id, created_at) または (organization_id, created_at DESC)
+
+  使用: ai_citations_responses, ai_interview_sessions, activities
+
+■ 組織 + ステータス + 時系列
+  (organization_id, status, created_at DESC) WHERE (deleted_at IS NULL)
+
+  使用: ai_interview_sessions
+
+■ ユニーク複合
+  (organization_id, slug) - posts, services, case_studies
+  (response_id, content_unit_id) - ai_citations_items
+
+--------------------------------------------------------------------------------
+5.3 部分インデックス
+--------------------------------------------------------------------------------
+
+■ ソフトデリート対応
+  WHERE (deleted_at IS NULL)
+
+  使用: ai_interview_sessions の複数インデックス
+
+■ ステータス限定
+  WHERE (status = 'published')
+
+  使用: ai_disclosure_documents
+
+--------------------------------------------------------------------------------
+5.4 冗長インデックス（要検討）
+--------------------------------------------------------------------------------
+
+■ ai_citations_items
+  - idx_ai_cit_items_content_unit_id
+  - idx_ai_citations_items_content_unit ← 同一定義、重複
+
+■ ai_citations_responses
+  - idx_ai_cit_resp_org_created_at
+  - idx_ai_citations_responses_org_created ← ほぼ同一
+
+■ ai_interview_sessions
+  - idx_ai_interview_sessions_org
+  - idx_aiis_org ← 同一定義、重複
+
+影響: 書き込み時のオーバーヘッド増
+推奨: 重複インデックスの統合を検討
+
+================================================================================
+6. RLS（Row Level Security）インフラ
+================================================================================
+
+--------------------------------------------------------------------------------
+6.1 RLSテスト基盤
+--------------------------------------------------------------------------------
+
+■ rls_test_scenarios
+  - テストシナリオ定義
+  - CHECK: expected_result IN ('ALLOW','DENY')
+  - CHECK: operation IN ('SELECT','INSERT','UPDATE','DELETE')
+
+■ rls_test_users
+  - テスト用ロール
+  - UNIQUE: role_name
+
+■ rls_test_runs
+  - テスト実行履歴
+  - CHECK: status IN ('RUNNING','COMPLETED','FAILED','CANCELLED')
+  - CHECK: trigger_type IN ('MANUAL','CI','SCHEDULED')
+
+■ rls_test_results
+  - 結果記録
+  - CHECK: actual_result IN ('ALLOW','DENY','ERROR')
+  - FK: scenario_id -> rls_test_scenarios(id)
+
+--------------------------------------------------------------------------------
+6.2 RLS監査
+--------------------------------------------------------------------------------
+
+■ rls_denied_events
+  - 拒否イベントログ
+  - CHECK: operation IN ('SELECT','INSERT','UPDATE','DELETE','RPC')
+  - CHECK: source IN ('api','edge','ui')
+
+  用途: RLSポリシー違反の検出・分析
+
+================================================================================
+7. 既知の問題と対応方針
+================================================================================
+
+--------------------------------------------------------------------------------
+7.1 緊急度: 高
+--------------------------------------------------------------------------------
+
+なし（重大な整合性問題は確認されず）
+
+--------------------------------------------------------------------------------
+7.2 緊急度: 中（2024-12-31 調査完了）
+--------------------------------------------------------------------------------
+
+■ public_*_tbl テーブルの用途確認 → 【調査完了・使用中】
+  対象: public_case_studies_tbl, public_faqs_tbl, public_news_tbl,
+        public_organizations_tbl, public_posts_tbl, public_products_tbl,
+        public_services_tbl
+
+  【調査結果 2024-12-31】
+  用途: CMS公開コンテンツ用キャッシュテーブル
+
+  使用箇所:
+  - src/types/cms-supabase.ts: 型定義（"Supabase の「正」"とコメントあり）
+  - src/types/cms-content.ts: 移行計画TODO（posts→public_posts_tbl等）
+  - src/app/api/public/organizations/summary/route.ts: 件数取得
+  - src/lib/cache/public-data-cache.ts: キャッシュ参照
+
+  同期関数:
+  - sync_public_case_studies_tbl, sync_public_faqs_tbl 等
+
+  結論: 廃止不可。公開APIで使用中。
+
+■ monthly_reports_legacy と ai_monthly_reports の関係 → 【調査完了・移行中】
+
+  【調査結果 2024-12-31】
+  現状:
+  - 新系統: ai_monthly_reports + report_jobs（主系統）
+  - 旧系統: monthly_reports_legacy + monthly_report_jobs
+  - 互換ビュー: ai_monthly_reports_compat が両方を橋渡し
+
+  使用状況:
+  - ai_monthly_reports:
+    - src/app/api/my/reports/monthly/*.ts で使用
+    - src/app/api/cron/monthly-report/route.ts で使用
+  - monthly_report_jobs:
+    - src/hooks/useMonthlyReportJobRealtime.ts で使用
+    - src/lib/reports/monthly-report-service.ts で使用
+    - src/lib/reports/client.ts で使用
+
+  結論: 移行途中。monthly_report_jobs は ai_monthly_reports_compat 経由で
+        ai_monthly_reports を参照。legacy 廃止には追加調査が必要。
+
+■ 冗長インデックスの整理 → 【未対応・別フェーズ】
+  対象:
+  - ai_citations_items: 2件の重複
+  - ai_citations_responses: 類似2件
+  - ai_interview_sessions: 2件の重複
+
+  アクション:
+  - クエリパターンを確認
+  - 不要な方をDROP INDEX CONCURRENTLY
+
+  注意: 破壊的変更のため今回のmigrationスコープ外
+
+--------------------------------------------------------------------------------
+7.3 緊急度: 低
+--------------------------------------------------------------------------------
+
+■ org_id / organization_id の統一
+  対象: ai_hreflang, ai_sites, qna_events
+
+  リスク:
+  - JOINミス
+  - RLSポリシー作成時の混乱
+
+  アクション:
+  - 次回大規模リファクタ時にリネーム検討
+  - または命名例外としてドキュメント化
+
+■ tenant_id の organization_id への統一
+  対象: org_memberships, org_roles
+
+  アクション:
+  - レガシーとして許容
+  - 新規開発では organization_id を使用
+
+================================================================================
+8. 運用推奨事項
+================================================================================
+
+--------------------------------------------------------------------------------
+8.1 パーティション管理
+--------------------------------------------------------------------------------
+
+■ 自動作成
+  - 月初に翌月パーティションを作成
+  - 同一インデックスセットを付与
+
+  対象テーブル:
+  - activities
+  - ai_bot_logs
+  - analytics_events
+  - audit_logs
+  - rate_limit_logs
+  - rate_limit_requests
+  - security_incidents
+
+■ デフォルトパーティション
+  - 月替わり境界の挿入失敗を防止
+  - まだ未作成の場合は追加推奨
+
+■ 古いパーティションの削除
+  - 保持期間を決定（例: 12ヶ月）
+  - DETACH PARTITION → DROP TABLE
+
+--------------------------------------------------------------------------------
+8.2 監視・アラート
+--------------------------------------------------------------------------------
+
+■ 既存インフラの活用
+  - alerts, alert_rules, alert_events, alert_thresholds
+  - intrusion_detection_alerts, intrusion_detection_rules
+  - rls_denied_events
+
+■ 推奨監視項目
+  - パーティションサイズの推移
+  - embeddings テーブルの肥大化（現在1680KB）
+  - RLS拒否イベントの発生頻度
+
+--------------------------------------------------------------------------------
+8.3 バックアップ・リカバリ
+--------------------------------------------------------------------------------
+
+■ 確認済みバックアップ
+  - _bf_projects_orgid_backup
+  - audit_logs_legacy_backup_20251204
+
+■ 推奨
+  - 定期的なスナップショット
+  - パーティション単位のリストア手順の確認
+
+================================================================================
+9. コード側との整合性チェックリスト
+================================================================================
+
+以下のテーブルがコードで正しく参照されているか確認:
+
+□ organizations - スラッグ、法人番号のユニーク制約
+□ organization_members - ロール制約 (owner/admin/member/viewer)
+□ ai_interview_sessions - JSONBカラムの型チェック
+□ ai_monthly_reports - ステータス遷移 (pending→generating→completed/failed)
+□ subscriptions - ステータス遷移
+□ user_subscriptions - EXCLUDE制約による期間重複防止
+□ billing_checkout_links - EXCLUDE制約によるアクティブ1件制限
+□ embeddings - ユニーク制約 (org, table, id, field, chunk_index)
+
+================================================================================
+10. 付録: テーブルサイズ上位
+================================================================================
+
+1. embeddings: 1680 kB
+2. audit_logs_202511: 360 kB
+3. case_studies: 328 kB
+4. ai_monthly_reports: 296 kB
+5. audit_logs_202512: 264 kB
+6. faqs: 272 kB
+7. ai_disclosure_documents: 192 kB
+8. billing_checkout_links: 144 kB
+9. audit_logs_legacy_backup_20251204: 144 kB
+10. audit_logs_202412〜202503: 各128 kB
+
+================================================================================
+11. Migration作成完了（2024-12-31 完了）
+================================================================================
+
+対象migration: supabase/migrations/20241231000001_schema_diff_reconciliation.sql
+合計: 22テーブル + 3 ENUM型 + 2 拡張機能（vector, btree_gist）
+
+--------------------------------------------------------------------------------
+11.1 Verified テーブル: migration作成済（15テーブル）
+--------------------------------------------------------------------------------
+
+source: Public Tables Column Metadata.csv + query(35).csv
+
+| #  | テーブル名                         | 列数 | 状況           |
+|----|-----------------------------------|------|----------------|
+| 1  | ai_citations_items                | 9    | migration済    |
+| 2  | ai_citations_responses            | 12   | migration済    |
+| 3  | ai_interview_axes                 | 10   | migration済    |
+| 4  | ai_usage_events                   | 6    | migration済    |
+| 5  | billing_checkout_link_activations | 9    | migration済    |
+| 6  | billing_checkout_links            | 13   | migration済    |
+| 7  | chatbot_interactions              | 11   | migration済    |
+| 8  | chatbots                          | 11   | migration済    |
+| 9  | customers                         | 6    | migration済    |
+| 10 | embedding_jobs                    | 22   | migration済    |
+| 11 | features                          | 7    | migration済    |
+| 12 | organization_members              | 9    | migration済    |
+| 13 | plans                             | 7    | migration済    |
+| 14 | profiles                          | 10   | migration済    |
+| 15 | stripe_customers                  | 4    | migration済    |
+
+--------------------------------------------------------------------------------
+11.2 USER-DEFINED型テーブル: migration作成済（4テーブル + 3 ENUM）
+--------------------------------------------------------------------------------
+
+source: query(36).csv, query(37).csv
+
+| #  | テーブル名               | 列数 | USER-DEFINED型                              |
+|----|-------------------------|------|---------------------------------------------|
+| 16 | ai_interview_questions  | 10   | interview_content_type                      |
+| 17 | ai_interview_sessions   | 14   | interview_content_type, interview_session_status |
+| 18 | ai_monthly_reports      | 14   | report_status                               |
+| 19 | embeddings              | 14   | vector (pgvector)                           |
+
+■ ENUM型定義（migration内で CREATE TYPE）
+  - interview_content_type: service, product, post, news, faq, case_study
+  - interview_session_status: draft, in_progress, completed
+  - report_status: pending, generating, completed, failed
+
+--------------------------------------------------------------------------------
+11.3 ordinal欠番テーブル: migration作成済（3テーブル）
+--------------------------------------------------------------------------------
+
+source: query(38).csv (pg_attribute使用)
+
+| #  | テーブル名          | 列数 | 欠番位置   | 備考                |
+|----|---------------------|------|------------|---------------------|
+| 20 | ai_content_units    | 12   | ordinal 2  | 削除済み列          |
+| 21 | subscriptions       | 9    | ordinal 2  | Stripe連携          |
+| 22 | user_subscriptions  | 11   | ordinal 7  | btree_gist拡張使用  |
+
+--------------------------------------------------------------------------------
+11.4 Tier D（差分対象外・未対応）
+--------------------------------------------------------------------------------
+
+以下は migration 対象外（派生/キャッシュ/バックアップ/パーティション子）。
+
+- _*_v2 テーブル群（11テーブル）: ビュー/マテビュー候補
+- public_*_tbl（7テーブル）: 用途要調査
+- *_legacy / _backup: 過渡期データ
+- *_YYYYMM: パーティション子（親定義で十分）
+- activities: パーティション親（別途対応）
+
+--------------------------------------------------------------------------------
+11.5 拡張機能（migration内で CREATE EXTENSION）
+--------------------------------------------------------------------------------
+
+| 拡張機能    | 用途                        | 状況        |
+|------------|----------------------------|-------------|
+| vector     | embeddings.embedding 列     | migration済 |
+| btree_gist | user_subscriptions EXCLUDE制約 | migration済 |
+
+================================================================================
+12. 実行済みエクスポートSQL（参考・アーカイブ）
+================================================================================
+
+以下のSQLは2024-12-31に実行済み。migration作成に使用した。
+
+--------------------------------------------------------------------------------
+12.1 USER-DEFINED 型の実体（ENUM ならラベル）
+--------------------------------------------------------------------------------
+
+SELECT
+  t.typname AS type_name,
+  e.enumsortorder,
+  e.enumlabel
+FROM pg_type t
+JOIN pg_enum e ON e.enumtypid = t.oid
+WHERE t.typname IN ('interview_session_status', 'report_status')
+ORDER BY t.typname, e.enumsortorder;
+
+--------------------------------------------------------------------------------
+12.2 content_type の型名確認
+--------------------------------------------------------------------------------
+
+SELECT
+  c.table_name,
+  c.column_name,
+  c.udt_name
+FROM information_schema.columns c
+WHERE c.table_schema = 'public'
+  AND c.table_name IN ('ai_interview_questions', 'ai_interview_sessions')
+  AND c.column_name = 'content_type';
+
+--------------------------------------------------------------------------------
+12.3 embeddings.embedding の型名確認
+--------------------------------------------------------------------------------
+
+SELECT
+  table_name,
+  column_name,
+  udt_name
+FROM information_schema.columns
+WHERE table_schema = 'public'
+  AND table_name = 'embeddings'
+  AND column_name = 'embedding';
+
+--------------------------------------------------------------------------------
+12.4 ordinal_position 欠落テーブルの再取得
+--------------------------------------------------------------------------------
+
+SELECT
+  table_name,
+  ordinal_position,
+  column_name,
+  data_type,
+  is_nullable,
+  column_default,
+  udt_name
+FROM information_schema.columns
+WHERE table_schema = 'public'
+  AND table_name IN ('ai_content_units', 'subscriptions', 'user_subscriptions')
+ORDER BY table_name, ordinal_position;
+
+--------------------------------------------------------------------------------
+12.5 Tier A/B テーブルのカラム定義取得
+--------------------------------------------------------------------------------
+
+SELECT
+  table_name,
+  ordinal_position,
+  column_name,
+  data_type,
+  udt_name,
+  is_nullable,
+  column_default
+FROM information_schema.columns
+WHERE table_schema = 'public'
+  AND table_name IN (
+    'profiles', 'plans', 'features', 'organization_members', 'products',
+    'supported_languages', 'ai_interview_axes', 'ai_citations_responses',
+    'ai_citations_items', 'embedding_jobs', 'chatbots', 'chatbot_interactions',
+    'billing_checkout_links', 'billing_checkout_link_activations',
+    'stripe_customers', 'customers', 'alerts', 'alert_rules'
+  )
+ORDER BY table_name, ordinal_position;
+
+================================================================================
+ドキュメント終了
+================================================================================

@@ -131,3 +131,88 @@ npm run build
 2. If for display only (badge styling), may be allowed
 3. Add to `docs/architecture/exceptions-allowlist.md` with justification
 4. This should be RARE
+
+---
+
+## 8. Rate Limiting / Security Logging 設計決定
+
+> 決定日: 2025-01-01
+> 対象テーブル: `rate_limit_requests`, `rate_limit_logs`, `security_incidents`
+
+### 8.1 書き込み経路
+
+| テーブル | 関数 | 場所 |
+|---------|------|------|
+| `rate_limit_requests` | `logRateLimitRequest()` | `middleware.ts:469-479` |
+| `rate_limit_logs` | `logAccess()` | `middleware.ts:802-816` |
+| `security_incidents` | `logSecurityIncident()` | `middleware.ts:441-452` |
+
+**方針**:
+- 全 INSERT で `created_at` 未指定 → DB DEFAULT `now()` に依存
+- Supabase SDK / SQL関数経由のみ（COPY/pg_restore 禁止）
+- service_role キー使用箇所に限定
+
+### 8.2 障害時ハンドリング
+
+**フェイルソフト方針**: ✅ 維持
+- INSERT 失敗時は `console.error` + Sentry 送信
+- リクエスト処理は継続（throw しない）
+
+**監視閾値**:
+| レベル | 条件 |
+|--------|------|
+| 警告 | 5分窓で INSERT 失敗率 > 1% |
+| 重大 | 5分窓で INSERT 失敗率 > 5% |
+
+### 8.3 将来のパーティション化
+
+**同意事項**:
+- DB側で BEFORE INSERT の `ensure_*` トリガー有効化時、アプリ変更不要
+- パーティション化条件: 日次 10万件超 or テーブル 10GB超
+
+### 8.4 RLS ポリシー
+
+| ロール | rate_limit_* | security_incidents |
+|--------|--------------|-------------------|
+| service_role | INSERT/SELECT | INSERT/SELECT |
+| admin (is_admin=true) | SELECT | SELECT |
+| authenticated | - | - |
+| anon | - | - |
+
+### 8.5 インデックス確認済み
+
+- `idx_rate_limit_ip_time (ip_address, created_at)`
+- `idx_rate_limit_key_time (key, created_at)`
+- `idx_rate_limit_logs_ip_timestamp (ip_address, timestamp)`
+
+### 8.6 Sentry アラートルール設定
+
+**手動設定手順** (Sentry Dashboard):
+
+1. **Sentry Project Settings** → **Alerts** → **Create Alert Rule**
+2. 設定内容:
+   - **Name**: `Rate Limit Logging Failures`
+   - **Environment**: `production`
+   - **Filter**: `tags.component:rate_limit_logging`
+   - **Conditions**:
+     - 警告: 5分窓で発生率 > 1%
+     - 重大: 5分窓で発生率 > 5%
+   - **Actions**: Slack / Email 通知
+
+**IaC 管理（将来）**: Sentry Terraform Provider または sentry-cli で管理可能
+
+```json
+{
+  "name": "Rate Limit Logging Failures",
+  "environment": "production",
+  "conditions": [
+    { "type": "event_frequency", "value": 10, "interval": "5m", "comparisonType": "count" }
+  ],
+  "filters": [
+    { "type": "tagged_event", "key": "component", "value": "rate_limit_logging" }
+  ],
+  "actions": [
+    { "type": "notify_email", "targetType": "Team" }
+  ]
+}
+```

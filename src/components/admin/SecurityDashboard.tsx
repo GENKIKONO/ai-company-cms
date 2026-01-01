@@ -41,9 +41,46 @@ interface ServiceRoleStats {
   }>;
 }
 
+interface WritePathMeta {
+  table_name: string;
+  function_name: string;
+  code_lines: string;
+  callers: string[];
+  created_at_explicit: boolean;
+  required_role: string;
+  notes: string;
+}
+
+interface RateLimitMetrics {
+  write_paths_meta: WritePathMeta[];
+  rate_limit_requests: {
+    period_minutes: number;
+    total_count: number;
+    suspicious_count: number;
+    recent_5min_count: number;
+  };
+  rate_limit_logs: {
+    period_minutes: number;
+    total_count: number;
+    top_ips: Array<{ ip: string; count: number; botCount: number }>;
+  };
+  security_incidents: {
+    period_hours: number;
+    total_count: number;
+    by_risk_level: Record<string, number>;
+    by_incident_type: Record<string, number>;
+  };
+  health: {
+    window_minutes: number;
+    insert_failure_rate_pct: number;
+    status: 'healthy' | 'warning' | 'critical';
+  };
+}
+
 export default function SecurityDashboard() {
   const [metrics, setMetrics] = useState<SecurityMetrics | null>(null);
   const [serviceRoleStats, setServiceRoleStats] = useState<ServiceRoleStats | null>(null);
+  const [rateLimitMetrics, setRateLimitMetrics] = useState<RateLimitMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -155,15 +192,30 @@ export default function SecurityDashboard() {
     }
   }, [supabase]);
 
+  const fetchRateLimitMetrics = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/rate-limit-metrics');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setRateLimitMetrics(data.data);
+        }
+      }
+    } catch (error) {
+      logger.error('Error fetching rate limit metrics:', { data: error });
+    }
+  }, []);
+
   const fetchAllData = useCallback(async () => {
     setLoading(true);
     await Promise.all([
       fetchSecurityMetrics(),
-      fetchServiceRoleStats()
+      fetchServiceRoleStats(),
+      fetchRateLimitMetrics()
     ]);
     setLastUpdate(new Date());
     setLoading(false);
-  }, [fetchSecurityMetrics, fetchServiceRoleStats]);
+  }, [fetchSecurityMetrics, fetchServiceRoleStats, fetchRateLimitMetrics]);
 
   useEffect(() => {
     fetchAllData();
@@ -283,6 +335,7 @@ export default function SecurityDashboard() {
           <TabsTrigger value="attackers">Top Attackers</TabsTrigger>
           <TabsTrigger value="service-role">Service Role Monitoring</TabsTrigger>
           <TabsTrigger value="rate-limits">Rate Limits</TabsTrigger>
+          <TabsTrigger value="db-write-paths">DB Write Paths</TabsTrigger>
         </TabsList>
 
         <TabsContent value="incidents" className="space-y-4">
@@ -416,6 +469,154 @@ export default function SecurityDashboard() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="db-write-paths" className="space-y-4">
+          {/* Health Status Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                System Health (5min window)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <Badge
+                  variant={
+                    rateLimitMetrics?.health.status === 'healthy'
+                      ? 'outline'
+                      : rateLimitMetrics?.health.status === 'warning'
+                      ? 'secondary'
+                      : 'destructive'
+                  }
+                  className="text-lg px-4 py-2"
+                >
+                  {rateLimitMetrics?.health.status?.toUpperCase() || 'UNKNOWN'}
+                </Badge>
+                <span className="text-sm text-gray-600">
+                  INSERT Failure Rate: {rateLimitMetrics?.health.insert_failure_rate_pct || 0}%
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Write Paths Meta */}
+          <Card>
+            <CardHeader>
+              <CardTitle>DB Write Path Mapping (middleware.ts)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 px-3">Table</th>
+                      <th className="text-left py-2 px-3">Function</th>
+                      <th className="text-left py-2 px-3">Lines</th>
+                      <th className="text-left py-2 px-3">Callers</th>
+                      <th className="text-left py-2 px-3">Role</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rateLimitMetrics?.write_paths_meta.map((meta) => (
+                      <tr key={meta.table_name} className="border-b">
+                        <td className="py-2 px-3 font-mono text-xs">{meta.table_name}</td>
+                        <td className="py-2 px-3 font-mono text-xs">{meta.function_name}()</td>
+                        <td className="py-2 px-3">{meta.code_lines}</td>
+                        <td className="py-2 px-3 text-xs">{meta.callers.join(', ')}</td>
+                        <td className="py-2 px-3">
+                          <Badge variant="outline">{meta.required_role}</Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Real-time Metrics Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Rate Limit Requests */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">rate_limit_requests</CardTitle>
+                <p className="text-xs text-gray-500">
+                  Last {rateLimitMetrics?.rate_limit_requests.period_minutes || 15} minutes
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Total</span>
+                    <span className="font-bold">
+                      {rateLimitMetrics?.rate_limit_requests.total_count || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Suspicious</span>
+                    <span className="font-bold text-yellow-600">
+                      {rateLimitMetrics?.rate_limit_requests.suspicious_count || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Recent (5min)</span>
+                    <span className="font-bold">
+                      {rateLimitMetrics?.rate_limit_requests.recent_5min_count || 0}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Rate Limit Logs Top IPs */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">rate_limit_logs Top IPs</CardTitle>
+                <p className="text-xs text-gray-500">
+                  Last {rateLimitMetrics?.rate_limit_logs.period_minutes || 10} minutes
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {rateLimitMetrics?.rate_limit_logs.top_ips.slice(0, 5).map((ip) => (
+                    <div key={ip.ip} className="flex justify-between text-sm">
+                      <span className="font-mono truncate">{ip.ip}</span>
+                      <span>
+                        {ip.count} {ip.botCount > 0 && <span className="text-xs text-gray-500">(🤖{ip.botCount})</span>}
+                      </span>
+                    </div>
+                  ))}
+                  {(!rateLimitMetrics?.rate_limit_logs.top_ips?.length) && (
+                    <p className="text-gray-500 text-sm">No data</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Security Incidents by Risk */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">security_incidents</CardTitle>
+                <p className="text-xs text-gray-500">
+                  Last {rateLimitMetrics?.security_incidents.period_hours || 24} hours
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {Object.entries(rateLimitMetrics?.security_incidents.by_risk_level || {}).map(
+                    ([risk, count]) => (
+                      <div key={risk} className="flex justify-between">
+                        <Badge variant={getRiskColor(risk)}>{risk}</Badge>
+                        <span className="font-bold">{count}</span>
+                      </div>
+                    )
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

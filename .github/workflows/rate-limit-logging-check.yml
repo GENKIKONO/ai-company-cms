@@ -1,0 +1,211 @@
+name: Rate Limit Logging Verification
+
+# Rate Limitログ記録の整合性チェック
+# DB設計とコードの紐付けが維持されていることを確認
+
+on:
+  push:
+    paths:
+      - 'middleware.ts'
+      - 'docs/runbook.md'
+      - 'src/app/api/admin/rate-limit-metrics/**'
+      - 'src/components/admin/SecurityDashboard.tsx'
+  pull_request:
+    paths:
+      - 'middleware.ts'
+      - 'docs/runbook.md'
+      - 'src/app/api/admin/rate-limit-metrics/**'
+      - 'src/components/admin/SecurityDashboard.tsx'
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  verify-rate-limit-logging:
+    name: Verify Rate Limit Logging Configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify service_role key usage is server-side only
+        run: |
+          echo "🔍 Checking service_role key usage in middleware.ts..."
+
+          # middleware.ts でのみ service_role を使用していることを確認
+          # (Edge Runtime で実行されるため、これはサーバーサイド扱い)
+
+          # client components で service_role を使用していないか確認
+          if grep -r "SUPABASE_SERVICE_ROLE_KEY" src/components/ --include="*.tsx" --include="*.ts" | grep -v "\.d\.ts"; then
+            echo "❌ service_role key found in client components"
+            exit 1
+          fi
+
+          echo "✅ service_role key usage is server-side only"
+
+      - name: Verify rate limit logging function signatures
+        run: |
+          echo "🔍 Verifying rate limit logging function signatures..."
+
+          # Expected patterns (from docs/runbook.md Section 8.1)
+
+          # logRateLimitRequest - should be around L459-491
+          if ! grep -n "async function logRateLimitRequest" middleware.ts | head -1; then
+            echo "❌ logRateLimitRequest function not found"
+            exit 1
+          fi
+
+          # Check INSERT for rate_limit_requests
+          if ! grep -n "\.from('rate_limit_requests')" middleware.ts | head -1; then
+            echo "❌ rate_limit_requests INSERT not found"
+            exit 1
+          fi
+
+          # logAccess - should be around L787-834
+          if ! grep -n "async function logAccess" middleware.ts | head -1; then
+            echo "❌ logAccess function not found"
+            exit 1
+          fi
+
+          # Check INSERT for rate_limit_logs
+          if ! grep -n "\.from('rate_limit_logs')" middleware.ts | head -1; then
+            echo "❌ rate_limit_logs INSERT not found"
+            exit 1
+          fi
+
+          # logSecurityIncident - should be around L431-461
+          if ! grep -n "async function logSecurityIncident" middleware.ts | head -1; then
+            echo "❌ logSecurityIncident function not found"
+            exit 1
+          fi
+
+          # Check INSERT for security_incidents
+          if ! grep -n "\.from('security_incidents')" middleware.ts | head -1; then
+            echo "❌ security_incidents INSERT not found"
+            exit 1
+          fi
+
+          echo "✅ All rate limit logging functions verified"
+
+      - name: Verify Sentry integration
+        run: |
+          echo "🔍 Verifying Sentry integration for error tracking..."
+
+          # Check Sentry import
+          if ! grep -q "import \* as Sentry from '@sentry/nextjs'" middleware.ts; then
+            echo "❌ Sentry import not found in middleware.ts"
+            exit 1
+          fi
+
+          # Check Sentry.captureException calls in catch blocks
+          sentry_calls=$(grep -c "Sentry.captureException" middleware.ts || echo "0")
+          if [ "$sentry_calls" -lt 3 ]; then
+            echo "❌ Expected at least 3 Sentry.captureException calls, found $sentry_calls"
+            exit 1
+          fi
+
+          # Check for rate_limit_logging tag
+          if ! grep -q "component: 'rate_limit_logging'" middleware.ts; then
+            echo "❌ Sentry tag 'rate_limit_logging' not found"
+            exit 1
+          fi
+
+          echo "✅ Sentry integration verified ($sentry_calls captureException calls)"
+
+      - name: Verify created_at is not explicitly set
+        run: |
+          echo "🔍 Verifying created_at relies on DB DEFAULT..."
+
+          # Extract INSERT blocks and check for created_at
+          # The INSERT blocks should NOT contain created_at
+
+          # Check logRateLimitRequest INSERT block
+          if grep -A 15 "\.from('rate_limit_requests')" middleware.ts | grep -A 10 "\.insert" | grep -q "created_at:"; then
+            echo "❌ created_at is explicitly set in rate_limit_requests INSERT"
+            exit 1
+          fi
+
+          # Check logAccess INSERT block
+          if grep -A 20 "\.from('rate_limit_logs')" middleware.ts | grep -A 15 "\.insert" | grep -q "created_at:"; then
+            echo "❌ created_at is explicitly set in rate_limit_logs INSERT"
+            exit 1
+          fi
+
+          # Check logSecurityIncident INSERT block
+          if grep -A 15 "\.from('security_incidents')" middleware.ts | grep -A 10 "\.insert" | grep -q "created_at:"; then
+            echo "❌ created_at is explicitly set in security_incidents INSERT"
+            exit 1
+          fi
+
+          echo "✅ created_at relies on DB DEFAULT now()"
+
+      - name: Verify runbook documentation exists
+        run: |
+          echo "🔍 Verifying runbook documentation..."
+
+          if [ ! -f "docs/runbook.md" ]; then
+            echo "❌ docs/runbook.md not found"
+            exit 1
+          fi
+
+          # Check for Rate Limiting section
+          if ! grep -q "Rate Limiting" docs/runbook.md; then
+            echo "❌ Rate Limiting section not found in runbook.md"
+            exit 1
+          fi
+
+          # Check for write path documentation
+          if ! grep -q "rate_limit_requests" docs/runbook.md && ! grep -q "logRateLimitRequest" docs/runbook.md; then
+            echo "⚠️ rate_limit_requests documentation may be missing from runbook.md"
+          fi
+
+          echo "✅ Runbook documentation verified"
+
+      - name: Verify API endpoint exists
+        run: |
+          echo "🔍 Verifying rate-limit-metrics API endpoint..."
+
+          if [ ! -f "src/app/api/admin/rate-limit-metrics/route.ts" ]; then
+            echo "❌ Rate limit metrics API endpoint not found"
+            exit 1
+          fi
+
+          # Check for proper authentication
+          if ! grep -q "getUserFullWithClient" src/app/api/admin/rate-limit-metrics/route.ts; then
+            echo "❌ Authentication check not found in API"
+            exit 1
+          fi
+
+          # Check for admin role verification
+          if ! grep -q "admin" src/app/api/admin/rate-limit-metrics/route.ts; then
+            echo "❌ Admin role check not found in API"
+            exit 1
+          fi
+
+          echo "✅ Rate limit metrics API verified"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "Rate Limit Logging Verification Summary"
+          echo "========================================"
+          echo ""
+          echo "Verified Components:"
+          echo "  - middleware.ts: logRateLimitRequest, logAccess, logSecurityIncident"
+          echo "  - Sentry integration with 'rate_limit_logging' tag"
+          echo "  - created_at relies on DB DEFAULT now()"
+          echo "  - docs/runbook.md documentation"
+          echo "  - API endpoint: /api/admin/rate-limit-metrics"
+          echo ""
+          echo "DB Tables Covered:"
+          echo "  - rate_limit_requests"
+          echo "  - rate_limit_logs"
+          echo "  - security_incidents"
+          echo ""

@@ -164,106 +164,121 @@ export async function POST(
 
     // Start transaction-like operations
     const now = new Date().toISOString();
-    
+
     try {
       if (decision === 'approve') {
-        // Check if organization is already a member (double-check)
-        const { data: existingMember, error: memberCheckError } = await supabaseAdmin
-          .from('org_group_members')
-          .select('id')
-          .eq('group_id', joinRequest.group_id)
-          .eq('organization_id', joinRequest.organization_id)
-          .maybeSingle();
+        // Use transactional RPC for approval (SECURITY DEFINER, atomic operation)
+        // RPC: approve_join_request(p_request_id uuid, p_invite_code text)
+        // - Inserts into org_group_members (if not exists)
+        // - Increments invite code usage (if provided)
+        // - Updates join request status to 'approved'
+        // - All in a single transaction
+        const { error: approveError } = await supabaseAdmin.rpc('approve_join_request', {
+          p_request_id: requestId,
+          p_invite_code: joinRequest.invite_code || null
+        });
 
-        if (memberCheckError) {
-          logger.error('Error checking existing membership', {
+        if (approveError) {
+          // Parse DB exception to user-friendly message
+          const errorMessage = approveError.message || '';
+          let userMessage = '参加リクエストの承認に失敗しました';
+          let errorCategory = 'unknown';
+
+          if (errorMessage.includes('not found') || errorMessage.includes('存在しません')) {
+            userMessage = 'リクエストまたは招待コードが見つかりません';
+            errorCategory = 'not_found';
+          } else if (errorMessage.includes('expired') || errorMessage.includes('期限')) {
+            userMessage = '招待コードの有効期限が切れています';
+            errorCategory = 'expired';
+          } else if (errorMessage.includes('max') || errorMessage.includes('上限')) {
+            userMessage = '招待コードの使用回数上限に達しています';
+            errorCategory = 'max_uses_reached';
+          } else if (errorMessage.includes('already') || errorMessage.includes('既に')) {
+            userMessage = '既にグループメンバーです';
+            errorCategory = 'already_member';
+          }
+
+          logger.error('Failed to approve join request via RPC', {
             component: 'join-request-decision-api',
             operation: 'approve',
             requestId,
-            error: memberCheckError.message
-          });
-          return NextResponse.json({ 
-            error: 'Failed to verify membership status' 
-          }, { status: 500 });
-        }
-
-        if (!existingMember) {
-          // Add organization to group
-          // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_members テーブルの型定義を Supabase client に追加
-          const { error: memberError } = await (supabaseAdmin as any)
-            .from('org_group_members')
-            .insert({
-              group_id: joinRequest.group_id,
-              organization_id: joinRequest.organization_id,
-              role: 'member',
-              added_by: joinRequest.organization_id // Self-added through join request
-            });
-
-          if (memberError) {
-            logger.error('Error adding organization to group', {
-              component: 'join-request-decision-api',
-              operation: 'approve',
-              requestId,
-              groupId: joinRequest.group_id,
-              organizationId: joinRequest.organization_id,
-              error: memberError.message
-            });
-            return NextResponse.json({ 
-              error: 'Failed to add organization to group' 
-            }, { status: 500 });
-          }
-        }
-
-        // Increment invite code usage via RPC
-        // RPC: increment_used_count(p_code text) RETURNS void
-        // - Increments used_count by 1
-        // - Throws exception if code not found, expired, or max uses reached
-        if (joinRequest.invite_code) {
-          const { error: incrementError } = await supabaseAdmin.rpc('increment_used_count', {
-            p_code: joinRequest.invite_code
+            inviteCode: joinRequest.invite_code,
+            error: approveError.message,
+            code: approveError.code,
+            errorCategory,
+            userMessage
           });
 
-          if (incrementError) {
-            // Parse DB exception to user-friendly message
-            const errorMessage = incrementError.message || '';
-            let userMessage = '招待コードの使用回数更新に失敗しました';
-            let errorCategory = 'unknown';
-
-            if (errorMessage.includes('not found') || errorMessage.includes('存在しません')) {
-              userMessage = '招待コードが見つかりません';
-              errorCategory = 'not_found';
-            } else if (errorMessage.includes('expired') || errorMessage.includes('期限')) {
-              userMessage = '招待コードの有効期限が切れています';
-              errorCategory = 'expired';
-            } else if (errorMessage.includes('max') || errorMessage.includes('上限')) {
-              userMessage = '招待コードの使用回数上限に達しています';
-              errorCategory = 'max_uses_reached';
-            }
-
-            // Log with structured data for monitoring
-            logger.warn('Failed to increment invite code usage', {
-              component: 'join-request-decision-api',
-              operation: 'approve',
-              requestId,
-              inviteCode: joinRequest.invite_code,
-              error: incrementError.message,
-              code: incrementError.code,
-              errorCategory,
-              userMessage
-            });
-
-            // Note: Approval still succeeds since membership was already created
-            // The invite code limitation is a secondary concern
-          }
+          return NextResponse.json({
+            error: userMessage,
+            code: errorCategory
+          }, { status: 400 });
         }
+
+        // Fetch updated request for response
+        const { data: updatedRequest, error: fetchError } = await (supabaseAdmin as any)
+          .from('org_group_join_requests')
+          .select(`
+            id,
+            group_id,
+            organization_id,
+            status,
+            invite_code,
+            requested_by,
+            reason,
+            decision_note,
+            decided_by,
+            decided_at,
+            created_at,
+            updated_at,
+            group:organization_groups!org_group_join_requests_group_id_fkey(
+              id,
+              name,
+              owner_organization:organizations!organization_groups_owner_org_id_fkey(
+                id,
+                name,
+                company_name
+              )
+            ),
+            organization:organizations!org_group_join_requests_organization_id_fkey(
+              id,
+              name,
+              company_name
+            )
+          `)
+          .eq('id', requestId)
+          .maybeSingle();
+
+        if (fetchError || !updatedRequest) {
+          logger.warn('Approval succeeded but failed to fetch updated request', {
+            component: 'join-request-decision-api',
+            operation: 'approve',
+            requestId,
+            error: fetchError?.message
+          });
+        }
+
+        logger.info('Join request approved successfully via RPC', {
+          component: 'join-request-decision-api',
+          operation: 'approve',
+          requestId,
+          groupId: joinRequest.group_id,
+          organizationId: joinRequest.organization_id,
+          userId: user.id
+        });
+
+        return NextResponse.json({
+          data: updatedRequest,
+          message: 'Join request approved successfully. Organization added to group.'
+        });
       }
 
-      // Update join request status
+      // Reject: Update join request status only
       // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
       const { data: updatedRequest, error: updateError } = await (supabaseAdmin as any)
         .from('org_group_join_requests')
         .update({
-          status: decision === 'approve' ? 'approved' : 'rejected',
+          status: 'rejected',
           decision_note: note || null,
           decided_by: user.id,
           decided_at: now,
@@ -335,9 +350,9 @@ export async function POST(
         userId: user.id
       });
 
-      return NextResponse.json({ 
+      return NextResponse.json({
         data: updatedRequest,
-        message: `Join request ${decision}d successfully${decision === 'approve' ? '. Organization added to group.' : '.'}`
+        message: 'Join request rejected successfully.'
       });
 
     } catch (transactionError: any) {

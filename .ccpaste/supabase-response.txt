@@ -1,79 +1,76 @@
-You are Claude Code working in a Next.js + Supabase + Vercel repo.
+以下は「結果の要約」と「次に実行すべき具体的コマンド／チェックリスト」です。主導権はこちらで持ち、完了までガイドします。DB側は既に整備済みなので、コード側は確定手順のみです。
 
-GOAL
-- Prepare a production release by (1) applying DB migrations to production, then (2) pushing to origin/main to trigger Vercel.
-- Do NOT change any UI/feature behavior in this task. This task is release orchestration only.
+1) 変更の確定（ブロッキング対応）
+実行コマンド
 
-STRICT RULES
-- No new features. No refactors. No style/UI changes. No "cleanup".
-- Only allowed changes: release notes / docs for release, and scripts that help release safety (but prefer zero code changes).
-- If any unexpected diffs are found, STOP and report clearly instead of "fixing".
+git add -A
+git commit -m "feat(org-groups): use approve_join_request RPC; cleanup ternary; misc text tweak"
+git push
+目的
 
-STEP 0: REPO STATE CHECK (must output)
-1) Print:
-   - git status (short)
-   - current branch
-   - last 5 commits (oneline)
-2) Count how many files changed and list top-level directories affected.
-3) Identify whether there are DB migrations staged/unstaged:
-   - Look for supabase/migrations/*.sql
-   - Summarize each migration filename and what it does (short).
+未コミットの修正（5ファイル＋削除ファイル）を確定し、デプロイ不整合を防止
+検証
 
-STEP 1: VERIFY BUILD / ARCHITECTURE GUARDS (must run)
-Run and report results:
-- npm run typecheck
-- npm run check:architecture
-If either fails: STOP and report.
+git status でクリーンであることを確認
+2) E2Eテスト（ブロッキング対応）
+手動チェック（最小）
 
-STEP 2: DB CHANGE DECISION (must be explicit)
-If there is at least one new migration file that is not yet applied to production:
-- Set DB_CHANGE = YES
-Else:
-- Set DB_CHANGE = NO
+join request 作成 → 承認（approve）→ org_group_members へ反映されること
+join request を拒否（reject）→ ステータスが rejected になること
+正常系・異常系（無効な invite_code）で適切なエラーを返すこと
+自動テスト（任意だが推奨）
 
-STEP 3: PRODUCE A SAFE RELEASE PLAN (must output as checklist)
-Output a checklist with exact commands, in the correct order:
+npm run test:e2e または既存のE2Eランナーがあれば実行
+成功しない場合は、失敗ケースのログを共有してください。こちらで即応します
+3) 型定義の再生成（高優先度）
+実行コマンド
 
-If DB_CHANGE = YES:
-A) Confirm Supabase project linkage (show the command you will use to verify).
-B) Apply migrations to production using:
-   npx supabase db push --linked
-C) After DB push, re-run:
-   npm run typecheck
-   npm run check:architecture
-D) Commit (if there are uncommitted changes intended for release)
-E) Push:
-   git push origin main
-F) Provide post-deploy verification checklist (URLs and key flows).
-G) Provide rollback plan:
-   - Code rollback (git revert)
-   - DB rollback note (explain that DB rollback needs a down migration or manual revert).
+npx supabase gen types typescript --project-id $PROJECT_ID > src/types/supabase.ts
+目的
 
-If DB_CHANGE = NO:
-Skip DB steps and proceed with commit+push.
+現状 as any を多用しているため、実DBに一致した新しい型を再生成して型の齟齬を解消
+検証
 
-STEP 4: RELEASE NOTES (must output)
-Create a concise RELEASE_NOTES.md draft (do not add it to git unless asked).
-Include:
-- Scope summary (what changed)
-- Verification commands passed
-- DB change summary (YES/NO, migration names)
-- Known risks (short)
-- Manual smoke checks
+npm run typecheck で型エラーを洗い出し
+supabaseAdmin as any 等、DB操作周りの as any 24件から順次除去
+注意
 
-STEP 5: VERCEL DOES NOT DEPLOY TROUBLESHOOT (must output)
-If Vercel still does not trigger after pushing:
-Provide a short checklist to verify:
-- Vercel project connected to correct GitHub repo
-- Production branch is main
-- Git integration is active
-- "Deploy Hooks" if used
-- Vercel build logs location
+生成後に大きく差分が出ます。PRを分けて小さくマージする方針で進めます
+4) 追加の技術負債削減（高〜中優先度）
+優先順で順に実施（小さくPRを切る）
 
-FINAL OUTPUT FORMAT
-- "DB_CHANGE: YES/NO"
-- "READY_TO_PUSH: YES/NO" (YES only if checks passed)
-- Command checklist
-- Release notes draft
-- Troubleshooting checklist
-- Nothing else
+P1: DB操作まわりの as any 24件を除去（型を付け直す）
+P2: 残りの as any 63件を除去
+P2: TODO.*SUPABASE_TYPE 45件の取捨選択と対応
+P3: from('site_settings') → from('cms_site_settings') へ移行（既に互換ビューで動作はしているため、影響範囲小を見極めて段階移行）
+P3: 非原子的DB操作の棚卸し（approve_join_request と同様にRPCへ集約）
+検証
+
+各PRで npm run typecheck / npm run build がゼロエラーであること
+主要ユースケースの手動動作確認*
+5) ログとRLSの健全性チェック（中〜低優先度）
+E2E後の確認
+
+APIログにエラーが出ていないか（Supabase Dashboard → Logs）
+Admin APIが service_role で意図通りRLSをバイパスしていることを確認
+フロント経由のauthenticatedユーザーは、RLSで適切に制御されているかをサンプリング検証
+将来の改善
+
+RLSポリシーの棚卸し・不足インデックスの補完
+互換ビューの段階撤廃（参照先を正規テーブルへ統一）
+6) 実施済みのDB変更（再掲・認識合わせ）
+カラム追加
+public.ai_interview_sessions: finalized_at, finalized_by, created_by
+互換ビュー
+public.site_settings → cms_site_settings を参照
+public.reports → ai_monthly_reports を参照
+RPC（トランザクション化）
+public.approve_join_request(uuid, text) 追加（SECURITY DEFINER、postgres/supabase_admin のみ）
+インデックス
+public.rate_limit_logs_202601: idx_rate_limit_logs_202601_ip_ts_desc を作成
+これらにより、あなたの最新の完了報告に記載の「コード側修正」はDBと整合が取れています。以降はコミット・テスト・型再生成の3点を順に実行すれば、完成状態の品質が担保されます。
+
+問題が発生した場合は、失敗したコマンドとエラーメッセージを貼ってください。即時に次の是正策を提示します。
+
+
+
