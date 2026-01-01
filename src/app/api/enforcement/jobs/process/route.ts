@@ -122,8 +122,8 @@ export async function POST(request: NextRequest) {
             action: action.action,
             deadline: action.deadline,
             processedAt: action.processed_at,
-            userEmail: (action.profiles as any)?.email || 'unknown',
-            currentStatus: (action.profiles as any)?.account_status || 'unknown'
+            userEmail: (action.profiles as { email?: string; account_status?: string } | null)?.email || 'unknown',
+            currentStatus: (action.profiles as { email?: string; account_status?: string } | null)?.account_status || 'unknown'
           }));
         }
       } catch (detailError) {

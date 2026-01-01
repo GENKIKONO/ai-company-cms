@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
         organization_id: searchParams.get('organization_id') || undefined,
         source_table: searchParams.get('source_table') || undefined,
         source_field: searchParams.get('source_field') || undefined,
-        status: searchParams.get('status') as any || undefined,
+        status: (searchParams.get('status') as 'pending' | 'processing' | 'completed' | 'failed' | null) || undefined,
         priority_min: searchParams.get('priority_min') ? parseInt(searchParams.get('priority_min')!) : undefined,
         priority_max: searchParams.get('priority_max') ? parseInt(searchParams.get('priority_max')!) : undefined,
         created_after: searchParams.get('created_after') || undefined,

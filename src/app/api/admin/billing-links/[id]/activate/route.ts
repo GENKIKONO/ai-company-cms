@@ -32,8 +32,8 @@ export async function PUT(
     }
 
     // トランザクション的に処理：同じplan_type + campaign_typeの他のリンクを非アクティブ化
-    const { error: deactivateError } = await (supabase
-      .from('billing_checkout_links') as any)
+    const { error: deactivateError } = await supabase
+      .from('billing_checkout_links')
       .update({ is_active: false })
       .eq('plan_type', (targetLink as { plan_type: string }).plan_type)
       .eq('campaign_type', (targetLink as { campaign_type: string }).campaign_type);
@@ -47,8 +47,8 @@ export async function PUT(
     }
 
     // 対象リンクをアクティブ化
-    const { data, error: activateError } = await (supabase
-      .from('billing_checkout_links') as any)
+    const { data, error: activateError } = await supabase
+      .from('billing_checkout_links')
       .update({ is_active: true })
       .eq('id', linkId)
       .select()

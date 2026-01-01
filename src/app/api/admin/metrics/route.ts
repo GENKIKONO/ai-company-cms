@@ -155,7 +155,7 @@ async function fetchMetricsData(
   const rlsDeniedWeeklyRaw = aggregateByWeek(rlsDeniedEvents, 'created_at', 'rls_denied_count', currentWeekStart, weeksCount);
   const rlsDeniedWeekly = rlsDeniedWeeklyRaw.map(item => ({
     week_start_utc: item.week_start_utc,
-    rls_denied_count: (item as any).rls_denied_count ?? 0
+    rls_denied_count: (item as { week_start_utc: string; rls_denied_count?: number }).rls_denied_count ?? 0
   }));
 
   // セキュリティインシデント集計

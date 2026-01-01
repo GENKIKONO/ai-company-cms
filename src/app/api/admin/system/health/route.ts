@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] app_users テーブルの型定義を Supabase client に追加
-    const { data: userProfile, error: profileError } = await (supabase as any)
+    // Admin role check - untyped client, no cast needed
+    const { data: userProfile, error: profileError } = await supabase
       .from('app_users')
       .select('role')
       .eq('id', user.id)

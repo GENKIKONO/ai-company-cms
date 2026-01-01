@@ -407,7 +407,8 @@ export async function completeFailure(request: CompleteJobRequest): Promise<{ su
         finished_at: finishedAt,
         error_code: request.error_code || null,
         error_message: truncated_message,
-        retry_count: (supabase as any).raw('retry_count + 1'),
+        // Note: raw SQL increment - requires custom supabase extension or RPC
+        retry_count: (supabase as unknown as { raw: (sql: string) => unknown }).raw('retry_count + 1'),
         meta: sanitizedMeta,
         updated_at: finishedAt
       })
@@ -471,7 +472,8 @@ export async function requestCancel(jobId: string): Promise<{ success: boolean; 
     const { data, error } = await supabase
       .from('job_runs_v2')
       .update({
-        meta: (supabase as any).raw("jsonb_set(meta, '{cancel_requested}', 'true')"),
+        // Note: raw JSONB operation - requires custom supabase extension or RPC
+        meta: (supabase as unknown as { raw: (sql: string) => unknown }).raw("jsonb_set(meta, '{cancel_requested}', 'true')"),
         updated_at: new Date().toISOString()
       })
       .eq('id', jobId)

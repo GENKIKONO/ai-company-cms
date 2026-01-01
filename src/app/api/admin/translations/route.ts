@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       source_field: searchParams.get('source_field') || undefined,
       source_lang: searchParams.get('source_lang') || undefined,
       target_lang: searchParams.get('target_lang') || undefined,
-      status: (searchParams.get('status') as any) || undefined,
+      status: (searchParams.get('status') as 'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled' | null) || undefined,
       priority_min: searchParams.get('priority_min') ? parseInt(searchParams.get('priority_min')!) : undefined,
       priority_max: searchParams.get('priority_max') ? parseInt(searchParams.get('priority_max')!) : undefined,
       created_after: searchParams.get('created_after') || undefined,

@@ -39,9 +39,10 @@ export async function POST(request: NextRequest) {
       CREATE INDEX IF NOT EXISTS idx_organizations_coordinates ON public.organizations(lat, lng) WHERE lat IS NOT NULL AND lng IS NOT NULL;
     `;
 
-    const { error: migrationError } = await (supabase.rpc as any)('exec_sql', { 
-      sql: migrationSQL 
-    });
+    // Note: exec_sql is a custom RPC function for migrations
+    const { error: migrationError } = await supabase.rpc('exec_sql' as 'approve_join_request', {
+      sql: migrationSQL
+    } as never);
 
     if (migrationError) {
       logger.error('Migration SQL execution failed:', { data: migrationError });
@@ -78,9 +79,9 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Test coordinate field update
-    const { error: updateError } = await (supabase
-      .from('organizations') as any)
+    // Test coordinate field update - untyped client, no cast needed
+    const { error: updateError } = await supabase
+      .from('organizations')
       .update({ 
         lat: 35.6762, // Tokyo Station coordinates
         lng: 139.6503 

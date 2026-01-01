@@ -13,9 +13,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Admin role check
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] user_organizations テーブルの型定義を Supabase client に追加
-    const { data: userOrg, error: orgError } = await (supabase as any)
+    // Admin role check - untyped client, no cast needed
+    const { data: userOrg, error: orgError } = await supabase
       .from('organization_members')
       .select('role')
       .eq('user_id', user.id)

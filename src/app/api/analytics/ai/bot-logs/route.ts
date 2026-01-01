@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
     // レスポンス整形（型安全な形でJOIN結果を処理）
     const formattedLogs: BotLogResponse[] = (logs || []).map(log => {
       // PostgREST JOINの結果をobject/arrayに関係なく処理
-      const nested = (log as any).ai_content_units;
+      const nested = (log as { ai_content_units?: unknown }).ai_content_units;
       const contentUnit = Array.isArray(nested) ? (nested[0] ?? null) : (nested ?? null);
       
       return {

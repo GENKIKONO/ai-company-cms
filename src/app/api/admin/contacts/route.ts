@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] app_users テーブルの型定義が完全でないため一時的にキャスト
-    if (userError || !userData || (userData as any).role !== 'admin') {
+    // Admin role check - untyped client, no cast needed
+    if (userError || !userData || userData.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

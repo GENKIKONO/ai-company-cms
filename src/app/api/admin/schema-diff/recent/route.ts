@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     const diffs: SchemaDiffSummary[] = (schemaDiffs || []).map(diff => {
       // 対応するジョブ実行を探す
       const relatedJob = (jobRuns || []).find(job => {
-        const jobMeta = job.meta as any;
+        const jobMeta = job.meta as { environment?: string } | null;
         const diffAt = new Date(diff.diff_at);
         const jobAt = new Date(job.started_at);
         
