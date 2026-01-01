@@ -29,7 +29,8 @@ import {
   createErrorResponse
 } from '@/lib/api/error-responses';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
-import { normalizePayload, normalizeDateFields, normalizeForInsert, findEmptyDateFields } from '@/lib/utils/payload-normalizer';
+import { normalizePayload, normalizeDateFields, normalizeForInsert } from '@/lib/utils/payload-normalizer';
+import { findEmptyDateFields, nullifyEmptyDateFields } from '@/lib/types/normalizers';
 import { buildOrgInsert } from '@/lib/utils/org-whitelist';
 import { createClient } from '@/lib/supabase/server';
 import { getUserWithClient, getUserFullWithClient } from '@/lib/core/auth-state';
@@ -277,11 +278,10 @@ export async function POST(request: NextRequest) {
     try {
       logger.debug('[ORG/CREATE] About to validate with schema', { normalizedRawBody });
       validatedData = organizationCreateSchema.parse(normalizedRawBody);
-      body = validatedData as any; // 既存の型との互換性のため
+      body = validatedData as OrganizationFormData; // 型アサーション（互換型）
       logger.debug('[ORG/CREATE] Validation successful', { validatedData });
-      
+
       // サニタイズ後ログ
-      const bodyAny = body as any;
       logger.info('📤 バリデーション後 (サニタイズ後):', {
         keys: Object.keys(body),
         name: body.name ? `${body.name.substring(0,2)}***` : body.name,
@@ -464,12 +464,20 @@ export async function POST(request: NextRequest) {
     logger.info('🔍 FINAL organization data for INSERT (after emergency guard)', { data: JSON.stringify(organizationData, null, 2) });
 
     // ✅ 最終ガード：日付は空文字の可能性が少しでもあれば null を明示して送る
-    const finalGuardDateFields = ['established_at']; // 必要に応じて他のDATE型も追記
+    // 型安全版: nullifyEmptyDateFieldsを使用
+    const finalGuardDateFields = ['established_at'] as const;
+    const beforeNullify = { ...organizationData };
+    organizationData = nullifyEmptyDateFields(
+      organizationData as Record<string, unknown>,
+      finalGuardDateFields
+    );
+
+    // ログ出力
     for (const f of finalGuardDateFields) {
-      const v = (organizationData as any)[f];
-      if (v === '' || v === undefined) {
-        (organizationData as any)[f] = null;   // ← キーを削除せず null を明示
-        logger.info(`🔧 [FINAL GUARD] Set ${f} to null (was: ${JSON.stringify(v)})`);
+      const beforeVal = (beforeNullify as Record<string, unknown>)[f];
+      const afterVal = (organizationData as Record<string, unknown>)[f];
+      if (beforeVal !== afterVal) {
+        logger.info(`🔧 [FINAL GUARD] Set ${f} to null (was: ${JSON.stringify(beforeVal)})`);
       }
     }
 

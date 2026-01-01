@@ -401,21 +401,28 @@ async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
           .eq('id', customer.organization_id);
 
         // ユーザー情報を取得してメール送信
-        const orgData = customer.organization as any;
-        const { data: user } = await supabase
-          .from('users')
-          .select('email, full_name')
-          .eq('id', orgData.created_by)
-          .maybeSingle();
+        // JOIN結果の型定義（PostgRESTはネストを配列で返す場合がある）
+        type OrgJoinResult = { id: string; name: string | null; created_by: string | null };
+        const orgRaw = customer.organization;
+        // 配列の場合は最初の要素を取得、単一オブジェクトの場合はそのまま
+        const orgData = (Array.isArray(orgRaw) ? orgRaw[0] : orgRaw) as OrgJoinResult | undefined;
 
-        if (user) {
-          // 支払い失敗メールを送信
-          await sendPaymentFailedEmail(
-            user.email,
-            user.full_name || user.email,
-            orgData.name
-          );
-          logger.debug(`Payment failed email sent to ${user.email}`);
+        if (orgData?.created_by) {
+          const { data: user } = await supabase
+            .from('users')
+            .select('email, full_name')
+            .eq('id', orgData.created_by)
+            .maybeSingle();
+
+          if (user) {
+            // 支払い失敗メールを送信
+            await sendPaymentFailedEmail(
+              user.email,
+              user.full_name || user.email,
+              orgData.name || 'Unknown Organization'
+            );
+            logger.debug(`Payment failed email sent to ${user.email}`);
+          }
         }
       }
     }

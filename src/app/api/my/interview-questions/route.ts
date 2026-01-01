@@ -7,13 +7,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerUser } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
-import { CONTENT_TYPES, SUPPORTED_LANGUAGES } from '@/types/ai-interviewer';
+import { CONTENT_TYPES, SUPPORTED_LANGUAGES, type ContentType, type SupportedLanguage } from '@/types/ai-interviewer';
 import { INTERVIEW_CONTENT_TYPE, type InterviewContentType } from '@/types/enums';
 import type { InterviewQuestion, InterviewAxis } from '@/types/interview-session';
 
 // TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
-// Supabase型定義のエイリアス（一時的に any でバイパス）
-type OrganizationKeywordRow = any;
+// Supabase型定義のエイリアス
+interface OrganizationKeywordRow {
+  id: string;
+  organization_id: string;
+  keyword: string;
+  locale: string | null;
+  priority: number;
+  is_active: boolean;
+}
 
 // レスポンス型定義
 interface InterviewQuestionsResponse {
@@ -24,18 +31,22 @@ interface InterviewQuestionsResponse {
   };
 }
 
+// 型安全な値リスト
+const CONTENT_TYPE_VALUES = Object.values(CONTENT_TYPES) as readonly ContentType[];
+const LANGUAGE_VALUES = Object.values(SUPPORTED_LANGUAGES) as readonly SupportedLanguage[];
+
 /**
- * 有効な content_type かチェック
+ * 有効な content_type かチェック（型安全版）
  */
-function isValidContentType(contentType: string): boolean {
-  return Object.values(CONTENT_TYPES).includes(contentType as any);
+function isValidContentType(contentType: string): contentType is ContentType {
+  return (CONTENT_TYPE_VALUES as readonly string[]).includes(contentType);
 }
 
 /**
- * 有効な言語コードかチェック
+ * 有効な言語コードかチェック（型安全版）
  */
-function isValidLanguage(lang: string): boolean {
-  return Object.values(SUPPORTED_LANGUAGES).includes(lang as any);
+function isValidLanguage(lang: string): lang is SupportedLanguage {
+  return (LANGUAGE_VALUES as readonly string[]).includes(lang);
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse<InterviewQuestionsResponse | { error: string }>> {

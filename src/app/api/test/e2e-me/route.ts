@@ -154,12 +154,39 @@ export async function GET(request: NextRequest) {
       errorType = 'system_error';
       errorMessage = '組織情報の取得に失敗しました';
     } else {
+      // JOIN結果の型定義（PostgRESTはネストを配列で返す）
+      type OrgData = {
+        id: string;
+        name: string | null;
+        slug: string | null;
+        plan: string | null;
+        status: string | null;
+        created_at: string | null;
+        updated_at: string | null;
+        show_services?: boolean;
+        show_posts?: boolean;
+        show_case_studies?: boolean;
+        show_faqs?: boolean;
+        show_qa?: boolean;
+        show_news?: boolean;
+        show_partnership?: boolean;
+        show_contact?: boolean;
+        is_demo_guess?: boolean;
+      };
+      type OrgMemberJoin = {
+        organization_id: string;
+        role: string;
+        organizations: OrgData[] | OrgData | null;
+      };
+
       // Map organization_members + organizations JOIN result to OrganizationSummary format
-      const rawOrganizations = (orgRows ?? [])
+      const rawOrganizations = ((orgRows ?? []) as unknown as OrgMemberJoin[])
         .map(member => {
-          const org = (member as any).organizations;
+          // PostgRESTは配列で返す場合がある
+          const orgRaw = member.organizations;
+          const org = Array.isArray(orgRaw) ? orgRaw[0] : orgRaw;
           if (!org) return null;
-          
+
           return {
             id: org.id,
             name: org.name,

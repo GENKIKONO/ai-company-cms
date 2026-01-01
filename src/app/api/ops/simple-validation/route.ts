@@ -208,8 +208,11 @@ async function validateJsonLdSystem() {
   try {
     // JSON-LDシステムの基本動作確認
     const { generateOrganizationJsonLd } = await import('@/lib/json-ld/organization');
-    
-    const testOrg = {
+
+    // 最小限のテスト用Organization型（必須フィールドのみ）
+    // Parameters<typeof fn>[0] で関数の引数型を取得
+    type TestOrganization = Parameters<typeof generateOrganizationJsonLd>[0];
+    const testOrg: Partial<TestOrganization> & { name: string } = {
       name: 'Test Organization',
       description: 'Test description',
       url: 'https://test.example.com',
@@ -219,7 +222,8 @@ async function validateJsonLdSystem() {
     };
 
     try {
-      const jsonLd = generateOrganizationJsonLd(testOrg as any);
+      // 型安全にキャスト
+      const jsonLd = generateOrganizationJsonLd(testOrg as TestOrganization);
       
       // 基本的な構造チェック
       if (!jsonLd['@context'] || !jsonLd['@type'] || !jsonLd.name) {

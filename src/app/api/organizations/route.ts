@@ -17,7 +17,8 @@ import {
   createErrorResponse
 } from '@/lib/api/error-responses';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
-import { normalizeForInsert, findEmptyDateFields } from '@/lib/utils/payload-normalizer';
+import { normalizeForInsert } from '@/lib/utils/payload-normalizer';
+import { findEmptyDateFields, nullifyEmptyDateFields } from '@/lib/types/normalizers';
 import { buildOrgInsert } from '@/lib/utils/org-whitelist';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
@@ -252,31 +253,37 @@ export async function POST(request: NextRequest) {
     };
 
     // 🚀 GPT恒久対策: 空文字の日付フィールドを検出（デバッグ用）
-    const emptyDates = findEmptyDateFields(organizationData as any, ['established_at']);
+    // 型安全版: Organization型のキーとして'established_at'を指定
+    const dateFields = ['established_at'] as const;
+    const emptyDates = findEmptyDateFields(organizationData as Record<string, unknown>, dateFields);
     if (emptyDates.length) {
       logger.warn('⚠️ [/api/organizations] Empty date fields detected, normalizing', { data: emptyDates });
     }
 
     // 🚀 GPT恒久対策: INSERT直前の確実な正規化
-    organizationData = normalizeForInsert(organizationData as any, {
+    organizationData = normalizeForInsert(organizationData, {
       dateFields: ['established_at'], // DBにある日付カラムを列挙
     });
 
-    logger.info('Normalized organization data for INSERT', { 
+    logger.info('Normalized organization data for INSERT', {
       component: '/api/organizations',
       organizationData: JSON.stringify(organizationData, null, 2)
     });
 
     // ✅ 最終ガード：日付は空文字の可能性が少しでもあれば null を明示して送る
-    const finalGuardDateFields = ['established_at']; // 必要に応じて他のDATE型も追記
-    for (const f of finalGuardDateFields) {
-      const v = (organizationData as any)[f];
-      if (v === '' || v === undefined) {
-        (organizationData as any)[f] = null;   // ← キーを削除せず null を明示
-        logger.debug('Final guard set field to null', { 
+    // 型安全版: nullifyEmptyDateFieldsを使用
+    organizationData = nullifyEmptyDateFields(
+      organizationData as Record<string, unknown>,
+      dateFields
+    ) as Partial<Organization>;
+
+    // ログ出力
+    for (const f of dateFields) {
+      const v = (organizationData as Record<string, unknown>)[f];
+      if (v === null) {
+        logger.debug('Final guard set field to null', {
           component: '/api/organizations',
           field: f,
-          previousValue: JSON.stringify(v)
         });
       }
     }

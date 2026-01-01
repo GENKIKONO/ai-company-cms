@@ -73,33 +73,48 @@ export async function GET(request: NextRequest) {
             .not('industries', 'is', null)
         ]);
 
+        // 型定義: Supabaseクエリ結果
+        type CountResult = { count: number | null; data: null; error: null } | { count: null; data: null; error: unknown };
+        type IndustriesResult = { data: { industries: string[] | null }[] | null; error: null } | { data: null; error: unknown };
+
+        // Promise.raceの結果を型安全に処理
+        const settledResults = await Promise.race([statsPromise, timeoutPromise]) as PromiseSettledResult<unknown>[];
+
         const [
           organizationsResult,
           servicesResult,
           casesResult,
           categoriesResult
-        ] = await Promise.race([statsPromise, timeoutPromise]) as any;
+        ] = settledResults as [
+          PromiseSettledResult<CountResult>,
+          PromiseSettledResult<CountResult>,
+          PromiseSettledResult<CountResult>,
+          PromiseSettledResult<IndustriesResult>
+        ];
 
         // 結果を処理
-        const organizations = organizationsResult.status === 'fulfilled' 
-          ? organizationsResult.value.count || 0 : 0;
-        
-        const services = servicesResult.status === 'fulfilled' 
-          ? servicesResult.value.count || 0 : 0;
-        
-        const cases = casesResult.status === 'fulfilled' 
-          ? casesResult.value.count || 0 : 0;
+        const organizations = organizationsResult.status === 'fulfilled'
+          ? (organizationsResult.value as CountResult).count || 0 : 0;
+
+        const services = servicesResult.status === 'fulfilled'
+          ? (servicesResult.value as CountResult).count || 0 : 0;
+
+        const cases = casesResult.status === 'fulfilled'
+          ? (casesResult.value as CountResult).count || 0 : 0;
 
         // 業界カテゴリーの一意数を計算
         let categories = 50; // デフォルト値
-        if (categoriesResult.status === 'fulfilled' && categoriesResult.value.data) {
-          const allIndustries = new Set<string>();
-          categoriesResult.value.data.forEach((org: any) => {
-            if (Array.isArray(org.industries)) {
-              org.industries.forEach((industry: string) => allIndustries.add(industry));
-            }
-          });
-          categories = allIndustries.size;
+        if (categoriesResult.status === 'fulfilled') {
+          const result = categoriesResult.value as IndustriesResult;
+          if (result.data) {
+            const allIndustries = new Set<string>();
+            result.data.forEach((org) => {
+              if (Array.isArray(org.industries)) {
+                org.industries.forEach((industry) => allIndustries.add(industry));
+              }
+            });
+            categories = allIndustries.size;
+          }
         }
 
         return {
