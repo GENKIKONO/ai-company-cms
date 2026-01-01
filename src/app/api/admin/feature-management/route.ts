@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
           feature_key: update.feature_key,
           config_value: update.config_value,
           updated_at: new Date().toISOString(),
-        } as any, {
+        }, {
           onConflict: 'plan_type,feature_key'
         });
 
@@ -142,10 +142,10 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] audit_logs テーブルの型定義を Supabase client に追加
+    // Note: Using untyped client for audit_logs table
     const { data: auditLog, error: auditError } = await supabase
       .from('audit_logs')
-      .insert([auditLogData] as any)
+      .insert([auditLogData])
       .select('id')
       .single();
 
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
     const response: FeatureManagementUpdateResponse = {
       success: true,
       updated_count: updatedCount,
-      audit_log_id: (auditLog as any)?.id || 'unknown',
+      audit_log_id: (auditLog as { id?: string } | null)?.id || 'unknown',
     };
 
     return NextResponse.json(response);

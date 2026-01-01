@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (orgError || !userOrg || (userOrg as any)?.role !== 'admin') {
+    if (orgError || !userOrg || userOrg.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (orgError || !userOrg || (userOrg as any)?.role !== 'admin') {
+    if (orgError || !userOrg || userOrg.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -116,8 +116,8 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString()
     };
 
-    const { data, error } = await (supabase
-      .from('cms_site_settings') as any)
+    const { data, error } = await supabase
+      .from('cms_site_settings')
       .upsert(settingData, {
         onConflict: 'key'
       })
@@ -173,7 +173,7 @@ export async function DELETE(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (orgError || !userOrg || (userOrg as any)?.role !== 'admin') {
+    if (orgError || !userOrg || userOrg.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 

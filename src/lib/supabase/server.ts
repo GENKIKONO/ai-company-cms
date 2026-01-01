@@ -1,12 +1,14 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
-// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
+
+// Note: Using untyped client to avoid 340+ type errors from schema drift
+// TODO: [SUPABASE_TYPE_FOLLOWUP] 型再生成後に Database 型を復元
 
 export const createClient = async () => {
   const { cookies } = await import('next/headers');
   const cookieStore = await cookies();
 
-  return createServerClient<any>(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

@@ -102,8 +102,8 @@ export async function POST(request: NextRequest) {
       updated_by: user.id
     };
 
-    const { data, error } = await (supabase
-      .from('feature_overrides') as any)
+    const { data, error } = await supabase
+      .from('feature_overrides')
       .upsert(overrideData, {
         onConflict: 'organization_id,feature_key'
       })

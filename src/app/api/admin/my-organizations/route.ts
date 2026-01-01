@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's organizations where they have admin or owner role
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] organization_members テーブルの型定義を Supabase client に追加
-    const { data: organizations, error } = await (supabaseAdmin as any)
+    // Note: supabaseAdmin is already untyped (SupabaseClient<any>) so no cast needed
+    const { data: organizations, error } = await supabaseAdmin
       .from('organization_members')
       .select(`
         organization_id,

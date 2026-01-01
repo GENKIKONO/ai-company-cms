@@ -511,7 +511,8 @@ export async function POST(request: NextRequest) {
       });
       
       // 23505: unique constraint violation - idempotent処理
-      if ((error as any).code === '23505') {
+      const pgError = error as { code?: string };
+      if (pgError.code === '23505') {
         logger.debug('[POST /api/my/organization] Unique constraint violation, trying to fetch existing organization');
         const { data: again } = await supabase
           .from('organizations')

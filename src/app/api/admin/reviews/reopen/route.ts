@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify admin role
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] app_users テーブルの型定義を Supabase client に追加
-    const { data: userProfile, error: profileError } = await (supabase as any)
+    // Note: Using untyped client - app_users テーブルの型定義を Supabase client に追加
+    const { data: userProfile, error: profileError } = await supabase
       .from('app_users')
       .select('role, full_name')
       .eq('id', user.id)
@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
     const { organization_id, reason, category, notes } = validation.data;
 
     // Check if organization exists
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] organizations テーブルの型定義を Supabase client に追加
-    const { data: organization, error: orgError } = await (supabase as any)
+    // Note: Using untyped client - organizations テーブルの型定義を Supabase client に追加
+    const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('id, name, status')
       .eq('id', organization_id)
@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
     const currentStatus = organization.status;
     
     // Update organization status to under_review
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] organizations テーブルの型定義を Supabase client に追加
-    const { error: updateError } = await (supabase as any)
+    // Note: Using untyped client - organizations テーブルの型定義を Supabase client に追加
+    const { error: updateError } = await supabase
       .from('organizations')
       .update({ 
         status: 'under_review',
@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create audit log entry
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] review_audit テーブルの型定義を Supabase client に追加
-    const { error: auditError } = await (supabase as any)
+    // Note: Using untyped client - review_audit テーブルの型定義を Supabase client に追加
+    const { error: auditError } = await supabase
       .from('review_audit')
       .insert({
         organization_id,
@@ -150,8 +150,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify admin role
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] app_users テーブルの型定義を Supabase client に追加
-    const { data: userProfile, error: profileError } = await (supabase as any)
+    // Note: Using untyped client - app_users テーブルの型定義を Supabase client に追加
+    const { data: userProfile, error: profileError } = await supabase
       .from('app_users')
       .select('role')
       .eq('id', user.id)
@@ -172,8 +172,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get organization details
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] organizations テーブルの型定義を Supabase client に追加
-    const { data: organization, error: orgError } = await (supabase as any)
+    // Note: Using untyped client - organizations テーブルの型定義を Supabase client に追加
+    const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('id, name, status')
       .eq('id', organizationId)
