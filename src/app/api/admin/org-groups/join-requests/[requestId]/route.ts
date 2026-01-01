@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/adminClient';
-import { supabaseAdmin as supabaseAdminUntyped } from '@/lib/supabase-admin-client';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
@@ -17,12 +16,12 @@ const decisionSchema = z.object({
 async function canManageJoinRequest(requestId: string, userId: string): Promise<boolean> {
   try {
     // Get join request with group info (uses untyped client for complex JOIN)
-    const { data: request, error } = await supabaseAdminUntyped
+    const { data: request, error } = await supabaseAdmin
       .from('org_group_join_requests')
       .select(`
         id,
         group_id,
-        group:organization_groups!org_group_join_requests_group_id_fkey(
+        group:org_groups!org_group_join_requests_group_id_fkey(
           id,
           owner_organization_id
         )
@@ -104,7 +103,7 @@ export async function POST(
     const { decision, note } = validation.data;
 
     // Get current user
-    const user = await getUserWithClient(supabaseAdminUntyped);
+    const user = await getUserWithClient(supabaseAdmin);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -206,13 +205,13 @@ export async function POST(
         }
 
         // Fetch updated request for response (uses untyped client for complex JOIN)
-        const { data: updatedRequest, error: fetchError } = await supabaseAdminUntyped
+        const { data: updatedRequest, error: fetchError } = await supabaseAdmin
           .from('org_group_join_requests')
           .select(`
             id, group_id, organization_id, status, invite_code, requested_by, reason,
             decision_note, decided_by, decided_at, created_at, updated_at,
-            group:organization_groups!org_group_join_requests_group_id_fkey(id, name,
-              owner_organization:organizations!organization_groups_owner_org_id_fkey(id, name, company_name)
+            group:org_groups!org_group_join_requests_group_id_fkey(id, name,
+              owner_organization:organizations!org_groups_owner_org_fkey(id, name, company_name)
             ),
             organization:organizations!org_group_join_requests_organization_id_fkey(id, name, company_name)
           `)
@@ -244,7 +243,7 @@ export async function POST(
       }
 
       // Reject: Update join request status only (uses untyped client for complex JOIN)
-      const { data: updatedRequest, error: updateError } = await supabaseAdminUntyped
+      const { data: updatedRequest, error: updateError } = await supabaseAdmin
         .from('org_group_join_requests')
         .update({
           status: 'rejected',
@@ -257,8 +256,8 @@ export async function POST(
         .select(`
           id, group_id, organization_id, status, invite_code, requested_by, reason,
           decision_note, decided_by, decided_at, created_at, updated_at,
-          group:organization_groups!org_group_join_requests_group_id_fkey(id, name,
-            owner_organization:organizations!organization_groups_owner_org_id_fkey(id, name, company_name)
+          group:org_groups!org_group_join_requests_group_id_fkey(id, name,
+            owner_organization:organizations!org_groups_owner_org_fkey(id, name, company_name)
           ),
           organization:organizations!org_group_join_requests_organization_id_fkey(id, name, company_name)
         `)

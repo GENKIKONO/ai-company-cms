@@ -7056,7 +7056,15 @@ export type Database = {
           revoked_at?: string | null
           used_count?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "org_group_invites_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "org_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       org_group_join_requests: {
         Row: {
@@ -7102,6 +7110,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "org_group_join_requests_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "org_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "org_group_join_requests_organization_id_fkey"
             columns: ["organization_id"]
@@ -7196,7 +7211,110 @@ export type Database = {
           organization_id?: string
           role?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "org_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "org_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_groups: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          owner_organization_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          owner_organization_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          owner_organization_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "ai_usage_counters"
+            referencedColumns: ["org_id"]
+          },
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_overview_v2"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_with_owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "v_orgs_visible"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "view_ai_starter_caps_current"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "view_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_groups_owner_org_fkey"
+            columns: ["owner_organization_id"]
+            isOneToOne: false
+            referencedRelation: "view_report_regen_limit_current"
+            referencedColumns: ["organization_id"]
+          },
+        ]
       }
       org_memberships: {
         Row: {

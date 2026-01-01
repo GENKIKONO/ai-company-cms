@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { supabaseAdmin } from '@/lib/supabase/adminClient';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
@@ -20,7 +20,7 @@ const removeMemberSchema = z.object({
 async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
   try {
     const { data: group, error } = await supabaseAdmin
-      .from('organization_groups')
+      .from('org_groups')
       .select('owner_organization_id')
       .eq('id', groupId)
       .maybeSingle();
@@ -29,7 +29,6 @@ async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
       return false;
     }
 
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] organization_groups テーブルの型定義を Supabase client に追加
     return await isUserAdminOfOrg((group as any).owner_organization_id, userId);
   } catch (error: any) {
     logger.error('Error checking group ownership', {
@@ -87,7 +86,7 @@ export async function POST(
 
     // Verify group exists
     const { data: group, error: groupError } = await supabaseAdmin
-      .from('organization_groups')
+      .from('org_groups')
       .select('id, name, owner_organization_id')
       .eq('id', groupId)
       .maybeSingle();
@@ -230,7 +229,7 @@ export async function DELETE(
 
     // Get group info
     const { data: group, error: groupError } = await supabaseAdmin
-      .from('organization_groups')
+      .from('org_groups')
       .select('name, owner_organization_id')
       .eq('id', groupId)
       .maybeSingle();

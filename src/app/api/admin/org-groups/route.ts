@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { supabaseAdmin } from '@/lib/supabase/adminClient';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
@@ -24,14 +24,14 @@ export async function GET(request: NextRequest) {
     const search = url.searchParams.get('search');
 
     let query = supabaseAdmin
-      .from('organization_groups')
+      .from('org_groups')
       .select(`
         id,
         name,
         description,
         created_at,
         updated_at,
-        owner_organization:organizations!organization_groups_owner_org_id_fkey(
+        owner_organization:organizations!org_groups_owner_org_fkey(
           id,
           name,
           company_name
@@ -148,9 +148,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the group
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] organization_groups テーブルの型定義を Supabase client に追加
     const { data: group, error } = await (supabaseAdmin as any)
-      .from('organization_groups')
+      .from('org_groups')
       .insert({
         name,
         description,
@@ -162,7 +161,7 @@ export async function POST(request: NextRequest) {
         description,
         created_at,
         updated_at,
-        owner_organization:organizations!organization_groups_owner_org_id_fkey(
+        owner_organization:organizations!org_groups_owner_org_fkey(
           id,
           name,
           company_name
@@ -220,7 +219,7 @@ export async function POST(request: NextRequest) {
       
       // Clean up - delete the group since we couldn't add the owner
       await supabaseAdmin
-        .from('organization_groups')
+        .from('org_groups')
         .delete()
         .eq('id', group.id);
         

@@ -2,7 +2,7 @@
 // import type { OrganizationGroupWithMembersAndOwner, OrgGroupMemberRow } from '@/types/org-groups-supabase';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { supabaseAdmin } from '@/lib/supabase/adminClient';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
@@ -52,7 +52,7 @@ async function canManageGroup(groupId: string, userId: string): Promise<boolean>
 async function isGroupOwner(groupId: string, userId: string): Promise<boolean> {
   try {
     const { data: group, error } = await supabaseAdmin
-      .from('organization_groups')
+      .from('org_groups')
       .select('owner_organization_id')
       .eq('id', groupId)
       .maybeSingle();
@@ -95,14 +95,14 @@ export async function GET(
 
     // Get group with full details
     const { data: group, error } = await supabaseAdmin
-      .from('organization_groups')
+      .from('org_groups')
       .select(`
         id,
         name,
         description,
         created_at,
         updated_at,
-        owner_organization:organizations!organization_groups_owner_org_id_fkey(
+        owner_organization:organizations!org_groups_owner_org_fkey(
           id,
           name,
           company_name
@@ -209,9 +209,8 @@ export async function PATCH(
     }
 
     // Update the group
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] organization_groups テーブルの型定義を Supabase client に追加
     const { data: group, error } = await (supabaseAdmin as any)
-      .from('organization_groups')
+      .from('org_groups')
       .update({
         ...updateData,
         updated_at: new Date().toISOString()
@@ -223,7 +222,7 @@ export async function PATCH(
         description,
         created_at,
         updated_at,
-        owner_organization:organizations!organization_groups_owner_org_id_fkey(
+        owner_organization:organizations!org_groups_owner_org_fkey(
           id,
           name,
           company_name
@@ -310,7 +309,7 @@ export async function DELETE(
 
     // Get group info for logging
     const { data: group, error: groupError } = await supabaseAdmin
-      .from('organization_groups')
+      .from('org_groups')
       .select('name, owner_organization_id')
       .eq('id', groupId)
       .maybeSingle();
@@ -331,7 +330,7 @@ export async function DELETE(
 
     // Delete the group (cascades to org_group_members)
     const { error } = await supabaseAdmin
-      .from('organization_groups')
+      .from('org_groups')
       .delete()
       .eq('id', groupId);
 

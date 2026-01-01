@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { supabaseAdmin } from '@/lib/supabase/adminClient';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
@@ -45,11 +45,11 @@ export async function GET(request: NextRequest) {
         decided_at,
         created_at,
         updated_at,
-        group:organization_groups!org_group_join_requests_group_id_fkey(
+        group:org_groups!org_group_join_requests_group_id_fkey(
           id,
           name,
           owner_organization_id,
-          owner_organization:organizations!organization_groups_owner_org_id_fkey(
+          owner_organization:organizations!org_groups_owner_org_fkey(
             id,
             name,
             company_name
@@ -306,10 +306,10 @@ export async function POST(request: NextRequest) {
         requested_by,
         reason,
         created_at,
-        group:organization_groups!org_group_join_requests_group_id_fkey(
+        group:org_groups!org_group_join_requests_group_id_fkey(
           id,
           name,
-          owner_organization:organizations!organization_groups_owner_org_id_fkey(
+          owner_organization:organizations!org_groups_owner_org_fkey(
             id,
             name,
             company_name

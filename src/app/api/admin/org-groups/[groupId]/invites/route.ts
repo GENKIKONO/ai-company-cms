@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/adminClient';
-import { supabaseAdmin as supabaseAdminUntyped } from '@/lib/supabase-admin-client';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
@@ -24,9 +23,9 @@ function generateInviteCode(): string {
 // Helper function to check if user is group owner admin
 async function isGroupOwnerAdmin(groupId: string, userId: string): Promise<{ isAdmin: boolean; ownerOrgId?: string }> {
   try {
-    // organization_groups table not in generated types - use untyped client
-    const { data: group, error } = await supabaseAdminUntyped
-      .from('organization_groups')
+    // org_groups - using typed client
+    const { data: group, error } = await supabaseAdmin
+      .from('org_groups')
       .select('owner_organization_id')
       .eq('id', groupId)
       .maybeSingle();
@@ -64,7 +63,7 @@ export async function GET(
     const { groupId } = await params;
 
     // Get current user
-    const user = await getUserWithClient(supabaseAdminUntyped);
+    const user = await getUserWithClient(supabaseAdmin);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -83,9 +82,9 @@ export async function GET(
       }, { status: 403 });
     }
 
-    // Verify group exists (organization_groups not in generated types)
-    const { data: group, error: groupError } = await supabaseAdminUntyped
-      .from('organization_groups')
+    // Verify group exists (org_groups)
+    const { data: group, error: groupError } = await supabaseAdmin
+      .from('org_groups')
       .select('id, name')
       .eq('id', groupId)
       .maybeSingle();
@@ -178,7 +177,7 @@ export async function POST(
     const { expiresAt, maxUses, note, customCode } = validation.data;
 
     // Get current user
-    const user = await getUserWithClient(supabaseAdminUntyped);
+    const user = await getUserWithClient(supabaseAdmin);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -197,9 +196,9 @@ export async function POST(
       }, { status: 403 });
     }
 
-    // Verify group exists (organization_groups not in generated types)
-    const { data: group, error: groupError } = await supabaseAdminUntyped
-      .from('organization_groups')
+    // Verify group exists (org_groups)
+    const { data: group, error: groupError } = await supabaseAdmin
+      .from('org_groups')
       .select('id, name')
       .eq('id', groupId)
       .maybeSingle();
