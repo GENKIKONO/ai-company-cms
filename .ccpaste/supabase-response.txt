@@ -1,76 +1,302 @@
-以下は「結果の要約」と「次に実行すべき具体的コマンド／チェックリスト」です。主導権はこちらで持ち、完了までガイドします。DB側は既に整備済みなので、コード側は確定手順のみです。
+PR1 適用内容（貼り付けて実装 → 検証まで）
+以下を順に反映してください。完了後に型チェック・ビルド・最小動作確認を実施します。
 
-1) 変更の確定（ブロッキング対応）
-実行コマンド
+1) 型付き Admin クライアントを新規追加
+追加: src/lib/supabase/adminClient.ts
+import
+ { createClient } 
+from
+ 
+'npm:@supabase/supabase-js@2.46.1'
 
-git add -A
-git commit -m "feat(org-groups): use approve_join_request RPC; cleanup ternary; misc text tweak"
-git push
-目的
+import
+ 
+type
+ { Database } 
+from
+ 
+'@/types/supabase'
+ 
+// or 'src/types/supabase'
 
-未コミットの修正（5ファイル＋削除ファイル）を確定し、デプロイ不整合を防止
-検証
+if
+ (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  
+throw
+ 
+new
+ 
+Error
+(
+'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
+)
+}
+export
+ 
+const
+ supabaseAdmin = createClient<Database>(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    
+auth
+: { 
+persistSession
+: 
+false
+ },
+    
+global
+: { 
+headers
+: { 
+'X-Client-Name'
+: 
+'admin-api'
+ } },
+  }
+)
 
-git status でクリーンであることを確認
-2) E2Eテスト（ブロッキング対応）
+ポイント
+
+Database 型を適用
+persistSession: false でサーバー実行に最適化
+2) 型ユーティリティ（任意だが推奨）
+追加: src/lib/types/supabase-helpers.ts
+import type { Database } from '@/types/supabase'
+export type OrgGroupMember = Database['public']['Tables']['org_group_members']['Row']
+export type OrgGroupInvite = Database['public']['Tables']['org_group_invites']['Row']
+export type OrgGroupJoinRequest = Database['public']['Tables']['org_group_join_requests']['Row']
+
+3) org-groups 配下の as any 除去と select の明示
+以下は代表的な変更例です。パスが異なる場合は該当ファイルに合わせて適用してください。
+
+変更: src/app/api/admin/org-groups/join-requests/[requestId]/route.ts
+編集点
+
+import の追加
+import { supabaseAdmin } from '@/lib/supabase/adminClient'
+import type { OrgGroupJoinRequest } from '@/lib/types/supabase-helpers'（任意）
+置換
+(supabaseAdmin as any) → supabaseAdmin
+select の明示（Row に合わせて必要最小）
+'id, group_id, organization_id, status, invite_code, requested_by, decided_by, decided_at, created_at, updated_at'
+RPC 呼び出しの戻り値ハンドリングを明確化
+差分イメージ（要点）
+
+- 
+const
+ { data, error } = 
+await
+ (supabaseAdmin 
+as
+ any)
+-   .
+from
+(
+'org_group_join_requests'
+)
+-   .
+select
+(
+'*'
+)
++ 
+const
+ { data, error } = 
+await
+ supabaseAdmin
++   .
+from
+(
+'org_group_join_requests'
+)
++   .
+select
+(
+'id, group_id, organization_id, status, invite_code, requested_by, decided_by, decided_at, created_at, updated_at'
+)
+    .eq(
+'id'
+, requestId)
+    .maybeSingle()
+  
+// 承認処理
+
+- 
+const
+ rpcRes = 
+await
+ (supabaseAdmin 
+as
+ any).rpc(
+'approve_join_request'
+, { p_request_id: requestId, p_invite_code: inviteCode })
++ 
+const
+ rpcRes = 
+await
+ supabaseAdmin.rpc(
+'approve_join_request'
+, {
++   p_request_id: requestId,
++   p_invite_code: inviteCode,
++ })
+  
+if
+ (rpcRes.error) {
+-   
+return
+ NextResponse.json({ error: rpcRes.error }, { status: 
+400
+ })
++   
+return
+ NextResponse.json({ error: rpcRes.error.message }, { status: 
+400
+ })
+  }
+
+変更: src/app/api/admin/org-groups/invites/route.ts
+編集点
+
+import { supabaseAdmin } from '@/lib/supabase/adminClient'
+(supabaseAdmin as any) → supabaseAdmin
+select 列の明示
+取得: 'id, group_id, code, expires_at, max_uses, used_count, created_by, note, created_at, revoked_at'
+作成/更新後の返却は 'id, code, used_count' など必要最小
+差分イメージ
+
+- 
+const
+ { data, error } = 
+await
+ (supabaseAdmin 
+as
+ any)
+-  .
+from
+(
+'org_group_invites'
+)
+-  .
+select
+(
+'*'
+)
++ 
+const
+ { data, error } = 
+await
+ supabaseAdmin
++  .
+from
+(
+'org_group_invites'
+)
++  .
+select
+(
+'id, group_id, code, expires_at, max_uses, used_count, created_by, note, created_at, revoked_at'
+)
+   .eq(
+'group_id'
+, groupId)
+- 
+const
+ { data: created, error: createErr } = 
+await
+ (supabaseAdmin 
+as
+ any)
++ 
+const
+ { data: created, error: createErr } = 
+await
+ supabaseAdmin
+   .
+from
+(
+'org_group_invites'
+)
+   .insert(payload)
+-  .
+select
+(
+'*'
+)
++  .
+select
+(
+'id, code, used_count'
+)
+   .maybeSingle()
+
+変更: src/app/api/admin/org-groups/members/route.ts
+編集点
+
+import { supabaseAdmin } from '@/lib/supabase/adminClient'
+(supabaseAdmin as any) → supabaseAdmin
+select 列の明示: 'id, group_id, organization_id, role, created_at'
+差分イメージ
+
+- 
+const
+ { data, error } = 
+await
+ (supabaseAdmin 
+as
+ any)
++ 
+const
+ { data, error } = 
+await
+ supabaseAdmin
+   .
+from
+(
+'org_group_members'
+)
+-  .
+select
+(
+'*'
+)
++  .
+select
+(
+'id, group_id, organization_id, role, created_at'
+)
+   .eq(
+'group_id'
+, groupId)
+
+共通のエラーハンドリング調整（PostgrestError）
+- if (error) return NextResponse.json({ error }, { status: 
+400
+ })
++ if (error) return NextResponse.json({ error: error.message }, { status: 
+400
+ })
+
+4) 実行と検証
+コマンド
+
+npm run typecheck
+npm run build
 手動チェック（最小）
 
-join request 作成 → 承認（approve）→ org_group_members へ反映されること
-join request を拒否（reject）→ ステータスが rejected になること
-正常系・異常系（無効な invite_code）で適切なエラーを返すこと
-自動テスト（任意だが推奨）
+join-requests 承認: approve_join_request RPC成功、org_group_members 追加、join_requests.status = approved
+join-requests 失敗: 無効 invite_code で 400/409 を返す
+invites 一覧/作成が正常
+members 一覧/削除が正常
+5) コミット＆プッシュ
+git add -A
+git commit -m "refactor(org-groups): remove as any; add typed admin client; narrow select columns"
+git push
+検証結果を共有してください。
 
-npm run test:e2e または既存のE2Eランナーがあれば実行
-成功しない場合は、失敗ケースのログを共有してください。こちらで即応します
-3) 型定義の再生成（高優先度）
-実行コマンド
-
-npx supabase gen types typescript --project-id $PROJECT_ID > src/types/supabase.ts
-目的
-
-現状 as any を多用しているため、実DBに一致した新しい型を再生成して型の齟齬を解消
-検証
-
-npm run typecheck で型エラーを洗い出し
-supabaseAdmin as any 等、DB操作周りの as any 24件から順次除去
-注意
-
-生成後に大きく差分が出ます。PRを分けて小さくマージする方針で進めます
-4) 追加の技術負債削減（高〜中優先度）
-優先順で順に実施（小さくPRを切る）
-
-P1: DB操作まわりの as any 24件を除去（型を付け直す）
-P2: 残りの as any 63件を除去
-P2: TODO.*SUPABASE_TYPE 45件の取捨選択と対応
-P3: from('site_settings') → from('cms_site_settings') へ移行（既に互換ビューで動作はしているため、影響範囲小を見極めて段階移行）
-P3: 非原子的DB操作の棚卸し（approve_join_request と同様にRPCへ集約）
-検証
-
-各PRで npm run typecheck / npm run build がゼロエラーであること
-主要ユースケースの手動動作確認*
-5) ログとRLSの健全性チェック（中〜低優先度）
-E2E後の確認
-
-APIログにエラーが出ていないか（Supabase Dashboard → Logs）
-Admin APIが service_role で意図通りRLSをバイパスしていることを確認
-フロント経由のauthenticatedユーザーは、RLSで適切に制御されているかをサンプリング検証
-将来の改善
-
-RLSポリシーの棚卸し・不足インデックスの補完
-互換ビューの段階撤廃（参照先を正規テーブルへ統一）
-6) 実施済みのDB変更（再掲・認識合わせ）
-カラム追加
-public.ai_interview_sessions: finalized_at, finalized_by, created_by
-互換ビュー
-public.site_settings → cms_site_settings を参照
-public.reports → ai_monthly_reports を参照
-RPC（トランザクション化）
-public.approve_join_request(uuid, text) 追加（SECURITY DEFINER、postgres/supabase_admin のみ）
-インデックス
-public.rate_limit_logs_202601: idx_rate_limit_logs_202601_ip_ts_desc を作成
-これらにより、あなたの最新の完了報告に記載の「コード側修正」はDBと整合が取れています。以降はコミット・テスト・型再生成の3点を順に実行すれば、完成状態の品質が担保されます。
-
-問題が発生した場合は、失敗したコマンドとエラーメッセージを貼ってください。即時に次の是正策を提示します。
-
-
+typecheck/build の結果
+上記3つの手動チェックの可否とエラーメッセージ（ある場合）
+問題があれば、その場で差分修正案を即時提示します。PR1が安定したら、次はPR2（admin/alerts 配下の as any 除去）に進みます。
 

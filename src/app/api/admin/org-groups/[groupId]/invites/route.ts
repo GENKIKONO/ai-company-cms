@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { supabaseAdmin } from '@/lib/supabase/adminClient';
+import { supabaseAdmin as supabaseAdminUntyped } from '@/lib/supabase-admin-client';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
@@ -23,7 +24,8 @@ function generateInviteCode(): string {
 // Helper function to check if user is group owner admin
 async function isGroupOwnerAdmin(groupId: string, userId: string): Promise<{ isAdmin: boolean; ownerOrgId?: string }> {
   try {
-    const { data: group, error } = await supabaseAdmin
+    // organization_groups table not in generated types - use untyped client
+    const { data: group, error } = await supabaseAdminUntyped
       .from('organization_groups')
       .select('owner_organization_id')
       .eq('id', groupId)
@@ -37,8 +39,7 @@ async function isGroupOwnerAdmin(groupId: string, userId: string): Promise<{ isA
       return { isAdmin: false };
     }
 
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] organization_groups テーブルの型定義を Supabase client に追加
-    const ownerOrgId = (group as any).owner_organization_id;
+    const ownerOrgId = group.owner_organization_id;
     const isAdmin = await isUserAdminOfOrg(ownerOrgId, userId);
     return { isAdmin, ownerOrgId };
   } catch (error: any) {
@@ -63,7 +64,7 @@ export async function GET(
     const { groupId } = await params;
 
     // Get current user
-    const user = await getUserWithClient(supabaseAdmin);
+    const user = await getUserWithClient(supabaseAdminUntyped);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -82,8 +83,8 @@ export async function GET(
       }, { status: 403 });
     }
 
-    // Verify group exists
-    const { data: group, error: groupError } = await supabaseAdmin
+    // Verify group exists (organization_groups not in generated types)
+    const { data: group, error: groupError } = await supabaseAdminUntyped
       .from('organization_groups')
       .select('id, name')
       .eq('id', groupId)
@@ -177,7 +178,7 @@ export async function POST(
     const { expiresAt, maxUses, note, customCode } = validation.data;
 
     // Get current user
-    const user = await getUserWithClient(supabaseAdmin);
+    const user = await getUserWithClient(supabaseAdminUntyped);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -196,8 +197,8 @@ export async function POST(
       }, { status: 403 });
     }
 
-    // Verify group exists
-    const { data: group, error: groupError } = await supabaseAdmin
+    // Verify group exists (organization_groups not in generated types)
+    const { data: group, error: groupError } = await supabaseAdminUntyped
       .from('organization_groups')
       .select('id, name')
       .eq('id', groupId)
@@ -246,7 +247,6 @@ export async function POST(
     }
 
     // Create invite
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_invites テーブルの型定義を Supabase client に追加
     const { data: invite, error } = await supabaseAdmin
       .from('org_group_invites')
       .insert({
@@ -257,19 +257,8 @@ export async function POST(
         used_count: 0,
         created_by: user.id,
         note: note || null
-      } as any)
-      .select(`
-        id,
-        group_id,
-        code,
-        expires_at,
-        max_uses,
-        used_count,
-        created_by,
-        note,
-        created_at,
-        revoked_at
-      `)
+      })
+      .select('id, group_id, code, expires_at, max_uses, used_count, created_by, note, created_at, revoked_at')
       .maybeSingle();
 
     if (error) {
@@ -302,7 +291,7 @@ export async function POST(
       component: 'group-invites-api',
       operation: 'create',
       groupId,
-      inviteId: (invite as any).id,
+      inviteId: invite.id,
       code: inviteCode.substring(0, 4) + '...',
       userId: user.id
     });

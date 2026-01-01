@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { supabaseAdmin } from '@/lib/supabase/adminClient';
+import { supabaseAdmin as supabaseAdminUntyped } from '@/lib/supabase-admin-client';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireAdminPermission } from '@/lib/auth/server';
 import { logger } from '@/lib/log';
-import { isUserAdminOfOrg, getUserOrganizations } from '@/lib/utils/org-permissions';
+import { isUserAdminOfOrg } from '@/lib/utils/org-permissions';
 import { z } from 'zod';
 
 // Validation schema
@@ -15,9 +16,8 @@ const decisionSchema = z.object({
 // Helper function to check if user can manage join request
 async function canManageJoinRequest(requestId: string, userId: string): Promise<boolean> {
   try {
-    // Get join request with group info
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
-    const { data: request, error } = await (supabaseAdmin as any)
+    // Get join request with group info (uses untyped client for complex JOIN)
+    const { data: request, error } = await supabaseAdminUntyped
       .from('org_group_join_requests')
       .select(`
         id,
@@ -48,8 +48,7 @@ async function canManageJoinRequest(requestId: string, userId: string): Promise<
     }
 
     // Check system admin role
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] profiles テーブルの型定義を Supabase client に追加
-    const { data: profile, error: profileError } = await (supabaseAdmin as any)
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', userId)
@@ -105,7 +104,7 @@ export async function POST(
     const { decision, note } = validation.data;
 
     // Get current user
-    const user = await getUserWithClient(supabaseAdmin);
+    const user = await getUserWithClient(supabaseAdminUntyped);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -126,18 +125,9 @@ export async function POST(
     }
 
     // Get join request details
-    // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
-    const { data: joinRequest, error: requestError } = await (supabaseAdmin as any)
+    const { data: joinRequest, error: requestError } = await supabaseAdmin
       .from('org_group_join_requests')
-      .select(`
-        id,
-        group_id,
-        organization_id,
-        status,
-        invite_code,
-        requested_by,
-        reason
-      `)
+      .select('id, group_id, organization_id, status, invite_code, requested_by, reason')
       .eq('id', requestId)
       .maybeSingle();
 
@@ -215,36 +205,16 @@ export async function POST(
           }, { status: 400 });
         }
 
-        // Fetch updated request for response
-        const { data: updatedRequest, error: fetchError } = await (supabaseAdmin as any)
+        // Fetch updated request for response (uses untyped client for complex JOIN)
+        const { data: updatedRequest, error: fetchError } = await supabaseAdminUntyped
           .from('org_group_join_requests')
           .select(`
-            id,
-            group_id,
-            organization_id,
-            status,
-            invite_code,
-            requested_by,
-            reason,
-            decision_note,
-            decided_by,
-            decided_at,
-            created_at,
-            updated_at,
-            group:organization_groups!org_group_join_requests_group_id_fkey(
-              id,
-              name,
-              owner_organization:organizations!organization_groups_owner_org_id_fkey(
-                id,
-                name,
-                company_name
-              )
+            id, group_id, organization_id, status, invite_code, requested_by, reason,
+            decision_note, decided_by, decided_at, created_at, updated_at,
+            group:organization_groups!org_group_join_requests_group_id_fkey(id, name,
+              owner_organization:organizations!organization_groups_owner_org_id_fkey(id, name, company_name)
             ),
-            organization:organizations!org_group_join_requests_organization_id_fkey(
-              id,
-              name,
-              company_name
-            )
+            organization:organizations!org_group_join_requests_organization_id_fkey(id, name, company_name)
           `)
           .eq('id', requestId)
           .maybeSingle();
@@ -273,9 +243,8 @@ export async function POST(
         });
       }
 
-      // Reject: Update join request status only
-      // TODO: [SUPABASE_TYPE_FOLLOWUP] org_group_join_requests テーブルの型定義を Supabase client に追加
-      const { data: updatedRequest, error: updateError } = await (supabaseAdmin as any)
+      // Reject: Update join request status only (uses untyped client for complex JOIN)
+      const { data: updatedRequest, error: updateError } = await supabaseAdminUntyped
         .from('org_group_join_requests')
         .update({
           status: 'rejected',
@@ -286,32 +255,12 @@ export async function POST(
         })
         .eq('id', requestId)
         .select(`
-          id,
-          group_id,
-          organization_id,
-          status,
-          invite_code,
-          requested_by,
-          reason,
-          decision_note,
-          decided_by,
-          decided_at,
-          created_at,
-          updated_at,
-          group:organization_groups!org_group_join_requests_group_id_fkey(
-            id,
-            name,
-            owner_organization:organizations!organization_groups_owner_org_id_fkey(
-              id,
-              name,
-              company_name
-            )
+          id, group_id, organization_id, status, invite_code, requested_by, reason,
+          decision_note, decided_by, decided_at, created_at, updated_at,
+          group:organization_groups!org_group_join_requests_group_id_fkey(id, name,
+            owner_organization:organizations!organization_groups_owner_org_id_fkey(id, name, company_name)
           ),
-          organization:organizations!org_group_join_requests_organization_id_fkey(
-            id,
-            name,
-            company_name
-          )
+          organization:organizations!org_group_join_requests_organization_id_fkey(id, name, company_name)
         `)
         .maybeSingle();
 
