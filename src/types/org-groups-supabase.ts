@@ -4,7 +4,7 @@
  */
 
 // ===== Organization Groups =====
-// Supabase の「正」: organization_groups テーブル
+// Supabase の正: org_groups テーブル
 export interface OrganizationGroupRow {
   id: string;
   owner_organization_id: string;
@@ -30,7 +30,7 @@ export type OrganizationGroupUpdate = Partial<Omit<OrganizationGroupRow, 'id' | 
 // Supabase の「正」: org_group_members テーブル
 export interface OrgGroupMemberRow {
   id: string;
-  group_id: string; // → organization_groups.id
+  group_id: string; // → org_groups.id
   organization_id: string; // → organizations.id
   role: 'admin' | 'member'; // TODO: [SUPABASE_ORG_GROUP_MIGRATION] 実際のenum値を確認
   created_at: string;
@@ -50,7 +50,7 @@ export type OrgGroupMemberUpdate = Partial<Omit<OrgGroupMemberRow, 'id' | 'group
 // Supabase の「正」: org_group_invites テーブル
 export interface OrgGroupInviteRow {
   id: string;
-  group_id: string; // → organization_groups.id
+  group_id: string; // → org_groups.id
   code: string; // 招待コード
   expires_at: string;
   max_uses: number;
@@ -75,7 +75,7 @@ export type OrgGroupInviteUpdate = Partial<Omit<OrgGroupInviteRow, 'id' | 'group
 // Supabase の「正」: org_group_join_requests テーブル
 export interface OrgGroupJoinRequestRow {
   id: string;
-  group_id: string; // → organization_groups.id
+  group_id: string; // → org_groups.id
   organization_id: string; // → organizations.id
   status: 'pending' | 'approved' | 'rejected'; // TODO: [SUPABASE_ORG_GROUP_MIGRATION] 実際のenum値を確認
   invite_code?: string | null;
@@ -242,9 +242,9 @@ export const ORG_GROUP_ROLES: OrgGroupRole[] = ['admin', 'member'];
 export const JOIN_REQUEST_STATUSES: JoinRequestStatus[] = ['pending', 'approved', 'rejected'];
 
 // Foreign Key Reference Names (for API queries)
-// TODO: [SUPABASE_ORG_GROUP_MIGRATION] 実際のFK制約名を確認して調整
+// 実際のDB FK制約名と一致させる
 export const FK_REFERENCES = {
-  ORGANIZATION_GROUPS_OWNER: 'organization_groups_owner_organization_id_fkey',
+  ORG_GROUPS_OWNER: 'org_groups_owner_org_fkey',
   ORG_GROUP_MEMBERS_GROUP: 'org_group_members_group_id_fkey',
   ORG_GROUP_MEMBERS_ORG: 'org_group_members_organization_id_fkey',
   ORG_GROUP_INVITES_GROUP: 'org_group_invites_group_id_fkey',
