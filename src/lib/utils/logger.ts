@@ -13,18 +13,18 @@ export enum LogLevel {
   DEBUG = 'DEBUG'
 }
 
-// Logger interface
+// Logger interface - 基本は文字列系だが、構造化データも許容
 interface LogContext {
   component?: string;
   userId?: string;
   organizationId?: string;
   requestId?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Core logger functions
 export const logger = {
-  error: (message: string, error?: Error | any, context?: LogContext) => {
+  error: (message: string, error?: Error | unknown, context?: LogContext) => {
     // Always log errors, even in production
     const timestamp = new Date().toISOString();
     const logData = {
@@ -47,7 +47,7 @@ export const logger = {
     }
   },
 
-  warn: (message: string, data?: any, context?: LogContext) => {
+  warn: (message: string, data?: unknown, context?: LogContext) => {
     // Log warnings in all environments
     const timestamp = new Date().toISOString();
     const logData = {
@@ -65,7 +65,7 @@ export const logger = {
     }
   },
 
-  info: (message: string, data?: any, context?: LogContext) => {
+  info: (message: string, data?: unknown, context?: LogContext) => {
     // Log info in development and staging, minimal in production
     if (isProd) {
       // Only log critical info in production
@@ -76,7 +76,7 @@ export const logger = {
     baseLogger.info(`[${timestamp}] INFO: ${message}`, { data: { data, context } });
   },
 
-  debug: (message: string, data?: any, context?: LogContext) => {
+  debug: (message: string, data?: unknown, context?: LogContext) => {
     // Only log debug in development
     if (!isDev) return;
     
@@ -86,11 +86,11 @@ export const logger = {
 };
 
 // Legacy verification functions (maintained for backward compatibility)
-export function vLog(message: string, data?: any) {
+export function vLog(message: string, data?: unknown) {
   logger.debug(`[VERIFY] ${message}`, data);
 }
 
-export function vErr(message: string, data?: any) {
+export function vErr(message: string, data?: unknown) {
   logger.error(`[VERIFY] ${message}`, { data: data });
 }
 

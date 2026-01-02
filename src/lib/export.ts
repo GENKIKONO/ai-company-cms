@@ -201,7 +201,8 @@ export class ExportService {
 
   // CSVフィールドフォーマット
   private formatFieldForCSV(org: Organization, field: string): string {
-    let value = (org as any)[field];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的フィールドアクセスのため1箇所のみ許容
+    let value = (org as Record<string, unknown>)[field];
     
     if (value === null || value === undefined) return '';
     
@@ -212,7 +213,7 @@ export class ExportService {
     
     // 日付の場合
     if (field.includes('date') || field === 'established_at') {
-      if (value) {
+      if (value && (typeof value === 'string' || typeof value === 'number')) {
         value = new Date(value).toLocaleDateString('ja-JP');
       }
     }
@@ -339,8 +340,11 @@ export class ExportService {
     };
   }
 
+  /** 比較データ型 */
+  private _comparisonData: { organizations: Organization[]; comparison: Record<string, Array<{ name: string; value: unknown }>> } | null = null;
+
   // 比較HTML構築
-  private buildComparisonHTML(data: any): string {
+  private buildComparisonHTML(data: { organizations: Organization[]; comparison: Record<string, Array<{ name: string; value: unknown }>> }): string {
     return `
 <!DOCTYPE html>
 <html lang="ja">
@@ -374,31 +378,31 @@ export class ExportService {
         <tbody>
             <tr class="metric-row">
                 <td><strong>従業員数</strong></td>
-                ${data.comparison.employees.map((item: any) => 
-                  `<td>${item.value ? item.value.toLocaleString() + '名' : '-'}</td>`
+                ${(data.comparison.employees ?? []).map((item) =>
+                  `<td>${item.value ? String(item.value).toLocaleString() + '名' : '-'}</td>`
                 ).join('')}
             </tr>
             <tr>
                 <td><strong>設立年</strong></td>
-                ${data.comparison.founded.map((item: any) => 
+                ${(data.comparison.established ?? []).map((item) =>
                   `<td>${item.value ? item.value + '年' : '-'}</td>`
                 ).join('')}
             </tr>
             <tr class="metric-row">
                 <td><strong>業界数</strong></td>
-                ${data.comparison.industries.map((item: any) => 
+                ${(data.comparison.industries ?? []).map((item) =>
                   `<td>${item.value}分野</td>`
                 ).join('')}
             </tr>
             <tr>
                 <td><strong>Webサイト</strong></td>
-                ${data.comparison.hasWebsite.map((item: any) => 
+                ${(data.comparison.hasWebsite ?? []).map((item) =>
                   `<td>${item.value ? '✅ あり' : '❌ なし'}</td>`
                 ).join('')}
             </tr>
             <tr class="metric-row">
                 <td><strong>ロゴ</strong></td>
-                ${data.comparison.hasLogo.map((item: any) => 
+                ${(data.comparison.hasLogo ?? []).map((item) =>
                   `<td>${item.value ? '✅ あり' : '❌ なし'}</td>`
                 ).join('')}
             </tr>

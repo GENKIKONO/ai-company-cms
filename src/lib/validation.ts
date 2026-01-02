@@ -52,8 +52,11 @@ export type PreflightResult = {
   warnings: string[];
 };
 
+/** JSON-LD生データ型（外部入力） */
+type JsonLdInput = Record<string, unknown>;
+
 // JSON-LD内部検証関数
-export const validateJsonLdStructure = (jsonLd: any): PreflightResult => {
+export const validateJsonLdStructure = (jsonLd: JsonLdInput): PreflightResult => {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -74,17 +77,18 @@ export const validateJsonLdStructure = (jsonLd: any): PreflightResult => {
       if (!jsonLd.url) errors.push('企業URLが設定されていません');
       
       // 住所チェック
-      if (jsonLd.address) {
-        if (!jsonLd.address.addressLocality) errors.push('市区町村が設定されていません');
-        if (!jsonLd.address.addressRegion) errors.push('都道府県が設定されていません');
-        if (jsonLd.address.addressCountry !== 'JP') warnings.push('国コードがJPではありません');
+      const address = jsonLd.address as Record<string, unknown> | undefined;
+      if (address) {
+        if (!address.addressLocality) errors.push('市区町村が設定されていません');
+        if (!address.addressRegion) errors.push('都道府県が設定されていません');
+        if (address.addressCountry !== 'JP') warnings.push('国コードがJPではありません');
       } else {
         errors.push('住所情報が設定されていません');
       }
 
       // 連絡先チェック
       if (jsonLd.contactPoint && Array.isArray(jsonLd.contactPoint)) {
-        jsonLd.contactPoint.forEach((contact: any, index: number) => {
+        (jsonLd.contactPoint as Array<{ telephone?: string }>).forEach((contact, index: number) => {
           if (!contact.telephone) {
             warnings.push(`連絡先${index + 1}: 電話番号が設定されていません`);
           } else if (!contact.telephone.startsWith('+81')) {
@@ -106,7 +110,7 @@ export const validateJsonLdStructure = (jsonLd: any): PreflightResult => {
       if (!jsonLd.mainEntity || !Array.isArray(jsonLd.mainEntity) || jsonLd.mainEntity.length === 0) {
         errors.push('FAQ項目が設定されていません');
       } else {
-        jsonLd.mainEntity.forEach((faq: any, index: number) => {
+        (jsonLd.mainEntity as Array<{ name?: string; acceptedAnswer?: { text?: string } }>).forEach((faq, index: number) => {
           if (!faq.name) errors.push(`FAQ${index + 1}: 質問が設定されていません`);
           if (!faq.acceptedAnswer?.text) errors.push(`FAQ${index + 1}: 回答が設定されていません`);
         });
@@ -142,9 +146,12 @@ export const validateJsonLdStructure = (jsonLd: any): PreflightResult => {
 };
 
 // 組織データのPreflight検証
-export const validateOrganizationPreflight = async (orgData: any): Promise<PreflightResult> => {
+export const validateOrganizationPreflight = async (orgData: unknown): Promise<PreflightResult> => {
   const errors: string[] = [];
   const warnings: string[] = [];
+
+  // 型ガード: オブジェクト確認
+  const data = orgData as Record<string, unknown>;
 
   try {
     // Zodバリデーション
@@ -156,10 +163,11 @@ export const validateOrganizationPreflight = async (orgData: any): Promise<Prefl
     }
 
     // URL存在チェック（簡易版）
-    if (orgData.url) {
+    const urlValue = data.url as string | undefined;
+    if (urlValue) {
       try {
-        new URL(orgData.url);
-        if (!orgData.url.startsWith('https://')) {
+        new URL(urlValue);
+        if (!urlValue.startsWith('https://')) {
           warnings.push('URLがHTTPSではありません');
         }
       } catch {
@@ -168,9 +176,10 @@ export const validateOrganizationPreflight = async (orgData: any): Promise<Prefl
     }
 
     // 電話番号E.164形式チェック
-    if (orgData.telephone) {
+    const telephoneValue = data.telephone as string | undefined;
+    if (telephoneValue) {
       const e164Pattern = /^\+81\d{9,10}$/;
-      if (!e164Pattern.test(orgData.telephone.replace(/[-\s]/g, ''))) {
+      if (!e164Pattern.test(telephoneValue.replace(/[-\s]/g, ''))) {
         warnings.push('電話番号がE.164形式でない可能性があります');
       }
     }
@@ -178,7 +187,8 @@ export const validateOrganizationPreflight = async (orgData: any): Promise<Prefl
     // 必須項目の存在チェック（requirements_system.mdから）
     const requiredFields = ['name', 'description', 'addressRegion', 'addressLocality', 'telephone', 'url'];
     requiredFields.forEach(field => {
-      if (!orgData[field] || (typeof orgData[field] === 'string' && orgData[field].trim() === '')) {
+      const fieldValue = data[field];
+      if (!fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === '')) {
         errors.push(`必須項目「${field}」が設定されていません`);
       }
     });
@@ -195,9 +205,12 @@ export const validateOrganizationPreflight = async (orgData: any): Promise<Prefl
 };
 
 // サービスデータのPreflight検証
-export const validateServicePreflight = async (serviceData: any): Promise<PreflightResult> => {
+export const validateServicePreflight = async (serviceData: unknown): Promise<PreflightResult> => {
   const errors: string[] = [];
   const warnings: string[] = [];
+
+  // 型ガード
+  const data = serviceData as Record<string, unknown>;
 
   try {
     const result = serviceSchema.safeParse(serviceData);
@@ -208,8 +221,9 @@ export const validateServicePreflight = async (serviceData: any): Promise<Prefli
     }
 
     // 価格フィールドの数値チェック
-    if (serviceData.price && serviceData.price.trim() !== '') {
-      const numericPrice = parseFloat(serviceData.price.replace(/[^0-9.]/g, ''));
+    const priceValue = data.price as string | undefined;
+    if (priceValue && priceValue.trim() !== '') {
+      const numericPrice = parseFloat(priceValue.replace(/[^0-9.]/g, ''));
       if (isNaN(numericPrice) || numericPrice <= 0) {
         warnings.push('価格が有効な数値ではありません');
       }
@@ -227,7 +241,7 @@ export const validateServicePreflight = async (serviceData: any): Promise<Prefli
 };
 
 // 包括的なPreflight検証
-export const runComprehensivePreflight = async (orgData: any, services?: any[], faqs?: any[], caseStudies?: any[]): Promise<PreflightResult> => {
+export const runComprehensivePreflight = async (orgData: unknown, services?: unknown[], faqs?: unknown[], caseStudies?: unknown[]): Promise<PreflightResult> => {
   const allErrors: string[] = [];
   const allWarnings: string[] = [];
 

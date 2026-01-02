@@ -14,13 +14,42 @@ export interface IframeOptions {
   responsive?: boolean;
 }
 
+/** 埋め込み用サービス型 */
+interface EmbedService {
+  name: string;
+  description?: string;
+}
+
+/** 埋め込み用投稿型 */
+interface EmbedPost {
+  title: string;
+  pub_date?: string;
+  created_at?: string;
+}
+
+/** 埋め込み用導入事例型 */
+interface EmbedCaseStudy {
+  title: string;
+  client_name?: string;
+}
+
+/** 埋め込み用FAQ型 */
+interface EmbedFAQ {
+  question: string;
+  answer: string;
+}
+
+/** JSON-LD構造化データ（anyを許容する外部データ） */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type JsonLdData = Record<string, any>;
+
 export interface IframeGeneratorOptions {
   organization: Organization;
-  services?: any[];
-  posts?: any[];
-  case_studies?: any[];
-  faqs?: any[];
-  jsonLd: any;
+  services?: EmbedService[];
+  posts?: EmbedPost[];
+  case_studies?: EmbedCaseStudy[];
+  faqs?: EmbedFAQ[];
+  jsonLd: JsonLdData;
   options: IframeOptions;
   baseUrl: string;
 }
@@ -296,10 +325,10 @@ function generateHeader(organization: Organization, baseUrl: string): string {
  */
 function generateContentSections(
   organization: Organization,
-  services: any[] = [],
-  posts: any[] = [],
-  case_studies: any[] = [],
-  faqs: any[] = []
+  services: EmbedService[] = [],
+  posts: EmbedPost[] = [],
+  case_studies: EmbedCaseStudy[] = [],
+  _faqs: EmbedFAQ[] = []
 ): string {
   let content = '';
 

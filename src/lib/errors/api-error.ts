@@ -41,12 +41,27 @@ export enum ApiErrorCode {
 /**
  * API統一エラークラス
  */
+/** APIエラー詳細型 */
+interface ApiErrorDetails {
+  field?: string;
+  message?: string;
+  constraint?: string;
+  originalError?: string;
+  [key: string]: unknown;
+}
+
+/** ユーザー情報型（デバッグ用） */
+interface DebugUser {
+  id?: string;
+  [key: string]: unknown;
+}
+
 export class ApiError extends Error {
   constructor(
     public code: ApiErrorCode,
     public reason: string,
     public statusCode: number = 500,
-    public details?: any,
+    public details?: ApiErrorDetails | ApiErrorDetails[],
     public originalError?: Error
   ) {
     super(reason);
@@ -56,8 +71,8 @@ export class ApiError extends Error {
   /**
    * NextResponse形式で返却
    */
-  toResponse(request?: NextRequest, user?: any): NextResponse {
-    const errorResponse: any = {
+  toResponse(request?: NextRequest, user?: DebugUser): NextResponse {
+    const errorResponse: Record<string, unknown> = {
       code: this.code,
       reason: this.reason,
     };
@@ -91,7 +106,7 @@ export class ApiError extends Error {
   /**
    * ログ出力用のフォーマット
    */
-  toLogFormat(): any {
+  toLogFormat(): Record<string, unknown> {
     return {
       code: this.code,
       reason: this.reason,
@@ -126,10 +141,16 @@ export function createValidationError(error: ZodError): ApiError {
   );
 }
 
+/** PostgreSQLエラー型 */
+interface PostgresError extends Error {
+  code?: string;
+  constraint?: string;
+}
+
 /**
  * データベースエラーを適切なAPIエラーに変換
  */
-export function createDatabaseError(error: any): ApiError {
+export function createDatabaseError(error: PostgresError): ApiError {
   // PostgreSQL制約違反
   if (error.code === '23505') {
     return new ApiError(

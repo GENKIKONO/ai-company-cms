@@ -8,9 +8,24 @@ import { type PlanType } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
 import type { MonthlyReport } from '@/types/domain/reports';
 import { getEffectiveFeatures, getFeatureEnabled, type EffectiveFeature } from '@/lib/featureGate';
-// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
+// AI Visibility スコア行型
+interface AIVisibilityScoreRow {
+  url: string;
+  calculated_at: string;
+  total_visibility_score: number | null;
+  structured_data_score: number | null;
+  ai_access_score: number | null;
+  seo_performance_score: number | null;
+  ai_bot_hits_count: number | null;
+  unique_bots_count: number | null;
+  ai_content_units?: { title: string | null; content_type: string | null } | null;
+}
 
-type OrganizationRow = any;
+// Bot ログ行型
+interface BotLogRow {
+  bot_name: string;
+  accessed_at: string;
+}
 
 interface ReportData {
   organization: {
@@ -161,27 +176,27 @@ export async function collectMonthlyData(
 /**
  * AI Visibility データを処理
  */
-function processAIVisibilityData(aiScores: any[]) {
+function processAIVisibilityData(aiScores: AIVisibilityScoreRow[]) {
   // URL別の最新スコアを取得
   const latestByUrl = aiScores.reduce((acc, score) => {
     if (!acc[score.url] || new Date(score.calculated_at) > new Date(acc[score.url].calculated_at)) {
       acc[score.url] = score;
     }
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, AIVisibilityScoreRow>);
 
   const latestScores = Object.values(latestByUrl);
 
   // 統計計算
   const totalUrls = latestScores.length;
-  const averageScore = totalUrls > 0 
-    ? Math.round((latestScores as any[]).reduce((sum: number, score: any) => sum + (Number(score.total_visibility_score) || 0), 0) / totalUrls)
+  const averageScore = totalUrls > 0
+    ? Math.round(latestScores.reduce((sum: number, score) => sum + (Number(score.total_visibility_score) || 0), 0) / totalUrls)
     : 0;
-  const topPerformingUrls = latestScores.filter((score: any) => (Number(score.total_visibility_score) || 0) >= 80).length;
-  const improvementNeededUrls = latestScores.filter((score: any) => (Number(score.total_visibility_score) || 0) <= 50).length;
+  const topPerformingUrls = latestScores.filter((score) => (Number(score.total_visibility_score) || 0) >= 80).length;
+  const improvementNeededUrls = latestScores.filter((score) => (Number(score.total_visibility_score) || 0) <= 50).length;
 
   const contentScores = latestScores
-    .map((score: any) => ({
+    .map((score) => ({
       url: score.url,
       title: score.ai_content_units?.title || null,
       total_score: Number(score.total_visibility_score || 0),
@@ -212,7 +227,7 @@ function processAIVisibilityData(aiScores: any[]) {
 /**
  * Bot ログデータを処理
  */
-function processBotLogsData(botLogs: any[]) {
+function processBotLogsData(botLogs: BotLogRow[]) {
   const botCounts = botLogs.reduce((acc, log) => {
     acc[log.bot_name] = (acc[log.bot_name] || 0) + 1;
     return acc;

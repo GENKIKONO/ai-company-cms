@@ -10,6 +10,10 @@ import { logPerformanceMetrics } from '@/lib/api/audit-logger';
 import { CacheManager, CacheKeyBuilder, CACHE_STRATEGIES } from './cache-strategy';
 
 import { logger } from '@/lib/log';
+
+/** Supabaseクライアント型（動的テーブルアクセスのためジェネリック） */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AppSupabaseClient = ReturnType<typeof createServerClient<any>>;
 // クエリパフォーマンス監視用の型
 export interface QueryPerformanceMetrics {
   query: string;
@@ -28,7 +32,7 @@ export interface CacheConfig {
 
 // 最適化されたクエリビルダー
 export class OptimizedQueryBuilder {
-  private supabase: any = null;
+  private supabase: AppSupabaseClient | null = null;
   private startTime: number;
   private queryDescription: string;
 
@@ -232,6 +236,9 @@ export class OptimizedQueryBuilder {
     );
   }
 
+  /** 検索結果型 */
+  private _searchResults: Record<string, unknown[]> = {};
+
   /**
    * フルテキスト検索（最適化版）
    */
@@ -242,12 +249,15 @@ export class OptimizedQueryBuilder {
   } = {}) {
     const { types = ['organizations'], limit = 20, offset = 0 } = options;
     const supabase = await this.getSupabaseClient();
-    const results: any = {};
+    const results: Record<string, unknown[]> = {};
 
     const startTime = Date.now();
 
     // 並列クエリで複数のテーブルを検索
     const promises = [];
+
+    /** 検索結果行型 */
+    type SearchResultRow = { type: string; data: unknown[] | null; error?: unknown };
 
     if (types.includes('organizations')) {
       promises.push(
@@ -258,7 +268,7 @@ export class OptimizedQueryBuilder {
           .eq('is_published', true)
           .eq('status', 'published')
           .range(offset, offset + limit - 1)
-          .then((result: any) => ({ type: 'organizations', ...result }))
+          .then((result): SearchResultRow => ({ type: 'organizations', ...result }))
       );
     }
 
@@ -273,7 +283,7 @@ export class OptimizedQueryBuilder {
           .or(`name.ilike.%${query}%,summary.ilike.%${query}%`)
           .eq('status', 'published')
           .range(offset, offset + limit - 1)
-          .then((result: any) => ({ type: 'services', ...result }))
+          .then((result): SearchResultRow => ({ type: 'services', ...result }))
       );
     }
 
@@ -288,17 +298,17 @@ export class OptimizedQueryBuilder {
           .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%`)
           .eq('status', 'published')
           .range(offset, offset + limit - 1)
-          .then((result: any) => ({ type: 'posts', ...result }))
+          .then((result): SearchResultRow => ({ type: 'posts', ...result }))
       );
     }
 
     const searchResults = await Promise.all(promises);
-    
-    searchResults.forEach((result: any) => {
+
+    searchResults.forEach((result) => {
       results[result.type] = result.data || [];
     });
 
-    const totalResults = Object.values(results).reduce((acc: number, arr: any) => acc + (arr?.length || 0), 0) as number;
+    const totalResults = Object.values(results).reduce((acc: number, arr) => acc + (Array.isArray(arr) ? arr.length : 0), 0);
     this.logQueryPerformance('search_optimized', startTime, totalResults);
 
     return results;
@@ -307,7 +317,7 @@ export class OptimizedQueryBuilder {
   /**
    * バッチ処理用の最適化クエリ
    */
-  async batchUpdateOptimized(table: string, updates: any[], key: string = 'id') {
+  async batchUpdateOptimized(table: string, updates: Record<string, unknown>[], _key: string = 'id') {
     const supabase = await this.getSupabaseClient();
     const batchSize = 100; // Supabaseの推奨バッチサイズ
     const results = [];
@@ -360,7 +370,7 @@ export class OptimizedQueryBuilder {
  * クエリキャッシュマネージャー
  */
 export class QueryCacheManager {
-  private static cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+  private static cache = new Map<string, { data: unknown; timestamp: number; ttl: number }>();
 
   static async get<T>(key: string): Promise<T | null> {
     const cached = this.cache.get(key);
@@ -372,7 +382,7 @@ export class QueryCacheManager {
       return null;
     }
 
-    return cached.data;
+    return cached.data as T;
   }
 
   static set<T>(key: string, data: T, ttl: number = 300) {
