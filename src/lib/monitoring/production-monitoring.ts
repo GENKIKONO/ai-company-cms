@@ -232,7 +232,7 @@ export class ProductionMonitor {
       // 過去1時間のメトリクスを取得
       const { data: metrics } = await this.supabase
         .from('monitoring_metrics')
-        .select('*')
+        .select('id, timestamp, status, response_time, uptime, performance_metrics, database_metrics, external_services, error_count, cache_hit, created_at')
         .gte('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString())
         .order('created_at', { ascending: false });
 
@@ -276,7 +276,7 @@ export class ProductionMonitor {
     try {
       const { data: errors } = await this.supabase
         .from('error_logs')
-        .select('*')
+        .select('id, error_type, error_message, stack_trace, user_id, request_path, created_at')
         .gte('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString());
 
       if (!errors || errors.length === 0) {

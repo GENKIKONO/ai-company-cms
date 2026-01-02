@@ -184,7 +184,7 @@ export async function getTranslationJobs(
 
     let query = supabase
       .from('translation_jobs')
-      .select('*', { count: 'exact' })
+      .select('id, organization_id, source_table, source_id, source_field, source_lang, target_lang, source_text, translated_text, status, translation_service, idempotency_key, error_message, retry_count, max_retries, priority, scheduled_at, started_at, completed_at, created_at, updated_at', { count: 'exact' })
       .order('priority', { ascending: false })
       .order('scheduled_at', { ascending: true });
 
@@ -245,7 +245,7 @@ export async function getTranslationMetrics(
       }
     );
 
-    let baseQuery = supabase.from('translation_jobs').select('*');
+    let baseQuery = supabase.from('translation_jobs').select('id, organization_id, source_table, target_lang, status, started_at, completed_at');
     if (organizationId) {
       baseQuery = baseQuery.eq('organization_id', organizationId);
     }

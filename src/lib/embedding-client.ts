@@ -199,7 +199,7 @@ export async function getEmbeddingJobs(
 
     let query = supabase
       .from('embedding_jobs')
-      .select('*', { count: 'exact' })
+      .select('id, organization_id, source_table, source_id, source_field, content_hash, content_text, chunk_count, chunk_strategy, embedding_model, status, batch_id, priority, idempotency_key, error_message, retry_count, max_retries, scheduled_at, started_at, completed_at, created_at, updated_at', { count: 'exact' })
       .order('priority', { ascending: false })
       .order('scheduled_at', { ascending: true });
 
@@ -322,11 +322,11 @@ export async function getEmbeddingMetrics(
     );
 
     // ジョブ統計
-    let jobQuery = supabase.from('embedding_jobs').select('*');
+    let jobQuery = supabase.from('embedding_jobs').select('id, organization_id, source_table, source_id, status, started_at, completed_at, created_at');
     if (organizationId) jobQuery = jobQuery.eq('organization_id', organizationId);
 
     // Embedding統計
-    let embeddingQuery = supabase.from('embeddings').select('*');
+    let embeddingQuery = supabase.from('embeddings').select('id, organization_id, embedding_model, is_active');
     if (organizationId) embeddingQuery = embeddingQuery.eq('organization_id', organizationId);
 
     const [jobsResult, embeddingsResult] = await Promise.all([
