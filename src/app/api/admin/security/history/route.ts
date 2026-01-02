@@ -28,7 +28,7 @@ export async function GET() {
     // ops_audit から security_scan のログを取得
     const { data: scans, error: scansError } = await supabase
       .from('ops_audit')
-      .select('*')
+      .select('id, action, target_type, target_id, user_id, metadata, created_at')
       .or('action.eq.security_scan,action.eq.security_scan_manual')
       .order('created_at', { ascending: false })
       .limit(50);

@@ -103,7 +103,7 @@ export async function PUT(
     // 現在のサブスクリプションを取得
     const { data: current, error: fetchError } = await supabase
       .from('user_subscriptions')
-      .select('*')
+      .select('id, user_id, plan_id, status, starts_at, ends_at, canceled_at, stripe_subscription_id, stripe_customer_id, created_at, updated_at')
       .eq('id', id)
       .single();
 

@@ -111,7 +111,7 @@ function SecurityDashboardContent() {
         } else if (activeTab === 'reports') {
           const { data, error } = await supabase
             .from('ip_reports')
-            .select('*')
+            .select('id, ip_address, report_type, reason, reporter_id, metadata, status, created_at, resolved_at')
             .order('created_at', { ascending: false })
             .limit(100);
           if (error) throw error;
@@ -119,7 +119,7 @@ function SecurityDashboardContent() {
         } else {
           const { data, error } = await supabase
             .from('ip_blocklist')
-            .select('*')
+            .select('id, ip_address, reason, blocked_by, blocked_at, expires_at, is_active')
             .order('blocked_at', { ascending: false })
             .limit(100);
           if (error) throw error;

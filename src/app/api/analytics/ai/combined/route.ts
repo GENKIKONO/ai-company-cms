@@ -214,7 +214,7 @@ export async function GET(request: NextRequest) {
     const { data: aiScores, error: aiError } = await supabase
       .from('ai_visibility_scores')
       .select(`
-        *,
+        id, organization_id, url, visibility_score, bot_hits, unique_bots, analyzed_at, total_visibility_score, ai_bot_hits_count, unique_bots_count, calculated_at,
         ai_content_units (
           title,
           content_type
@@ -235,7 +235,7 @@ export async function GET(request: NextRequest) {
     // 2. SEO メトリクス取得
     const { data: seoMetrics, error: seoError } = await supabase
       .from('seo_search_console_metrics')
-      .select('*')
+      .select('id, organization_id, url, search_query, clicks, impressions, ctr, average_position, date_recorded, date')
       .eq('organization_id', orgId)
       .gte('date_recorded', startDate.toISOString().split('T')[0])
       .is('search_query', null) // ページレベルのメトリクスのみ

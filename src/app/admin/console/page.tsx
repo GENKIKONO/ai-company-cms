@@ -198,21 +198,21 @@ async function fetchConsoleDataFromViews(): Promise<AdminConsoleData> {
       // アラートデータ（VIEW: admin_alerts_latest_v1）
       supabase
         .from('admin_alerts_latest_v1')
-        .select('*')
+        .select('id, event_type, severity, message, metadata, resolved, created_at')
         .order('created_at', { ascending: false })
         .limit(10),
-      
+
       // ジョブデータ（VIEW: admin_jobs_recent_v1）
       supabase
         .from('admin_jobs_recent_v1')
-        .select('*')
+        .select('id, job_name, status, started_at, finished_at, duration_ms, error_message, created_at')
         .order('created_at', { ascending: false })
         .limit(10),
-      
+
       // サマリーデータ（VIEW: admin_summary_today_v1）
       supabase
         .from('admin_summary_today_v1')
-        .select('*')
+        .select('total_users, active_users, new_signups, total_organizations, active_jobs, failed_jobs, open_alerts')
         .single()
     ]);
 

@@ -29,7 +29,7 @@ export async function GET() {
     const result = await withTimeout(
       supabase
         .from('public_services_jsonld')
-        .select('*')
+        .select('id, name, description, url, provider, price, offers')
         .order('name', { ascending: true })
         .then((res: { data: any[] | null; error: any }) => res),
       5000

@@ -69,7 +69,7 @@ export async function GET(
     // 違反統計を user_violation_stats ビューから取得
     const { data: violationStats, error: statsError } = await supabase
       .from('user_violation_stats')
-      .select('*')
+      .select('user_id, total_violations, violations_3y, violations_2y, violations_1y, violations_6m, high_violations_1y, last_violation_at, last_violation_rule')
       .eq('user_id', userId)
       .single();
 

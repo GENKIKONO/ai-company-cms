@@ -292,7 +292,7 @@ async function buildResponseFromCache(
 ): Promise<NextResponse> {
   const { data: cachedData, error } = await supabase
     .from('seo_search_console_metrics')
-    .select('*')
+    .select('id, organization_id, url, search_query, clicks, impressions, ctr, average_position, date_recorded, created_at')
     .eq('organization_id', orgId)
     .gte('date_recorded', startDate)
     .lte('date_recorded', endDate)

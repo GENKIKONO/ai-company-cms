@@ -125,7 +125,7 @@ function AuditLogContent() {
       const supabase = createClient();
       const { data, error } = await supabase
         .from('service_role_audit')
-        .select('*')
+        .select('id, action, target_type, target_id, user_id, job_name, request_id, expected_row_count, affected_row_count, duration_ms, status, error_code, meta, metadata, ip_address, user_agent, created_at')
         .order('created_at', { ascending: false })
         .limit(100);
       if (error) throw error;

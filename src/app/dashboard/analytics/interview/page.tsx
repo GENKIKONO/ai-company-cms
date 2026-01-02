@@ -34,7 +34,7 @@ async function fetchInitialData(orgId: string, period: '7d' | '30d' | '90d' = '3
     // MATERIALIZED VIEWから取得
     const { data: mvData, error: mvError } = await supabase
       .from('mv_ai_interview_org_daily_metrics')
-      .select('*')
+      .select('organization_id, day, total_sessions, total_responses, avg_duration_sec, unique_users, session_count, completed_session_count, completion_rate, avg_question_count, ai_used_session_count, ai_call_count, citations_item_count, quoted_tokens_sum, last_session_at')
       .eq('organization_id', orgId)
       .gte('day', fromDate)
       .lte('day', toDate)
@@ -55,7 +55,7 @@ async function fetchInitialData(orgId: string, period: '7d' | '30d' | '90d' = '3
 
       const { data: viewData, error: viewError } = await supabase
         .from('v_ai_interview_org_daily_metrics')
-        .select('*')
+        .select('organization_id, day, total_sessions, total_responses, avg_duration_sec, unique_users, session_count, completed_session_count, completion_rate, avg_question_count, ai_used_session_count, ai_call_count, citations_item_count, quoted_tokens_sum, last_session_at')
         .eq('organization_id', orgId)
         .gte('day', fromDate)
         .lte('day', toDate)

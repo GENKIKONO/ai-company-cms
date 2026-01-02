@@ -99,14 +99,14 @@ export default function SecurityDashboard() {
       // Get security incidents
       const { data: incidents } = await supabase
         .from('security_incidents')
-        .select('*')
+        .select('id, ip_address, incident_type, severity, risk_level, blocked, metadata, created_at')
         .gte('created_at', oneHourAgo.toISOString())
         .order('created_at', { ascending: false });
 
       // Get rate limit requests
       const { data: rateLimitRequests } = await supabase
         .from('rate_limit_requests')
-        .select('*')
+        .select('id, ip_address, endpoint, path, is_suspicious, created_at')
         .gte('created_at', oneHourAgo.toISOString());
 
       // Calculate metrics

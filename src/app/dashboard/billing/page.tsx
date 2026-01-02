@@ -96,7 +96,7 @@ function BillingContent() {
 
       const orgResult = await supabase
         .from('organizations')
-        .select('*')
+        .select('id, name, slug, status, is_published, logo_url, description, legal_form, representative_name, created_by, created_at')
         .eq('created_by', user.id)
         .maybeSingle();
 

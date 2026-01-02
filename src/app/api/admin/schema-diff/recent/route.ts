@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     
     const { data: schemaDiffs, error: diffError } = await supabase
       .from('v_schema_diff_recent')
-      .select('*')
+      .select('id, environment, diff_at, severity, summary')
       .gte('diff_at', since24h)
       .order('diff_at', { ascending: false })
       .limit(20);

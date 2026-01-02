@@ -55,7 +55,7 @@ function JobsMonitorContent() {
         if (activeTab === 'translation') {
           const { data, error } = await supabase
             .from('translation_jobs')
-            .select('*')
+            .select('id, organization_id, source_table, source_id, source_field, source_lang, target_lang, target_language, status, error_message, completed_at, created_at, updated_at')
             .order('created_at', { ascending: false })
             .limit(100);
           if (error) throw error;
@@ -63,7 +63,7 @@ function JobsMonitorContent() {
         } else {
           const { data, error } = await supabase
             .from('embedding_jobs')
-            .select('*')
+            .select('id, organization_id, source_table, source_id, source_field, status, priority, error_message, retry_count, completed_at, created_at, updated_at')
             .order('created_at', { ascending: false })
             .limit(100);
           if (error) throw error;

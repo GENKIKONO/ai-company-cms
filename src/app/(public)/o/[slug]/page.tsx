@@ -90,7 +90,7 @@ const getOrganizationDataCached = (slug: string) => {
       // ✅ P0: published のみを公開対象とする（enum準拠）
       const { data: organization, error: orgError } = await supabase
         .from('organizations')
-        .select('*')
+        .select('id, name, slug, status, is_published, logo_url, description, website_url, legal_form, representative_name, address, phone, email, established_date, capital, employees_count, business_overview, vision, mission, show_services, show_posts, show_case_studies, show_faqs, show_qa, show_contact, created_at, updated_at')
         .eq('slug', safeSlug)
         .eq('status', 'published')
         .eq('is_published', true)
@@ -164,26 +164,26 @@ const getOrganizationDataCached = (slug: string) => {
       const [postsResult, servicesResult, caseStudiesResult, faqsResult, qaEntriesResult] = await Promise.all([
         supabase
           .from('posts')
-          .select('*')
+          .select('id, organization_id, slug, title, content, excerpt, featured_image, status, published_at, created_by, sort_order, created_at, updated_at')
           .eq('organization_id', organization.id)
           .order('created_at', { ascending: false })
           .limit(10),
-        
+
         supabase
           .from('services')
-          .select('*')
+          .select('id, organization_id, name, slug, summary, description, price, price_range, category, image_url, features, status, created_by, sort_order, created_at, updated_at')
           .eq('organization_id', organization.id)
           .order('created_at', { ascending: false }),
-        
+
         supabase
           .from('case_studies')
-          .select('*')
+          .select('id, organization_id, title, slug, summary, content, client_name, industry, challenge, solution, results, image_url, tags, status, created_by, sort_order, created_at, updated_at')
           .eq('organization_id', organization.id)
           .order('created_at', { ascending: false }),
-        
+
         supabase
           .from('faqs')
-          .select('*')
+          .select('id, organization_id, question, answer, category, display_order, sort_order, status, created_by, created_at, updated_at')
           .eq('organization_id', organization.id)
           .order('display_order', { ascending: true })
           .order('created_at', { ascending: false }),

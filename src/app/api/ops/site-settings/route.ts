@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     // サイト設定を取得
     const { data, error } = await supabase
       .from('cms_site_settings')
-      .select('*')
+      .select('id, key, value, description, data_type, is_public, created_at, updated_at')
       .maybeSingle();
 
     if (error && error.code !== 'PGRST116') {

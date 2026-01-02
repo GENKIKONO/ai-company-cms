@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     try {
       const { data, error } = await supabase
         .from('ai_visibility_logs')
-        .select('*')
+        .select('id, url, user_agent, timestamp, severity_level, response_time_ms, issues')
         .gte('timestamp', yesterday)
         .order('timestamp', { ascending: false })
         .limit(100);

@@ -126,3 +126,112 @@ export const embeddingJobColumns =
 
 export const translationJobColumns =
   'id, organization_id, source_table, source_id, source_field, source_lang, target_lang, source_text, translated_text, status, translation_service, error_message, retry_count, priority, scheduled_at, started_at, completed_at, created_at, updated_at' as const;
+
+// =============================================================================
+// AI Interview Sessions
+// =============================================================================
+
+export const aiInterviewSessionColumns =
+  'id, user_id, organization_id, title, description, status, content_type, created_at, updated_at' as const;
+
+// =============================================================================
+// AI Visibility Logs
+// =============================================================================
+
+export const aiVisibilityLogColumns =
+  'id, url, user_agent, timestamp, severity_level, response_time_ms, issues' as const;
+
+// =============================================================================
+// Ops Audit
+// =============================================================================
+
+export const opsAuditColumns =
+  'id, action, target_type, target_id, user_id, metadata, created_at' as const;
+
+// =============================================================================
+// Schema Diff
+// =============================================================================
+
+/** v_schema_diff_recent ビュー */
+export const schemaDiffRecentColumns =
+  'id, environment, diff_at, severity, summary' as const;
+
+// =============================================================================
+// Feature Overrides
+// =============================================================================
+
+export const featureOverrideColumns =
+  'id, organization_id, feature_key, is_enabled, config, expires_at, created_at, updated_at, updated_by' as const;
+
+// =============================================================================
+// Job Runs
+// =============================================================================
+
+export const jobRunsColumns =
+  'id, job_name, status, started_at, finished_at, duration_ms, meta, error_message, created_at' as const;
+
+// =============================================================================
+// User Subscriptions
+// =============================================================================
+
+export const userSubscriptionColumns =
+  'id, user_id, plan_id, status, starts_at, ends_at, canceled_at, stripe_subscription_id, stripe_customer_id, created_at, updated_at' as const;
+
+// =============================================================================
+// Public Services JSONLD View
+// =============================================================================
+
+export const publicServicesJsonldColumns =
+  'id, name, description, url, provider, price, offers' as const;
+
+// =============================================================================
+// Partners
+// =============================================================================
+
+export const partnerColumns =
+  'id, name, description, website_url, logo_url, brand_logo_url, contact_email, partnership_type, contract_start_date, contract_end_date, is_active, created_at, updated_at' as const;
+
+// =============================================================================
+// AI Citations Views
+// =============================================================================
+
+export const aiCitationsAggregateColumns =
+  'response_id, organization_id, session_id, user_id, model, response_created_at, source_key, title, url, citations_count, total_weight, total_quoted_tokens, total_quoted_chars, max_score, avg_score, last_cited_at' as const;
+
+export const aiCitationsOrgPeriodColumns =
+  'organization_id, day_bucket, source_key, title, url, citations_count, total_weight, total_quoted_tokens, total_quoted_chars, max_score, avg_score, last_cited_at' as const;
+
+// =============================================================================
+// File Metadata
+// =============================================================================
+
+export const fileMetadataColumns =
+  'id, bucket_id, object_path, language_code, display_name, metadata, created_by, created_at' as const;
+
+// =============================================================================
+// AI Monthly Reports
+// =============================================================================
+
+export const aiMonthlyReportColumns =
+  'id, organization_id, plan_id, level, period_start, period_end, status, summary_text, metrics, sections, suggestions, created_at, updated_at' as const;
+
+// =============================================================================
+// User Violation Stats View
+// =============================================================================
+
+export const userViolationStatsColumns =
+  'user_id, total_violations, violations_3y, violations_2y, violations_1y, violations_6m, high_violations_1y, last_violation_at, last_violation_rule' as const;
+
+// =============================================================================
+// SEO Search Console Metrics
+// =============================================================================
+
+export const seoSearchConsoleMetricsColumns =
+  'id, organization_id, url, search_query, clicks, impressions, ctr, average_position, date_recorded, created_at' as const;
+
+// =============================================================================
+// Questions
+// =============================================================================
+
+export const questionColumns =
+  'id, company_id, user_id, question_text, status, answer_text, created_at, answered_at, answered_by' as const;

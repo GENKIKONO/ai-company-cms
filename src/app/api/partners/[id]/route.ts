@@ -41,7 +41,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const { data: partner, error } = await supabase
       .from('partners')
-      .select('*')
+      .select('id, name, description, website_url, logo_url, brand_logo_url, contact_email, partnership_type, contract_start_date, contract_end_date, is_active, created_at, updated_at')
       .eq('id', id)
       .single();
 

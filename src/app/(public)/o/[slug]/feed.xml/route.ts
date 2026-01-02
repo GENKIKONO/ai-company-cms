@@ -19,7 +19,7 @@ export async function GET(
     // 企業情報を取得
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
-      .select('*')
+      .select('id, name, slug, description, website_url, logo_url, created_at, updated_at')
       .eq('slug', slug)
       .eq('status', 'published')
       .single();

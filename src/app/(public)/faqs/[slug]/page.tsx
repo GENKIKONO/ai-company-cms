@@ -84,7 +84,7 @@ export default async function FaqPage(
   const { slug } = await params;
   const { data: rows, error } = await supabase
     .from('v_faqs_published')
-    .select('*')
+    .select('id, organization_id, question, answer, answer_html, answer_plain, slug, lang, category, display_order, created_at, updated_at')
     .eq('slug', slug);
 
   if (error || !rows || rows.length === 0) {

@@ -65,7 +65,7 @@ export async function GET(
     // レポート詳細を取得（.single()禁止 → .maybeSingle()で安全化）
     const { data: report, error } = await supabase
       .from('ai_monthly_reports')
-      .select('*')
+      .select('id, organization_id, plan_id, level, period_start, period_end, status, summary_text, metrics, sections, suggestions, created_at, updated_at')
       .eq('organization_id', organizationId)
       .eq('period_start', periodDate.start)
       .eq('period_end', periodDate.end)

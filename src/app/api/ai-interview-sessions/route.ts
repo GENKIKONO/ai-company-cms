@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     const { data: sessions, error } = await supabase
       .from('ai_interview_sessions')
-      .select('*')
+      .select('id, user_id, organization_id, title, description, status, content_type, created_at, updated_at')
       .eq('user_id', user.id)
 
     if (error) {

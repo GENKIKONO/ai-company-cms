@@ -124,7 +124,7 @@ export default function SchemaDiffPage() {
     try {
       const { data, error: queryError } = await supabase
         .from('v_schema_diff_recent')
-        .select('*')
+        .select('id, environment, baseline_environment, diff_at, severity, summary, diff')
         .order('diff_at', { ascending: false });
 
       if (queryError) {

@@ -75,7 +75,7 @@ function AiVisibilityContent() {
         } else if (activeTab === 'config') {
           const { data, error } = await supabase
             .from('ai_visibility_config')
-            .select('*')
+            .select('id, organization_id, key, value, description, is_enabled, enabled, check_interval_hours, notification_threshold, updated_at, created_at')
             .order('updated_at', { ascending: false })
             .limit(100);
           if (error) throw error;
@@ -83,7 +83,7 @@ function AiVisibilityContent() {
         } else {
           const { data, error } = await supabase
             .from('ai_bot_logs')
-            .select('*')
+            .select('id, organization_id, url, request_path, bot_name, user_agent, accessed_at, response_status, status_code, created_at')
             .order('created_at', { ascending: false })
             .limit(200);
           if (error) throw error;

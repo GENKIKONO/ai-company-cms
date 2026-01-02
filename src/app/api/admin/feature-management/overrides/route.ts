@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('feature_overrides')
-      .select('*')
+      .select('id, organization_id, feature_key, is_enabled, config, expires_at, created_at, updated_at, updated_by')
       .order('created_at', { ascending: false });
 
     if (organizationId) {

@@ -90,7 +90,7 @@ export async function collectMonthlyData(
     // 組織情報取得（機能判定用の全情報を含む）
     const { data: org, error: orgError } = await supabase
       .from('organizations')
-      .select('*')
+      .select('id, name, slug, status, is_published, logo_url, description, website_url, legal_form, representative_name, plan, created_by, created_at')
       .eq('id', organizationId)
       .single();
 

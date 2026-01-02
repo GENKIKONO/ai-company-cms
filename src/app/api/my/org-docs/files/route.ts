@@ -258,7 +258,7 @@ export async function GET(request: NextRequest) {
 
     const { data: files, error: listError } = await serviceSupabase
       .from('file_metadata')
-      .select('*')
+      .select('id, bucket_id, object_path, language_code, display_name, metadata, created_by, created_at')
       .eq('bucket_id', ORG_DOCS_BUCKET_ID)
       .eq('metadata->>doc_type', 'org_pdf')
       .eq('metadata->>organization_id', organizationId)

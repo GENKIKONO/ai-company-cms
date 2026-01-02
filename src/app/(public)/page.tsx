@@ -35,7 +35,7 @@ export default async function HomePage() {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('site_settings')
-      .select('*')
+      .select('id, hero_title, hero_subtitle, representative_message, hero_background_image, footer_links')
       .single();
     
     if (data && !error) {

@@ -40,7 +40,7 @@ function StorageLogsContent() {
         const supabase = createClient();
         let query = supabase
           .from('storage_access_logs')
-          .select('*')
+          .select('id, bucket_id, object_path, action, user_id, ip_address, user_agent, status_code, created_at')
           .order('created_at', { ascending: false })
           .limit(200);
 

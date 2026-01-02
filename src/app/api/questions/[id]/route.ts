@@ -123,7 +123,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     // 質問の存在確認
     const { data: existingQuestion, error: fetchError } = await supabase
       .from('questions')
-      .select('*')
+      .select('id, company_id, user_id, question_text, status, answer_text, created_at, answered_at, answered_by')
       .eq('id', questionId)
       .maybeSingle();
 

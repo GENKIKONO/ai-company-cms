@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
     
     const query = supabase
       .from('job_runs_v2')
-      .select('*')
+      .select('id, job_name, status, started_at, finished_at, duration_ms, meta, error_message, created_at')
       .eq('job_name', 'ai_citations_aggregation')
       .order('created_at', { ascending: false })
       .limit(50);

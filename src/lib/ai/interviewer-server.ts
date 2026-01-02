@@ -41,7 +41,7 @@ export async function getInterviewQuestionsByAxis(
     // ai_interview_question_catalog_v1 ビューから質問を取得
     const { data: questionData, error } = await supabase
       .from('ai_interview_question_catalog_v1')
-      .select('*')
+      .select('axis_id, axis_key, axis_code, axis_name, axis_sort_order, axis_active, question_id, question_text, help_text, question_sort_order, question_active, content_type, lang')
       .eq('content_type', contentType)
       .eq('lang', lang)
       .eq('axis_active', true)

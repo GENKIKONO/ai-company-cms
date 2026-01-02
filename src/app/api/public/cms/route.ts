@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     if (!setting) {
       let sectionsQuery = supabase
         .from('cms_sections')
-        .select('*')
+        .select('id, page_key, section_key, section_type, title, content, display_order, is_active, created_at, updated_at')
         .eq('page_key', page)
         .eq('is_active', true)
         .order('display_order');
