@@ -94,7 +94,7 @@ async function getQnaStatsFromView(
   try {
     let query = supabase
       .from('qna_stats')
-      .select('*')
+      .select('qna_id, question, category_name, organization_name, view_count, unique_view_count, last_activity_at, organization_id, category_id')
       .eq('organization_id', organizationId);
 
     if (qnaId) {

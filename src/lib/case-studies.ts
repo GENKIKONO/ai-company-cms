@@ -10,7 +10,7 @@ export async function getCaseStudies(organizationId: string) {
   try {
     const { data, error } = await supabaseBrowser
       .from('case_studies')
-      .select('*')
+      .select('id, organization_id, service_id, title, slug, client_name, client_industry, client_size, challenge, solution, results, testimonial, images, is_published, created_at, updated_at')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 

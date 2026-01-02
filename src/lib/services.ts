@@ -151,7 +151,7 @@ export async function getPriceRanges() {
 export async function getServicesByOrganization(organizationId: string) {
   return await supabaseBrowser
     .from('services')
-    .select('*')
+    .select('id, organization_id, name, slug, summary, description, price, price_range, duration_months, category, features, image_url, video_url, cta_text, cta_url, is_published, status, created_by, created_at, updated_at')
     .eq('organization_id', organizationId)
     .order('created_at', { ascending: false });
 }

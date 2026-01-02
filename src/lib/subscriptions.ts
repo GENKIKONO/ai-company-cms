@@ -32,7 +32,7 @@ export async function getOrganizationSubscription(organizationId: string) {
   try {
     const { data, error } = await supabaseBrowser
       .from('subscriptions')
-      .select('*')
+      .select('id, organization_id, plan_id, status, current_period_start, current_period_end, stripe_subscription_id, stripe_customer_id, cancel_at_period_end, created_at, updated_at')
       .eq('organization_id', organizationId)
       .in('status', ['active', 'pending'])
       .maybeSingle();

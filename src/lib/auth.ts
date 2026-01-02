@@ -259,7 +259,7 @@ export const savedSearches = {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('user_saved_searches')
-      .select('*')
+      .select('id, user_id, name, search_params, created_at, updated_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -379,7 +379,7 @@ export const preferences = {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('user_preferences')
-      .select('*')
+      .select('id, user_id, preferences, created_at, updated_at')
       .eq('user_id', userId)
       .maybeSingle();
 

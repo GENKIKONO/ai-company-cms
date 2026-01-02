@@ -222,7 +222,7 @@ export async function getCurrentPlan(
 
   const { data, error } = await supabase
     .from('plans')
-    .select('*')
+    .select('id, name, slug, description, status, sort_order, monthly_price, yearly_price, stripe_price_id_monthly, stripe_price_id_yearly, created_at, updated_at')
     .eq('id', planId)
     .single();
 

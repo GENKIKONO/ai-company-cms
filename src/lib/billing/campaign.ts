@@ -70,7 +70,7 @@ export async function fetchActiveCheckoutLink(
     // アクティブなチェックアウトリンクを検索
     const { data: checkoutLink, error } = await supabase
       .from('stripe_checkout_links')
-      .select('*')
+      .select('id, plan, campaign_type, stripe_price_id, stripe_checkout_url, discount_rate, is_active, is_private, created_at, updated_at')
       .eq('plan', plan)
       .eq('campaign_type', campaignType)
       .eq('is_active', true)
@@ -85,7 +85,7 @@ export async function fetchActiveCheckoutLink(
       // フォールバック：通常キャンペーンのリンクを探す
       const { data: fallbackLink } = await supabase
         .from('stripe_checkout_links')
-        .select('*')
+        .select('id, plan, campaign_type, stripe_price_id, stripe_checkout_url, discount_rate, is_active, is_private, created_at, updated_at')
         .eq('plan', plan)
         .eq('campaign_type', 'regular')
         .eq('is_active', true)
@@ -170,7 +170,7 @@ export async function getPrivateCheckoutLink(
     // プライベートリンクを検索
     const { data: checkoutLink, error } = await supabase
       .from('stripe_checkout_links')
-      .select('*')
+      .select('id, plan, campaign_type, stripe_price_id, stripe_checkout_url, discount_rate, is_active, is_private, created_at, updated_at')
       .eq('plan', plan)
       .eq('campaign_type', campaignType)
       .eq('is_private', true)

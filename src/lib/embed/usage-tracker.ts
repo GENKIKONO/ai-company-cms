@@ -162,7 +162,7 @@ export class EmbedUsageTracker {
     try {
       const { data, error } = await this.supabase
         .from('embed_usage_daily')
-        .select('*')
+        .select('organization_id, date, widget_loads, iframe_loads, total_clicks, error_count, avg_response_time, unique_sources, updated_at')
         .eq('organization_id', organizationId)
         .gte('date', startDate)
         .lte('date', endDate)
@@ -189,7 +189,7 @@ export class EmbedUsageTracker {
       
       const { data, error } = await this.supabase
         .from('embed_usage_monthly')
-        .select('*')
+        .select('organization_id, month, total_views, widget_views, iframe_views, unique_visitors, top_sources, error_rate')
         .eq('organization_id', organizationId)
         .eq('month', monthKey)
         .single();

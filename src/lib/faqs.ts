@@ -10,7 +10,7 @@ export async function getFAQs(organizationId: string) {
   try {
     const { data, error } = await supabaseBrowser
       .from('faqs')
-      .select('*')
+      .select('id, organization_id, service_id, question, answer, category, order_index, is_published, created_at, updated_at')
       .eq('organization_id', organizationId)
       .order('order_index', { ascending: true });
 

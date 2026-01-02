@@ -348,7 +348,7 @@ export async function checkActiveDelegation(
 
     const { data: delegation, error } = await supabase
       .from('hearing_delegations')
-      .select('*')
+      .select('id, hearing_agent_id, client_user_id, organization_id, status, expires_at, scope, created_at')
       .eq('hearing_agent_id', userId)
       .eq('organization_id', organizationId)
       .eq('status', 'active')

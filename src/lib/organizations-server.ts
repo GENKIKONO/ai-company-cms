@@ -101,7 +101,7 @@ export const getOrganizationByIdCached = (orgId: string) =>
 
       const { data, error } = await supabase
         .from('organizations')
-        .select('*')
+        .select('id, name, slug, status, is_published, logo_url, description, legal_form, representative_name, capital, employees, address_country, address_region, address_locality, address_postal_code, address_street, lat, lng, telephone, email, email_public, url, same_as, industries, created_by')
         .eq('id', orgId)
         .eq('created_by', user.id)
         .single();
