@@ -8,6 +8,82 @@ import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { AnalyticsEngine } from '@/lib/analytics/comprehensive-analytics';
 import { logger } from '@/lib/utils/logger';
 
+// =====================================================
+// TYPE DEFINITIONS
+// =====================================================
+
+/** 人気組織の型 */
+interface PopularOrganization {
+  name: string;
+  views: number;
+  unique_views: number;
+}
+
+/** 検索クエリの型 */
+interface SearchQueryData {
+  query: string;
+  count: number;
+  results_count: number;
+}
+
+/** API応答時間の型 */
+interface ApiResponseTime {
+  endpoint: string;
+  average_time: number;
+  call_count: number;
+}
+
+/** ダッシュボードデータの型 */
+interface DashboardData {
+  usage: {
+    daily_active_users: number;
+    weekly_active_users: number;
+    monthly_active_users: number;
+    page_views: number;
+    session_count: number;
+    average_session_duration: number;
+    bounce_rate: number;
+    conversion_rate: number;
+  };
+  content: {
+    popular_organizations: PopularOrganization[];
+    search_queries: SearchQueryData[];
+  };
+  performance: {
+    average_page_load_time: number;
+    error_rate: number;
+    uptime_percentage: number;
+    cache_hit_rate: number;
+    api_response_times: ApiResponseTime[];
+  };
+  business: {
+    organizations_created: number;
+    services_published: number;
+    case_studies_published: number;
+    user_engagement: {
+      login_count: number;
+      profile_completion_rate: number;
+      feature_adoption_rate: Record<string, number>;
+    };
+    subscription_metrics: {
+      active_subscriptions: number;
+      new_subscriptions: number;
+      churned_subscriptions: number;
+      mrr: number;
+    };
+  };
+  period: {
+    start_date: string;
+    end_date: string;
+  };
+  last_updated: string;
+}
+
+/** エラーメッセージ取得 */
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Admin権限チェック
@@ -110,13 +186,13 @@ export async function GET(request: NextRequest) {
         });
     }
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('❌ Analytics Dashboard API Error', { data: error instanceof Error ? error : new Error(String(error)) });
-    
+
     return NextResponse.json({
       success: false,
       error: 'Analytics data fetch failed',
-      message: error.message,
+      message: getErrorMessage(error),
     }, { status: 500 });
   }
 }
@@ -154,20 +230,20 @@ export async function POST(request: NextRequest) {
       message: 'Event tracked successfully',
     });
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('❌ Analytics Event Tracking Error', { data: error instanceof Error ? error : new Error(String(error)) });
-    
+
     return NextResponse.json({
       success: false,
       error: 'Event tracking failed',
-      message: error.message,
+      message: getErrorMessage(error),
     }, { status: 500 });
   }
 }
 
-function generateMarkdownReport(data: any): string {
+function generateMarkdownReport(data: DashboardData): string {
   const { usage, content, performance, business, period, last_updated } = data;
-  
+
   return `# Analytics Dashboard Report
 
 **Period:** ${new Date(period.start_date).toLocaleDateString()} - ${new Date(period.end_date).toLocaleDateString()}
@@ -190,7 +266,7 @@ function generateMarkdownReport(data: any): string {
 
 | Organization | Views | Unique Views |
 |-------------|--------|--------------|
-${content.popular_organizations.slice(0, 10).map((org: any) => 
+${content.popular_organizations.slice(0, 10).map((org) =>
   `| ${org.name} | ${org.views} | ${org.unique_views} |`
 ).join('\n')}
 
@@ -198,7 +274,7 @@ ${content.popular_organizations.slice(0, 10).map((org: any) =>
 
 | Query | Count | Avg Results |
 |-------|-------|------------|
-${content.search_queries.slice(0, 10).map((query: any) => 
+${content.search_queries.slice(0, 10).map((query) =>
   `| ${query.query} | ${query.count} | ${query.results_count} |`
 ).join('\n')}
 
@@ -215,7 +291,7 @@ ${content.search_queries.slice(0, 10).map((query: any) =>
 
 | Endpoint | Avg Time | Calls |
 |----------|----------|--------|
-${performance.api_response_times.map((api: any) => 
+${performance.api_response_times.map((api) =>
   `| ${api.endpoint} | ${api.average_time}ms | ${api.call_count.toLocaleString()} |`
 ).join('\n')}
 
@@ -231,8 +307,8 @@ ${performance.api_response_times.map((api: any) =>
 
 ### Feature Adoption Rates
 
-${Object.entries(business.user_engagement.feature_adoption_rate).map(([feature, rate]: [string, any]) => 
-  `- **${feature.replace('_', ' ').replace(/\\b\\w/g, (l: string) => l.toUpperCase())}:** ${rate.toFixed(1)}%`
+${Object.entries(business.user_engagement.feature_adoption_rate).map(([feature, rate]) =>
+  `- **${feature.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}:** ${rate.toFixed(1)}%`
 ).join('\n')}
 
 ## Subscription Metrics
