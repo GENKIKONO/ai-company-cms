@@ -1,4 +1,5 @@
 import { logger } from '@/lib/utils/logger';
+// グローバル型宣言は src/types/global.d.ts で定義済み
 
 /**
  * パフォーマンス監視ユーティリティ (I2)
@@ -9,20 +10,6 @@ import { logger } from '@/lib/utils/logger';
 interface LayoutShiftEntry extends PerformanceEntry {
   hadRecentInput?: boolean;
   value?: number;
-}
-
-/** Chrome非標準 performance.memory API */
-interface PerformanceMemory {
-  usedJSHeapSize: number;
-  totalJSHeapSize: number;
-  jsHeapSizeLimit: number;
-}
-
-/** Chrome非標準 performance.memory 拡張 */
-declare global {
-  interface Performance {
-    memory?: PerformanceMemory;
-  }
 }
 
 export interface PerformanceMetrics {
@@ -531,11 +518,9 @@ export class PerformanceMonitor {
     const data = report || this.getFullReport();
     
     // Plausible Analytics に送信
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const plausible = typeof window !== 'undefined' ? (window as any).plausible : undefined;
-    if (plausible) {
+    if (typeof window !== 'undefined' && window.plausible) {
       try {
-        plausible('Performance', {
+        window.plausible('Performance', {
           props: {
             lcp: String(data.webVitals.lcp ?? ''),
             fid: String(data.webVitals.fid ?? ''),

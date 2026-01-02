@@ -339,7 +339,12 @@ export async function globalSearch(options: {
   offset?: number;
 } = {}) {
   try {
-    const results = {
+    const results: {
+      organizations: unknown[];
+      services: unknown[];
+      case_studies: unknown[];
+      total: number;
+    } = {
       organizations: [],
       services: [],
       case_studies: [],
@@ -374,7 +379,7 @@ export async function globalSearch(options: {
       }
 
       const { data: orgs } = await orgQuery.limit(options.limit || 20);
-      results.organizations = (orgs || []) as any;
+      results.organizations = orgs || [];
     }
 
     // サービス検索
@@ -396,7 +401,7 @@ export async function globalSearch(options: {
       }
 
       const { data: services } = await serviceQuery.limit(options.limit || 20);
-      results.services = (services || []) as any;
+      results.services = services || [];
     }
 
     // 事例検索
@@ -414,7 +419,7 @@ export async function globalSearch(options: {
       }
 
       const { data: cases } = await caseQuery.limit(options.limit || 20);
-      results.case_studies = (cases || []) as any;
+      results.case_studies = cases || [];
     }
 
     results.total = results.organizations.length + results.services.length + results.case_studies.length;

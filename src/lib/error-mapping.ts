@@ -189,16 +189,15 @@ export async function fetchAuthenticatedResource<T>(
  * ErrorBoundary用のエラー判定ヘルパー
  */
 export function isStandardError(error: unknown): error is StandardError {
+  if (error === null || typeof error !== 'object') {
+    return false;
+  }
+  const obj = error as Record<string, unknown>;
   return (
-    error !== null &&
-    typeof error === 'object' &&
-    'status' in error &&
-    'code' in error &&
-    'message' in error &&
-    typeof (error as any).status === 'number' &&
-    typeof (error as any).code === 'string' &&
-    typeof (error as any).message === 'string'
-  )
+    typeof obj.status === 'number' &&
+    typeof obj.code === 'string' &&
+    typeof obj.message === 'string'
+  );
 }
 
 /**
