@@ -6,6 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { PlanType } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
+import type { JsonObject } from '@/lib/utils/ab-testing';
 
 // 使用状況データ型
 export interface EmbedUsage {
@@ -18,7 +19,7 @@ export interface EmbedUsage {
   ip_address?: string;
   response_time?: number;
   error_message?: string;
-  custom_properties?: Record<string, any>;
+  custom_properties?: JsonObject;
   created_at?: string;
 }
 

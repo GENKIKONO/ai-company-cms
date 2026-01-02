@@ -5,6 +5,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
+import type { JsonObject } from '@/lib/utils/ab-testing';
 
 export interface AnalyticsEvent {
   event_type: string;
@@ -15,7 +16,7 @@ export interface AnalyticsEvent {
   referrer?: string;
   user_agent?: string;
   ip_address?: string;
-  properties?: Record<string, any>;
+  properties?: JsonObject;
   timestamp: string;
 }
 
@@ -170,7 +171,7 @@ export class AnalyticsEngine {
     value?: number;
     user_id?: string;
     organization_id?: string;
-    properties?: Record<string, any>;
+    properties?: JsonObject;
   }): Promise<void> {
     await this.trackEvent({
       event_type: 'conversion',

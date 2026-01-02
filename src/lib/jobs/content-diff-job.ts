@@ -6,6 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { beginRun, completeSuccess, completeFailure, type JobMeta } from '@/lib/job-runs';
 import { getDiffRebuildThresholdPercent } from '@/lib/admin/settings';
+import type { JsonObject, JsonValue } from '@/lib/utils/ab-testing';
 
 export type ContentDiffJobTarget = 
   | 'organizations'
@@ -20,7 +21,7 @@ export type ContentDiffJobTarget =
 
 export interface ContentDiffJobInput {
   target_table: ContentDiffJobTarget;
-  source_data: Record<string, any>[];
+  source_data: JsonObject[];
   organization_id?: string;
   request_id?: string;
 }
@@ -56,20 +57,27 @@ function createServiceRoleClient() {
  * content_hash を計算する（仮実装）
  * 注意：実際の計算ロジックはSupabase側のRPC関数と一致させる必要あり
  */
-function calculateContentHash(data: Record<string, any>): string {
+function calculateContentHash(data: JsonObject): string {
   // ビジネス的な内容のみからハッシュ計算
   const businessFields = ['title', 'body', 'content', 'description', 'properties'];
-  const relevantData: Record<string, any> = {};
-  
+  const relevantData: JsonObject = {};
+
   for (const field of businessFields) {
     if (data[field] !== undefined) {
       relevantData[field] = data[field];
     }
   }
-  
+
   // 簡易的なハッシュ計算（実際はcrypto.subtle.digestを使う）
   const jsonString = JSON.stringify(relevantData, Object.keys(relevantData).sort());
   return btoa(jsonString).slice(0, 64); // 仮実装
+}
+
+/** 差分変更操作 */
+interface ContentDiffChange {
+  operation: 'INSERT' | 'UPDATE' | 'DELETE';
+  id: string;
+  data?: JsonObject;
 }
 
 /**
@@ -78,9 +86,9 @@ function calculateContentHash(data: Record<string, any>): string {
 async function detectChanges(
   supabase: ReturnType<typeof createServiceRoleClient>,
   targetTable: ContentDiffJobTarget,
-  sourceData: Record<string, any>[],
+  sourceData: JsonObject[],
   organizationId?: string
-): Promise<{ total_count: number; diff_count: number; changes: any[] }> {
+): Promise<{ total_count: number; diff_count: number; changes: ContentDiffChange[] }> {
   // 現在のデータを取得
   let query = supabase.from(`public_${targetTable}`).select('id, content_hash');
   
@@ -98,31 +106,32 @@ async function detectChanges(
     (currentData || []).map(row => [row.id, row.content_hash])
   );
   
-  const changes = [];
-  
+  const changes: ContentDiffChange[] = [];
+
   for (const sourceRow of sourceData) {
     const newHash = calculateContentHash(sourceRow);
-    const currentHash = currentHashMap.get(sourceRow.id);
+    const rowId = String(sourceRow.id ?? '');
+    const currentHash = currentHashMap.get(rowId);
     
     if (!currentHash) {
       // 新規レコード
       changes.push({
         operation: 'INSERT',
-        id: sourceRow.id,
+        id: rowId,
         data: { ...sourceRow, content_hash: newHash }
       });
     } else if (currentHash !== newHash) {
       // 更新レコード
       changes.push({
         operation: 'UPDATE',
-        id: sourceRow.id,
+        id: rowId,
         data: { ...sourceRow, content_hash: newHash }
       });
     }
   }
-  
+
   // 削除対象の検出（sourceDataにない既存レコード）
-  const sourceIds = new Set(sourceData.map(row => row.id));
+  const sourceIds = new Set(sourceData.map(row => String(row.id ?? '')));
   for (const [currentId] of currentHashMap) {
     if (!sourceIds.has(currentId)) {
       changes.push({
@@ -146,7 +155,7 @@ async function detectChanges(
 async function applyChanges(
   supabase: ReturnType<typeof createServiceRoleClient>,
   targetTable: ContentDiffJobTarget,
-  changes: any[],
+  changes: ContentDiffChange[],
   isFullRebuild: boolean
 ): Promise<void> {
   if (isFullRebuild) {
