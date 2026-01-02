@@ -12,9 +12,9 @@
 export const PLAN_LIMITS = {
   // TODO: [PLAN_TYPE_MISMATCH] 'trial' は Supabase plan_features に存在しない
   // 既存コードで使用中のため保持、将来的に starter に統合検討
-  trial: { 
-    services: 5, 
-    materials: 10, 
+  trial: {
+    services: 5,
+    materials: 10,
     embeds: 1,
     external_links: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
     category_tags: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
@@ -29,11 +29,13 @@ export const PLAN_LIMITS = {
     posts: 10,  // 記事制限
     faqs: 10,  // FAQ制限
     trial_days: 14,  // 14日間トライアル
-    structured_score: true  // 構造化スコア表示
+    structured_score: true,  // 構造化スコア表示
+    approval_flow: false,  // 承認フロー機能
+    team_management: false  // チーム権限管理
   },
-  starter: { 
-    services: 5, 
-    materials: 10, 
+  starter: {
+    services: 5,
+    materials: 10,
     embeds: 1,
     external_links: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
     category_tags: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
@@ -45,11 +47,13 @@ export const PLAN_LIMITS = {
     case_studies: 5,  // 導入事例制限
     posts: 10,  // 記事制限
     faqs: 10,  // FAQ制限
-    structured_score: true  // 構造化スコア表示
+    structured_score: true,  // 構造化スコア表示
+    approval_flow: false,  // 承認フロー機能
+    team_management: false  // チーム権限管理
   },
-  pro: { 
-    services: 20, 
-    materials: 10, 
+  pro: {
+    services: 20,
+    materials: 10,
     embeds: 5,
     external_links: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
     category_tags: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */,
@@ -61,7 +65,9 @@ export const PLAN_LIMITS = {
     case_studies: 20,  // 導入事例制限
     posts: 100,  // 記事制限
     faqs: 50,  // FAQ制限
-    structured_score: true  // 構造化スコア表示
+    structured_score: true,  // 構造化スコア表示
+    approval_flow: false,  // 承認フロー機能
+    team_management: false  // チーム権限管理
   },
   business: { 
     services: Number.POSITIVE_INFINITY /* TODO: [UNLIMITED_MISMATCH] Supabase では -1 */, 
@@ -103,7 +109,8 @@ export const PLAN_LIMITS = {
     search_console: true,
     custom_features: true,  // カスタム機能開発
     dedicated_support: true,  // 専任サポート
-    sla_guarantee: true  // SLA保証
+    sla_guarantee: true,  // SLA保証
+    team_management: true  // チーム権限管理
   }
 } as const;
 

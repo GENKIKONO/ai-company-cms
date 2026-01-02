@@ -500,13 +500,13 @@ async function getEffectiveOrgFeaturesFromEntitlements(orgId: string): Promise<E
 
         case 'approval_flow':
           config = {
-            enabled: entitlementValue?.enabled ?? Boolean((planLimits as any).approval_flow),
+            enabled: entitlementValue?.enabled ?? Boolean(planLimits.approval_flow),
           };
           break;
 
         case 'team_management':
           config = {
-            enabled: entitlementValue?.enabled ?? Boolean((planLimits as any).team_management),
+            enabled: entitlementValue?.enabled ?? Boolean(planLimits.team_management),
           };
           break;
 
@@ -589,8 +589,8 @@ function getEffectiveOrgFeaturesFromStaticConfig(planType: PlanType): EffectiveO
     limit: planLimits.posts === Number.POSITIVE_INFINITY ? null : planLimits.posts,
   };
   features.verified_badge = { enabled: planLimits.verified_badge };
-  features.approval_flow = { enabled: Boolean((planLimits as any).approval_flow) };
-  features.team_management = { enabled: Boolean((planLimits as any).team_management) };
+  features.approval_flow = { enabled: Boolean(planLimits.approval_flow) };
+  features.team_management = { enabled: Boolean(planLimits.team_management) };
 
   return {
     features,
@@ -701,7 +701,7 @@ export async function isFeatureLimitReached(
  * @returns 機能が利用可能かどうか
  */
 export async function canUseFeatureFromOrgAsync(
-  organization: { id: string; plan?: string | null; feature_flags?: any } | null | undefined,
+  organization: { id: string; plan?: string | null; feature_flags?: Record<string, unknown> | null } | null | undefined,
   key: FeatureKey,
 ): Promise<boolean> {
   const context = { organizationId: organization?.id, featureKey: key, component: 'canUseFeatureFromOrgAsync' };
@@ -779,7 +779,7 @@ export async function canUseFeatureFromOrgAsync(
  * @returns 各キーの boolean 値のマップ
  */
 export async function getMultipleFeatureFlagsFromOrgAsync(
-  organization: { id: string; plan?: string | null; feature_flags?: any } | null | undefined,
+  organization: { id: string; plan?: string | null; feature_flags?: Record<string, unknown> | null } | null | undefined,
   keys: FeatureKey[],
 ): Promise<Record<FeatureKey, boolean>> {
   const context = { organizationId: organization?.id, keysCount: keys.length, component: 'getMultipleFeatureFlagsFromOrgAsync' };
