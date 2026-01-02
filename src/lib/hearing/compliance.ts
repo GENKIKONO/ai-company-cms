@@ -5,6 +5,21 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/log';
+import type { JsonValue } from '@/lib/utils/ab-testing';
+
+// コンプライアンスチェック用の入力型（JSON互換）
+export type ComplianceContent = JsonValue | { images?: unknown[]; price?: unknown; [k: string]: JsonValue | unknown };
+
+// コンプライアンス違反の証拠型
+export type ComplianceEvidence = JsonValue;
+
+// コンプライアンス問題項目
+export interface ComplianceIssue {
+  description: string;
+  severity: RiskLevel;
+  recommendation: string;
+  autoFixable: boolean;
+}
 
 // リスクレベル定義
 export enum RiskLevel {
@@ -43,13 +58,8 @@ interface ComplianceResult {
   checkType: ComplianceCheckType;
   riskLevel: RiskLevel;
   passed: boolean;
-  issues: Array<{
-    description: string;
-    severity: RiskLevel;
-    recommendation: string;
-    autoFixable: boolean;
-  }>;
-  metadata?: Record<string, any>;
+  issues: ComplianceIssue[];
+  metadata?: Record<string, unknown>;
 }
 
 // 同意文テンプレート
@@ -131,7 +141,7 @@ export const CONSENT_TEMPLATES = {
 // メインコンプライアンスチェック関数
 export async function performComplianceCheck(
   contentType: string,
-  content: any,
+  content: ComplianceContent,
   organizationId: string
 ): Promise<{
   overallRisk: RiskLevel;
@@ -202,8 +212,8 @@ export async function performComplianceCheck(
 }
 
 // 個人情報検出チェック
-async function checkPersonalInformation(content: any): Promise<ComplianceResult> {
-  const issues: any[] = [];
+async function checkPersonalInformation(content: ComplianceContent): Promise<ComplianceResult> {
+  const issues: ComplianceIssue[] = [];
   const textContent = JSON.stringify(content).toLowerCase();
 
   // 個人情報パターン検出
@@ -242,8 +252,8 @@ async function checkPersonalInformation(content: any): Promise<ComplianceResult>
 }
 
 // 著作権チェック
-async function checkCopyrightIssues(content: any): Promise<ComplianceResult> {
-  const issues: any[] = [];
+async function checkCopyrightIssues(content: ComplianceContent): Promise<ComplianceResult> {
+  const issues: ComplianceIssue[] = [];
   const textContent = JSON.stringify(content).toLowerCase();
 
   // 著作権侵害の可能性があるキーワード
@@ -266,7 +276,8 @@ async function checkCopyrightIssues(content: any): Promise<ComplianceResult> {
   });
 
   // 画像の権利確認
-  if (content.images && content.images.length > 0) {
+  const contentObj = typeof content === 'object' && content !== null ? content as Record<string, unknown> : null;
+  if (contentObj && Array.isArray(contentObj.images) && contentObj.images.length > 0) {
     issues.push({
       description: '画像素材の使用権限確認が必要です',
       severity: RiskLevel.MEDIUM,
@@ -284,8 +295,8 @@ async function checkCopyrightIssues(content: any): Promise<ComplianceResult> {
 }
 
 // 誤解を招くコンテンツチェック
-async function checkMisleadingContent(content: any, contentType: string): Promise<ComplianceResult> {
-  const issues: any[] = [];
+async function checkMisleadingContent(content: ComplianceContent, contentType: string): Promise<ComplianceResult> {
+  const issues: ComplianceIssue[] = [];
   const textContent = JSON.stringify(content).toLowerCase();
 
   // 誤解を招く可能性のある表現
@@ -308,7 +319,8 @@ async function checkMisleadingContent(content: any, contentType: string): Promis
   });
 
   // サービス固有のチェック
-  if (contentType === 'service' && content.price) {
+  const contentRecord = typeof content === 'object' && content !== null ? content as Record<string, unknown> : null;
+  if (contentType === 'service' && contentRecord?.price) {
     if (!textContent.includes('税込') && !textContent.includes('税別')) {
       issues.push({
         description: '価格表示に税込・税別の記載がありません',
@@ -333,8 +345,8 @@ async function checkMisleadingContent(content: any, contentType: string): Promis
 }
 
 // 悪意のあるコンテンツチェック
-async function checkMaliciousContent(content: any): Promise<ComplianceResult> {
-  const issues: any[] = [];
+async function checkMaliciousContent(content: ComplianceContent): Promise<ComplianceResult> {
+  const issues: ComplianceIssue[] = [];
   const textContent = JSON.stringify(content);
 
   // 悪意のあるURLパターン
@@ -364,8 +376,8 @@ async function checkMaliciousContent(content: any): Promise<ComplianceResult> {
 }
 
 // 消費者保護チェック
-async function checkConsumerProtection(content: any, contentType: string): Promise<ComplianceResult> {
-  const issues: any[] = [];
+async function checkConsumerProtection(content: ComplianceContent, contentType: string): Promise<ComplianceResult> {
+  const issues: ComplianceIssue[] = [];
   const textContent = JSON.stringify(content).toLowerCase();
 
   if (contentType === 'service') {
@@ -399,8 +411,8 @@ async function checkConsumerProtection(content: any, contentType: string): Promi
 }
 
 // 医療関連主張チェック
-async function checkMedicalClaims(content: any): Promise<ComplianceResult> {
-  const issues: any[] = [];
+async function checkMedicalClaims(content: ComplianceContent): Promise<ComplianceResult> {
+  const issues: ComplianceIssue[] = [];
   const textContent = JSON.stringify(content).toLowerCase();
 
   const medicalKeywords = [
@@ -434,8 +446,8 @@ async function checkMedicalClaims(content: any): Promise<ComplianceResult> {
 }
 
 // 金融アドバイスチェック
-async function checkFinancialAdvice(content: any): Promise<ComplianceResult> {
-  const issues: any[] = [];
+async function checkFinancialAdvice(content: ComplianceContent): Promise<ComplianceResult> {
+  const issues: ComplianceIssue[] = [];
   const textContent = JSON.stringify(content).toLowerCase();
 
   const financialKeywords = [
@@ -513,7 +525,7 @@ export async function reportComplianceViolation(
   description: string,
   contentId: string,
   reportedBy: string,
-  evidence?: any
+  evidence?: ComplianceEvidence
 ): Promise<boolean> {
   try {
     const supabase = createClient(
