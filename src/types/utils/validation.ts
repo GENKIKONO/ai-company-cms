@@ -66,6 +66,13 @@ export const isStringArray: TypeGuard<string[]> = (value): value is string[] => 
   return isArray(value) && value.every(isString)
 }
 
+export const isNonEmptyString = (value: unknown): value is string => {
+  return typeof value === 'string' && value.length > 0
+}
+
+// JsonObject 型ガード（isObject のエイリアス）
+export const isJsonObject = isObject
+
 export const isNumberArray: TypeGuard<number[]> = (value): value is number[] => {
   return isArray(value) && value.every(isNumber)
 }

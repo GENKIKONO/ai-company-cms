@@ -5,6 +5,26 @@ import { logger } from '@/lib/utils/logger';
  * Web Vitals、リソース読み込み、ユーザー体験の測定
  */
 
+/** CLS Layout Shift Entry (非標準Performance API拡張) */
+interface LayoutShiftEntry extends PerformanceEntry {
+  hadRecentInput?: boolean;
+  value?: number;
+}
+
+/** Chrome非標準 performance.memory API */
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+/** Chrome非標準 performance.memory 拡張 */
+declare global {
+  interface Performance {
+    memory?: PerformanceMemory;
+  }
+}
+
 export interface PerformanceMetrics {
   // Core Web Vitals
   lcp?: number; // Largest Contentful Paint
@@ -119,23 +139,25 @@ export class WebVitalsMonitor {
 
     let clsValue = 0;
     let sessionValue = 0;
-    let sessionEntries: any[] = [];
+    let sessionEntries: LayoutShiftEntry[] = [];
 
     const observer = new PerformanceObserver((list) => {
-      const entries = list.getEntries();
-      
-      entries.forEach((entry: any) => {
+      const entries = list.getEntries() as LayoutShiftEntry[];
+
+      entries.forEach((entry) => {
         if (!entry.hadRecentInput) {
           const firstSessionEntry = sessionEntries[0];
           const lastSessionEntry = sessionEntries[sessionEntries.length - 1];
 
-          if (sessionValue && 
+          if (sessionValue &&
+              lastSessionEntry &&
+              firstSessionEntry &&
               entry.startTime - lastSessionEntry.startTime < 1000 &&
               entry.startTime - firstSessionEntry.startTime < 5000) {
-            sessionValue += entry.value;
+            sessionValue += entry.value ?? 0;
             sessionEntries.push(entry);
           } else {
-            sessionValue = entry.value;
+            sessionValue = entry.value ?? 0;
             sessionEntries = [entry];
           }
 
@@ -443,7 +465,7 @@ export class MemoryMonitor {
   } | null {
     if (typeof window === 'undefined' || !('performance' in window)) return null;
 
-    const memory = (performance as any).memory;
+    const memory = performance.memory;
     if (!memory) return null;
 
     return {
@@ -509,14 +531,16 @@ export class PerformanceMonitor {
     const data = report || this.getFullReport();
     
     // Plausible Analytics に送信
-    if (typeof window !== 'undefined' && (window as any).plausible) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const plausible = typeof window !== 'undefined' ? (window as any).plausible : undefined;
+    if (plausible) {
       try {
-        (window as any).plausible('Performance', {
+        plausible('Performance', {
           props: {
-            lcp: data.webVitals.lcp,
-            fid: data.webVitals.fid,
-            cls: data.webVitals.cls,
-            score: data.webVitalsScore.score,
+            lcp: String(data.webVitals.lcp ?? ''),
+            fid: String(data.webVitals.fid ?? ''),
+            cls: String(data.webVitals.cls ?? ''),
+            score: String(data.webVitalsScore.score),
             rating: data.webVitalsScore.rating
           }
         });

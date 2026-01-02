@@ -132,7 +132,7 @@ export async function PUT(
 
     // organizationId を除去したデータを正規化
     const normalizedData = normalizeCaseStudyPayload(restBody);
-    const updateData = {
+    const updateData: Record<string, unknown> = {
       ...normalizedData,
       updated_at: new Date().toISOString(),
     };

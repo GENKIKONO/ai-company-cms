@@ -9,17 +9,15 @@ import { z } from 'zod';
  * 空文字列をnullに変換する共通transformer
  * null/undefined/空文字を統一的に扱う
  */
-export const normalizeEmptyToNull = <T extends string | null | undefined>(
-  val: T
-): T extends string ? (string extends T ? string | null : T) : T => {
+export function normalizeEmptyToNull(val: string | null | undefined): string | null {
   if (val === '' || val === null || val === undefined) {
-    return null as any;
+    return null;
   }
-  if (typeof val === 'string' && val.trim() === '') {
-    return null as any;
+  if (val.trim() === '') {
+    return null;
   }
-  return val as any;
-};
+  return val;
+}
 
 /**
  * オプショナル文字列フィールド（空文字→null変換付き）
@@ -188,10 +186,11 @@ export const postalCodeField = () =>
  */
 export const jsonArrayField = <T>() =>
   z.union([
-    z.array(z.any()),
-    z.string().transform(str => {
+    z.array(z.unknown()),
+    z.string().transform((str): unknown[] => {
       try {
-        return JSON.parse(str);
+        const parsed: unknown = JSON.parse(str);
+        return Array.isArray(parsed) ? parsed : [];
       } catch {
         return [];
       }

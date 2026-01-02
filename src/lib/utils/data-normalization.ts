@@ -3,6 +3,34 @@
 // ================================
 // Single-Org API全体で使用する統一されたデータ正規化機能
 
+import { isNonEmptyString, isObject } from '@/types/utils/validation';
+
+/** メディアオブジェクト入力型 */
+interface MediaInput {
+  type?: string;
+  url?: string;
+  alt_text?: string;
+  caption?: string;
+}
+
+/** 営業時間入力型 */
+interface BusinessHoursInput {
+  day?: string;
+  is_open?: boolean;
+  open_time?: string;
+  close_time?: string;
+}
+
+/** メディア入力の型ガード */
+function isMediaInput(v: unknown): v is MediaInput {
+  return isObject(v) && typeof (v as MediaInput).url === 'string';
+}
+
+/** 営業時間入力の型ガード */
+function isBusinessHoursInput(v: unknown): v is BusinessHoursInput {
+  return isObject(v) && typeof (v as BusinessHoursInput).day === 'string';
+}
+
 /**
  * 空文字をnullに変換する共通ユーティリティ
  * フォームデータの正規化に使用
@@ -71,8 +99,10 @@ export function normalizeArrayFields<T extends Record<string, any>>(
 
 /**
  * Post データの正規化
+ * @returns 正規化されたペイロード（フィールドアクセス可能）
  */
-export function normalizePostPayload(data: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function normalizePostPayload(data: Record<string, unknown>): Record<string, any> {
   const normalized = normalizeEmptyStrings(data, [
     'content_markdown',
     'content_html',
@@ -92,11 +122,12 @@ export function normalizePostPayload(data: any) {
 /**
  * Service データの正規化
  */
-export function normalizeServicePayload(data: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function normalizeServicePayload(data: Record<string, unknown>): Record<string, any> {
   // 実際のデータベース スキーマに存在するフィールドのみ抽出
   const allowedFields = [
     'name',
-    'description', 
+    'description',
     'category',
     'price',
     'is_published',
@@ -104,9 +135,9 @@ export function normalizeServicePayload(data: any) {
   ];
 
   // 許可されたフィールドのみを保持
-  let normalized: any = {};
+  let normalized: Record<string, unknown> = {};
   allowedFields.forEach(field => {
-    if (data.hasOwnProperty(field)) {
+    if (Object.prototype.hasOwnProperty.call(data, field)) {
       normalized[field] = data[field];
     }
   });
@@ -125,21 +156,21 @@ export function normalizeServicePayload(data: any) {
     if (Array.isArray(normalized.features)) {
       // 空文字やnull要素を除去
       normalized.features = normalized.features
-        .filter((feature: any) => feature && feature.trim() !== '');
+        .filter((feature): feature is string => isNonEmptyString(feature));
     } else {
       normalized.features = null;
     }
   }
-  
+
   // media配列の正規化
   if (normalized.media) {
     if (Array.isArray(normalized.media)) {
       // 各メディアオブジェクトの正規化とバリデーション
       normalized.media = normalized.media
-        .filter((media: any) => media && media.url && media.url.trim() !== '')
-        .map((media: any) => ({
+        .filter((m): m is MediaInput => isMediaInput(m) && isNonEmptyString(m.url))
+        .map((media) => ({
           type: media.type || 'image',
-          url: media.url.trim(),
+          url: (media.url ?? '').trim(),
           alt_text: media.alt_text?.trim() || null,
           caption: media.caption?.trim() || null
         }));
@@ -154,36 +185,35 @@ export function normalizeServicePayload(data: any) {
 /**
  * CaseStudy データの正規化
  */
-export function normalizeCaseStudyPayload(data: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function normalizeCaseStudyPayload(data: Record<string, unknown>): Record<string, any> {
   const normalized = normalizeEmptyStrings(data, [
     'problem',
-    'solution', 
+    'solution',
     'result'
   ]);
-  
+
   // Map 'result' to 'outcome' for database compatibility
   // Database schema uses 'outcome' while frontend/types use 'result'
   if (normalized.result !== undefined) {
     normalized.outcome = normalized.result;
     delete normalized.result;
   }
-  
+
   // tags配列の正規化
   if (normalized.tags) {
     if (Array.isArray(normalized.tags)) {
       // 空文字やnull要素を除去
-      normalized.tags = normalized.tags
-        .filter((tag: any) => tag && tag.trim() !== '');
-      
+      const validTags = normalized.tags
+        .filter((tag): tag is string => isNonEmptyString(tag));
+
       // 空配列の場合はnullに
-      if (normalized.tags.length === 0) {
-        normalized.tags = null;
-      }
+      normalized.tags = validTags.length > 0 ? validTags : null;
     } else {
       normalized.tags = null;
     }
   }
-  
+
   return normalized;
 }
 
@@ -191,16 +221,18 @@ export function normalizeCaseStudyPayload(data: any) {
 /**
  * FAQ データの正規化
  */
-export function normalizeFAQPayload(data: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function normalizeFAQPayload(data: Record<string, unknown>): Record<string, any> {
   const normalized = normalizeEmptyStrings(data, ['category']);
-  
+
   return normalized;
 }
 
 /**
  * Organization データの正規化
  */
-export function normalizeOrganizationPayload(data: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function normalizeOrganizationPayload(data: Record<string, unknown>): Record<string, any> {
   let normalized = normalizeEmptyStrings(data, [
     'description',
     'url',
@@ -250,10 +282,13 @@ export function normalizeOrganizationPayload(data: any) {
   }
   
   // brand color validation (hex format)
-  if (normalized.brand_color_primary && !/^#[0-9A-Fa-f]{6}$/.test(normalized.brand_color_primary)) {
+  const hexColorPattern = /^#[0-9A-Fa-f]{6}$/;
+  const primaryColor = normalized.brand_color_primary;
+  if (typeof primaryColor === 'string' && !hexColorPattern.test(primaryColor)) {
     normalized.brand_color_primary = null;
   }
-  if (normalized.brand_color_secondary && !/^#[0-9A-Fa-f]{6}$/.test(normalized.brand_color_secondary)) {
+  const secondaryColor = normalized.brand_color_secondary;
+  if (typeof secondaryColor === 'string' && !hexColorPattern.test(secondaryColor)) {
     normalized.brand_color_secondary = null;
   }
   
@@ -280,19 +315,19 @@ export function normalizeOrganizationPayload(data: any) {
   if (normalized.business_hours && Array.isArray(normalized.business_hours)) {
     const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
     const validBusinessHours = normalized.business_hours
-      .filter((hours: any) => {
-        return (
-          hours &&
-          typeof hours === 'object' &&
-          validDays.includes(hours.day) &&
-          typeof hours.is_open === 'boolean' &&
-          (!hours.is_open || (
-            hours.open_time && /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(hours.open_time) &&
-            hours.close_time && /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(hours.close_time)
-          ))
-        );
+      .filter((hours): hours is BusinessHoursInput => {
+        if (!isBusinessHoursInput(hours)) return false;
+        const { day, is_open, open_time, close_time } = hours;
+        if (!day || !validDays.includes(day)) return false;
+        if (typeof is_open !== 'boolean') return false;
+        if (is_open) {
+          const timePattern = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
+          if (!open_time || !timePattern.test(open_time)) return false;
+          if (!close_time || !timePattern.test(close_time)) return false;
+        }
+        return true;
       });
-    
+
     normalized.business_hours = validBusinessHours.length > 0 ? validBusinessHours : null;
   } else {
     normalized.business_hours = null;

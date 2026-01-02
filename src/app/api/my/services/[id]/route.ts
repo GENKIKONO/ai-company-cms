@@ -141,7 +141,7 @@ export async function PUT(
 
     // データ正規化
     const normalizedData = normalizeServicePayload(body);
-    const updateData = {
+    const updateData: Record<string, unknown> = {
       ...normalizedData,
       updated_at: new Date().toISOString(),
     };

@@ -711,7 +711,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // 更新データの準備（created_byは変更不可）
-    let updateData = {
+    let updateData: Record<string, unknown> = {
       ...normalizedData,
       updated_at: new Date().toISOString(),
     };
