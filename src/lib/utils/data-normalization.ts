@@ -260,7 +260,7 @@ export function normalizeOrganizationPayload(data: any) {
   // social_media object validation
   if (normalized.social_media && typeof normalized.social_media === 'object') {
     const allowedKeys = ['facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'tiktok', 'github', 'note', 'qiita', 'zenn'];
-    const validSocialMedia: any = {};
+    const validSocialMedia: Record<string, string> = {};
     
     for (const [key, value] of Object.entries(normalized.social_media)) {
       if (allowedKeys.includes(key) && typeof value === 'string' && value.trim() !== '') {
@@ -307,7 +307,7 @@ export function normalizeOrganizationPayload(data: any) {
 export interface APIError {
   error: string;
   message: string;
-  details?: any;
+  details?: Record<string, unknown>;
   errorId?: string;
 }
 
@@ -318,7 +318,7 @@ export function createErrorResponse(
   error: string,
   message: string,
   status: number,
-  details?: any,
+  details?: Record<string, unknown>,
   errorId?: string
 ): Response {
   const errorResponse: APIError = {
@@ -383,7 +383,7 @@ export function createNotFoundError(resource: string): Response {
 /**
  * Conflict エラーの統一形式
  */
-export function createConflictError(message: string, details?: any): Response {
+export function createConflictError(message: string, details?: Record<string, unknown>): Response {
   return createErrorResponse(
     'Conflict',
     message,
