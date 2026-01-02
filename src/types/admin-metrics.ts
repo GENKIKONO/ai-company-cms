@@ -79,3 +79,50 @@ export type MetricsApiParams = {
   range?: '1w' | '4w' | '12w';
   orgId?: string;
 };
+
+// =====================================================
+// RAW DATA TYPES (from Supabase tables/views)
+// =====================================================
+
+export interface RlsDeniedEvent {
+  created_at: string;
+}
+
+export interface SecurityIncident {
+  detected_at: string;
+  severity: string;
+}
+
+export interface JobRun {
+  job_name: string | null;
+  status: string;
+  created_at: string;
+}
+
+export interface WebhookEvent {
+  event_type: string | null;
+  created_at: string;
+}
+
+export interface AiInterviewKpiRow {
+  week_start: string;
+  organization_id: string | null;
+  organization_name: string | null;
+  completion_rate_pct: number | null;
+  total_sessions: number | null;
+  completed_sessions: number | null;
+}
+
+export interface AiCitationsKpiRow {
+  week_start: string;
+  organization_id: string | null;
+  organization_name: string | null;
+  citation_count: number | null;
+  unique_sources: number | null;
+}
+
+// Weekly aggregation output
+export interface WeeklyCount {
+  week_start_utc: string;
+  [key: string]: string | number;
+}

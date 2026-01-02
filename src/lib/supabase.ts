@@ -4,18 +4,19 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import type { 
-  SupabaseDatabase, 
-  TableRow, 
-  TableInsert, 
+import type {
+  SupabaseDatabase,
+  TableRow,
+  TableInsert,
   TableUpdate,
   DatabaseResult,
   DatabaseError,
-  isDatabaseError 
+  isDatabaseError
 } from '@/types/database.types'
 import type { ApiResponse } from '@/types/api.types'
 import { createApiResponse, createErrorResponse } from '@/types/api.types'
 import { logger } from '@/lib/utils/logger'
+import { asFilterValue, asInsertData, asUpdateData } from '@/lib/supabase-boundary'
 
 // =====================================================
 // TYPED SUPABASE CLIENT
@@ -80,7 +81,7 @@ export async function selectFrom<T extends keyof SupabaseDatabase['public']['Tab
     // Apply filters
     if (options?.filters) {
       Object.entries(options.filters).forEach(([key, value]) => {
-        query = query.eq(key, value as any)
+        query = query.eq(key, asFilterValue(value))
       })
     }
 
@@ -126,7 +127,7 @@ export async function selectSingle<T extends keyof SupabaseDatabase['public']['T
   try {
     const { data, error } = await table(tableName)
       .select(columns || '*')
-      .eq('id', id as any)
+      .eq('id', asFilterValue(id))
       .single()
 
     if (error) {
@@ -155,7 +156,7 @@ export async function insertInto<T extends keyof SupabaseDatabase['public']['Tab
 ): Promise<DatabaseResult<TableRow<T>[]>> {
   try {
     const { data: result, error } = await table(tableName)
-      .insert(data as any)
+      .insert(asInsertData(data))
       .select()
 
     if (error) {
@@ -185,8 +186,8 @@ export async function updateRecord<T extends keyof SupabaseDatabase['public']['T
 ): Promise<DatabaseResult<TableRow<T>>> {
   try {
     const { data, error } = await table(tableName)
-      .update(updates as any)
-      .eq('id', id as any)
+      .update(asUpdateData(updates))
+      .eq('id', asFilterValue(id))
       .select()
       .single()
 
@@ -219,7 +220,7 @@ export async function upsertRecord<T extends keyof SupabaseDatabase['public']['T
   }
 ): Promise<DatabaseResult<TableRow<T>[]>> {
   try {
-    const query = table(tableName).upsert(data as any, {
+    const query = table(tableName).upsert(asInsertData(data), {
       onConflict: options?.onConflict,
       ignoreDuplicates: options?.ignoreDuplicates ?? false,
     })
@@ -253,7 +254,7 @@ export async function deleteRecord<T extends keyof SupabaseDatabase['public']['T
   try {
     const { error } = await table(tableName)
       .delete()
-      .eq('id', id as any)
+      .eq('id', asFilterValue(id))
 
     if (error) {
       logger.error('Database delete error:', { data: error })
@@ -288,7 +289,7 @@ export async function countRecords<T extends keyof SupabaseDatabase['public']['T
 
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
-        query = query.eq(key, value as any)
+        query = query.eq(key, asFilterValue(value))
       })
     }
 
@@ -322,7 +323,7 @@ export async function recordExists<T extends keyof SupabaseDatabase['public']['T
     let query = table(tableName).select('id', { count: 'exact', head: true })
 
     Object.entries(filters).forEach(([key, value]) => {
-      query = query.eq(key, value as any)
+      query = query.eq(key, asFilterValue(value))
     })
 
     const { count, error } = await query

@@ -9,7 +9,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserFullWithClient } from '@/lib/core/auth-state';
-import type { AdminMetricsResponse, MetricsApiParams } from '@/types/admin-metrics';
+import type {
+  AdminMetricsResponse,
+  MetricsApiParams,
+  RlsDeniedEvent,
+  SecurityIncident,
+  JobRun,
+  WebhookEvent,
+  AiInterviewKpiRow,
+  AiCitationsKpiRow,
+  JobFailRate,
+  EdgeErrorRate,
+  WeeklySecurityIncidents,
+  WeeklyJobFailRate,
+  WeeklyAlertEvents,
+  WeeklyCount
+} from '@/types/admin-metrics';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export async function GET(request: NextRequest) {
   try {
@@ -96,7 +112,7 @@ export async function GET(request: NextRequest) {
  * KPIデータを取得する関数（実DB接続版）
  */
 async function fetchMetricsData(
-  supabase: any,
+  supabase: SupabaseClient,
   range: string,
   orgId?: string
 ): Promise<AdminMetricsResponse> {
@@ -169,32 +185,30 @@ async function fetchMetricsData(
   const jobFailRateWeekly = aggregateJobFailRateByWeek(jobRuns, currentWeekStart, weeksCount);
 
   // Edge関数エラー率（job_runs_v2から推測）
-  const edgeJobs = jobRuns.filter((j: any) => j.job_name?.startsWith('edge:'));
+  const edgeJobs = jobRuns.filter((j: JobRun) => j.job_name?.startsWith('edge:'));
   const edgeErrorRateWorst3 = calculateEdgeErrorRates(edgeJobs);
 
   // アラートイベント集計
   const webhookEvents = alertEventsResult.data || [];
   const alertEventsCurrent = aggregateAlertEvents(webhookEvents, rlsDeniedCount, jobFailRateTop3, securityIncidentsCount);
 
-  // AI Interview KPI (from view)
-  const aiInterviewKpiData = aiInterviewKpiResult.data || [];
-  const aiInterviewCompletionWeekly = aiInterviewKpiData.map((row: any) => ({
+  // AI Interview KPI (from view) - map to chart expected format
+  const aiInterviewKpiData = (aiInterviewKpiResult.data || []) as AiInterviewKpiRow[];
+  const aiInterviewCompletionWeekly = aiInterviewKpiData.map((row) => ({
     week_start_utc: row.week_start,
-    organization_id: row.organization_id,
-    organization_name: row.organization_name,
+    org_id: row.organization_id,
     completion_rate_pct: row.completion_rate_pct || 0,
-    total_sessions: row.total_sessions || 0,
-    completed_sessions: row.completed_sessions || 0,
   }));
 
-  // AI Citations KPI (from view)
-  const aiCitationsKpiData = aiCitationsKpiResult.data || [];
-  const aiCitationsWeekly = aiCitationsKpiData.map((row: any) => ({
+  // AI Citations KPI (from view) - map to chart expected format
+  // Note: View provides citation_count/unique_sources, but chart expects avg_items_per_response/tokens_sum
+  // Mapping: citation_count → avg_items_per_response, unique_sources * 100 → tokens_sum (approximation)
+  const aiCitationsKpiData = (aiCitationsKpiResult.data || []) as AiCitationsKpiRow[];
+  const aiCitationsWeekly = aiCitationsKpiData.map((row) => ({
     week_start_utc: row.week_start,
-    organization_id: row.organization_id,
-    organization_name: row.organization_name,
-    citation_count: row.citation_count || 0,
-    unique_sources: row.unique_sources || 0,
+    org_id: row.organization_id,
+    avg_items_per_response: row.citation_count || 0,
+    tokens_sum: (row.unique_sources || 0) * 100, // Approximation until actual token data available
   }));
 
   return {
@@ -219,13 +233,13 @@ async function fetchMetricsData(
 /**
  * 週次集計ヘルパー
  */
-function aggregateByWeek(
-  items: any[],
-  dateField: string,
+function aggregateByWeek<T extends Record<string, unknown>>(
+  items: T[],
+  dateField: keyof T,
   countField: string,
   currentWeekStart: Date,
   weeksCount: number
-) {
+): WeeklyCount[] {
   const weekCounts: Record<string, number> = {};
 
   // 初期化
@@ -237,7 +251,7 @@ function aggregateByWeek(
 
   // 集計
   for (const item of items) {
-    const dateStr = item[dateField];
+    const dateStr = item[dateField] as string | undefined;
     if (!dateStr) continue;
     const itemDate = new Date(dateStr);
     const weekStart = getUTCWeekStart(itemDate);
@@ -255,7 +269,7 @@ function aggregateByWeek(
 /**
  * ジョブ失敗率計算
  */
-function calculateJobFailRates(jobRuns: any[]) {
+function calculateJobFailRates(jobRuns: JobRun[]): JobFailRate[] {
   const jobStats: Record<string, { failed: number; total: number }> = {};
 
   for (const job of jobRuns) {
@@ -283,7 +297,7 @@ function calculateJobFailRates(jobRuns: any[]) {
 /**
  * Edge関数エラー率計算
  */
-function calculateEdgeErrorRates(edgeJobs: any[]) {
+function calculateEdgeErrorRates(edgeJobs: JobRun[]): EdgeErrorRate[] {
   const funcStats: Record<string, { failed: number; total: number }> = {};
 
   for (const job of edgeJobs) {
@@ -311,8 +325,8 @@ function calculateEdgeErrorRates(edgeJobs: any[]) {
 /**
  * セキュリティインシデント週次集計
  */
-function aggregateSecurityByWeek(incidents: any[], currentWeekStart: Date, weeksCount: number) {
-  const result: any[] = [];
+function aggregateSecurityByWeek(incidents: SecurityIncident[], currentWeekStart: Date, weeksCount: number): WeeklySecurityIncidents[] {
+  const result: WeeklySecurityIncidents[] = [];
   const riskLevels = ['low', 'medium', 'high', 'critical'];
 
   for (let i = weeksCount - 1; i >= 0; i--) {
@@ -343,8 +357,8 @@ function aggregateSecurityByWeek(incidents: any[], currentWeekStart: Date, weeks
 /**
  * ジョブ失敗率週次集計
  */
-function aggregateJobFailRateByWeek(jobRuns: any[], currentWeekStart: Date, weeksCount: number) {
-  const result: any[] = [];
+function aggregateJobFailRateByWeek(jobRuns: JobRun[], currentWeekStart: Date, weeksCount: number): WeeklyJobFailRate[] {
+  const result: WeeklyJobFailRate[] = [];
   const jobNames = [...new Set(jobRuns.map(j => j.job_name || 'unknown'))].slice(0, 5);
 
   for (let i = weeksCount - 1; i >= 0; i--) {
@@ -378,11 +392,11 @@ function aggregateJobFailRateByWeek(jobRuns: any[], currentWeekStart: Date, week
  * アラートイベント集計
  */
 function aggregateAlertEvents(
-  webhookEvents: any[],
+  webhookEvents: WebhookEvent[],
   rlsDeniedCount: number,
-  jobFailRates: any[],
+  jobFailRates: JobFailRate[],
   securityIncidentsCount: number
-) {
+): WeeklyAlertEvents[] {
   const THRESHOLDS = {
     rls_spike: 5,
     job_fail_spike: 10,
