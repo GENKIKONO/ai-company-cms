@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runContentDiffJob, type ContentDiffJobInput } from '@/lib/jobs/content-diff-job';
 import { requireSuperAdminUser } from '@/lib/auth/server';
+import type { Database } from '@/types/supabase';
+
+/** job_runs_v2 の取得列（列明示パターン） */
+type JobRunV2Row = Database['public']['Tables']['job_runs_v2']['Row'];
+type JobRunV2Status = Pick<JobRunV2Row,
+  | 'id'
+  | 'job_name'
+  | 'status'
+  | 'started_at'
+  | 'finished_at'
+  | 'duration_ms'
+  | 'error_message'
+  | 'meta'
+>;
 
 /**
  * Content Diff Job API
@@ -138,11 +152,12 @@ export async function GET(request: NextRequest) {
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(supabaseUrl, serviceRoleKey);
     
+    // 列明示でクエリ（select * を排除）
     const { data: jobRecord, error } = await supabase
       .from('job_runs_v2')
-      .select('*')
+      .select('id, job_name, status, started_at, finished_at, duration_ms, error_message, meta')
       .eq('id', jobId)
-      .single();
+      .single<JobRunV2Status>();
     
     if (error || !jobRecord) {
       return NextResponse.json(

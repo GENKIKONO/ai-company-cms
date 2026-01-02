@@ -37,6 +37,45 @@ export type MonthlyReportJobRow = Tables['monthly_report_jobs']['Row'];
 export type ReportStatus = 'pending' | 'generating' | 'completed' | 'failed';
 export type JobStatus = 'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled' | 'timeout' | 'skipped';
 
+// =====================================================
+// 列明示パターン（select('*') 排除用定数）
+// =====================================================
+
+/** ai_monthly_reports の全列（列明示パターン） */
+const AI_MONTHLY_REPORTS_COLUMNS = `
+  id,
+  organization_id,
+  period_start,
+  period_end,
+  month_bucket,
+  plan_id,
+  level,
+  status,
+  summary_text,
+  sections,
+  metrics,
+  suggestions,
+  created_at,
+  updated_at
+` as const;
+
+/** monthly_report_jobs の全列（列明示パターン） */
+const MONTHLY_REPORT_JOBS_COLUMNS = `
+  id,
+  organization_id,
+  report_id,
+  status,
+  idempotency_key,
+  meta,
+  scheduled_at,
+  started_at,
+  finished_at,
+  attempts,
+  last_error,
+  created_at,
+  updated_at
+` as const;
+
 // Result Types
 export interface ReportResult {
   report: MonthlyReportRow | null;
@@ -90,7 +129,7 @@ export async function getReportsList(params: {
 
     let query = supabase
       .from('ai_monthly_reports')
-      .select('*', { count: 'exact' })
+      .select(AI_MONTHLY_REPORTS_COLUMNS, { count: 'exact' })
       .eq('organization_id', organizationId)
       .order('period_start', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -151,7 +190,7 @@ export async function getReportByPeriod(params: {
 
     let query = supabase
       .from('ai_monthly_reports')
-      .select('*')
+      .select(AI_MONTHLY_REPORTS_COLUMNS)
       .eq('organization_id', params.organizationId)
       .eq('period_start', periodStart);
 
@@ -201,7 +240,7 @@ export async function getLatestReport(
       // Fallback to direct query if RPC doesn't exist
       let query = supabase
         .from('ai_monthly_reports')
-        .select('*')
+        .select(AI_MONTHLY_REPORTS_COLUMNS)
         .eq('organization_id', organizationId)
         .eq('status', 'completed')
         .order('period_start', { ascending: false })
@@ -248,7 +287,7 @@ export async function getJobsList(params: {
 
     let query = supabase
       .from('monthly_report_jobs')
-      .select('*')
+      .select(MONTHLY_REPORT_JOBS_COLUMNS)
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -286,7 +325,7 @@ export async function checkActiveJob(
 
     const { data, error } = await supabase
       .from('monthly_report_jobs')
-      .select('*')
+      .select(MONTHLY_REPORT_JOBS_COLUMNS)
       .eq('organization_id', organizationId)
       .in('status', ['queued', 'running'])
       .order('created_at', { ascending: false })
