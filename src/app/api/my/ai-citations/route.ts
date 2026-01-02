@@ -344,15 +344,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       message: 'sessionId か (orgId + from + to) のいずれかを指定してください'
     } as AICitationsApiResponse<never>, { status: 400 });
 
-  } catch (error: any) {
+  } catch (error) {
     // 認証・認可エラーの場合
-    if (error.code === 'AUTH_REQUIRED' || error.code === 'ORG_ACCESS_DENIED') {
+    const err = error as { code?: string; message?: string; stack?: string };
+    if (err.code === 'AUTH_REQUIRED' || err.code === 'ORG_ACCESS_DENIED') {
       return createAuthErrorResponse(error);
     }
 
     logger.error('AI citations API error', {
-      error: error.message,
-      stack: error.stack
+      error: err.message ?? String(error),
+      stack: err.stack
     });
 
     return NextResponse.json({

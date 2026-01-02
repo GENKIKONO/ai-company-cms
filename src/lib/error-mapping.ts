@@ -1,5 +1,6 @@
 import { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
+import { _fetchSingleFromDynamicTable, type TableName } from '@/lib/_internal/db-boundary'
 
 /** 型付き Supabase クライアント */
 type TypedSupabaseClient = SupabaseClient<Database>
@@ -139,8 +140,11 @@ export function mapSupabaseError(error: PostgrestError | Error | unknown): Stand
 /**
  * maybeSingle()の結果に対する統一的なハンドリング
  */
+/** エラー型（PostgrestError互換または簡易形式） */
+type QueryError = PostgrestError | { message: string; code?: string } | null;
+
 export function handleMaybeSingleResult<T>(
-  result: { data: T | null; error: PostgrestError | null },
+  result: { data: T | null; error: QueryError },
   resourceName: string = 'リソース'
 ): T {
   // エラーがある場合
@@ -277,8 +281,7 @@ export async function ensureMembership(
   }
 }
 
-/** テーブル名の型 */
-type TableName = keyof Database['public']['Tables'];
+// TableName は db-boundary.ts からインポート済み
 
 /**
  * 組織スコープのリソース取得パターン
@@ -304,16 +307,14 @@ export async function fetchOrganizationResource<TRow>(
     organizationId
   );
 
-  // Step 2: リソース取得（動的テーブル名のため型アサーション使用）
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的テーブル名のため必要
-  const { data, error } = await (supabase as any)
-    .from(tableName)
-    .select('*')
-    .eq('id', resourceId)
-    .eq('organization_id', confirmedOrgId)
-    .maybeSingle();
+  // Step 2: リソース取得（動的テーブル名は db-boundary.ts に隔離）
+  const { data, error } = await _fetchSingleFromDynamicTable<TRow>(
+    supabase,
+    tableName,
+    { id: resourceId, organization_id: confirmedOrgId }
+  );
 
-  return handleMaybeSingleResult({ data: data as TRow | null, error }, resourceName);
+  return handleMaybeSingleResult({ data, error }, resourceName);
 }
 
 /**
@@ -332,14 +333,12 @@ export async function fetchUserResource<TRow>(
   resourceId: string,
   resourceName: string = 'リソース'
 ): Promise<TRow> {
-  // 動的テーブル名のため型アサーション使用
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的テーブル名のため必要
-  const { data, error } = await (supabase as any)
-    .from(tableName)
-    .select('*')
-    .eq('id', resourceId)
-    .eq('user_id', userId)
-    .maybeSingle();
+  // 動的テーブル名は db-boundary.ts に隔離
+  const { data, error } = await _fetchSingleFromDynamicTable<TRow>(
+    supabase,
+    tableName,
+    { id: resourceId, user_id: userId }
+  );
 
-  return handleMaybeSingleResult({ data: data as TRow | null, error }, resourceName);
+  return handleMaybeSingleResult({ data, error }, resourceName);
 }

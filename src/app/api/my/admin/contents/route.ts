@@ -211,17 +211,20 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
 
-  } catch (error: any) {
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    const errStack = error instanceof Error ? error.stack : undefined;
+
     logger.error('Failed to fetch admin contents:', {
-      error: error.message,
-      stack: error.stack
+      error: errMsg,
+      stack: errStack
     });
 
     const errorResponse: AdminContentApiError = {
       success: false,
       code: 'FETCH_CONTENTS_ERROR',
-      message: error.message || 'Failed to fetch contents',
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      message: errMsg || 'Failed to fetch contents',
+      details: process.env.NODE_ENV === 'development' ? errStack : undefined
     };
 
     return NextResponse.json(errorResponse, { status: 500 });

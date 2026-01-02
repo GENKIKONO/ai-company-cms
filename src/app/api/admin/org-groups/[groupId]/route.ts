@@ -167,12 +167,12 @@ export async function GET(
 
     return NextResponse.json({ data: typedGroup });
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Unexpected error in GET org-group details', {
       component: 'org-groups-detail-api',
       operation: 'get',
       groupId: "unknown",
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -278,12 +278,12 @@ export async function PATCH(
 
     return NextResponse.json({ data: group });
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Unexpected error in PATCH org-group', {
       component: 'org-groups-detail-api',
       operation: 'update',
       groupId: "unknown",
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -370,12 +370,12 @@ export async function DELETE(
       message: 'Group deleted successfully' 
     });
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Unexpected error in DELETE org-group', {
       component: 'org-groups-detail-api',
       operation: 'delete',
       groupId: "unknown",
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

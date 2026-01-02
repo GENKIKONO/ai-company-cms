@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requireOrgMember } from '@/lib/api/auth-middleware';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type {
   InterviewAnalyticsApiResponse,
   InterviewAnalyticsResponse,
@@ -118,11 +119,16 @@ function transformSupabaseData(
   };
 }
 
+/** エラーメッセージ取得ヘルパー */
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 /**
  * MATERIALIZED VIEW からデータ取得
  */
 async function fetchFromMaterializedView(
-  supabase: any,
+  supabase: SupabaseClient,
   orgId: string,
   fromDate: string,
   toDate: string
@@ -146,7 +152,7 @@ async function fetchFromMaterializedView(
  * 通常VIEW からデータ取得（フォールバック）
  */
 async function fetchFromView(
-  supabase: any,
+  supabase: SupabaseClient,
   orgId: string,
   fromDate: string,
   toDate: string
@@ -189,11 +195,11 @@ export async function GET(request: NextRequest) {
     let period: InterviewAnalyticsPeriod;
     try {
       period = validatePeriod(periodParam);
-    } catch (validationError: any) {
+    } catch (validationError) {
       const error: InterviewAnalyticsError = {
         success: false,
         code: 'INVALID_PERIOD',
-        message: validationError.message
+        message: getErrorMessage(validationError)
       };
       return NextResponse.json(error, { status: 400 });
     }
@@ -234,19 +240,19 @@ export async function GET(request: NextRequest) {
         rawData = await fetchFromView(supabase, orgId, fromDate, toDate);
         dataSource = 'view';
       }
-    } catch (mvError: any) {
+    } catch (mvError) {
       // MATERIALIZED VIEWエラー時は通常VIEWにフォールバック
       logger.warn('Materialized view query failed, falling back to regular view', {
-        error: mvError.message,
+        error: getErrorMessage(mvError),
         orgId,
         period
       });
-      
+
       try {
         rawData = await fetchFromView(supabase, orgId, fromDate, toDate);
         dataSource = 'view';
-      } catch (viewError: any) {
-        throw new Error(`Both materialized view and view queries failed: ${viewError.message}`);
+      } catch (viewError) {
+        throw new Error(`Both materialized view and view queries failed: ${getErrorMessage(viewError)}`);
       }
     }
 
@@ -274,21 +280,23 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
 
-  } catch (error: any) {
+  } catch (error) {
     const queryTimeMs = Date.now() - startTime;
-    
+    const errMsg = getErrorMessage(error);
+    const errStack = error instanceof Error ? error.stack : undefined;
+
     logger.error('Failed to fetch interview analytics:', {
-      error: error.message,
-      stack: error.stack,
+      error: errMsg,
+      stack: errStack,
       queryTimeMs
     });
 
     const errorResponse: InterviewAnalyticsError = {
       success: false,
       code: 'DATA_SOURCE_ERROR',
-      message: error.message || 'Failed to fetch analytics data',
+      message: errMsg || 'Failed to fetch analytics data',
       detail: process.env.NODE_ENV === 'development' ? {
-        stack: error.stack,
+        stack: errStack,
         queryTimeMs
       } : undefined
     };

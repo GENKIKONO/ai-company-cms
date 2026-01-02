@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthUser, requireOrgMember, createAuthErrorResponse } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type {
   InterviewQuestionsResponse,
   InterviewQuestionsQuery,
@@ -15,6 +16,39 @@ import type {
   OrganizationKeyword,
   InterviewContentType
 } from '@/types/interview';
+
+// =====================================================
+// TYPE DEFINITIONS
+// =====================================================
+
+/** キーワード行 */
+interface KeywordRow {
+  keyword: string;
+}
+
+/** 質問軸行 */
+interface AxisRow {
+  id: string;
+  code: string;
+  label_ja: string;
+  label_en: string;
+  description_ja?: string;
+  description_en?: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+/** 質問行 */
+interface QuestionRow {
+  id: string;
+  axis_id: string;
+  question_text: string;
+  keywords: string[] | null;
+  sort_order: number;
+  content_type: string;
+  lang: string;
+  is_active: boolean;
+}
 
 /**
  * 有効なcontent_typeかチェック
@@ -30,8 +64,8 @@ function isValidContentType(contentType: string): contentType is InterviewConten
  * 組織キーワードを取得
  */
 async function fetchOrgKeywords(
-  supabase: any, 
-  orgId: string, 
+  supabase: SupabaseClient,
+  orgId: string,
   lang: string
 ): Promise<string[]> {
   const { data: keywords, error } = await supabase
@@ -46,17 +80,17 @@ async function fetchOrgKeywords(
     return [];
   }
 
-  return keywords?.map((k: any) => k.keyword.toLowerCase()) || [];
+  return (keywords as KeywordRow[] | null)?.map((k) => k.keyword.toLowerCase()) ?? [];
 }
 
 /**
  * 質問軸と質問を取得
  */
 async function fetchQuestionsWithAxes(
-  supabase: any,
+  supabase: SupabaseClient,
   contentType: InterviewContentType,
   lang: string
-) {
+): Promise<{ axes: AxisRow[]; questions: QuestionRow[] }> {
   // 1. 質問軸を取得
   const { data: axes, error: axesError } = await supabase
     .from('ai_interview_axes')
@@ -81,7 +115,10 @@ async function fetchQuestionsWithAxes(
     throw new Error(`Failed to fetch questions: ${questionsError.message}`);
   }
 
-  return { axes: axes || [], questions: questions || [] };
+  return {
+    axes: (axes ?? []) as AxisRow[],
+    questions: (questions ?? []) as QuestionRow[]
+  };
 }
 
 /**
@@ -100,7 +137,7 @@ function calculateMatchCount(questionKeywords: string[] | null, orgKeywords: str
  * 質問データを変換・ソート
  */
 function transformAndSortQuestions(
-  questions: any[],
+  questions: QuestionRow[],
   orgKeywords: string[]
 ): InterviewQuestionItem[] {
   return questions.map(q => {
@@ -134,7 +171,7 @@ function transformAndSortQuestions(
  * 軸ごとにグルーピング
  */
 function groupQuestionsByAxis(
-  axes: any[],
+  axes: AxisRow[],
   questions: InterviewQuestionItem[]
 ): AxisGroup[] {
   return axes.map(axis => {
@@ -222,15 +259,16 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
 
-  } catch (error: any) {
+  } catch (error) {
     // 認証・認可エラーの場合は専用のレスポンスを返す
-    if (error.code === 'AUTH_REQUIRED' || error.code === 'ORG_ACCESS_DENIED') {
+    const err = error as { code?: string; message?: string; stack?: string };
+    if (err.code === 'AUTH_REQUIRED' || err.code === 'ORG_ACCESS_DENIED') {
       return createAuthErrorResponse(error);
     }
 
     logger.error('Interview questions API error', {
-      error: error.message,
-      stack: error.stack
+      error: err.message ?? String(error),
+      stack: err.stack
     });
 
     return NextResponse.json(

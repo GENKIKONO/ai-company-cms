@@ -23,6 +23,13 @@ interface NewsSitemapItem {
   };
 }
 
+/** 組織情報（JOINで取得） */
+interface PostOrganization {
+  slug: string;
+  name?: string;
+  company_name?: string;
+}
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -66,7 +73,9 @@ export async function GET() {
     const items: NewsSitemapItem[] = recentPosts
       .filter(post => post.organizations && typeof post.organizations === 'object' && 'slug' in post.organizations)
       .map(post => {
-        const org = post.organizations as any;
+        // organizations は単一オブジェクトまたは配列で返る可能性がある
+        const orgData = post.organizations;
+        const org: PostOrganization = Array.isArray(orgData) ? orgData[0] : orgData as PostOrganization;
         
         // タグからキーワード抽出
         let keywords = '';

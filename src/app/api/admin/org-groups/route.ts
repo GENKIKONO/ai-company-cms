@@ -80,11 +80,11 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Unexpected error in GET org-groups', {
       component: 'org-groups-api',
       operation: 'list',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -241,11 +241,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: group }, { status: 201 });
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Unexpected error in POST org-groups', {
       component: 'org-groups-api',
       operation: 'create',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

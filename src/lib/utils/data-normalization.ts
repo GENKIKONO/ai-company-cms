@@ -5,6 +5,23 @@
 
 import { isNonEmptyString, isObject } from '@/types/utils/validation';
 
+// =====================================================
+// INTERNAL HELPERS (型安全なフィールド操作)
+// =====================================================
+
+/**
+ * 動的フィールドへの値設定（内部用）
+ * @internal Record<string, unknown> への動的代入を1箇所に集約
+ */
+function _setField<T extends Record<string, unknown>>(
+  obj: T,
+  key: keyof T,
+  value: unknown
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的フィールド代入のため内部で1箇所のみ許容
+  (obj as any)[key] = value;
+}
+
 /** メディアオブジェクト入力型 */
 interface MediaInput {
   type?: string;
@@ -35,18 +52,18 @@ function isBusinessHoursInput(v: unknown): v is BusinessHoursInput {
  * 空文字をnullに変換する共通ユーティリティ
  * フォームデータの正規化に使用
  */
-export function normalizeEmptyStrings<T extends Record<string, any>>(
+export function normalizeEmptyStrings<T extends Record<string, unknown>>(
   data: T,
   fieldsToNormalize: (keyof T)[]
 ): T {
   const normalized = { ...data };
-  
+
   fieldsToNormalize.forEach(field => {
     if (normalized[field] === '') {
-      normalized[field] = null as any;
+      _setField(normalized, field, null);
     }
   });
-  
+
   return normalized;
 }
 
@@ -54,26 +71,26 @@ export function normalizeEmptyStrings<T extends Record<string, any>>(
  * 数値フィールドの正規化
  * 空文字や不正な値をnullに変換
  */
-export function normalizeNumericFields<T extends Record<string, any>>(
+export function normalizeNumericFields<T extends Record<string, unknown>>(
   data: T,
   numericFields: (keyof T)[]
 ): T {
   const normalized = { ...data };
-  
+
   numericFields.forEach(field => {
     const value = normalized[field];
     if (value === '' || value === null || value === undefined) {
-      normalized[field] = null as any;
+      _setField(normalized, field, null);
     } else if (typeof value === 'string') {
       const parsed = parseFloat(value);
       if (isNaN(parsed)) {
-        normalized[field] = null as any;
+        _setField(normalized, field, null);
       } else {
-        normalized[field] = parsed as any;
+        _setField(normalized, field, parsed);
       }
     }
   });
-  
+
   return normalized;
 }
 
@@ -81,19 +98,19 @@ export function normalizeNumericFields<T extends Record<string, any>>(
  * 配列フィールドの正規化
  * 空配列をnullに変換
  */
-export function normalizeArrayFields<T extends Record<string, any>>(
+export function normalizeArrayFields<T extends Record<string, unknown>>(
   data: T,
   arrayFields: (keyof T)[]
 ): T {
   const normalized = { ...data };
-  
+
   arrayFields.forEach(field => {
     const value = normalized[field];
     if (Array.isArray(value) && value.length === 0) {
-      normalized[field] = null as any;
+      _setField(normalized, field, null);
     }
   });
-  
+
   return normalized;
 }
 
