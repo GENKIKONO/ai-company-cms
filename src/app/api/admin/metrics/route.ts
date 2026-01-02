@@ -156,12 +156,12 @@ async function fetchMetricsData(
     // AI Interview completion KPI (view confirmed by Supabase Assistant)
     supabase
       .from('kpi_ai_interview_completion_weekly')
-      .select('*')
+      .select('week_start, organization_id, completion_rate_pct')
       .gte('week_start', rangeStartISO.split('T')[0]),
     // AI Citations KPI (view confirmed by Supabase Assistant)
     supabase
       .from('kpi_ai_citations_weekly')
-      .select('*')
+      .select('week_start, organization_id, citation_count, unique_sources')
       .gte('week_start', rangeStartISO.split('T')[0]),
   ]);
 

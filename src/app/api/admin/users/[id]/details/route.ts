@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Admin purpose: keep using app_users since profiles doesn't have email/role
     const { data: targetUser, error: fetchError } = await supabase
       .from('app_users')
-      .select('*')
+      .select('id, email, display_name, avatar_url, phone, role, plan, email_verified, phone_verified, created_at, updated_at, last_sign_in_at')
       .eq('id', id)
       .single();
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // 関連する組織情報を取得
     const { data: organizations, error: orgError } = await supabase
       .from('organizations')
-      .select('*')
+      .select('id, name, slug, status, plan, is_published, created_at, updated_at')
       .eq('created_by', id);
 
     if (orgError) {

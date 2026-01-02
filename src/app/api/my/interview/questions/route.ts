@@ -94,7 +94,7 @@ async function fetchQuestionsWithAxes(
   // 1. 質問軸を取得
   const { data: axes, error: axesError } = await supabase
     .from('ai_interview_axes')
-    .select('*')
+    .select('id, code, label_ja, label_en, description_ja, description_en, sort_order, is_active')
     .eq('is_active', true)
     .order('sort_order');
 
@@ -105,7 +105,7 @@ async function fetchQuestionsWithAxes(
   // 2. 質問を取得（keywordsカラムを含む）
   const { data: questions, error: questionsError } = await supabase
     .from('ai_interview_questions')
-    .select('*')
+    .select('id, axis_id, question_text, keywords, sort_order, content_type, lang, is_active')
     .eq('content_type', contentType)
     .eq('lang', lang)
     .eq('is_active', true)

@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     // 対象テーブル単体＋organization_idフィルタで取得
     const { data: categories, error } = await supabase
       .from('qa_categories')
-      .select('*')
+      .select('id, organization_id, name, slug, description, visibility, sort_order, is_active, created_at, updated_at, created_by, updated_by')
       .or(`organization_id.eq.${organizationId},visibility.eq.global`)
       .eq('is_active', true)
       .order('sort_order', { ascending: true });

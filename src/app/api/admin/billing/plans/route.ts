@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('plans')
-      .select('*')
+      .select('id, name, slug, description, status, sort_order, monthly_price, yearly_price, stripe_price_id_monthly, stripe_price_id_yearly, created_at, updated_at')
       .order('sort_order', { ascending: true });
 
     if (!includeDeprecated) {

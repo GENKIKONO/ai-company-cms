@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('cms_site_settings')
-      .select('*')
+      .select('id, key, value, description, data_type, is_public, created_at, updated_at')
       .order('key');
 
     if (isPublicOnly) {

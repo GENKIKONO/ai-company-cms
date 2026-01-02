@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('cms_assets')
-      .select('*')
+      .select('id, filename, original_name, file_path, file_size, mime_type, alt_text, description, tags, is_active, created_at')
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 

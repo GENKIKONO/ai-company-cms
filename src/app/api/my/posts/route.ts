@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     // 組織の投稿を取得（organization_id前提）
     const { data: posts, error: postsError } = await supabase
       .from('posts')
-      .select('*')
+      .select('id, organization_id, title, slug, content, content_markdown, content_html, status, is_published, published_at, created_by, created_at, updated_at')
       .eq('organization_id', orgId)
       .order('created_at', { ascending: false });
 

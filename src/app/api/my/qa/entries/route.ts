@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     // 対象テーブル単体＋organization_idフィルタで取得
     const { data: entries, error } = await supabase
       .from('qa_entries')
-      .select('*')
+      .select('id, organization_id, category_id, question, answer, tags, visibility, status, published_at, last_edited_by, last_edited_at, created_at, updated_at, content_hash')
       .eq('organization_id', organizationId)
       .order('last_edited_at', { ascending: false });
 

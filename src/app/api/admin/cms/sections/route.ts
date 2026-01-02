@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('cms_sections')
-      .select('*')
+      .select('id, page_key, section_key, section_type, title, content, display_order, is_active, created_at, updated_at')
       .order('page_key')
       .order('display_order');
 

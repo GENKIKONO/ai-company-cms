@@ -135,7 +135,7 @@ async function fetchFromMaterializedView(
 ): Promise<SupabaseOrgDailyMetric[]> {
   const { data, error } = await supabase
     .from('mv_ai_interview_org_daily_metrics')
-    .select('*')
+    .select('organization_id, day, session_count, completed_session_count, completion_rate, avg_question_count, ai_used_session_count, ai_call_count, citations_item_count, quoted_tokens_sum, last_session_at')
     .eq('organization_id', orgId)
     .gte('day', fromDate)
     .lte('day', toDate)
@@ -159,7 +159,7 @@ async function fetchFromView(
 ): Promise<SupabaseOrgDailyMetric[]> {
   const { data, error } = await supabase
     .from('v_ai_interview_org_daily_metrics')
-    .select('*')
+    .select('organization_id, day, session_count, completed_session_count, completion_rate, avg_question_count, ai_used_session_count, ai_call_count, citations_item_count, quoted_tokens_sum, last_session_at')
     .eq('organization_id', orgId)
     .gte('day', fromDate)
     .lte('day', toDate)
