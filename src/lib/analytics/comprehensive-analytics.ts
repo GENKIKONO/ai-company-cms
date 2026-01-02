@@ -6,6 +6,39 @@
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 import type { JsonObject } from '@/lib/utils/ab-testing';
+import type { Database } from '@/types/supabase';
+
+// Supabase生成型
+type Tables = Database['public']['Tables'];
+type AnalyticsEventRow = Tables['analytics_events']['Row'];
+
+/** analytics_events の列（列明示パターン） */
+const ANALYTICS_EVENTS_COLUMNS = `
+  id,
+  event_key,
+  user_id,
+  session_id,
+  feature_id,
+  page_url,
+  properties,
+  user_agent,
+  ip_address,
+  created_at
+` as const;
+
+/** DB Row → AnalyticsEvent 変換（スキーマ差分吸収） */
+function toAnalyticsEvent(row: AnalyticsEventRow): AnalyticsEvent {
+  return {
+    event_type: row.event_key,
+    user_id: row.user_id ?? undefined,
+    session_id: row.session_id ?? undefined,
+    page_path: row.page_url ?? undefined,
+    user_agent: row.user_agent ?? undefined,
+    ip_address: row.ip_address as string | undefined,
+    properties: row.properties as JsonObject | undefined,
+    timestamp: row.created_at,
+  };
+}
 
 export interface AnalyticsEvent {
   event_type: string;
@@ -210,10 +243,10 @@ export class AnalyticsEngine {
       // ページビュー数
       const { count: page_views } = await supabase
         .from('analytics_events')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_type', 'page_view')
-        .gte('timestamp', startDate)
-        .lte('timestamp', endDate);
+        .select('id', { count: 'exact', head: true })
+        .eq('event_key', 'page_view')
+        .gte('created_at', startDate)
+        .lte('created_at', endDate);
 
       // セッション数（簡易計算）
       const { data: sessionData } = await supabase
@@ -393,14 +426,14 @@ export class AnalyticsEngine {
       // 組織作成数
       const { count: organizations_created } = await supabase
         .from('organizations')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .gte('created_at', startDate)
         .lte('created_at', endDate);
 
       // サービス公開数
       const { count: services_published } = await supabase
         .from('services')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('status', 'published')
         .gte('created_at', startDate)
         .lte('created_at', endDate);
@@ -408,17 +441,17 @@ export class AnalyticsEngine {
       // 事例公開数
       const { count: case_studies_published } = await supabase
         .from('case_studies')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .gte('created_at', startDate)
         .lte('created_at', endDate);
 
       // ログイン数
       const { count: login_count } = await supabase
         .from('analytics_events')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_type', 'user_login')
-        .gte('timestamp', startDate)
-        .lte('timestamp', endDate);
+        .select('id', { count: 'exact', head: true })
+        .eq('event_key', 'user_login')
+        .gte('created_at', startDate)
+        .lte('created_at', endDate);
 
       return {
         organizations_created: organizations_created || 0,
@@ -515,21 +548,21 @@ export class AnalyticsEngine {
       // 過去5分のページビュー
       const { count: current_page_views } = await supabase
         .from('analytics_events')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_type', 'page_view')
-        .gte('timestamp', fiveMinutesAgo);
+        .select('id', { count: 'exact', head: true })
+        .eq('event_key', 'page_view')
+        .gte('created_at', fiveMinutesAgo);
 
       // 最新のイベント
       const { data: recent_events } = await supabase
         .from('analytics_events')
-        .select('*')
-        .order('timestamp', { ascending: false })
+        .select(ANALYTICS_EVENTS_COLUMNS)
+        .order('created_at', { ascending: false })
         .limit(10);
 
       return {
         active_users,
         current_page_views: current_page_views || 0,
-        recent_events: recent_events || [],
+        recent_events: (recent_events || []).map(toAnalyticsEvent),
       };
     } catch (error) {
       logger.error('Failed to get real-time stats', { data: error instanceof Error ? error : new Error(String(error)) });

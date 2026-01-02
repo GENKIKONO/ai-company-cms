@@ -14,6 +14,22 @@ type CitationsResponseInsert = Tables['ai_citations_responses']['Insert'];
 type CitationsItemRow = Tables['ai_citations_items']['Row'];
 type CitationsItemInsert = Tables['ai_citations_items']['Insert'];
 
+/** ai_citations_responses の列（列明示パターン） */
+const AI_CITATIONS_RESPONSES_COLUMNS = `
+  id,
+  organization_id,
+  session_id,
+  request_id,
+  user_id,
+  model_name,
+  prompt_tokens,
+  completion_tokens,
+  output_tokens,
+  quoted_tokens,
+  quoted_chars,
+  created_at
+` as const;
+
 // エクスポート用の型定義
 export interface AiCitationItemInput {
   contentUnitId: string;
@@ -228,7 +244,7 @@ export async function getCitationsSummary(responseId: string): Promise<Citations
     
     const { data, error } = await supabase
       .from('ai_citations_responses')
-      .select('*')
+      .select(AI_CITATIONS_RESPONSES_COLUMNS)
       .eq('id', responseId)
       .returns<CitationsResponseRow>()
       .single();

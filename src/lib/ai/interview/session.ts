@@ -18,6 +18,27 @@ type InterviewSessionInsert = Tables['ai_interview_sessions']['Insert'];
 type InterviewSessionStatus = Database['public']['Enums']['interview_session_status'];
 type InterviewContentType = Database['public']['Enums']['interview_content_type'];
 
+/** ai_interview_sessions の列（列明示パターン） */
+const AI_INTERVIEW_SESSIONS_COLUMNS = `
+  id,
+  organization_id,
+  user_id,
+  content_type,
+  status,
+  answers,
+  generated_content,
+  generated_content_json,
+  notes,
+  meta,
+  version,
+  created_by,
+  finalized_by,
+  finalized_at,
+  deleted_at,
+  created_at,
+  updated_at
+` as const;
+
 // =====================================================
 // ANSWERS FORMAT NORMALIZATION
 // =====================================================
@@ -206,7 +227,7 @@ export async function finalizeInterviewSession(input: FinalizeSessionInput): Pro
     // セッション情報取得
     const { data: session, error: fetchError } = await supabase
       .from('ai_interview_sessions')
-      .select('*')
+      .select(AI_INTERVIEW_SESSIONS_COLUMNS)
       .eq('id', input.sessionId)
       .single();
 
@@ -304,7 +325,7 @@ export async function getInterviewSession(sessionId: string): Promise<InterviewS
 
     const { data, error } = await supabase
       .from('ai_interview_sessions')
-      .select('*')
+      .select(AI_INTERVIEW_SESSIONS_COLUMNS)
       .eq('id', sessionId)
       .single();
 
@@ -343,7 +364,7 @@ export async function getUserInterviewSessions(userId: string): Promise<Intervie
 
     const { data, error } = await supabase
       .from('ai_interview_sessions')
-      .select('*')
+      .select(AI_INTERVIEW_SESSIONS_COLUMNS)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
