@@ -99,6 +99,24 @@ interface PerformanceSummary {
   };
 }
 
+// Extended types for Supabase query results
+interface AIScoreWithUnit extends AIScoreData {
+  calculated_at: string;
+  total_visibility_score: number;
+  ai_bot_hits_count?: number;
+  unique_bots_count?: number;
+  ai_content_units?: {
+    title?: string;
+    content_type?: string;
+  };
+}
+
+// Performance matrix item with category
+type PerformanceMatrixItem = UrlMetrics & {
+  combined_score: number;
+  performance_category: string;
+};
+
 // Response types
 interface CombinedAnalyticsResponse {
   organization_id: string;
@@ -244,10 +262,11 @@ export async function GET(request: NextRequest) {
     }
 
     // 4. データ統合・分析
+    // DB境界: Supabase結果を内部型にキャスト
     const analysis = await performCombinedAnalysis(
-      aiScores || [],
-      seoMetrics || [],
-      botLogs || [],
+      (aiScores || []) as AIScoreWithUnit[],
+      (seoMetrics || []) as SEOMetricData[],
+      (botLogs || []) as BotLogData[],
       startDate,
       endDate,
       minDataPoints
@@ -275,12 +294,12 @@ export async function GET(request: NextRequest) {
  * AI × SEO 統合分析実行
  */
 async function performCombinedAnalysis(
-  aiScores: AIScoreData[],
+  aiScores: AIScoreWithUnit[],
   seoMetrics: SEOMetricData[],
   botLogs: BotLogData[],
   startDate: Date,
   endDate: Date,
-  minDataPoints: number
+  _minDataPoints: number
 ) {
   // URL別にデータを統合
   const urlDataMap = new Map<string, UrlMetrics>();
@@ -368,12 +387,12 @@ async function performCombinedAnalysis(
 /**
  * URL別最新スコア取得
  */
-function getLatestScoresByUrl(aiScores: any[]): any[] {
-  const scoresByUrl = new Map<string, any>();
-  
+function getLatestScoresByUrl(aiScores: AIScoreWithUnit[]): AIScoreWithUnit[] {
+  const scoresByUrl = new Map<string, AIScoreWithUnit>();
+
   aiScores.forEach(score => {
-    if (!scoresByUrl.has(score.url) || 
-        new Date(score.calculated_at) > new Date(scoresByUrl.get(score.url).calculated_at)) {
+    const existing = scoresByUrl.get(score.url);
+    if (!existing || new Date(score.calculated_at) > new Date(existing.calculated_at)) {
       scoresByUrl.set(score.url, score);
     }
   });
@@ -384,11 +403,12 @@ function getLatestScoresByUrl(aiScores: any[]): any[] {
 /**
  * URL別SEOデータ集計
  */
-function aggregateSEOByUrl(seoMetrics: any[]): Map<string, any> {
-  const seoByUrl = new Map<string, any>();
+function aggregateSEOByUrl(seoMetrics: SEOMetricData[]): Map<string, UrlMetrics['seo_metrics']> {
+  const seoByUrl = new Map<string, UrlMetrics['seo_metrics']>();
 
   seoMetrics.forEach(metric => {
-    if (!seoByUrl.has(metric.url)) {
+    const existing = seoByUrl.get(metric.url);
+    if (!existing) {
       seoByUrl.set(metric.url, {
         average_position: metric.average_position || 0,
         impressions: metric.impressions || 0,
@@ -397,7 +417,6 @@ function aggregateSEOByUrl(seoMetrics: any[]): Map<string, any> {
       });
     } else {
       // 複数日データがある場合は平均値を計算
-      const existing = seoByUrl.get(metric.url);
       existing.average_position = (existing.average_position + (metric.average_position || 0)) / 2;
       existing.impressions += metric.impressions || 0;
       existing.clicks += metric.clicks || 0;
@@ -411,12 +430,13 @@ function aggregateSEOByUrl(seoMetrics: any[]): Map<string, any> {
 /**
  * URL別最終アクセス日時取得
  */
-function getLastAccessByUrl(botLogs: any[]): Map<string, string> {
+function getLastAccessByUrl(botLogs: BotLogData[]): Map<string, string> {
   const lastAccessByUrl = new Map<string, string>();
 
   botLogs.forEach(log => {
-    if (!lastAccessByUrl.has(log.url) || 
-        new Date(log.accessed_at) > new Date(lastAccessByUrl.get(log.url))) {
+    if (!log.accessed_at) return;
+    const existing = lastAccessByUrl.get(log.url);
+    if (!existing || new Date(log.accessed_at) > new Date(existing)) {
       lastAccessByUrl.set(log.url, log.accessed_at);
     }
   });
@@ -427,9 +447,12 @@ function getLastAccessByUrl(botLogs: any[]): Map<string, string> {
 /**
  * AI×SEO 統合スコア計算
  */
-function calculateCombinedScore(aiMetrics: any, seoMetrics: any): number {
+function calculateCombinedScore(
+  aiMetrics: UrlMetrics['ai_metrics'],
+  seoMetrics: UrlMetrics['seo_metrics']
+): number {
   const aiScore = aiMetrics.visibility_score; // 0-100
-  const seoScore = seoMetrics.average_position > 0 
+  const seoScore = seoMetrics.average_position > 0
     ? Math.max(0, 100 - (seoMetrics.average_position - 1) * 10) // 1位=100, 10位=10, 11位以下=0
     : 0;
 
@@ -440,7 +463,10 @@ function calculateCombinedScore(aiMetrics: any, seoMetrics: any): number {
 /**
  * パフォーマンスカテゴリ分類
  */
-function categorizePerformance(aiMetrics: any, seoMetrics: any): string {
+function categorizePerformance(
+  aiMetrics: UrlMetrics['ai_metrics'],
+  seoMetrics: UrlMetrics['seo_metrics']
+): string {
   const aiStrong = aiMetrics.visibility_score >= 70;
   const seoStrong = seoMetrics.average_position > 0 && seoMetrics.average_position <= 10;
 
@@ -453,9 +479,9 @@ function categorizePerformance(aiMetrics: any, seoMetrics: any): string {
 /**
  * 相関分析
  */
-function calculateCorrelation(performanceMatrix: any[]): any {
-  const validData = performanceMatrix.filter(data => 
-    data.ai_metrics.visibility_score > 0 && 
+function calculateCorrelation(performanceMatrix: PerformanceMatrixItem[]): CorrelationData {
+  const validData = performanceMatrix.filter(data =>
+    data.ai_metrics.visibility_score > 0 &&
     data.seo_metrics.average_position > 0
   );
 
@@ -475,7 +501,7 @@ function calculateCorrelation(performanceMatrix: any[]): any {
 
   return {
     correlation_score: Math.round(correlation * 100) / 100,
-    correlation_strength: getCorrelationStrength(Math.abs(correlation)),
+    correlation_strength: getCorrelationStrength(Math.abs(correlation)) as CorrelationData['correlation_strength'],
     sample_size: validData.length,
   };
 }
@@ -512,29 +538,30 @@ function getCorrelationStrength(absCorrelation: number): string {
 /**
  * インサイト生成
  */
-function generateInsights(performanceMatrix: any[]): any {
-  const aiOutperforming = performanceMatrix.filter(d => 
+function generateInsights(performanceMatrix: PerformanceMatrixItem[]): CombinedAnalyticsResponse['insights'] {
+  const aiOutperforming = performanceMatrix.filter(d =>
     d.performance_category === 'ai_strong_seo_weak'
   );
-  
-  const seoOutperforming = performanceMatrix.filter(d => 
+
+  const seoOutperforming = performanceMatrix.filter(d =>
     d.performance_category === 'ai_weak_seo_strong'
   );
 
-  const aiBoostNeeded = seoOutperforming.map(d => d.url);
-  const seoBoostNeeded = aiOutperforming.map(d => d.url);
+  const aiBoostNeeded = seoOutperforming.map(d => d.url).filter((u): u is string => !!u);
+  const seoBoostNeeded = aiOutperforming.map(d => d.url).filter((u): u is string => !!u);
   const contentQualityCheck = performanceMatrix
     .filter(d => d.performance_category === 'ai_weak_seo_weak')
-    .map(d => d.url);
+    .map(d => d.url)
+    .filter((u): u is string => !!u);
 
   return {
     ai_outperforming_seo: {
       count: aiOutperforming.length,
-      urls: aiOutperforming.slice(0, 5).map(d => d.url),
+      urls: aiOutperforming.slice(0, 5).map(d => d.url).filter((u): u is string => !!u),
     },
     seo_outperforming_ai: {
       count: seoOutperforming.length,
-      urls: seoOutperforming.slice(0, 5).map(d => d.url),
+      urls: seoOutperforming.slice(0, 5).map(d => d.url).filter((u): u is string => !!u),
     },
     optimization_opportunities: {
       ai_boost_needed: aiBoostNeeded.slice(0, 5),
@@ -547,15 +574,20 @@ function generateInsights(performanceMatrix: any[]): any {
 /**
  * トレンド分析生成
  */
-function generateTrendAnalysis(aiScores: any[], seoMetrics: any[], startDate: Date, endDate: Date): any[] {
+function generateTrendAnalysis(
+  _aiScores: AIScoreWithUnit[],
+  _seoMetrics: SEOMetricData[],
+  startDate: Date,
+  endDate: Date
+): CombinedAnalyticsResponse['trend_analysis'] {
   // 日別データ集計（実装簡略化）
   const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-  const trends = [];
+  const trends: CombinedAnalyticsResponse['trend_analysis'] = [];
 
   for (let i = 0; i < Math.min(days, 30); i++) {
     const date = new Date(startDate);
     date.setDate(date.getDate() + i);
-    
+
     trends.push({
       date: date.toISOString().split('T')[0],
       ai_avg_score: 65 + Math.random() * 20, // 模擬データ
@@ -570,23 +602,23 @@ function generateTrendAnalysis(aiScores: any[], seoMetrics: any[], startDate: Da
 /**
  * サマリー生成
  */
-function generateSummary(performanceMatrix: any[]): any {
+function generateSummary(performanceMatrix: PerformanceMatrixItem[]): CombinedAnalyticsResponse['summary'] {
   const totalUrls = performanceMatrix.length;
-  const highPerformance = performanceMatrix.filter(d => 
+  const highPerformance = performanceMatrix.filter(d =>
     d.performance_category === 'ai_strong_seo_strong'
   ).length;
-  const underperforming = performanceMatrix.filter(d => 
+  const underperforming = performanceMatrix.filter(d =>
     d.performance_category === 'ai_weak_seo_weak'
   ).length;
 
-  const aiAvg = totalUrls > 0 
-    ? performanceMatrix.reduce((sum, d) => sum + d.ai_metrics.visibility_score, 0) / totalUrls 
+  const aiAvg = totalUrls > 0
+    ? performanceMatrix.reduce((sum, d) => sum + d.ai_metrics.visibility_score, 0) / totalUrls
     : 0;
-  
-  const seoAvg = totalUrls > 0 
+
+  const seoAvg = totalUrls > 0
     ? performanceMatrix
         .filter(d => d.seo_metrics.average_position > 0)
-        .reduce((sum, d) => sum + d.seo_metrics.average_position, 0) / totalUrls 
+        .reduce((sum, d) => sum + d.seo_metrics.average_position, 0) / totalUrls
     : 0;
 
   const recommendations = generateRecommendations(performanceMatrix);
@@ -604,8 +636,8 @@ function generateSummary(performanceMatrix: any[]): any {
 /**
  * レコメンデーション生成
  */
-function generateRecommendations(performanceMatrix: any[]): string[] {
-  const recommendations = [];
+function generateRecommendations(performanceMatrix: PerformanceMatrixItem[]): string[] {
+  const recommendations: string[] = [];
   
   const highAILowSEO = performanceMatrix.filter(d => d.performance_category === 'ai_strong_seo_weak').length;
   const lowAIHighSEO = performanceMatrix.filter(d => d.performance_category === 'ai_weak_seo_strong').length;
