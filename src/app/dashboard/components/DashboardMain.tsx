@@ -34,6 +34,17 @@ interface CaseStudiesStats {
   published: number;
 }
 
+// Dashboard用の拡張組織型（useOrganizationの返却型を拡張）
+interface DashboardOrganization {
+  id: string;
+  name: string;
+  slug?: string;
+  plan?: string;
+  logo_url?: string | null;
+  is_published?: boolean;
+  feature_flags?: Record<string, boolean>;
+}
+
 export default function DashboardMain() {
   const { 
     user, 
@@ -49,7 +60,8 @@ export default function DashboardMain() {
   } = useOrganization();
   
   // 組織の最終チェック：organizationsに組織があるのにorganizationが未設定の場合の対処
-  const currentOrganization = organization || (organizations.length > 0 ? organizations[0] : null);
+  // NOTE: 境界で一度キャストし、以降は型安全にアクセス
+  const currentOrganization = (organization || (organizations.length > 0 ? organizations[0] : null)) as DashboardOrganization | null;
   
   const [stats, setStats] = useState<DashboardStats>({ total: 0, draft: 0, published: 0, archived: 0 });
   const [caseStudiesStats, setCaseStudiesStats] = useState<CaseStudiesStats>({ total: 0, published: 0 });
@@ -324,9 +336,9 @@ export default function DashboardMain() {
         <div className="relative text-center">
           {/* Organization badge */}
           <div className="inline-flex items-center gap-3 glass-card backdrop-blur-sm border border-[var(--dashboard-card-border)] rounded-full px-6 py-3 mb-8 spring-bounce">
-            {(currentOrganization as any).logo_url ? (
+            {currentOrganization.logo_url ? (
               <Image
-                src={(currentOrganization as any).logo_url}
+                src={currentOrganization.logo_url}
                 alt={`${currentOrganization.name}のロゴ`}
                 width={24}
                 height={24}
@@ -342,7 +354,7 @@ export default function DashboardMain() {
             <span className="text-[var(--color-text-primary)] font-medium" data-testid="organization-name">
               {currentOrganization.name}
             </span>
-            <div className={`w-2 h-2 rounded-full ${(currentOrganization as any).is_published ? 'bg-[var(--status-success)] animate-pulse' : 'bg-[var(--color-text-tertiary)]'}`}></div>
+            <div className={`w-2 h-2 rounded-full ${currentOrganization.is_published ? 'bg-[var(--status-success)] animate-pulse' : 'bg-[var(--color-text-tertiary)]'}`}></div>
           </div>
 
           {/* Main headline */}
@@ -355,7 +367,7 @@ export default function DashboardMain() {
 
           {/* Quick actions */}
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-            <PublishToggle organizationId={currentOrganization.id} isPublished={(currentOrganization as any).is_published} organizationName={currentOrganization.name} />
+            <PublishToggle organizationId={currentOrganization.id} isPublished={currentOrganization.is_published} organizationName={currentOrganization.name} />
             <Link
               href={`/organizations/${currentOrganization.id}`}
               className="flex-1 text-center px-4 py-2 rounded-lg border border-[var(--dashboard-card-border)] bg-[var(--dashboard-card-bg)] text-[var(--color-text-primary)] font-medium hover:bg-[var(--aio-muted)] transition-colors"
@@ -418,13 +430,13 @@ export default function DashboardMain() {
           {/* Right column */}
           <div className="space-y-8">
             <DashboardActions organization={organization} />
-            <FirstTimeUserOnboarding organization={organization as any} />
+            <FirstTimeUserOnboarding organization={organization as DashboardOrganization} />
           </div>
         </div>
 
         {/* Bottom section */}
         <div className="mt-12">
-          <DashboardClient organizationId={currentOrganization.id} organizationName={currentOrganization.name} isPublished={(currentOrganization as any).is_published} />
+          <DashboardClient organizationId={currentOrganization.id} organizationName={currentOrganization.name} isPublished={currentOrganization.is_published} />
         </div>
       </DashboardSection>
     </>
