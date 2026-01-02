@@ -5,11 +5,35 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import { createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 import { createGSCClient, transformGSCMetrics } from '@/lib/gsc-client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
+
+// =====================================================
+// TYPE DEFINITIONS
+// =====================================================
+
+/** GSCメトリクス行の型 */
+interface GSCMetricRow {
+  search_query?: string | null;
+  url?: string;
+  clicks?: number;
+  impressions?: number;
+  ctr?: number;
+  average_position?: number;
+}
+
+/** GSC APIからのメトリクス型 */
+interface GSCAPIMetric {
+  keys?: string[];
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+}
 
 // Request/Response types
 interface GSCCollectionRequest {
@@ -260,7 +284,7 @@ export async function POST(request: NextRequest) {
  * キャッシュされたデータからレスポンスを構築
  */
 async function buildResponseFromCache(
-  supabase: any,
+  supabase: SupabaseClient,
   orgId: string,
   startDate: string,
   endDate: string,
@@ -278,33 +302,35 @@ async function buildResponseFromCache(
     throw error;
   }
 
+  const rows = (cachedData ?? []) as GSCMetricRow[];
+
   // キャッシュデータを GSC 形式に変換
-  const queries = cachedData
-    .filter((row: any) => row.search_query)
+  const queries = rows
+    .filter((row) => row.search_query)
     .slice(0, 100);
-  
-  const pages = cachedData
-    .filter((row: any) => !row.search_query)
+
+  const pages = rows
+    .filter((row) => !row.search_query)
     .slice(0, 100);
 
   const response = await buildGSCResponse(
-    queries.map((row: any) => ({
-      keys: [row.search_query, row.url],
-      clicks: row.clicks,
-      impressions: row.impressions,
-      ctr: row.ctr,
-      position: row.average_position,
+    queries.map((row) => ({
+      keys: [row.search_query ?? '', row.url ?? ''],
+      clicks: row.clicks ?? 0,
+      impressions: row.impressions ?? 0,
+      ctr: row.ctr ?? 0,
+      position: row.average_position ?? 0,
     })),
-    pages.map((row: any) => ({
-      keys: [row.url],
-      clicks: row.clicks,
-      impressions: row.impressions,
-      ctr: row.ctr,
-      position: row.average_position,
+    pages.map((row) => ({
+      keys: [row.url ?? ''],
+      clicks: row.clicks ?? 0,
+      impressions: row.impressions ?? 0,
+      ctr: row.ctr ?? 0,
+      position: row.average_position ?? 0,
     })),
     startDate,
     endDate,
-    cachedData.length,
+    rows.length,
     collectionId
   );
 
@@ -315,8 +341,8 @@ async function buildResponseFromCache(
  * GSCレスポンス構築
  */
 async function buildGSCResponse(
-  queries: any[],
-  pages: any[],
+  queries: GSCAPIMetric[],
+  pages: GSCAPIMetric[],
   startDate: string,
   endDate: string,
   storedRecords: number,
