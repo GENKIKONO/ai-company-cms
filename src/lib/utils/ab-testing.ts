@@ -5,6 +5,17 @@
 
 import { logger } from '@/lib/log';
 
+// JSON互換の最小安全型
+type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
+export interface JsonObject { [k: string]: JsonValue }
+export interface JsonArray extends Array<JsonValue> {}
+
+// A/Bテスト用の安全な属性型
+export type SafeAttrs = Record<string, string | number | boolean | null | undefined>;
+export interface ABTestVariantConfig extends JsonObject {}
+export interface AnalyticsEventData extends JsonObject {}
+
 export interface ABTestConfig {
   id: string;
   name: string;
@@ -14,7 +25,7 @@ export interface ABTestConfig {
     id: string;
     name: string;
     weight: number; // 0-100の重み
-    config?: Record<string, any>;
+    config?: ABTestVariantConfig;
   }>;
   targeting?: {
     userAttributes?: Record<string, string[]>;
@@ -31,7 +42,7 @@ export interface ABTestResult {
   userId?: string;
   sessionId: string;
   timestamp: Date;
-  attributes?: Record<string, any>;
+  attributes?: SafeAttrs;
 }
 
 /**
@@ -63,10 +74,10 @@ export class ABTestManager {
    * ユーザーのバリアント割り当て
    */
   getVariant(
-    testId: string, 
-    userId?: string, 
+    testId: string,
+    userId?: string,
     sessionId?: string,
-    attributes?: Record<string, any>
+    attributes?: SafeAttrs
   ): string | null {
     const test = this.tests.get(testId);
     if (!test || !test.enabled) {
@@ -104,7 +115,7 @@ export class ABTestManager {
   /**
    * バリアント設定の取得
    */
-  getVariantConfig(testId: string, variantId: string): Record<string, any> | null {
+  getVariantConfig(testId: string, variantId: string): ABTestVariantConfig | null {
     const test = this.tests.get(testId);
     if (!test) return null;
 
@@ -119,7 +130,7 @@ export class ABTestManager {
     featureKey: string,
     userId?: string,
     sessionId?: string,
-    attributes?: Record<string, any>
+    attributes?: SafeAttrs
   ): boolean {
     const variant = this.getVariant(featureKey, userId, sessionId, attributes);
     return variant === 'enabled' || variant === 'true';
@@ -134,7 +145,7 @@ export class ABTestManager {
     value?: number,
     userId?: string,
     sessionId?: string,
-    metadata?: Record<string, any>
+    metadata?: AnalyticsEventData
   ): void {
     const identifier = userId || sessionId || 'anonymous';
     const variant = this.getUserAssignment(testId, identifier);
@@ -196,7 +207,7 @@ export class ABTestManager {
   private matchesTargeting(
     test: ABTestConfig,
     userId?: string,
-    attributes?: Record<string, any>
+    attributes?: SafeAttrs
   ): boolean {
     if (!test.targeting) return true;
 
@@ -212,7 +223,7 @@ export class ABTestManager {
     if (test.targeting.userAttributes && attributes) {
       for (const [key, values] of Object.entries(test.targeting.userAttributes)) {
         const userValue = attributes[key];
-        if (!userValue || !values.includes(userValue)) return false;
+        if (!userValue || !values.includes(String(userValue))) return false;
       }
     }
 
@@ -253,19 +264,19 @@ export class ABTestManager {
     variantId: string,
     userId?: string,
     sessionId?: string,
-    attributes?: Record<string, any>
+    attributes?: SafeAttrs
   ): void {
     this.sendAnalyticsEvent('ab_test_assignment', {
       testId,
       variantId,
-      userId,
-      sessionId,
+      userId: userId ?? null,
+      sessionId: sessionId ?? null,
       timestamp: new Date().toISOString(),
-      attributes
+      attributes: attributes ?? null
     });
   }
 
-  private sendAnalyticsEvent(eventName: string, data: Record<string, any>): void {
+  private sendAnalyticsEvent(eventName: string, data: AnalyticsEventData): void {
     // Plausible Analytics
     if (typeof window !== 'undefined' && (window as any).plausible) {
       try {
@@ -359,11 +370,11 @@ export class ABTestManager {
 export function useABTest(
   testId: string,
   userId?: string,
-  attributes?: Record<string, any>
+  attributes?: SafeAttrs
 ): {
   variant: string | null;
-  config: Record<string, any> | null;
-  trackConversion: (type: string, value?: number, metadata?: Record<string, any>) => void;
+  config: ABTestVariantConfig | null;
+  trackConversion: (type: string, value?: number, metadata?: AnalyticsEventData) => void;
 } {
   const sessionId = getSessionId();
   const variant = abTestManager.getVariant(testId, userId, sessionId, attributes);
@@ -372,7 +383,7 @@ export function useABTest(
   const trackConversion = (
     type: string,
     value?: number,
-    metadata?: Record<string, any>
+    metadata?: AnalyticsEventData
   ) => {
     abTestManager.trackConversion(testId, type, value, userId, sessionId, metadata);
   };
@@ -386,7 +397,7 @@ export function useABTest(
 export function useFeatureFlag(
   featureKey: string,
   userId?: string,
-  attributes?: Record<string, any>
+  attributes?: SafeAttrs
 ): boolean {
   const sessionId = getSessionId();
   return abTestManager.isFeatureEnabled(featureKey, userId, sessionId, attributes);
