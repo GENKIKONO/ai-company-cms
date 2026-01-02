@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     // 事例取得（RLSにより組織メンバーのみアクセス可能）
     const { data, error } = await supabase
       .from('case_studies')
-      .select('*')
+      .select('id, organization_id, service_id, title, slug, client_name, client_industry, client_size, challenge, solution, outcome, testimonial, images, is_published, created_at, updated_at')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 

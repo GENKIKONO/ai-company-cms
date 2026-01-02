@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('features')
-      .select('*')
+      .select('id, key, name, description, category, status, created_at, updated_at')
       .order('category', { ascending: true })
       .order('name', { ascending: true });
 

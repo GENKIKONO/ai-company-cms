@@ -45,7 +45,7 @@ export async function GET(
 
     const { data, error } = await supabase
       .from('case_studies')
-      .select('*')
+      .select('id, organization_id, service_id, title, slug, client_name, client_industry, client_size, challenge, solution, outcome, testimonial, images, is_published, created_by, created_at, updated_at')
       .eq('id', id)
       .maybeSingle();
 

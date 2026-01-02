@@ -45,7 +45,7 @@ export async function PUT(
     // 既存の投稿を取得（組織との関連性もチェック）
     const { data: existingPost, error: postError } = await supabase
       .from('posts')
-      .select('*')
+      .select('id, organization_id, title, slug, content, status, is_published, published_at, meta, created_by, created_at, updated_at')
       .eq('id', postId)
       .eq('organization_id', orgId)
       .maybeSingle();

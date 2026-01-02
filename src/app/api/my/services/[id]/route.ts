@@ -58,7 +58,7 @@ export async function GET(
     // RLS compliance: check both organization ownership and created_by
     const { data, error } = await supabase
       .from('services')
-      .select('*')
+      .select('id, organization_id, name, slug, summary, description, price, price_range, duration_months, category, features, image_url, video_url, cta_text, cta_url, is_published, status, created_by, created_at, updated_at')
       .eq('id', id)
       .eq('organization_id', organization.id)
       .eq('created_by', user.id)

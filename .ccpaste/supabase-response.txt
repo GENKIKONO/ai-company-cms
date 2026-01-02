@@ -1,81 +1,94 @@
-受領と前提の訂正
-ご共有ありがとうございます。現状棚卸しのうち「select('') 126件残」が最重要です。これを放置すると、Supabase 側の型安全性・パフォーマンス・最小権限の原則が崩れます。ここからは、DB側の整合を損なわず、アプリ側の工数を最小化しつつ、select('') を段階的にゼロへ置換する実行プロンプトを提示します。
+ご指摘ありがとうございます（破壊的変更の回避）
+ご懸念は正当です。コミットブロッカーを避けつつ、確実に前進させる段階的アプローチに切り替えます。
 
-また、TypeScript 設定や ESLint 設定はアプリ側課題ですが、DBの型生成・参照手順はSupabase側の推奨を明示します。推測禁止の方針に従い、都度「実測（grepと型出力）」で確定させます。
+即時の方針変更（安全版）
+ESLint no-explicit-any は当面 warn 維持（CIで「件数監視」だけ実施）
+pre-commit は typecheck + select('*') 検出のみ（lintは外す）
+型生成は PROJECT_ID 確認後に実行（それまで既存型を尊重）
+Batch 6 はこの安全基盤の上で実施*
+修正版タスク（安全版）
+pre-commit（ブロック最小化）
+.husky/pre-commit
+#!/bin/sh
 
-実行プロンプト（select('') ゼロ化タスク専用）
-目的
+. 
+"
+$(dirname 
+"
+$0
+"
+)
+/_/husky.sh"
 
-プロダクト全体の select('*') を実測で洗い出し、列指定へ一括置換してゼロにする。
-Supabase 型生成と照合し、列名・型を事実ベースで確定させる。
-技術負債（暗黙any・過取得・不要JOIN）を増やさず、正しい最小列取得へ収束。*
-前提（棚卸し）
+pnpm typecheck
+bash scripts/check-select-star.sh
 
-現在 select('*') は 126件（実測）
-Typecheck: PASS（現時点）
-Supabase スキーマは Dashboard/SQL 定義が唯一の真実（コードで補わない）*
-制約・注意
+select('') 検出スクリプト（そのまま利用）
+scripts/check-select-star.sh は現行のまま
+ESLint ルール（anyはwarnのまま、select('')はエラー化しない）
+.eslintrc.* 抜粋*
+{
+  
+"rules"
+: {
+    
+"@typescript-eslint/no-explicit-any"
+: 
+"warn"
 
-置換は「DBスキーマの実列」を基準に行う。推測禁止。
-破壊的変更（DB列の削除・改名）は行わない。アプリ側の列選択のみを調整。
-1コミットあたり10〜20件の置換に分割し、型検査と動作確認を挟む。
-すべての変更は「最小列」の原則に沿う（返却に不要な列は選ばない）。
-手順
+  }
+}
 
-ベースライン計測（ログ保存）
-grep -R "select('\*')" -n src | wc -l
-該当ファイルリストを保存:
-grep -R "select('\*')" -n src > .logs/select_star_candidates.txt
-実数値126件と差異があれば正を採用（履歴に残す）
-DBスキーマの型ソースを確定（事実の抽出）
-Supabase 型生成（例: supabase gen types typescript --project-id --schema public > src/types/database.ts）
-もしくは既存の型生成ファイルを再生成して最新化
-生成物により各テーブルの列名・型を確認（IDEで参照しやすい位置に配置）
-以降の置換はこの型定義を根拠に実施
-自動置換の準備（安全なテンプレ）
-置換対象の使用目的を分類（SELECTの利用箇所が返却DTOやUI表示で何を使うかを確認）
-代表パターンをテンプレ化（例）
-before: supabase.from('table').select('*')
-after: supabase.from('table').select('id, name, status, created_at')
-列名は database.ts の Table['Row'] をIDE補完で参照し、実在列のみ指定
-join/select でネストがある場合は "parent(id, child:child_table(id,name))" の形式で明示*
-置換の実行（10〜20件ずつ、コミット単位で）
-置換単位の優先度:
-API routes（外部契約に影響）→ lib（共通関数）→ app/components（UI）
-各置換後の検証:
-型検査（pnpm typecheck）
-試験的呼び出し（存在するならE2E/統合テスト）で必須フィールドが欠けないか確認
-コミットメッセージ規約:
-refactor(db): replace select('') with explicit columns in
-実測の更新
-各コミット後に再計測:
-grep -R "select('\*')" -n src | wc -l
-進捗ログに残し、残件を更新
-終了判定
-select('*') = 0 の実測
-型検査 PASS 維持
-主要フロー（API応答・画面表示）で欠落列がないことを確認*
-エラー対応
+備考: select('') はCIスクリプトで検出するため、ESLintでは規制しません
+CI（PRのみ、ブロックするのは select('') と typecheck）
+CI ステップ
+pnpm install
+pnpm typecheck
+bash scripts/check-select-star.sh
+ESLint は実行するが、no-explicit-any は warn のためブロックしない
+追加: any 件数集計をログ出力（ブロックはしない）
+# scripts/count-any.sh（任意）
 
-列不足エラー（undefined参照）が出たら、利用側のDTO/表示要件を確認し、必要最小限の列を追記
-既に非推奨/廃止予定の列は選択対象に入れない（当面必要ならTODOタグを残し、移行計画をIssue化）
-型生成結果と不一致があれば、スキーマ変更の漏れを疑い、DB側（SQL/マイグレーション）を正として型を再生成
-追加のSupabase推奨（根本品質の底上げ）
-これらはアプリ側タスクですが、DBと型の一貫性維持に直結します。完了後に着手を推奨。
+#!/usr/bin/env bash
 
-型生成の自動化:
-CIで DB スキーマ変更時に supabase gen types を再実行し、型差分を検出・PRに含める
-RLSと列選択の整合:
-select('*') 廃止により、RLSで不必要な列参照が消えることが多い
-RLSで参照される列に適切なインデックスを追加（特に user_id/tenant_id など）
-Realtime運用:
-今後、broadcast/triggerを使う場合も、payload の列は必要最小限に限定*
-次のKPI（現実的ライン）
-select('*') 126 → 0（ゼロ化タスクの主目標）
-: any 389 → 360（-29）副次効果を期待（DTO/正規化の見直しで減少）
-as any 57 → 55（-2）境界外流入の抑止確認
-Typecheck PASS 維持*
-この順序で進めれば、「推測なし・DBを真実とする」原則のもと、商用品質へ一段引き上げられます。必要であれば、特定のテーブル/クエリの列リスト作成をこちらで分担します。
+set
+ -euo pipefail
+count=$(grep -rEn 
+":\s*any\b|as\s+any\b"
+ --include=
+"*.ts"
+ --include=
+"*.tsx"
+ src/ | wc -l | tr -d 
+' '
+)
+echo
+ 
+"ℹ any usages (colon or 'as'): 
+$count
+"
+
+型生成は PROJECT_ID 確認後に実行
+未確認のうちは型生成をスキップ
+PROJECT_ID を受領後、以下を実行
+npx supabase gen types typescript --project-id <PROJECT_ID> --schema public > src/types/database.generated.ts
+生成後に typed-client を導入（既存 supabase.ts を安全に置換、差分は最小）
+Batch 6（APIの select('') を優先削減）
+現行の型で可能な範囲から、明示列へ置換
+共通 columns.ts はファイル同居の小粒から導入し、重複が見えた段階で共通化
+段階的な any 削減と将来の error 化ロールアウト
+週次で any 件数の上限を設定し、下げる（例: 今週 ≤ 380、来週 ≤ 360）
+上限を満たした段階で no-explicit-any を error 化に切り替えるPRを用意
+必要な確認（お願いします）
+Supabase PROJECT_ID（型生成のため）
+Husky の導入有無（未導入なら最初の1回だけセットアップします）
+CI 実行環境（GitHub Actions など）と、上記ジョブを追加可能か
+進め方の選択肢
+A: warn維持で安全に進める（上記プランで開始）【推奨】
+B: 先に any をまとめて削減（対象ディレクトリ限定の strict 移行と併用）
+C: error 化を強行（現状は開発停止リスクが高く非推奨）
+Aでよろしければ、すぐに「pre-commit最小化 + CIガード（select検出/anyカウント）」を反映し、Batch 6 を開始します。PROJECT_ID の共有だけお願いします。
+
 
 
 

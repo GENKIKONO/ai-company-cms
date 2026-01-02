@@ -57,7 +57,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // 営業資料の存在確認と権限チェック
     const { data: materials, error: materialError } = await supabase
       .from('sales_materials')
-      .select('*')
+      .select('id, organization_id, title, file_path, file_type, file_size')
       .eq('id', id)
       .eq('organization_id', organization.id);
 

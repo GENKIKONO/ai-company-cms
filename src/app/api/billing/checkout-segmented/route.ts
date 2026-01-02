@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     // Get user's organization (Single-Org Mode)
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
-      .select('*')
+      .select('id, name, slug')
       .eq('created_by', (authResult as AuthContext).user.id)
       .single();
 

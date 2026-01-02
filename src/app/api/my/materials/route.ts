@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     // 対象テーブル単体＋organization_idフィルタで取得
     const { data, error } = await supabase
       .from('sales_materials')
-      .select('*')
+      .select('id, organization_id, title, file_path, file_type, file_size, uploaded_by, created_at, updated_at')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 

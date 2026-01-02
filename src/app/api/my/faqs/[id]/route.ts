@@ -41,7 +41,7 @@ export async function GET(
 
     const { data, error } = await supabase
       .from('faqs')
-      .select('*')
+      .select('id, organization_id, service_id, question, answer, category, order_index, is_published, created_at, updated_at')
       .eq('id', id)
       .maybeSingle();
 
