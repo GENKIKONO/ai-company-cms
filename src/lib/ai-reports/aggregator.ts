@@ -1,11 +1,12 @@
-import type { 
-  ContentMetrics, 
-  TopContent, 
-  WeakContent, 
+import type {
+  ContentMetrics,
+  TopContent,
+  WeakContent,
   ReportLevel,
-  ReportPeriod 
+  ReportPeriod
 } from './types';
 import { getServiceRoleClient, normalizeUrl, getAnalyticsPartitionTables } from './supabase-client';
+import { toContentUnionViewRows } from '@/lib/supabase-boundary';
 
 export class ReportAggregator {
   private supabase;
@@ -18,12 +19,14 @@ export class ReportAggregator {
     organizationId: string, 
     period: ReportPeriod
   ): Promise<ContentMetrics> {
-    // コンテンツ統計をcontent_union_viewから取得
-    const { data: contentStats } = await this.supabase
+    // コンテンツ統計をcontent_union_viewから取得（境界で型確定）
+    const { data: rawContentStats } = await this.supabase
       .from('content_union_view')
-      .select('content_type, is_published')
+      .select('id, content_type, is_published')
       .eq('organization_id', organizationId)
       .eq('is_published', true);
+
+    const contentStats = toContentUnionViewRows(rawContentStats);
 
     const contentCounts = {
       services_published: 0,
@@ -34,7 +37,7 @@ export class ReportAggregator {
       products_published: 0,
     };
 
-    contentStats?.forEach(item => {
+    contentStats.forEach(item => {
       switch (item.content_type) {
         case 'service':
           contentCounts.services_published++;

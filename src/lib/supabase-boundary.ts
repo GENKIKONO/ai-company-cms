@@ -89,3 +89,109 @@ export function asInsertData<T>(data: T): any {
 export function asUpdateData<T>(data: T): any {
   return data;
 }
+
+// =====================================================
+// QNA STATS BOUNDARY TYPES
+// =====================================================
+
+/**
+ * qna_stats ビューの行型
+ */
+export interface QnaStatsViewRow {
+  qna_id: string;
+  question: string;
+  category_name?: string | null;
+  organization_name?: string | null;
+  view_count?: number | null;
+  unique_view_count?: number | null;
+  last_activity_at?: string | null;
+}
+
+/**
+ * qna_stats ビュー結果の境界変換
+ */
+export function toQnaStatsViewRows(input: unknown): QnaStatsViewRow[] {
+  if (!Array.isArray(input)) return [];
+  return input.map((r) => {
+    const o = r as Record<string, unknown>;
+    return {
+      qna_id: String(o.qna_id ?? ''),
+      question: typeof o.question === 'string' ? o.question : '',
+      category_name: typeof o.category_name === 'string' ? o.category_name : null,
+      organization_name: typeof o.organization_name === 'string' ? o.organization_name : null,
+      view_count: typeof o.view_count === 'number' ? o.view_count : null,
+      unique_view_count: typeof o.unique_view_count === 'number' ? o.unique_view_count : null,
+      last_activity_at: typeof o.last_activity_at === 'string' ? o.last_activity_at : null,
+    };
+  }).filter(r => r.qna_id !== '');
+}
+
+/**
+ * qa_entries + join結果の行型
+ */
+export interface QaEntryWithRelations {
+  id: string;
+  question: string;
+  organization_id?: string;
+  category_id?: string | null;
+  created_at?: string;
+  organizations?: { name?: string } | null;
+  qa_categories?: { name?: string } | null;
+}
+
+/**
+ * qa_entries + join結果の境界変換
+ */
+export function toQaEntriesWithRelations(input: unknown): QaEntryWithRelations[] {
+  if (!Array.isArray(input)) return [];
+  return input.map((r) => {
+    const o = r as Record<string, unknown>;
+    const orgs = o.organizations as Record<string, unknown> | null | undefined;
+    const cats = o.qa_categories as Record<string, unknown> | null | undefined;
+    return {
+      id: String(o.id ?? ''),
+      question: typeof o.question === 'string' ? o.question : '',
+      organization_id: typeof o.organization_id === 'string' ? o.organization_id : undefined,
+      category_id: typeof o.category_id === 'string' ? o.category_id : null,
+      created_at: typeof o.created_at === 'string' ? o.created_at : undefined,
+      organizations: orgs ? { name: typeof orgs.name === 'string' ? orgs.name : undefined } : null,
+      qa_categories: cats ? { name: typeof cats.name === 'string' ? cats.name : undefined } : null,
+    };
+  }).filter(r => r.id !== '');
+}
+
+// =====================================================
+// CONTENT UNION VIEW BOUNDARY TYPES
+// =====================================================
+
+/**
+ * content_union_view の行型
+ */
+export interface ContentUnionViewRow {
+  id: string;
+  content_type: string;
+  title?: string | null;
+  is_published?: boolean;
+  canonical_url?: string | null;
+  organization_id?: string;
+  created_at?: string;
+}
+
+/**
+ * content_union_view 結果の境界変換
+ */
+export function toContentUnionViewRows(input: unknown): ContentUnionViewRow[] {
+  if (!Array.isArray(input)) return [];
+  return input.map((r) => {
+    const o = r as Record<string, unknown>;
+    return {
+      id: String(o.id ?? ''),
+      content_type: typeof o.content_type === 'string' ? o.content_type : '',
+      title: typeof o.title === 'string' ? o.title : null,
+      is_published: typeof o.is_published === 'boolean' ? o.is_published : undefined,
+      canonical_url: typeof o.canonical_url === 'string' ? o.canonical_url : null,
+      organization_id: typeof o.organization_id === 'string' ? o.organization_id : undefined,
+      created_at: typeof o.created_at === 'string' ? o.created_at : undefined,
+    };
+  }).filter(r => r.id !== '');
+}

@@ -1,5 +1,7 @@
 // エラーハンドリングユーティリティ
 
+import type { JsonObject } from '@/lib/utils/ab-testing';
+
 export enum ErrorCode {
   // 認証エラー
   UNAUTHORIZED = 'UNAUTHORIZED',
@@ -34,7 +36,7 @@ export enum ErrorCode {
 export interface AppError {
   code: ErrorCode;
   message: string;
-  details?: Record<string, any>;
+  details?: JsonObject;
   timestamp: string;
   requestId?: string;
   userId?: string;
@@ -43,7 +45,7 @@ export interface AppError {
 
 export class CustomError extends Error {
   public readonly code: ErrorCode;
-  public readonly details?: Record<string, any>;
+  public readonly details?: JsonObject;
   public readonly timestamp: string;
   public readonly requestId?: string;
   public readonly userId?: string;
@@ -52,7 +54,7 @@ export class CustomError extends Error {
   constructor(
     code: ErrorCode,
     message: string,
-    details?: Record<string, any>,
+    details?: JsonObject,
     requestId?: string,
     userId?: string,
     organizationId?: string
@@ -88,7 +90,7 @@ export const createError = {
   forbidden: (message = 'アクセスが禁止されています') => 
     new CustomError(ErrorCode.FORBIDDEN, message),
   
-  validation: (message: string, details?: Record<string, any>) => 
+  validation: (message: string, details?: JsonObject) => 
     new CustomError(ErrorCode.VALIDATION_ERROR, message, details),
   
   notFound: (resource = 'リソース', id?: string) => 
@@ -100,7 +102,7 @@ export const createError = {
   rateLimit: (limit: number, window: string) => 
     new CustomError(ErrorCode.RATE_LIMIT_EXCEEDED, 'レート制限に達しました', { limit, window }),
   
-  fileUpload: (message: string, details?: Record<string, any>) => 
+  fileUpload: (message: string, details?: JsonObject) => 
     new CustomError(ErrorCode.FILE_UPLOAD_ERROR, message, details),
   
   fileSize: (maxSize: number, actualSize: number) => 
@@ -117,10 +119,10 @@ export const createError = {
       actualType
     }),
   
-  external: (service: string, message: string, details?: Record<string, any>) => 
+  external: (service: string, message: string, details?: JsonObject) => 
     new CustomError(ErrorCode.EXTERNAL_API_ERROR, `${service}エラー: ${message}`, details),
   
-  internal: (message = 'サーバー内部エラーが発生しました', details?: Record<string, any>) => 
+  internal: (message = 'サーバー内部エラーが発生しました', details?: JsonObject) => 
     new CustomError(ErrorCode.INTERNAL_SERVER_ERROR, message, details),
   
   timeout: (operation: string, timeoutMs: number) => 

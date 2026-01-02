@@ -19,6 +19,7 @@ import type {
   QAStatsFilters,
 } from '../qna-stats';
 import { normalizeUserAgent } from '../material-stats';
+import { toQnaStatsViewRows, toQaEntriesWithRelations } from '@/lib/supabase-boundary';
 
 // =====================================================
 // Types
@@ -129,15 +130,16 @@ async function getQnaStatsFromView(
       };
     }
 
-    // ビューデータを QAStatsResponse に変換
-    const byQNA: QAStatsSummary[] = data.map((row: any) => ({
+    // ビューデータを QAStatsResponse に変換（境界で型確定）
+    const rows = toQnaStatsViewRows(data);
+    const byQNA: QAStatsSummary[] = rows.map((row) => ({
       qnaId: row.qna_id,
       question: row.question,
-      categoryName: row.category_name,
+      categoryName: row.category_name ?? undefined,
       organizationName: row.organization_name || 'Unknown',
       views: row.view_count || 0,
       uniqueViews: row.unique_view_count || 0,
-      lastActivityAt: row.last_activity_at,
+      lastActivityAt: row.last_activity_at ?? undefined,
     }));
 
     const totalViews = byQNA.reduce((sum, item) => sum + item.views, 0);
@@ -228,8 +230,9 @@ async function getQnaStatsComputed(
   // 閲覧統計データは生成できません。
   // TODO: [DB_MIGRATION] qna_stats_raw テーブル作成後、閲覧データを取得
 
-  // 仮のレスポンス（閲覧データなし）
-  const byQNA: QAStatsSummary[] = entries.map((entry: any) => ({
+  // 仮のレスポンス（閲覧データなし）- 境界で型確定
+  const typedEntries = toQaEntriesWithRelations(entries);
+  const byQNA: QAStatsSummary[] = typedEntries.map((entry) => ({
     qnaId: entry.id,
     question: entry.question,
     categoryName: entry.qa_categories?.name,
