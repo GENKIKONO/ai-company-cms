@@ -50,7 +50,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const { data: category, error } = await supabase
       .from('qa_categories')
-      .select('*')
+      .select('id, organization_id, name, slug, description, visibility, sort_order, is_active, created_at, updated_at, created_by, updated_by')
       .eq('id', id)
       .or(`organization_id.eq.${organization.id},visibility.eq.global`)
       .maybeSingle();
@@ -117,7 +117,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // Check if category exists and user has access
     const { data: existingCategory, error: fetchError } = await supabase
       .from('qa_categories')
-      .select('*')
+      .select('id, organization_id, name, slug, description, visibility, sort_order, is_active, created_at, updated_at, created_by, updated_by')
       .eq('id', id)
       .eq('organization_id', organization.id)
       .eq('visibility', 'org')
@@ -226,7 +226,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     // Check if category exists and user has access
     const { data: existingCategory, error: fetchError } = await supabase
       .from('qa_categories')
-      .select('*')
+      .select('id, organization_id, name, slug, description, visibility, sort_order, is_active, created_at, updated_at, created_by, updated_by')
       .eq('id', id)
       .eq('organization_id', organization.id)
       .eq('visibility', 'org')

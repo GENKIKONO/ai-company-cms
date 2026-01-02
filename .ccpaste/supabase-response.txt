@@ -1,302 +1,81 @@
-PR1 適用内容（貼り付けて実装 → 検証まで）
-以下を順に反映してください。完了後に型チェック・ビルド・最小動作確認を実施します。
+受領と前提の訂正
+ご共有ありがとうございます。現状棚卸しのうち「select('') 126件残」が最重要です。これを放置すると、Supabase 側の型安全性・パフォーマンス・最小権限の原則が崩れます。ここからは、DB側の整合を損なわず、アプリ側の工数を最小化しつつ、select('') を段階的にゼロへ置換する実行プロンプトを提示します。
 
-1) 型付き Admin クライアントを新規追加
-追加: src/lib/supabase/adminClient.ts
-import
- { createClient } 
-from
- 
-'npm:@supabase/supabase-js@2.46.1'
+また、TypeScript 設定や ESLint 設定はアプリ側課題ですが、DBの型生成・参照手順はSupabase側の推奨を明示します。推測禁止の方針に従い、都度「実測（grepと型出力）」で確定させます。
 
-import
- 
-type
- { Database } 
-from
- 
-'@/types/supabase'
- 
-// or 'src/types/supabase'
+実行プロンプト（select('') ゼロ化タスク専用）
+目的
 
-if
- (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  
-throw
- 
-new
- 
-Error
-(
-'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
-)
-}
-export
- 
-const
- supabaseAdmin = createClient<Database>(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  {
-    
-auth
-: { 
-persistSession
-: 
-false
- },
-    
-global
-: { 
-headers
-: { 
-'X-Client-Name'
-: 
-'admin-api'
- } },
-  }
-)
+プロダクト全体の select('*') を実測で洗い出し、列指定へ一括置換してゼロにする。
+Supabase 型生成と照合し、列名・型を事実ベースで確定させる。
+技術負債（暗黙any・過取得・不要JOIN）を増やさず、正しい最小列取得へ収束。*
+前提（棚卸し）
 
-ポイント
+現在 select('*') は 126件（実測）
+Typecheck: PASS（現時点）
+Supabase スキーマは Dashboard/SQL 定義が唯一の真実（コードで補わない）*
+制約・注意
 
-Database 型を適用
-persistSession: false でサーバー実行に最適化
-2) 型ユーティリティ（任意だが推奨）
-追加: src/lib/types/supabase-helpers.ts
-import type { Database } from '@/types/supabase'
-export type OrgGroupMember = Database['public']['Tables']['org_group_members']['Row']
-export type OrgGroupInvite = Database['public']['Tables']['org_group_invites']['Row']
-export type OrgGroupJoinRequest = Database['public']['Tables']['org_group_join_requests']['Row']
+置換は「DBスキーマの実列」を基準に行う。推測禁止。
+破壊的変更（DB列の削除・改名）は行わない。アプリ側の列選択のみを調整。
+1コミットあたり10〜20件の置換に分割し、型検査と動作確認を挟む。
+すべての変更は「最小列」の原則に沿う（返却に不要な列は選ばない）。
+手順
 
-3) org-groups 配下の as any 除去と select の明示
-以下は代表的な変更例です。パスが異なる場合は該当ファイルに合わせて適用してください。
+ベースライン計測（ログ保存）
+grep -R "select('\*')" -n src | wc -l
+該当ファイルリストを保存:
+grep -R "select('\*')" -n src > .logs/select_star_candidates.txt
+実数値126件と差異があれば正を採用（履歴に残す）
+DBスキーマの型ソースを確定（事実の抽出）
+Supabase 型生成（例: supabase gen types typescript --project-id --schema public > src/types/database.ts）
+もしくは既存の型生成ファイルを再生成して最新化
+生成物により各テーブルの列名・型を確認（IDEで参照しやすい位置に配置）
+以降の置換はこの型定義を根拠に実施
+自動置換の準備（安全なテンプレ）
+置換対象の使用目的を分類（SELECTの利用箇所が返却DTOやUI表示で何を使うかを確認）
+代表パターンをテンプレ化（例）
+before: supabase.from('table').select('*')
+after: supabase.from('table').select('id, name, status, created_at')
+列名は database.ts の Table['Row'] をIDE補完で参照し、実在列のみ指定
+join/select でネストがある場合は "parent(id, child:child_table(id,name))" の形式で明示*
+置換の実行（10〜20件ずつ、コミット単位で）
+置換単位の優先度:
+API routes（外部契約に影響）→ lib（共通関数）→ app/components（UI）
+各置換後の検証:
+型検査（pnpm typecheck）
+試験的呼び出し（存在するならE2E/統合テスト）で必須フィールドが欠けないか確認
+コミットメッセージ規約:
+refactor(db): replace select('') with explicit columns in
+実測の更新
+各コミット後に再計測:
+grep -R "select('\*')" -n src | wc -l
+進捗ログに残し、残件を更新
+終了判定
+select('*') = 0 の実測
+型検査 PASS 維持
+主要フロー（API応答・画面表示）で欠落列がないことを確認*
+エラー対応
 
-変更: src/app/api/admin/org-groups/join-requests/[requestId]/route.ts
-編集点
+列不足エラー（undefined参照）が出たら、利用側のDTO/表示要件を確認し、必要最小限の列を追記
+既に非推奨/廃止予定の列は選択対象に入れない（当面必要ならTODOタグを残し、移行計画をIssue化）
+型生成結果と不一致があれば、スキーマ変更の漏れを疑い、DB側（SQL/マイグレーション）を正として型を再生成
+追加のSupabase推奨（根本品質の底上げ）
+これらはアプリ側タスクですが、DBと型の一貫性維持に直結します。完了後に着手を推奨。
 
-import の追加
-import { supabaseAdmin } from '@/lib/supabase/adminClient'
-import type { OrgGroupJoinRequest } from '@/lib/types/supabase-helpers'（任意）
-置換
-(supabaseAdmin as any) → supabaseAdmin
-select の明示（Row に合わせて必要最小）
-'id, group_id, organization_id, status, invite_code, requested_by, decided_by, decided_at, created_at, updated_at'
-RPC 呼び出しの戻り値ハンドリングを明確化
-差分イメージ（要点）
+型生成の自動化:
+CIで DB スキーマ変更時に supabase gen types を再実行し、型差分を検出・PRに含める
+RLSと列選択の整合:
+select('*') 廃止により、RLSで不必要な列参照が消えることが多い
+RLSで参照される列に適切なインデックスを追加（特に user_id/tenant_id など）
+Realtime運用:
+今後、broadcast/triggerを使う場合も、payload の列は必要最小限に限定*
+次のKPI（現実的ライン）
+select('*') 126 → 0（ゼロ化タスクの主目標）
+: any 389 → 360（-29）副次効果を期待（DTO/正規化の見直しで減少）
+as any 57 → 55（-2）境界外流入の抑止確認
+Typecheck PASS 維持*
+この順序で進めれば、「推測なし・DBを真実とする」原則のもと、商用品質へ一段引き上げられます。必要であれば、特定のテーブル/クエリの列リスト作成をこちらで分担します。
 
-- 
-const
- { data, error } = 
-await
- (supabaseAdmin 
-as
- any)
--   .
-from
-(
-'org_group_join_requests'
-)
--   .
-select
-(
-'*'
-)
-+ 
-const
- { data, error } = 
-await
- supabaseAdmin
-+   .
-from
-(
-'org_group_join_requests'
-)
-+   .
-select
-(
-'id, group_id, organization_id, status, invite_code, requested_by, decided_by, decided_at, created_at, updated_at'
-)
-    .eq(
-'id'
-, requestId)
-    .maybeSingle()
-  
-// 承認処理
 
-- 
-const
- rpcRes = 
-await
- (supabaseAdmin 
-as
- any).rpc(
-'approve_join_request'
-, { p_request_id: requestId, p_invite_code: inviteCode })
-+ 
-const
- rpcRes = 
-await
- supabaseAdmin.rpc(
-'approve_join_request'
-, {
-+   p_request_id: requestId,
-+   p_invite_code: inviteCode,
-+ })
-  
-if
- (rpcRes.error) {
--   
-return
- NextResponse.json({ error: rpcRes.error }, { status: 
-400
- })
-+   
-return
- NextResponse.json({ error: rpcRes.error.message }, { status: 
-400
- })
-  }
-
-変更: src/app/api/admin/org-groups/invites/route.ts
-編集点
-
-import { supabaseAdmin } from '@/lib/supabase/adminClient'
-(supabaseAdmin as any) → supabaseAdmin
-select 列の明示
-取得: 'id, group_id, code, expires_at, max_uses, used_count, created_by, note, created_at, revoked_at'
-作成/更新後の返却は 'id, code, used_count' など必要最小
-差分イメージ
-
-- 
-const
- { data, error } = 
-await
- (supabaseAdmin 
-as
- any)
--  .
-from
-(
-'org_group_invites'
-)
--  .
-select
-(
-'*'
-)
-+ 
-const
- { data, error } = 
-await
- supabaseAdmin
-+  .
-from
-(
-'org_group_invites'
-)
-+  .
-select
-(
-'id, group_id, code, expires_at, max_uses, used_count, created_by, note, created_at, revoked_at'
-)
-   .eq(
-'group_id'
-, groupId)
-- 
-const
- { data: created, error: createErr } = 
-await
- (supabaseAdmin 
-as
- any)
-+ 
-const
- { data: created, error: createErr } = 
-await
- supabaseAdmin
-   .
-from
-(
-'org_group_invites'
-)
-   .insert(payload)
--  .
-select
-(
-'*'
-)
-+  .
-select
-(
-'id, code, used_count'
-)
-   .maybeSingle()
-
-変更: src/app/api/admin/org-groups/members/route.ts
-編集点
-
-import { supabaseAdmin } from '@/lib/supabase/adminClient'
-(supabaseAdmin as any) → supabaseAdmin
-select 列の明示: 'id, group_id, organization_id, role, created_at'
-差分イメージ
-
-- 
-const
- { data, error } = 
-await
- (supabaseAdmin 
-as
- any)
-+ 
-const
- { data, error } = 
-await
- supabaseAdmin
-   .
-from
-(
-'org_group_members'
-)
--  .
-select
-(
-'*'
-)
-+  .
-select
-(
-'id, group_id, organization_id, role, created_at'
-)
-   .eq(
-'group_id'
-, groupId)
-
-共通のエラーハンドリング調整（PostgrestError）
-- if (error) return NextResponse.json({ error }, { status: 
-400
- })
-+ if (error) return NextResponse.json({ error: error.message }, { status: 
-400
- })
-
-4) 実行と検証
-コマンド
-
-npm run typecheck
-npm run build
-手動チェック（最小）
-
-join-requests 承認: approve_join_request RPC成功、org_group_members 追加、join_requests.status = approved
-join-requests 失敗: 無効 invite_code で 400/409 を返す
-invites 一覧/作成が正常
-members 一覧/削除が正常
-5) コミット＆プッシュ
-git add -A
-git commit -m "refactor(org-groups): remove as any; add typed admin client; narrow select columns"
-git push
-検証結果を共有してください。
-
-typecheck/build の結果
-上記3つの手動チェックの可否とエラーメッセージ（ある場合）
-問題があれば、その場で差分修正案を即時提示します。PR1が安定したら、次はPR2（admin/alerts 配下の as any 除去）に進みます。
 

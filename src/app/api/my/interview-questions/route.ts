@@ -86,7 +86,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<InterviewQ
     // 1. 質問軸を取得
     const { data: axesData, error: axesError } = await supabase
       .from('ai_interview_axes')
-      .select('*')
+      .select('id, code, label_ja, label_en, description_ja, description_en, sort_order, is_active')
       .eq('is_active', true)
       .order('sort_order');
 
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<InterviewQ
     // 2. 質問を取得（指定されたcontentType・langでフィルタ）
     const { data: questionsData, error: questionsError } = await supabase
       .from('ai_interview_questions')
-      .select('*')
+      .select('id, axis_id, question_text, content_type, lang, sort_order, is_active')
       .eq('content_type', contentType)
       .eq('lang', lang)
       .eq('is_active', true)
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<InterviewQ
       } else {
         const { data: keywords, error: keywordsError } = await supabase
           .from('organization_keywords')
-          .select('*')
+          .select('id, organization_id, keyword, locale, priority, is_active')
           .eq('organization_id', organizationId)
           .eq('is_active', true)
           .eq('locale', lang)

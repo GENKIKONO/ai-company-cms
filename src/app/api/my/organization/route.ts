@@ -117,7 +117,18 @@ export async function GET(request: NextRequest) {
     // RLS 前提：created_by = auth.uid() を満たす行のみ返る
     const { data, error } = await supabase
       .from('organizations')
-      .select('*')
+      .select(`
+        id, name, slug, description, legal_form, representative_name, corporate_number, verified,
+        established_at, capital, employees, address_country, address_region, address_locality,
+        address_postal_code, address_street, lat, lng, telephone, email, email_public, url, logo_url,
+        same_as, industries, status, is_published, partner_id, created_by, created_at, updated_at,
+        meta_title, meta_description, meta_keywords, keywords, website, website_url, size,
+        favicon_url, brand_color_primary, brand_color_secondary, social_media, business_hours, timezone,
+        languages_supported, certifications, awards, company_culture, mission_statement, vision_statement, values,
+        feature_flags, entitlements, stripe_customer_id, stripe_subscription_id, plan, subscription_status,
+        current_period_end, trial_end_date, show_services, show_posts, show_case_studies, show_faqs,
+        show_qa, show_news, show_partnership, show_contact
+      `)
       .eq('created_by', user.id)
       .maybeSingle();
 
@@ -303,7 +314,18 @@ export async function POST(request: NextRequest) {
     // 既に企業を持っているかチェック（idempotent処理）
     const { data: existingOrg } = await supabase
       .from('organizations')
-      .select('*')
+      .select(`
+        id, name, slug, description, legal_form, representative_name, corporate_number, verified,
+        established_at, capital, employees, address_country, address_region, address_locality,
+        address_postal_code, address_street, lat, lng, telephone, email, email_public, url, logo_url,
+        same_as, industries, status, is_published, partner_id, created_by, created_at, updated_at,
+        meta_title, meta_description, meta_keywords, keywords, website, website_url, size,
+        favicon_url, brand_color_primary, brand_color_secondary, social_media, business_hours, timezone,
+        languages_supported, certifications, awards, company_culture, mission_statement, vision_statement, values,
+        feature_flags, entitlements, stripe_customer_id, stripe_subscription_id, plan, subscription_status,
+        current_period_end, trial_end_date, show_services, show_posts, show_case_studies, show_faqs,
+        show_qa, show_news, show_partnership, show_contact
+      `)
       .eq('created_by', user.id)
       .not('status', 'eq', 'archived')
       .maybeSingle();
@@ -524,7 +546,18 @@ export async function POST(request: NextRequest) {
         logger.debug('[POST /api/my/organization] Unique constraint violation, trying to fetch existing organization');
         const { data: again } = await supabase
           .from('organizations')
-          .select('*')
+          .select(`
+            id, name, slug, description, legal_form, representative_name, corporate_number, verified,
+            established_at, capital, employees, address_country, address_region, address_locality,
+            address_postal_code, address_street, lat, lng, telephone, email, email_public, url, logo_url,
+            same_as, industries, status, is_published, partner_id, created_by, created_at, updated_at,
+            meta_title, meta_description, meta_keywords, keywords, website, website_url, size,
+            favicon_url, brand_color_primary, brand_color_secondary, social_media, business_hours, timezone,
+            languages_supported, certifications, awards, company_culture, mission_statement, vision_statement, values,
+            feature_flags, entitlements, stripe_customer_id, stripe_subscription_id, plan, subscription_status,
+            current_period_end, trial_end_date, show_services, show_posts, show_case_studies, show_faqs,
+            show_qa, show_news, show_partnership, show_contact
+          `)
           .eq('created_by', user.id)
           .not('status', 'eq', 'archived')
           .maybeSingle();

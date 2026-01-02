@@ -30,9 +30,19 @@ export async function GET(
     const supabase = supabaseAdmin;
     
     // 組織情報を取得（is_published=true の企業のみ）
+    // 公開APIのため課金・内部情報は除外
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
-      .select('*')
+      .select(`
+        id, name, slug, description, legal_form, representative_name, corporate_number, verified,
+        established_at, capital, employees, address_country, address_region, address_locality,
+        address_postal_code, address_street, lat, lng, telephone, email, email_public, url, logo_url,
+        same_as, industries, status, is_published, created_at, updated_at,
+        meta_title, meta_description, meta_keywords, keywords, website, website_url, size,
+        favicon_url, brand_color_primary, brand_color_secondary, social_media, business_hours, timezone,
+        languages_supported, certifications, awards, company_culture, mission_statement, vision_statement, values,
+        show_services, show_posts, show_case_studies, show_faqs, show_qa, show_news, show_partnership, show_contact
+      `)
       .eq('slug', slug)
       .eq('is_published', true)
       .maybeSingle();
@@ -62,33 +72,32 @@ export async function GET(
       // 公開された記事
       supabase
         .from('posts')
-        .select('*')
+        .select('id, title, slug, content_markdown, content_html, status, published_at, created_at, updated_at')
         .eq('organization_id', organization.id)
         .eq('is_published', true)
         .order('created_at', { ascending: false })
         .limit(10),
-      
+
       // 公開されたサービス一覧
       supabase
         .from('services')
-        .select('*')
+        .select('id, name, price, duration_months, category, description, features, image_url, video_url, cta_text, cta_url, created_at, updated_at')
         .eq('organization_id', organization.id)
         .eq('is_published', true)
         .order('created_at', { ascending: false }),
-      
+
       // 公開された事例一覧
       supabase
         .from('case_studies')
-        .select('*')
+        .select('id, title, problem, solution, result, tags, created_at, updated_at')
         .eq('organization_id', organization.id)
         .eq('is_published', true)
         .order('created_at', { ascending: false }),
-      
+
       // 公開されたFAQ一覧
-      // Note: is_published = true で統一（statusフィールドは将来的に廃止予定）
       supabase
         .from('faqs')
-        .select('*')
+        .select('id, question, answer, category, sort_order, created_at, updated_at')
         .eq('organization_id', organization.id)
         .eq('is_published', true)
         .order('created_at', { ascending: false })
