@@ -3,11 +3,28 @@
  * AIO Hub API エンドポイント用の汎用フェッチャー
  */
 
+import type { JsonValue } from '@/lib/utils/ab-testing';
+
+/**
+ * フェッチエラー（SWR互換の例外型）
+ */
+export class FetchError extends Error {
+  status: number;
+  info?: JsonValue;
+
+  constructor(message: string, status: number, info?: JsonValue) {
+    super(message);
+    this.name = 'FetchError';
+    this.status = status;
+    this.info = info;
+  }
+}
+
 /**
  * 基本フェッチャー関数
  * SWRのfetcher関数として使用
  */
-export async function fetcher(url: string): Promise<any> {
+export async function fetcher<T = unknown>(url: string): Promise<T> {
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -17,18 +34,13 @@ export async function fetcher(url: string): Promise<any> {
   });
 
   if (!response.ok) {
-    const error = new Error('データの取得に失敗しました');
-    
-    // レスポンスの詳細をエラーに付加
+    let info: JsonValue | undefined;
     try {
-      const errorData = await response.json();
-      (error as any).info = errorData;
-      (error as any).status = response.status;
+      info = await response.json();
     } catch {
-      (error as any).status = response.status;
+      // JSON parse失敗は無視
     }
-    
-    throw error;
+    throw new FetchError('データの取得に失敗しました', response.status, info);
   }
 
   return response.json();
@@ -37,7 +49,7 @@ export async function fetcher(url: string): Promise<any> {
 /**
  * POST リクエスト用フェッチャー
  */
-export async function postFetcher(url: string, data?: any): Promise<any> {
+export async function postFetcher<T = unknown, D = unknown>(url: string, data?: D): Promise<T> {
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -48,17 +60,13 @@ export async function postFetcher(url: string, data?: any): Promise<any> {
   });
 
   if (!response.ok) {
-    const error = new Error('リクエストに失敗しました');
-    
+    let info: JsonValue | undefined;
     try {
-      const errorData = await response.json();
-      (error as any).info = errorData;
-      (error as any).status = response.status;
+      info = await response.json();
     } catch {
-      (error as any).status = response.status;
+      // JSON parse失敗は無視
     }
-    
-    throw error;
+    throw new FetchError('リクエストに失敗しました', response.status, info);
   }
 
   return response.json();
