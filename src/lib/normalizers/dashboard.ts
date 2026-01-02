@@ -52,14 +52,23 @@ export const getDefaultStats = (): DashboardStats => ({
   missingTables: []
 });
 
+/** 入力統計データの部分型（API応答など） */
+interface RawDashboardStats {
+  ok?: boolean;
+  counts?: Partial<DashboardStats['counts']>;
+  analytics?: Partial<DashboardStats['analytics']>;
+  missingTables?: string[];
+  error?: string;
+}
+
 // 統計データ正規化：undefined/null でもクラッシュしない
-export const normalizeDashboardStats = (stats: any): DashboardStats => {
+export const normalizeDashboardStats = (stats: RawDashboardStats | null | undefined): DashboardStats => {
   if (!stats) {
     return getDefaultStats();
   }
 
   const defaultStats = getDefaultStats();
-  
+
   // counts の正規化：各プロパティが存在しない場合もデフォルト値で補完
   const normalizedCounts = stats.counts ? {
     services: stats.counts.services || defaultStats.counts.services,

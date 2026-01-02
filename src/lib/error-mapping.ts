@@ -1,4 +1,8 @@
-import { PostgrestError } from '@supabase/supabase-js'
+import { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
+
+/** 型付き Supabase クライアント */
+type TypedSupabaseClient = SupabaseClient<Database>
 
 /**
  * 標準化されたエラーレスポンス型
@@ -223,14 +227,14 @@ export function createErrorResponse(error: unknown): Response {
  * 2段階パターンの第1段階として使用
  */
 export async function ensureMembership(
-  supabase: any,
+  supabase: TypedSupabaseClient,
   userId: string,
   organizationId?: string
 ): Promise<{ organizationId: string }> {
   try {
     // 組織IDが指定されていない場合は、ユーザーの所属組織を取得
     let targetOrgId = organizationId;
-    
+
     if (!targetOrgId) {
       const result = await supabase
         .from('organizations')
@@ -241,7 +245,7 @@ export async function ensureMembership(
       const org = handleMaybeSingleResult<{ id: string }>(result, '所属組織');
       targetOrgId = org.id;
     }
-    
+
     // 組織への所属確認（RLS経由で確認）
     const membershipResult = await supabase
       .from('organizations')
@@ -249,7 +253,7 @@ export async function ensureMembership(
       .eq('id', targetOrgId)
       .eq('created_by', userId)
       .maybeSingle();
-    
+
     try {
       handleMaybeSingleResult(membershipResult, '組織のメンバーシップ');
       return { organizationId: targetOrgId };
@@ -273,53 +277,69 @@ export async function ensureMembership(
   }
 }
 
+/** テーブル名の型 */
+type TableName = keyof Database['public']['Tables'];
+
 /**
  * 組織スコープのリソース取得パターン
  * Step 1: ensureMembership → Step 2: fetchResource
+ *
+ * @example
+ * const service = await fetchOrganizationResource<Database['public']['Tables']['services']['Row']>(
+ *   supabase, userId, 'services', serviceId, 'サービス'
+ * );
  */
-export async function fetchOrganizationResource<T>(
-  supabase: any,
+export async function fetchOrganizationResource<TRow>(
+  supabase: TypedSupabaseClient,
   userId: string,
-  tableName: string,
+  tableName: TableName,
   resourceId: string,
   resourceName: string = 'リソース',
   organizationId?: string
-): Promise<T> {
+): Promise<TRow> {
   // Step 1: メンバーシップ確認
   const { organizationId: confirmedOrgId } = await ensureMembership(
-    supabase, 
-    userId, 
+    supabase,
+    userId,
     organizationId
   );
-  
-  // Step 2: リソース取得
-  const result = await supabase
+
+  // Step 2: リソース取得（動的テーブル名のため型アサーション使用）
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的テーブル名のため必要
+  const { data, error } = await (supabase as any)
     .from(tableName)
     .select('*')
     .eq('id', resourceId)
     .eq('organization_id', confirmedOrgId)
     .maybeSingle();
-  
-  return handleMaybeSingleResult(result, resourceName);
+
+  return handleMaybeSingleResult({ data: data as TRow | null, error }, resourceName);
 }
 
 /**
  * ユーザー専用リソース取得パターン
  * 組織IDは不要、ユーザーIDのみで制御
+ *
+ * @example
+ * const profile = await fetchUserResource<Database['public']['Tables']['profiles']['Row']>(
+ *   supabase, userId, 'profiles', profileId, 'プロフィール'
+ * );
  */
-export async function fetchUserResource<T>(
-  supabase: any,
+export async function fetchUserResource<TRow>(
+  supabase: TypedSupabaseClient,
   userId: string,
-  tableName: string,
+  tableName: TableName,
   resourceId: string,
   resourceName: string = 'リソース'
-): Promise<T> {
-  const result = await supabase
+): Promise<TRow> {
+  // 動的テーブル名のため型アサーション使用
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的テーブル名のため必要
+  const { data, error } = await (supabase as any)
     .from(tableName)
     .select('*')
     .eq('id', resourceId)
     .eq('user_id', userId)
     .maybeSingle();
-  
-  return handleMaybeSingleResult(result, resourceName);
+
+  return handleMaybeSingleResult({ data: data as TRow | null, error }, resourceName);
 }
