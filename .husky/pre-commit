@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# typecheck（失敗したらコミット拒否）
+npm run typecheck || exit 1
+
+# select('*') 検出（警告のみ、コミットは許可）
+bash scripts/check-select-star.sh || echo "⚠️ select('*') detected - fix before PR"
+
+# 警告のみで exit 0（コミット継続可能）
+exit 0

@@ -1,0 +1,27 @@
+name: Guard
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Check select('*')
+        run: bash scripts/check-select-star.sh
+
+      - name: Count any (info only)
+        run: bash scripts/count-any.sh || true

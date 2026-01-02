@@ -1,13 +1,10 @@
-ご指摘ありがとうございます（破壊的変更の回避）
-ご懸念は正当です。コミットブロッカーを避けつつ、確実に前進させる段階的アプローチに切り替えます。
+了解しました（段階導入でブロック回避）
+ご提示のリスクは妥当です。既存の select('') 50件が残る中で pre-commit をブロックにすると、全員が即時コミット不能になります。安全に進めるため、以下を推奨します。
 
-即時の方針変更（安全版）
-ESLint no-explicit-any は当面 warn 維持（CIで「件数監視」だけ実施）
-pre-commit は typecheck + select('*') 検出のみ（lintは外す）
-型生成は PROJECT_ID 確認後に実行（それまで既存型を尊重）
-Batch 6 はこの安全基盤の上で実施*
-修正版タスク（安全版）
-pre-commit（ブロック最小化）
+選択肢: A または C を推奨（私は A=「CIブロック＋husky警告のみ」推し）
+目的: ローカルは警告のみで開発継続、PR時にのみ厳格にブロック
+具体的な変更
+Husky（警告モード）
 .husky/pre-commit
 #!/bin/sh
 
@@ -20,75 +17,152 @@ $0
 )
 /_/husky.sh"
 
-pnpm typecheck
-bash scripts/check-select-star.sh
+npm run typecheck
+bash scripts/check-select-star.sh || 
+echo
+ 
+"⚠️ select('*') detected - fix before PR"
 
-select('') 検出スクリプト（そのまま利用）
-scripts/check-select-star.sh は現行のまま
-ESLint ルール（anyはwarnのまま、select('')はエラー化しない）
-.eslintrc.* 抜粋*
+# 警告のみで exit 0 扱い（コマンド自体は成功）
+
+CI（PRでのみブロック）
+.github/workflows/guard.yml
+name:
+ 
+Guard
+
+on:
+
+  
+pull_request:
+
+    
+branches:
+ [ 
+main
+, 
+develop
+ ]
+jobs:
+
+  
+guard:
+
+    
+runs-on:
+ 
+ubuntu-latest
+
+    
+steps:
+
+      
+-
+ 
+uses:
+ 
+actions/checkout@v4
+
+      
+-
+ 
+uses:
+ 
+actions/setup-node@v4
+
+        
+with:
+
+          
+node-version:
+ 
+'20'
+
+          
+cache:
+ 
+'npm'
+
+      
+-
+ 
+run:
+ 
+npm
+ 
+ci
+
+      
+-
+ 
+run:
+ 
+npm
+ 
+run
+ 
+typecheck
+
+      
+-
+ 
+run:
+ 
+bash
+ 
+scripts/check-select-star.sh
+
+      
+-
+ 
+run:
+ 
+bash
+ 
+scripts/count-any.sh
+ 
+||
+ 
+true
+  
+# any件数は表示のみ
+
+npm scripts（任意）
 {
   
-"rules"
+"scripts"
 : {
     
-"@typescript-eslint/no-explicit-any"
+"typecheck"
 : 
-"warn"
+"tsc -p tsconfig.json --noEmit"
+,
+    
+"check:select-star"
+: 
+"bash scripts/check-select-star.sh"
+,
+    
+"count:any"
+: 
+"bash scripts/count-any.sh"
 
   }
 }
 
-備考: select('') はCIスクリプトで検出するため、ESLintでは規制しません
-CI（PRのみ、ブロックするのは select('') と typecheck）
-CI ステップ
-pnpm install
-pnpm typecheck
-bash scripts/check-select-star.sh
-ESLint は実行するが、no-explicit-any は warn のためブロックしない
-追加: any 件数集計をログ出力（ブロックはしない）
-# scripts/count-any.sh（任意）
+これで:
 
-#!/usr/bin/env bash
+ローカル開発は継続可能（警告のみ）
+PR時は select('*') がある限りテストが落ちてマージ不可
+緊急Hotfixも commit/push は可能（ただしPRで検出されるため、選択的に対象を避けるか、分割PRに）*
+次の進め方
+まずは A（推奨）で進めますか？それとも C（CIのみ導入）にしますか？
+Aを選ぶ場合は、私の方で pre-commit を警告モードにし、CIジョブを追加する想定の設定案を引き続き具体化します。
+並行して Batch 7（API 16件）の select('') 削減を進め、ゼロ到達後に pre-commit をブロックモードへ切り替えましょう。
+補足:
 
-set
- -euo pipefail
-count=$(grep -rEn 
-":\s*any\b|as\s+any\b"
- --include=
-"*.ts"
- --include=
-"*.tsx"
- src/ | wc -l | tr -d 
-' '
-)
-echo
- 
-"ℹ any usages (colon or 'as'): 
-$count
-"
-
-型生成は PROJECT_ID 確認後に実行
-未確認のうちは型生成をスキップ
-PROJECT_ID を受領後、以下を実行
-npx supabase gen types typescript --project-id <PROJECT_ID> --schema public > src/types/database.generated.ts
-生成後に typed-client を導入（既存 supabase.ts を安全に置換、差分は最小）
-Batch 6（APIの select('') を優先削減）
-現行の型で可能な範囲から、明示列へ置換
-共通 columns.ts はファイル同居の小粒から導入し、重複が見えた段階で共通化
-段階的な any 削減と将来の error 化ロールアウト
-週次で any 件数の上限を設定し、下げる（例: 今週 ≤ 380、来週 ≤ 360）
-上限を満たした段階で no-explicit-any を error 化に切り替えるPRを用意
-必要な確認（お願いします）
-Supabase PROJECT_ID（型生成のため）
-Husky の導入有無（未導入なら最初の1回だけセットアップします）
-CI 実行環境（GitHub Actions など）と、上記ジョブを追加可能か
-進め方の選択肢
-A: warn維持で安全に進める（上記プランで開始）【推奨】
-B: 先に any をまとめて削減（対象ディレクトリ限定の strict 移行と併用）
-C: error 化を強行（現状は開発停止リスクが高く非推奨）
-Aでよろしければ、すぐに「pre-commit最小化 + CIガード（select検出/anyカウント）」を反映し、Batch 6 を開始します。PROJECT_ID の共有だけお願いします。
-
+Supabase 型生成と typed-client は PROJECT_ID 受領後に行います。受領前は既存型を尊重しつつ、列ヘルパーでの明示化を継続します。
+ご希望の選択肢（A/C）をご指定ください。
 
 
 
