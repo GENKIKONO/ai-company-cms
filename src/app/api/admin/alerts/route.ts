@@ -15,6 +15,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
 import { z } from 'zod';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Validation schemas
 const createRuleSchema = z.object({
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
 
 // Alert Rules一覧取得
 async function getAlertRules(
-  supabase: any,
+  supabase: SupabaseClient,
   url: URL,
   limit: number,
   offset: number,
@@ -123,7 +124,7 @@ async function getAlertRules(
 
 // Alerts一覧取得
 async function getAlerts(
-  supabase: any,
+  supabase: SupabaseClient,
   url: URL,
   limit: number,
   offset: number,
@@ -231,7 +232,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Alert Rule作成
-async function createAlertRule(supabase: any, body: any, userId: string) {
+async function createAlertRule(supabase: SupabaseClient, body: unknown, userId: string) {
   const validation = createRuleSchema.safeParse(body);
 
   if (!validation.success) {
@@ -272,7 +273,7 @@ async function createAlertRule(supabase: any, body: any, userId: string) {
 }
 
 // Alert作成
-async function createAlert(supabase: any, body: any, userId: string) {
+async function createAlert(supabase: SupabaseClient, body: unknown, userId: string) {
   const validation = createAlertSchema.safeParse(body);
 
   if (!validation.success) {

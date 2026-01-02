@@ -7,6 +7,33 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
+// =====================================================
+// TYPE DEFINITIONS
+// =====================================================
+
+/** CMS設定行 */
+interface CmsSettingRow {
+  key: string;
+  value: string | null;
+  data_type?: string;
+}
+
+/** CMSセクション */
+interface CmsSection {
+  section_key: string;
+  section_type?: string;
+  title?: string;
+  content?: unknown;
+  display_order?: number;
+  is_active?: boolean;
+}
+
+/** CMSデータ結果 */
+interface CmsDataResult {
+  settings?: Record<string, string | null>;
+  sections?: CmsSection[];
+}
+
 // 公開CMS データ取得
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +44,7 @@ export async function GET(request: NextRequest) {
     const section = url.searchParams.get('section');
     const setting = url.searchParams.get('setting');
 
-    const result: any = {};
+    const result: CmsDataResult = {};
 
     // サイト設定取得
     if (!section || setting) {
@@ -42,10 +69,13 @@ export async function GET(request: NextRequest) {
         }
       } else {
         // 設定データをkey-valueオブジェクトに変換
-        result.settings = (settings || []).reduce((acc: any, setting: any) => {
-          acc[setting.key] = setting.value;
-          return acc;
-        }, {});
+        result.settings = (settings || []).reduce<Record<string, string | null>>(
+          (acc, setting: CmsSettingRow) => {
+            acc[setting.key] = setting.value;
+            return acc;
+          },
+          {}
+        );
       }
 
       // 特定の設定が要求された場合
@@ -132,7 +162,7 @@ export async function GET(request: NextRequest) {
 
       // 特定のセクションが要求された場合
       if (section) {
-        const sectionData = result.sections.find((s: any) => s.section_key === section);
+        const sectionData = result.sections.find((s: CmsSection) => s.section_key === section);
         return NextResponse.json({
           success: true,
           data: sectionData || null

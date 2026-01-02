@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/auth/admin-auth';
 import { logger } from '@/lib/utils/logger';
 import {
@@ -15,6 +15,25 @@ import {
   createErrorResponse,
   debugLog
 } from '@/lib/material-stats';
+
+// =====================================================
+// TYPE DEFINITIONS
+// =====================================================
+
+/** 統計行データ */
+interface StatsRow {
+  action: string;
+  created_at: string;
+}
+
+/** 資料別統計行データ（JOINで配列が返る可能性があるため） */
+interface MaterialStatsRow extends StatsRow {
+  material_id: string;
+  sales_materials: {
+    id: string;
+    title: string;
+  } | { id: string; title: string }[];
+}
 
 /**
  * 管理者専用の営業資料統計CSVエクスポートAPI
@@ -120,7 +139,7 @@ export async function GET(request: NextRequest) {
  * 日別統計CSVエクスポート生成
  */
 async function generateDailyExport(
-  supabase: any,
+  supabase: SupabaseClient,
   from: string,
   to: string,
   materialId?: string | null
@@ -145,17 +164,17 @@ async function generateDailyExport(
 
   // 日別集計
   const dailyMap = new Map<string, { views: number; downloads: number }>();
-  
-  statsData?.forEach((item: any) => {
+
+  (statsData as StatsRow[] | null)?.forEach((item) => {
     const date = item.created_at.split('T')[0];
     const existing = dailyMap.get(date) || { views: 0, downloads: 0 };
-    
+
     if (item.action === 'view') {
       existing.views++;
     } else if (item.action === 'download') {
       existing.downloads++;
     }
-    
+
     dailyMap.set(date, existing);
   });
 
@@ -186,7 +205,7 @@ async function generateDailyExport(
  * 資料別統計CSVエクスポート生成
  */
 async function generateMaterialExport(
-  supabase: any,
+  supabase: SupabaseClient,
   from: string,
   to: string,
   materialId?: string | null
@@ -226,21 +245,26 @@ async function generateMaterialExport(
     lastActivityAt: string;
   }>();
 
-  statsData?.forEach((item: any) => {
-    const materialId = item.material_id;
-    const existing = materialMap.get(materialId);
-    
+  (statsData as MaterialStatsRow[] | null)?.forEach((item) => {
+    const matId = item.material_id;
+    const existing = materialMap.get(matId);
+    // sales_materialsが配列で返る場合と単体で返る場合の両方に対応
+    const salesMaterial = Array.isArray(item.sales_materials)
+      ? item.sales_materials[0]
+      : item.sales_materials;
+    const title = salesMaterial?.title ?? 'Unknown';
+
     if (existing) {
       if (item.action === 'view') existing.views++;
       if (item.action === 'download') existing.downloads++;
-      
+
       if (item.created_at > existing.lastActivityAt) {
         existing.lastActivityAt = item.created_at;
       }
     } else {
-      materialMap.set(materialId, {
-        materialId,
-        title: item.sales_materials.title,
+      materialMap.set(matId, {
+        materialId: matId,
+        title,
         views: item.action === 'view' ? 1 : 0,
         downloads: item.action === 'download' ? 1 : 0,
         lastActivityAt: item.created_at

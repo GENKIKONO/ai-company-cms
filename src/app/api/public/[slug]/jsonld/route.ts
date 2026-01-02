@@ -1,8 +1,8 @@
 // 診断用JSON-LDエンドポイント: /api/public/[slug]/jsonld
 // 実際にページで出力するJSON-LDをそのまま返す（デバッグ・検証用）
 import { NextRequest, NextResponse } from 'next/server';
-import { 
-  generateOrganizationJsonLd, 
+import {
+  generateOrganizationJsonLd,
   generateServiceJsonLd,
   generateCaseStudyJsonLd,
   generateFAQJsonLd,
@@ -10,6 +10,7 @@ import {
 } from '@/lib/utils/jsonld';
 import { buildSafeUrl, getSafeBaseUrl } from '@/lib/utils/safe-url';
 import { logger } from '@/lib/utils/logger';
+import type { Service, CaseStudy, Post } from '@/types/legacy/database';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,7 +71,7 @@ export async function GET(
           );
         }
         
-        const service = services?.find((s: any) => s.id === id);
+        const service = services?.find((s: Service) => s.id === id);
         if (!service) {
           return NextResponse.json(
             { error: 'Service not found' },
@@ -88,7 +89,7 @@ export async function GET(
           return NextResponse.json([]);
         }
         
-        const jsonLdArray = services.map((service: any) => 
+        const jsonLdArray = services.map((service: Service) =>
           generateServiceJsonLd(service, organization)
         );
         return NextResponse.json(jsonLdArray);
@@ -102,7 +103,7 @@ export async function GET(
           );
         }
         
-        const caseStudy = case_studies?.find((cs: any) => cs.id === id);
+        const caseStudy = case_studies?.find((cs: CaseStudy) => cs.id === id);
         if (!caseStudy) {
           return NextResponse.json(
             { error: 'Case study not found' },
@@ -120,7 +121,7 @@ export async function GET(
           return NextResponse.json([]);
         }
         
-        const jsonLdArray = case_studies.map((caseStudy: any) => 
+        const jsonLdArray = case_studies.map((caseStudy: CaseStudy) =>
           generateCaseStudyJsonLd(caseStudy, organization)
         );
         return NextResponse.json(jsonLdArray);
@@ -144,7 +145,7 @@ export async function GET(
           );
         }
         
-        const post = posts?.find((p: any) => p.id === id);
+        const post = posts?.find((p: Post) => p.id === id);
         if (!post) {
           return NextResponse.json(
             { error: 'Post not found' },
@@ -174,7 +175,7 @@ export async function GET(
             "@id": `${baseUrl}/o/${organization.slug}`,
             "name": organization.name
           },
-          "blogPost": posts.map((post: any) => generatePostJsonLd(post, organization))
+          "blogPost": posts.map((post: Post) => generatePostJsonLd(post, organization))
         };
         return NextResponse.json(blogJsonLd);
       }

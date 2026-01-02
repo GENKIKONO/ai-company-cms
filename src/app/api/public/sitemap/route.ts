@@ -5,12 +5,37 @@ import { logger } from '@/lib/log';
 
 export const dynamic = 'force-dynamic';
 
+// =====================================================
+// TYPE DEFINITIONS
+// =====================================================
+
 interface SitemapEntry {
   url: string;
   lastModified: string;
   changeFrequency: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
   priority: number;
   type: 'organization' | 'service' | 'case-study' | 'faq' | 'post' | 'page';
+}
+
+/** サービスアイテム（サイトマップ用） */
+interface SitemapServiceItem {
+  id: string;
+  updated_at?: string;
+  created_at?: string;
+}
+
+/** 事例アイテム（サイトマップ用） */
+interface SitemapCaseStudyItem {
+  id: string;
+  updated_at?: string;
+  created_at?: string;
+}
+
+/** 投稿アイテム（サイトマップ用） */
+interface SitemapPostItem {
+  id: string;
+  updated_at?: string;
+  created_at?: string;
 }
 
 async function getAllPublishedOrganizations() {
@@ -87,10 +112,10 @@ export async function GET() {
               type: 'page'
             });
 
-            services.forEach((service: any) => {
+            services.forEach((service: SitemapServiceItem) => {
               sitemap.push({
                 url: `${baseUrl}/o/${org.slug}/services/${service.id}`,
-                lastModified: service.updated_at || service.created_at,
+                lastModified: service.updated_at || service.created_at || new Date().toISOString(),
                 changeFrequency: 'monthly',
                 priority: 0.6,
                 type: 'service'
@@ -108,10 +133,10 @@ export async function GET() {
               type: 'page'
             });
 
-            case_studies.forEach((caseStudy: any) => {
+            case_studies.forEach((caseStudy: SitemapCaseStudyItem) => {
               sitemap.push({
                 url: `${baseUrl}/o/${org.slug}/case-studies/${caseStudy.id}`,
-                lastModified: caseStudy.updated_at || caseStudy.created_at,
+                lastModified: caseStudy.updated_at || caseStudy.created_at || new Date().toISOString(),
                 changeFrequency: 'monthly',
                 priority: 0.6,
                 type: 'case-study'
@@ -140,10 +165,10 @@ export async function GET() {
               type: 'page'
             });
 
-            posts.forEach((post: any) => {
+            posts.forEach((post: SitemapPostItem) => {
               sitemap.push({
                 url: `${baseUrl}/o/${org.slug}/posts/${post.id}`,
-                lastModified: post.updated_at || post.created_at,
+                lastModified: post.updated_at || post.created_at || new Date().toISOString(),
                 changeFrequency: 'monthly',
                 priority: 0.5,
                 type: 'post'
