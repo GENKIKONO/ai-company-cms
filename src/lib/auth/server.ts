@@ -411,7 +411,7 @@ export async function requireOrgRole(
  */
 export function handleAuthErrorForSSR(error: Error, currentPath?: string): never {
   if ('code' in error) {
-    switch ((error as any).code) {
+    switch ((error as { code: string }).code) {
       case 'AUTH_REQUIRED': {
         const redirectUrl = currentPath ? `?redirect=${encodeURIComponent(currentPath)}` : '';
         redirect(`/auth/login${redirectUrl}`);
@@ -468,7 +468,7 @@ function classifySupabaseRPCError(errorMessage: string): 'auth' | 'permission' |
 export function createAuthErrorResponse(error: Error): NextResponse {
   // P1-3 権限ガードエラー
   if ('code' in error) {
-    switch ((error as any).code) {
+    switch ((error as { code: string }).code) {
       case 'AUTH_REQUIRED': {
         return NextResponse.json(
           { error: 'Authentication required' }, 
