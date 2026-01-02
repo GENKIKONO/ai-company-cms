@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { AuthContext } from './auth-middleware';
 
 import { logger } from '@/lib/log';
+import type { JsonObject } from '@/lib/utils/ab-testing';
 // ログレベル定義
 export enum LogLevel {
   DEBUG = 'debug',
@@ -32,7 +33,7 @@ export interface ApiUsageLog {
   requestSize?: number;
   responseSize?: number;
   errorMessage?: string;
-  metadata?: Record<string, any>;
+  metadata?: JsonObject;
 }
 
 // ビジネスメトリクス用のログ
@@ -42,7 +43,7 @@ export interface BusinessMetricsLog {
   userId?: string;
   userRole?: string;
   organizationId?: string;
-  metadata?: Record<string, any>;
+  metadata?: JsonObject;
 }
 
 // パフォーマンスメトリクス
@@ -55,7 +56,7 @@ export interface PerformanceMetrics {
   externalApiTime?: number;
   cacheHit?: boolean;
   memoryUsage?: number;
-  metadata?: Record<string, any>;
+  metadata?: JsonObject;
 }
 
 /**
@@ -119,7 +120,7 @@ export function estimateResponseSize(response: NextResponse): number {
 /**
  * 構造化ログ出力
  */
-export async function logStructured(level: LogLevel, message: string, data?: Record<string, any>) {
+export async function logStructured(level: LogLevel, message: string, data?: JsonObject) {
   const logEntry = {
     timestamp: new Date().toISOString(),
     level,
@@ -207,7 +208,7 @@ export function logPerformanceMetrics(metrics: PerformanceMetrics) {
 /**
  * エラーログの記録
  */
-export function logError(error: Error, context?: Record<string, any>) {
+export function logError(error: Error, context?: JsonObject) {
   logStructured(LogLevel.ERROR, 'ERROR', {
     type: 'error',
     error: {
@@ -222,7 +223,7 @@ export function logError(error: Error, context?: Record<string, any>) {
 /**
  * セキュリティイベントの記録
  */
-export function logSecurityEvent(event: string, details: Record<string, any>) {
+export function logSecurityEvent(event: string, details: JsonObject) {
   logStructured(LogLevel.WARN, 'SECURITY_EVENT', {
     type: 'security',
     event,
@@ -323,7 +324,7 @@ export function createApiUsageMiddleware() {
  * ビジネスイベント記録ヘルパー
  */
 export class BusinessEventLogger {
-  static organizationCreated(userId: string, organizationId: string, metadata?: Record<string, any>) {
+  static organizationCreated(userId: string, organizationId: string, metadata?: JsonObject) {
     logBusinessMetrics({
       timestamp: new Date().toISOString(),
       eventType: 'organization_created',
@@ -333,7 +334,7 @@ export class BusinessEventLogger {
     });
   }
   
-  static organizationPublished(userId: string, organizationId: string, metadata?: Record<string, any>) {
+  static organizationPublished(userId: string, organizationId: string, metadata?: JsonObject) {
     logBusinessMetrics({
       timestamp: new Date().toISOString(),
       eventType: 'organization_published',
@@ -343,7 +344,7 @@ export class BusinessEventLogger {
     });
   }
   
-  static serviceCreated(userId: string, organizationId: string, serviceId: string, metadata?: Record<string, any>) {
+  static serviceCreated(userId: string, organizationId: string, serviceId: string, metadata?: JsonObject) {
     logBusinessMetrics({
       timestamp: new Date().toISOString(),
       eventType: 'service_created',
@@ -353,7 +354,7 @@ export class BusinessEventLogger {
     });
   }
   
-  static billingSubscription(userId: string, organizationId: string, subscriptionId: string, metadata?: Record<string, any>) {
+  static billingSubscription(userId: string, organizationId: string, subscriptionId: string, metadata?: JsonObject) {
     logBusinessMetrics({
       timestamp: new Date().toISOString(),
       eventType: 'billing_subscription',
@@ -363,7 +364,7 @@ export class BusinessEventLogger {
     });
   }
   
-  static userLogin(userId: string, userRole: string, metadata?: Record<string, any>) {
+  static userLogin(userId: string, userRole: string, metadata?: JsonObject) {
     logBusinessMetrics({
       timestamp: new Date().toISOString(),
       eventType: 'auth_login',
@@ -373,7 +374,7 @@ export class BusinessEventLogger {
     });
   }
   
-  static userSignup(userId: string, userRole: string, metadata?: Record<string, any>) {
+  static userSignup(userId: string, userRole: string, metadata?: JsonObject) {
     logBusinessMetrics({
       timestamp: new Date().toISOString(),
       eventType: 'auth_signup',

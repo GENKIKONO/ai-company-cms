@@ -7,6 +7,9 @@
 import { WebVitalsData } from '../performance';
 import { logger as utilLogger } from '@/lib/log';
 
+// 安全なログメタデータ型（any→unknownで型安全性向上）
+type LogMetadata = Record<string, unknown>;
+
 // ログレベル定義
 export enum LogLevel {
   ERROR = 'error',
@@ -23,7 +26,7 @@ export interface LogEntry {
   userId?: string;
   sessionId?: string;
   organizationId?: string;
-  metadata?: Record<string, any>;
+  metadata?: LogMetadata;
   stack?: string;
   url?: string;
   userAgent?: string;
@@ -124,7 +127,7 @@ export class ExternalLogTransport implements LogTransport {
 export class Logger {
   private static instance: Logger;
   private transports: LogTransport[] = [];
-  private context: Record<string, any> = {};
+  private context: LogMetadata = {};
 
   private constructor() {
     // デフォルトでコンソール出力を設定
@@ -142,11 +145,11 @@ export class Logger {
     this.transports.push(transport);
   }
 
-  setContext(context: Record<string, any>): void {
+  setContext(context: LogMetadata): void {
     this.context = { ...this.context, ...context };
   }
 
-  private async log(level: LogLevel, message: string, metadata?: Record<string, any>): Promise<void> {
+  private async log(level: LogLevel, message: string, metadata?: LogMetadata): Promise<void> {
     const entry: LogEntry = {
       level,
       message,
@@ -163,7 +166,7 @@ export class Logger {
     );
   }
 
-  async error(message: string, error?: Error, metadata?: Record<string, any>): Promise<void> {
+  async error(message: string, error?: Error, metadata?: LogMetadata): Promise<void> {
     await this.log(LogLevel.ERROR, message, {
       ...metadata,
       error: error ? {
@@ -175,15 +178,15 @@ export class Logger {
     });
   }
 
-  async warn(message: string, metadata?: Record<string, any>): Promise<void> {
+  async warn(message: string, metadata?: LogMetadata): Promise<void> {
     await this.log(LogLevel.WARN, message, metadata);
   }
 
-  async info(message: string, metadata?: Record<string, any>): Promise<void> {
+  async info(message: string, metadata?: LogMetadata): Promise<void> {
     await this.log(LogLevel.INFO, message, metadata);
   }
 
-  async debug(message: string, metadata?: Record<string, any>): Promise<void> {
+  async debug(message: string, metadata?: LogMetadata): Promise<void> {
     await this.log(LogLevel.DEBUG, message, metadata);
   }
 }
@@ -235,7 +238,7 @@ export class ErrorMonitor {
   captureError(
     error: Error,
     category: ErrorCategory = ErrorCategory.SYSTEM,
-    metadata?: Record<string, any>
+    metadata?: LogMetadata
   ): void {
     // エラー数をカウント
     const currentCount = this.errorCounts.get(category) || 0;
@@ -264,7 +267,7 @@ export class ErrorMonitor {
   private async sendCriticalAlert(
     error: Error,
     category: ErrorCategory,
-    metadata?: Record<string, any>
+    metadata?: LogMetadata
   ): Promise<void> {
     // 本番環境では外部アラートサービスに送信
     // 開発環境ではコンソール警告
@@ -277,9 +280,9 @@ export class ErrorMonitor {
           message: error.message,
           severity: 'critical',
           environment: process.env.NEXT_PUBLIC_APP_ENV || 'production',
-          userId: metadata?.userId,
-          organizationId: metadata?.organizationId,
-          url: metadata?.url,
+          userId: metadata?.userId as string | undefined,
+          organizationId: metadata?.organizationId as string | undefined,
+          url: metadata?.url as string | undefined,
           stackTrace: error.stack,
           timestamp: new Date().toISOString(),
         });
