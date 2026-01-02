@@ -21,9 +21,12 @@
  */
 
 import type { FeatureKey, FeatureFlags, FeatureConfig } from '@/types/features';
-// TODO: [SUPABASE_TYPE_FOLLOWUP] Supabase Database 型定義を再構築後に復元する
-
-type OrganizationRow = any;
+// NOTE: 最小必要項目のみ定義（effective-features.ts と互換）
+export type OrganizationRow = {
+  id: string;
+  plan?: string | null;
+  feature_flags?: Record<string, unknown> | null;
+};
 
 /**
  * 組織の feature_flags JSONB から特定キーの値を型安全に取得

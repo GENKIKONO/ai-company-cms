@@ -755,15 +755,15 @@ export async function canUseFeatureFromOrgAsync(
       logger.debug('RPC failed, falling back to sync logic', undefined, context);
     }
     const { canUseFeatureFromOrg } = await import('./features');
-    return canUseFeatureFromOrg(organization as any, key);
+    return canUseFeatureFromOrg(organization, key);
 
   } catch (error) {
     logger.error('Error in canUseFeatureFromOrgAsync, falling back to sync logic', error, context);
-    
+
     // 例外発生時もsync版にフォールバック
     try {
       const { canUseFeatureFromOrg } = await import('./features');
-      return canUseFeatureFromOrg(organization as any, key);
+      return canUseFeatureFromOrg(organization, key);
     } catch (fallbackError) {
       logger.error('Fallback sync logic also failed', fallbackError, context);
       return false; // 最終的に安全側で false
@@ -834,15 +834,15 @@ export async function getMultipleFeatureFlagsFromOrgAsync(
       logger.debug('RPC failed, falling back to sync logic for multiple flags', undefined, context);
     }
     const { getMultipleFeatureFlagsFromOrg } = await import('./features');
-    return getMultipleFeatureFlagsFromOrg(organization as any, keys);
+    return getMultipleFeatureFlagsFromOrg(organization, keys);
 
   } catch (error) {
     logger.error('Error in getMultipleFeatureFlagsFromOrgAsync, falling back to sync logic', error, context);
-    
+
     // 例外発生時もsync版にフォールバック
     try {
       const { getMultipleFeatureFlagsFromOrg } = await import('./features');
-      return getMultipleFeatureFlagsFromOrg(organization as any, keys);
+      return getMultipleFeatureFlagsFromOrg(organization, keys);
     } catch (fallbackError) {
       logger.error('Fallback sync logic also failed', fallbackError, context);
       // 最終的に全てfalseで安全側リターン
