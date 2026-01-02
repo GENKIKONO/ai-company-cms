@@ -107,3 +107,85 @@ export function validateRequestBody<T>(
     return { success: false, error: 'Invalid request body' };
   }
 }
+
+// =====================================================
+// TYPE-SAFE REQUEST PARSING
+// =====================================================
+
+/** パース結果の型 */
+export type ParseResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string; status: 400 | 422 };
+
+/**
+ * NextRequest から JSON ボディを型安全にパース
+ * @example
+ * const schema = z.object({ name: z.string(), age: z.number() });
+ * const result = await parseRequestBody(request, schema);
+ * if (!result.ok) {
+ *   return NextResponse.json({ error: result.error }, { status: result.status });
+ * }
+ * const { name, age } = result.data; // 型安全
+ */
+export async function parseRequestBody<T>(
+  request: NextRequest,
+  schema: z.ZodSchema<T>
+): Promise<ParseResult<T>> {
+  let rawBody: unknown;
+
+  try {
+    rawBody = await request.json();
+  } catch {
+    return { ok: false, error: 'Invalid JSON body', status: 400 };
+  }
+
+  try {
+    const data = schema.parse(rawBody);
+    return { ok: true, data };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const messages = error.errors.map(e => `${e.path.join('.')}: ${e.message}`);
+      return { ok: false, error: messages.join('; '), status: 422 };
+    }
+    return { ok: false, error: 'Validation failed', status: 422 };
+  }
+}
+
+/**
+ * オプショナルなJSONボディをパース（ボディなしも許容）
+ */
+export async function parseOptionalBody<T>(
+  request: NextRequest,
+  schema: z.ZodSchema<T>
+): Promise<ParseResult<T | null>> {
+  const contentLength = request.headers.get('content-length');
+  if (!contentLength || contentLength === '0') {
+    return { ok: true, data: null };
+  }
+
+  return parseRequestBody(request, schema) as Promise<ParseResult<T | null>>;
+}
+
+/**
+ * URLSearchParams を型安全にパース
+ */
+export function parseSearchParams<T>(
+  params: URLSearchParams,
+  schema: z.ZodSchema<T>
+): ParseResult<T> {
+  const obj: Record<string, string> = {};
+  params.forEach((value, key) => {
+    obj[key] = value;
+  });
+
+  try {
+    const data = schema.parse(obj);
+    return { ok: true, data };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const messages = error.errors.map(e => `${e.path.join('.')}: ${e.message}`);
+      return { ok: false, error: messages.join('; '), status: 422 };
+    }
+    return { ok: false, error: 'Invalid query parameters', status: 422 };
+  }
+}

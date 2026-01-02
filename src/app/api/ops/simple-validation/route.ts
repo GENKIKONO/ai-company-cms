@@ -4,8 +4,43 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/utils/logger';
+
+// =====================================================
+// TYPE DEFINITIONS
+// =====================================================
+
+/** チェック結果ステータス */
+type CheckStatus = 'pass' | 'fail' | 'warning' | 'skip';
+
+/** 個別チェック結果 */
+interface ValidationCheck {
+  name: string;
+  status: CheckStatus;
+  message: string;
+  critical: boolean;
+}
+
+/** 全体ステータス */
+type OverallStatus = 'ready' | 'warning' | 'not_ready';
+
+/** バリデーションレポート */
+interface ValidationReport {
+  timestamp: string;
+  overall_status: OverallStatus;
+  critical_issues: number;
+  warning_issues: number;
+  passed_checks: number;
+  total_checks: number;
+  checks: ValidationCheck[];
+  deployment_approval: boolean;
+  execution_time: number;
+}
+
+/** エラーメッセージ取得ヘルパー */
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +50,7 @@ export async function GET(request: NextRequest) {
     logger.debug('🔍 Starting simplified validation checks...');
     const startTime = Date.now();
 
-    const checks = [];
+    const checks: ValidationCheck[] = [];
 
     // 1. 環境変数チェック
     checks.push(await validateEnvironmentVariables());
@@ -37,12 +72,12 @@ export async function GET(request: NextRequest) {
     const passed_checks = checks.filter(c => c.status === 'pass').length;
     const total_checks = checks.length;
 
-    const overall_status = critical_issues > 0 ? 'not_ready' : 
+    const overall_status: OverallStatus = critical_issues > 0 ? 'not_ready' :
                           warning_issues > 0 ? 'warning' : 'ready';
 
     const deployment_approval = critical_issues === 0;
 
-    const report = {
+    const report: ValidationReport = {
       timestamp: new Date().toISOString(),
       overall_status,
       critical_issues,
@@ -72,18 +107,18 @@ export async function GET(request: NextRequest) {
       report,
     });
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('❌ Validation Error', { data: error instanceof Error ? error : new Error(String(error)) });
-    
+
     return NextResponse.json({
       success: false,
       error: 'Validation failed',
-      message: error.message,
+      message: getErrorMessage(error),
     }, { status: 500 });
   }
 }
 
-async function validateEnvironmentVariables() {
+async function validateEnvironmentVariables(): Promise<ValidationCheck> {
   try {
     const required = [
       'NEXT_PUBLIC_SUPABASE_URL',
@@ -92,7 +127,7 @@ async function validateEnvironmentVariables() {
     ];
 
     const missing = required.filter(key => !process.env[key]);
-    
+
     if (missing.length > 0) {
       return {
         name: 'Environment Variables',
@@ -109,23 +144,23 @@ async function validateEnvironmentVariables() {
       critical: true,
     };
 
-  } catch (error: any) {
+  } catch (error) {
     return {
       name: 'Environment Variables',
-      status: 'fail',
-      message: `Validation error: ${error.message}`,
+      status: 'fail' as const,
+      message: `Validation error: ${getErrorMessage(error)}`,
       critical: true,
     };
   }
 }
 
-async function validateDatabaseConnection() {
+async function validateDatabaseConnection(): Promise<ValidationCheck> {
   try {
     const { createClient: createServerClient } = await import('@/lib/supabase/server');
     const supabase = await createServerClient();
-    
+
     // 基本接続テスト
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('organizations')
       .select('id')
       .limit(1);
@@ -146,21 +181,21 @@ async function validateDatabaseConnection() {
       critical: true,
     };
 
-  } catch (error: any) {
+  } catch (error) {
     return {
       name: 'Database Connection',
-      status: 'fail',
-      message: `Database connection error: ${error.message}`,
+      status: 'fail' as const,
+      message: `Database connection error: ${getErrorMessage(error)}`,
       critical: true,
     };
   }
 }
 
-async function validateHealthAPI() {
+async function validateHealthAPI(): Promise<ValidationCheck> {
   try {
     // Try to fetch health endpoint locally
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-    
+
     try {
       const response = await fetch(`${baseUrl}/api/health`, {
         method: 'GET',
@@ -194,17 +229,17 @@ async function validateHealthAPI() {
       };
     }
 
-  } catch (error: any) {
+  } catch (error) {
     return {
       name: 'Health API',
-      status: 'fail',
-      message: `Health API validation error: ${error.message}`,
+      status: 'fail' as const,
+      message: `Health API validation error: ${getErrorMessage(error)}`,
       critical: false,
     };
   }
 }
 
-async function validateJsonLdSystem() {
+async function validateJsonLdSystem(): Promise<ValidationCheck> {
   try {
     // JSON-LDシステムの基本動作確認
     const { generateOrganizationJsonLd } = await import('@/lib/json-ld/organization');
@@ -251,24 +286,24 @@ async function validateJsonLdSystem() {
       };
     }
 
-  } catch (error: any) {
+  } catch (error) {
     return {
       name: 'JSON-LD System',
-      status: 'fail',
-      message: `JSON-LD validation error: ${error.message}`,
+      status: 'fail' as const,
+      message: `JSON-LD validation error: ${getErrorMessage(error)}`,
       critical: false,
     };
   }
 }
 
-function generateValidationMarkdown(report: any): string {
-  const statusEmoji = {
+function generateValidationMarkdown(report: ValidationReport): string {
+  const statusEmoji: Record<OverallStatus, string> = {
     'ready': '✅',
     'warning': '⚠️',
     'not_ready': '❌',
   };
 
-  const checkEmoji = {
+  const checkEmoji: Record<CheckStatus, string> = {
     'pass': '✅',
     'fail': '❌',
     'warning': '⚠️',
@@ -278,7 +313,7 @@ function generateValidationMarkdown(report: any): string {
   return `# System Validation Report
 
 **Generated:** ${new Date(report.timestamp).toLocaleString()}
-**Overall Status:** ${statusEmoji[report.overall_status as keyof typeof statusEmoji] || '❓'} ${report.overall_status.toUpperCase()}
+**Overall Status:** ${statusEmoji[report.overall_status] || '❓'} ${report.overall_status.toUpperCase()}
 **Deployment Approval:** ${report.deployment_approval ? '✅ APPROVED' : '❌ NOT APPROVED'}
 **Execution Time:** ${report.execution_time}ms
 
@@ -295,13 +330,13 @@ function generateValidationMarkdown(report: any): string {
 
 | Check | Status | Critical | Message |
 |-------|--------|----------|---------|
-${report.checks.map((check: any) => 
-  `| ${check.name} | ${checkEmoji[check.status as keyof typeof checkEmoji] || '❓'} ${check.status} | ${check.critical ? '🔴' : '🟡'} | ${check.message} |`
+${report.checks.map((check) =>
+  `| ${check.name} | ${checkEmoji[check.status] || '❓'} ${check.status} | ${check.critical ? '🔴' : '🟡'} | ${check.message} |`
 ).join('\n')}
 
 ## Deployment Decision
 
-${report.deployment_approval ? 
+${report.deployment_approval ?
   '🟢 **DEPLOYMENT APPROVED** - All critical checks passed. System ready for production deployment.' :
   '🔴 **DEPLOYMENT NOT APPROVED** - Critical issues found. Resolve all critical issues before deployment.'
 }
@@ -309,7 +344,7 @@ ${report.deployment_approval ?
 ${report.critical_issues > 0 ? `
 ### Critical Issues to Resolve
 
-${report.checks.filter((c: any) => c.status === 'fail' && c.critical).map((check: any) => 
+${report.checks.filter((c) => c.status === 'fail' && c.critical).map((check) =>
   `- **${check.name}:** ${check.message}`
 ).join('\n')}
 ` : ''}
@@ -317,7 +352,7 @@ ${report.checks.filter((c: any) => c.status === 'fail' && c.critical).map((check
 ${report.warning_issues > 0 ? `
 ### Warnings (Non-blocking)
 
-${report.checks.filter((c: any) => c.status === 'warning' || (c.status === 'fail' && !c.critical)).map((check: any) => 
+${report.checks.filter((c) => c.status === 'warning' || (c.status === 'fail' && !c.critical)).map((check) =>
   `- **${check.name}:** ${check.message}`
 ).join('\n')}
 ` : ''}

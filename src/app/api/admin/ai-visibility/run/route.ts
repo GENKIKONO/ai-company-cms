@@ -1,8 +1,53 @@
 /* eslint-disable no-console */
-import { supabaseAdmin } from '@/lib/supabase-admin-client';import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-admin-client';
+import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { updateLastCheck } from '@/lib/ai-visibility-config';
 import { logger } from '@/lib/log';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+// =====================================================
+// TYPE DEFINITIONS
+// =====================================================
+
+/** HTML解析結果の型 */
+interface HtmlAnalysis {
+  hasJsonLd: boolean;
+  jsonLdSchemas: string[];
+  metaRobots: string | null;
+  canonical: string | null;
+  title: string | null;
+  description: string | null;
+  mainTextLength: number;
+}
+
+/** 単一URL検査結果の型 */
+interface CheckResult {
+  url: string;
+  userAgent: string;
+  timestamp: string;
+  statusCode: number;
+  responseTime: number;
+  contentType?: string;
+  analysis?: HtmlAnalysis;
+  severity: 'P0' | 'P1' | 'P2' | 'OK';
+  issues: string[];
+  signature?: string;
+  error?: string;
+}
+
+/** サマリー型 */
+interface CheckSummary {
+  total: number;
+  p0Issues: number;
+  p1Issues: number;
+  p2Issues: number;
+  okChecks: number;
+  avgResponseTime: number;
+  uniqueUrls: number;
+  uniqueUserAgents: number;
+  topIssues: string[];
+}
 
 // Error message translation mapping
 function translateIssue(issue: string): string {
@@ -121,8 +166,8 @@ async function runAIVisibilityCheck(urls: string[], isDryRun: boolean) {
     'Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)'
   ];
   
-  const results: any[] = [];
-  
+  const results: CheckResult[] = [];
+
   for (const url of urls) {
     for (const userAgent of userAgents) {
       try {
@@ -136,7 +181,11 @@ async function runAIVisibilityCheck(urls: string[], isDryRun: boolean) {
         results.push({
           url,
           userAgent,
-          status: 'error',
+          timestamp: new Date().toISOString(),
+          statusCode: 0,
+          responseTime: 0,
+          severity: 'P0' as const,
+          issues: [`Error: ${error instanceof Error ? error.message : 'Unknown error'}`],
           error: error instanceof Error ? error.message : 'Unknown error'
         });
       }
@@ -146,7 +195,7 @@ async function runAIVisibilityCheck(urls: string[], isDryRun: boolean) {
   return results;
 }
 
-async function checkSingleUrl(url: string, userAgent: string, isDryRun: boolean) {
+async function checkSingleUrl(url: string, userAgent: string, _isDryRun: boolean): Promise<CheckResult> {
   const startTime = Date.now();
   
   try {
@@ -170,8 +219,8 @@ async function checkSingleUrl(url: string, userAgent: string, isDryRun: boolean)
     const statusCode = response.status;
     
     let htmlContent = '';
-    let analysis: any = {};
-    
+    let analysis: HtmlAnalysis | undefined;
+
     if (contentType.includes('text/html') && statusCode === 200) {
       htmlContent = await response.text();
       analysis = analyzeHTML(htmlContent, url);
@@ -200,14 +249,14 @@ async function checkSingleUrl(url: string, userAgent: string, isDryRun: boolean)
       statusCode: 0,
       responseTime: Date.now() - startTime,
       error: error instanceof Error ? error.message : 'Unknown error',
-      severity: 'P0',
+      severity: 'P0' as const,
       issues: [`Failed to fetch: ${error instanceof Error ? error.message : 'Unknown error'}`]
     };
   }
 }
 
-function analyzeHTML(html: string, url: string) {
-  const analysis: any = {
+function analyzeHTML(html: string, _url: string): HtmlAnalysis {
+  const analysis: HtmlAnalysis = {
     hasJsonLd: false,
     jsonLdSchemas: [],
     metaRobots: null,
@@ -270,7 +319,7 @@ function analyzeHTML(html: string, url: string) {
   return analysis;
 }
 
-function determineSeverity(statusCode: number, analysis: any, userAgent: string, url: string): string {
+function determineSeverity(statusCode: number, analysis: HtmlAnalysis | undefined, _userAgent: string, url: string): 'P0' | 'P1' | 'P2' | 'OK' {
   // P0: Critical issues that prevent AI indexing
   if (statusCode === 403 || statusCode === 404 || statusCode === 500) {
     return 'P0';
@@ -313,7 +362,7 @@ function determineSeverity(statusCode: number, analysis: any, userAgent: string,
   return 'OK';
 }
 
-function generateIssues(statusCode: number, analysis: any, userAgent: string, url: string): string[] {
+function generateIssues(statusCode: number, analysis: HtmlAnalysis | undefined, _userAgent: string, url: string): string[] {
   const issues: string[] = [];
   
   if (statusCode === 403) {
@@ -370,11 +419,11 @@ function generateContentSignature(html: string): string {
   return crypto.createHash('sha256').update(content).digest('hex').substring(0, 16);
 }
 
-function generateSummary(results: any[]) {
+function generateSummary(results: CheckResult[]): CheckSummary {
   const uniqueUrls = new Set<string>();
   const uniqueUserAgents = new Set<string>();
-  
-  const summary = {
+
+  const summary: CheckSummary = {
     total: results.length,
     p0Issues: 0,
     p1Issues: 0,
@@ -383,7 +432,7 @@ function generateSummary(results: any[]) {
     avgResponseTime: 0,
     uniqueUrls: 0,
     uniqueUserAgents: 0,
-    topIssues: [] as string[]
+    topIssues: []
   };
   
   let totalResponseTime = 0;
@@ -427,7 +476,7 @@ function generateSummary(results: any[]) {
   return summary;
 }
 
-async function saveResults(supabase: any, results: any[]) {
+async function saveResults(supabase: SupabaseClient, results: CheckResult[]) {
   // Save to ai_visibility_logs table
   for (const result of results) {
     try {
@@ -454,7 +503,7 @@ async function saveResults(supabase: any, results: any[]) {
   }
 }
 
-async function sendNotifications(results: any[]) {
+async function sendNotifications(results: CheckResult[]) {
   // TODO: Implement Slack notifications
   const summary = generateSummary(results);
   
