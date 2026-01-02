@@ -29,7 +29,7 @@ export async function GET() {
     // feature_registry 取得
     const { data: features, error: featuresError } = await supabase
       .from('feature_registry')
-      .select('*')
+      .select('id, feature_key, display_name, description, category, control_type, default_config, is_active, created_at, updated_at')
       .eq('is_active', true)
       .order('category', { ascending: true })
       .order('display_name', { ascending: true });
@@ -45,7 +45,7 @@ export async function GET() {
     // plan_features 取得
     const { data: planFeatures, error: planFeaturesError } = await supabase
       .from('plan_features')
-      .select('*')
+      .select('id, plan_type, feature_key, config_value, created_at, updated_at')
       .order('plan_type', { ascending: true })
       .order('feature_key', { ascending: true });
 
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     // 現在の設定を取得（audit log用）
     const { data: currentSettings, error: currentError } = await supabase
       .from('plan_features')
-      .select('*');
+      .select('id, plan_type, feature_key, config_value, created_at, updated_at');
 
     if (currentError) {
       logger.error('Error fetching current settings:', { data: currentError });

@@ -148,7 +148,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       // v_ai_citations_aggregatesから取得
       const { data: aggregates, error: aggregatesError } = await supabase
         .from('v_ai_citations_aggregates')
-        .select('*')
+        .select('response_id, organization_id, session_id, user_id, model, response_created_at, source_key, title, url, citations_count, total_weight, total_quoted_tokens, total_quoted_chars, max_score, avg_score, last_cited_at')
         .eq('session_id', sessionId)
         .order('max_score', { ascending: false, nullsFirst: false })
         .order('citations_count', { ascending: false })
@@ -210,7 +210,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       // mv_ai_citations_org_periodから取得
       const { data: mvData, error: mvError } = await supabase
         .from('mv_ai_citations_org_period')
-        .select('*')
+        .select('organization_id, day_bucket, source_key, title, url, citations_count, total_weight, total_quoted_tokens, total_quoted_chars, max_score, avg_score, last_cited_at')
         .eq('organization_id', orgId)
         .gte('day_bucket', from)
         .lt('day_bucket', to);

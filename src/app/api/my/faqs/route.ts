@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     // FAQs取得（RLSにより組織メンバーのみアクセス可能）
     const { data, error } = await supabase
       .from('faqs')
-      .select('*')
+      .select('id, organization_id, question, answer, category, sort_order, is_published, status, created_by, created_at, updated_at')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 
@@ -329,7 +329,7 @@ export async function POST(request: NextRequest) {
     if (insertData?.id) {
       const { data: selectData, error: selectError } = await supabase
         .from('faqs')
-        .select('*')
+        .select('id, organization_id, question, answer, category, sort_order, is_published, status, created_by, created_at, updated_at')
         .eq('id', insertData.id)
         .eq('organization_id', orgData.id)
         .maybeSingle();

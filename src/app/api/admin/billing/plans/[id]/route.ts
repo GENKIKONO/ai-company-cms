@@ -32,7 +32,7 @@ export async function GET(
 
     const { data, error } = await supabase
       .from('plans')
-      .select('*')
+      .select('id, name, slug, description, status, sort_order, monthly_price, yearly_price, stripe_price_id_monthly, stripe_price_id_yearly, created_at, updated_at')
       .eq('id', id)
       .single();
 
@@ -78,7 +78,7 @@ export async function PUT(
     // 現在のユーザーと更新前のデータを取得（監査ログ用）
     const [user, { data: beforeData }] = await Promise.all([
       getUserWithClient(supabase),
-      supabase.from('plans').select('*').eq('id', id).single(),
+      supabase.from('plans').select('id, name, slug, description, status, sort_order, monthly_price, yearly_price, stripe_price_id_monthly, stripe_price_id_yearly, created_at, updated_at').eq('id', id).single(),
     ]);
 
     const body = await request.json();
@@ -175,7 +175,7 @@ export async function DELETE(
     // 現在のユーザーと削除前のデータを取得（監査ログ用）
     const [user, { data: beforeData }] = await Promise.all([
       getUserWithClient(supabase),
-      supabase.from('plans').select('*').eq('id', id).single(),
+      supabase.from('plans').select('id, name, slug, description, status, sort_order, monthly_price, yearly_price, stripe_price_id_monthly, stripe_price_id_yearly, created_at, updated_at').eq('id', id).single(),
     ]);
 
     // 削除ではなく非推奨化を推奨（データ整合性のため）

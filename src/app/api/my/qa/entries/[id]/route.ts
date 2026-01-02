@@ -51,7 +51,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const { data: entry, error } = await supabase
       .from('qa_entries')
       .select(`
-        *,
+        id, organization_id, category_id, question, answer, tags, visibility, status,
+        published_at, last_edited_by, last_edited_at, created_at, updated_at, content_hash,
         qa_categories!left(id, name, slug)
       `)
       .eq('id', id)
@@ -120,7 +121,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // Check if entry exists and user has access
     const { data: existingEntry, error: fetchError } = await supabase
       .from('qa_entries')
-      .select('*')
+      .select('id, organization_id, category_id, question, answer, tags, visibility, status, published_at, last_edited_by, last_edited_at, created_at, updated_at, content_hash')
       .eq('id', id)
       .eq('organization_id', organization.id)
       .maybeSingle();
@@ -271,7 +272,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     // Check if entry exists and user has access
     const { data: existingEntry, error: fetchError } = await supabase
       .from('qa_entries')
-      .select('*')
+      .select('id, organization_id, category_id, question, answer, tags, visibility, status, published_at, last_edited_by, last_edited_at, created_at, updated_at, content_hash')
       .eq('id', id)
       .eq('organization_id', organization.id)
       .maybeSingle();
