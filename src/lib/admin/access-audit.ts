@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Admin Access Audit - アクセス監査ユーティリティ
  *

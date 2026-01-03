@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserFullWithClient } from '@/lib/core/auth-state';
+import { logger } from '@/lib/utils/logger';
 
 // 固定メタ情報（DB紐付けビュー相当）
 const WRITE_PATHS_META = [
@@ -184,7 +185,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Rate limit metrics API error:', error);
+    logger.error('Rate limit metrics API error:', { data: error });
     return NextResponse.json(
       {
         success: false,

@@ -12,6 +12,7 @@ import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireSiteAdmin, SiteAdminRequiredError } from '@/lib/billing';
 import { writeAdminAuditLog, buildActionName } from '@/lib/admin/audit';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 // バリデーションスキーマ
 const createPlanSchema = z.object({
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      console.error('[admin/billing/plans] GET error:', error);
+      logger.error('[admin/billing/plans] GET error:', { data: error });
       return NextResponse.json(
         { error: 'プラン一覧の取得に失敗しました', code: error.code },
         { status: 500 }
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
         { status: err.status }
       );
     }
-    console.error('[admin/billing/plans] GET unexpected error:', err);
+    logger.error('[admin/billing/plans] GET unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -109,8 +110,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      // eslint-disable-next-line no-console
-      console.error('[admin/billing/plans] POST error:', error);
+      logger.error('[admin/billing/plans] POST error:', { data: error });
       return NextResponse.json(
         { error: 'プランの作成に失敗しました', code: error.code },
         { status: 500 }
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('[admin/billing/plans] POST unexpected error:', err);
+    logger.error('[admin/billing/plans] POST unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

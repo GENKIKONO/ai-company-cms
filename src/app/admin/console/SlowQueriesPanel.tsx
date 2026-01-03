@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * AIOHub P3-1: Super Admin Console - Slow Queries Panel
  * 

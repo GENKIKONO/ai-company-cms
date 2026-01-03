@@ -1,4 +1,6 @@
 // Stub implementation to avoid Sentry imports in App Router
+import { logger } from '@/lib/utils/logger';
+
 export interface SentryContext {
   userId?: string;
   organizationId?: string;
@@ -18,20 +20,20 @@ export interface SentryPerformanceMetric {
 
 export class SentryUtils {
   static setUserContext(userId: string, organizationId?: string, email?: string) {
-    // Stub - log to console instead
-    console.debug('SentryUtils.setUserContext', { userId, organizationId, email });
+    // Stub - log instead
+    logger.debug('SentryUtils.setUserContext', { data: { userId, organizationId, email } });
   }
 
   static clearUserContext() {
-    console.debug('SentryUtils.clearUserContext');
+    logger.debug('SentryUtils.clearUserContext');
   }
 
   static captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', context?: SentryContext) {
-    console.debug('SentryUtils.captureMessage', { message, level, context });
+    logger.debug('SentryUtils.captureMessage', { data: { message, level, context } });
   }
 
   static captureException(error: Error, context?: SentryContext) {
-    console.error('SentryUtils.captureException', error, context);
+    logger.error('SentryUtils.captureException', { data: { error, context } });
   }
 
   static captureAPIError(error: Error, request: {
@@ -41,7 +43,7 @@ export class SentryUtils {
     userId?: string;
     organizationId?: string;
   }) {
-    console.error('SentryUtils.captureAPIError', error, request);
+    logger.error('SentryUtils.captureAPIError', { data: { error, request } });
   }
 
   static captureSSRError(error: Error, pageProps: {
@@ -50,15 +52,15 @@ export class SentryUtils {
     userId?: string;
     organizationId?: string;
   }) {
-    console.error('SentryUtils.captureSSRError', error, pageProps);
+    logger.error('SentryUtils.captureSSRError', { data: { error, pageProps } });
   }
 
   static trackPerformance(metric: SentryPerformanceMetric) {
-    console.debug('SentryUtils.trackPerformance', metric);
+    logger.debug('SentryUtils.trackPerformance', { data: metric });
   }
 
   static startTransaction(name: string, operation: string, context?: SentryContext) {
-    console.debug('SentryUtils.startTransaction', { name, operation, context });
+    logger.debug('SentryUtils.startTransaction', { data: { name, operation, context } });
     return { name, operation, startTime: Date.now() };
   }
 
@@ -72,26 +74,26 @@ export class SentryUtils {
     
     return callback(transaction)
       .then(result => {
-        console.debug('SentryUtils.withTransaction completed', { name, operation, duration: Date.now() - transaction.startTime });
+        logger.debug('SentryUtils.withTransaction completed', { data: { name, operation, duration: Date.now() - transaction.startTime } });
         return result;
       })
       .catch(error => {
         this.captureException(error, context);
-        console.debug('SentryUtils.withTransaction failed', { name, operation, duration: Date.now() - transaction.startTime });
+        logger.debug('SentryUtils.withTransaction failed', { data: { name, operation, duration: Date.now() - transaction.startTime } });
         throw error;
       });
   }
 
   static addBreadcrumb(message: string, category: string, data?: Record<string, any>) {
-    console.debug('SentryUtils.addBreadcrumb', { message, category, data });
+    logger.debug('SentryUtils.addBreadcrumb', { data: { message, category, breadcrumbData: data } });
   }
 
   static setTag(key: string, value: string) {
-    console.debug('SentryUtils.setTag', { key, value });
+    logger.debug('SentryUtils.setTag', { data: { key, value } });
   }
 
   static setContext(key: string, context: Record<string, any>) {
-    console.debug('SentryUtils.setContext', { key, context });
+    logger.debug('SentryUtils.setContext', { data: { key, context } });
   }
 
   static wrapAPIHandler<T extends any[]>(
@@ -107,15 +109,17 @@ export class SentryUtils {
       const startTime = Date.now();
 
       try {
-        console.debug('SentryUtils.wrapAPIHandler start', { operationName, context });
+        logger.debug('SentryUtils.wrapAPIHandler start', { data: { operationName, context } });
         const result = await handler(...args);
-        
-        console.debug('SentryUtils.wrapAPIHandler success', {
-          operationName,
-          context,
-          duration: Date.now() - startTime,
+
+        logger.debug('SentryUtils.wrapAPIHandler success', {
+          data: {
+            operationName,
+            context,
+            duration: Date.now() - startTime,
+          }
         });
-        
+
         return result;
       } catch (error) {
         if (error instanceof Error) {
@@ -134,10 +138,10 @@ export class SentryUtils {
     retryCount?: number;
     processingTime?: number;
   }) {
-    console.debug('SentryUtils.trackWebhookEvent', { eventType, success, context });
+    logger.debug('SentryUtils.trackWebhookEvent', { data: { eventType, success, context } });
 
     if (!success) {
-      console.warn('SentryUtils.trackWebhookEvent failed', { eventType, context });
+      logger.warn('SentryUtils.trackWebhookEvent failed', { data: { eventType, context } });
     }
   }
 }

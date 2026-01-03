@@ -50,11 +50,13 @@ export async function GET(req: NextRequest) {
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('[QA_CATEGORIES_DEBUG] supabase error', {
-        code: error.code,
-        message: error.message,
-        details: error.details,
-        hint: error.hint
+      logger.error('[QA_CATEGORIES_DEBUG] supabase error', {
+        data: {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        }
       });
       return NextResponse.json({ 
         error: 'Failed to fetch categories', 

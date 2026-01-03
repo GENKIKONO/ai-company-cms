@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireSiteAdmin, SiteAdminRequiredError } from '@/lib/billing';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 // バリデーションスキーマ
 const exportRequestSchema = z.object({
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      console.error('[admin/billing/analytics/export] query error:', error);
+      logger.error('[admin/billing/analytics/export] query error:', { data: error });
       return NextResponse.json(
         { error: 'データの取得に失敗しました', code: error.code },
         { status: 500 }
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      console.error('[admin/billing/analytics/export] upload error:', uploadError);
+      logger.error('[admin/billing/analytics/export] upload error:', { data: uploadError });
       return NextResponse.json(
         { error: 'ファイルのアップロードに失敗しました', code: 'UPLOAD_ERROR' },
         { status: 500 }
@@ -126,7 +127,7 @@ export async function POST(request: NextRequest) {
       .createSignedUrl(filePath, 3600);
 
     if (signError) {
-      console.error('[admin/billing/analytics/export] signedUrl error:', signError);
+      logger.error('[admin/billing/analytics/export] signedUrl error:', { data: signError });
       // 署名URL失敗時は直接ダウンロードパスを返す
       return NextResponse.json({
         success: true,
@@ -157,7 +158,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('[admin/billing/analytics/export] unexpected error:', err);
+    logger.error('[admin/billing/analytics/export] unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

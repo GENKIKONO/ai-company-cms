@@ -4,6 +4,7 @@
  */
 
 import 'server-only';
+import { logger } from '@/lib/utils/logger';
 
 export interface VectorSearchRequest {
   query: string;
@@ -59,8 +60,8 @@ export async function searchSimilarContent(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Vector Search Client] Search failed:', error);
-    
+    logger.error('[Vector Search Client] Search failed:', { data: error });
+
     return {
       success: false,
       message: `Vector search failed: ${errorMsg}`
@@ -97,8 +98,8 @@ export async function getAvailableSourceTables(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Vector Search Client] Get tables failed:', error);
-    
+    logger.error('[Vector Search Client] Get tables failed:', { data: error });
+
     return {
       success: false,
       message: `Get available tables failed: ${errorMsg}`
@@ -156,8 +157,8 @@ export async function getRecommendedContent(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Vector Search Client] Get recommendations failed:', error);
-    
+    logger.error('[Vector Search Client] Get recommendations failed:', { data: error });
+
     return {
       success: false,
       message: `Get recommended content failed: ${errorMsg}`

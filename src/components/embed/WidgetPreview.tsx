@@ -160,7 +160,8 @@ export function WidgetPreviewThumbnail({
     <div className="widget-thumbnail">
       <div className="thumbnail-header">
         {organization.logo_url && (
-          <img 
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={organization.logo_url} 
             alt={`${organization.name}ロゴ`}
             className="thumbnail-logo"

@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserFullWithClient } from '@/lib/core/auth-state';
+import { logger } from '@/lib/utils/logger';
 
 // admin-rpc.tsから移行した型定義
 interface ContentRefreshHistoryItem {
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (error) {
-      console.error('getContentRefreshHistory error:', error);
+      logger.error('getContentRefreshHistory error:', { data: error });
       return NextResponse.json(
         {
           error: 'Failed to fetch content refresh history',
@@ -91,7 +92,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Content refresh history API error:', error);
+    logger.error('Content refresh history API error:', { data: error });
     return NextResponse.json(
       { 
         error: 'Failed to fetch content refresh history',
@@ -173,7 +174,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ data: result, error: null });
 
   } catch (error) {
-    console.error('Content refresh trigger API error:', error);
+    logger.error('Content refresh trigger API error:', { data: error });
     return NextResponse.json(
       { 
         error: 'Failed to trigger content refresh',

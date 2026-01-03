@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
     const { data: searchResults, error } = await rpcQuery;
 
     if (error) {
-      console.error('Vector search error:', error);
+      logger.error('Vector search error:', { data: error });
       throw error;
     }
 
@@ -111,8 +112,8 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[Vector Search API] Error:', error);
-    
+    logger.error('[Vector Search API] Error:', { data: error });
+
     // OpenAI API エラーの詳細処理
     if (error instanceof Error && error.message.includes('OpenAI API')) {
       return NextResponse.json({
@@ -172,7 +173,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[Vector Search Info API] Error:', error);
+    logger.error('[Vector Search Info API] Error:', { data: error });
     return NextResponse.json({
       success: false,
       message: error instanceof Error ? error.message : 'Internal server error'

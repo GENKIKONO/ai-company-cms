@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * E2E Test Login API Endpoint
  *

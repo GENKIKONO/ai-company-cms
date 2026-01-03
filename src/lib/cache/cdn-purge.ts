@@ -4,6 +4,7 @@
  */
 
 import 'server-only';
+import { logger } from '@/lib/utils/logger';
 
 export interface CdnPurgeOptions {
   scope: 'url' | 'prefix' | 'all';
@@ -59,8 +60,8 @@ export async function purgeVercelCache(options: CdnPurgeOptions): Promise<CdnPur
     
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[CDN Purge] Vercel revalidation failed:', error);
-    
+    logger.error('[CDN Purge] Vercel revalidation failed:', { data: error });
+
     return {
       success: false,
       message: 'CDN purge failed',
@@ -114,8 +115,8 @@ export async function enqueueSupabasePurge(options: CdnPurgeOptions): Promise<Cd
     
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[CDN Purge] Supabase enqueue failed:', error);
-    
+    logger.error('[CDN Purge] Supabase enqueue failed:', { data: error });
+
     return {
       success: false,
       message: 'Supabase purge enqueue failed',
@@ -135,18 +136,18 @@ export async function purgeCdn(options: CdnPurgeOptions): Promise<CdnPurgeResult
   
   // 本番環境ではSupabase Edge Function経由を推奨
   if (isProduction && !options.immediate) {
-    console.log('[CDN Purge] Using Supabase queue for production');
+    logger.info('[CDN Purge] Using Supabase queue for production');
     return enqueueSupabasePurge(options);
   }
-  
+
   // 開発環境またはimmediate指定時は直接Vercel
   if (isVercel) {
-    console.log('[CDN Purge] Using direct Vercel revalidation');
+    logger.info('[CDN Purge] Using direct Vercel revalidation');
     return purgeVercelCache(options);
   }
-  
+
   // ローカル環境では何もしない
-  console.log('[CDN Purge] Skipping CDN purge in local environment');
+  logger.info('[CDN Purge] Skipping CDN purge in local environment');
   return {
     success: true,
     message: 'CDN purge skipped in local environment',
@@ -206,8 +207,8 @@ export async function purgeContentCache(
  * 便利関数: サイト全体パージ（緊急時用）
  */
 export async function purgeEntireSite(): Promise<CdnPurgeResult> {
-  console.warn('[CDN Purge] Executing full site purge - this may impact performance');
-  
+  logger.warn('[CDN Purge] Executing full site purge - this may impact performance');
+
   return purgeCdn({
     scope: 'all',
     paths: [] // 'all' scope では paths は無視される

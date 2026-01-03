@@ -57,10 +57,12 @@ export async function GET(request: NextRequest) {
     const authUser = await getUserFullWithClient(supabase);
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log('[ME_DEBUG] Entry point:', {
-        hasAuthUser: !!authUser,
-        userId: authUser?.id,
-        userEmail: authUser?.email,
+      logger.debug('[ME_DEBUG] Entry point:', {
+        data: {
+          hasAuthUser: !!authUser,
+          userId: authUser?.id,
+          userEmail: authUser?.email,
+        }
       });
     }
 
@@ -86,9 +88,11 @@ export async function GET(request: NextRequest) {
     };
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log('[ME_DEBUG] user', {
-        id: authUser?.id,
-        email: authUser?.email,
+      logger.debug('[ME_DEBUG] user', {
+        data: {
+          id: authUser?.id,
+          email: authUser?.email,
+        }
       });
     }
 
@@ -102,20 +106,20 @@ export async function GET(request: NextRequest) {
       .rpc('get_my_organizations_slim');
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log('[ME_DEBUG] orgs_from_rpc', orgRows);
-      console.log('[ME_DEBUG] rpc_error', orgError);
-      
+      logger.debug('[ME_DEBUG] orgs_from_rpc', { data: orgRows });
+      logger.debug('[ME_DEBUG] rpc_error', { data: orgError });
+
       // DEBUG: Check if id field is present in RPC response
       if (orgRows && orgRows.length > 0) {
-        console.log('[ME_DEBUG] first_org_raw_fields', Object.keys(orgRows[0]));
-        console.log('[ME_DEBUG] first_org_id', orgRows[0].id);
-        console.log('[ME_DEBUG] first_org_full_object', orgRows[0]);
+        logger.debug('[ME_DEBUG] first_org_raw_fields', { data: Object.keys(orgRows[0]) });
+        logger.debug('[ME_DEBUG] first_org_id', { data: orgRows[0].id });
+        logger.debug('[ME_DEBUG] first_org_full_object', { data: orgRows[0] });
       }
     }
 
     if (orgError) {
       // RPCエラーは system_error として扱う（DB側は正常の前提）
-      console.error('[ME_DEBUG] get_my_organizations_slim error', orgError);
+      logger.error('[ME_DEBUG] get_my_organizations_slim error', { data: orgError });
       errorType = 'system_error';
       errorMessage = '組織情報の取得に失敗しました';
     } else {
@@ -125,12 +129,14 @@ export async function GET(request: NextRequest) {
       selectedOrganization = organizations.length > 0 ? organizations[0] : null;
       
       if (process.env.NODE_ENV !== 'production') {
-        console.log('[ME_DEBUG] organizations mapped:', { 
-          userId: authUser.id, 
-          orgCount: organizations.length,
-          firstOrgId: organizations[0]?.id,
-          firstOrgName: organizations[0]?.name,
-          firstOrgFullMapped: organizations[0]
+        logger.debug('[ME_DEBUG] organizations mapped:', {
+          data: {
+            userId: authUser.id,
+            orgCount: organizations.length,
+            firstOrgId: organizations[0]?.id,
+            firstOrgName: organizations[0]?.name,
+            firstOrgFullMapped: organizations[0]
+          }
         });
       }
       
@@ -140,9 +146,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log('[ME_DEBUG] response_summary', {
-        organizationsLength: organizations.length,
-        errorType,
+      logger.debug('[ME_DEBUG] response_summary', {
+        data: {
+          organizationsLength: organizations.length,
+          errorType,
+        }
       });
     }
 
@@ -157,23 +165,28 @@ export async function GET(request: NextRequest) {
     };
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log('[ME_DEBUG] Final response:', { 
-        hasUser: !!user,
-        organizationsLength: organizations.length,
-        selectedOrgId: selectedOrganization?.id,
-        selectedOrgSlug: selectedOrganization?.slug,
-        selectedOrgPlan: selectedOrganization?.plan,
-        organizationId: selectedOrganization?.id,  // Extra check for dashboard compatibility
-        errorType,
-        hasError: !!errorMessage,
-        errorMessage: errorMessage
+      logger.debug('[ME_DEBUG] Final response:', {
+        data: {
+          hasUser: !!user,
+          organizationsLength: organizations.length,
+          selectedOrgId: selectedOrganization?.id,
+          selectedOrgSlug: selectedOrganization?.slug,
+          selectedOrgPlan: selectedOrganization?.plan,
+          organizationId: selectedOrganization?.id,  // Extra check for dashboard compatibility
+          errorType,
+          hasError: !!errorMessage,
+          errorMessage: errorMessage
+        }
       });
-      
+
       // Extra debug: log the complete response structure that will be sent
-      console.log('[ME_DEBUG] Complete response structure:');
-      console.log('[ME_DEBUG] - organizations[0]?.id:', organizations[0]?.id);
-      console.log('[ME_DEBUG] - selectedOrganization?.id:', selectedOrganization?.id);
-      console.log('[ME_DEBUG] - organization?.id:', selectedOrganization?.id);
+      logger.debug('[ME_DEBUG] Complete response structure:', {
+        data: {
+          'organizations[0]?.id': organizations[0]?.id,
+          'selectedOrganization?.id': selectedOrganization?.id,
+          'organization?.id': selectedOrganization?.id
+        }
+      });
     }
     
     const response = NextResponse.json(responseData);

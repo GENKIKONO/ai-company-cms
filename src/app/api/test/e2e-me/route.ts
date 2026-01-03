@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 /**
  * E2E Test User API Endpoint
  * Service role authentication for testing purposes only
- * 
+ *
  * Purpose: Bypass UI login for E2E testing while maintaining production security
  * Authentication: Uses x-rls-regression-admin-token header with service_role client
  * Safety: Only works in development environment (NODE_ENV=development)

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Translation Analytics Page
  * P4-3: 翻訳システム分析・運用監視

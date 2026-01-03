@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * 課金・プラン管理ユーティリティ
  *

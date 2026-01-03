@@ -4,6 +4,7 @@
  */
 
 import 'server-only';
+import { logger } from '@/lib/utils/logger';
 
 export interface EmbeddingJobRequest {
   organization_id: string;
@@ -120,8 +121,8 @@ export async function enqueueEmbeddingJob(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Embedding Client] Enqueue failed:', error);
-    
+    logger.error('[Embedding Client] Enqueue failed:', { data: error });
+
     return {
       success: false,
       message: `Embedding job enqueue failed: ${errorMsg}`
@@ -168,8 +169,8 @@ export async function drainEmbeddingJobs(): Promise<{
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Embedding Client] Drain failed:', error);
-    
+    logger.error('[Embedding Client] Drain failed:', { data: error });
+
     return {
       success: false,
       processed_count: 0,
@@ -229,8 +230,8 @@ export async function getEmbeddingJobs(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Embedding Client] Get jobs failed:', error);
-    
+    logger.error('[Embedding Client] Get jobs failed:', { data: error });
+
     return {
       data: [],
       total: 0,
@@ -292,8 +293,8 @@ export async function getEmbeddings(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Embedding Client] Get embeddings failed:', error);
-    
+    logger.error('[Embedding Client] Get embeddings failed:', { data: error });
+
     return {
       data: [],
       total: 0,
@@ -380,8 +381,8 @@ export async function getEmbeddingMetrics(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Embedding Client] Get metrics failed:', error);
-    
+    logger.error('[Embedding Client] Get metrics failed:', { data: error });
+
     return {
       data: null,
       error: errorMsg
@@ -465,8 +466,8 @@ export async function enqueueOrganizationEmbeddings(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Embedding Client] Bulk enqueue failed:', error);
-    
+    logger.error('[Embedding Client] Bulk enqueue failed:', { data: error });
+
     return {
       success: false,
       enqueued_count: 0,

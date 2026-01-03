@@ -267,6 +267,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
               {/* アバター */}
               <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
                 {member.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={member.avatar_url} alt="" className="w-10 h-10 rounded-full" />
                 ) : (
                   <span className="text-sm font-medium text-gray-600">

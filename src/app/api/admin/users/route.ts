@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     // Step 2: organization_id の集合を取得して organizations を一括取得
     const orgIds = [...new Set(users?.map(u => u.organization_id).filter(Boolean) as string[])];
 
-    let orgsMap: Map<string, { id: string; name: string | null; status: string | null; is_published: boolean | null }> = new Map();
+    const orgsMap: Map<string, { id: string; name: string | null; status: string | null; is_published: boolean | null }> = new Map();
 
     if (orgIds.length > 0) {
       const { data: orgs, error: orgError } = await supabase

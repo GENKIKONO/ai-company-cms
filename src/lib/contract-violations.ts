@@ -1,14 +1,15 @@
 /**
  * Data Contract 違反検知・記録ユーティリティ (Next.js用)
  * EPIC 3-4: contract_violations テーブルへの安全な INSERT
- * 
+ *
  * Edge Functions版と仕様統一:
- * - service_role 経由のみ INSERT  
+ * - service_role 経由のみ INSERT
  * - payload の匿名化必須
  * - request_id の統一生成
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 /**
  * Data Contract 違反タイプ (Edge Functions版と統一)
@@ -179,28 +180,34 @@ export async function recordContractViolation(
       .single();
 
     if (error) {
-      console.error('Failed to record contract violation', {
-        error: error.message,
-        endpoint: entry.endpoint,
-        violation_type: entry.violation_type
+      logger.error('Failed to record contract violation', {
+        data: {
+          error: error.message,
+          endpoint: entry.endpoint,
+          violation_type: entry.violation_type
+        }
       });
       return { success: false, error: error.message };
     }
 
-    console.log('Contract violation recorded', {
-      violation_id: data.id,
-      endpoint: entry.endpoint,
-      violation_type: entry.violation_type,
-      table_name: entry.table_name
+    logger.info('Contract violation recorded', {
+      data: {
+        violation_id: data.id,
+        endpoint: entry.endpoint,
+        violation_type: entry.violation_type,
+        table_name: entry.table_name
+      }
     });
 
     return { success: true, violation_id: data.id };
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Exception recording contract violation', {
-      error: errorMsg,
-      endpoint: entry.endpoint
+    logger.error('Exception recording contract violation', {
+      data: {
+        error: errorMsg,
+        endpoint: entry.endpoint
+      }
     });
     return { success: false, error: errorMsg };
   }
@@ -283,13 +290,15 @@ export const ContractViolationHelpers = {
  * 非同期でContract違反を記録 (レスポンスをブロックしない)
  */
 export function recordContractViolationAsync(entry: ContractViolationEntry): void {
-  Promise.resolve().then(() => 
+  Promise.resolve().then(() =>
     recordContractViolation(entry)
   ).catch(error => {
-    console.error('Failed to record contract violation async', {
-      error: error.message,
-      endpoint: entry.endpoint,
-      violation_type: entry.violation_type
+    logger.error('Failed to record contract violation async', {
+      data: {
+        error: error.message,
+        endpoint: entry.endpoint,
+        violation_type: entry.violation_type
+      }
     });
   });
 }

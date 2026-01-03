@@ -262,18 +262,18 @@ export async function healthCheck(): Promise<{
           timeoutPromise
         ]);
         checks.stripe = true;
-        console.log('[healthCheck] Stripe OK');
+        mainLogger.info('[healthCheck] Stripe OK');
       } else {
         // 設定されていない場合はスキップ（健康とみなす）
         checks.stripe = true;
-        console.log('[healthCheck] Stripe skipped (no key configured)');
+        mainLogger.info('[healthCheck] Stripe skipped (no key configured)');
       }
     } catch (err) {
       // Stripe失敗は degraded であり unhealthy ではない
       checks.stripe = false;
       // エラーを分類してログ出力（秘密情報は出さない）
       const category = categorizeStripeError(err);
-      console.error(`[healthCheck] Stripe FAILED category=${category}`);
+      mainLogger.error(`[healthCheck] Stripe FAILED category=${category}`);
     }
 
     // Resend接続チェック（オプショナルサービス、タイムアウト付き）

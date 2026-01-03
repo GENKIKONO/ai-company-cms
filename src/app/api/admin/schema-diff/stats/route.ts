@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserWithClient } from '@/lib/core/auth-state';
+import { logger } from '@/lib/utils/logger';
 
 interface SchemaDiffStats {
   total_diffs_24h: number;
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
       .order('diff_at', { ascending: false });
 
     if (diffError) {
-      console.error('Failed to fetch schema diffs for stats:', diffError);
+      logger.error('Failed to fetch schema diffs for stats:', { data: diffError });
       return NextResponse.json(
         { error: 'Failed to fetch schema diff statistics' },
         { status: 500 }
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
       .order('started_at', { ascending: false });
 
     if (jobError) {
-      console.error('Failed to fetch job runs for stats:', jobError);
+      logger.warn('Failed to fetch job runs for stats:', { data: jobError });
       // ジョブ情報は必須ではないので継続
     }
 
@@ -155,7 +156,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Schema diff stats API error:', error);
+    logger.error('Schema diff stats API error:', { data: error });
     return NextResponse.json(
       { 
         success: false,

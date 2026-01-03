@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { runContentDiffJob, type ContentDiffJobInput } from '@/lib/jobs/content-diff-job';
 import { requireSuperAdminUser } from '@/lib/auth/server';
 import type { Database } from '@/types/supabase';
+import { logger } from '@/lib/utils/logger';
 
 /** job_runs_v2 の取得列（列明示パターン） */
 type JobRunV2Row = Database['public']['Tables']['job_runs_v2']['Row'];
@@ -113,8 +114,8 @@ export async function POST(request: NextRequest) {
     }, { status: httpStatus });
     
   } catch (error) {
-    console.error('Content diff API error:', error);
-    
+    logger.error('Content diff API error:', { data: error });
+
     return NextResponse.json(
       {
         success: false,
@@ -182,8 +183,8 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Job status API error:', error);
-    
+    logger.error('Job status API error:', { data: error });
+
     return NextResponse.json(
       {
         success: false,

@@ -57,11 +57,13 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('[MATERIALS_DEBUG] supabase error', {
-        code: error.code,
-        message: error.message,
-        details: error.details,
-        hint: error.hint
+      logger.error('[MATERIALS_DEBUG] supabase error', {
+        data: {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        }
       });
       return NextResponse.json(
         { error: 'Database error', message: error.message, details: error.details },

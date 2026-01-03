@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * P3-8: Admin Metrics Dashboard
  * 監査・可観測性 KPI の定義 & ダッシュボード

@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireSiteAdmin, SiteAdminRequiredError } from '@/lib/billing';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 // 更新用バリデーションスキーマ
 const updateSubscriptionSchema = z.object({
@@ -45,7 +46,7 @@ export async function GET(
           { status: 404 }
         );
       }
-      console.error('[admin/billing/subscriptions/[id]] GET error:', error);
+      logger.error('[admin/billing/subscriptions/[id]] GET error:', { data: error });
       return NextResponse.json(
         { error: 'サブスクリプションの取得に失敗しました', code: error.code },
         { status: 500 }
@@ -80,7 +81,7 @@ export async function GET(
         { status: err.status }
       );
     }
-    console.error('[admin/billing/subscriptions/[id]] GET unexpected error:', err);
+    logger.error('[admin/billing/subscriptions/[id]] GET unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -114,7 +115,7 @@ export async function PUT(
       );
     }
 
-    let updateData: Record<string, unknown> = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
 
@@ -214,7 +215,7 @@ export async function PUT(
           { status: 400 }
         );
       }
-      console.error('[admin/billing/subscriptions/[id]] PUT error:', error);
+      logger.error('[admin/billing/subscriptions/[id]] PUT error:', { data: error });
       return NextResponse.json(
         { error: 'サブスクリプションの更新に失敗しました', code: error.code },
         { status: 500 }
@@ -242,7 +243,7 @@ export async function PUT(
         { status: 400 }
       );
     }
-    console.error('[admin/billing/subscriptions/[id]] PUT unexpected error:', err);
+    logger.error('[admin/billing/subscriptions/[id]] PUT unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Embedding Management Page
  * P4-4: Embedding ジョブ管理・監視画面

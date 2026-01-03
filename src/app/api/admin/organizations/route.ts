@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[Admin Organizations API] Error:', error);
+    logger.error('[Admin Organizations API] Error:', { data: error });
     return NextResponse.json({
       success: false,
       message: error instanceof Error ? error.message : 'Internal server error'

@@ -9,6 +9,7 @@ import { getUserWithClient } from '@/lib/core/auth-state';
 import { requireSiteAdmin, SiteAdminRequiredError } from '@/lib/billing';
 import { writeAdminAuditLog, buildActionName, computeDiff } from '@/lib/admin/audit';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 // 更新用バリデーションスキーマ
 const updatePlanSchema = z.object({
@@ -43,7 +44,7 @@ export async function GET(
           { status: 404 }
         );
       }
-      console.error('[admin/billing/plans/[id]] GET error:', error);
+      logger.error('[admin/billing/plans/[id]] GET error:', { data: error });
       return NextResponse.json(
         { error: 'プランの取得に失敗しました', code: error.code },
         { status: 500 }
@@ -58,7 +59,7 @@ export async function GET(
         { status: err.status }
       );
     }
-    console.error('[admin/billing/plans/[id]] GET unexpected error:', err);
+    logger.error('[admin/billing/plans/[id]] GET unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -120,8 +121,7 @@ export async function PUT(
           { status: 404 }
         );
       }
-      // eslint-disable-next-line no-console
-      console.error('[admin/billing/plans/[id]] PUT error:', error);
+      logger.error('[admin/billing/plans/[id]] PUT error:', { data: error });
       return NextResponse.json(
         { error: 'プランの更新に失敗しました', code: error.code },
         { status: 500 }
@@ -155,7 +155,7 @@ export async function PUT(
         { status: 400 }
       );
     }
-    console.error('[admin/billing/plans/[id]] PUT unexpected error:', err);
+    logger.error('[admin/billing/plans/[id]] PUT unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -202,8 +202,7 @@ export async function DELETE(
             { status: 404 }
           );
         }
-        // eslint-disable-next-line no-console
-        console.error('[admin/billing/plans/[id]] DELETE (deprecate) error:', error);
+        logger.error('[admin/billing/plans/[id]] DELETE (deprecate) error:', { data: error });
         return NextResponse.json(
           { error: 'プランの非推奨化に失敗しました', code: error.code },
           { status: 500 }
@@ -250,8 +249,7 @@ export async function DELETE(
     const { error } = await supabase.from('plans').delete().eq('id', id);
 
     if (error) {
-      // eslint-disable-next-line no-console
-      console.error('[admin/billing/plans/[id]] DELETE error:', error);
+      logger.error('[admin/billing/plans/[id]] DELETE error:', { data: error });
       return NextResponse.json(
         { error: 'プランの削除に失敗しました', code: error.code },
         { status: 500 }
@@ -278,7 +276,7 @@ export async function DELETE(
         { status: err.status }
       );
     }
-    console.error('[admin/billing/plans/[id]] DELETE unexpected error:', err);
+    logger.error('[admin/billing/plans/[id]] DELETE unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

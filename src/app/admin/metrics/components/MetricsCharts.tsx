@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { fetchMetricsData } from '@/lib/admin/metrics';
 import RlsDeniedWeeklyChart from './charts/RlsDeniedWeeklyChart';
 import JobFailRateWeeklyChart from './charts/JobFailRateWeeklyChart';

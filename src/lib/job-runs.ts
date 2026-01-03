@@ -9,6 +9,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 /**
  * 型定義（Edge Functions版と統一）
@@ -256,10 +257,12 @@ export async function beginRun(request: BeginRunRequest): Promise<BeginRunResult
         throw error;
       }
       
-      console.log('Job run started', {
-        job_id: data.id,
-        job_name: request.job_name,
-        idempotency_key: request.idempotency_key
+      logger.info('Job run started', {
+        data: {
+          job_id: data.id,
+          job_name: request.job_name,
+          idempotency_key: request.idempotency_key
+        }
       });
       
       return {
@@ -271,9 +274,11 @@ export async function beginRun(request: BeginRunRequest): Promise<BeginRunResult
     } catch (insertError: any) {
       // UNIQUE制約違反時の処理
       if (insertError.code === '23505' && request.idempotency_key) {
-        console.log('Job idempotency key collision, fetching existing', {
-          job_name: request.job_name,
-          idempotency_key: request.idempotency_key
+        logger.info('Job idempotency key collision, fetching existing', {
+          data: {
+            job_name: request.job_name,
+            idempotency_key: request.idempotency_key
+          }
         });
         
         const { data: existing, error: selectError } = await supabase
@@ -290,9 +295,11 @@ export async function beginRun(request: BeginRunRequest): Promise<BeginRunResult
         const existingRecord = existing as JobRunRecord;
         
         if (existingRecord.status === 'running' || existingRecord.status === 'pending') {
-          console.warn('Duplicate job execution prevented', {
-            job_id: existingRecord.id,
-            existing_status: existingRecord.status
+          logger.warn('Duplicate job execution prevented', {
+            data: {
+              job_id: existingRecord.id,
+              existing_status: existingRecord.status
+            }
           });
           
           return {
@@ -301,9 +308,11 @@ export async function beginRun(request: BeginRunRequest): Promise<BeginRunResult
             is_duplicate: true
           };
         } else {
-          console.warn('Job with same idempotency_key exists in final state', {
-            job_id: existingRecord.id,
-            existing_status: existingRecord.status
+          logger.warn('Job with same idempotency_key exists in final state', {
+            data: {
+              job_id: existingRecord.id,
+              existing_status: existingRecord.status
+            }
           });
           
           return {
@@ -320,9 +329,11 @@ export async function beginRun(request: BeginRunRequest): Promise<BeginRunResult
     
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Failed to begin job run', {
-      error: errorMsg,
-      job_name: request.job_name
+    logger.error('Failed to begin job run', {
+      data: {
+        error: errorMsg,
+        job_name: request.job_name
+      }
     });
     
     return {
@@ -365,19 +376,23 @@ export async function completeSuccess(request: CompleteJobRequest): Promise<{ su
       throw new Error('No running job found to complete');
     }
     
-    console.log('Job completed successfully', {
-      job_id: request.job_id,
-      job_name: data.job_name,
-      duration_ms: data.duration_ms
+    logger.info('Job completed successfully', {
+      data: {
+        job_id: request.job_id,
+        job_name: data.job_name,
+        duration_ms: data.duration_ms
+      }
     });
     
     return { success: true };
     
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Failed to complete job success', {
-      error: errorMsg,
-      job_id: request.job_id
+    logger.error('Failed to complete job success', {
+      data: {
+        error: errorMsg,
+        job_id: request.job_id
+      }
     });
     
     return { success: false, error: errorMsg };
@@ -425,20 +440,24 @@ export async function completeFailure(request: CompleteJobRequest): Promise<{ su
       throw new Error('No running job found to complete');
     }
     
-    console.warn('Job completed with failure', {
-      job_id: request.job_id,
-      job_name: data.job_name,
-      error_code: request.error_code,
-      retry_count: data.retry_count
+    logger.warn('Job completed with failure', {
+      data: {
+        job_id: request.job_id,
+        job_name: data.job_name,
+        error_code: request.error_code,
+        retry_count: data.retry_count
+      }
     });
     
     return { success: true };
     
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Failed to complete job failure', {
-      error: errorMsg,
-      job_id: request.job_id
+    logger.error('Failed to complete job failure', {
+      data: {
+        error: errorMsg,
+        job_id: request.job_id
+      }
     });
     
     return { success: false, error: errorMsg };
@@ -489,18 +508,22 @@ export async function requestCancel(jobId: string): Promise<{ success: boolean; 
       return { success: false, error: 'No running job found to cancel' };
     }
     
-    console.log('Job cancel requested', {
-      job_id: jobId,
-      job_name: data.job_name
+    logger.info('Job cancel requested', {
+      data: {
+        job_id: jobId,
+        job_name: data.job_name
+      }
     });
     
     return { success: true };
     
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Failed to request job cancel', {
-      error: errorMsg,
-      job_id: jobId
+    logger.error('Failed to request job cancel', {
+      data: {
+        error: errorMsg,
+        job_id: jobId
+      }
     });
     
     return { success: false, error: errorMsg };
@@ -525,26 +548,30 @@ export async function checkConcurrentRunning(
       .gte('started_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
     
     if (error) {
-      console.error('Failed to check concurrent running jobs', { error: error.message });
+      logger.error('Failed to check concurrent running jobs', { data: { error: error.message } });
       return { can_run: true, current_running: 0 };
     }
     
     const currentRunning = count || 0;
     const canRun = currentRunning < maxConcurrent;
     
-    console.debug('Concurrent running jobs check', {
-      job_name: jobName,
-      current_running: currentRunning,
-      max_concurrent: maxConcurrent,
-      can_run: canRun
+    logger.debug('Concurrent running jobs check', {
+      data: {
+        job_name: jobName,
+        current_running: currentRunning,
+        max_concurrent: maxConcurrent,
+        can_run: canRun
+      }
     });
     
     return { can_run: canRun, current_running: currentRunning };
     
   } catch (error) {
-    console.error('Exception checking concurrent running jobs', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      job_name: jobName
+    logger.error('Exception checking concurrent running jobs', {
+      data: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        job_name: jobName
+      }
     });
     
     return { can_run: true, current_running: 0 };

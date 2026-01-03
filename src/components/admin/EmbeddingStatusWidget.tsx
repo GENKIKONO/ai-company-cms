@@ -37,6 +37,7 @@ export default function EmbeddingStatusWidget() {
         setLastUpdate(new Date());
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error fetching embedding metrics:', error);
     } finally {
       setLoading(false);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { AiReportGenerator, getPreviousMonthPeriod } from '@/lib/ai-reports/generator';
+import { logger } from '@/lib/utils/logger';
 
 // 単一組織のレポート生成
 export async function POST(request: NextRequest) {
@@ -35,8 +36,8 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('AI Monthly Report generation failed:', error);
-    
+    logger.error('AI Monthly Report generation failed:', { data: error });
+
     return NextResponse.json(
       { 
         error: 'Report generation failed',
@@ -87,7 +88,7 @@ export async function PUT(request: NextRequest) {
         results.errors.push(
           `${org.id}: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
-        console.error(`Failed to generate report for org ${org.id}:`, error);
+        logger.error(`Failed to generate report for org ${org.id}:`, { data: error });
       }
     }
 
@@ -98,8 +99,8 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Batch AI Monthly Report generation failed:', error);
-    
+    logger.error('Batch AI Monthly Report generation failed:', { data: error });
+
     return NextResponse.json(
       { 
         error: 'Batch generation failed',

@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserWithClient } from '@/lib/core/auth-state';
+import { logger } from '@/lib/utils/logger';
 
 interface SchemaDiffSummary {
   id: string;
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
       .limit(20);
 
     if (diffError) {
-      console.error('Failed to fetch schema diffs:', diffError);
+      logger.error('Failed to fetch schema diffs:', { data: diffError });
       return NextResponse.json(
         { error: 'Failed to fetch schema diff history' },
         { status: 500 }
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
       .limit(50);
 
     if (jobError) {
-      console.error('Failed to fetch job runs:', jobError);
+      logger.warn('Failed to fetch job runs:', { data: jobError });
       // ジョブ情報取得失敗は警告レベルとし、継続
     }
 
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Schema diff recent API error:', error);
+    logger.error('Schema diff recent API error:', { data: error });
     return NextResponse.json(
       { 
         success: false,

@@ -35,11 +35,13 @@ export async function validateOrgAccess(
 ): Promise<boolean> {
   try {
     const supabase = await createClient();
-    
-    console.log('[ORG_ACCESS_DEBUG] Calling validate_org_access RPC:', {
-      organizationId,
-      userId,
-      permission
+
+    logger.debug('[ORG_ACCESS_DEBUG] Calling validate_org_access RPC:', {
+      data: {
+        organizationId,
+        userId,
+        permission
+      }
     });
     
     // Call validate_org_access RPC function (DB側は正常の前提)
@@ -51,7 +53,7 @@ export async function validateOrgAccess(
 
     if (error) {
       // DB側は正常前提なので、ここでのエラーは unexpected
-      console.error('[ORG_ACCESS_DEBUG] validateOrgAccess RPC error:', error);
+      logger.error('[ORG_ACCESS_DEBUG] validateOrgAccess RPC error:', { data: error });
       throw new OrgAccessError(
         'メンバーシップ確認に失敗しました',
         'INTERNAL_ERROR',
@@ -68,15 +70,15 @@ export async function validateOrgAccess(
       );
     }
 
-    console.log('[ORG_ACCESS_DEBUG] Access granted');
+    logger.debug('[ORG_ACCESS_DEBUG] Access granted');
     return true;
-    
+
   } catch (error) {
     if (error instanceof OrgAccessError) {
       throw error;
     }
-    
-    console.error('[ORG_ACCESS_DEBUG] Unexpected error:', error);
+
+    logger.error('[ORG_ACCESS_DEBUG] Unexpected error:', { data: error });
     throw new OrgAccessError(
       'メンバーシップ確認に失敗しました',
       'INTERNAL_ERROR',

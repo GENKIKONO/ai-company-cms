@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserFullWithClient } from '@/lib/core/auth-state';
+import { logger } from '@/lib/utils/logger';
 import type {
   AdminMetricsResponse,
   MetricsApiParams,
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
     if (orgId && orgId !== 'all') {
       // 特定組織を指定している場合は、その組織へのアクセス権限をチェック
       // 現在はSuper Adminなので全組織アクセス可能だが、将来の拡張性のため記載
-      console.debug('Organization-specific metrics request:', { orgId, user_id: user.id });
+      logger.debug('Organization-specific metrics request:', { data: { orgId, user_id: user.id } });
     }
 
     // ============================================
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Admin metrics API error:', error);
+    logger.error('Admin metrics API error:', { data: error });
     return NextResponse.json(
       { 
         success: false,

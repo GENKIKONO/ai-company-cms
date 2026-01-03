@@ -12,6 +12,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { ok, err, ErrorCodes } from '@/lib/api/response';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +33,7 @@ export async function GET() {
       .order('action');
 
     if (error) {
-      console.error('Actions query error:', error);
+      logger.error('Actions query error:', { data: error });
       return NextResponse.json(
         err(ErrorCodes.QUERY_ERROR, error.message),
         { status: 500 }
@@ -44,7 +45,7 @@ export async function GET() {
 
     return NextResponse.json(ok({ actions: uniqueActions }));
   } catch (e) {
-    console.error('Actions API error:', e);
+    logger.error('Actions API error:', { data: e });
     return NextResponse.json(
       err(ErrorCodes.INTERNAL_ERROR, e instanceof Error ? e.message : 'Internal server error'),
       { status: 500 }

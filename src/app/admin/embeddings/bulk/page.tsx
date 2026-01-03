@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Bulk Embedding Enqueue Page
  * P4-4: 組織単位の一括Embedding投入

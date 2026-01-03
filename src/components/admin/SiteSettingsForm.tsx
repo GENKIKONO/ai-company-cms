@@ -212,7 +212,8 @@ export function SiteSettingsForm({ organizationId }: SiteSettingsFormProps) {
             {settings.logo_url && (
               <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <div className="flex-shrink-0">
-                  <img 
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={settings.logo_url} 
                     alt="現在のロゴ" 
                     className="w-20 h-20 object-contain rounded-lg border border-gray-200 bg-white"

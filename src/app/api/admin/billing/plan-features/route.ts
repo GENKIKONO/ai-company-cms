@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireSiteAdmin, SiteAdminRequiredError } from '@/lib/billing';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 // バリデーションスキーマ
 const upsertPlanFeatureSchema = z.object({
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      console.error('[admin/billing/plan-features] GET error:', error);
+      logger.error('[admin/billing/plan-features] GET error:', { data: error });
       return NextResponse.json(
         { error: '割当一覧の取得に失敗しました', code: error.code },
         { status: 500 }
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
         { status: err.status }
       );
     }
-    console.error('[admin/billing/plan-features] GET unexpected error:', err);
+    logger.error('[admin/billing/plan-features] GET unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -129,7 +130,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('[admin/billing/plan-features] POST error:', error);
+      logger.error('[admin/billing/plan-features] POST error:', { data: error });
       return NextResponse.json(
         { error: '割当の保存に失敗しました', code: error.code },
         { status: 500 }
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('[admin/billing/plan-features] POST unexpected error:', err);
+    logger.error('[admin/billing/plan-features] POST unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -218,7 +219,7 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('[admin/billing/plan-features] PUT unexpected error:', err);
+    logger.error('[admin/billing/plan-features] PUT unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

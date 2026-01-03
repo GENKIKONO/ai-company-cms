@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireSiteAdmin, SiteAdminRequiredError } from '@/lib/billing';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 // バリデーションスキーマ
 const createFeatureSchema = z.object({
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      console.error('[admin/billing/features] GET error:', error);
+      logger.error('[admin/billing/features] GET error:', { data: error });
       return NextResponse.json(
         { error: '機能一覧の取得に失敗しました', code: error.code },
         { status: 500 }
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
         { status: err.status }
       );
     }
-    console.error('[admin/billing/features] GET unexpected error:', err);
+    logger.error('[admin/billing/features] GET unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('[admin/billing/features] POST error:', error);
+      logger.error('[admin/billing/features] POST error:', { data: error });
       return NextResponse.json(
         { error: '機能の作成に失敗しました', code: error.code },
         { status: 500 }
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('[admin/billing/features] POST unexpected error:', err);
+    logger.error('[admin/billing/features] POST unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

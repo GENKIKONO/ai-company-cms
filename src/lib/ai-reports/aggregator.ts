@@ -7,6 +7,7 @@ import type {
 } from './types';
 import { getServiceRoleClient, normalizeUrl, getAnalyticsPartitionTables } from './supabase-client';
 import { toContentUnionViewRows } from '@/lib/supabase-boundary';
+import { logger } from '@/lib/utils/logger';
 
 export class ReportAggregator {
   private supabase;
@@ -140,13 +141,13 @@ export class ReportAggregator {
           ));
 
         if (error) {
-          console.warn(`Failed to query ${tableName}:`, error.message);
+          logger.warn(`Failed to query ${tableName}:`, { data: { message: error.message } });
           continue;
         }
 
         totalPageViews += count || 0;
       } catch (error) {
-        console.warn(`Analytics table ${tableName} not accessible:`, error);
+        logger.warn(`Analytics table ${tableName} not accessible:`, { data: error });
         continue;
       }
     }
@@ -170,13 +171,13 @@ export class ReportAggregator {
           .in('page_url', [normalizedUrl, canonicalUrl]);
 
         if (error) {
-          console.warn(`Failed to query ${tableName} for URL ${canonicalUrl}:`, error.message);
+          logger.warn(`Failed to query ${tableName} for URL ${canonicalUrl}:`, { data: { message: error.message } });
           continue;
         }
 
         totalViews += count || 0;
       } catch (error) {
-        console.warn(`Analytics table ${tableName} not accessible:`, error);
+        logger.warn(`Analytics table ${tableName} not accessible:`, { data: error });
         continue;
       }
     }

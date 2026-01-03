@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { 
-  runAiCitationsAggregationJob, 
+import {
+  runAiCitationsAggregationJob,
   runWeeklyAiCitationsAggregation,
-  type AiCitationsAggregationJobInput 
+  type AiCitationsAggregationJobInput
 } from '@/lib/jobs/ai-citations-aggregation-job';
 import { requireSuperAdminUser } from '@/lib/auth/server';
+import { logger } from '@/lib/utils/logger';
 
 /**
  * AI Citations Aggregation Job API
@@ -112,8 +113,8 @@ export async function POST(request: NextRequest) {
     }, { status: httpStatus });
     
   } catch (error) {
-    console.error('AI Citations Aggregation API error:', error);
-    
+    logger.error('AI Citations Aggregation API error:', { data: error });
+
     return NextResponse.json(
       {
         success: false,
@@ -224,8 +225,8 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('AI Citations Aggregation status API error:', error);
-    
+    logger.error('AI Citations Aggregation status API error:', { data: error });
+
     return NextResponse.json(
       {
         success: false,

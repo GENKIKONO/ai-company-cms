@@ -6,6 +6,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { withTimeout } from '@/lib/server/timeout';
+import { logger } from '@/lib/utils/logger';
 
 export const runtime = 'edge';
 export const revalidate = 120; // ISR 2分
@@ -35,7 +36,7 @@ export async function GET() {
     );
 
     if (result.error) {
-      console.error('GET /api/public/organizations/summary', result.error.message);
+      logger.error('GET /api/public/organizations/summary', { data: result.error.message });
       throw result.error;
     }
 
@@ -50,7 +51,7 @@ export async function GET() {
       }
     );
   } catch (e) {
-    console.error('GET /api/public/organizations/summary error:', e);
+    logger.error('GET /api/public/organizations/summary error:', { data: e });
     return NextResponse.json(
       { error: 'internal_error', total: 0 },
       { status: 500 }

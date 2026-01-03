@@ -12,6 +12,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { ok, err, ErrorCodes } from '@/lib/api/response';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +35,7 @@ export async function GET() {
       .limit(50);
 
     if (scansError) {
-      console.error('Scan history query error:', scansError);
+      logger.error('Scan history query error:', { data: scansError });
       return NextResponse.json(
         err(ErrorCodes.QUERY_ERROR, scansError.message),
         { status: 500 }
@@ -65,7 +66,7 @@ export async function GET() {
       })
     );
   } catch (e) {
-    console.error('Security history API error:', e);
+    logger.error('Security history API error:', { data: e });
     return NextResponse.json(
       err(ErrorCodes.INTERNAL_ERROR, e instanceof Error ? e.message : 'Internal server error'),
       { status: 500 }

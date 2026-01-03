@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireSiteAdmin, SiteAdminRequiredError } from '@/lib/billing';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('[admin/billing/analytics] GET error:', error);
+      logger.error('[admin/billing/analytics] GET error:', { data: error });
       return NextResponse.json(
         { error: 'イベント一覧の取得に失敗しました', code: error.code },
         { status: 500 }
@@ -91,7 +92,7 @@ export async function GET(request: NextRequest) {
         { status: err.status }
       );
     }
-    console.error('[admin/billing/analytics] GET unexpected error:', err);
+    logger.error('[admin/billing/analytics] GET unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -137,7 +138,7 @@ async function getSummary(
     const { data, error } = await query;
 
     if (error) {
-      console.error('[admin/billing/analytics] getSummary error:', error);
+      logger.error('[admin/billing/analytics] getSummary error:', { data: error });
       return NextResponse.json(
         { error: '集計の取得に失敗しました', code: error.code },
         { status: 500 }
@@ -176,7 +177,7 @@ async function getSummary(
         .sort((a, b) => a.date.localeCompare(b.date)),
     });
   } catch (err) {
-    console.error('[admin/billing/analytics] getSummary unexpected error:', err);
+    logger.error('[admin/billing/analytics] getSummary unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

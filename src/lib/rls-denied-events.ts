@@ -1,7 +1,7 @@
 /**
  * RLS拒否イベントロギングユーティリティ (Next.js用)
  * EPIC 3-5: rls_denied_events テーブルへの安全なログ記録
- * 
+ *
  * Edge Functions版と仕様統一:
  * - service_role経由のみINSERT
  * - 1分窓サンプリング制限
@@ -10,6 +10,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 /**
  * RLS拒否理由 (Edge Functions版と統一)
@@ -191,9 +192,11 @@ export async function recordRlsDeniedEvent(
   try {
     // サンプリング制御
     if (shouldSkipDueToSampling(entry)) {
-      console.debug('RLS denied event skipped due to sampling', {
-        table_name: entry.table_name,
-        reason: entry.reason
+      logger.debug('RLS denied event skipped due to sampling', {
+        data: {
+          table_name: entry.table_name,
+          reason: entry.reason
+        }
       });
       return { success: true, skipped: true };
     }
@@ -237,50 +240,58 @@ export async function recordRlsDeniedEvent(
         if (error) {
           throw error;
         }
-        
-        console.log('RLS denied event recorded', {
-          event_id: data.id,
-          table_name: entry.table_name,
-          operation: entry.operation,
-          reason: entry.reason,
-          attempt
+
+        logger.info('RLS denied event recorded', {
+          data: {
+            event_id: data.id,
+            table_name: entry.table_name,
+            operation: entry.operation,
+            reason: entry.reason,
+            attempt
+          }
         });
-        
+
         return { success: true };
         
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-        
+
         if (attempt === maxRetries) {
-          console.error('Failed to record RLS denied event after retries', {
-            error: errorMsg,
-            table_name: entry.table_name,
-            reason: entry.reason,
-            attempts: maxRetries
+          logger.error('Failed to record RLS denied event after retries', {
+            data: {
+              error: errorMsg,
+              table_name: entry.table_name,
+              reason: entry.reason,
+              attempts: maxRetries
+            }
           });
           return { success: false, error: errorMsg };
         }
-        
+
         // 指数バックオフ待機
         const backoffMs = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
         await new Promise(resolve => setTimeout(resolve, backoffMs));
-        
-        console.warn('RLS denied event recording retry', {
-          error: errorMsg,
-          attempt,
-          next_retry_in_ms: backoffMs
+
+        logger.warn('RLS denied event recording retry', {
+          data: {
+            error: errorMsg,
+            attempt,
+            next_retry_in_ms: backoffMs
+          }
         });
       }
     }
     
     return { success: false, error: 'Max retries exceeded' };
-    
+
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Exception in RLS denied event recording', {
-      error: errorMsg,
-      table_name: entry.table_name,
-      reason: entry.reason
+    logger.error('Exception in RLS denied event recording', {
+      data: {
+        error: errorMsg,
+        table_name: entry.table_name,
+        reason: entry.reason
+      }
     });
     return { success: false, error: errorMsg };
   }
@@ -290,13 +301,15 @@ export async function recordRlsDeniedEvent(
  * 非同期でRLS拒否イベントを記録
  */
 export function recordRlsDeniedEventAsync(entry: RlsDeniedEventEntry): void {
-  Promise.resolve().then(() => 
+  Promise.resolve().then(() =>
     recordRlsDeniedEvent(entry)
   ).catch(error => {
-    console.error('Async RLS denied event recording failed', {
-      error: error.message,
-      table_name: entry.table_name,
-      reason: entry.reason
+    logger.error('Async RLS denied event recording failed', {
+      data: {
+        error: error.message,
+        table_name: entry.table_name,
+        reason: entry.reason
+      }
     });
   });
 }

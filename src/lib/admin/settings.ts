@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/utils/logger';
 import 'server-only';
 
 /**
@@ -28,7 +29,7 @@ export async function getDiffRebuildThresholdPercent(): Promise<number> {
     return isNaN(parsed) ? 30 : parsed;
     
   } catch (error) {
-    console.warn('Failed to load diff rebuild threshold, using default:', error);
+    logger.warn('Failed to load diff rebuild threshold, using default:', { data: error });
     return 30;
   }
 }
@@ -54,7 +55,7 @@ export async function getSettingNumber(key: string, defaultValue: number): Promi
     return isNaN(parsed) ? defaultValue : parsed;
     
   } catch (error) {
-    console.warn(`Failed to load setting ${key}, using default:`, error);
+    logger.warn(`Failed to load setting ${key}, using default:`, { data: error });
     return defaultValue;
   }
 }
@@ -73,9 +74,9 @@ export async function getSettingString(key: string, defaultValue: string): Promi
       .maybeSingle();
     
     return data?.value ?? defaultValue;
-    
+
   } catch (error) {
-    console.warn(`Failed to load setting ${key}, using default:`, error);
+    logger.warn(`Failed to load setting ${key}, using default:`, { data: error });
     return defaultValue;
   }
 }

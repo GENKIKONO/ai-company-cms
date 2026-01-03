@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireSiteAdmin, SiteAdminRequiredError } from '@/lib/billing';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 // バリデーションスキーマ
 const createSubscriptionSchema = z.object({
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('[admin/billing/subscriptions] GET error:', error);
+      logger.error('[admin/billing/subscriptions] GET error:', { data: error });
       return NextResponse.json(
         { error: 'サブスクリプション一覧の取得に失敗しました', code: error.code },
         { status: 500 }
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
         { status: err.status }
       );
     }
-    console.error('[admin/billing/subscriptions] GET unexpected error:', err);
+    logger.error('[admin/billing/subscriptions] GET unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -182,7 +183,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      console.error('[admin/billing/subscriptions] POST error:', error);
+      logger.error('[admin/billing/subscriptions] POST error:', { data: error });
       return NextResponse.json(
         { error: 'サブスクリプションの作成に失敗しました', code: error.code },
         { status: 500 }
@@ -203,7 +204,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('[admin/billing/subscriptions] POST unexpected error:', err);
+    logger.error('[admin/billing/subscriptions] POST unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

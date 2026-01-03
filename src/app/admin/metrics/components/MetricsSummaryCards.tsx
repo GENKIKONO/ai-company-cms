@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { fetchMetricsData } from '@/lib/admin/metrics';
 import type { MetricsSummary } from '@/types/admin-metrics';
 

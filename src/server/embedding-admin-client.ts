@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Embedding Admin Client - Server-Side Only
  * P4-5: SERVICE_ROLE_KEYを使用するサーバー専用クライアント

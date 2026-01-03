@@ -4,12 +4,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { 
-  enqueueEmbeddingJobServer, 
-  drainEmbeddingJobsServer, 
+import {
+  enqueueEmbeddingJobServer,
+  drainEmbeddingJobsServer,
   enqueueOrganizationEmbeddingsServer,
-  type EmbeddingJobRequest 
+  type EmbeddingJobRequest
 } from '@/server/embedding-admin-client';
+import { logger } from '@/lib/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 });
     }
   } catch (error) {
-    console.error('[Admin Embeddings API] Error:', error);
+    logger.error('[Admin Embeddings API] Error:', { data: error });
     return NextResponse.json({
       success: false,
       message: error instanceof Error ? error.message : 'Internal server error'

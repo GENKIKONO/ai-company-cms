@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Embed Page Server Component Wrapper (Phase 4-B)
  * 

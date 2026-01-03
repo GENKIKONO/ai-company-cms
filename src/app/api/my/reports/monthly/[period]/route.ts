@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { canUseFeature } from '@/lib/featureGate';
+import { logger } from '@/lib/utils/logger';
 
 // レポート詳細取得
 export async function GET(
@@ -45,7 +46,7 @@ export async function GET(
         );
       }
     } catch (error) {
-      console.error('AI reports feature check failed:', error);
+      logger.error('AI reports feature check failed:', { data: error });
       // NOTE: AIレポート機能チェックでエラー時は禁止側に倒す
       return NextResponse.json(
         {
@@ -72,7 +73,7 @@ export async function GET(
       .maybeSingle();
 
     if (error) {
-      console.error('Failed to query ai_monthly_reports detail:', error);
+      logger.error('Failed to query ai_monthly_reports detail:', { data: error });
       return NextResponse.json(
         { 
           error: 'Failed to fetch report',
@@ -105,7 +106,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Failed to fetch monthly report:', error);
+    logger.error('Failed to fetch monthly report:', { data: error });
     return NextResponse.json(
       { 
         error: 'Failed to fetch report',

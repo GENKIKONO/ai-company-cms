@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireSiteAdmin, SiteAdminRequiredError } from '@/lib/billing';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 // バリデーションスキーマ
 const createLimitSchema = z.object({
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      console.error('[admin/billing/feature-limits] GET error:', error);
+      logger.error('[admin/billing/feature-limits] GET error:', { data: error });
       return NextResponse.json(
         { error: '制限一覧の取得に失敗しました', code: error.code },
         { status: 500 }
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest) {
         { status: err.status }
       );
     }
-    console.error('[admin/billing/feature-limits] GET unexpected error:', err);
+    logger.error('[admin/billing/feature-limits] GET unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('[admin/billing/feature-limits] POST error:', error);
+      logger.error('[admin/billing/feature-limits] POST error:', { data: error });
       return NextResponse.json(
         { error: '制限の作成に失敗しました', code: error.code },
         { status: 500 }
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('[admin/billing/feature-limits] POST unexpected error:', err);
+    logger.error('[admin/billing/feature-limits] POST unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -210,7 +211,7 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('[admin/billing/feature-limits] PUT unexpected error:', err);
+    logger.error('[admin/billing/feature-limits] PUT unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
@@ -239,7 +240,7 @@ export async function DELETE(request: NextRequest) {
       .eq('id', id);
 
     if (error) {
-      console.error('[admin/billing/feature-limits] DELETE error:', error);
+      logger.error('[admin/billing/feature-limits] DELETE error:', { data: error });
       return NextResponse.json(
         { error: '制限の削除に失敗しました', code: error.code },
         { status: 500 }
@@ -254,7 +255,7 @@ export async function DELETE(request: NextRequest) {
         { status: err.status }
       );
     }
-    console.error('[admin/billing/feature-limits] DELETE unexpected error:', err);
+    logger.error('[admin/billing/feature-limits] DELETE unexpected error:', { data: err });
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

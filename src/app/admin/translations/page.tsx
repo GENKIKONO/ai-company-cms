@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Translation Jobs Management Page
  * P4-3: 翻訳ジョブ管理画面

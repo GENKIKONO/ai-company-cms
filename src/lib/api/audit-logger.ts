@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * API使用状況ログ整備
  * 要件定義準拠: API使用パターン分析用統一ログ収集

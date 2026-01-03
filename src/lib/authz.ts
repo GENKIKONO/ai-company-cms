@@ -15,6 +15,7 @@
  */
 
 import { SupabaseClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 export type OrgRole = 'viewer' | 'editor' | 'admin';
 
@@ -87,13 +88,13 @@ export async function hasOrgRole(
     });
 
     if (error) {
-      console.error('hasOrgRole RPC error:', error);
+      logger.error('hasOrgRole RPC error:', { data: error });
       return false;
     }
 
     return !!data;
   } catch (err) {
-    console.error('hasOrgRole error:', err);
+    logger.error('hasOrgRole error:', { data: err });
     return false;
   }
 }

@@ -49,11 +49,13 @@ export async function GET(req: NextRequest) {
       .order('last_edited_at', { ascending: false });
 
     if (error) {
-      console.error('[QA_ENTRIES_DEBUG] supabase error', {
-        code: error.code,
-        message: error.message,
-        details: error.details,
-        hint: error.hint
+      logger.error('[QA_ENTRIES_DEBUG] supabase error', {
+        data: {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        }
       });
       return NextResponse.json({ 
         error: 'Failed to fetch entries', 

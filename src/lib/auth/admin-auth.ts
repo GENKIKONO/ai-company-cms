@@ -352,7 +352,7 @@ export async function logSecurityEvent(event: {
         },
       });
     } catch (sentryError) {
-      console.warn('Failed to send security event to Sentry:', sentryError);
+      logger.warn('Failed to send security event to Sentry:', { data: sentryError });
     }
     logger.debug('SECURITY EVENT', logEntry);
   } else {

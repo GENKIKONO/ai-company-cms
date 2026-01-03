@@ -10,6 +10,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/utils/logger';
 
 // Content refresh関連の型定義
 export interface ContentRefreshHistoryItem {
@@ -108,7 +109,7 @@ export async function getContentRefreshHistory(
     });
 
     if (error) {
-      console.error('getContentRefreshHistory error:', error);
+      logger.error('getContentRefreshHistory error:', { data: error });
       return {
         data: [],
         error: {
@@ -121,7 +122,7 @@ export async function getContentRefreshHistory(
 
     return { data: data || [], error: null };
   } catch (error) {
-    console.error('getContentRefreshHistory exception:', error);
+    logger.error('getContentRefreshHistory exception:', { data: error });
     return {
       data: [],
       error: {
@@ -141,7 +142,7 @@ export async function getRlsDeniesTop5(): Promise<{ data: RlsDeniesTop5Item[]; e
     const { data, error } = await supabase.rpc('admin_get_rls_denies_top5');
 
     if (error) {
-      console.error('getRlsDeniesTop5 error:', error);
+      logger.error('getRlsDeniesTop5 error:', { data: error });
       return {
         data: [],
         error: {
@@ -154,7 +155,7 @@ export async function getRlsDeniesTop5(): Promise<{ data: RlsDeniesTop5Item[]; e
 
     return { data: data || [], error: null };
   } catch (error) {
-    console.error('getRlsDeniesTop5 exception:', error);
+    logger.error('getRlsDeniesTop5 exception:', { data: error });
     return {
       data: [],
       error: {
@@ -174,7 +175,7 @@ export async function getEdgeFailureStats(): Promise<{ data: EdgeFailureStatsIte
     const { data, error } = await supabase.rpc('admin_get_edge_failure_stats');
 
     if (error) {
-      console.error('getEdgeFailureStats error:', error);
+      logger.error('getEdgeFailureStats error:', { data: error });
       return {
         data: [],
         error: {
@@ -187,7 +188,7 @@ export async function getEdgeFailureStats(): Promise<{ data: EdgeFailureStatsIte
 
     return { data: data || [], error: null };
   } catch (error) {
-    console.error('getEdgeFailureStats exception:', error);
+    logger.error('getEdgeFailureStats exception:', { data: error });
     return {
       data: [],
       error: {
@@ -207,7 +208,7 @@ export async function getPublicTablesFreshness(): Promise<{ data: PublicTablesFr
     const { data, error } = await supabase.rpc('admin_get_public_tables_freshness');
 
     if (error) {
-      console.error('getPublicTablesFreshness error:', error);
+      logger.error('getPublicTablesFreshness error:', { data: error });
       return {
         data: [],
         error: {
@@ -220,7 +221,7 @@ export async function getPublicTablesFreshness(): Promise<{ data: PublicTablesFr
 
     return { data: data || [], error: null };
   } catch (error) {
-    console.error('getPublicTablesFreshness exception:', error);
+    logger.error('getPublicTablesFreshness exception:', { data: error });
     return {
       data: [],
       error: {
@@ -240,7 +241,7 @@ export async function getLegacyViewsOverdue(): Promise<{ data: LegacyViewsOverdu
     const { data, error } = await supabase.rpc('admin_check_legacy_views_overdue');
 
     if (error) {
-      console.error('getLegacyViewsOverdue error:', error);
+      logger.error('getLegacyViewsOverdue error:', { data: error });
       return {
         data: [],
         error: {
@@ -253,7 +254,7 @@ export async function getLegacyViewsOverdue(): Promise<{ data: LegacyViewsOverdu
 
     return { data: data || [], error: null };
   } catch (error) {
-    console.error('getLegacyViewsOverdue exception:', error);
+    logger.error('getLegacyViewsOverdue exception:', { data: error });
     return {
       data: [],
       error: {
@@ -273,7 +274,7 @@ export async function getSchemaDiffCandidates(): Promise<{ data: SchemaDiffCandi
     const { data, error } = await supabase.rpc('admin_get_schema_diff_candidates');
 
     if (error) {
-      console.error('getSchemaDiffCandidates error:', error);
+      logger.error('getSchemaDiffCandidates error:', { data: error });
       return {
         data: [],
         error: {
@@ -286,7 +287,7 @@ export async function getSchemaDiffCandidates(): Promise<{ data: SchemaDiffCandi
 
     return { data: data || [], error: null };
   } catch (error) {
-    console.error('getSchemaDiffCandidates exception:', error);
+    logger.error('getSchemaDiffCandidates exception:', { data: error });
     return {
       data: [],
       error: {
@@ -345,7 +346,7 @@ export async function triggerContentRefresh(params: {
     return { data: result, error: null };
 
   } catch (error) {
-    console.error('triggerContentRefresh exception:', error);
+    logger.error('triggerContentRefresh exception:', { data: error });
     return {
       data: null,
       error: {

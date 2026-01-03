@@ -18,6 +18,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { ok, err, ErrorCodes } from '@/lib/api/response';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -205,7 +206,7 @@ export async function GET(request: NextRequest) {
       )
     );
   } catch (e) {
-    console.error('Alerts dashboard API error:', e);
+    logger.error('Alerts dashboard API error:', { data: e });
     return NextResponse.json(
       err(ErrorCodes.INTERNAL_ERROR, e instanceof Error ? e.message : 'Internal server error'),
       { status: 500 }

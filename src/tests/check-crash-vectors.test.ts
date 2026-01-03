@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * ✅ CRITICAL TEST - Crash Vector Detection Core Functionality
  * 

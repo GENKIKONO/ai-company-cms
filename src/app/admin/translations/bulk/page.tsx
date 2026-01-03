@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Bulk Translation Enqueue Page
  * P4-3: 組織単位の一括翻訳投入

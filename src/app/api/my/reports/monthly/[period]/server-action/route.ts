@@ -20,6 +20,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { canUseFeature } from '@/lib/featureGate';
+import { logger } from '@/lib/utils/logger';
 
 interface RouteParams {
   params: Promise<{ period: string }>;
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
   } catch (error) {
-    console.error('Server action failed:', error);
+    logger.error('Server action failed:', { data: error });
     return NextResponse.json(
       {
         error: 'ServerActionFailed',
@@ -192,7 +193,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
   } catch (error) {
-    console.error('Server action GET failed:', error);
+    logger.error('Server action GET failed:', { data: error });
     return NextResponse.json(
       { error: 'ServerActionFailed' },
       { status: 500 }

@@ -25,6 +25,7 @@ import { getUserWithClient } from '@/lib/core/auth-state';
 import { ok, err, ErrorCodes } from '@/lib/api/response';
 import { writeAdminAuditLog, AuditLogEntry } from '@/lib/admin/audit';
 import { z } from 'zod';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('Audit query error:', error);
+      logger.error('Audit query error:', { data: error });
       return NextResponse.json(
         err(ErrorCodes.QUERY_ERROR, error.message),
         { status: 500 }
@@ -115,7 +116,7 @@ export async function GET(request: NextRequest) {
       )
     );
   } catch (e) {
-    console.error('Audit API error:', e);
+    logger.error('Audit API error:', { data: e });
     return NextResponse.json(
       err(ErrorCodes.INTERNAL_ERROR, e instanceof Error ? e.message : 'Internal server error'),
       { status: 500 }
@@ -177,7 +178,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('Audit POST error:', e);
+    logger.error('Audit POST error:', { data: e });
     return NextResponse.json(
       err(ErrorCodes.INTERNAL_ERROR, e instanceof Error ? e.message : 'Internal server error'),
       { status: 500 }

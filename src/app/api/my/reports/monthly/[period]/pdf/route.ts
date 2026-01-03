@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api/auth-middleware';
 import { getServiceRoleClient } from '@/lib/ai-reports/supabase-client';
+import { logger } from '@/lib/utils/logger';
 
 // PDF出力
 export async function GET(
@@ -47,7 +48,7 @@ export async function GET(
       .maybeSingle();
 
     if (error) {
-      console.error('Failed to query ai_monthly_reports for PDF:', error);
+      logger.error('Failed to query ai_monthly_reports for PDF:', { data: error });
       return NextResponse.json(
         { 
           error: 'Failed to fetch report for PDF',
@@ -70,7 +71,7 @@ export async function GET(
       .maybeSingle();
 
     if (orgError) {
-      console.error('Failed to query organization for PDF:', orgError);
+      logger.error('Failed to query organization for PDF:', { data: orgError });
       return NextResponse.json(
         { 
           error: 'Failed to fetch organization info for PDF',
@@ -93,7 +94,7 @@ export async function GET(
     );
 
   } catch (error) {
-    console.error('Failed to generate PDF report:', error);
+    logger.error('Failed to generate PDF report:', { data: error });
     return NextResponse.json(
       { 
         error: 'Failed to generate PDF',

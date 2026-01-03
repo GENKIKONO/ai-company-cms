@@ -4,6 +4,7 @@
  */
 
 import 'server-only';
+import { logger } from '@/lib/utils/logger';
 
 export interface TranslationJobRequest {
   organization_id: string;
@@ -105,8 +106,8 @@ export async function enqueueTranslationJob(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Translation Client] Enqueue failed:', error);
-    
+    logger.error('[Translation Client] Enqueue failed:', { data: error });
+
     return {
       success: false,
       message: `Translation job enqueue failed: ${errorMsg}`
@@ -153,8 +154,8 @@ export async function drainTranslationJobs(): Promise<{
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Translation Client] Drain failed:', error);
-    
+    logger.error('[Translation Client] Drain failed:', { data: error });
+
     return {
       success: false,
       processed_count: 0,
@@ -216,8 +217,8 @@ export async function getTranslationJobs(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Translation Client] Get jobs failed:', error);
-    
+    logger.error('[Translation Client] Get jobs failed:', { data: error });
+
     return {
       data: [],
       total: 0,
@@ -307,8 +308,8 @@ export async function getTranslationMetrics(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Translation Client] Get metrics failed:', error);
-    
+    logger.error('[Translation Client] Get metrics failed:', { data: error });
+
     return {
       data: null,
       error: errorMsg
@@ -399,8 +400,8 @@ export async function enqueueOrganizationTranslation(
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Translation Client] Bulk enqueue failed:', error);
-    
+    logger.error('[Translation Client] Bulk enqueue failed:', { data: error });
+
     return {
       success: false,
       enqueued_count: 0,

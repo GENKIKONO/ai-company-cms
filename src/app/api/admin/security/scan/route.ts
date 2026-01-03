@@ -13,6 +13,7 @@ import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { runManualSecurityScan } from '@/lib/jobs/security-scan-job';
 import { createClient } from '@/lib/supabase/server';
 import { ok, err, ErrorCodes } from '@/lib/api/response';
+import { logger } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +66,7 @@ export async function POST() {
       })
     );
   } catch (e) {
-    console.error('Security scan API error:', e);
+    logger.error('Security scan API error:', { data: e });
     return NextResponse.json(
       err(ErrorCodes.INTERNAL_ERROR, e instanceof Error ? e.message : 'Internal server error'),
       { status: 500 }

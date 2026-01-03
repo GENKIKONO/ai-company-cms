@@ -7,6 +7,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { logger } from '@/lib/utils/logger';
 
 export interface AdminCheckResult {
   isAdmin: boolean;
@@ -83,7 +84,7 @@ export async function checkAdminAuth(): Promise<AdminCheckResult> {
       userId: user.id,
     };
   } catch (err) {
-    console.error('Admin auth check failed:', err);
+    logger.error('Admin auth check failed:', { data: err });
     return {
       isAdmin: false,
       userId: null,

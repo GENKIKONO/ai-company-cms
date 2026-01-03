@@ -1,11 +1,12 @@
 /**
  * Admin Metrics Data Fetching
  * P3-8: KPI Metrics API Client
- * 
+ *
  * /api/admin/metricsから KPI データを取得するヘルパー関数
  */
 
 import type { AdminMetricsResponse, MetricsApiParams } from '@/types/admin-metrics';
+import { logger } from '@/lib/utils/logger';
 
 /**
  * KPIメトリクスデータを取得
@@ -47,8 +48,8 @@ export async function fetchMetricsData(
     return result.data;
 
   } catch (error) {
-    console.error('Failed to fetch metrics data:', error);
-    
+    logger.error('Failed to fetch metrics data:', { data: error });
+
     // エラー時はフォールバック用の空データを返す
     return createEmptyMetricsResponse();
   }

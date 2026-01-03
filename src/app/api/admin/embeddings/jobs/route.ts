@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getEmbeddingJobs, getEmbeddings } from '@/lib/embedding-client';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('[Embedding Jobs API] Error:', error);
+    logger.error('[Embedding Jobs API] Error:', { data: error });
     return NextResponse.json({
       success: false,
       message: error instanceof Error ? error.message : 'Internal server error'

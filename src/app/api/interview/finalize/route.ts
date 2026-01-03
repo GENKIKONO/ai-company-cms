@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getSessionWithClient, getUserWithClient } from '@/lib/core/auth-state';
 import { z } from 'zod';
 import { recordContractViolationAsync, ContractViolationHelpers } from '@/lib/contract-violations';
+import { logger } from '@/lib/utils/logger';
 
 // ============================================
 // リクエスト/レスポンス型定義
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     const session = await getSessionWithClient(supabase);
     if (!session?.access_token) {
-      console.log('Authentication failed in Next.js Route');
+      logger.info('Authentication failed in Next.js Route');
       return NextResponse.json(
         { success: false, error: 'Authentication required', code: 'UNAUTHENTICATED' },
         { status: 401 }
@@ -93,8 +94,8 @@ export async function POST(request: NextRequest) {
         recordContractViolationAsync(violation);
       }
       
-      console.log('Request validation failed', { 
-        error: error instanceof z.ZodError ? error.errors : error 
+      logger.info('Request validation failed', {
+        data: error instanceof z.ZodError ? error.errors : error
       });
       return NextResponse.json(
         { success: false, error: 'Invalid request format', code: 'VALIDATION_ERROR' },
@@ -146,12 +147,14 @@ export async function POST(request: NextRequest) {
       }
     };
 
-    console.log('Calling Edge Function', {
-      url: edgeFunctionUrl,
-      interview_id: requestBody.interview_id,
-      organization_id: requestBody.organization_id,
-      user_id: userId,
-      idempotency_key: idempotencyKey
+    logger.info('Calling Edge Function', {
+      data: {
+        url: edgeFunctionUrl,
+        interview_id: requestBody.interview_id,
+        organization_id: requestBody.organization_id,
+        user_id: userId,
+        idempotency_key: idempotencyKey
+      }
     });
 
     // Edge Function呼び出し
@@ -171,12 +174,14 @@ export async function POST(request: NextRequest) {
     try {
       edgeData = await edgeResponse.json();
     } catch (error) {
-      console.error('Failed to parse Edge Function response', {
-        status: edgeResponse.status,
-        statusText: edgeResponse.statusText,
-        error: error.message
+      logger.error('Failed to parse Edge Function response', {
+        data: {
+          status: edgeResponse.status,
+          statusText: edgeResponse.statusText,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        }
       });
-      
+
       return NextResponse.json(
         { 
           success: false, 
@@ -190,13 +195,15 @@ export async function POST(request: NextRequest) {
 
     // Edge Function エラーレスポンス処理
     if (!edgeResponse.ok) {
-      console.error('Edge Function returned error', {
-        status: edgeResponse.status,
-        statusText: edgeResponse.statusText,
-        data: edgeData,
-        latency_ms: latencyMs
+      logger.error('Edge Function returned error', {
+        data: {
+          status: edgeResponse.status,
+          statusText: edgeResponse.statusText,
+          data: edgeData,
+          latency_ms: latencyMs
+        }
       });
-      
+
       return NextResponse.json(
         { 
           success: false, 
@@ -211,14 +218,16 @@ export async function POST(request: NextRequest) {
     // ============================================
     // 6. 成功レスポンス
     // ============================================
-    
-    console.log('Interview finalization successful', {
-      interview_id: requestBody.interview_id,
-      organization_id: requestBody.organization_id,
-      user_id: userId,
-      latency_ms: latencyMs,
-      notifications_sent: edgeData.notifications_sent,
-      edge_success: edgeData.success
+
+    logger.info('Interview finalization successful', {
+      data: {
+        interview_id: requestBody.interview_id,
+        organization_id: requestBody.organization_id,
+        user_id: userId,
+        latency_ms: latencyMs,
+        notifications_sent: edgeData.notifications_sent,
+        edge_success: edgeData.success
+      }
     });
 
     return NextResponse.json({
@@ -232,11 +241,13 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     const latencyMs = Date.now() - startTime;
-    
-    console.error('Next.js Route Handler error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      latency_ms: latencyMs
+
+    logger.error('Next.js Route Handler error', {
+      data: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        latency_ms: latencyMs
+      }
     });
 
     return NextResponse.json(
@@ -287,7 +298,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Failed to fetch interview status', { error: error.message });
+      logger.error('Failed to fetch interview status', { data: { error: error.message } });
       return NextResponse.json(
         { error: 'Interview not found or access denied' },
         { status: 404 }
@@ -303,7 +314,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('GET handler error', { error: error.message });
+    logger.error('GET handler error', { data: { error: error instanceof Error ? error.message : 'Unknown error' } });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

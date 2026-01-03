@@ -1,5 +1,6 @@
 import { generateContentWithOpenAI, type OpenAIMessage } from '@/lib/ai/openai-client';
 import type { ContentMetrics, ReportSections, SuggestionItem, ReportLevel } from './types';
+import { logger } from '@/lib/utils/logger';
 
 export class LlmSummarizer {
   async generateSummaryText(
@@ -29,7 +30,7 @@ export class LlmSummarizer {
       
       return response.content;
     } catch (error) {
-      console.error('LLM summary generation failed:', error);
+      logger.error('LLM summary generation failed:', { data: error });
       return this.getFallbackSummary(metrics, level);
     }
   }
@@ -63,7 +64,7 @@ export class LlmSummarizer {
       const suggestions = this.parseSuggestionsResponse(response.content, level);
       return suggestions;
     } catch (error) {
-      console.error('LLM suggestions generation failed:', error);
+      logger.error('LLM suggestions generation failed:', { data: error });
       return this.getFallbackSuggestions(level);
     }
   }
@@ -165,7 +166,7 @@ ${level === 'light' ? '基本的で実行しやすい提案' :
         category: s.category || 'content',
       }));
     } catch (error) {
-      console.error('Failed to parse suggestions response:', error);
+      logger.error('Failed to parse suggestions response:', { data: error });
       return this.getFallbackSuggestions(level);
     }
   }

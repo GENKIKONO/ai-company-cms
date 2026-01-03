@@ -4,6 +4,7 @@
  */
 
 import 'server-only';
+import { logger } from '@/lib/utils/logger';
 
 /**
  * 公開ページの全パスリストを取得
@@ -38,9 +39,9 @@ export async function getAllPublicPaths(): Promise<string[]> {
     // 動的に組織別パスを追加
     const orgPaths = await getOrganizationPublicPaths();
     publicPaths.push(...orgPaths);
-    
+
   } catch (error) {
-    console.warn('[getAllPublicPaths] Failed to load org paths:', error);
+    logger.warn('[getAllPublicPaths] Failed to load org paths:', { data: error });
     // 基本パスのみで継続
   }
 
@@ -96,9 +97,9 @@ async function getOrganizationPublicPaths(): Promise<string[]> {
         }
       }
     }
-    
+
   } catch (error) {
-    console.warn('[getOrganizationPublicPaths] Database error:', error);
+    logger.warn('[getOrganizationPublicPaths] Database error:', { data: error });
   }
 
   return orgPaths;
