@@ -108,8 +108,8 @@ jobs:
 
       - name: 🧹 ESLint check (MANDATORY)
         run: |
-          npm run lint || {
-            echo "❌ ESLint エラーがあります"
+          npm run lint -- --max-warnings 0 || {
+            echo "❌ ESLint エラーまたは警告があります"
             echo "💡 コードの品質問題を修正してからPRをマージしてください"
             exit 1
           }
@@ -142,11 +142,22 @@ jobs:
 
       - name: 🏗️ Production build test (MANDATORY)
         run: |
-          npm run build || {
+          # Build and capture warnings
+          BUILD_OUTPUT=$(npm run build 2>&1) || {
             echo "❌ ビルドに失敗しました"
             echo "💡 ビルドエラーを修正してからPRをマージしてください"
             exit 1
           }
+
+          # Check for warnings (zero-warning policy)
+          WARNING_COUNT=$(echo "$BUILD_OUTPUT" | grep -c "Warning:" || echo "0")
+          if [ "$WARNING_COUNT" -gt 0 ]; then
+            echo "❌ ビルド警告が $WARNING_COUNT 件あります"
+            echo "$BUILD_OUTPUT" | grep "Warning:"
+            echo "💡 警告を解消してからPRをマージしてください"
+            exit 1
+          fi
+          echo "✅ ビルド成功（警告0件）"
         env:
           # 必須環境変数（プレースホルダー値）
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
