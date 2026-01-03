@@ -1,0 +1,553 @@
+{
+  "project": {
+    "name": "AIOHub",
+    "version": "0.1.1",
+    "generatedAt": "2024-11-20T00:00:00Z",
+    "analysisCompleteness": 70,
+    "totalFiles": 640,
+    "totalPages": 106,
+    "totalApiRoutes": 171
+  },
+  "architecture": {
+    "framework": "Next.js 15 (App Router)",
+    "database": "Supabase (PostgreSQL + RLS)",
+    "authentication": "Supabase Auth",
+    "payments": "Stripe (segment-based pricing)",
+    "deployment": "Vercel",
+    "bundleSize": "~200MB"
+  },
+  "features": {
+    "authentication": {
+      "name": "認証・ユーザー管理",
+      "icon": "🔐",
+      "status": "implemented",
+      "testCoverage": 90,
+      "subFeatures": {
+        "login": {
+          "name": "ログイン",
+          "page": "/auth/login",
+          "api": "/api/auth/session",
+          "testStatus": "e2e_complete",
+          "riskLevel": "low"
+        },
+        "signup": {
+          "name": "サインアップ", 
+          "page": "/auth/signup",
+          "api": "/api/auth/session",
+          "testStatus": "e2e_complete",
+          "riskLevel": "low"
+        },
+        "passwordReset": {
+          "name": "パスワードリセット",
+          "page": "/auth/forgot-password",
+          "testStatus": "basic_check",
+          "riskLevel": "medium"
+        },
+        "sessionManagement": {
+          "name": "セッション管理",
+          "api": "/api/me",
+          "testStatus": "smoke_test",
+          "riskLevel": "low"
+        }
+      }
+    },
+    "organizationManagement": {
+      "name": "組織・代理店管理",
+      "icon": "🏢",
+      "status": "partial",
+      "testCoverage": 60,
+      "subFeatures": {
+        "organizationCreation": {
+          "name": "組織作成",
+          "page": "/organizations/new", 
+          "api": "/api/organizations",
+          "testStatus": "e2e_complete",
+          "riskLevel": "low"
+        },
+        "organizationDetails": {
+          "name": "組織詳細",
+          "page": "/organizations/[id]",
+          "testStatus": "e2e_complete", 
+          "riskLevel": "low"
+        },
+        "publicOrganizationPages": {
+          "name": "組織公開ページ",
+          "page": "/o/[slug]",
+          "api": "/api/public/organizations/[slug]",
+          "testStatus": "display_check",
+          "riskLevel": "medium"
+        },
+        "agencyManagement": {
+          "name": "代理店管理",
+          "page": "/agency/*",
+          "testStatus": "untested",
+          "riskLevel": "high",
+          "note": "未解析 - B2B展開への影響"
+        },
+        "organizationGroups": {
+          "name": "組織グループ",
+          "page": "/admin/org-groups",
+          "api": "/api/admin/org-groups",
+          "testStatus": "admin_tested",
+          "riskLevel": "medium"
+        }
+      }
+    },
+    "contentManagement": {
+      "name": "コンテンツ管理システム",
+      "icon": "📝",
+      "status": "implemented",
+      "testCoverage": 70,
+      "subFeatures": {
+        "posts": {
+          "name": "投稿管理",
+          "page": "/dashboard/posts",
+          "api": "/api/my/posts", 
+          "testStatus": "e2e_complete",
+          "riskLevel": "low"
+        },
+        "services": {
+          "name": "サービス管理",
+          "page": "/dashboard/services",
+          "api": "/api/my/services",
+          "testStatus": "basic_check",
+          "riskLevel": "medium"
+        },
+        "faqs": {
+          "name": "FAQ管理",
+          "page": "/my/faqs",
+          "api": "/api/my/faqs", 
+          "testStatus": "basic_check",
+          "riskLevel": "medium"
+        },
+        "caseStudies": {
+          "name": "ケーススタディ",
+          "page": "/organizations/[id]/case-studies",
+          "api": "/api/my/case-studies",
+          "testStatus": "basic_check",
+          "riskLevel": "medium"
+        },
+        "materials": {
+          "name": "素材管理",
+          "page": "/dashboard/materials",
+          "api": "/api/my/materials", 
+          "testStatus": "basic_check",
+          "riskLevel": "medium"
+        }
+      }
+    },
+    "billing": {
+      "name": "決済・サブスクリプション",
+      "icon": "💳", 
+      "status": "implemented",
+      "testCoverage": 85,
+      "subFeatures": {
+        "segmentedPricing": {
+          "name": "セグメント別価格",
+          "api": "/api/billing/checkout-segmented",
+          "testStatus": "e2e_complete",
+          "riskLevel": "low",
+          "segments": {
+            "test_user": { "discount": "30%", "tested": true },
+            "early_user": { "discount": "20%", "tested": true },
+            "normal_user": { "discount": "0%", "tested": true }
+          }
+        },
+        "planManagement": {
+          "name": "プラン管理",
+          "plans": ["starter", "pro", "business", "enterprise"],
+          "testStatus": "e2e_complete",
+          "riskLevel": "low"
+        },
+        "customerPortal": {
+          "name": "顧客ポータル",
+          "api": "/api/billing/portal",
+          "testStatus": "basic_check",
+          "riskLevel": "medium"
+        },
+        "webhooks": {
+          "name": "Stripe Webhook",
+          "api": "/api/stripe/webhook",
+          "testStatus": "untested",
+          "riskLevel": "high"
+        }
+      }
+    },
+    "aiAnalytics": {
+      "name": "AI可視性・アナリティクス", 
+      "icon": "📊",
+      "status": "critical_untested",
+      "testCoverage": 5,
+      "businessImpact": "revenue_critical",
+      "subFeatures": {
+        "visibilityScoreCalculation": {
+          "name": "AI可視性スコア計算",
+          "api": "/api/analytics/ai/recalculate",
+          "testStatus": "untested",
+          "riskLevel": "critical",
+          "businessImpact": "revenue_direct"
+        },
+        "visibilityDataRetrieval": {
+          "name": "可視性データ取得",
+          "api": "/api/analytics/ai/visibility", 
+          "testStatus": "untested",
+          "riskLevel": "critical",
+          "businessImpact": "customer_experience"
+        },
+        "combinedReporting": {
+          "name": "統合レポート",
+          "api": "/api/analytics/ai/combined",
+          "testStatus": "untested", 
+          "riskLevel": "critical",
+          "businessImpact": "competitive_advantage"
+        },
+        "botLogAnalysis": {
+          "name": "ボットログ分析",
+          "api": "/api/analytics/ai/bot-logs",
+          "testStatus": "untested",
+          "riskLevel": "medium"
+        },
+        "seoIntegration": {
+          "name": "SEO連携",
+          "api": "/api/analytics/seo/gsc",
+          "testStatus": "untested", 
+          "riskLevel": "medium"
+        },
+        "dashboardCards": {
+          "name": "AIダッシュボード",
+          "page": "/dashboard",
+          "components": ["AIVisibilityCard", "PerformanceMetrics"],
+          "testStatus": "basic_display",
+          "riskLevel": "medium",
+          "technicalDebt": "useEffect warnings"
+        }
+      }
+    },
+    "embedWidgets": {
+      "name": "埋め込みWidget・公開API",
+      "icon": "🎯",
+      "status": "critical_untested", 
+      "testCoverage": 0,
+      "businessImpact": "public_facing",
+      "subFeatures": {
+        "iframeEmbeds": {
+          "name": "iframe埋め込み",
+          "api": "/api/public/embed/[slug]/iframe",
+          "testStatus": "untested",
+          "riskLevel": "critical", 
+          "publicFacing": true
+        },
+        "widgetEmbeds": {
+          "name": "Widget埋め込み", 
+          "api": "/api/public/embed/[slug]/widget",
+          "testStatus": "untested",
+          "riskLevel": "critical",
+          "publicFacing": true
+        },
+        "legacyEmbeds": {
+          "name": "レガシー埋め込み",
+          "apis": [
+            "/api/public/embed/iframe/[slug]",
+            "/api/public/embed/widget/[slug]"
+          ],
+          "testStatus": "untested",
+          "riskLevel": "medium"
+        },
+        "publicApi": {
+          "name": "公開API",
+          "apis": [
+            "/api/public/organizations",
+            "/api/public/posts", 
+            "/api/public/faqs",
+            "/api/public/case-studies",
+            "/api/public/services",
+            "/api/public/stats"
+          ],
+          "testStatus": "partial_smoke", 
+          "riskLevel": "medium"
+        },
+        "seoStructuredData": {
+          "name": "SEO・構造化データ",
+          "apis": [
+            "/api/public/[slug]/jsonld",
+            "/api/public/sitemap"
+          ],
+          "testStatus": "implemented",
+          "riskLevel": "low"
+        }
+      }
+    },
+    "adminManagement": {
+      "name": "管理・監査機能",
+      "icon": "👑",
+      "status": "partial",
+      "testCoverage": 40,
+      "subFeatures": {
+        "managementConsole": {
+          "name": "管理コンソール",
+          "page": "/management-console",
+          "subPages": [
+            "reports", "users", "settings", "contacts", 
+            "hearings", "embed-dashboard", "security"
+          ],
+          "testStatus": "basic_access",
+          "riskLevel": "medium",
+          "permissionLevel": "organization_admin"
+        },
+        "systemAdmin": {
+          "name": "システム管理",
+          "page": "/admin",
+          "subFeatures": {
+            "aiVisibilityManagement": {
+              "name": "AI可視性管理",
+              "apis": ["/api/admin/ai-visibility/latest", "/api/admin/ai-visibility/run"],
+              "testStatus": "basic_check",
+              "riskLevel": "medium"
+            },
+            "materialStats": {
+              "name": "素材統計",
+              "api": "/api/admin/material-stats",
+              "testStatus": "basic_check", 
+              "riskLevel": "low"
+            },
+            "qnaStats": {
+              "name": "Q&A統計",
+              "api": "/api/admin/qna-stats",
+              "testStatus": "basic_check",
+              "riskLevel": "low"
+            },
+            "billingAnalytics": {
+              "name": "請求分析",
+              "apis": [
+                "/api/admin/billing-analytics/trends",
+                "/api/admin/billing-analytics/campaigns", 
+                "/api/admin/billing-analytics/summary"
+              ],
+              "testStatus": "undetailed",
+              "riskLevel": "medium"
+            },
+            "featureManagement": {
+              "name": "機能管理",
+              "api": "/api/admin/feature-management",
+              "testStatus": "undetailed", 
+              "riskLevel": "medium"
+            }
+          },
+          "permissionLevel": "system_admin"
+        },
+        "enforcement": {
+          "name": "Enforcement (監査・執行)",
+          "status": "critical_untested",
+          "riskLevel": "critical", 
+          "businessImpact": "account_control",
+          "subFeatures": {
+            "violationDetection": {
+              "name": "違反検出",
+              "api": "/api/enforcement/violations",
+              "riskLevel": "critical",
+              "potentialImpact": "false_positives"
+            },
+            "warningActions": {
+              "name": "警告処理", 
+              "api": "/api/enforcement/actions/warn",
+              "riskLevel": "high",
+              "potentialImpact": "customer_relations"
+            },
+            "suspensionActions": {
+              "name": "アカウント停止",
+              "api": "/api/enforcement/actions/suspend",
+              "riskLevel": "critical",
+              "potentialImpact": "revenue_loss"
+            },
+            "freezeActions": {
+              "name": "アカウント凍結",
+              "api": "/api/enforcement/actions/freeze", 
+              "riskLevel": "critical",
+              "potentialImpact": "legal_issues"
+            },
+            "reinstateActions": {
+              "name": "復帰処理",
+              "api": "/api/enforcement/actions/reinstate",
+              "riskLevel": "high",
+              "potentialImpact": "operational_confusion"
+            }
+          }
+        }
+      }
+    },
+    "monitoring": {
+      "name": "モニタリング・診断",
+      "icon": "📱", 
+      "status": "implemented",
+      "testCoverage": 50,
+      "subFeatures": {
+        "diagnosticEndpoints": {
+          "name": "診断エンドポイント",
+          "apis": {
+            "/api/diag/echo": { "function": "リクエスト解析", "testStatus": "smoke_tested" },
+            "/api/diag/env": { "function": "環境変数確認", "testStatus": "smoke_tested" },
+            "/api/diag/database": { "function": "DB接続確認", "testStatus": "basic_check" },
+            "/api/diag/auth-context": { "function": "認証状態確認", "testStatus": "basic_check" },
+            "/api/diag/security": { "function": "セキュリティ確認", "testStatus": "basic_check" },
+            "/api/diag/comprehensive": { "function": "統合診断", "testStatus": "basic_check" }
+          },
+          "riskLevel": "low"
+        },
+        "metricsMonitoring": {
+          "name": "メトリクス・監視",
+          "apis": [
+            "/api/monitoring/metrics", 
+            "/api/health/*"
+          ],
+          "testStatus": "undetailed",
+          "riskLevel": "medium"
+        },
+        "errorTracking": {
+          "name": "エラー監視",
+          "service": "Sentry",
+          "status": "implemented",
+          "testStatus": "integrated",
+          "riskLevel": "low"
+        }
+      }
+    }
+  },
+  "database": {
+    "type": "Supabase (PostgreSQL)",
+    "tables": [
+      "users", "organizations", "posts", "services", "faqs", 
+      "case_studies", "materials", "subscriptions", 
+      "ai_visibility_scores", "violations", "audit_logs"
+    ],
+    "rls": {
+      "implemented": true,
+      "testStatus": "basic_confirmed",
+      "detailsAnalyzed": false
+    }
+  },
+  "codeQuality": {
+    "eslintWarnings": {
+      "total": 40,
+      "useEffectDependencies": 38,
+      "nextImageOptimization": 2,
+      "severity": "medium"
+    },
+    "typeScriptErrors": 0,
+    "backupFiles": {
+      "count": "10+", 
+      "location": "src/lib/embed/*, src/lib/icons/*",
+      "action": "delete_safe"
+    },
+    "technicalDebt": {
+      "todoFixme": 10,
+      "locations": [
+        "src/app/api/analytics/ai/recalculate/route.ts",
+        "src/app/api/analytics/ai/visibility/route.ts", 
+        "src/lib/auth/admin-auth.ts",
+        "src/lib/monitoring/index.ts"
+      ]
+    }
+  },
+  "testCoverage": {
+    "overall": 45,
+    "categories": {
+      "authentication": 90,
+      "billing": 85, 
+      "contentManagement": 70,
+      "organizationManagement": 60,
+      "monitoring": 50,
+      "adminManagement": 40,
+      "aiAnalytics": 5,
+      "embedWidgets": 0,
+      "enforcement": 0
+    }
+  },
+  "riskAssessment": {
+    "critical": [
+      {
+        "area": "aiAnalytics",
+        "reason": "Revenue-critical functionality untested",
+        "impact": "Business continuity"
+      },
+      {
+        "area": "enforcement", 
+        "reason": "Account control system untested",
+        "impact": "Customer relations, legal issues"
+      },
+      {
+        "area": "embedWidgets",
+        "reason": "Public-facing functionality untested", 
+        "impact": "Brand reputation"
+      }
+    ],
+    "high": [
+      {
+        "area": "agencyManagement",
+        "reason": "B2B functionality unverified",
+        "impact": "Business expansion"
+      },
+      {
+        "area": "useEffectWarnings", 
+        "reason": "Performance and bug risks",
+        "impact": "User experience"
+      }
+    ],
+    "medium": [
+      {
+        "area": "apiCoverage",
+        "reason": "Limited smoke test coverage",
+        "impact": "Operational reliability"
+      }
+    ]
+  },
+  "actionPlan": {
+    "immediate": {
+      "timeframe": "This week",
+      "priority": "critical",
+      "actions": [
+        "Implement AI Analytics API smoke tests",
+        "Implement Enforcement API tests", 
+        "Implement Embed Widget E2E tests",
+        "Delete backup files (.bak*)",
+        "Fix simple useEffect warnings"
+      ]
+    },
+    "shortTerm": {
+      "timeframe": "This month", 
+      "priority": "high",
+      "actions": [
+        "Verify agency management functionality",
+        "Expand API smoke test coverage",
+        "Fix complex useEffect warnings",
+        "Implement performance tests"
+      ]
+    },
+    "longTerm": {
+      "timeframe": "Next quarter",
+      "priority": "medium", 
+      "actions": [
+        "Comprehensive security testing",
+        "Load testing and capacity planning", 
+        "Technical debt reduction",
+        "Advanced monitoring implementation"
+      ]
+    }
+  },
+  "metadata": {
+    "generatedBy": "Claude Code AI Assistant",
+    "analysisDate": "2024-11-20",
+    "contextLimitations": [
+      "Dynamic content not analyzed",
+      "Production environment specifics unknown",
+      "External service dependencies not verified", 
+      "Performance characteristics not measured"
+    ],
+    "generatedArtifacts": [
+      "scripts/api-smoke-test-critical.js",
+      "scripts/fix-useeffect-warnings.js", 
+      ".github/workflows/mandatory-pr-checks.yml",
+      "docs/feature-inventory.md",
+      "docs/feature-inventory.json"
+    ]
+  }
+}
