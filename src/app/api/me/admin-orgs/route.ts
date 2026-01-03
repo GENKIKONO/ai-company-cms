@@ -87,7 +87,7 @@ export async function GET() {
     // Supabase returns organizations as object (not array) with !inner join
     const rows = (data ?? []) as unknown as MembershipRow[];
     const orgs: AdminOrg[] = rows
-      .filter((row) => row.organizations != null)
+      .filter((row) => row.organizations !== null)
       .map((row) => ({
         id: row.organizations.id,
         name: row.organizations.name,
