@@ -40,22 +40,8 @@ export async function GET(request: NextRequest) {
     const user = await getUserWithClient(supabase);
     if (!user) {
       return NextResponse.json({
-        ok: false,
-        error: 'Unauthorized',
-        counts: {
-          services: { count: 0, missing: true },
-          case_studies: { count: 0, missing: true },
-          posts: { count: 0, missing: true },
-          faqs: { count: 0, missing: true },
-          contacts: { count: 0, missing: true }
-        },
-        analytics: {
-          pageViews: 0,
-          avgDurationSec: 0,
-          conversionRate: 0
-        },
-        missingTables: ['services', 'case_studies', 'posts', 'faqs', 'contacts']
-      }, { status: 200 });
+        error: 'Unauthorized - Authentication required'
+      }, { status: 401 });
     }
 
     // 組織情報取得
@@ -67,22 +53,8 @@ export async function GET(request: NextRequest) {
 
     if (orgError || !orgData) {
       return NextResponse.json({
-        ok: false,
-        error: 'Organization not found',
-        counts: {
-          services: { count: 0, missing: true },
-          case_studies: { count: 0, missing: true },
-          posts: { count: 0, missing: true },
-          faqs: { count: 0, missing: true },
-          contacts: { count: 0, missing: true }
-        },
-        analytics: {
-          pageViews: 0,
-          avgDurationSec: 0,
-          conversionRate: 0
-        },
-        missingTables: ['services', 'case_studies', 'posts', 'faqs', 'contacts']
-      }, { status: 200 });
+        error: 'Organization not found for user'
+      }, { status: 403 });
     }
 
     const orgId = orgData.id;

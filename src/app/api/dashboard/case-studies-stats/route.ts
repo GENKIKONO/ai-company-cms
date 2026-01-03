@@ -1,12 +1,23 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: Request) {
   try {
+    // 認証チェック
+    const supabaseAuth = await createServerClient();
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({
+        error: 'Unauthorized - Authentication required'
+      }, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url);
     const orgId = searchParams.get('orgId');
-    
+
     if (!orgId) {
       return NextResponse.json({ error: 'orgId required' }, { status: 400 });
     }

@@ -15,14 +15,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Admin role check（v_app_users_compat2 互換ビュー使用）
-    const { data: userProfile, error: profileError } = await supabase
-      .from('v_app_users_compat2')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
+    // Check user role from auth state (no additional DB query needed)
+    const userRole = user.app_role || 'user';
 
-    if (profileError || userProfile?.role !== 'admin') {
+    if (userRole !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 

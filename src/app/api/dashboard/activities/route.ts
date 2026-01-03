@@ -20,7 +20,7 @@ export async function GET(req: Request) {
       // 直近5件のアクティビティを取得
       const { data, error } = await supabase
         .from('activities')
-        .select('id, message, created_at')
+        .select('id, action, resource_type, metadata, user_id, created_at')
         .eq('organization_id', orgId)
         .order('created_at', { ascending: false })
         .limit(5);
