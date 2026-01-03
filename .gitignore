@@ -63,3 +63,20 @@ stage1-task*.md
 playwright-report/
 test-results/
 
+# Test results and audit artifacts
+test-results*.json
+*_audit*.json
+*_report.json
+phase*-*.json
+phase*_*.json
+security_audit_report.json
+
+# Debug folder
+debug/
+
+# Development scripts (temporary)
+scripts/*.js
+
+# Temporary SQL files
+sql/migrations/
+

@@ -1,0 +1,153 @@
+name: 🔍 Pre-commit Quality Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pre-commit-check:
+    name: 🚨 Pre-commit Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          # フルヒストリーを取得（差分解析のため）
+          fetch-depth: 0
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📲 Install dependencies
+        run: npm ci
+
+      - name: 📋 Get changed files
+        id: changed-files
+        run: |
+          # PRで変更されたファイルを取得
+          echo "changed-files<<EOF" >> $GITHUB_OUTPUT
+          git diff --name-only origin/${{ github.base_ref }}...HEAD >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "🔍 Changed files in this PR:"
+          git diff --name-only origin/${{ github.base_ref }}...HEAD
+
+      - name: 🔤 TypeScript check on changed files
+        run: |
+          # 変更されたTSファイルのみをチェック
+          CHANGED_TS_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(ts|tsx)$' || true)
+          if [ -n "$CHANGED_TS_FILES" ]; then
+            echo "🔍 Checking TypeScript for changed files:"
+            echo "$CHANGED_TS_FILES"
+            # 全体のtypecheckを実行（部分チェックは複雑なため）
+            npm run typecheck
+          else
+            echo "✅ No TypeScript files changed"
+          fi
+
+      - name: 🧹 ESLint on changed files
+        run: |
+          CHANGED_JS_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(js|jsx|ts|tsx)$' || true)
+          if [ -n "$CHANGED_JS_FILES" ]; then
+            echo "🔍 Running ESLint on changed files:"
+            echo "$CHANGED_JS_FILES" | xargs npx eslint || true
+            echo "📊 ESLint summary for changed files:"
+            echo "$CHANGED_JS_FILES" | xargs npx eslint --format compact || true
+          else
+            echo "✅ No JavaScript/TypeScript files changed"
+          fi
+
+      - name: 🎨 Prettier check on changed files
+        run: |
+          CHANGED_FORMATTABLE_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(js|jsx|ts|tsx|json|md|yml|yaml)$' || true)
+          if [ -n "$CHANGED_FORMATTABLE_FILES" ]; then
+            echo "🔍 Checking Prettier formatting for changed files:"
+            echo "$CHANGED_FORMATTABLE_FILES" | xargs npx prettier --check || true
+          else
+            echo "✅ No formattable files changed"
+          fi
+
+      - name: 🚫 Check for forbidden patterns
+        run: |
+          echo "🔍 Checking for forbidden patterns in changed files:"
+          
+          # org_id の使用チェック
+          CHANGED_TS_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(ts|tsx)$' || true)
+          if [ -n "$CHANGED_TS_FILES" ]; then
+            echo "Checking for org_id usage in changed files:"
+            echo "$CHANGED_TS_FILES" | xargs grep -n "org_id" || echo "✅ No org_id usage found"
+            
+            echo "Checking for console statements:"
+            echo "$CHANGED_TS_FILES" | xargs grep -n "console\." || echo "✅ No console statements found"
+          fi
+
+      - name: 🧪 Run tests for changed modules
+        run: |
+          # 変更されたファイルに対応するテストファイルの実行
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed-files }}"
+          
+          # 基本的なユニットテストは常に実行
+          npm run test:unit
+          
+          # E2Eテストはファイルパターンに応じて
+          if echo "$CHANGED_FILES" | grep -E "(auth|login)" > /dev/null; then
+            echo "🎭 Auth-related changes detected, running auth E2E tests"
+            npm run test:e2e:critical || true
+          fi
+          
+          if echo "$CHANGED_FILES" | grep -E "(billing|stripe|segment)" > /dev/null; then
+            echo "💳 Billing-related changes detected, running billing E2E tests"
+            npm run test:e2e:billing || true
+          fi
+          
+          if echo "$CHANGED_FILES" | grep -E "(admin|management)" > /dev/null; then
+            echo "👑 Admin-related changes detected, running admin E2E tests"
+            npm run test:e2e:admin || true
+          fi
+
+      - name: 📊 Generate PR quality report
+        run: |
+          echo "# 📊 PR Quality Report" > pr-quality-report.md
+          echo "" >> pr-quality-report.md
+          echo "**PR:** #${{ github.event.number }}" >> pr-quality-report.md
+          echo "**Branch:** \`${{ github.head_ref }}\`" >> pr-quality-report.md
+          echo "**Base:** \`${{ github.base_ref }}\`" >> pr-quality-report.md
+          echo "**Commit:** \`${{ github.sha }}\`" >> pr-quality-report.md
+          echo "" >> pr-quality-report.md
+          echo "## 📁 Changed Files" >> pr-quality-report.md
+          echo "\`\`\`" >> pr-quality-report.md
+          git diff --name-only origin/${{ github.base_ref }}...HEAD >> pr-quality-report.md
+          echo "\`\`\`" >> pr-quality-report.md
+          echo "" >> pr-quality-report.md
+          echo "## 🔍 Quality Checks" >> pr-quality-report.md
+          echo "- ✅ TypeScript compilation" >> pr-quality-report.md
+          echo "- 🔍 ESLint analysis (see details above)" >> pr-quality-report.md
+          echo "- 🎨 Prettier formatting check" >> pr-quality-report.md
+          echo "- 🚫 Forbidden pattern check" >> pr-quality-report.md
+          echo "- 🧪 Relevant test execution" >> pr-quality-report.md
+
+      - name: 📁 Upload quality report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-quality-report
+          path: pr-quality-report.md
+          retention-days: 7
+
+      - name: 💬 Comment PR with quality summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (fs.existsSync('pr-quality-report.md')) {
+              const report = fs.readFileSync('pr-quality-report.md', 'utf8');
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `${report}\n\n---\n*Generated by AIOHub CI/CD Pipeline*`
+              });
+            }

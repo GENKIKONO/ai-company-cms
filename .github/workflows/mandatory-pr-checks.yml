@@ -1,0 +1,356 @@
+name: 🛡️ Mandatory PR Checks
+
+# PR → main マージ前の必須チェック
+# lint / typecheck / build / test:e2e を必ず通す
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+env:
+  NODE_VERSION: '20'
+  # テスト環境変数
+  TEST_USER_EMAIL: 'test@aiohub.dev'
+  TEST_USER_PASSWORD: 'TestPass123!'
+  PLAYWRIGHT_BASE_URL: 'http://localhost:3000'
+
+# 同時実行制限（同じPRでの重複実行を防止）
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # 📋 前提条件チェック
+  pre-flight:
+    name: 📋 Pre-flight Validation
+    runs-on: ubuntu-latest
+    outputs:
+      should-run-tests: ${{ steps.check-changes.outputs.should-run-tests }}
+      should-run-e2e: ${{ steps.check-changes.outputs.should-run-e2e }}
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📲 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Check changed files
+        id: check-changes
+        run: |
+          # 変更されたファイルを取得
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:" 
+          echo "$CHANGED_FILES"
+          
+          # TypeScript/JavaScriptファイルの変更があるか
+          if echo "$CHANGED_FILES" | grep -E '\.(ts|tsx|js|jsx)$' > /dev/null; then
+            echo "should-run-tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-run-tests=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # 重要なファイルの変更があるか（E2Eテスト必要）
+          if echo "$CHANGED_FILES" | grep -E '(pages?|components?|api|auth|billing|admin)' > /dev/null; then
+            echo "should-run-e2e=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-run-e2e=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🚫 Check for forbidden patterns
+        run: |
+          npm run validate:forbidden || {
+            echo "❌ 禁止パターンが検出されました"
+            echo "💡 org_id の使用や禁止フィールドを確認してください"
+            exit 1
+          }
+
+      - name: 📋 Validate schema consistency
+        run: |
+          npm run validate:schema || {
+            echo "❌ スキーマの整合性チェックに失敗しました" 
+            exit 1
+          }
+
+  # 🧹 コード品質チェック（必須）
+  code-quality:
+    name: 🧹 Code Quality (MANDATORY)
+    runs-on: ubuntu-latest
+    needs: pre-flight
+    if: needs.pre-flight.outputs.should-run-tests == 'true'
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📲 Install dependencies
+        run: npm ci
+
+      - name: 🔤 TypeScript check (MANDATORY)
+        run: |
+          npm run typecheck || {
+            echo "❌ TypeScript コンパイルエラーがあります"
+            echo "💡 型エラーを修正してからPRをマージしてください"
+            exit 1
+          }
+
+      - name: 🧹 ESLint check (MANDATORY)
+        run: |
+          npm run lint || {
+            echo "❌ ESLint エラーがあります"
+            echo "💡 コードの品質問題を修正してからPRをマージしてください"
+            exit 1
+          }
+
+      - name: 🎨 Prettier format check
+        run: |
+          npm run format:check || {
+            echo "❌ コードフォーマットに問題があります"
+            echo "💡 npm run format を実行してコードを整形してください"
+            exit 1
+          }
+
+  # 🏗️ ビルドテスト（必須）
+  build-verification:
+    name: 🏗️ Build Verification (MANDATORY)
+    runs-on: ubuntu-latest
+    needs: [pre-flight, code-quality]
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📲 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Production build test (MANDATORY)
+        run: |
+          npm run build || {
+            echo "❌ ビルドに失敗しました"
+            echo "💡 ビルドエラーを修正してからPRをマージしてください"
+            exit 1
+          }
+        env:
+          # 必須環境変数（プレースホルダー値）
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL || 'https://aiohub.jp' }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'sk_test_placeholder' }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET || 'whsec_placeholder' }}
+
+      - name: 📏 Bundle size analysis
+        run: |
+          BUILD_SIZE=$(du -sh .next/ | cut -f1)
+          echo "📦 Build size: $BUILD_SIZE"
+          
+          # 大きすぎるバンドルサイズの警告
+          if [ "$(du -s .next/ | cut -f1)" -gt 200000 ]; then
+            echo "⚠️ Warning: Build size is large (>200MB). Consider optimization."
+          fi
+
+  # 🧪 単体テスト
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: [pre-flight, code-quality]
+    if: needs.pre-flight.outputs.should-run-tests == 'true'
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📲 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run unit tests
+        run: |
+          npm run test:unit || {
+            echo "⚠️ 単体テストに失敗しました"
+            echo "💡 テストを確認してください（マージをブロックしません）"
+          }
+
+  # 🎭 E2Eテスト（必須、重要な変更のみ）
+  e2e-tests:
+    name: 🎭 E2E Tests (MANDATORY)
+    runs-on: ubuntu-latest
+    needs: [pre-flight, build-verification]
+    if: needs.pre-flight.outputs.should-run-e2e == 'true'
+    timeout-minutes: 15
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📲 Install dependencies
+        run: npm ci
+
+      - name: 🎭 Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: 🚀 Start application
+        run: |
+          npm run build
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: 🎭 Run critical E2E tests (MANDATORY)
+        run: |
+          # 重要なE2Eテストのみ実行
+          npx playwright test auth-flow.spec.ts || FAILED_TESTS="$FAILED_TESTS auth-flow"
+          npx playwright test posts-management.spec.ts || FAILED_TESTS="$FAILED_TESTS posts-management" 
+          npx playwright test admin-console.spec.ts || FAILED_TESTS="$FAILED_TESTS admin-console"
+          npx playwright test segment-billing.spec.ts || FAILED_TESTS="$FAILED_TESTS segment-billing"
+          
+          if [ -n "$FAILED_TESTS" ]; then
+            echo "❌ E2Eテストが失敗しました: $FAILED_TESTS"
+            echo "💡 重要機能が壊れている可能性があります。修正してからPRをマージしてください"
+            exit 1
+          fi
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ env.PLAYWRIGHT_BASE_URL }}
+          TEST_USER_EMAIL: ${{ env.TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ env.TEST_USER_PASSWORD }}
+
+      - name: 📁 Upload E2E results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 3
+
+  # 🌬️ APIスモークテスト（重要領域）
+  api-smoke-tests:
+    name: 🌬️ Critical API Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [pre-flight, build-verification]
+    timeout-minutes: 5
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📲 Install dependencies
+        run: npm ci
+
+      - name: 🚀 Start application for API tests
+        run: |
+          npm run build
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: 🌬️ Run critical API smoke tests
+        run: |
+          node scripts/api-smoke-test-critical.js || {
+            echo "❌ 重要API のスモークテストが失敗しました"
+            echo "💡 AIアナリティクス、埋め込みWidget、Enforcement APIを確認してください"
+            exit 1
+          }
+
+  # ✅ 最終チェック
+  mandatory-checks-summary:
+    name: ✅ Mandatory Checks Summary
+    runs-on: ubuntu-latest
+    needs: [pre-flight, code-quality, build-verification, e2e-tests, api-smoke-tests]
+    if: always()
+    steps:
+      - name: 📋 Check all mandatory results
+        run: |
+          echo "📊 Mandatory PR Checks Results:"
+          echo "================================"
+          
+          # 各ジョブの結果をチェック
+          CODE_QUALITY="${{ needs.code-quality.result }}"
+          BUILD_VERIFICATION="${{ needs.build-verification.result }}"
+          E2E_TESTS="${{ needs.e2e-tests.result }}"
+          API_SMOKE="${{ needs.api-smoke-tests.result }}"
+          
+          echo "🧹 Code Quality: $CODE_QUALITY"
+          echo "🏗️ Build Verification: $BUILD_VERIFICATION"
+          echo "🎭 E2E Tests: $E2E_TESTS"
+          echo "🌬️ API Smoke Tests: $API_SMOKE"
+          
+          # いずれかが失敗している場合はエラー
+          if [[ "$CODE_QUALITY" == "failure" || "$BUILD_VERIFICATION" == "failure" || "$E2E_TESTS" == "failure" || "$API_SMOKE" == "failure" ]]; then
+            echo ""
+            echo "❌ 必須チェックに失敗しています"
+            echo "💡 このPRは main ブランチにマージできません"
+            echo "💡 すべての必須チェックが通るまで修正を続けてください"
+            exit 1
+          else
+            echo ""
+            echo "🎉 すべての必須チェックが完了しました！"
+            echo "✅ このPRは main ブランチにマージ可能です"
+          fi
+
+  # 🚨 失敗通知
+  failure-notification:
+    name: 🚨 Failure Notification
+    runs-on: ubuntu-latest
+    needs: [mandatory-checks-summary]
+    if: failure()
+    steps:
+      - name: 💬 Comment failure details
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = `## ❌ 必須チェックが失敗しました
+            
+            このPRは以下の必須チェックを通過する必要があります：
+            
+            - ✅ **TypeScript コンパイル** (npm run typecheck)
+            - ✅ **ESLint チェック** (npm run lint) 
+            - ✅ **ビルド検証** (npm run build)
+            - ✅ **重要E2Eテスト** (認証・投稿・管理・決済)
+            - ✅ **重要APIスモークテスト** (AI・埋め込み・監査)
+            
+            ### 📋 修正手順
+            1. \`npm run lint\` でESLintエラーを確認・修正
+            2. \`npm run typecheck\` でTypeScriptエラーを確認・修正  
+            3. \`npm run build\` でビルドエラーを確認・修正
+            4. \`npm run test:e2e\` でE2Eテストを実行・修正
+            5. 修正後にPRを更新すると再度チェックが実行されます
+            
+            ---
+            *🤖 AIOHub Mandatory CI/CD Pipeline*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
