@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's organization
+    // Get user's organization（v_app_users_compat2 互換ビュー使用）
     const { data: userProfiles, error: profileError } = await supabase
-      .from('app_users')
+      .from('v_app_users_compat2')
       .select('organization_id')
       .eq('id', user.id);
 
@@ -116,10 +116,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's organization with plan info
+    // Get user's organization（v_app_users_compat2 互換ビュー使用）
     const { data: userProfiles, error: profileError } = await supabase
-      .from('app_users')
-      .select('organization_id, organizations(plan_id)')
+      .from('v_app_users_compat2')
+      .select('organization_id')
       .eq('id', user.id);
 
     if (profileError) {
@@ -132,8 +132,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
     }
 
+    // 二段取得: organizations から plan_id を取得
+    const { data: orgData } = await supabase
+      .from('organizations')
+      .select('plan_id')
+      .eq('id', userProfile.organization_id)
+      .maybeSingle();
+
+    // plan_id を userProfile に追加（既存コードとの互換性のため）
+    const userProfileWithOrg = {
+      ...userProfile,
+      organizations: orgData ? { plan_id: orgData.plan_id } : null
+    };
+
     const organizationId = userProfile.organization_id;
-    const planId = (userProfile.organizations as { plan_id?: string } | null)?.plan_id ?? 'free';
+    const planId = (userProfileWithOrg.organizations as { plan_id?: string } | null)?.plan_id ?? 'free';
 
     // Parse request body
     const body = await request.json();

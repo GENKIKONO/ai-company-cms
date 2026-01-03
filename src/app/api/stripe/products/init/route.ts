@@ -17,11 +17,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // v_app_users_compat2 互換ビュー使用
     const { data: appUser, error: userError } = await supabase
-      .from('app_users')
+      .from('v_app_users_compat2')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (userError || appUser?.role !== 'admin') {
       return NextResponse.json(

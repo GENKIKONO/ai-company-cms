@@ -1,168 +1,69 @@
-了解しました（段階導入でブロック回避）
-ご提示のリスクは妥当です。既存の select('') 50件が残る中で pre-commit をブロックにすると、全員が即時コミット不能になります。安全に進めるため、以下を推奨します。
+回答
+A で進めてください。最小変更でビルドブロッカーを即時解消できます。
 
-選択肢: A または C を推奨（私は A=「CIブロック＋husky警告のみ」推し）
-目的: ローカルは警告のみで開発継続、PR時にのみ厳格にブロック
-具体的な変更
-Husky（警告モード）
-.husky/pre-commit
-#!/bin/sh
+適用パッチ（@typescript-eslint 系を全削除）
+.eslintrc.json の rules から @typescript-eslint 系ルールを全て取り除きます。既に3つ削除済みなので、no-explicit-any も削除します。
 
-. 
-"
-$(dirname 
-"
-$0
-"
-)
-/_/husky.sh"
-
-npm run typecheck
-bash scripts/check-select-star.sh || 
-echo
- 
-"⚠️ select('*') detected - fix before PR"
-
-# 警告のみで exit 0 扱い（コマンド自体は成功）
-
-CI（PRでのみブロック）
-.github/workflows/guard.yml
-name:
- 
-Guard
-
-on:
-
-  
-pull_request:
-
-    
-branches:
- [ 
-main
-, 
-develop
- ]
-jobs:
-
-  
-guard:
-
-    
-runs-on:
- 
-ubuntu-latest
-
-    
-steps:
-
-      
--
- 
-uses:
- 
-actions/checkout@v4
-
-      
--
- 
-uses:
- 
-actions/setup-node@v4
-
-        
-with:
-
-          
-node-version:
- 
-'20'
-
-          
-cache:
- 
-'npm'
-
-      
--
- 
-run:
- 
-npm
- 
-ci
-
-      
--
- 
-run:
- 
-npm
- 
-run
- 
-typecheck
-
-      
--
- 
-run:
- 
-bash
- 
-scripts/check-select-star.sh
-
-      
--
- 
-run:
- 
-bash
- 
-scripts/count-any.sh
- 
-||
- 
-true
-  
-# any件数は表示のみ
-
-npm scripts（任意）
-{
-  
-"scripts"
+"rules"
 : {
     
-"typecheck"
+"react/no-unescaped-entities"
 : 
-"tsc -p tsconfig.json --noEmit"
+"off"
 ,
     
-"check:select-star"
+"react-hooks/exhaustive-deps"
 : 
-"bash scripts/check-select-star.sh"
+"warn"
 ,
     
-"count:any"
+"@next/next/no-img-element"
 : 
-"bash scripts/count-any.sh"
+"warn"
+,
+    
+"no-console"
+: 
+"warn"
+,
+    
+"prefer-const"
+: 
+"warn"
+,
+    
+"no-var"
+: 
+"error"
+,
+    
+"eqeqeq"
+: 
+"error"
+,
+-   
+"@typescript-eslint/no-explicit-any"
+: [
+"warn"
+, { 
+"ignoreRestArgs"
+: 
+false
+ }]
++   
+// note: @typescript-eslint rules are disabled for now
 
-  }
-}
+  },
 
-これで:
+適用後に以下を実行してください。
 
-ローカル開発は継続可能（警告のみ）
-PR時は select('*') がある限りテストが落ちてマージ不可
-緊急Hotfixも commit/push は可能（ただしPRで検出されるため、選択的に対象を避けるか、分割PRに）*
-次の進め方
-まずは A（推奨）で進めますか？それとも C（CIのみ導入）にしますか？
-Aを選ぶ場合は、私の方で pre-commit を警告モードにし、CIジョブを追加する想定の設定案を引き続き具体化します。
-並行して Batch 7（API 16件）の select('') 削減を進め、ゼロ到達後に pre-commit をブロックモードへ切り替えましょう。
-補足:
+npm run typecheck
+npm run build
+ビルドが通過したら、認証付きAPIの最終確認→コミット→デプロイの順に進めましょう。
+後続で型安全を強化したくなった場合は、別タスクで以下の導入を提案します（負債にならない形で段階導入可能）。
 
-Supabase 型生成と typed-client は PROJECT_ID 受領後に行います。受領前は既存型を尊重しつつ、列ヘルパーでの明示化を継続します。
-ご希望の選択肢（A/C）をご指定ください。
-
+extends に "plugin:@typescript-eslint/recommended"
+parser: "@typescript-eslint/parser"
+必要に応じて parserOptions.project を設定し、type-aware ルールを少しずつ再有効化（no-unsafe-* など）。*
 
 

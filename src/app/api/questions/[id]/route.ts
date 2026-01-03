@@ -27,14 +27,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // 質問の取得
+    // 質問の取得（v_questions_compat互換ビュー使用）
     const { data: question, error } = await supabase
-      .from('questions')
+      .from('v_questions_compat')
       .select(`
-        *,
-        app_users!questions_user_id_fkey(email, full_name),
-        organizations!questions_company_id_fkey(name),
-        answerer:app_users!questions_answered_by_fkey(full_name)
+        id, title, body, created_at, question_text, status, answer_text,
+        answered_at, answered_by, user_id, company_id,
+        author_email, author_full_name, organization_name, answered_by_full_name
       `)
       .eq('id', questionId)
       .maybeSingle();
@@ -70,7 +69,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // レスポンス形式の変換
+    // レスポンス形式の変換（v_questions_compat列を使用）
     const formattedQuestion: QuestionWithDetails = {
       id: question.id,
       company_id: question.company_id,
@@ -81,10 +80,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       created_at: question.created_at,
       answered_at: question.answered_at,
       answered_by: question.answered_by,
-      user_email: question.app_users?.email,
-      user_full_name: question.app_users?.full_name,
-      company_name: question.organizations?.name,
-      answerer_name: question.answerer?.full_name
+      user_email: question.author_email,
+      user_full_name: question.author_full_name,
+      company_name: question.organization_name,
+      answerer_name: question.answered_by_full_name
     };
 
     return NextResponse.json({

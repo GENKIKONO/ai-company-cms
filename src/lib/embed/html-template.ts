@@ -40,7 +40,6 @@ interface EmbedFAQ {
 }
 
 /** JSON-LD構造化データ（anyを許容する外部データ） */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type JsonLdData = Record<string, any>;
 
 export interface IframeGeneratorOptions {

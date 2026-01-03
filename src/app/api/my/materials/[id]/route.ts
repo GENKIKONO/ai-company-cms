@@ -30,9 +30,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Invalid material ID format' }, { status: 400 });
     }
 
-    // ユーザーの組織IDを取得
+    // ユーザーの組織IDを取得（v_app_users_compat2 互換ビュー使用）
     const { data: userProfiles, error: profileError } = await supabase
-      .from('app_users')
+      .from('v_app_users_compat2')
       .select('organization_id')
       .eq('id', user.id);
 

@@ -128,6 +128,42 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_alerts: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          detected_at: string
+          event_type: string
+          id: string
+          organization_id: string
+          severity: string
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          detected_at?: string
+          event_type: string
+          id?: string
+          organization_id: string
+          severity?: string
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          detected_at?: string
+          event_type?: string
+          id?: string
+          organization_id?: string
+          severity?: string
+          title?: string | null
+        }
+        Relationships: []
+      }
       admin_audit_logs: {
         Row: {
           action: string
@@ -245,6 +281,13 @@ export type Database = {
             columns: ["content_unit_id"]
             isOneToOne: false
             referencedRelation: "ai_content_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_bot_logs_content_unit_id_fkey"
+            columns: ["content_unit_id"]
+            isOneToOne: false
+            referencedRelation: "v_ai_content_units_compat"
             referencedColumns: ["id"]
           },
           {
@@ -391,6 +434,13 @@ export type Database = {
             columns: ["content_unit_id"]
             isOneToOne: false
             referencedRelation: "ai_content_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_citations_items_content_unit_id_fkey"
+            columns: ["content_unit_id"]
+            isOneToOne: false
+            referencedRelation: "v_ai_content_units_compat"
             referencedColumns: ["id"]
           },
           {
@@ -620,6 +670,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_ai_interview_session_metrics"
             referencedColumns: ["session_id"]
+          },
+          {
+            foreignKeyName: "fk_acr_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1195,6 +1252,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "ai_interview_sessions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_interview_sessions_finalized_by_fkey"
+            columns: ["finalized_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "ai_interview_sessions_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
@@ -1263,6 +1334,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "ai_interview_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1804,6 +1882,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "ai_usage_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "ai_usage_events_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
@@ -1960,6 +2045,13 @@ export type Database = {
             columns: ["content_unit_id"]
             isOneToOne: false
             referencedRelation: "ai_content_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_visibility_scores_content_unit_id_fkey"
+            columns: ["content_unit_id"]
+            isOneToOne: false
+            referencedRelation: "v_ai_content_units_compat"
             referencedColumns: ["id"]
           },
           {
@@ -2345,6 +2437,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "app_users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "app_users_partner_id_fkey"
             columns: ["partner_id"]
@@ -3731,7 +3830,15 @@ export type Database = {
           stripe_checkout_url?: string | null
           stripe_price_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "billing_checkout_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       blocked_ips: {
         Row: {
@@ -3779,7 +3886,15 @@ export type Database = {
           updated_at?: string | null
           violation_count?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "blocked_ips_blocked_by_fkey"
+            columns: ["blocked_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cache_invalidation_queue: {
         Row: {
@@ -3978,6 +4093,13 @@ export type Database = {
           verified_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "case_studies_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "case_studies_interview_session_id_fkey"
             columns: ["interview_session_id"]
@@ -4311,6 +4433,13 @@ export type Database = {
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
           },
+          {
+            foreignKeyName: "chatbot_interactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       chatbots: {
@@ -4354,6 +4483,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "chatbots_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "chatbots_organization_id_fkey"
             columns: ["organization_id"]
@@ -4653,6 +4789,39 @@ export type Database = {
             referencedColumns: ["task_id"]
           },
         ]
+      }
+      consent_records: {
+        Row: {
+          consent_key: string
+          created_at: string
+          granted: boolean
+          granted_at: string | null
+          id: string
+          org_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          consent_key: string
+          created_at?: string
+          granted?: boolean
+          granted_at?: string | null
+          id?: string
+          org_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          consent_key?: string
+          created_at?: string
+          granted?: boolean
+          granted_at?: string | null
+          id?: string
+          org_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       content_refresh_queue: {
         Row: {
@@ -5442,6 +5611,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "faqs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "faqs_interview_session_id_fkey"
             columns: ["interview_session_id"]
             isOneToOne: false
@@ -5971,6 +6147,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "intrusion_detection_alerts_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "intrusion_detection_alerts_rule_id_fkey"
             columns: ["rule_id"]
             isOneToOne: false
@@ -6034,7 +6217,15 @@ export type Database = {
           threshold_window_minutes?: number | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "intrusion_detection_rules_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ip_blocklist: {
         Row: {
@@ -6073,7 +6264,15 @@ export type Database = {
           severity?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ip_blocklist_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ip_report_actions: {
         Row: {
@@ -6227,6 +6426,30 @@ export type Database = {
           started_at?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      materials: {
+        Row: {
+          created_at: string
+          file_key: string
+          id: string
+          mime_type: string | null
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_key: string
+          id?: string
+          mime_type?: string | null
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          file_key?: string
+          id?: string
+          mime_type?: string | null
+          owner_id?: string
         }
         Relationships: []
       }
@@ -7058,6 +7281,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "org_group_invites_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "org_group_invites_group_id_fkey"
             columns: ["group_id"]
             isOneToOne: false
@@ -7110,6 +7340,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "org_group_join_requests_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "org_group_join_requests_group_id_fkey"
             columns: ["group_id"]
@@ -7187,6 +7424,13 @@ export type Database = {
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
           },
+          {
+            foreignKeyName: "org_group_join_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       org_group_members: {
@@ -7244,6 +7488,13 @@ export type Database = {
           owner_organization_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "org_groups_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "org_groups_owner_org_fkey"
             columns: ["owner_organization_id"]
@@ -7707,6 +7958,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "organization_members_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "organization_members_org_fk"
             columns: ["organization_id"]
             isOneToOne: false
@@ -7845,6 +8103,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "organization_members_user_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -8854,7 +9126,15 @@ export type Database = {
           next_violation_set_by?: string | null
           role?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
@@ -9565,6 +9845,20 @@ export type Database = {
             foreignKeyName: "qa_content_logs_qa_entry_id_fkey"
             columns: ["qa_entry_id"]
             isOneToOne: false
+            referencedRelation: "v_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qa_content_logs_qa_entry_id_fkey"
+            columns: ["qa_entry_id"]
+            isOneToOne: false
+            referencedRelation: "v_questions_compat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qa_content_logs_qa_entry_id_fkey"
+            columns: ["qa_entry_id"]
+            isOneToOne: false
             referencedRelation: "view_qa_entries"
             referencedColumns: ["id"]
           },
@@ -9988,7 +10282,15 @@ export type Database = {
           updated_at?: string | null
           window_ms?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "rate_limit_configs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rate_limit_logs: {
         Row: {
@@ -12270,7 +12572,22 @@ export type Database = {
           reason?: string | null
           target_user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "role_change_audit_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_change_audit_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       room_members: {
         Row: {
@@ -12375,6 +12692,13 @@ export type Database = {
             referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "room_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rooms: {
@@ -12400,6 +12724,13 @@ export type Database = {
           organization_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "rooms_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "rooms_organization_id_fkey"
             columns: ["organization_id"]
@@ -12606,6 +12937,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "sales_materials_created_by_auth_users_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -13598,7 +13936,15 @@ export type Database = {
           severity_level?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sensitive_data_patterns_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_role_audit: {
         Row: {
@@ -13953,6 +14299,13 @@ export type Database = {
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
           },
+          {
+            foreignKeyName: "services_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       settings: {
@@ -14251,6 +14604,27 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      test_org_memberships: {
+        Row: {
+          created_at: string
+          organization_id: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          organization_id: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          organization_id?: string
+          role?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -14584,6 +14958,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "user_profiles_auth_user_id_fkey"
+            columns: ["auth_user_id"]
+            isOneToOne: true
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "user_profiles_preferred_lang_fkey"
             columns: ["preferred_lang"]
             isOneToOne: false
@@ -14777,6 +15158,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "users_organization_id_fkey"
@@ -15062,6 +15450,13 @@ export type Database = {
             foreignKeyName: "ai_bot_logs_content_unit_id_fkey"
             columns: ["content_unit_id"]
             isOneToOne: false
+            referencedRelation: "v_ai_content_units_compat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_bot_logs_content_unit_id_fkey"
+            columns: ["content_unit_id"]
+            isOneToOne: false
             referencedRelation: "view_ai_content_units"
             referencedColumns: ["id"]
           },
@@ -15271,7 +15666,15 @@ export type Database = {
           violations_30d: number | null
           violations_7d: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       admin_summary_today_v1: {
         Row: {
@@ -15363,6 +15766,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "users_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "users_organization_id_fkey"
@@ -15458,7 +15868,15 @@ export type Database = {
           user_id: string | null
           violations_30d: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_citation_integrity_daily: {
         Row: {
@@ -16086,6 +16504,13 @@ export type Database = {
           verified_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "case_studies_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "case_studies_interview_session_id_fkey"
             columns: ["interview_session_id"]
@@ -19236,6 +19661,13 @@ export type Database = {
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
           },
+          {
+            foreignKeyName: "services_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       services_public_minimal: {
@@ -19612,6 +20044,20 @@ export type Database = {
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
           },
+          {
+            foreignKeyName: "organization_members_user_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_violation_stats: {
@@ -19633,6 +20079,47 @@ export type Database = {
           violations_2y: number | null
           violations_3y: number | null
           violations_6m: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_admin_alerts_latest: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          detected_at: string | null
+          event_type: string | null
+          id: string | null
+          organization_id: string | null
+          severity: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          detected_at?: string | null
+          event_type?: string | null
+          id?: string | null
+          organization_id?: string | null
+          severity?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          detected_at?: string | null
+          event_type?: string | null
+          id?: string | null
+          organization_id?: string | null
+          severity?: string | null
+          title?: string | null
         }
         Relationships: []
       }
@@ -19810,7 +20297,23 @@ export type Database = {
             referencedRelation: "v_ai_interview_session_metrics"
             referencedColumns: ["session_id"]
           },
+          {
+            foreignKeyName: "fk_acr_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      v_ai_citations_compat: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string | null
+          source_url: string | null
+        }
+        Relationships: []
       }
       v_ai_citations_daily: {
         Row: {
@@ -20108,6 +20611,122 @@ export type Database = {
           },
           {
             foreignKeyName: "fk_acr_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "view_report_regen_limit_current"
+            referencedColumns: ["organization_id"]
+          },
+        ]
+      }
+      v_ai_content_units_compat: {
+        Row: {
+          content: string | null
+          content_type: string | null
+          description: string | null
+          id: string | null
+          last_updated: string | null
+          meta: Json | null
+          order_no: number | null
+          organization_id: string | null
+          section_key: string | null
+          session_id: string | null
+          title: string | null
+          url: string | null
+        }
+        Insert: {
+          content?: never
+          content_type?: string | null
+          description?: string | null
+          id?: string | null
+          last_updated?: string | null
+          meta?: never
+          order_no?: never
+          organization_id?: string | null
+          section_key?: never
+          session_id?: never
+          title?: string | null
+          url?: string | null
+        }
+        Update: {
+          content?: never
+          content_type?: string | null
+          description?: string | null
+          id?: string | null
+          last_updated?: string | null
+          meta?: never
+          order_no?: never
+          organization_id?: string | null
+          section_key?: never
+          session_id?: never
+          title?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "ai_usage_counters"
+            referencedColumns: ["org_id"]
+          },
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_overview_v2"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_with_owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "v_orgs_visible"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "view_ai_starter_caps_current"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "view_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_content_units_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "view_report_regen_limit_current"
@@ -20555,6 +21174,13 @@ export type Database = {
             referencedRelation: "v_ai_interview_session_metrics"
             referencedColumns: ["session_id"]
           },
+          {
+            foreignKeyName: "fk_acr_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       v_alert_events: {
@@ -20623,6 +21249,25 @@ export type Database = {
           alert_source_table?: string | null
           alert_where_key?: string | null
           alert_where_sql?: string | null
+        }
+        Relationships: []
+      }
+      v_app_users_compat2: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          display_name: string | null
+          email: string | null
+          email_verified: boolean | null
+          full_name: string | null
+          id: string | null
+          last_sign_in_at: string | null
+          organization_id: string | null
+          phone: string | null
+          phone_verified: boolean | null
+          plan: string | null
+          role: string | null
+          updated_at: string | null
         }
         Relationships: []
       }
@@ -20779,6 +21424,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "case_studies_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "case_studies_interview_session_id_fkey"
             columns: ["interview_session_id"]
             isOneToOne: false
@@ -20905,6 +21557,16 @@ export type Database = {
             referencedColumns: ["organization_id"]
           },
         ]
+      }
+      v_comprehensive_analytics_compat: {
+        Row: {
+          active_orgs: number | null
+          generated_at: string | null
+          total_answers: number | null
+          total_interviews: number | null
+          total_questions: number | null
+        }
+        Relationships: []
       }
       v_crawler_policy_current: {
         Row: {
@@ -21065,6 +21727,20 @@ export type Database = {
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
           },
+          {
+            foreignKeyName: "organization_members_user_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       v_current_user_orgs: {
@@ -21217,6 +21893,15 @@ export type Database = {
             referencedColumns: ["organization_id"]
           },
         ]
+      }
+      v_dashboard_stats_compat: {
+        Row: {
+          active_orgs: number | null
+          alerts_count: number | null
+          total_users: number | null
+          updated_at: string | null
+        }
+        Relationships: []
       }
       v_disclosures_admin_list: {
         Row: {
@@ -21451,6 +22136,16 @@ export type Database = {
           },
         ]
       }
+      v_gsc_analytics_compat: {
+        Row: {
+          clicks: number | null
+          ctr: number | null
+          generated_at: string | null
+          impressions: number | null
+          position: number | null
+        }
+        Relationships: []
+      }
       v_job_failures_24h: {
         Row: {
           failures: number | null
@@ -21489,6 +22184,30 @@ export type Database = {
           succeeded_runs: number | null
           success_rate_pct: number | null
           total_runs: number | null
+        }
+        Relationships: []
+      }
+      v_materials_public: {
+        Row: {
+          created_at: string | null
+          file_key: string | null
+          id: string | null
+          mime_type: string | null
+          owner_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_key?: string | null
+          id?: string | null
+          mime_type?: string | null
+          owner_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_key?: string | null
+          id?: string | null
+          mime_type?: string | null
+          owner_id?: string | null
         }
         Relationships: []
       }
@@ -23059,6 +23778,322 @@ export type Database = {
         }
         Relationships: []
       }
+      v_qna_stats: {
+        Row: {
+          org_id: string | null
+          period_end: string | null
+          period_start: string | null
+          total_archived: number | null
+          total_draft: number | null
+          total_published: number | null
+          updates_last_7d: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "ai_usage_counters"
+            referencedColumns: ["org_id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_overview_v2"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_with_owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "v_orgs_visible"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "view_ai_starter_caps_current"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "view_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "view_report_regen_limit_current"
+            referencedColumns: ["organization_id"]
+          },
+        ]
+      }
+      v_qna_stats_compat: {
+        Row: {
+          total_answers: number | null
+          total_questions: number | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
+      v_questions: {
+        Row: {
+          answer: string | null
+          category_id: string | null
+          created_at: string | null
+          id: string | null
+          organization_id: string | null
+          published_at: string | null
+          question: string | null
+          slug: string | null
+          status: Database["public"]["Enums"]["cms_content_status"] | null
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          answer?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          organization_id?: string | null
+          published_at?: string | null
+          question?: string | null
+          slug?: string | null
+          status?: Database["public"]["Enums"]["cms_content_status"] | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          organization_id?: string | null
+          published_at?: string | null
+          question?: string | null
+          slug?: string | null
+          status?: Database["public"]["Enums"]["cms_content_status"] | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "ai_usage_counters"
+            referencedColumns: ["org_id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_overview_v2"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_with_owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "v_orgs_visible"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "view_ai_starter_caps_current"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "view_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "view_report_regen_limit_current"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "qa_entries_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "qa_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qa_entries_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "view_qa_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_questions_compat: {
+        Row: {
+          answer_text: string | null
+          answered_at: string | null
+          answered_by: string | null
+          answered_by_full_name: string | null
+          author_email: string | null
+          author_full_name: string | null
+          body: string | null
+          company_id: string | null
+          created_at: string | null
+          id: string | null
+          organization_name: string | null
+          question_text: string | null
+          status: Database["public"]["Enums"]["cms_content_status"] | null
+          title: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "ai_usage_counters"
+            referencedColumns: ["org_id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_overview_v2"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_with_owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "v_orgs_visible"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "view_ai_starter_caps_current"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "view_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_qa_entries_org"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "view_report_regen_limit_current"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "qa_entries_last_edited_by_fkey"
+            columns: ["answered_by"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_rate_limit_logs_current: {
         Row: {
           bot_type: string | null
@@ -23469,6 +24504,13 @@ export type Database = {
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
           },
+          {
+            foreignKeyName: "services_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       v_subscription_audit: {
@@ -23506,6 +24548,27 @@ export type Database = {
             referencedColumns: ["project_id"]
           },
         ]
+      }
+      v_user_org_memberships: {
+        Row: {
+          created_at: string | null
+          organization_id: string | null
+          role: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          organization_id?: string | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          organization_id?: string | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       view_activities_daily_7d: {
         Row: {
@@ -23704,6 +24767,13 @@ export type Database = {
             columns: ["content_unit_id"]
             isOneToOne: false
             referencedRelation: "ai_content_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_visibility_scores_content_unit_id_fkey"
+            columns: ["content_unit_id"]
+            isOneToOne: false
+            referencedRelation: "v_ai_content_units_compat"
             referencedColumns: ["id"]
           },
           {
@@ -23954,6 +25024,13 @@ export type Database = {
           verified_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "case_studies_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "case_studies_interview_session_id_fkey"
             columns: ["interview_session_id"]
@@ -24207,6 +25284,13 @@ export type Database = {
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
           },
+          {
+            foreignKeyName: "chatbot_interactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       view_chatbots: {
@@ -24250,6 +25334,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "chatbots_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "chatbots_organization_id_fkey"
             columns: ["organization_id"]
@@ -24492,6 +25583,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "faqs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "faqs_interview_session_id_fkey"
             columns: ["interview_session_id"]
@@ -25963,6 +27061,13 @@ export type Database = {
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
           },
+          {
+            foreignKeyName: "sales_materials_created_by_auth_users_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
+          },
         ]
       }
       view_security_incidents_daily_7d: {
@@ -26172,6 +27277,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "view_report_regen_limit_current"
             referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "services_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_app_users_compat2"
+            referencedColumns: ["id"]
           },
         ]
       }

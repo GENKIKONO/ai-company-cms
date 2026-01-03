@@ -21,25 +21,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // 管理者用途のため auth.users をそのまま使用（profiles には email/role がないため）
-    // Admin purpose: keep using auth.users since profiles doesn't have email/role
+    // 二段取得: v_app_users_compat2 + organizations
+    // Step 1: ユーザー一覧を取得（v_app_users_compat2 互換ビュー使用）
     const { data: users, error } = await supabase
-      .from('app_users')
-      .select(`
-        id,
-        email,
-        full_name,
-        role,
-        created_at,
-        updated_at,
-        organization_id,
-        organizations (
-          id,
-          name,
-          status,
-          is_published
-        )
-      `)
+      .from('v_app_users_compat2')
+      .select('id, email, full_name, role, created_at, updated_at, organization_id')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -47,7 +33,29 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
 
-    return NextResponse.json({ data: users });
+    // Step 2: organization_id の集合を取得して organizations を一括取得
+    const orgIds = [...new Set(users?.map(u => u.organization_id).filter(Boolean) as string[])];
+
+    let orgsMap: Map<string, { id: string; name: string | null; status: string | null; is_published: boolean | null }> = new Map();
+
+    if (orgIds.length > 0) {
+      const { data: orgs, error: orgError } = await supabase
+        .from('organizations')
+        .select('id, name, status, is_published')
+        .in('id', orgIds);
+
+      if (!orgError && orgs) {
+        orgs.forEach(org => orgsMap.set(org.id, org));
+      }
+    }
+
+    // Step 3: メモリ上でマージ（既存の形式を維持）
+    const usersWithOrgs = users?.map(user => ({
+      ...user,
+      organizations: user.organization_id ? orgsMap.get(user.organization_id) || null : null
+    })) || [];
+
+    return NextResponse.json({ data: usersWithOrgs });
 
   } catch (error) {
     logger.error('Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });

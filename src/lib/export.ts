@@ -201,7 +201,6 @@ export class ExportService {
 
   // CSVフィールドフォーマット
   private formatFieldForCSV(org: Organization, field: string): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的フィールドアクセスのため1箇所のみ許容
     let value = (org as Record<string, unknown>)[field];
     
     if (value === null || value === undefined) return '';

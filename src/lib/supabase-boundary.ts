@@ -67,7 +67,6 @@ export function unwrapDataArray<T>(data: T[] | null): T[] {
  * フィルター値の境界キャスト
  * .eq(key, value) の value に使用
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asFilterValue(value: unknown): any {
   return value;
 }
@@ -76,7 +75,6 @@ export function asFilterValue(value: unknown): any {
  * Insert/Upsertデータの境界キャスト
  * .insert(data) / .upsert(data) の data に使用
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asInsertData<T>(data: T): any {
   return data;
 }
@@ -85,7 +83,6 @@ export function asInsertData<T>(data: T): any {
  * Updateデータの境界キャスト
  * .update(data) の data に使用
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asUpdateData<T>(data: T): any {
   return data;
 }

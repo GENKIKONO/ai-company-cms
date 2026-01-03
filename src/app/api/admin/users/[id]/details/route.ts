@@ -22,13 +22,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // 管理者用途のため app_users をそのまま使用（profiles には email/role がないため）
-    // Admin purpose: keep using app_users since profiles doesn't have email/role
+    // v_app_users_compat2 互換ビュー使用
     const { data: targetUser, error: fetchError } = await supabase
-      .from('app_users')
+      .from('v_app_users_compat2')
       .select('id, email, display_name, avatar_url, phone, role, plan, email_verified, phone_verified, created_at, updated_at, last_sign_in_at')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !targetUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

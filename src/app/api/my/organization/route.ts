@@ -190,9 +190,9 @@ export async function POST(request: NextRequest) {
 
     // ✅ 外部キー制約の詳細チェック: public.users にユーザーが存在するか確認し、必要に応じて作成
     try {
-      // まず public.users テーブルでユーザーを確認
+      // まず public.users テーブルでユーザーを確認（v_app_users_compat2 互換ビュー使用）
       const { data: publicUser, error: publicUserError } = await supabase
-        .from('users')
+        .from('v_app_users_compat2')
         .select('id, email')
         .eq('id', user.id)
         .maybeSingle();

@@ -408,8 +408,9 @@ async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<boolean> {
         const orgData = (Array.isArray(orgRaw) ? orgRaw[0] : orgRaw) as OrgJoinResult | undefined;
 
         if (orgData?.created_by) {
+          // v_app_users_compat2 互換ビュー使用
           const { data: user } = await supabase
-            .from('users')
+            .from('v_app_users_compat2')
             .select('email, full_name')
             .eq('id', orgData.created_by)
             .maybeSingle();

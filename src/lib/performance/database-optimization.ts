@@ -12,7 +12,6 @@ import { CacheManager, CacheKeyBuilder, CACHE_STRATEGIES } from './cache-strateg
 import { logger } from '@/lib/log';
 
 /** Supabaseクライアント型（動的テーブルアクセスのためジェネリック） */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AppSupabaseClient = ReturnType<typeof createServerClient<any>>;
 // クエリパフォーマンス監視用の型
 export interface QueryPerformanceMetrics {

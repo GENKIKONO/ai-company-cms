@@ -143,12 +143,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Admin権限チェック
+    // Admin権限チェック（v_app_users_compat2 互換ビュー使用）
     const { data: userProfile } = await supabase
-      .from('app_users')
+      .from('v_app_users_compat2')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (userProfile?.role !== 'admin' && userProfile?.role !== 'super_admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });

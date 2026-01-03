@@ -18,7 +18,6 @@ function _setField<T extends Record<string, unknown>>(
   key: keyof T,
   value: unknown
 ): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的フィールド代入のため内部で1箇所のみ許容
   (obj as any)[key] = value;
 }
 
@@ -118,7 +117,6 @@ export function normalizeArrayFields<T extends Record<string, unknown>>(
  * Post データの正規化
  * @returns 正規化されたペイロード（フィールドアクセス可能）
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizePostPayload(data: Record<string, unknown>): Record<string, any> {
   const normalized = normalizeEmptyStrings(data, [
     'content_markdown',
@@ -139,7 +137,6 @@ export function normalizePostPayload(data: Record<string, unknown>): Record<stri
 /**
  * Service データの正規化
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeServicePayload(data: Record<string, unknown>): Record<string, any> {
   // 実際のデータベース スキーマに存在するフィールドのみ抽出
   const allowedFields = [
@@ -202,7 +199,6 @@ export function normalizeServicePayload(data: Record<string, unknown>): Record<s
 /**
  * CaseStudy データの正規化
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeCaseStudyPayload(data: Record<string, unknown>): Record<string, any> {
   const normalized = normalizeEmptyStrings(data, [
     'problem',
@@ -238,7 +234,6 @@ export function normalizeCaseStudyPayload(data: Record<string, unknown>): Record
 /**
  * FAQ データの正規化
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeFAQPayload(data: Record<string, unknown>): Record<string, any> {
   const normalized = normalizeEmptyStrings(data, ['category']);
 
@@ -248,7 +243,6 @@ export function normalizeFAQPayload(data: Record<string, unknown>): Record<strin
 /**
  * Organization データの正規化
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeOrganizationPayload(data: Record<string, unknown>): Record<string, any> {
   let normalized = normalizeEmptyStrings(data, [
     'description',

@@ -15,12 +15,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Admin role check - untyped client, no cast needed
+    // Admin role check（v_app_users_compat2 互換ビュー使用）
     const { data: userProfile, error: profileError } = await supabase
-      .from('app_users')
+      .from('v_app_users_compat2')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (profileError || userProfile?.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });

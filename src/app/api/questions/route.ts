@@ -26,14 +26,13 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(url.searchParams.get('limit') || '50');
     const offset = parseInt(url.searchParams.get('offset') || '0');
 
-    // クエリ構築
+    // クエリ構築（v_questions_compat互換ビュー使用）
     let query = supabase
-      .from('questions')
+      .from('v_questions_compat')
       .select(`
-        *,
-        app_users!questions_user_id_fkey(email, full_name),
-        organizations!questions_company_id_fkey(name),
-        answerer:app_users!questions_answered_by_fkey(full_name)
+        id, title, body, created_at, question_text, status, answer_text,
+        answered_at, answered_by, user_id, company_id,
+        author_email, author_full_name, organization_name, answered_by_full_name
       `)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -57,7 +56,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // レスポンス形式の変換
+    // レスポンス形式の変換（v_questions_compat列を使用）
     const formattedQuestions: QuestionWithDetails[] = questions?.map(q => ({
       id: q.id,
       company_id: q.company_id,
@@ -68,10 +67,10 @@ export async function GET(request: NextRequest) {
       created_at: q.created_at,
       answered_at: q.answered_at,
       answered_by: q.answered_by,
-      user_email: q.app_users?.email,
-      user_full_name: q.app_users?.full_name,
-      company_name: q.organizations?.name,
-      answerer_name: q.answerer?.full_name
+      user_email: q.author_email,
+      user_full_name: q.author_full_name,
+      company_name: q.organization_name,
+      answerer_name: q.answered_by_full_name
     })) || [];
 
     return NextResponse.json({

@@ -41,7 +41,6 @@ export async function _fetchSingleFromDynamicTable<TRow>(
   tableName: TableName,
   filters: Record<string, string>
 ): Promise<QueryResult<TRow>> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的テーブル名のため内部で1箇所のみ許容
   let query = (supabase as any).from(tableName).select('*');
 
   for (const [key, value] of Object.entries(filters)) {
@@ -71,7 +70,6 @@ export async function _fetchManyFromDynamicTable<TRow>(
     limit?: number;
   }
 ): Promise<QueryResult<TRow[]>> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 動的テーブル名のため内部で1箇所のみ許容
   let query = (supabase as any).from(tableName).select('*');
 
   for (const [key, value] of Object.entries(filters)) {

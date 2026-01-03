@@ -14,14 +14,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 管理者チェック
+    // 管理者チェック（v_app_users_compat2 互換ビュー使用）
     const { data: userData, error: userError } = await supabase
-      .from('app_users')
+      .from('v_app_users_compat2')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    // Admin role check - untyped client, no cast needed
     if (userError || !userData || userData.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
