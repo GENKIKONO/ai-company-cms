@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     let selectedOrganization: OrganizationSummary | null = null;
     let errorMessage: string | undefined = undefined;
     let errorType: MeErrorType = 'none';
-    
+
     // RPC一本＋素直なマッピングで組織取得
     const { data: orgRows, error: orgError } = await supabase
       .rpc('get_my_organizations_slim');

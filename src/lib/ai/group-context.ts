@@ -49,7 +49,7 @@ export async function getAIGroupScope(userId: string): Promise<AIGroupScope | nu
       .select(`
         organization_id,
         role,
-        organization:organizations!user_organizations_organization_id_fkey(
+        organization:organizations!inner(
           id,
           name,
           company_name,
