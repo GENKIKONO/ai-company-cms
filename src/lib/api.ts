@@ -27,6 +27,17 @@ import {
 import type { DatabaseResult } from '@/types/database.types'
 import { logger } from '@/lib/utils/logger'
 
+// Local type for user_preferences (table not in generated schema)
+// TODO: Add user_preferences table to database or remove this feature
+interface UserPreferencesRow {
+  id: string
+  user_id: string
+  preferences: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+type UserPreferencesUpdate = Partial<Omit<UserPreferencesRow, 'id' | 'user_id'>>
+
 // =====================================================
 // API CLIENT IMPLEMENTATION
 // =====================================================
@@ -523,11 +534,11 @@ export const userApi = {
   updateProfile: (data: TableUpdate<'profiles'>) => 
     apiClient.patch<TableUpdate<'profiles'>, TableRow<'profiles'>>('/user/profile', { body: data }),
     
-  preferences: () => 
-    apiClient.get<TableRow<'user_preferences'>>('/user/preferences'),
-    
-  updatePreferences: (data: TableUpdate<'user_preferences'>) => 
-    apiClient.patch<TableUpdate<'user_preferences'>, TableRow<'user_preferences'>>('/user/preferences', { body: data }),
+  preferences: () =>
+    apiClient.get<UserPreferencesRow>('/user/preferences'),
+
+  updatePreferences: (data: UserPreferencesUpdate) =>
+    apiClient.patch<UserPreferencesUpdate, UserPreferencesRow>('/user/preferences', { body: data }),
 }
 
 // Export types for external use

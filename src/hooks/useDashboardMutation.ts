@@ -12,9 +12,11 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { insertInto, updateRecord, deleteRecord } from '@/lib/supabase';
-import { getDataSource, hasDataSourcePermission, type DataSourceKey } from '@/config/data-sources';
+import { getDataSource, hasDataSourcePermission, type DataSourceKey, type TableName } from '@/config/data-sources';
 import type { UserRole } from '@/types/utils/database';
-import type { TableInsert, TableUpdate, TableRow } from '@/types/database.types';
+import type { TableInsert, TableUpdate, SupabaseDatabase } from '@/types/database.types';
+
+type WritableTableName = keyof SupabaseDatabase['public']['Tables'];
 
 // =====================================================
 // TYPES
@@ -120,9 +122,11 @@ export function useDashboardMutation<
           ? { ...data, organization_id: organizationId }
           : data;
 
+        // Use writeTable if defined, otherwise fall back to table (for non-view sources)
+        const targetTable = (config.writeTable || config.table) as WritableTableName;
         const { data: result, error: insertError } = await insertInto(
-          config.table,
-          insertData as TableInsert<typeof config.table>
+          targetTable,
+          insertData as TableInsert<typeof targetTable>
         );
 
         if (insertError) {
@@ -159,10 +163,12 @@ export function useDashboardMutation<
       setState((prev) => ({ ...prev, isUpdating: true, error: null, lastAction: 'update' }));
 
       try {
+        // Use writeTable if defined, otherwise fall back to table (for non-view sources)
+        const targetTable = (config.writeTable || config.table) as WritableTableName;
         const { data: result, error: updateError } = await updateRecord(
-          config.table,
+          targetTable,
           id,
-          data as TableUpdate<typeof config.table>
+          data as TableUpdate<typeof targetTable>
         );
 
         if (updateError) {
@@ -196,7 +202,9 @@ export function useDashboardMutation<
       setState((prev) => ({ ...prev, isDeleting: true, error: null, lastAction: 'delete' }));
 
       try {
-        const { error: deleteError } = await deleteRecord(config.table, id);
+        // Use writeTable if defined, otherwise fall back to table (for non-view sources)
+        const targetTable = (config.writeTable || config.table) as WritableTableName;
+        const { error: deleteError } = await deleteRecord(targetTable, id);
 
         if (deleteError) {
           throw new Error(deleteError.message || '削除に失敗しました');

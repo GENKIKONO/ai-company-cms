@@ -1,10 +1,16 @@
 /**
  * Complete Supabase Database Type Definitions
  * Phase 4: Type Safety - Comprehensive Database Schema Types
+ *
+ * NOTE: SupabaseDatabase is now delegated to generated ./supabase.ts
+ * which includes all secure dashboard views (v_dashboard_*_secure)
  */
 
 // Re-export base types from database.ts for compatibility
 export * from '@/types/database'
+
+// Import generated Database type from supabase.ts
+import type { Database as GeneratedDatabase } from './supabase'
 
 // =====================================================
 // SUPABASE DATABASE SCHEMA TYPE DEFINITIONS
@@ -12,976 +18,15 @@ export * from '@/types/database'
 
 /**
  * Complete Supabase Database Schema
- * Generated from actual database schema with full type safety
+ * Delegated to generated supabase.ts (includes secure dashboard views)
+ *
+ * Available views:
+ * - v_dashboard_posts_secure
+ * - v_dashboard_services_secure
+ * - v_dashboard_case_studies_secure
+ * - v_dashboard_faqs_secure
  */
-export interface SupabaseDatabase {
-  public: {
-    Tables: {
-      profiles: {
-        Row: {
-          id: string
-          full_name: string | null
-          avatar_url: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          full_name?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          full_name?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      organizations: {
-        Row: {
-          id: string
-          name: string
-          slug: string
-          description: string | null
-          legal_form: string | null
-          representative_name: string | null
-          corporate_number: string | null
-          verified: boolean | null
-          established_at: string | null
-          capital: number | null
-          employees: number | null
-          address_country: string
-          address_region: string | null
-          address_locality: string | null
-          address_postal_code: string | null
-          address_street: string | null
-          lat: number | null
-          lng: number | null
-          telephone: string | null
-          email: string | null
-          email_public: boolean
-          url: string | null
-          logo_url: string | null
-          same_as: string[] | null
-          industries: string[] | null
-          status: 'draft' | 'waiting_approval' | 'public_unverified' | 'published' | 'paused' | 'archived'
-          is_published: boolean
-          partner_id: string | null
-          created_by: string | null
-          created_at: string
-          updated_at: string
-          meta_title: string | null
-          meta_description: string | null
-          meta_keywords: string[] | null
-          keywords: string[] | null
-          website: string | null
-          website_url: string | null
-          size: number | null
-          favicon_url: string | null
-          brand_color_primary: string | null
-          brand_color_secondary: string | null
-          social_media: Record<string, unknown> | null
-          business_hours: Record<string, unknown>[] | null
-          timezone: string | null
-          languages_supported: string[] | null
-          certifications: string[] | null
-          awards: string[] | null
-          company_culture: string | null
-          mission_statement: string | null
-          vision_statement: string | null
-          values: string[] | null
-          feature_flags: Record<string, unknown> | null  // TODO: [TYPE_SAFETY] 型安全なFeatureFlagsインターフェースに移行
-          entitlements: Record<string, unknown> | null
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          plan: 'starter' | 'pro' | 'business' | null
-          subscription_status: 'active' | 'inactive' | 'canceled' | 'past_due' | null
-          current_period_end: string | null
-          trial_end_date: string | null
-          show_services: boolean | null
-          show_posts: boolean | null
-          show_case_studies: boolean | null
-          show_faqs: boolean | null
-          show_qa: boolean | null
-          show_news: boolean | null
-          show_partnership: boolean | null
-          show_contact: boolean | null
-        }
-        Insert: {
-          id?: string
-          name: string
-          slug: string
-          description?: string | null
-          legal_form?: string | null
-          representative_name?: string | null
-          corporate_number?: string | null
-          verified?: boolean | null
-          established_at?: string | null
-          capital?: number | null
-          employees?: number | null
-          address_country: string
-          address_region?: string | null
-          address_locality?: string | null
-          address_postal_code?: string | null
-          address_street?: string | null
-          lat?: number | null
-          lng?: number | null
-          telephone?: string | null
-          email?: string | null
-          email_public?: boolean
-          url?: string | null
-          logo_url?: string | null
-          same_as?: string[] | null
-          industries?: string[] | null
-          status?: 'draft' | 'waiting_approval' | 'public_unverified' | 'published' | 'paused' | 'archived'
-          is_published?: boolean
-          partner_id?: string | null
-          created_by?: string | null
-          created_at?: string
-          updated_at?: string
-          meta_title?: string | null
-          meta_description?: string | null
-          meta_keywords?: string[] | null
-          keywords?: string[] | null
-          website?: string | null
-          website_url?: string | null
-          size?: number | null
-          favicon_url?: string | null
-          brand_color_primary?: string | null
-          brand_color_secondary?: string | null
-          social_media?: Record<string, unknown> | null
-          business_hours?: Record<string, unknown>[] | null
-          timezone?: string | null
-          languages_supported?: string[] | null
-          certifications?: string[] | null
-          awards?: string[] | null
-          company_culture?: string | null
-          mission_statement?: string | null
-          vision_statement?: string | null
-          values?: string[] | null
-          feature_flags?: Record<string, unknown> | null
-          entitlements?: Record<string, unknown> | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          plan?: 'starter' | 'pro' | 'business' | null
-          subscription_status?: 'active' | 'inactive' | 'canceled' | 'past_due' | null
-          current_period_end?: string | null
-          trial_end_date?: string | null
-          show_services?: boolean | null
-          show_posts?: boolean | null
-          show_case_studies?: boolean | null
-          show_faqs?: boolean | null
-          show_qa?: boolean | null
-          show_news?: boolean | null
-          show_partnership?: boolean | null
-          show_contact?: boolean | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          slug?: string
-          description?: string | null
-          legal_form?: string | null
-          representative_name?: string | null
-          corporate_number?: string | null
-          verified?: boolean | null
-          established_at?: string | null
-          capital?: number | null
-          employees?: number | null
-          address_country?: string
-          address_region?: string | null
-          address_locality?: string | null
-          address_postal_code?: string | null
-          address_street?: string | null
-          lat?: number | null
-          lng?: number | null
-          telephone?: string | null
-          email?: string | null
-          email_public?: boolean
-          url?: string | null
-          logo_url?: string | null
-          same_as?: string[] | null
-          industries?: string[] | null
-          status?: 'draft' | 'waiting_approval' | 'public_unverified' | 'published' | 'paused' | 'archived'
-          is_published?: boolean
-          partner_id?: string | null
-          created_by?: string | null
-          created_at?: string
-          updated_at?: string
-          meta_title?: string | null
-          meta_description?: string | null
-          meta_keywords?: string[] | null
-          keywords?: string[] | null
-          website?: string | null
-          website_url?: string | null
-          size?: number | null
-          favicon_url?: string | null
-          brand_color_primary?: string | null
-          brand_color_secondary?: string | null
-          social_media?: Record<string, unknown> | null
-          business_hours?: Record<string, unknown>[] | null
-          timezone?: string | null
-          languages_supported?: string[] | null
-          certifications?: string[] | null
-          awards?: string[] | null
-          company_culture?: string | null
-          mission_statement?: string | null
-          vision_statement?: string | null
-          values?: string[] | null
-          feature_flags?: Record<string, unknown> | null
-          entitlements?: Record<string, unknown> | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          plan?: 'starter' | 'pro' | 'business' | null
-          subscription_status?: 'active' | 'inactive' | 'canceled' | 'past_due' | null
-          current_period_end?: string | null
-          trial_end_date?: string | null
-          show_services?: boolean | null
-          show_posts?: boolean | null
-          show_case_studies?: boolean | null
-          show_faqs?: boolean | null
-          show_qa?: boolean | null
-          show_news?: boolean | null
-          show_partnership?: boolean | null
-          show_contact?: boolean | null
-        }
-      }
-      services: {
-        Row: {
-          id: string
-          organization_id: string
-          name: string
-          price: number | null
-          duration_months: number | null
-          category: string | null
-          description: string | null
-          features: string[] | null
-          image_url: string | null
-          video_url: string | null
-          cta_text: string | null
-          cta_url: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          name: string
-          price?: number | null
-          duration_months?: number | null
-          category?: string | null
-          description?: string | null
-          features?: string[] | null
-          image_url?: string | null
-          video_url?: string | null
-          cta_text?: string | null
-          cta_url?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          name?: string
-          price?: number | null
-          duration_months?: number | null
-          category?: string | null
-          description?: string | null
-          features?: string[] | null
-          image_url?: string | null
-          video_url?: string | null
-          cta_text?: string | null
-          cta_url?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      posts: {
-        Row: {
-          id: string
-          organization_id: string
-          title: string
-          slug: string
-          content_markdown: string | null
-          content_html: string | null
-          status: 'draft' | 'published' | 'archived'
-          published_at: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          title: string
-          slug: string
-          content_markdown?: string | null
-          content_html?: string | null
-          status?: 'draft' | 'published' | 'archived'
-          published_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          title?: string
-          slug?: string
-          content_markdown?: string | null
-          content_html?: string | null
-          status?: 'draft' | 'published' | 'archived'
-          published_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      case_studies: {
-        Row: {
-          id: string
-          organization_id: string
-          title: string
-          problem: string | null
-          solution: string | null
-          result: string | null
-          tags: string[] | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          title: string
-          problem?: string | null
-          solution?: string | null
-          result?: string | null
-          tags?: string[] | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          title?: string
-          problem?: string | null
-          solution?: string | null
-          result?: string | null
-          tags?: string[] | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      faqs: {
-        Row: {
-          id: string
-          organization_id: string
-          question: string
-          answer: string
-          category: string | null
-          sort_order: number
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          question: string
-          answer: string
-          category?: string | null
-          sort_order?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          question?: string
-          answer?: string
-          category?: string | null
-          sort_order?: number
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      qa_categories: {
-        Row: {
-          id: string
-          organization_id: string | null
-          name: string
-          slug: string
-          description: string | null
-          visibility: 'public' | 'private' | 'organization'
-          sort_order: number
-          is_active: boolean
-          created_at: string
-          updated_at: string
-          created_by: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          id?: string
-          organization_id?: string | null
-          name: string
-          slug: string
-          description?: string | null
-          visibility?: 'public' | 'private' | 'organization'
-          sort_order?: number
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          id?: string
-          organization_id?: string | null
-          name?: string
-          slug?: string
-          description?: string | null
-          visibility?: 'public' | 'private' | 'organization'
-          sort_order?: number
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-          created_by?: string | null
-          updated_by?: string | null
-        }
-      }
-      qa_entries: {
-        Row: {
-          id: string
-          organization_id: string
-          category_id: string | null
-          question: string
-          answer: string
-          tags: string[]
-          visibility: 'public' | 'private' | 'organization'
-          status: 'active' | 'inactive' | 'archived'
-          published_at: string | null
-          last_edited_by: string
-          last_edited_at: string
-          created_at: string
-          updated_at: string
-          content_hash: string | null
-          refresh_suggested_at: string | null
-          jsonld_cache: Record<string, unknown> | null
-          search_vector: string | null
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          category_id?: string | null
-          question: string
-          answer: string
-          tags?: string[]
-          visibility?: 'public' | 'private' | 'organization'
-          status?: 'active' | 'inactive' | 'archived'
-          published_at?: string | null
-          last_edited_by: string
-          last_edited_at?: string
-          created_at?: string
-          updated_at?: string
-          content_hash?: string | null
-          refresh_suggested_at?: string | null
-          jsonld_cache?: Record<string, unknown> | null
-          search_vector?: string | null
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          category_id?: string | null
-          question?: string
-          answer?: string
-          tags?: string[]
-          visibility?: 'public' | 'private' | 'organization'
-          status?: 'active' | 'inactive' | 'archived'
-          published_at?: string | null
-          last_edited_by?: string
-          last_edited_at?: string
-          created_at?: string
-          updated_at?: string
-          content_hash?: string | null
-          refresh_suggested_at?: string | null
-          jsonld_cache?: Record<string, unknown> | null
-          search_vector?: string | null
-        }
-      }
-      user_favorites: {
-        Row: {
-          id: string
-          user_id: string
-          organization_id: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          organization_id: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          organization_id?: string
-          created_at?: string
-        }
-      }
-      user_saved_searches: {
-        Row: {
-          id: string
-          user_id: string
-          name: string
-          search_params: Record<string, unknown>
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-          search_params: Record<string, unknown>
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          search_params?: Record<string, unknown>
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      user_preferences: {
-        Row: {
-          id: string
-          user_id: string
-          preferences: Record<string, unknown>
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          preferences: Record<string, unknown>
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          preferences?: Record<string, unknown>
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      partners: {
-        Row: {
-          id: string
-          name: string
-          description: string | null
-          website_url: string | null
-          logo_url: string | null
-          brand_logo_url: string | null
-          contact_email: string | null
-          partnership_type: 'strategic' | 'technology' | 'distribution' | 'investment' | null
-          contract_start_date: string | null
-          contract_end_date: string | null
-          is_active: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          description?: string | null
-          website_url?: string | null
-          logo_url?: string | null
-          brand_logo_url?: string | null
-          contact_email?: string | null
-          partnership_type?: 'strategic' | 'technology' | 'distribution' | 'investment' | null
-          contract_start_date?: string | null
-          contract_end_date?: string | null
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          description?: string | null
-          website_url?: string | null
-          logo_url?: string | null
-          brand_logo_url?: string | null
-          contact_email?: string | null
-          partnership_type?: 'strategic' | 'technology' | 'distribution' | 'investment' | null
-          contract_start_date?: string | null
-          contract_end_date?: string | null
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      analytics_events: {
-        Row: {
-          id: string
-          user_id: string | null
-          session_id: string | null
-          event_name: string
-          event_properties: Record<string, unknown> | null
-          page_url: string | null
-          user_agent: string | null
-          ip_address: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id?: string | null
-          session_id?: string | null
-          event_name: string
-          event_properties?: Record<string, unknown> | null
-          page_url?: string | null
-          user_agent?: string | null
-          ip_address?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string | null
-          session_id?: string | null
-          event_name?: string
-          event_properties?: Record<string, unknown> | null
-          page_url?: string | null
-          user_agent?: string | null
-          ip_address?: string | null
-          created_at?: string
-        }
-      }
-      monthly_reports: {
-        Row: {
-          id: string
-          organization_id: string
-          year: number
-          month: number
-          status: 'pending' | 'completed' | 'failed'
-          format: 'pdf' | 'csv' | 'json'
-          file_url: string | null
-          file_size: number | null
-          data_summary: Record<string, unknown>
-          generated_at: string | null
-          sent_at: string | null
-          error_message: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          year: number
-          month: number
-          status?: 'pending' | 'completed' | 'failed'
-          format?: 'pdf' | 'csv' | 'json'
-          file_url?: string | null
-          file_size?: number | null
-          data_summary: Record<string, unknown>
-          generated_at?: string | null
-          sent_at?: string | null
-          error_message?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          year?: number
-          month?: number
-          status?: 'pending' | 'completed' | 'failed'
-          format?: 'pdf' | 'csv' | 'json'
-          file_url?: string | null
-          file_size?: number | null
-          data_summary?: Record<string, unknown>
-          generated_at?: string | null
-          sent_at?: string | null
-          error_message?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      sales_materials: {
-        Row: {
-          id: string
-          organization_id: string
-          title: string
-          file_path: string
-          file_type: string | null
-          file_size: number | null
-          uploaded_by: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          title: string
-          file_path: string
-          file_type?: string | null
-          file_size?: number | null
-          uploaded_by: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          title?: string
-          file_path?: string
-          file_type?: string | null
-          file_size?: number | null
-          uploaded_by?: string
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      sales_material_stats: {
-        Row: {
-          id: string
-          material_id: string
-          user_id: string | null
-          company_id: string | null
-          action: 'create' | 'update' | 'delete'
-          user_agent: string | null
-          ip_address: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          material_id: string
-          user_id?: string | null
-          company_id?: string | null
-          action: 'create' | 'update' | 'delete'
-          user_agent?: string | null
-          ip_address?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          material_id?: string
-          user_id?: string | null
-          company_id?: string | null
-          action?: 'create' | 'update' | 'delete'
-          user_agent?: string | null
-          ip_address?: string | null
-          created_at?: string
-        }
-      }
-      qa_view_stats: {
-        Row: {
-          id: string
-          qna_id: string
-          user_id: string | null
-          company_id: string | null
-          action: 'create' | 'update' | 'delete'
-          user_agent: string | null
-          ip_address: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          qna_id: string
-          user_id?: string | null
-          company_id?: string | null
-          action?: 'create' | 'update' | 'delete'
-          user_agent?: string | null
-          ip_address?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          qna_id?: string
-          user_id?: string | null
-          company_id?: string | null
-          action?: 'create' | 'update' | 'delete'
-          user_agent?: string | null
-          ip_address?: string | null
-          created_at?: string
-        }
-      }
-      questions: {
-        Row: {
-          id: string
-          company_id: string
-          user_id: string
-          question_text: string
-          status: 'active' | 'inactive' | 'archived'
-          answer_text: string | null
-          created_at: string
-          answered_at: string | null
-          answered_by: string | null
-        }
-        Insert: {
-          id?: string
-          company_id: string
-          user_id: string
-          question_text: string
-          status?: 'active' | 'inactive' | 'archived'
-          answer_text?: string | null
-          created_at?: string
-          answered_at?: string | null
-          answered_by?: string | null
-        }
-        Update: {
-          id?: string
-          company_id?: string
-          user_id?: string
-          question_text?: string
-          status?: 'active' | 'inactive' | 'archived'
-          answer_text?: string | null
-          created_at?: string
-          answered_at?: string | null
-          answered_by?: string | null
-        }
-      }
-      subscriptions: {
-        Row: {
-          id: string
-          organization_id: string
-          stripe_subscription_id: string
-          stripe_customer_id: string
-          status: 'active' | 'inactive' | 'canceled' | 'past_due'
-          plan_id: string
-          current_period_start: string
-          current_period_end: string
-          cancelled_at: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          stripe_subscription_id: string
-          stripe_customer_id: string
-          status?: 'active' | 'inactive' | 'canceled' | 'past_due'
-          plan_id: string
-          current_period_start: string
-          current_period_end: string
-          cancelled_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          stripe_subscription_id?: string
-          stripe_customer_id?: string
-          status?: 'active' | 'inactive' | 'canceled' | 'past_due'
-          plan_id?: string
-          current_period_start?: string
-          current_period_end?: string
-          cancelled_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      stripe_customers: {
-        Row: {
-          id: string
-          organization_id: string
-          stripe_customer_id: string
-          email: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          stripe_customer_id: string
-          email: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          stripe_customer_id?: string
-          email?: string
-          created_at?: string
-          updated_at?: string
-        }
-      }
-    }
-    Views: {
-      organizations_with_owner: {
-        Row: {
-          id: string
-          name: string
-          slug: string
-          status: 'draft' | 'waiting_approval' | 'public_unverified' | 'published' | 'paused' | 'archived'
-          is_published: boolean
-          created_at: string
-          updated_at: string
-          owner_email: string | null
-          owner_full_name: string | null
-          owner_avatar_url: string | null
-          owner_role: 'admin' | 'editor' | 'viewer' | null
-        }
-        Insert: never
-        Update: never
-      }
-      sales_material_stats_summary: {
-        Row: {
-          material_id: string
-          material_title: string
-          organization_name: string
-          total_views: number
-          total_downloads: number
-          unique_viewers: number
-          unique_downloaders: number
-          last_viewed_at: string | null
-          last_downloaded_at: string | null
-        }
-        Insert: never
-        Update: never
-      }
-      qa_stats_summary: {
-        Row: {
-          qna_id: string
-          question: string
-          organization_name: string
-          category_name: string | null
-          total_views: number
-          unique_viewers: number
-          last_viewed_at: string | null
-        }
-        Insert: never
-        Update: never
-      }
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      user_role: 'admin' | 'editor' | 'viewer'
-      organization_status: 'draft' | 'waiting_approval' | 'public_unverified' | 'published' | 'paused' | 'archived'
-      partnership_type: 'strategic' | 'technology' | 'distribution' | 'investment'
-      post_status: 'draft' | 'published'
-      qa_visibility: 'global' | 'org'
-      qa_entry_visibility: 'public' | 'private'
-      qa_entry_status: 'draft' | 'published' | 'archived'
-      report_status: 'generating' | 'completed' | 'failed'
-      report_format: 'html' | 'pdf'
-      sales_action: 'view' | 'download'
-      qa_stats_action: 'view'
-      question_status: 'open' | 'answered' | 'closed'
-      subscription_status: 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'paused'
-      subscription_plan: 'trial' | 'starter' | 'pro' | 'business' | 'enterprise'
-      qa_log_action: 'create' | 'update' | 'publish' | 'unpublish' | 'archive' | 'delete' | 'category_create' | 'category_update' | 'category_delete'
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+export type SupabaseDatabase = GeneratedDatabase
 
 // =====================================================
 // TYPE-SAFE SUPABASE CLIENT WRAPPER
@@ -998,31 +43,31 @@ export type TypedSupabaseClient = {
     select: <K extends keyof SupabaseDatabase['public']['Tables'][T]['Row'] | '*'>(
       columns?: K | string
     ) => Promise<{
-      data: K extends '*' 
+      data: K extends '*'
         ? SupabaseDatabase['public']['Tables'][T]['Row'][] | null
         : Pick<SupabaseDatabase['public']['Tables'][T]['Row'], K extends keyof SupabaseDatabase['public']['Tables'][T]['Row'] ? K : never>[] | null
       error: Error | null
     }>
-    
+
     insert: (
       values: SupabaseDatabase['public']['Tables'][T]['Insert'] | SupabaseDatabase['public']['Tables'][T]['Insert'][]
     ) => Promise<{
       data: SupabaseDatabase['public']['Tables'][T]['Row'][] | null
       error: Error | null
     }>
-    
+
     update: (
       values: SupabaseDatabase['public']['Tables'][T]['Update']
     ) => Promise<{
       data: SupabaseDatabase['public']['Tables'][T]['Row'][] | null
       error: Error | null
     }>
-    
+
     delete: () => Promise<{
       data: null
       error: Error | null
     }>
-    
+
     upsert: (
       values: SupabaseDatabase['public']['Tables'][T]['Insert'] | SupabaseDatabase['public']['Tables'][T]['Insert'][]
     ) => Promise<{
@@ -1067,7 +112,7 @@ export interface TypedQueryBuilder<T> {
   maybeSingle(): Promise<{ data: T | null; error: Error | null }>
   limit(count: number): TypedQueryBuilder<T>
   order<K extends keyof T>(
-    column: K, 
+    column: K,
     options?: { ascending?: boolean; nullsFirst?: boolean; foreignTable?: string }
   ): TypedQueryBuilder<T>
   range(from: number, to: number): TypedQueryBuilder<T>
@@ -1081,25 +126,25 @@ export interface TypedQueryBuilder<T> {
 /**
  * Extract table row type
  */
-export type TableRow<T extends keyof SupabaseDatabase['public']['Tables']> = 
+export type TableRow<T extends keyof SupabaseDatabase['public']['Tables']> =
   SupabaseDatabase['public']['Tables'][T]['Row']
 
 /**
  * Extract table insert type
  */
-export type TableInsert<T extends keyof SupabaseDatabase['public']['Tables']> = 
+export type TableInsert<T extends keyof SupabaseDatabase['public']['Tables']> =
   SupabaseDatabase['public']['Tables'][T]['Insert']
 
 /**
  * Extract table update type
  */
-export type TableUpdate<T extends keyof SupabaseDatabase['public']['Tables']> = 
+export type TableUpdate<T extends keyof SupabaseDatabase['public']['Tables']> =
   SupabaseDatabase['public']['Tables'][T]['Update']
 
 /**
  * Extract enum values
  */
-export type EnumValues<T extends keyof SupabaseDatabase['public']['Enums']> = 
+export type EnumValues<T extends keyof SupabaseDatabase['public']['Enums']> =
   SupabaseDatabase['public']['Enums'][T]
 
 /**
@@ -1175,8 +220,17 @@ export type UserWithProfile = {
 
 /**
  * Question with details
+ * NOTE: Uses 'questions' table if available in schema
  */
-export type QuestionWithDetails = TableRow<'questions'> & {
+export interface QuestionWithDetails {
+  id: string
+  title?: string
+  content?: string
+  status?: string
+  user_id?: string
+  organization_id?: string
+  created_at?: string
+  updated_at?: string
   user_email?: string
   user_full_name?: string
   company_name?: string
@@ -1219,7 +273,7 @@ export type RequireFields<T, K extends keyof T> = T & Required<Pick<T, K>>
 /**
  * JSON value type for database storage
  */
-export type Json = 
+export type Json =
   | string
   | number
   | boolean
