@@ -23,6 +23,7 @@ import {
   UserCircleIcon,
   ClockIcon,
   LinkIcon,
+  ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 
 const getNavigation = (organization: any) => {
@@ -157,6 +158,19 @@ export function DashboardSidebar({ canSeeAdminNav = false }: DashboardSidebarPro
                 );
               })()}
             </ul>
+          </li>
+          {/* Logout button at the bottom */}
+          <li className="mt-auto">
+            <Link
+              href="/auth/signout"
+              className="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-[var(--color-text-secondary)] hover:text-[var(--btn-danger-bg)] hover:bg-[var(--aio-danger-muted)]"
+            >
+              <ArrowRightOnRectangleIcon
+                className="h-6 w-6 shrink-0 text-[var(--color-text-tertiary)] group-hover:text-[var(--btn-danger-bg)]"
+                aria-hidden="true"
+              />
+              ログアウト
+            </Link>
           </li>
         </ul>
       </nav>
