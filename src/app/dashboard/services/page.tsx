@@ -182,6 +182,26 @@ interface ServiceListItemProps {
 }
 
 function ServiceListItem({ service, onDelete, isDeleting, canDelete }: ServiceListItemProps) {
+  // price の安全な数値変換（null/NaN/文字列対応）
+  const p = service.price;
+  const priceNumber =
+    typeof p === 'string' ? Number(p) :
+    typeof p === 'number' ? p : null;
+  const hasPrice = priceNumber !== null && !Number.isNaN(priceNumber);
+
+  // 日付の安全なフォーマット
+  const formatDate = (dateStr: string | null | undefined): string | null => {
+    if (!dateStr) return null;
+    try {
+      return new Date(dateStr).toLocaleDateString('ja-JP');
+    } catch {
+      return null;
+    }
+  };
+  const createdAtFormatted = formatDate(service.created_at);
+  const updatedAtFormatted = formatDate(service.updated_at);
+  const showUpdatedAt = updatedAtFormatted && service.updated_at !== service.created_at;
+
   return (
     <div className="p-6 hover:bg-[var(--aio-muted)]/50 transition-colors">
       <div className="flex items-start justify-between gap-4">
@@ -198,17 +218,17 @@ function ServiceListItem({ service, onDelete, isDeleting, canDelete }: ServiceLi
             {service.category && (
               <DashboardBadge variant="default">{service.category}</DashboardBadge>
             )}
-            {service.price && (
-              <span>価格: ¥{service.price.toLocaleString()}</span>
+            {hasPrice && (
+              <span>価格: ¥{priceNumber.toLocaleString()}</span>
             )}
             {service.duration_months && (
               <span>期間: {service.duration_months}ヶ月</span>
             )}
           </div>
           <div className="mt-2 text-sm text-[var(--color-text-tertiary)]">
-            <span>作成: {new Date(service.created_at).toLocaleDateString('ja-JP')}</span>
-            {service.updated_at !== service.created_at && (
-              <span className="ml-4">更新: {new Date(service.updated_at).toLocaleDateString('ja-JP')}</span>
+            {createdAtFormatted && <span>作成: {createdAtFormatted}</span>}
+            {showUpdatedAt && (
+              <span className="ml-4">更新: {updatedAtFormatted}</span>
             )}
           </div>
         </div>

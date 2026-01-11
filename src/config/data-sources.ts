@@ -18,9 +18,24 @@ import type { UserRole } from '@/types/utils/database';
 
 export type TableName = keyof SupabaseDatabase['public']['Tables'];
 
+// ダッシュボード用セキュアビュー名（厳密な union 型）
+export type SecureViewName =
+  | 'v_dashboard_posts_secure'
+  | 'v_dashboard_services_secure'
+  | 'v_dashboard_case_studies_secure'
+  | 'v_dashboard_faqs_secure';
+
+// ダッシュボード用書き込み可能テーブル（厳密な union 型）
+export type DashboardWritableTable = 'posts' | 'services' | 'case_studies' | 'faqs';
+
+// ダッシュボードエンティティキー
+export type DashboardEntityKey = 'posts' | 'services' | 'case_studies' | 'faqs';
+
 export interface DataSourceConfig {
-  /** テーブル名（DB） */
-  table: TableName;
+  /** テーブル名またはビュー名（DB）- 読み取り用 */
+  table: TableName | SecureViewName;
+  /** 書き込み用のテーブル名（ビューの場合に元テーブルを指定） */
+  writeTable?: TableName;
   /** 日本語表示名 */
   displayName: string;
   /** デフォルトで取得するカラム（* で全カラム） */
@@ -63,9 +78,10 @@ export interface DataSourceConfig {
 export const DATA_SOURCES: Record<string, DataSourceConfig> = {
   // ----- コンテンツ管理 -----
   posts: {
-    table: 'posts',
+    table: 'v_dashboard_posts_secure',
+    writeTable: 'posts',
     displayName: '投稿',
-    defaultSelect: 'id, title, slug, status, excerpt, featured_image_url, published_at, created_at, updated_at',
+    defaultSelect: 'id, title, slug, status, is_published, published_at, created_at, updated_at, summary, organization_id',
     defaultOrder: { column: 'created_at', ascending: false },
     permissions: {
       read: ['viewer', 'editor', 'admin'],
@@ -82,9 +98,10 @@ export const DATA_SOURCES: Record<string, DataSourceConfig> = {
   },
 
   services: {
-    table: 'services',
+    table: 'v_dashboard_services_secure',
+    writeTable: 'services',
     displayName: 'サービス',
-    defaultSelect: 'id, name, description, price, duration_months, category, image_url, created_at, updated_at',
+    defaultSelect: 'id, name, slug, status, is_published, published_at, organization_id, description, duration_months, category, price, created_at, updated_at',
     defaultOrder: { column: 'created_at', ascending: false },
     permissions: {
       read: ['viewer', 'editor', 'admin'],
@@ -101,10 +118,11 @@ export const DATA_SOURCES: Record<string, DataSourceConfig> = {
   },
 
   faqs: {
-    table: 'faqs',
+    table: 'v_dashboard_faqs_secure',
+    writeTable: 'faqs',
     displayName: 'FAQ',
-    defaultSelect: 'id, question, answer, category, display_order, is_published, created_at, updated_at',
-    defaultOrder: { column: 'display_order', ascending: true },
+    defaultSelect: 'id, question, answer, category, slug, status, is_published, published_at, created_at, updated_at, organization_id',
+    defaultOrder: { column: 'created_at', ascending: false },
     permissions: {
       read: ['viewer', 'editor', 'admin'],
       write: ['editor', 'admin'],
@@ -120,9 +138,10 @@ export const DATA_SOURCES: Record<string, DataSourceConfig> = {
   },
 
   case_studies: {
-    table: 'case_studies',
+    table: 'v_dashboard_case_studies_secure',
+    writeTable: 'case_studies',
     displayName: '事例紹介',
-    defaultSelect: 'id, title, summary, challenge, solution, result, image_url, is_published, created_at, updated_at',
+    defaultSelect: 'id, title, slug, status, is_published, published_at, created_at, updated_at, summary, client_name, industry, organization_id',
     defaultOrder: { column: 'created_at', ascending: false },
     permissions: {
       read: ['viewer', 'editor', 'admin'],
@@ -258,3 +277,35 @@ export function getOrgScopedDataSources(): string[] {
 
 // Type exports
 export type DataSourceKey = keyof typeof DATA_SOURCES;
+
+// =====================================================
+// DASHBOARD SPECIFIC HELPERS
+// =====================================================
+
+/**
+ * ダッシュボードエンティティかどうかをチェック
+ */
+export function isDashboardEntity(key: string): key is DashboardEntityKey {
+  return ['posts', 'services', 'case_studies', 'faqs'].includes(key);
+}
+
+/**
+ * ダッシュボードエンティティのビュー名を取得（型安全）
+ */
+export function getDashboardViewName(entity: DashboardEntityKey): SecureViewName {
+  const viewMap: Record<DashboardEntityKey, SecureViewName> = {
+    posts: 'v_dashboard_posts_secure',
+    services: 'v_dashboard_services_secure',
+    case_studies: 'v_dashboard_case_studies_secure',
+    faqs: 'v_dashboard_faqs_secure',
+  };
+  return viewMap[entity];
+}
+
+/**
+ * ダッシュボードエンティティの書き込みテーブル名を取得（型安全）
+ */
+export function getDashboardWriteTable(entity: DashboardEntityKey): DashboardWritableTable {
+  // エンティティ名とテーブル名は同一
+  return entity;
+}

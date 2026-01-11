@@ -11,10 +11,31 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { selectFrom, countRecords, supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { getDataSource, hasDataSourcePermission, type DataSourceKey } from '@/config/data-sources';
+import { allowedViews, isAllowedView, type AllowedViewName } from '@/lib/allowlist';
 import type { UserRole } from '@/types/utils/database';
-import type { DatabaseError } from '@/types/database.types';
+
+// =====================================================
+// HELPER FUNCTIONS
+// =====================================================
+
+/**
+ * Create a query for the given table/view
+ * Returns any to avoid infinite type instantiation with complex Supabase types
+ */
+function createQuery(
+  tableName: string,
+  selectColumns: string,
+  options?: { count?: 'exact' | 'planned' | 'estimated'; head?: boolean }
+): any {
+  // For dashboard secure views, use the allowlist
+  if (isAllowedView(tableName)) {
+    return supabase.from(tableName as AllowedViewName).select(selectColumns, options);
+  }
+  // For other tables, use dynamic access
+  return (supabase as any).from(tableName).select(selectColumns, options);
+}
 
 // =====================================================
 // TYPES
@@ -137,36 +158,51 @@ export function useDashboardData<T = Record<string, unknown>>(
     setIsPermissionError(false);
 
     try {
-      // Fetch data
-      const { data: result, error: fetchError } = await selectFrom(
-        config.table,
-        {
-          columns: select || config.defaultSelect,
-          filters: effectiveFilters,
-          orderBy: orderBy || config.defaultOrder,
-          limit,
-        }
-      );
+      // Build query using type-safe helper (supports views via allowlist)
+      let query = createQuery(config.table, select || config.defaultSelect);
+
+      // Apply filters
+      Object.entries(effectiveFilters).forEach(([key, value]) => {
+        query = query.eq(key, value);
+      });
+
+      // Apply ordering
+      const sortConfig = orderBy || config.defaultOrder;
+      if (sortConfig) {
+        query = query.order(sortConfig.column, { ascending: sortConfig.ascending ?? true });
+      }
+
+      // Apply limit
+      if (limit) {
+        query = query.limit(limit);
+      }
+
+      // Apply offset
+      if (offset && offset > 0) {
+        query = query.range(offset, offset + (limit || 100) - 1);
+      }
+
+      const { data: result, error: fetchError } = await query;
 
       if (fetchError) {
         throw new Error(fetchError.message || 'データの取得に失敗しました');
       }
 
-      // Apply offset manually if needed (selectFrom doesn't support offset directly)
-      let processedData = result || [];
-      if (offset && offset > 0) {
-        processedData = processedData.slice(offset);
-      }
-
       // Apply transform if provided
       const finalData = transform
-        ? transform(processedData)
-        : (processedData as T[]);
+        ? transform(result || [])
+        : ((result || []) as T[]);
 
       setData(finalData);
 
-      // Get total count
-      const { data: count } = await countRecords(config.table, effectiveFilters);
+      // Get total count using head: true for efficiency
+      let countQuery = createQuery(config.table, '*', { count: 'exact', head: true });
+
+      Object.entries(effectiveFilters).forEach(([key, value]) => {
+        countQuery = countQuery.eq(key, value);
+      });
+
+      const { count } = await countQuery;
       setTotalCount(count || 0);
 
     } catch (err) {
@@ -277,10 +313,14 @@ export function useDashboardCount(
         effectiveFilters.organization_id = organizationId;
       }
 
-      const { data: result, error: fetchError } = await countRecords(
-        config.table,
-        effectiveFilters
-      );
+      // Use type-safe helper (supports views via allowlist)
+      let countQuery = createQuery(config.table, '*', { count: 'exact', head: true });
+
+      Object.entries(effectiveFilters).forEach(([key, value]) => {
+        countQuery = countQuery.eq(key, value);
+      });
+
+      const { count: result, error: fetchError } = await countQuery;
 
       if (fetchError) {
         throw new Error(fetchError.message);

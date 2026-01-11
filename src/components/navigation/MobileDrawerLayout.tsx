@@ -158,9 +158,9 @@ export function MobileDrawerLayout({
         </div>
       )}
 
-      {/* デスクトップ用サイドバー（lg以上で表示） */}
+      {/* デスクトップ用サイドバー（lg以上で常時表示） */}
       {desktopSidebar && (
-        <aside className="hidden lg:fixed lg:left-0 lg:inset-y-0 lg:z-[100] lg:flex lg:w-64 lg:flex-col">
+        <aside className="hidden lg:block fixed left-0 top-0 bottom-0 z-[100] w-64">
           {desktopSidebar}
         </aside>
       )}
