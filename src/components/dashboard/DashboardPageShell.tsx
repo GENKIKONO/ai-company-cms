@@ -185,19 +185,16 @@ export function DashboardPageShell({
         // Fallback to organization_members if view doesn't exist
         let membership: { organization_id: string; role: string } | null = null;
 
-        try {
-          // Try v_current_user_orgs first (recommended view)
-          const { data: viewData, error: viewError } = await supabase
-            .from('v_current_user_orgs')
-            .select('organization_id, role')
-            .maybeSingle();
+        // Try v_current_user_orgs first, fall back to organization_members if permission denied
+        const { data: viewData, error: viewError } = await supabase
+          .from('v_current_user_orgs')
+          .select('organization_id, role')
+          .maybeSingle();
 
-          if (!viewError && viewData) {
-            membership = viewData;
-          }
-        } catch {
-          // View might not exist, fall back to direct table
+        if (!viewError && viewData) {
+          membership = viewData;
         }
+        // viewError (including 42501 permission denied) → fallback below
 
         if (!membership) {
           // Fallback: direct query to organization_members
