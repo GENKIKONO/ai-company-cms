@@ -21852,31 +21852,58 @@ export type Database = {
       }
       v_dashboard_case_studies_secure: {
         Row: {
+          client_name: string | null
+          created_at: string | null
           id: string | null
+          industry: string | null
           is_published: boolean | null
           organization_id: string | null
+          problem: string | null
           published_at: string | null
+          result: string | null
           slug: string | null
+          solution: string | null
           status: string | null
+          summary: string | null
+          tags: string[] | null
           title: string | null
+          updated_at: string | null
         }
         Insert: {
+          client_name?: string | null
+          created_at?: string | null
           id?: string | null
-          is_published?: never
+          industry?: string | null
+          is_published?: boolean | null
           organization_id?: string | null
+          problem?: string | null
           published_at?: string | null
+          result?: string | null
           slug?: string | null
+          solution?: string | null
           status?: string | null
+          summary?: string | null
+          tags?: string[] | null
           title?: string | null
+          updated_at?: string | null
         }
         Update: {
+          client_name?: string | null
+          created_at?: string | null
           id?: string | null
-          is_published?: never
+          industry?: string | null
+          is_published?: boolean | null
           organization_id?: string | null
+          problem?: string | null
           published_at?: string | null
+          result?: string | null
           slug?: string | null
+          solution?: string | null
           status?: string | null
+          summary?: string | null
+          tags?: string[] | null
           title?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -21953,6 +21980,9 @@ export type Database = {
       }
       v_dashboard_faqs_secure: {
         Row: {
+          answer: string | null
+          category: string | null
+          created_at: string | null
           id: string | null
           is_published: boolean | null
           organization_id: string | null
@@ -21960,24 +21990,33 @@ export type Database = {
           question: string | null
           slug: string | null
           status: string | null
+          updated_at: string | null
         }
         Insert: {
+          answer?: string | null
+          category?: string | null
+          created_at?: string | null
           id?: string | null
-          is_published?: never
+          is_published?: boolean | null
           organization_id?: string | null
           published_at?: string | null
           question?: string | null
           slug?: string | null
           status?: string | null
+          updated_at?: string | null
         }
         Update: {
+          answer?: string | null
+          category?: string | null
+          created_at?: string | null
           id?: string | null
-          is_published?: never
+          is_published?: boolean | null
           organization_id?: string | null
           published_at?: string | null
           question?: string | null
           slug?: string | null
           status?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -22146,31 +22185,40 @@ export type Database = {
       }
       v_dashboard_posts_secure: {
         Row: {
+          created_at: string | null
           id: string | null
           is_published: boolean | null
           organization_id: string | null
           published_at: string | null
           slug: string | null
           status: string | null
+          summary: string | null
           title: string | null
+          updated_at: string | null
         }
         Insert: {
+          created_at?: string | null
           id?: string | null
           is_published?: boolean | null
           organization_id?: string | null
           published_at?: string | null
           slug?: string | null
           status?: string | null
+          summary?: string | null
           title?: string | null
+          updated_at?: string | null
         }
         Update: {
+          created_at?: string | null
           id?: string | null
           is_published?: boolean | null
           organization_id?: string | null
           published_at?: string | null
           slug?: string | null
           status?: string | null
+          summary?: string | null
           title?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {

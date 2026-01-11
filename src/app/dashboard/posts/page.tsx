@@ -224,6 +224,20 @@ function PostListItem({ post, onDelete, isDeleting, canDelete }: PostListItemPro
     return status === 'published' ? 'published' : 'draft';
   };
 
+  // 日付の安全なフォーマット
+  const formatDate = (dateStr: string | null | undefined): string | null => {
+    if (!dateStr) return null;
+    try {
+      return new Date(dateStr).toLocaleDateString('ja-JP');
+    } catch {
+      return null;
+    }
+  };
+  const createdAtFormatted = formatDate(post.created_at);
+  const updatedAtFormatted = formatDate(post.updated_at);
+  const publishedAtFormatted = formatDate(post.published_at);
+  const showUpdatedAt = updatedAtFormatted && post.updated_at !== post.created_at;
+
   return (
     <div className="p-6 hover:bg-[var(--aio-muted)]/50 transition-colors">
       <div className="flex items-start justify-between gap-4">
@@ -237,12 +251,12 @@ function PostListItem({ post, onDelete, isDeleting, canDelete }: PostListItemPro
             <StatusBadge status={getStatusBadgeStatus(post.status)} />
           </div>
           <div className="mt-2 text-sm text-[var(--color-text-tertiary)]">
-            <span>作成: {new Date(post.created_at).toLocaleDateString('ja-JP')}</span>
-            {post.updated_at !== post.created_at && (
-              <span className="ml-4">更新: {new Date(post.updated_at).toLocaleDateString('ja-JP')}</span>
+            {createdAtFormatted && <span>作成: {createdAtFormatted}</span>}
+            {showUpdatedAt && (
+              <span className="ml-4">更新: {updatedAtFormatted}</span>
             )}
-            {post.published_at && (
-              <span className="ml-4">公開: {new Date(post.published_at).toLocaleDateString('ja-JP')}</span>
+            {publishedAtFormatted && (
+              <span className="ml-4">公開: {publishedAtFormatted}</span>
             )}
           </div>
         </div>

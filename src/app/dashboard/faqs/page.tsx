@@ -182,6 +182,22 @@ interface FAQListItemProps {
 }
 
 function FAQListItem({ faq, onDelete, isDeleting, canDelete }: FAQListItemProps) {
+  // 日付の安全なフォーマット
+  const formatDate = (dateStr: string | null | undefined): string | null => {
+    if (!dateStr) return null;
+    try {
+      return new Date(dateStr).toLocaleDateString('ja-JP');
+    } catch {
+      return null;
+    }
+  };
+  const createdAtFormatted = formatDate(faq.created_at);
+  const updatedAtFormatted = formatDate(faq.updated_at);
+  const showUpdatedAt = updatedAtFormatted && faq.updated_at !== faq.created_at;
+
+  // answer の安全なチェック
+  const hasAnswer = faq.answer && faq.answer.trim() !== '';
+
   return (
     <div className="p-6 hover:bg-[var(--aio-muted)]/50 transition-colors">
       <div className="flex items-start justify-between gap-4">
@@ -189,16 +205,18 @@ function FAQListItem({ faq, onDelete, isDeleting, canDelete }: FAQListItemProps)
           <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">
             Q: {faq.question}
           </h3>
-          <div className="text-sm text-[var(--color-text-secondary)] mb-3">
-            <strong>A:</strong> {faq.answer}
-          </div>
+          {hasAnswer && (
+            <div className="text-sm text-[var(--color-text-secondary)] mb-3">
+              <strong>A:</strong> {faq.answer}
+            </div>
+          )}
           <div className="flex items-center gap-4 text-sm text-[var(--color-text-tertiary)]">
-            {faq.category && (
+            {faq.category && faq.category.trim() !== '' && (
               <DashboardBadge variant="info">{faq.category}</DashboardBadge>
             )}
-            <span>作成: {new Date(faq.created_at).toLocaleDateString('ja-JP')}</span>
-            {faq.updated_at !== faq.created_at && (
-              <span>更新: {new Date(faq.updated_at).toLocaleDateString('ja-JP')}</span>
+            {createdAtFormatted && <span>作成: {createdAtFormatted}</span>}
+            {showUpdatedAt && (
+              <span>更新: {updatedAtFormatted}</span>
             )}
           </div>
         </div>

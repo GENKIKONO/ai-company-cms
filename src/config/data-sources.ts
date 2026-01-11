@@ -81,7 +81,7 @@ export const DATA_SOURCES: Record<string, DataSourceConfig> = {
     table: 'v_dashboard_posts_secure',
     writeTable: 'posts',
     displayName: '投稿',
-    defaultSelect: 'id, title, slug, status, is_published, published_at, created_at, updated_at, summary, organization_id',
+    defaultSelect: 'id, title, slug, is_published, published_at, organization_id, status, created_at, updated_at, summary',
     defaultOrder: { column: 'created_at', ascending: false },
     permissions: {
       read: ['viewer', 'editor', 'admin'],
@@ -121,7 +121,7 @@ export const DATA_SOURCES: Record<string, DataSourceConfig> = {
     table: 'v_dashboard_faqs_secure',
     writeTable: 'faqs',
     displayName: 'FAQ',
-    defaultSelect: 'id, question, answer, category, slug, status, is_published, published_at, created_at, updated_at, organization_id',
+    defaultSelect: 'id, question, slug, is_published, published_at, organization_id, status, answer, category, created_at, updated_at',
     defaultOrder: { column: 'created_at', ascending: false },
     permissions: {
       read: ['viewer', 'editor', 'admin'],
@@ -141,7 +141,7 @@ export const DATA_SOURCES: Record<string, DataSourceConfig> = {
     table: 'v_dashboard_case_studies_secure',
     writeTable: 'case_studies',
     displayName: '事例紹介',
-    defaultSelect: 'id, title, slug, status, is_published, published_at, created_at, updated_at, summary, client_name, industry, organization_id',
+    defaultSelect: 'id, title, slug, is_published, published_at, organization_id, status, problem, solution, result, tags, created_at, updated_at, summary, client_name, industry',
     defaultOrder: { column: 'created_at', ascending: false },
     permissions: {
       read: ['viewer', 'editor', 'admin'],

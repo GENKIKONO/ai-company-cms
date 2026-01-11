@@ -182,6 +182,22 @@ interface CaseStudyListItemProps {
 }
 
 function CaseStudyListItem({ caseStudy, onDelete, isDeleting, canDelete }: CaseStudyListItemProps) {
+  // 日付の安全なフォーマット
+  const formatDate = (dateStr: string | null | undefined): string | null => {
+    if (!dateStr) return null;
+    try {
+      return new Date(dateStr).toLocaleDateString('ja-JP');
+    } catch {
+      return null;
+    }
+  };
+  const createdAtFormatted = formatDate(caseStudy.created_at);
+  const updatedAtFormatted = formatDate(caseStudy.updated_at);
+  const showUpdatedAt = updatedAtFormatted && caseStudy.updated_at !== caseStudy.created_at;
+
+  // tags の安全なチェック（null と [] の両方を考慮）
+  const hasTags = Array.isArray(caseStudy.tags) && caseStudy.tags.length > 0;
+
   return (
     <div className="p-6 hover:bg-[var(--aio-muted)]/50 transition-colors">
       <div className="flex items-start justify-between gap-4">
@@ -189,7 +205,7 @@ function CaseStudyListItem({ caseStudy, onDelete, isDeleting, canDelete }: CaseS
           <h3 className="text-lg font-medium text-[var(--color-text-primary)] truncate">
             {caseStudy.title}
           </h3>
-          {caseStudy.problem && (
+          {caseStudy.problem && caseStudy.problem.trim() !== '' && (
             <div className="mt-2">
               <h4 className="text-sm font-medium text-[var(--color-text-secondary)]">課題</h4>
               <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2 mt-1">
@@ -197,7 +213,7 @@ function CaseStudyListItem({ caseStudy, onDelete, isDeleting, canDelete }: CaseS
               </p>
             </div>
           )}
-          {caseStudy.solution && (
+          {caseStudy.solution && caseStudy.solution.trim() !== '' && (
             <div className="mt-2">
               <h4 className="text-sm font-medium text-[var(--color-text-secondary)]">解決策</h4>
               <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2 mt-1">
@@ -205,7 +221,7 @@ function CaseStudyListItem({ caseStudy, onDelete, isDeleting, canDelete }: CaseS
               </p>
             </div>
           )}
-          {caseStudy.tags && caseStudy.tags.length > 0 && (
+          {hasTags && (
             <div className="mt-2 flex flex-wrap gap-1">
               {caseStudy.tags.map((tag, index) => (
                 <DashboardBadge key={index} variant="warning" size="sm">
@@ -215,9 +231,9 @@ function CaseStudyListItem({ caseStudy, onDelete, isDeleting, canDelete }: CaseS
             </div>
           )}
           <div className="mt-2 text-sm text-[var(--color-text-tertiary)]">
-            <span>作成: {new Date(caseStudy.created_at).toLocaleDateString('ja-JP')}</span>
-            {caseStudy.updated_at !== caseStudy.created_at && (
-              <span className="ml-4">更新: {new Date(caseStudy.updated_at).toLocaleDateString('ja-JP')}</span>
+            {createdAtFormatted && <span>作成: {createdAtFormatted}</span>}
+            {showUpdatedAt && (
+              <span className="ml-4">更新: {updatedAtFormatted}</span>
             )}
           </div>
         </div>
