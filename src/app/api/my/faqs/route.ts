@@ -72,10 +72,10 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // FAQs取得（RLSにより組織メンバーのみアクセス可能）
+    // FAQs取得（セキュアビュー経由、RLSにより組織メンバーのみアクセス可能）
     const { data, error } = await supabase
-      .from('faqs')
-      .select('id, organization_id, question, answer, category, sort_order, is_published, status, created_by, created_at, updated_at')
+      .from('v_dashboard_faqs_secure')
+      .select('id, question, slug, is_published, published_at, organization_id, status, answer, category, created_at, updated_at')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 

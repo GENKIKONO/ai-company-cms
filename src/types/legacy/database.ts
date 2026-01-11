@@ -40,24 +40,30 @@ export interface Partner {
 export type Organization = import('../utils/database').OrganizationWithLegacyFields;
 
 // Legacy Service Type
+// NOTE: Dashboard reads from v_dashboard_services_secure which aliases name as title
 export interface Service {
   id: string;
   organization_id: string;
-  name: string;
+  title: string; // View alias: name AS title
+  name?: string; // Base table column (for backward compat)
+  slug?: string;
   price?: number;
   duration_months?: number;
   category?: string;
   description?: string;
-  features: string[];
+  summary?: string;
+  features?: string[];
   image_url?: string;
   video_url?: string;
   cta_text?: string;
   cta_url?: string;
   status: string;
+  is_published?: boolean;
+  published_at?: string;
   created_at: string;
   updated_at: string;
-  created_by: string;
-  sort_order: number;
+  created_by?: string;
+  sort_order?: number;
 }
 
 // Legacy FAQ Type

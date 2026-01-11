@@ -207,7 +207,7 @@ function ServiceListItem({ service, onDelete, isDeleting, canDelete }: ServiceLi
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-medium text-[var(--color-text-primary)] truncate">
-            {service.name}
+            {service.title}
           </h3>
           {service.description && (
             <p className="mt-1 text-sm text-[var(--color-text-secondary)] line-clamp-2">

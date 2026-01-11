@@ -58,10 +58,10 @@ export async function GET(request: NextRequest) {
       }, { status: 403 });
     }
 
-    // サービス取得（RLSにより組織メンバーのみアクセス可能）
+    // サービス取得（セキュアビュー経由、RLSにより組織メンバーのみアクセス可能）
     const { data: services, error: servicesError } = await supabase
-      .from('services')
-      .select('id, organization_id, name, summary, description, price, duration_months, category, features, image_url, video_url, cta_text, cta_url, is_published, status, created_by, created_at, updated_at')
+      .from('v_dashboard_services_secure')
+      .select('id, title, slug, status, is_published, published_at, organization_id, description, duration_months, category, price, created_at, updated_at, summary')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 

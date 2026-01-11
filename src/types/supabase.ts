@@ -22387,48 +22387,39 @@ export type Database = {
       }
       v_dashboard_services_secure: {
         Row: {
-          category: string | null
           created_at: string | null
-          description: string | null
-          duration_months: number | null
           id: string | null
           is_published: boolean | null
-          name: string | null
           organization_id: string | null
-          price: number | null
           published_at: string | null
           slug: string | null
           status: string | null
+          summary: string | null
+          title: string | null
           updated_at: string | null
         }
         Insert: {
-          category?: string | null
           created_at?: string | null
-          description?: string | null
-          duration_months?: number | null
           id?: string | null
           is_published?: boolean | null
-          name?: string | null
           organization_id?: string | null
-          price?: never
           published_at?: string | null
           slug?: string | null
           status?: string | null
+          summary?: string | null
+          title?: string | null
           updated_at?: string | null
         }
         Update: {
-          category?: string | null
           created_at?: string | null
-          description?: string | null
-          duration_months?: number | null
           id?: string | null
           is_published?: boolean | null
-          name?: string | null
           organization_id?: string | null
-          price?: never
           published_at?: string | null
           slug?: string | null
           status?: string | null
+          summary?: string | null
+          title?: string | null
           updated_at?: string | null
         }
         Relationships: [

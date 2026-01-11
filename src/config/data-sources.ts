@@ -101,7 +101,7 @@ export const DATA_SOURCES: Record<string, DataSourceConfig> = {
     table: 'v_dashboard_services_secure',
     writeTable: 'services',
     displayName: 'サービス',
-    defaultSelect: 'id, name, slug, status, is_published, published_at, organization_id, description, duration_months, category, price, created_at, updated_at',
+    defaultSelect: 'id, title, slug, status, is_published, published_at, organization_id, description, duration_months, category, price, created_at, updated_at, summary',
     defaultOrder: { column: 'created_at', ascending: false },
     permissions: {
       read: ['viewer', 'editor', 'admin'],
@@ -109,7 +109,7 @@ export const DATA_SOURCES: Record<string, DataSourceConfig> = {
       delete: ['admin'],
     },
     requiresOrgScope: true,
-    searchableColumns: ['name', 'description'],
+    searchableColumns: ['title', 'description'],
     ui: {
       emptyMessage: 'サービスがありません',
       createPath: '/dashboard/services/new',

@@ -31,10 +31,10 @@ export async function GET(request: NextRequest) {
   return withOrgAuth(request, async ({ orgId }) => {
     const supabase = await createClient();
     
-    // 組織の投稿を取得（organization_id前提）
+    // 組織の投稿を取得（セキュアビュー経由）
     const { data: posts, error: postsError } = await supabase
-      .from('posts')
-      .select('id, organization_id, title, slug, content, content_markdown, content_html, status, is_published, published_at, created_by, created_at, updated_at')
+      .from('v_dashboard_posts_secure')
+      .select('id, title, slug, is_published, published_at, organization_id, status, created_at, updated_at, summary')
       .eq('organization_id', orgId)
       .order('created_at', { ascending: false });
 

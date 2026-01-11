@@ -19,7 +19,7 @@ export interface DashboardList {
     Pick<PostRow, 'id' | 'title' | 'slug' | 'published_at' | 'organization_id' | 'status' | 'is_published'>
   >;
   services: Array<
-    Pick<ServiceRow, 'id' | 'name' | 'slug' | 'published_at' | 'organization_id' | 'status' | 'is_published'>
+    Pick<ServiceRow, 'id' | 'title' | 'slug' | 'published_at' | 'organization_id' | 'status' | 'is_published'>
   >;
   case_studies: Array<
     Pick<CaseStudyRow, 'id' | 'title' | 'slug' | 'published_at' | 'organization_id' | 'status' | 'is_published'>
@@ -68,7 +68,7 @@ export async function getDashboardList(options: GetDashboardListOptions = {}): P
 
   let servicesQ = supabase
     .from(allowedViews.services)
-    .select('id,name,slug,published_at,organization_id,status,is_published')
+    .select('id,title,slug,published_at,organization_id,status,is_published')
     .order('published_at', { ascending: false })
     .limit(limit);
 
@@ -141,7 +141,7 @@ export async function getDashboardEntity<K extends keyof DashboardList>(
   const viewName = allowedViews[entity];
   const selectColumns =
     entity === 'services'
-      ? 'id,name,slug,published_at,organization_id,status,is_published'
+      ? 'id,title,slug,published_at,organization_id,status,is_published'
       : entity === 'faqs'
         ? 'id,question,slug,published_at,organization_id,status,is_published'
         : 'id,title,slug,published_at,organization_id,status,is_published';

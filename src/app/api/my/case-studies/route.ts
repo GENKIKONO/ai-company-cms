@@ -65,10 +65,10 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // 事例取得（RLSにより組織メンバーのみアクセス可能）
+    // 事例取得（セキュアビュー経由、RLSにより組織メンバーのみアクセス可能）
     const { data, error } = await supabase
-      .from('case_studies')
-      .select('id, organization_id, service_id, title, slug, client_name, client_industry, client_size, challenge, solution, outcome, testimonial, images, is_published, created_at, updated_at')
+      .from('v_dashboard_case_studies_secure')
+      .select('id, title, slug, is_published, published_at, organization_id, status, problem, solution, result, tags, created_at, updated_at, summary, client_name, industry')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 
@@ -76,15 +76,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Database error', message: error.message }, { status: 500 });
     }
 
-    // Map database 'outcome' field to frontend 'result' field for consistency
-    const mappedData = (data || []).map((caseStudy: any) => ({
-      ...caseStudy,
-      result: caseStudy.outcome,
-      // Remove outcome field to avoid confusion
-      outcome: undefined
-    }));
-
-    return NextResponse.json({ data: mappedData });
+    // セキュアビューは既にresultカラムを返すためマッピング不要
+    return NextResponse.json({ data: data || [] });
 
   } catch (error) {
     const errorId = generateErrorId('get-case-studies');

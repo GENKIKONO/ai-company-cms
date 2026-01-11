@@ -219,10 +219,16 @@ const getOrganizationDataCached = (slug: string) => {
         }
       });
 
+      // servicesのnameをtitleにマップ（Legacy Service型との互換性）
+      const mappedServices = (servicesResult.data || []).map(s => ({
+        ...s,
+        title: s.name,
+      }));
+
       return {
         organization,
         posts: postsResult.data || [],
-        services: servicesResult.data || [],
+        services: mappedServices,
         case_studies: caseStudiesResult.data || [],
         faqs: faqsResult.data || [],
         qa_entries: qaEntriesResult.data || []
