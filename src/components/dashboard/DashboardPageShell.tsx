@@ -19,7 +19,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { DashboardErrorBoundary } from './DashboardErrorBoundary';
 import { DashboardLoadingState } from './ui/DashboardLoadingState';
 import { DashboardAlert } from './ui/DashboardAlert';
@@ -143,6 +143,7 @@ export function DashboardPageShell({
   onSystemError,
 }: DashboardPageShellProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   // Request ID for error tracking
   const [requestId] = useState(() => uuidv4());
@@ -341,8 +342,9 @@ export function DashboardPageShell({
       setIsLoading(false);
       setIsDataFetched(true);
     }
+  // pathname を依存配列に追加: クライアントサイドナビゲーション時にデータを再取得
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPublic, requiredRole, siteAdminOnly, router, logToAudit]);
+  }, [isPublic, requiredRole, siteAdminOnly, router, logToAudit, pathname]);
 
   /**
    * 権限チェック関数（DBのRPCを使用）
