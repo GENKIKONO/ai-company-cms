@@ -406,6 +406,26 @@ export default function DashboardPage() {
 }
 ```
 
+### DashboardPageShellでのリダイレクト禁止
+
+```tsx
+// NG: クライアントコンポーネント内で認証失敗時にリダイレクト
+// → クライアントナビゲーション時のCookie同期遅延でリダイレクトループが発生
+if (!currentUser) {
+  router.push('/auth/login'); // ← NG: リダイレクトループの原因
+  return;
+}
+
+// OK: エラー表示にしてユーザーに再読み込みを促す
+// → Middlewareが認証を担当。Shell内ではリダイレクトしない
+if (!currentUser) {
+  setError('認証情報の取得に失敗しました。ページを再読み込みしてください。');
+  return;
+}
+```
+
+**重要**: `DashboardPageShell` 内で `router.push('/auth/login')` を**絶対に使わない**。Middlewareが認証リダイレクトの唯一の責任者。
+
 ---
 
 **このガイドに従わない実装は拒否し、参照ファイルを確認してから再実装すること。**

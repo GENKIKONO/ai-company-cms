@@ -206,6 +206,8 @@ export function DashboardPageShell({
 
     try {
       // Get current user
+      // NOTE: Middleware handles auth redirect. If we reach here, user should be authenticated.
+      // Don't redirect on auth failure - show error instead to avoid redirect loops during navigation.
       const currentUser = await getCurrentUser();
 
       // Check if this fetch is stale before proceeding
@@ -214,8 +216,11 @@ export function DashboardPageShell({
       }
 
       if (!currentUser && !isPublic) {
-        // Not authenticated - redirect to login
-        router.push('/auth/login?redirect=' + encodeURIComponent(window.location.pathname));
+        // User should be authenticated (middleware passed), but client auth failed
+        // This can happen during navigation due to cookie sync timing
+        // Don't redirect - let the user retry or show error
+        setError('認証情報の取得に失敗しました。ページを再読み込みしてください。');
+        setErrorCode('AUTH_SYNC_ERROR');
         return;
       }
 
@@ -269,7 +274,10 @@ export function DashboardPageShell({
               return;
             }
             if (isSessionExpiredError(membershipError)) {
-              router.push('/auth/login?redirect=' + encodeURIComponent(window.location.pathname));
+              // NOTE: Don't redirect - might be a timing issue during navigation
+              // Middleware handles actual session expiration
+              setError('セッションの確認に失敗しました。ページを再読み込みしてください。');
+              setErrorCode('SESSION_ERROR');
               return;
             }
             throw membershipError;
@@ -368,8 +376,10 @@ export function DashboardPageShell({
         setErrorCode('RLS_DENIED');
         await logToAudit('page_access', 'error', 'rls_denied');
       } else if (isSessionExpiredError(err)) {
-        router.push('/auth/login?redirect=' + encodeURIComponent(window.location.pathname));
-        return;
+        // NOTE: Don't redirect - might be a timing issue during navigation
+        // Middleware handles actual session expiration
+        setErrorCode('SESSION_ERROR');
+        await logToAudit('page_access', 'error', 'session_error');
       } else {
         await logToAudit('page_access', 'error', message);
       }
