@@ -156,15 +156,15 @@ export function DashboardLayoutContent({ children, accountStatus, canSeeAdminNav
     document.body
   ) : null;
 
-  // モバイルドロワー（DashboardSidebarを使用）
+  // モバイルドロワー（右側から展開、DashboardSidebarを使用）
   const Drawer = mounted && shouldRender ? createPortal(
     <div
       id="dashboard-mobile-drawer"
       role="navigation"
       aria-label="ダッシュボードメニュー"
       className={classNames(
-        "fixed top-0 left-0 z-50 h-screen w-64 bg-white shadow-xl lg:hidden transition-transform duration-300 ease-out",
-        isClosing ? "-translate-x-full" : "translate-x-0"
+        "fixed top-0 right-0 z-50 h-screen w-64 bg-[var(--dashboard-card-bg)] shadow-xl lg:hidden transition-transform duration-300 ease-out",
+        isClosing ? "translate-x-full" : "translate-x-0"
       )}
       onClick={(e) => e.stopPropagation()}
     >
@@ -174,11 +174,11 @@ export function DashboardLayoutContent({ children, accountStatus, canSeeAdminNav
   ) : null;
 
   return (
-    <div className="min-h-screen">
-      {/* デスクトップサイドバー（lg以上で表示） */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+    <div className="min-h-screen bg-[var(--dashboard-bg)]">
+      {/* デスクトップサイドバー（lg以上で常に表示） */}
+      <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 flex-col lg:flex">
         <DashboardSidebar canSeeAdminNav={canSeeAdminNav} />
-      </div>
+      </aside>
 
       {/* モバイルナビゲーション */}
       {Overlay}
