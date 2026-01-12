@@ -57,17 +57,26 @@ export interface DashboardPageContext {
   organization: OrganizationContext | null;
   /** 組織ID */
   organizationId: string | null;
+  /** ユーザーが所属する全組織一覧 */
+  organizations: OrganizationContext[];
   /** ユーザーロール（参考値、権限判定にはhasOrgRoleを使用） */
   userRole: UserRole;
   /** 読み込み中か */
   isLoading: boolean;
+  /** 組織が0件（オンボーディング対象） */
+  isReallyEmpty: boolean;
   /** 権限チェック関数（DB RPCベース） */
   checkPermission: (requiredRole: OrgRole) => Promise<boolean>;
   /** データ更新関数 */
   refresh: () => Promise<void>;
+  /** 組織関連キャッシュ無効化（コンテンツ更新時に使用） */
+  invalidateOrganization: () => Promise<void>;
   /** リクエストID（エラー追跡用） */
   requestId: string;
 }
+
+/** 拡張ポイント用のレンダー関数型 */
+export type ShellRenderFn = (ctx: DashboardPageContext) => React.ReactNode;
 
 export interface DashboardPageShellProps {
   children: React.ReactNode;
@@ -83,6 +92,12 @@ export interface DashboardPageShellProps {
   public?: boolean;
   /** サイト管理者専用（org_idなしでもadmin権限が必要） */
   siteAdminOnly?: boolean;
+  /** 組織未作成時のカスタムUI（/dashboard トップページ用） */
+  onEmptyOrganization?: React.ReactNode | ShellRenderFn;
+  /** 権限エラー時のカスタムUI */
+  onPermissionError?: React.ReactNode | ShellRenderFn;
+  /** システムエラー時のカスタムUI */
+  onSystemError?: React.ReactNode | ShellRenderFn;
 }
 
 // =====================================================
@@ -102,6 +117,15 @@ export function useDashboardPageContext(): DashboardPageContext {
   return context;
 }
 
+/**
+ * Dashboardページコンテキストを取得するフック（セーフ版）
+ * DashboardPageShell 外で呼ばれた場合は null を返す
+ * @internal useOrganization のラッパ化移行用
+ */
+export function useDashboardPageContextSafe(): DashboardPageContext | null {
+  return useContext(PageContext);
+}
+
 // =====================================================
 // COMPONENT
 // =====================================================
@@ -114,6 +138,9 @@ export function DashboardPageShell({
   loadingSkeleton,
   public: isPublic = false,
   siteAdminOnly = false,
+  onEmptyOrganization,
+  onPermissionError,
+  onSystemError,
 }: DashboardPageShellProps) {
   const router = useRouter();
 
@@ -123,11 +150,13 @@ export function DashboardPageShell({
   // State
   const [user, setUser] = useState<AppUser | null>(null);
   const [organization, setOrganization] = useState<OrganizationContext | null>(null);
+  const [organizations, setOrganizations] = useState<OrganizationContext[]>([]);
   const [userRole, setUserRole] = useState<UserRole>('viewer');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [permissionError, setPermissionError] = useState<string | null>(null);
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   /**
    * 監査ログ送信（Core経由）
@@ -154,6 +183,7 @@ export function DashboardPageShell({
     setError(null);
     setErrorCode(null);
     setPermissionError(null);
+    setIsDataFetched(false);
 
     try {
       // Get current user
@@ -181,28 +211,26 @@ export function DashboardPageShell({
           }
         }
 
-        // Get user's organization using view (v_current_user_orgs recommended)
+        // Get ALL user's organizations using view (v_current_user_orgs recommended)
         // Fallback to organization_members if view doesn't exist
-        let membership: { organization_id: string; role: string } | null = null;
+        let memberships: { organization_id: string; role: string }[] = [];
 
         // Try v_current_user_orgs first, fall back to organization_members if permission denied
         const { data: viewData, error: viewError } = await supabase
           .from('v_current_user_orgs')
-          .select('organization_id, role')
-          .maybeSingle();
+          .select('organization_id, role');
 
-        if (!viewError && viewData) {
-          membership = viewData;
+        if (!viewError && viewData && viewData.length > 0) {
+          memberships = viewData;
         }
         // viewError (including 42501 permission denied) → fallback below
 
-        if (!membership) {
+        if (memberships.length === 0) {
           // Fallback: direct query to organization_members
           const { data: membershipData, error: membershipError } = await supabase
             .from('organization_members')
             .select('organization_id, role')
-            .eq('user_id', currentUser.id)
-            .maybeSingle();
+            .eq('user_id', currentUser.id);
 
           if (membershipError) {
             if (isRLSDeniedError(membershipError)) {
@@ -218,52 +246,66 @@ export function DashboardPageShell({
             throw membershipError;
           }
 
-          membership = membershipData;
+          memberships = membershipData || [];
         }
 
-        if (membership) {
-          // Get organization details
-          const { data: org, error: orgError } = await supabase
+        if (memberships.length > 0) {
+          // Get all organization details
+          const orgIds = memberships.map(m => m.organization_id);
+          const { data: orgsData, error: orgsError } = await supabase
             .from('organizations')
             .select('id, name, slug, plan')
-            .eq('id', membership.organization_id)
-            .single();
+            .in('id', orgIds);
 
-          if (orgError) {
-            if (isRLSDeniedError(orgError)) {
+          if (orgsError) {
+            if (isRLSDeniedError(orgsError)) {
               setErrorCode('RLS_DENIED');
               setError('組織情報へのアクセス権限がありません');
               await logToAudit('page_access', 'denied', 'org_rls_denied');
               return;
             }
-            throw orgError;
+            throw orgsError;
           }
 
-          setOrganization({
+          // Map organizations with their contexts
+          const orgContexts: OrganizationContext[] = (orgsData || []).map(org => ({
             id: org.id,
             name: org.name,
             slug: org.slug,
             plan: org.plan,
-          });
+          }));
 
-          // Set user role from membership (for display purposes only)
-          const role = (membership.role as UserRole) || 'viewer';
-          setUserRole(role);
+          setOrganizations(orgContexts);
 
-          // Check required permission via DB RPC
-          // 権限判定はDBに完全委譲 - JSでの比較は行わない
-          if (requiredRole !== 'viewer') {
-            const hasPermission = await hasOrgRole(supabase, org.id, mappedRole);
-            if (!hasPermission) {
-              setPermissionError(
-                `このページにアクセスするには${getRoleDisplayName(requiredRole)}以上の権限が必要です`
-              );
-              await logToAudit('page_access', 'denied', `required_role_${requiredRole}`);
-              return;
+          // Set the first organization as the current one (or could be selected)
+          const firstMembership = memberships[0];
+          const currentOrg = orgContexts.find(o => o.id === firstMembership.organization_id) || orgContexts[0];
+
+          if (currentOrg) {
+            setOrganization(currentOrg);
+
+            // Set user role from first membership (for display purposes only)
+            const role = (firstMembership.role as UserRole) || 'viewer';
+            setUserRole(role);
+
+            // Check required permission via DB RPC
+            // 権限判定はDBに完全委譲 - JSでの比較は行わない
+            if (requiredRole !== 'viewer') {
+              const hasPermission = await hasOrgRole(supabase, currentOrg.id, mappedRole);
+              if (!hasPermission) {
+                setPermissionError(
+                  `このページにアクセスするには${getRoleDisplayName(requiredRole)}以上の権限が必要です`
+                );
+                await logToAudit('page_access', 'denied', `required_role_${requiredRole}`);
+                return;
+              }
             }
           }
         } else {
-          // No organization membership
+          // No organization membership - isReallyEmpty will be true
+          setOrganizations([]);
+          setOrganization(null);
+
           if (requiredRole !== 'viewer') {
             // Admin pages without org might need site_admin check
             if (requiredRole === 'admin') {
@@ -297,6 +339,7 @@ export function DashboardPageShell({
       }
     } finally {
       setIsLoading(false);
+      setIsDataFetched(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPublic, requiredRole, siteAdminOnly, router, logToAudit]);
@@ -315,6 +358,18 @@ export function DashboardPageShell({
     }
   }, [organization?.id]);
 
+  /**
+   * 組織関連キャッシュ無効化
+   * コンテンツ更新時に使用
+   */
+  const invalidateOrganization = useCallback(async () => {
+    // 現在はrefreshと同等。将来的にはSWR等のキャッシュ無効化も追加可能
+    await fetchData();
+  }, [fetchData]);
+
+  // 組織が0件（オンボーディング対象）
+  const isReallyEmpty = isDataFetched && !isLoading && organizations.length === 0 && !error && !permissionError;
+
   // Initial fetch
   useEffect(() => {
     fetchData();
@@ -332,11 +387,27 @@ export function DashboardPageShell({
     user,
     organization,
     organizationId: organization?.id || null,
+    organizations,
     userRole,
     isLoading,
+    isReallyEmpty,
     checkPermission,
     refresh: fetchData,
+    invalidateOrganization,
     requestId,
+  };
+
+  /**
+   * 拡張ポイントのレンダリングヘルパー
+   */
+  const renderExtensionPoint = (
+    point: React.ReactNode | ShellRenderFn | undefined
+  ): React.ReactNode | null => {
+    if (!point) return null;
+    if (typeof point === 'function') {
+      return point(contextValue);
+    }
+    return point;
   };
 
   // Render loading state
@@ -348,8 +419,19 @@ export function DashboardPageShell({
     );
   }
 
-  // Render error state
+  // Render error state (with extension point)
   if (error) {
+    const customErrorUI = renderExtensionPoint(onSystemError);
+    if (customErrorUI) {
+      return (
+        <PageContext.Provider value={contextValue}>
+          <DashboardErrorBoundary>
+            {customErrorUI}
+          </DashboardErrorBoundary>
+        </PageContext.Provider>
+      );
+    }
+
     return (
       <DashboardSection>
         <DashboardAlert
@@ -361,7 +443,7 @@ export function DashboardPageShell({
           }}
         >
           {error}
-          <span className="block mt-2 text-xs text-gray-500">
+          <span className="block mt-2 text-xs text-[var(--color-text-tertiary)]">
             リクエストID: {requestId}
           </span>
         </DashboardAlert>
@@ -369,8 +451,19 @@ export function DashboardPageShell({
     );
   }
 
-  // Render permission error
+  // Render permission error (with extension point)
   if (permissionError) {
+    const customPermissionUI = renderExtensionPoint(onPermissionError);
+    if (customPermissionUI) {
+      return (
+        <PageContext.Provider value={contextValue}>
+          <DashboardErrorBoundary>
+            {customPermissionUI}
+          </DashboardErrorBoundary>
+        </PageContext.Provider>
+      );
+    }
+
     return (
       <DashboardSection>
         <DashboardAlert
@@ -382,7 +475,40 @@ export function DashboardPageShell({
           }}
         >
           {permissionError}
-          <span className="block mt-2 text-xs text-gray-500">
+          <span className="block mt-2 text-xs text-[var(--color-text-tertiary)]">
+            リクエストID: {requestId}
+          </span>
+        </DashboardAlert>
+      </DashboardSection>
+    );
+  }
+
+  // Render empty organization state (with extension point)
+  if (isReallyEmpty && user) {
+    const customEmptyUI = renderExtensionPoint(onEmptyOrganization);
+    if (customEmptyUI) {
+      return (
+        <PageContext.Provider value={contextValue}>
+          <DashboardErrorBoundary>
+            {customEmptyUI}
+          </DashboardErrorBoundary>
+        </PageContext.Provider>
+      );
+    }
+
+    // Default empty organization UI - redirect to create organization
+    return (
+      <DashboardSection>
+        <DashboardAlert
+          variant="info"
+          title="組織を作成してください"
+          action={{
+            label: '組織を作成',
+            onClick: () => router.push('/organizations/new'),
+          }}
+        >
+          ダッシュボードを利用するには、まず組織を作成してください。
+          <span className="block mt-2 text-xs text-[var(--color-text-tertiary)]">
             リクエストID: {requestId}
           </span>
         </DashboardAlert>
