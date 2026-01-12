@@ -1,9 +1,15 @@
+'use client';
+
 /**
  * /dashboard ルートページ
  *
  * NOTE: [CORE_ARCHITECTURE] DashboardPageShell 経由で統一管理
  * - 認証・権限・組織チェックは Shell が担当
  * - 拡張ポイント（onEmptyOrganization, onPermissionError, onSystemError）でカスタムUIを提供
+ *
+ * NOTE: 'use client' が必要な理由
+ * - onEmptyOrganization等のコールバック関数をDashboardPageShell（クライアントコンポーネント）に渡すため
+ * - Next.js 13+ではサーバーコンポーネントからクライアントコンポーネントに関数を渡せない
  */
 
 import {
@@ -15,10 +21,8 @@ import { EmptyOrganizationUI } from './components/EmptyOrganizationUI';
 import { PermissionErrorUI } from './components/PermissionErrorUI';
 import { SystemErrorUI } from './components/SystemErrorUI';
 
-// 強制的に動的SSRにして、認証状態を毎回評価
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-export const revalidate = 0;
+// NOTE: 'use client' コンポーネントではdynamic/fetchCache/revalidateは使用不可
+// 認証チェックはDashboardPageShellとmiddlewareで担当
 
 export default function DashboardPage() {
   return (
