@@ -339,4 +339,73 @@ import { DashboardCard } from '@/components/dashboard/ui';
 
 ---
 
+## 10. Dashboard認証アーキテクチャ
+
+### 認証の責務分担
+
+| レイヤー | ファイル | 責務 |
+|---------|----------|------|
+| Middleware | `src/middleware.ts` | **主認証ゲート** - 未認証ユーザーをログインへリダイレクト |
+| Layout | `src/app/dashboard/layout.tsx` | **UIシェル提供のみ** - 認証チェックは行わない |
+| Page Shell | `DashboardPageShell` | **ページレベル認証** - 組織・権限チェック |
+
+### 重要な注意点
+
+```tsx
+// NG: Layoutで認証リダイレクト（クライアントナビゲーション時に問題発生）
+export default async function DashboardLayout({ children }) {
+  const user = await getServerUser();
+  if (!user) {
+    redirect('/auth/login'); // ← これがNavigation時にリダイレクトループを引き起こす
+  }
+  return <Layout>{children}</Layout>;
+}
+
+// OK: Middlewareに認証を任せ、Layoutは表示のみ
+export default async function DashboardLayout({ children }) {
+  // 認証チェックはMiddlewareが担当
+  // Layoutは表示用データのみ取得（失敗してもエラーにしない）
+  let accountStatus = 'active';
+  try {
+    const user = await getUser();
+    if (user) {
+      accountStatus = await getAccountStatus(user.id);
+    }
+  } catch {
+    // Silent fail - Middleware handles auth
+  }
+  return <Layout accountStatus={accountStatus}>{children}</Layout>;
+}
+```
+
+### Dashboardページの'use client'ルール
+
+```tsx
+// NG: サーバーコンポーネントからクライアントコンポーネントに関数を渡す
+// page.tsx (サーバーコンポーネント)
+export default function DashboardPage() {
+  return (
+    <DashboardPageShell
+      onError={(ctx) => <ErrorUI user={ctx.user} />} // ← 関数は渡せない
+    >
+      <Content />
+    </DashboardPageShell>
+  );
+}
+
+// OK: 'use client'を追加して関数を渡せるようにする
+'use client';
+export default function DashboardPage() {
+  return (
+    <DashboardPageShell
+      onError={(ctx) => <ErrorUI user={ctx.user} />} // ← OK
+    >
+      <Content />
+    </DashboardPageShell>
+  );
+}
+```
+
+---
+
 **このガイドに従わない実装は拒否し、参照ファイルを確認してから再実装すること。**

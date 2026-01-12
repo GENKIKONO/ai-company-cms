@@ -1,57 +1,81 @@
-export const dynamic = 'force-dynamic';
-
-import { redirect } from 'next/navigation';
-import { getServerUserWithStatus } from '@/lib/auth/server';
-import { getUserOrganizations } from '@/lib/server/organizations';
-import { isSiteAdmin } from '@/lib/core/auth-state';
-import { DashboardLayoutContent } from '@/components/dashboard/DashboardLayoutContent';
-import type { AccountStatus } from '@/lib/auth/account-status-guard';
-
 /**
- * Dashboard Layout with Server Gate
+ * Dashboard Layout
  *
  * Layout Boundary: Dashboard shell with sidebar.
  * - Public header/footer: NOT rendered (handled by (public) route group)
  * - Sidebar: ALWAYS rendered for all /dashboard/** routes
  *
- * Auth Gates:
- * 1. User session exists
- * 2. Account status (not deleted)
- * 3. Organization membership (site_admin exempt)
+ * Auth Strategy:
+ * - Middleware handles primary auth check and redirects
+ * - Layout provides UI shell only (no redundant auth check)
+ * - DashboardPageShell handles page-level auth state management
+ *
+ * NOTE: Server-side auth check removed to prevent redirect loops during
+ * client-side navigation. Middleware is the single source of truth for auth.
  *
  * See: docs/architecture/boundaries.md
  */
+
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
+import { DashboardLayoutContent } from '@/components/dashboard/DashboardLayoutContent';
+import type { AccountStatus } from '@/lib/auth/account-status-guard';
+
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Gate 1: Auth check
-  const userProfile = await getServerUserWithStatus();
+  // Get account status for UI display (non-blocking)
+  // Auth enforcement is handled by middleware, not here
+  let accountStatus: AccountStatus = 'active';
+  let isAdmin = false;
 
-  if (!userProfile) {
-    redirect('/auth/login');
-  }
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll() {
+            // Read-only in layout - cookies set by middleware
+          },
+        },
+      }
+    );
 
-  // Gate 2: Account status check
-  const accountStatus: AccountStatus = userProfile.accountStatus;
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (accountStatus === 'deleted') {
-    redirect('/auth/login');
-  }
+    if (user) {
+      // Get account status (optional - for banner display)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('account_status')
+        .eq('id', user.id)
+        .maybeSingle();
 
-  // Gate 3: Organization membership (site_admin exempt)
-  const isAdmin = await isSiteAdmin();
+      if (profile?.account_status) {
+        accountStatus = profile.account_status as AccountStatus;
+      }
 
-  if (!isAdmin) {
-    const userOrgs = await getUserOrganizations(userProfile.id);
+      // Check if user is site admin (optional - for admin nav)
+      const { data: appUser } = await supabase
+        .from('v_app_users_compat2')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
 
-    if (userOrgs.length === 0) {
-      redirect('/organizations/new');
+      isAdmin = appUser?.role === 'admin';
     }
+  } catch {
+    // Silent fail - middleware handles auth, layout just renders UI
+    // Default values (active, not admin) are safe fallbacks
   }
 
-  // Render: Dashboard layout with sidebar (no CSS hacks needed)
   return (
     <DashboardLayoutContent accountStatus={accountStatus} canSeeAdminNav={isAdmin}>
       {children}
