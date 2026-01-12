@@ -14,9 +14,14 @@
   header.hidden.lg\:block {
     display: block;
   }
-  
+
   /* ヘッダー内ナビゲーション表示 */
   header nav.hidden.lg\:flex {
+    display: flex;
+  }
+
+  /* ダッシュボードサイドバー表示 */
+  aside.hidden.lg\:flex {
     display: flex;
   }
   
