@@ -1,11 +1,13 @@
 /**
  * 組織コンテキストフック
  * 現在のユーザーの組織情報を管理
- * 
- * Version 4: 構造化エラーハンドリング対応版
- * - MeApiResponse 型使用（organization-summary.ts ベース）
- * - errorType ベースのエラー判定（文字列フォールバック付き）
- * - 後方互換性維持
+ *
+ * Version 5: DashboardPageShell コンテキスト統合版
+ * - DashboardPageShell 内では useDashboardPageContext() を使用
+ * - Shell 外では従来の SWR ベース実装にフォールバック
+ * - 段階的移行のため、両方のパスをサポート
+ *
+ * @deprecated DashboardPageShell 配下では useDashboardPageContext() を直接使用してください
  */
 
 import useSWR from 'swr';
@@ -16,6 +18,7 @@ import { CACHE_KEYS } from '@/lib/cache/keys';
 import { logger } from '@/lib/log';
 import { useAuth } from './useAuth';
 import { MeApiResponse, OrganizationSummary } from '@/types/organization-summary';
+import { useDashboardPageContextSafe } from '@/components/dashboard/DashboardPageShell';
 
 // 構造化エラータイプ（/api/me と同期）
 type MeErrorType =
@@ -55,13 +58,65 @@ export interface MeResponse {
 
 /**
  * 現在のユーザーと組織情報を同時に取得
+ * @deprecated DashboardPageShell 配下では useDashboardPageContext() を直接使用してください
  */
 export function useOrganization() {
+  // DashboardPageShell 内であればコンテキストを使用
+  const shellContext = useDashboardPageContextSafe();
+
+  // 両方のHookを常に呼び出す（React Hooksルール準拠）
+  // shellContext が存在する場合、legacyResult は使用されないが呼び出しは必要
+  const legacyResult = useOrganizationLegacyInternal(!shellContext);
+
+  // Shell コンテキストが利用可能な場合はそれを使用
+  if (shellContext) {
+    if (process.env.NODE_ENV === 'development') {
+      // 開発時のみ警告（一度だけ）
+      logger.debug('[DEPRECATED] useOrganization() called inside DashboardPageShell. Use useDashboardPageContext() directly.');
+    }
+
+    // Shell コンテキストを useOrganization の戻り値形式にマッピング
+    return {
+      user: shellContext.user,
+      organization: shellContext.organization ? {
+        ...shellContext.organization,
+        feature_flags: {} as Record<string, boolean>, // Shell では feature_flags を持たない
+      } : null,
+      organizations: shellContext.organizations.map(org => ({
+        ...org,
+        feature_flags: {} as Record<string, boolean>,
+      })),
+      selectedOrganization: shellContext.organization ? {
+        ...shellContext.organization,
+        feature_flags: {} as Record<string, boolean>,
+      } : null,
+      isLoading: shellContext.isLoading,
+      error: null,
+      hasPermissionError: false, // Shell 内ではすでにハンドル済み
+      hasSystemError: false,     // Shell 内ではすでにハンドル済み
+      isDataFetched: !shellContext.isLoading,
+      isReallyEmpty: shellContext.isReallyEmpty,
+      invalidateOrganization: shellContext.invalidateOrganization,
+      refresh: shellContext.refresh,
+    };
+  }
+
+  // Shell 外の場合は従来の SWR 実装を使用
+  return legacyResult;
+}
+
+/**
+ * 従来の SWR ベース実装（Shell 外用）
+ * @internal
+ * @param enabled - データフェッチを有効にするかどうか（React Hooksルール準拠のため常に呼び出される）
+ */
+function useOrganizationLegacyInternal(enabled: boolean = true) {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
 
   // 認証されたユーザーがいる場合のみSWRを実行（拡張型を使用）
+  // enabled=false の場合はデータフェッチをスキップ（ShellContext使用時）
   const { data, error, isLoading, mutate } = useSWR<ExtendedMeApiResponse>(
-    isAuthenticated && user ? [CACHE_KEYS.organization, user.id] : null,
+    enabled && isAuthenticated && user ? [CACHE_KEYS.organization, user.id] : null,
     () => fetcher(CACHE_KEYS.organization),
     {
       revalidateOnFocus: false,
