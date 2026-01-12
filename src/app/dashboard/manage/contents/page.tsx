@@ -198,9 +198,9 @@ function getGenerationSourceLabel(generationSource: string): string {
  */
 function getGenerationSourceBadgeColor(generationSource: string): string {
   if (generationSource === 'manual') {
-    return 'bg-gray-100 text-gray-700';
+    return 'bg-[var(--aio-surface)] text-[var(--color-text-secondary)]';
   }
-  return 'bg-purple-100 text-purple-800';
+  return 'bg-[var(--aio-purple-muted)] text-[var(--aio-purple)]';
 }
 
 /**
@@ -489,7 +489,7 @@ function AdminContentsContent() {
       window.location.href = editPath;
     } else {
       // 汎用編集ページへのフォールバック
-      window.location.href = `/dashboard/admin/contents/${item.source_table}/${item.id}/edit?orgId=${organizationId}`;
+      window.location.href = `/dashboard/manage/contents/${item.source_table}/${item.id}/edit?orgId=${organizationId}`;
     }
 
     logger.info('Edit navigation:', { itemId: item.id, sourceTable: item.source_table });

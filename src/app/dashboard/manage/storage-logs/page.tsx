@@ -65,23 +65,23 @@ function StorageLogsContent() {
 
   const getStatusBadge = (statusCode: number) => {
     if (statusCode >= 200 && statusCode < 300) {
-      return 'bg-green-100 text-green-800';
+      return 'bg-[var(--aio-success-muted)] text-[var(--aio-success)]';
     } else if (statusCode >= 400 && statusCode < 500) {
-      return 'bg-yellow-100 text-yellow-800';
+      return 'bg-[var(--aio-warning-muted)] text-[var(--aio-warning)]';
     } else if (statusCode >= 500) {
-      return 'bg-red-100 text-red-800';
+      return 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)]';
     }
-    return 'bg-gray-100 text-gray-800';
+    return 'bg-[var(--aio-surface)] text-[var(--color-text-primary)]';
   };
 
   const getActionBadge = (action: string) => {
     const styles: Record<string, string> = {
       read: 'bg-[var(--aio-muted)] text-[var(--aio-primary)]',
-      write: 'bg-green-100 text-green-800',
-      delete: 'bg-red-100 text-red-800',
-      list: 'bg-purple-100 text-purple-800',
+      write: 'bg-[var(--aio-success-muted)] text-[var(--aio-success)]',
+      delete: 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)]',
+      list: 'bg-[var(--aio-purple-muted)] text-[var(--aio-purple)]',
     };
-    return styles[action?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+    return styles[action?.toLowerCase()] || 'bg-[var(--aio-surface)] text-[var(--color-text-primary)]';
   };
 
   return (
@@ -90,36 +90,36 @@ function StorageLogsContent() {
         <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 ダッシュボード
               </Link>
             </li>
-            <li><span className="text-gray-500">/</span></li>
+            <li><span className="text-[var(--color-text-tertiary)]">/</span></li>
             <li>
-              <Link href="/dashboard/admin" className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard/manage" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 管理
               </Link>
             </li>
-            <li><span className="text-gray-500">/</span></li>
-            <li className="text-gray-900 font-medium">ストレージログ</li>
+            <li><span className="text-[var(--color-text-tertiary)]">/</span></li>
+            <li className="text-[var(--color-text-primary)] font-medium">ストレージログ</li>
           </ol>
         </nav>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">ストレージアクセスログ</h1>
-            <p className="text-sm text-gray-500 mt-1">ファイルストレージへのアクセス履歴</p>
+        <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)]">
+          <div className="px-6 py-4 border-b border-[var(--dashboard-card-border)]">
+            <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">ストレージアクセスログ</h1>
+            <p className="text-sm text-[var(--color-text-tertiary)] mt-1">ファイルストレージへのアクセス履歴</p>
           </div>
 
           {/* フィルター */}
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div className="px-6 py-4 border-b border-[var(--dashboard-card-border)] bg-[var(--aio-surface)]">
             <div className="flex gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">バケット</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">バケット</label>
                 <select
                   value={filterBucket}
                   onChange={(e) => setFilterBucket(e.target.value)}
-                  className="block w-40 rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-primary)] focus:ring-[var(--aio-primary)] text-sm"
+                  className="block w-40 rounded-md border-[var(--input-border)] shadow-sm focus:border-[var(--aio-primary)] focus:ring-[var(--aio-primary)] text-sm"
                 >
                   <option value="">全て</option>
                   <option value="assets">assets</option>
@@ -128,11 +128,11 @@ function StorageLogsContent() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">アクション</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">アクション</label>
                 <select
                   value={filterAction}
                   onChange={(e) => setFilterAction(e.target.value)}
-                  className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-[var(--aio-primary)] focus:ring-[var(--aio-primary)] text-sm"
+                  className="block w-32 rounded-md border-[var(--input-border)] shadow-sm focus:border-[var(--aio-primary)] focus:ring-[var(--aio-primary)] text-sm"
                 >
                   <option value="">全て</option>
                   <option value="read">read</option>
@@ -148,42 +148,42 @@ function StorageLogsContent() {
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin h-8 w-8 border-4 border-[var(--aio-primary)] border-t-transparent rounded-full mx-auto"></div>
-                <p className="text-gray-500 mt-4">読み込み中...</p>
+                <p className="text-[var(--color-text-tertiary)] mt-4">読み込み中...</p>
               </div>
             ) : error ? (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-red-700">{error}</p>
+              <div className="bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
+                <p className="text-[var(--aio-danger)]">{error}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+                  <thead className="bg-[var(--aio-surface)]">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">日時</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">バケット</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">パス</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">アクション</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ステータス</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">日時</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">バケット</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">パス</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">アクション</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">ステータス</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">IP</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
                     {logs.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                        <td colSpan={6} className="px-4 py-8 text-center text-[var(--color-text-tertiary)]">
                           ログがありません
                         </td>
                       </tr>
                     ) : (
                       logs.map((log) => (
                         <tr key={log.id}>
-                          <td className="px-4 py-4 text-sm text-gray-500">
+                          <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                             {new Date(log.created_at).toLocaleString('ja-JP')}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-900">
+                          <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                             {log.bucket_id}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-900 max-w-xs truncate font-mono">
+                          <td className="px-4 py-4 text-sm text-[var(--color-text-primary)] max-w-xs truncate font-mono">
                             {log.object_path}
                           </td>
                           <td className="px-4 py-4">
@@ -196,7 +196,7 @@ function StorageLogsContent() {
                               {log.status_code}
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-500 font-mono">
+                          <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)] font-mono">
                             {log.ip_address || '-'}
                           </td>
                         </tr>

@@ -171,24 +171,24 @@ function SecurityDashboardContent() {
 
   const getSeverityBadge = (severity: string) => {
     const styles: Record<string, string> = {
-      critical: 'bg-red-100 text-red-800',
-      high: 'bg-orange-100 text-orange-800',
-      medium: 'bg-yellow-100 text-yellow-800',
+      critical: 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)]',
+      high: 'bg-[var(--aio-pending-muted)] text-[var(--aio-pending)]',
+      medium: 'bg-[var(--aio-warning-muted)] text-[var(--aio-warning)]',
       low: 'bg-[var(--aio-muted)] text-[var(--aio-primary)]',
     };
-    return styles[severity?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+    return styles[severity?.toLowerCase()] || 'bg-[var(--aio-surface)] text-[var(--color-text-primary)]';
   };
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      open: 'bg-red-100 text-red-800',
-      investigating: 'bg-yellow-100 text-yellow-800',
-      resolved: 'bg-green-100 text-green-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-      approved: 'bg-green-100 text-green-800',
-      rejected: 'bg-gray-100 text-gray-800',
+      open: 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)]',
+      investigating: 'bg-[var(--aio-warning-muted)] text-[var(--aio-warning)]',
+      resolved: 'bg-[var(--aio-success-muted)] text-[var(--aio-success)]',
+      pending: 'bg-[var(--aio-warning-muted)] text-[var(--aio-warning)]',
+      approved: 'bg-[var(--aio-success-muted)] text-[var(--aio-success)]',
+      rejected: 'bg-[var(--aio-surface)] text-[var(--color-text-primary)]',
     };
-    return styles[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+    return styles[status?.toLowerCase()] || 'bg-[var(--aio-surface)] text-[var(--color-text-primary)]';
   };
 
   const formatDate = (dateStr: string | null) => {
@@ -209,7 +209,7 @@ function SecurityDashboardContent() {
         {toast && (
           <div
             className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg ${
-              toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+              toast.type === 'success' ? 'bg-[var(--aio-success)] text-white' : 'bg-[var(--aio-danger)] text-white'
             }`}
           >
             {toast.message}
@@ -219,31 +219,31 @@ function SecurityDashboardContent() {
         <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 ダッシュボード
               </Link>
             </li>
-            <li><span className="text-gray-500">/</span></li>
+            <li><span className="text-[var(--color-text-tertiary)]">/</span></li>
             <li>
-              <Link href="/dashboard/admin" className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard/manage" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 管理
               </Link>
             </li>
-            <li><span className="text-gray-500">/</span></li>
-            <li className="text-gray-900 font-medium">セキュリティ</li>
+            <li><span className="text-[var(--color-text-tertiary)]">/</span></li>
+            <li className="text-[var(--color-text-primary)] font-medium">セキュリティ</li>
           </ol>
         </nav>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)]">
+          <div className="px-6 py-4 border-b border-[var(--dashboard-card-border)] flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">セキュリティダッシュボード</h1>
-              <p className="text-sm text-gray-500 mt-1">侵入検知・IP管理・通報管理</p>
+              <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">セキュリティダッシュボード</h1>
+              <p className="text-sm text-[var(--color-text-tertiary)] mt-1">侵入検知・IP管理・通報管理</p>
             </div>
             <button
               onClick={handleManualScan}
               disabled={scanning}
-              className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 bg-[var(--aio-danger)] text-white text-sm font-medium rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {scanning ? (
                 <>
@@ -265,14 +265,14 @@ function SecurityDashboardContent() {
           </div>
 
           {/* タブ */}
-          <div className="border-b border-gray-200">
+          <div className="border-b border-[var(--dashboard-card-border)]">
             <nav className="flex -mb-px">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'overview'
-                    ? 'border-red-500 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-[var(--status-error)] text-[var(--aio-danger)]'
+                    : 'border-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
                 }`}
               >
                 概要
@@ -281,8 +281,8 @@ function SecurityDashboardContent() {
                 onClick={() => setActiveTab('alerts')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'alerts'
-                    ? 'border-red-500 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-[var(--status-error)] text-[var(--aio-danger)]'
+                    : 'border-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
                 }`}
               >
                 侵入検知アラート
@@ -291,8 +291,8 @@ function SecurityDashboardContent() {
                 onClick={() => setActiveTab('reports')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'reports'
-                    ? 'border-red-500 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-[var(--status-error)] text-[var(--aio-danger)]'
+                    : 'border-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
                 }`}
               >
                 IP通報
@@ -301,8 +301,8 @@ function SecurityDashboardContent() {
                 onClick={() => setActiveTab('blocklist')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'blocklist'
-                    ? 'border-red-500 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-[var(--status-error)] text-[var(--aio-danger)]'
+                    : 'border-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
                 }`}
               >
                 ブロックリスト
@@ -313,12 +313,12 @@ function SecurityDashboardContent() {
           <div className="p-6" data-testid="security-list">
             {loading ? (
               <div className="text-center py-12">
-                <div className="animate-spin h-8 w-8 border-4 border-red-500 border-t-transparent rounded-full mx-auto"></div>
-                <p className="text-gray-500 mt-4">読み込み中...</p>
+                <div className="animate-spin h-8 w-8 border-4 border-[var(--status-error)] border-t-transparent rounded-full mx-auto"></div>
+                <p className="text-[var(--color-text-tertiary)] mt-4">読み込み中...</p>
               </div>
             ) : error ? (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-red-700">{error}</p>
+              <div className="bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
+                <p className="text-[var(--aio-danger)]">{error}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -327,21 +327,21 @@ function SecurityDashboardContent() {
                   <div className="space-y-6">
                     {/* サマリーカード */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <div className="text-sm font-medium text-gray-500">最終スキャン</div>
-                        <div className="mt-1 text-xl font-semibold text-gray-900">
+                      <div className="bg-[var(--aio-surface)] rounded-lg p-4 border border-[var(--dashboard-card-border)]">
+                        <div className="text-sm font-medium text-[var(--color-text-tertiary)]">最終スキャン</div>
+                        <div className="mt-1 text-xl font-semibold text-[var(--color-text-primary)]">
                           {formatDate(scanSummary?.lastScanAt ?? null)}
                         </div>
                       </div>
-                      <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                        <div className="text-sm font-medium text-red-600">未解決アラート</div>
-                        <div className="mt-1 text-3xl font-bold text-red-700">
+                      <div className="bg-[var(--aio-danger-muted)] rounded-lg p-4 border border-[var(--aio-danger)]">
+                        <div className="text-sm font-medium text-[var(--aio-danger)]">未解決アラート</div>
+                        <div className="mt-1 text-3xl font-bold text-[var(--aio-danger)]">
                           {scanSummary?.openAlerts ?? 0}
                         </div>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <div className="text-sm font-medium text-gray-500">総アラート数</div>
-                        <div className="mt-1 text-xl font-semibold text-gray-900">
+                      <div className="bg-[var(--aio-surface)] rounded-lg p-4 border border-[var(--dashboard-card-border)]">
+                        <div className="text-sm font-medium text-[var(--color-text-tertiary)]">総アラート数</div>
+                        <div className="mt-1 text-xl font-semibold text-[var(--color-text-primary)]">
                           {scanSummary?.totalAlerts ?? 0}
                         </div>
                       </div>
@@ -349,20 +349,20 @@ function SecurityDashboardContent() {
 
                     {/* スキャン履歴テーブル */}
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">スキャン履歴</h3>
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                      <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-4">スキャン履歴</h3>
+                      <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+                        <thead className="bg-[var(--aio-surface)]">
                           <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">実行日時</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">タイプ</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">検出数</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">実行時間</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">実行日時</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">タイプ</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">検出数</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">実行時間</th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
                           {scanHistory.length === 0 ? (
                             <tr>
-                              <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                              <td colSpan={4} className="px-4 py-8 text-center text-[var(--color-text-tertiary)]">
                                 スキャン履歴がありません
                               </td>
                             </tr>
@@ -372,24 +372,24 @@ function SecurityDashboardContent() {
                               const result = details?.result as Record<string, unknown> | null;
                               return (
                                 <tr key={scan.id}>
-                                  <td className="px-4 py-4 text-sm text-gray-500">
+                                  <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                                     {formatDate(scan.created_at)}
                                   </td>
                                   <td className="px-4 py-4">
                                     <span
                                       className={`px-2 py-1 text-xs rounded-full ${
                                         scan.action === 'security_scan_manual'
-                                          ? 'bg-purple-100 text-purple-800'
+                                          ? 'bg-[var(--aio-purple-muted)] text-[var(--aio-purple)]'
                                           : 'bg-[var(--aio-muted)] text-[var(--aio-primary)]'
                                       }`}
                                     >
                                       {scan.action === 'security_scan_manual' ? '手動' : '自動'}
                                     </span>
                                   </td>
-                                  <td className="px-4 py-4 text-sm text-gray-900">
+                                  <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                                     {String(result?.alertsDetected ?? result?.alerts_count ?? '-')}
                                   </td>
-                                  <td className="px-4 py-4 text-sm text-gray-500">
+                                  <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                                     {details?.duration ? `${details.duration}ms` : result?.duration ? `${result.duration}ms` : '-'}
                                   </td>
                                 </tr>
@@ -403,27 +403,27 @@ function SecurityDashboardContent() {
                 )}
 
                 {activeTab === 'alerts' && (
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+                    <thead className="bg-[var(--aio-surface)]">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">検知日時</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">重大度</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">送信元IP</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">説明</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状態</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">検知日時</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">重大度</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">送信元IP</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">説明</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">状態</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
                       {alerts.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                          <td colSpan={5} className="px-4 py-8 text-center text-[var(--color-text-tertiary)]">
                             アラートがありません
                           </td>
                         </tr>
                       ) : (
                         alerts.map((alert) => (
                           <tr key={alert.id}>
-                            <td className="px-4 py-4 text-sm text-gray-500">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                               {formatDate(alert.detected_at)}
                             </td>
                             <td className="px-4 py-4">
@@ -431,10 +431,10 @@ function SecurityDashboardContent() {
                                 {alert.severity}
                               </span>
                             </td>
-                            <td className="px-4 py-4 text-sm font-mono text-gray-900">
+                            <td className="px-4 py-4 text-sm font-mono text-[var(--color-text-primary)]">
                               {alert.source_ip}
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900 max-w-xs truncate">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)] max-w-xs truncate">
                               {alert.description}
                             </td>
                             <td className="px-4 py-4">
@@ -450,32 +450,32 @@ function SecurityDashboardContent() {
                 )}
 
                 {activeTab === 'reports' && (
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+                    <thead className="bg-[var(--aio-surface)]">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">通報日時</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">理由</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状態</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">通報日時</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">IP</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">理由</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">状態</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
                       {reports.length === 0 ? (
                         <tr>
-                          <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                          <td colSpan={4} className="px-4 py-8 text-center text-[var(--color-text-tertiary)]">
                             通報がありません
                           </td>
                         </tr>
                       ) : (
                         reports.map((report) => (
                           <tr key={report.id}>
-                            <td className="px-4 py-4 text-sm text-gray-500">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                               {formatDate(report.created_at)}
                             </td>
-                            <td className="px-4 py-4 text-sm font-mono text-gray-900">
+                            <td className="px-4 py-4 text-sm font-mono text-[var(--color-text-primary)]">
                               {report.ip_address}
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                               {report.reason}
                             </td>
                             <td className="px-4 py-4">
@@ -491,40 +491,40 @@ function SecurityDashboardContent() {
                 )}
 
                 {activeTab === 'blocklist' && (
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+                    <thead className="bg-[var(--aio-surface)]">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ブロック日時</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">理由</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">有効期限</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状態</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">ブロック日時</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">IP</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">理由</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">有効期限</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">状態</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
                       {blocklist.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                          <td colSpan={5} className="px-4 py-8 text-center text-[var(--color-text-tertiary)]">
                             ブロックリストが空です
                           </td>
                         </tr>
                       ) : (
                         blocklist.map((blocked) => (
                           <tr key={blocked.id}>
-                            <td className="px-4 py-4 text-sm text-gray-500">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                               {formatDate(blocked.blocked_at)}
                             </td>
-                            <td className="px-4 py-4 text-sm font-mono text-gray-900">
+                            <td className="px-4 py-4 text-sm font-mono text-[var(--color-text-primary)]">
                               {blocked.ip_address}
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                               {blocked.reason}
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-500">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                               {blocked.expires_at ? formatDate(blocked.expires_at) : '永続'}
                             </td>
                             <td className="px-4 py-4">
-                              <span className={`px-2 py-1 text-xs rounded-full ${blocked.is_active ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
+                              <span className={`px-2 py-1 text-xs rounded-full ${blocked.is_active ? 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)]' : 'bg-[var(--aio-surface)] text-[var(--color-text-primary)]'}`}>
                                 {blocked.is_active ? '有効' : '無効'}
                               </span>
                             </td>

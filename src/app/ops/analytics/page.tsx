@@ -1,5 +1,9 @@
 import { Metadata } from 'next';
 import { LogAnalytics } from '@/lib/api/audit-logger';
+import { requireOpsAdminPage } from '@/lib/ops-guard';
+
+// 管理系ページ: cookiesを使用するためリクエスト時実行が必要
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'API使用状況 - AIO Hub 運用管理',
@@ -11,6 +15,8 @@ export const metadata: Metadata = {
  * 運用管理者向けの統計・監視画面
  */
 export default async function AnalyticsPage() {
+  // Ops Admin権限チェック（Core経由）
+  await requireOpsAdminPage();
   // 過去30日間のデータを取得
   const endDate = new Date();
   const startDate = new Date();

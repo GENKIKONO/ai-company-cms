@@ -82,17 +82,30 @@ Analytics/Audit 記録
 | DashboardPageShell | `/dashboard/**` | 組織作業領域（主体=org） | `org_role` |
 | UserShell（Account） | `/account/**` | 個人管理領域（主体=user） | `auth.uid` |
 | AdminPageShell | `/admin/**` | 運営管理（主体=site） | `site_admin` |
+| OpsLayout | `/ops/**` | 運用管理（主体=site） | `ops_admin` |
+| ManagementConsoleLayout | `/management-console/**` | 管理コンソール（主体=site） | `site_admin` |
+
+### 3.2.1 Dashboard サブ領域
+
+Dashboard領域内には、組織管理者向けのサブ領域が存在する：
+
+| サブパス | 主目的 | 権限モデル |
+|---------|--------|-----------|
+| `/dashboard/manage/**` | 組織管理機能 | `org_role='admin'` (org manager) |
+
+**注意:** `org_role='admin'` は組織内の管理者ユーザーであり、`site_admin`（運営者）とは異なる。
 
 ### 3.3 Shell別責務マトリクス
 
-| 責務 | Info | Dashboard | Account | Admin |
-|------|:----:|:---------:|:-------:|:-----:|
-| 認証チェック | - | ✓ | ✓ | ✓ |
-| 組織コンテキスト | - | ✓ | - | - |
-| 個人コンテキスト | - | - | ✓ | - |
-| site_admin判定 | - | - | - | ✓ |
-| Feature Gate | - | ✓ | ✓ | ✓ |
-| 監査ログ | - | ✓ | ✓ | ✓ |
+| 責務 | Info | Dashboard | Account | Admin | Ops | MgmtConsole |
+|------|:----:|:---------:|:-------:|:-----:|:---:|:-----------:|
+| 認証チェック | - | ✓ | ✓ | ✓ | ✓ | ✓ |
+| 組織コンテキスト | - | ✓ | - | - | - | - |
+| 個人コンテキスト | - | - | ✓ | - | - | - |
+| site_admin判定 | - | - | - | ✓ | - | ✓ |
+| ops_admin判定 | - | - | - | - | ✓ | - |
+| Feature Gate | - | ✓ | ✓ | ✓ | - | - |
+| 監査ログ | - | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 ---
 
@@ -888,16 +901,30 @@ export default async function ProfilePage() {
 
 ---
 
-### D.4 4領域とShell対応
+### D.4 6領域とShell対応
 
-| 領域 | パス | Shell | 主体 |
-|------|------|-------|------|
+| 領域 | パス | Shell/Layout | 主体 |
+|------|------|--------------|------|
 | Info | /, /pricing, /terms等 | InfoPageShell | なし（認証不要） |
 | Dashboard | /dashboard/** | DashboardPageShell | org（組織） |
+| Dashboard管理 | /dashboard/manage/** | DashboardPageShell (requiredRole) | org manager |
 | Account | /account/** | UserShell | user（個人） |
 | Admin | /admin/** | AdminPageShell | site_admin |
+| Ops | /ops/** | OpsLayout | ops_admin |
+| MgmtConsole | /management-console/** | ManagementConsoleLayout | site_admin |
 
 **重要:** 領域を間違えてShellを使用すると、権限チェックが破綻します。
+
+### D.4.1 権限レベルの区別
+
+| 権限 | 対象 | 説明 |
+|------|------|------|
+| `site_admin` | 運営者 | サイト全体を管理（Admin, MgmtConsole） |
+| `ops_admin` | 運用者 | 運用管理機能へのアクセス（Ops） |
+| `org manager` | 顧客の管理者 | 組織内でadminロールを持つユーザー |
+| `org_role` | 顧客のスタッフ | 組織内の一般ユーザー |
+
+**注意:** 「admin」という用語は `site_admin`（運営者）のみに使用し、組織管理者には `org manager` を使用する。
 
 ---
 

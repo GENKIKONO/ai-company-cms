@@ -90,11 +90,11 @@ export function DashboardSidebar({ canSeeAdminNav = false }: DashboardSidebarPro
   const { organization } = useOrganization();
   const navigation = getNavigation(organization);
 
-  // Admin navigation item (only visible to site admins)
-  const adminNavItem = { name: '管理', href: '/dashboard/admin', icon: ShieldCheckIcon };
+  // Org manager navigation item (only visible to org managers/admins)
+  const manageNavItem = { name: '管理', href: '/dashboard/manage', icon: ShieldCheckIcon };
 
   return (
-    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 border-r border-gray-200" data-testid="dashboard-sidenav">
+    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 border-r border-[var(--dashboard-card-border)]" data-testid="dashboard-sidenav">
       <div className="flex h-16 shrink-0 items-center">
         <Link href="/dashboard" className="text-xl font-bold text-[var(--aio-primary)]">
           AIO Hub
@@ -115,13 +115,13 @@ export function DashboardSidebar({ canSeeAdminNav = false }: DashboardSidebarPro
                       className={classNames(
                         isActive
                           ? 'bg-[var(--aio-primary)] text-white'
-                          : 'text-gray-700 hover:text-[var(--aio-primary)] hover:bg-gray-50',
+                          : 'text-[var(--color-text-secondary)] hover:text-[var(--aio-primary)] hover:bg-[var(--aio-surface)]',
                         'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                       )}
                     >
                       <item.icon
                         className={classNames(
-                          isActive ? 'text-white' : 'text-gray-400 group-hover:text-[var(--aio-primary)]',
+                          isActive ? 'text-white' : 'text-[var(--color-icon-muted)] group-hover:text-[var(--aio-primary)]',
                           'h-6 w-6 shrink-0'
                         )}
                         aria-hidden="true"
@@ -131,28 +131,28 @@ export function DashboardSidebar({ canSeeAdminNav = false }: DashboardSidebarPro
                   </li>
                 );
               })}
-              {/* Admin navigation - only rendered for site admins */}
+              {/* Org manager navigation - only rendered for org managers */}
               {canSeeAdminNav && (() => {
-                const isActive = pathname === adminNavItem.href || pathname.startsWith(adminNavItem.href + '/');
+                const isActive = pathname === manageNavItem.href || pathname.startsWith(manageNavItem.href + '/');
                 return (
-                  <li key={adminNavItem.name}>
+                  <li key={manageNavItem.name}>
                     <Link
-                      href={adminNavItem.href}
+                      href={manageNavItem.href}
                       className={classNames(
                         isActive
                           ? 'bg-[var(--aio-primary)] text-white'
-                          : 'text-gray-700 hover:text-[var(--aio-primary)] hover:bg-gray-50',
+                          : 'text-[var(--color-text-secondary)] hover:text-[var(--aio-primary)] hover:bg-[var(--aio-surface)]',
                         'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                       )}
                     >
-                      <adminNavItem.icon
+                      <manageNavItem.icon
                         className={classNames(
-                          isActive ? 'text-white' : 'text-gray-400 group-hover:text-[var(--aio-primary)]',
+                          isActive ? 'text-white' : 'text-[var(--color-icon-muted)] group-hover:text-[var(--aio-primary)]',
                           'h-6 w-6 shrink-0'
                         )}
                         aria-hidden="true"
                       />
-                      {adminNavItem.name}
+                      {manageNavItem.name}
                     </Link>
                   </li>
                 );

@@ -180,10 +180,10 @@ function BillingLinksContent() {
       <div className="">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="h-8 bg-[var(--dashboard-card-border)] rounded w-1/4 mb-4"></div>
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-200 rounded"></div>
+                <div key={i} className="h-16 bg-[var(--dashboard-card-border)] rounded"></div>
               ))}
             </div>
           </div>
@@ -197,14 +197,14 @@ function BillingLinksContent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ヘッダー */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Checkout リンク管理</h1>
-          <p className="text-lg text-gray-600 mt-2">Stripe決済リンクの期間管理・キャンペーン管理</p>
+          <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">Checkout リンク管理</h1>
+          <p className="text-lg text-[var(--color-text-secondary)] mt-2">Stripe決済リンクの期間管理・キャンペーン管理</p>
         </div>
 
         {/* エラー表示 */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="mb-6 bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
+            <p className="text-sm text-[var(--aio-danger)]">{error}</p>
           </div>
         )}
 
@@ -221,26 +221,26 @@ function BillingLinksContent() {
 
         {/* 新規追加フォーム */}
         {showAddForm && (
-          <div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">新規リンク追加</h2>
+          <div className="mb-8 bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)] p-6">
+            <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">新規リンク追加</h2>
             <form onSubmit={handleAddSubmit} className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">ラベル *</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">ラベル *</label>
                 <input
                   type="text"
                   value={formData.label}
                   onChange={(e) => setFormData({...formData, label: e.target.value})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border border-[var(--input-border)] rounded-md px-3 py-2"
                   placeholder="early-user-20off"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">プランタイプ *</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">プランタイプ *</label>
                 <select
                   value={formData.plan_type}
                   onChange={(e) => setFormData({...formData, plan_type: e.target.value})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border border-[var(--input-border)] rounded-md px-3 py-2"
                   required
                 >
                   <option value="starter">Starter</option>
@@ -250,11 +250,11 @@ function BillingLinksContent() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">キャンペーンタイプ *</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">キャンペーンタイプ *</label>
                 <select
                   value={formData.campaign_type}
                   onChange={(e) => setFormData({...formData, campaign_type: e.target.value})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border border-[var(--input-border)] rounded-md px-3 py-2"
                   required
                 >
                   <option value="test_user">test_user (6ヶ月無料+30%OFF)</option>
@@ -263,34 +263,34 @@ function BillingLinksContent() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">割引率（%）</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">割引率（%）</label>
                 <input
                   type="number"
                   min="0"
                   max="100"
                   value={formData.discount_rate}
                   onChange={(e) => setFormData({...formData, discount_rate: parseInt(e.target.value) || 0})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border border-[var(--input-border)] rounded-md px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stripe Price ID *</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Stripe Price ID *</label>
                 <input
                   type="text"
                   value={formData.stripe_price_id}
                   onChange={(e) => setFormData({...formData, stripe_price_id: e.target.value})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border border-[var(--input-border)] rounded-md px-3 py-2"
                   placeholder="price_xxx"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Checkout URL（任意）</label>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Checkout URL（任意）</label>
                 <input
                   type="url"
                   value={formData.stripe_checkout_url}
                   onChange={(e) => setFormData({...formData, stripe_checkout_url: e.target.value})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  className="w-full border border-[var(--input-border)] rounded-md px-3 py-2"
                   placeholder="https://checkout.stripe.com/..."
                 />
               </div>
@@ -300,9 +300,9 @@ function BillingLinksContent() {
                   id="is_public"
                   checked={formData.is_public}
                   onChange={(e) => setFormData({...formData, is_public: e.target.checked})}
-                  className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded"
+                  className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-[var(--input-border)] rounded"
                 />
-                <label htmlFor="is_public" className="ml-2 block text-sm text-gray-700">
+                <label htmlFor="is_public" className="ml-2 block text-sm text-[var(--color-text-secondary)]">
                   公開CTA表示（チェックを外すと<LockIcon className="w-3 h-3 inline mx-1" aria-hidden />プライベートリンク：運営が手動で配布する特別価格のリンク）
                 </label>
               </div>
@@ -311,7 +311,7 @@ function BillingLinksContent() {
                   type="button"
                   onClick={() => setShowAddForm(false)}
                   disabled={submitting}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                  className="px-4 py-2 border border-[var(--input-border)] rounded-md text-[var(--color-text-secondary)] hover:bg-[var(--aio-surface)] disabled:opacity-50"
                 >
                   キャンセル
                 </button>
@@ -328,32 +328,32 @@ function BillingLinksContent() {
         )}
 
         {/* リンク一覧 */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
+        <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)]">
+          <div className="px-6 py-4 border-b border-[var(--dashboard-card-border)]">
+            <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
               登録済みリンク一覧 ({links.length}件)
             </h2>
           </div>
 
           {links.length === 0 ? (
             <div className="p-12 text-center">
-              <p className="text-gray-500">登録されたリンクはありません</p>
+              <p className="text-[var(--color-text-tertiary)]">登録されたリンクはありません</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-[var(--dashboard-card-border)]">
               {links.map((link) => (
-                <div key={link.id} className="p-6 hover:bg-gray-50">
+                <div key={link.id} className="p-6 hover:bg-[var(--aio-surface)]">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-4">
-                        <h3 className="text-lg font-medium text-gray-900">{link.label}</h3>
+                        <h3 className="text-lg font-medium text-[var(--color-text-primary)]">{link.label}</h3>
                         {link.is_active && (
-                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                          <span className="px-2 py-1 bg-[var(--aio-success-muted)] text-[var(--aio-success)] text-xs font-medium rounded-full">
                             適用中
                           </span>
                         )}
                         {!link.is_public && (
-                          <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
+                          <span className="px-2 py-1 bg-[var(--aio-pending-muted)] text-[var(--aio-pending)] text-xs font-medium rounded-full">
                             <LockIcon className="w-3 h-3 inline mr-1" aria-hidden /> プライベートリンク
                           </span>
                         )}
@@ -363,13 +363,13 @@ function BillingLinksContent() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-2 text-sm text-gray-500 space-x-4">
+                      <div className="mt-2 text-sm text-[var(--color-text-tertiary)] space-x-4">
                         <span>プラン: {link.plan_type}</span>
                         <span>キャンペーン: {getCampaignTypeDisplay(link.campaign_type)}</span>
                         <span>Price ID: {link.stripe_price_id}</span>
                       </div>
                       {link.stripe_checkout_url && (
-                        <div className="mt-1 text-xs text-gray-400 truncate max-w-lg">
+                        <div className="mt-1 text-xs text-[var(--color-icon-muted)] truncate max-w-lg">
                           URL: {link.stripe_checkout_url}
                         </div>
                       )}
@@ -380,7 +380,7 @@ function BillingLinksContent() {
                         <button
                           onClick={() => handleActivate(link.id)}
                           disabled={submitting}
-                          className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 disabled:opacity-50"
+                          className="px-3 py-1 bg-[var(--color-text-secondary)] text-white rounded text-sm hover:opacity-90 disabled:opacity-50"
                         >
                           {submitting ? '...' : 'これを適用'}
                         </button>

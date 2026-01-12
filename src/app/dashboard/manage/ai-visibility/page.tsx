@@ -99,10 +99,10 @@ function AiVisibilityContent() {
   }, [activeTab]);
 
   const getScoreBadge = (score: number) => {
-    if (score >= 80) return 'bg-green-100 text-green-800';
-    if (score >= 60) return 'bg-yellow-100 text-yellow-800';
-    if (score >= 40) return 'bg-orange-100 text-orange-800';
-    return 'bg-red-100 text-red-800';
+    if (score >= 80) return 'bg-[var(--aio-success-muted)] text-[var(--aio-success)]';
+    if (score >= 60) return 'bg-[var(--aio-warning-muted)] text-[var(--aio-warning)]';
+    if (score >= 40) return 'bg-[var(--aio-pending-muted)] text-[var(--aio-pending)]';
+    return 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)]';
   };
 
   return (
@@ -111,36 +111,36 @@ function AiVisibilityContent() {
         <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 ダッシュボード
               </Link>
             </li>
-            <li><span className="text-gray-500">/</span></li>
+            <li><span className="text-[var(--color-text-tertiary)]">/</span></li>
             <li>
-              <Link href="/dashboard/admin" className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard/manage" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 管理
               </Link>
             </li>
-            <li><span className="text-gray-500">/</span></li>
-            <li className="text-gray-900 font-medium">AI可視性</li>
+            <li><span className="text-[var(--color-text-tertiary)]">/</span></li>
+            <li className="text-[var(--color-text-primary)] font-medium">AI可視性</li>
           </ol>
         </nav>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">AI可視性ダッシュボード</h1>
-            <p className="text-sm text-gray-500 mt-1">AIクローラーからの可視性スコアとボットアクセス状況</p>
+        <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)]">
+          <div className="px-6 py-4 border-b border-[var(--dashboard-card-border)]">
+            <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">AI可視性ダッシュボード</h1>
+            <p className="text-sm text-[var(--color-text-tertiary)] mt-1">AIクローラーからの可視性スコアとボットアクセス状況</p>
           </div>
 
           {/* タブ */}
-          <div className="border-b border-gray-200">
+          <div className="border-b border-[var(--dashboard-card-border)]">
             <nav className="flex -mb-px">
               <button
                 onClick={() => setActiveTab('scores')}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'scores'
                     ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    : 'border-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
                 }`}
               >
                 可視性スコア
@@ -150,7 +150,7 @@ function AiVisibilityContent() {
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'config'
                     ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    : 'border-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
                 }`}
               >
                 設定
@@ -160,7 +160,7 @@ function AiVisibilityContent() {
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
                   activeTab === 'bot_logs'
                     ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    : 'border-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
                 }`}
               >
                 ボットログ
@@ -172,45 +172,45 @@ function AiVisibilityContent() {
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin h-8 w-8 border-4 border-[var(--aio-primary)] border-t-transparent rounded-full mx-auto"></div>
-                <p className="text-gray-500 mt-4">読み込み中...</p>
+                <p className="text-[var(--color-text-tertiary)] mt-4">読み込み中...</p>
               </div>
             ) : error ? (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-red-700">{error}</p>
+              <div className="bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
+                <p className="text-[var(--aio-danger)]">{error}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 {activeTab === 'scores' && (
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+                    <thead className="bg-[var(--aio-surface)]">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">計測日時</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">組織</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ソース</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">タイプ</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">スコア</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">計測日時</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">組織</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">ソース</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">タイプ</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">スコア</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
                       {scores.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                          <td colSpan={5} className="px-4 py-8 text-center text-[var(--color-text-tertiary)]">
                             スコアデータがありません
                           </td>
                         </tr>
                       ) : (
                         scores.map((score) => (
                           <tr key={score.id}>
-                            <td className="px-4 py-4 text-sm text-gray-500">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                               {new Date(score.measured_at).toLocaleString('ja-JP')}
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                               {score.organizations?.name || score.organization_id.slice(0, 8)}
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                               {score.source_key}
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                               {score.visibility_type}
                             </td>
                             <td className="px-4 py-4">
@@ -226,41 +226,41 @@ function AiVisibilityContent() {
                 )}
 
                 {activeTab === 'config' && (
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+                    <thead className="bg-[var(--aio-surface)]">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">組織ID</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">有効</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">チェック間隔</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">通知閾値</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">更新日時</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">組織ID</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">有効</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">チェック間隔</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">通知閾値</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">更新日時</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
                       {configs.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                          <td colSpan={5} className="px-4 py-8 text-center text-[var(--color-text-tertiary)]">
                             設定がありません
                           </td>
                         </tr>
                       ) : (
                         configs.map((config) => (
                           <tr key={config.id}>
-                            <td className="px-4 py-4 text-sm text-gray-500 font-mono">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)] font-mono">
                               {config.organization_id.slice(0, 8)}...
                             </td>
                             <td className="px-4 py-4">
-                              <span className={`px-2 py-1 text-xs rounded-full ${config.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                              <span className={`px-2 py-1 text-xs rounded-full ${config.enabled ? 'bg-[var(--aio-success-muted)] text-[var(--aio-success)]' : 'bg-[var(--aio-surface)] text-[var(--color-text-primary)]'}`}>
                                 {config.enabled ? '有効' : '無効'}
                               </span>
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                               {config.check_interval_hours}時間
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                               {config.notification_threshold}%
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-500">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                               {new Date(config.updated_at).toLocaleString('ja-JP')}
                             </td>
                           </tr>
@@ -271,36 +271,36 @@ function AiVisibilityContent() {
                 )}
 
                 {activeTab === 'bot_logs' && (
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+                    <thead className="bg-[var(--aio-surface)]">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">日時</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ボット名</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">パス</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ステータス</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">日時</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">ボット名</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">パス</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">ステータス</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
                       {botLogs.length === 0 ? (
                         <tr>
-                          <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                          <td colSpan={4} className="px-4 py-8 text-center text-[var(--color-text-tertiary)]">
                             ボットログがありません
                           </td>
                         </tr>
                       ) : (
                         botLogs.map((log) => (
                           <tr key={log.id}>
-                            <td className="px-4 py-4 text-sm text-gray-500">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-tertiary)]">
                               {new Date(log.created_at).toLocaleString('ja-JP')}
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)]">
                               {log.bot_name}
                             </td>
-                            <td className="px-4 py-4 text-sm text-gray-900 max-w-xs truncate font-mono">
+                            <td className="px-4 py-4 text-sm text-[var(--color-text-primary)] max-w-xs truncate font-mono">
                               {log.request_path}
                             </td>
                             <td className="px-4 py-4">
-                              <span className={`px-2 py-1 text-xs rounded-full ${log.status_code === 200 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                              <span className={`px-2 py-1 text-xs rounded-full ${log.status_code === 200 ? 'bg-[var(--aio-success-muted)] text-[var(--aio-success)]' : 'bg-[var(--aio-warning-muted)] text-[var(--aio-warning)]'}`}>
                                 {log.status_code}
                               </span>
                             </td>

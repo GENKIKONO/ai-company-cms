@@ -59,74 +59,74 @@ function AiUsageContent() {
         <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 ダッシュボード
               </Link>
             </li>
-            <li><span className="text-gray-500">/</span></li>
+            <li><span className="text-[var(--color-text-tertiary)]">/</span></li>
             <li>
-              <Link href="/dashboard/admin" className="text-gray-500 hover:text-gray-700">
+              <Link href="/dashboard/manage" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 管理
               </Link>
             </li>
-            <li><span className="text-gray-500">/</span></li>
-            <li className="text-gray-900 font-medium">AI使用量</li>
+            <li><span className="text-[var(--color-text-tertiary)]">/</span></li>
+            <li className="text-[var(--color-text-primary)] font-medium">AI使用量</li>
           </ol>
         </nav>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">AI使用量ダッシュボード</h1>
-            <p className="text-sm text-gray-500 mt-1">組織ごとのAI機能使用状況を確認</p>
+        <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)]">
+          <div className="px-6 py-4 border-b border-[var(--dashboard-card-border)]">
+            <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">AI使用量ダッシュボード</h1>
+            <p className="text-sm text-[var(--color-text-tertiary)] mt-1">組織ごとのAI機能使用状況を確認</p>
           </div>
 
           <div className="p-6" data-testid="ai-usage-list">
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin h-8 w-8 border-4 border-[var(--aio-primary)] border-t-transparent rounded-full mx-auto"></div>
-                <p className="text-gray-500 mt-4">読み込み中...</p>
+                <p className="text-[var(--color-text-tertiary)] mt-4">読み込み中...</p>
               </div>
             ) : error ? (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-red-700">{error}</p>
+              <div className="bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
+                <p className="text-[var(--aio-danger)]">{error}</p>
               </div>
             ) : usageData.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-500">使用データがありません</p>
+                <p className="text-[var(--color-text-tertiary)]">使用データがありません</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+                  <thead className="bg-[var(--aio-surface)]">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">組織</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">インタビュー数</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">メッセージ数</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">トークン数</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">最終更新</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">組織</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">インタビュー数</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">メッセージ数</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">トークン数</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase">最終更新</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
                     {usageData.map((item) => (
                       <tr key={item.organization_id}>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-[var(--color-text-primary)]">
                             {item.organizations?.name || '不明'}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-[var(--color-text-tertiary)]">
                             {item.organizations?.slug || item.organization_id}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                           {item.interview_count?.toLocaleString() || 0}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                           {item.message_count?.toLocaleString() || 0}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                           {item.token_count?.toLocaleString() || 0}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-tertiary)]">
                           {item.updated_at ? new Date(item.updated_at).toLocaleString('ja-JP') : '-'}
                         </td>
                       </tr>

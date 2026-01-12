@@ -1,33 +1,21 @@
 /**
  * サイト文言管理ページ - 管理者専用
  * パス: /ops/site
+ *
+ * NOTE: [CORE_ARCHITECTURE] Ops Admin権限チェックを実施
+ * See: docs/core-architecture.md
  */
-import { redirect } from 'next/navigation';
-import { createClient } from "@/lib/supabase/server"
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { requireOpsAdminPage } from '@/lib/ops-guard';
 import { env } from '@/lib/env';
 import SiteSettingsForm from './SiteSettingsForm';
 import { logger } from '@/lib/utils/logger';
 
-// 管理者チェック関数
-function isAdmin(userEmail?: string): boolean {
-  return userEmail?.toLowerCase().trim() === env.ADMIN_EMAIL;
-}
+// 管理系ページ: cookiesを使用するためリクエスト時実行が必要
+export const dynamic = 'force-dynamic';
 
 export default async function SiteSettingsPage() {
-  const supabase = await createClient();
-
-  // 認証確認
-  const user = await getUserWithClient(supabase);
-
-  if (!user) {
-    redirect('/auth/login?redirect=%2Fops%2Fsite');
-  }
-  
-  // 管理者確認
-  if (!isAdmin(user.email)) {
-    redirect('/dashboard');
-  }
+  // Ops Admin権限チェック（Core経由）
+  await requireOpsAdminPage();
 
   // 現在のサイト設定を取得
   let currentSettings = null;
