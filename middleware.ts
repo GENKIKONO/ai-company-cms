@@ -112,30 +112,40 @@ export async function middleware(req: NextRequest) {
     // 認証系ページの処理は下で行う
   }
 
-  // Supabase SSR クライアント（推奨API: getAll/setAll）
-  // NOTE: @supabase/ssr の推奨方式。個別の get/set/remove ではなく getAll/setAll を使用
-  // これによりクライアントナビゲーション時のCookie読み取り問題を解決
-  const res = NextResponse.next({
-    request: { headers: req.headers },
-  });
+  // Supabase SSR クライアント（セキュアCookie設定付き）
+  const res = NextResponse.next();
   const isProduction = process.env.NODE_ENV === 'production';
-
+  const domain = isProduction && process.env.NEXT_PUBLIC_APP_URL?.includes('aiohub.jp') 
+    ? '.aiohub.jp' 
+    : undefined;
+    
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return req.cookies.getAll();
+        get: (name: string) => req.cookies.get(name)?.value,
+        set: (name: string, value: string, options: any) => {
+          const secureOptions = {
+            ...options,
+            sameSite: 'lax' as const,
+            secure: isProduction,
+            domain,
+            path: '/',
+            httpOnly: false, // Supabase needs client access to auth tokens
+          };
+          res.cookies.set(name, value, secureOptions);
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            // Supabaseのデフォルトオプションを尊重しつつ、本番環境ではSecure属性を確保
-            res.cookies.set(name, value, {
-              ...options,
-              secure: isProduction ? true : options?.secure,
-            });
-          });
+        remove: (name: string, options: any) => {
+          const secureOptions = {
+            ...options,
+            sameSite: 'lax' as const,
+            secure: isProduction,
+            domain,
+            path: '/',
+            maxAge: 0,
+          };
+          res.cookies.set(name, '', secureOptions);
         },
       },
     }
