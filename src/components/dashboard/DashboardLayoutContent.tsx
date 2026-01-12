@@ -3,15 +3,18 @@
 /**
  * DashboardLayoutContent - ダッシュボードのレイアウトコンテンツ
  *
- * MobileDrawerLayoutを使用してモバイルナビゲーションを提供。
+ * デスクトップ: サイドバーを常に表示
+ * モバイル: FAB（右下）をクリックでドロワー表示
+ *
  * @see docs/architecture/boundaries.md
  */
 
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppErrorBoundary } from '@/components/common/AppErrorBoundary';
 import { AccountStatusBanner } from '@/components/account/AccountStatusBanner';
 import { AccountRestrictedMessage } from '@/components/account/AccountRestrictedMessage';
-import { MobileDrawerLayout } from '@/components/navigation/MobileDrawerLayout';
 import type { AccountStatus } from '@/lib/auth/account-status-guard';
 
 interface DashboardLayoutContentProps {
@@ -20,33 +23,183 @@ interface DashboardLayoutContentProps {
   canSeeAdminNav?: boolean;
 }
 
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
+}
+
+// モバイル判定カスタムHook（lg=1024未満でモバイル）
+function useIsMobile(lg = 1024) {
+  const [mobile, setMobile] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width:${lg - 1}px)`);
+    const onChange = () => setMobile(mq.matches);
+    onChange();
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, [lg]);
+
+  return mobile;
+}
+
 export function DashboardLayoutContent({ children, accountStatus, canSeeAdminNav = false }: DashboardLayoutContentProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+  const isMobile = useIsMobile(1024);
+  const scrollYRef = useRef(0);
+
+  // マウント状態管理
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // アニメーション制御: 開く処理
+  useEffect(() => {
+    if (isOpen && !isClosing) {
+      setShouldRender(true);
+    }
+  }, [isOpen, isClosing]);
+
+  // アニメーション制御: 閉じる処理
+  useEffect(() => {
+    if (!isOpen && shouldRender) {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setIsClosing(false);
+        setShouldRender(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, shouldRender]);
+
+  // スクロールロック
+  const handleScrollLock = useCallback((shouldLock: boolean) => {
+    if (shouldLock) {
+      scrollYRef.current = window.scrollY;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollYRef.current}px`;
+      document.body.style.width = '100%';
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      if (scrollYRef.current > 0) {
+        window.scrollTo(0, scrollYRef.current);
+      }
+    }
+  }, []);
+
+  // トグル
+  const handleToggle = useCallback(() => {
+    const newIsOpen = !isOpen;
+    handleScrollLock(newIsOpen);
+    setIsOpen(newIsOpen);
+  }, [isOpen, handleScrollLock]);
+
+  // Escキーで閉じる
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && handleToggle();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, handleToggle]);
+
   // frozen users see only restriction message
   if (accountStatus === 'frozen') {
     return <AccountRestrictedMessage status="frozen" />;
   }
 
-  // active/warned/suspended users see normal dashboard
-  return (
-    <MobileDrawerLayout
-      drawerTitle="メニュー"
-      drawerContent={<DashboardSidebar canSeeAdminNav={canSeeAdminNav} />}
-      mobileHeaderTitle="AIO Hub"
-      desktopSidebar={<DashboardSidebar canSeeAdminNav={canSeeAdminNav} />}
-      mainClassName="lg:pl-64 min-h-screen pt-14 lg:pt-0"
+  // FABボタン（モバイルのみ）
+  const Fab = mounted && isMobile ? createPortal(
+    <button
+      type="button"
+      aria-label={isOpen ? "メニューを閉じる" : "メニューを開く"}
+      aria-expanded={isOpen}
+      aria-controls="dashboard-mobile-drawer"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleToggle();
+      }}
+      className={classNames(
+        "fixed bottom-4 right-4 z-[9999] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--aio-primary)] text-white shadow-lg hover:bg-[var(--aio-primary-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aio-primary)] transition-transform duration-200",
+        isOpen ? "rotate-90" : "rotate-0"
+      )}
     >
-      <main className="py-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Account status banner for warned/suspended users */}
-          {(accountStatus === 'warned' || accountStatus === 'suspended') && (
-            <AccountStatusBanner status={accountStatus} />
-          )}
+      {isOpen ? (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      ) : (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      )}
+    </button>,
+    document.body
+  ) : null;
 
-          <AppErrorBoundary>
-            {children}
-          </AppErrorBoundary>
+  // オーバーレイ
+  const Overlay = mounted && shouldRender ? createPortal(
+    <div
+      className={classNames(
+        "fixed inset-0 z-40 bg-black/40 pointer-events-auto transition-opacity duration-300 lg:hidden",
+        isClosing ? "opacity-0" : "opacity-100"
+      )}
+      aria-hidden="true"
+      onClick={handleToggle}
+    />,
+    document.body
+  ) : null;
+
+  // モバイルドロワー（DashboardSidebarを使用）
+  const Drawer = mounted && shouldRender ? createPortal(
+    <div
+      id="dashboard-mobile-drawer"
+      role="navigation"
+      aria-label="ダッシュボードメニュー"
+      className={classNames(
+        "fixed top-0 left-0 z-50 h-screen w-64 bg-white shadow-xl lg:hidden transition-transform duration-300 ease-out",
+        isClosing ? "-translate-x-full" : "translate-x-0"
+      )}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <DashboardSidebar canSeeAdminNav={canSeeAdminNav} />
+    </div>,
+    document.body
+  ) : null;
+
+  return (
+    <div className="min-h-screen">
+      {/* デスクトップサイドバー（lg以上で表示） */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+        <DashboardSidebar canSeeAdminNav={canSeeAdminNav} />
+      </div>
+
+      {/* モバイルナビゲーション */}
+      {Overlay}
+      {Drawer}
+      {Fab}
+
+      {/* メインコンテンツ */}
+      <main className="lg:pl-64 min-h-screen">
+        <div className="py-10">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            {/* Account status banner for warned/suspended users */}
+            {(accountStatus === 'warned' || accountStatus === 'suspended') && (
+              <AccountStatusBanner status={accountStatus} />
+            )}
+
+            <AppErrorBoundary>
+              {children}
+            </AppErrorBoundary>
+          </div>
         </div>
       </main>
-    </MobileDrawerLayout>
+    </div>
   );
 }
