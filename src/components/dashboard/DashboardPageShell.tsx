@@ -18,7 +18,7 @@
  * - DBの関数 `user_has_org_role` / `is_site_admin` に完全委譲
  */
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { DashboardErrorBoundary } from './DashboardErrorBoundary';
 import { DashboardLoadingState } from './ui/DashboardLoadingState';
@@ -159,6 +159,12 @@ export function DashboardPageShell({
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [isDataFetched, setIsDataFetched] = useState(false);
 
+  // Fetch counter ref to track current fetch and ignore stale results
+  // This prevents race conditions during client-side navigation
+  const fetchCounterRef = useRef(0);
+  // Ref to track if component is mounted (for cleanup)
+  const isMountedRef = useRef(true);
+
   /**
    * 監査ログ送信（Core経由）
    */
@@ -178,8 +184,20 @@ export function DashboardPageShell({
 
   /**
    * ユーザーと組織データを取得
+   *
+   * Race condition対策:
+   * - fetchCounterRef で現在のfetchを追跡
+   * - 古いfetchの結果は無視（stale closure問題を防止）
+   * - コンポーネントアンマウント後の状態更新を防止
    */
   const fetchData = useCallback(async () => {
+    // Increment counter and capture current fetch ID
+    fetchCounterRef.current += 1;
+    const currentFetchId = fetchCounterRef.current;
+
+    // Helper to check if this fetch is still valid
+    const isStale = () => currentFetchId !== fetchCounterRef.current || !isMountedRef.current;
+
     setIsLoading(true);
     setError(null);
     setErrorCode(null);
@@ -190,6 +208,11 @@ export function DashboardPageShell({
       // Get current user
       const currentUser = await getCurrentUser();
 
+      // Check if this fetch is stale before proceeding
+      if (isStale()) {
+        return;
+      }
+
       if (!currentUser && !isPublic) {
         // Not authenticated - redirect to login
         router.push('/auth/login?redirect=' + encodeURIComponent(window.location.pathname));
@@ -199,12 +222,13 @@ export function DashboardPageShell({
       setUser(currentUser);
 
       if (currentUser) {
-        const supabase = await createClient();
+        const supabase = createClient();
         const mappedRole = mapRequiredRole(requiredRole);
 
         // サイト管理者専用ページの場合
         if (siteAdminOnly || (requiredRole === 'admin' && !organization)) {
           const isAdmin = await isSiteAdmin(supabase);
+          if (isStale()) return;
           if (!isAdmin) {
             setPermissionError('このページにアクセスするにはサイト管理者権限が必要です');
             await logToAudit('page_access', 'denied', 'site_admin_required');
@@ -221,6 +245,8 @@ export function DashboardPageShell({
           .from('v_current_user_orgs')
           .select('organization_id, role');
 
+        if (isStale()) return;
+
         if (!viewError && viewData && viewData.length > 0) {
           memberships = viewData;
         }
@@ -232,6 +258,8 @@ export function DashboardPageShell({
             .from('organization_members')
             .select('organization_id, role')
             .eq('user_id', currentUser.id);
+
+          if (isStale()) return;
 
           if (membershipError) {
             if (isRLSDeniedError(membershipError)) {
@@ -257,6 +285,8 @@ export function DashboardPageShell({
             .from('organizations')
             .select('id, name, slug, plan')
             .in('id', orgIds);
+
+          if (isStale()) return;
 
           if (orgsError) {
             if (isRLSDeniedError(orgsError)) {
@@ -293,6 +323,7 @@ export function DashboardPageShell({
             // 権限判定はDBに完全委譲 - JSでの比較は行わない
             if (requiredRole !== 'viewer') {
               const hasPermission = await hasOrgRole(supabase, currentOrg.id, mappedRole);
+              if (isStale()) return;
               if (!hasPermission) {
                 setPermissionError(
                   `このページにアクセスするには${getRoleDisplayName(requiredRole)}以上の権限が必要です`
@@ -311,6 +342,7 @@ export function DashboardPageShell({
             // Admin pages without org might need site_admin check
             if (requiredRole === 'admin') {
               const isAdmin = await isSiteAdmin(supabase);
+              if (isStale()) return;
               if (!isAdmin) {
                 setPermissionError('組織に所属していないか、権限がありません');
                 await logToAudit('page_access', 'denied', 'no_org_membership');
@@ -325,6 +357,9 @@ export function DashboardPageShell({
         }
       }
     } catch (err) {
+      // Ignore errors from stale fetches
+      if (isStale()) return;
+
       const message = err instanceof Error ? err.message : 'データの取得に失敗しました';
       setError(message);
 
@@ -339,8 +374,11 @@ export function DashboardPageShell({
         await logToAudit('page_access', 'error', message);
       }
     } finally {
-      setIsLoading(false);
-      setIsDataFetched(true);
+      // Only update loading state if this fetch is still current
+      if (!isStale()) {
+        setIsLoading(false);
+        setIsDataFetched(true);
+      }
     }
   // pathname を依存配列に追加: クライアントサイドナビゲーション時にデータを再取得
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -353,7 +391,7 @@ export function DashboardPageShell({
     if (!organization?.id) return false;
 
     try {
-      const supabase = await createClient();
+      const supabase = createClient();
       return await hasOrgRole(supabase, organization.id, role);
     } catch {
       return false;
@@ -372,9 +410,18 @@ export function DashboardPageShell({
   // 組織が0件（オンボーディング対象）
   const isReallyEmpty = isDataFetched && !isLoading && organizations.length === 0 && !error && !permissionError;
 
-  // Initial fetch
+  // Component mount tracking and data fetch
   useEffect(() => {
+    // Mark component as mounted
+    isMountedRef.current = true;
+
+    // Fetch data
     fetchData();
+
+    // Cleanup: mark component as unmounted to prevent stale updates
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [fetchData]);
 
   // Update document title
