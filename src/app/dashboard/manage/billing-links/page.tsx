@@ -71,8 +71,8 @@ function BillingLinksContent() {
       
       if (!response.ok) {
         if (response.status === 401) {
-          router.push('/auth/signin');
-          return;
+          // NOTE: Don't redirect - middleware handles auth
+          throw new Error('認証情報の取得に失敗しました。ページを再読み込みしてください。');
         }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }

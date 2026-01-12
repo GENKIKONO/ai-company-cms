@@ -90,7 +90,8 @@ function BillingContent() {
 
       const user = await getCurrentUserClient();
       if (!user) {
-        router.push('/login');
+        // NOTE: Don't redirect - middleware handles auth
+        setError('認証情報の取得に失敗しました。ページを再読み込みしてください。');
         return;
       }
 
