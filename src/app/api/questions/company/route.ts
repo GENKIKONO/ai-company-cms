@@ -18,16 +18,39 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // ユーザーの企業IDを取得
+    // ユーザーの所属組織を取得（organization_members経由）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (membershipError) {
+      logger.error('Error fetching organization membership:', { data: membershipError });
+      return NextResponse.json(
+        { error: 'Failed to fetch organization membership' },
+        { status: 500 }
+      );
+    }
+
+    if (!membershipData) {
+      return NextResponse.json(
+        { error: 'Organization membership not found. You must be a member of an organization to access this endpoint.' },
+        { status: 404 }
+      );
+    }
+
+    // 組織詳細を取得
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select('id, name')
-      .eq('created_by', user.id)
-      .maybeSingle();
+      .eq('id', membershipData.organization_id)
+      .single();
 
     if (orgError || !orgData) {
       return NextResponse.json(
-        { error: 'Organization not found. You must be a company owner to access this endpoint.' },
+        { error: 'Organization not found' },
         { status: 404 }
       );
     }

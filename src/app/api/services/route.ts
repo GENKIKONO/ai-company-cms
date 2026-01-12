@@ -40,19 +40,30 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
-    // 組織情報取得
-    const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .single();
+    // 組織情報取得（organization_members経由）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
 
-    if (orgError || !orgData) {
+    if (membershipError) {
+      logger.error('Error fetching organization membership:', { data: membershipError });
       return NextResponse.json({
-        error: '企業情報が見つかりません',
-        code: 'ORG_NOT_FOUND'
+        error: '組織メンバーシップの取得に失敗しました',
+        code: 'MEMBERSHIP_ERROR'
+      }, { status: 500 });
+    }
+
+    if (!membershipData) {
+      return NextResponse.json({
+        error: '組織に所属していません',
+        code: 'NO_MEMBERSHIP'
       }, { status: 404 });
     }
+
+    const orgData = { id: membershipData.organization_id };
 
     // リクエストボディ解析とバリデーション
     const body = await request.json();

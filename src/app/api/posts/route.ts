@@ -20,19 +20,30 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
-    // 組織情報取得
-    const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .single();
+    // 組織情報取得（organization_members経由）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
 
-    if (orgError || !orgData) {
+    if (membershipError) {
+      apiLogger.error('POST', '/api/posts', membershipError instanceof Error ? membershipError : new Error(String(membershipError)), { userId: user.id });
       return NextResponse.json({
         ok: false,
-        error: 'Organization not found'
+        error: 'Failed to fetch organization membership'
+      }, { status: 500 });
+    }
+
+    if (!membershipData) {
+      return NextResponse.json({
+        ok: false,
+        error: 'Organization membership not found'
       }, { status: 404 });
     }
+
+    const orgData = { id: membershipData.organization_id };
 
     // リクエストボディ解析
     const body = await request.json();
