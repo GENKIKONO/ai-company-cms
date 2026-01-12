@@ -21,15 +21,21 @@ export async function GET(request: NextRequest) {
       return createErrorResponse('Authentication required', 401);
     }
 
-    // ユーザーの企業IDを取得
-    const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('created_by', user.id)
-      .single();
+    // ユーザーの所属組織を確認（organization_members経由）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
 
-    if (orgError || !orgData) {
-      return createErrorResponse('Organization not found', 404);
+    if (membershipError) {
+      logger.error('Error fetching user organization membership:', { data: membershipError });
+      return createErrorResponse('Failed to fetch organization membership', 500);
+    }
+
+    if (!membershipData) {
+      return createErrorResponse('Organization membership not found', 404);
     }
 
     const url = new URL(request.url);

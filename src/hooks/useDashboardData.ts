@@ -21,6 +21,16 @@ import type { UserRole } from '@/types/utils/database';
 // =====================================================
 
 /**
+ * Normalize user role for permission checks
+ * Maps 'owner' to 'admin' to match DATA_SOURCES.permissions config
+ */
+function normalizeRole(role: UserRole | string): UserRole {
+  if (role === 'owner') return 'admin';
+  if (role === 'admin' || role === 'editor' || role === 'viewer') return role;
+  return 'viewer'; // Default fallback
+}
+
+/**
  * Create a query for the given table/view
  * Returns any to avoid infinite type instantiation with complex Supabase types
  */
@@ -115,11 +125,12 @@ export function useDashboardData<T = Record<string, unknown>>(
   // Get data source config
   const config = useMemo(() => getDataSource(dataSourceKey), [dataSourceKey]);
 
-  // Permission check
+  // Permission check (normalize role to handle 'owner' → 'admin')
+  const normalizedRole = useMemo(() => normalizeRole(userRole), [userRole]);
   const hasPermission = useMemo(() => {
     if (!config) return false;
-    return hasDataSourcePermission(dataSourceKey, 'read', userRole);
-  }, [config, dataSourceKey, userRole]);
+    return hasDataSourcePermission(dataSourceKey, 'read', normalizedRole);
+  }, [config, dataSourceKey, normalizedRole]);
 
   // Build filters with org scope
   const effectiveFilters = useMemo(() => {

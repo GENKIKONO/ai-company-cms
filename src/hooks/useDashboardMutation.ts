@@ -19,6 +19,20 @@ import type { TableInsert, TableUpdate, SupabaseDatabase } from '@/types/databas
 type WritableTableName = keyof SupabaseDatabase['public']['Tables'];
 
 // =====================================================
+// HELPER FUNCTIONS
+// =====================================================
+
+/**
+ * Normalize user role for permission checks
+ * Maps 'owner' to 'admin' to match DATA_SOURCES.permissions config
+ */
+function normalizeRole(role: UserRole | string): UserRole {
+  if (role === 'owner') return 'admin';
+  if (role === 'admin' || role === 'editor' || role === 'viewer') return role;
+  return 'viewer'; // Default fallback
+}
+
+// =====================================================
 // TYPES
 // =====================================================
 
@@ -88,16 +102,19 @@ export function useDashboardMutation<
   // Get data source config
   const config = useMemo(() => getDataSource(dataSourceKey), [dataSourceKey]);
 
+  // Normalize role (handle 'owner' → 'admin')
+  const normalizedRole = useMemo(() => normalizeRole(userRole), [userRole]);
+
   // Permission checks
   const canWrite = useMemo(() => {
     if (!config) return false;
-    return hasDataSourcePermission(dataSourceKey, 'write', userRole);
-  }, [config, dataSourceKey, userRole]);
+    return hasDataSourcePermission(dataSourceKey, 'write', normalizedRole);
+  }, [config, dataSourceKey, normalizedRole]);
 
   const canDelete = useMemo(() => {
     if (!config) return false;
-    return hasDataSourcePermission(dataSourceKey, 'delete', userRole);
-  }, [config, dataSourceKey, userRole]);
+    return hasDataSourcePermission(dataSourceKey, 'delete', normalizedRole);
+  }, [config, dataSourceKey, normalizedRole]);
 
   // Create action
   const create = useCallback(
