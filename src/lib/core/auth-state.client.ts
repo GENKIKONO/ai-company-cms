@@ -31,36 +31,43 @@ import type { AuthChangeEvent, Session, Subscription, User, AuthError } from '@s
 /**
  * 現在のログインユーザーを取得（クライアント側専用）
  *
+ * 認証済みユーザーが存在すれば、profiles テーブルのデータがなくても
+ * 最低限のユーザー情報を返す（ログインリダイレクト問題を防止）
+ *
  * @returns AppUser | null
  */
 export async function getCurrentUserClient(): Promise<AppUser | null> {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const supabase = createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (!user) return null;
+    if (authError || !user) {
+      // 認証エラーまたはユーザーなし → 未ログイン
+      return null;
+    }
 
-    // profiles テーブルからプロフィール情報を取得
-    const { data: profile, error } = await supabase
+    // profiles テーブルからプロフィール情報を取得（オプショナル）
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, full_name, avatar_url, created_at')
       .eq('id', user.id)
       .maybeSingle();
 
-    if (error || !profile) {
+    if (profileError) {
       // eslint-disable-next-line no-console
-      console.error('[core/auth-state.client] Profile fetch error:', error);
-      return null;
+      console.warn('[core/auth-state.client] Profile fetch error (using fallback):', profileError.message);
     }
 
+    // profile が取得できなくても、認証済みユーザー情報を返す
+    // これにより profiles レコードがないユーザーでもログインリダイレクトを防止
     return {
-      id: profile.id,
+      id: user.id,
       email: user.email || '',
-      full_name: profile.full_name,
-      avatar_url: profile.avatar_url,
+      full_name: profile?.full_name ?? user.user_metadata?.full_name ?? null,
+      avatar_url: profile?.avatar_url ?? user.user_metadata?.avatar_url ?? null,
       role: (user.app_metadata?.role as UserRole) || 'viewer',
-      created_at: profile.created_at,
-      updated_at: profile.created_at,
+      created_at: profile?.created_at ?? user.created_at ?? new Date().toISOString(),
+      updated_at: profile?.created_at ?? user.updated_at ?? new Date().toISOString(),
       email_verified: !!user.email_confirmed_at,
     };
   } catch (err) {
