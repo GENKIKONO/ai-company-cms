@@ -12,7 +12,7 @@ export default function DashboardBackLink({
   variant = 'simple'
 }: DashboardBackLinkProps) {
   const linkClasses = variant === 'button'
-    ? "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] transition-colors"
+    ? "inline-flex items-center px-4 py-2 border border-[var(--input-border)] rounded-md shadow-sm text-sm font-medium text-[var(--color-text-secondary)] bg-white hover:bg-[var(--aio-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] transition-colors"
     : "text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-flex items-center transition-colors";
 
   return (

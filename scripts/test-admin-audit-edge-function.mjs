@@ -100,7 +100,7 @@ async function main() {
 
   const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/admin-audit-log`;
   const payload = {
-    page: '/dashboard/admin/jobs',
+    page: '/dashboard/manage/jobs',
     action: 'filter_changed',
     detail: 'status=running,q=abc',
   };

@@ -47,19 +47,41 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 組織の所有権確認 (通常のサーバーサイドクライアントを使用)
+    // 組織のアクセス権確認（organization_members経由、owner/adminロール必須）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('user_id', user.id)
+      .eq('organization_id', organizationId)
+      .maybeSingle();
+
+    if (membershipError || !membershipData) {
+      return NextResponse.json({
+        success: false,
+        error: 'Organization membership not found'
+      }, { status: 403 });
+    }
+
+    // owner/adminロール必須チェック
+    if (membershipData.role !== 'owner' && membershipData.role !== 'admin') {
+      return NextResponse.json({
+        success: false,
+        error: 'Owner or admin permission required for logo upload'
+      }, { status: 403 });
+    }
+
+    // 組織の存在確認
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
-      .select('id, created_by')
+      .select('id')
       .eq('id', organizationId)
-      .eq('created_by', user.id)
       .single();
 
     if (orgError || !organization) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Organization not found or access denied' 
-      }, { status: 403 });
+      return NextResponse.json({
+        success: false,
+        error: 'Organization not found'
+      }, { status: 404 });
     }
 
     // ファイル拡張子の決定

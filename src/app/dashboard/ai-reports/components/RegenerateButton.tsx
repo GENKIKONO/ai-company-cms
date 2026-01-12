@@ -82,12 +82,12 @@ export function RegenerateButton({
 
   const getButtonColor = () => {
     if (status === 'success') {
-      return 'bg-green-100 text-green-800 border border-green-200';
+      return 'bg-[var(--aio-success-muted)] text-[var(--aio-success)] border border-[var(--aio-success)]';
     }
     if (status === 'error') {
-      return 'bg-red-100 text-red-800 border border-red-200';
+      return 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)] border border-[var(--aio-danger)]';
     }
-    return 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300';
+    return 'bg-[var(--aio-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--dashboard-card-border)] border border-[var(--input-border)]';
   };
 
   const getIcon = () => {
@@ -126,8 +126,8 @@ export function RegenerateButton({
       {message && (
         <div className={`
           absolute top-full left-0 mt-2 p-2 rounded text-xs whitespace-nowrap z-10
-          ${status === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : ''}
-          ${status === 'error' ? 'bg-red-100 text-red-800 border border-red-200' : ''}
+          ${status === 'success' ? 'bg-[var(--aio-success-muted)] text-[var(--aio-success)] border border-[var(--aio-success)]' : ''}
+          ${status === 'error' ? 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)] border border-[var(--aio-danger)]' : ''}
         `}>
           {message}
         </div>

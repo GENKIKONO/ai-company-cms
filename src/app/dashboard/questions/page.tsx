@@ -253,26 +253,26 @@ function QuestionsContent() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'open':
-        return <Clock className="h-4 w-4 text-orange-500" />;
+        return <Clock className="h-4 w-4 text-[var(--aio-pending)]" />;
       case 'answered':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-[var(--aio-success)]" />;
       case 'closed':
-        return <XCircle className="h-4 w-4 text-gray-500" />;
+        return <XCircle className="h-4 w-4 text-[var(--color-text-tertiary)]" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
+        return <Clock className="h-4 w-4 text-[var(--color-text-tertiary)]" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':
-        return 'text-orange-600 bg-orange-50 border-orange-200';
+        return 'text-[var(--aio-pending)] bg-[var(--aio-pending-muted)] border-[var(--dashboard-card-border)]';
       case 'answered':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-[var(--aio-success)] bg-[var(--aio-success-muted)] border-[var(--dashboard-card-border)]';
       case 'closed':
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'text-[var(--color-text-secondary)] bg-[var(--aio-surface)] border-[var(--dashboard-card-border)]';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'text-[var(--color-text-secondary)] bg-[var(--aio-surface)] border-[var(--dashboard-card-border)]';
     }
   };
 
@@ -349,11 +349,11 @@ function QuestionsContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="hig-text-caption text-[var(--color-text-secondary)]">未回答</p>
-                  <p className="hig-text-h2 text-orange-500 mt-1">
+                  <p className="hig-text-h2 text-[var(--aio-pending)] mt-1">
                     {stats.open}
                   </p>
                 </div>
-                <Clock className="h-8 w-8 text-orange-500 opacity-60" />
+                <Clock className="h-8 w-8 text-[var(--aio-pending)] opacity-60" />
               </div>
             </DashboardCardContent>
           </DashboardCard>
@@ -363,11 +363,11 @@ function QuestionsContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="hig-text-caption text-[var(--color-text-secondary)]">回答済み</p>
-                  <p className="hig-text-h2 text-green-500 mt-1">
+                  <p className="hig-text-h2 text-[var(--aio-success)] mt-1">
                     {stats.answered}
                   </p>
                 </div>
-                <CheckCircle className="h-8 w-8 text-green-500 opacity-60" />
+                <CheckCircle className="h-8 w-8 text-[var(--aio-success)] opacity-60" />
               </div>
             </DashboardCardContent>
           </DashboardCard>
@@ -377,11 +377,11 @@ function QuestionsContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="hig-text-caption text-[var(--color-text-secondary)]">完了</p>
-                  <p className="hig-text-h2 text-gray-500 mt-1">
+                  <p className="hig-text-h2 text-[var(--color-text-tertiary)] mt-1">
                     {stats.closed}
                   </p>
                 </div>
-                <XCircle className="h-8 w-8 text-gray-500 opacity-60" />
+                <XCircle className="h-8 w-8 text-[var(--color-text-tertiary)] opacity-60" />
               </div>
             </DashboardCardContent>
           </DashboardCard>
@@ -543,12 +543,12 @@ function QuestionsContent() {
                               <h4 className="hig-text-caption font-semibold text-[var(--color-text-secondary)] mb-2">
                                 現在の回答:
                               </h4>
-                              <div className="bg-green-50 border border-green-200 p-3 rounded">
+                              <div className="bg-[var(--aio-success-muted)] border border-[var(--dashboard-card-border)] p-3 rounded">
                                 <p className="hig-text-body text-[var(--color-text-primary)] whitespace-pre-wrap">
                                   {question.answer_text}
                                 </p>
                                 {question.answered_at && question.answerer_name && (
-                                  <div className="mt-3 pt-3 border-t border-green-200">
+                                  <div className="mt-3 pt-3 border-t border-[var(--dashboard-card-border)]">
                                     <p className="hig-text-caption text-[var(--color-text-secondary)]">
                                       回答者: {question.answerer_name} •
                                       回答日: {new Date(question.answered_at).toLocaleDateString('ja-JP')}
@@ -576,8 +576,8 @@ function QuestionsContent() {
                               </div>
                             </div>
                           ) : (
-                            <div className="bg-orange-50 border border-orange-200 p-3 rounded">
-                              <p className="hig-text-body text-orange-700 mb-3">
+                            <div className="bg-[var(--aio-pending-muted)] border border-[var(--dashboard-card-border)] p-3 rounded">
+                              <p className="hig-text-body text-[var(--aio-pending)] mb-3">
                                 まだ回答していません
                               </p>
                               <DashboardButton

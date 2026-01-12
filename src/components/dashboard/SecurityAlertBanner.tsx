@@ -88,8 +88,8 @@ export function SecurityAlertBanner({ className = '' }: SecurityAlertBannerProps
 
   const hasCritical = alerts.some((a) => a.severity === 'critical');
   const bgColor = hasCritical
-    ? 'bg-red-600'
-    : 'bg-orange-500';
+    ? 'bg-[var(--status-error)]'
+    : 'bg-[var(--status-pending)]';
   const Icon = hasCritical ? ShieldExclamationIcon : ExclamationTriangleIcon;
 
   return (
@@ -114,7 +114,7 @@ export function SecurityAlertBanner({ className = '' }: SecurityAlertBannerProps
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/dashboard/admin/security"
+              href="/dashboard/manage/security"
               className="text-sm font-medium hover:underline"
             >
               詳細を確認

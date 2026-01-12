@@ -13,22 +13,22 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-[#f9fafb] text-gray-900">
+    <div className="min-h-screen bg-[var(--dashboard-bg)] text-[var(--color-text-primary)]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-4 sm:px-6 lg:px-8">
+      <header className="bg-white border-b border-[var(--dashboard-card-border)] px-4 py-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">
                 AIO Hub Dashboard
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-[var(--color-text-secondary)] mt-1">
                 AI × SEO 統合分析プラットフォーム
               </p>
             </div>
             <div className="flex items-center space-x-4">
               {/* User info placeholder */}
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-[var(--color-text-secondary)]">
                 ダッシュボード
               </div>
             </div>
@@ -42,9 +42,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
+      <footer className="bg-white border-t border-[var(--dashboard-card-border)] mt-12">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="text-center text-sm text-gray-500">
+          <div className="text-center text-sm text-[var(--color-text-tertiary)]">
             © 2024 LuxuCare株式会社. All rights reserved.
           </div>
         </div>

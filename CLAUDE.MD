@@ -6,8 +6,9 @@
 - [実装ガイドライン](docs/implementation.md)
 - [タスク分解（スプリント計画）](docs/sprints.md)
 - **[MVPセットアップガイド（Cursor + Claude Code）](docs/mvp_setup_guide.md)** ⭐
-- **[デザインシステム v2.0](DESIGN_SYSTEM.md)** ⭐ ← UI/デザイン関連は必読
+- **[デザインシステム v3.0 - iCloud Dense](DESIGN_SYSTEM.md)** ⭐ ← UI/デザイン関連は必読
 - **[コアアーキテクチャ要件定義](docs/core-architecture.md)** ⭐ ← Shell/Core/Policy設計の正規文書
+- **[AI実装ガード](docs/ai-implementation-guard.md)** ⭐ ← 直書き・端折り防止チェックリスト
 - [プラン・機能アーキテクチャ](docs/plans-architecture.md)
 
 ---
@@ -32,11 +33,14 @@ Admin（/admin/**）            → AdminPageShell  → site_admin権限
 ```
 **領域を間違えないこと！** 詳細は `docs/core-architecture.md` 参照
 
-### UI領域（デザイン）
+### UI領域（デザイン）- iCloud Dense統一
 ```
-Public Pages → AioSection, HIGButton
-Dashboard   → DashboardCard, DashboardButton
+全ページ共通  → Button (@/components/ui/button) ※統一ボタン
+Public Pages → AioSection
+Dashboard   → DashboardCard
 Admin       → AdminPageShell内のコンポーネント
+
+※ HIGButton/DashboardButton は後方互換エイリアス（内部は統一Button）
 ```
 詳細は `DESIGN_SYSTEM.md` 参照
 
@@ -50,7 +54,11 @@ Admin       → AdminPageShell内のコンポーネント
 - className色直書き禁止（`bg-blue-500` NG）
 - インラインスタイル禁止
 - 確認なしの新規コンポーネント作成禁止
-- 領域違反（DashboardでHIGButton使用、AdminでDashboardPageShell使用等）禁止
+- 独自ボタンコンポーネント作成禁止（統一Button使用）
+- 領域違反（AdminでDashboardPageShell使用等）禁止
+
+### 実装前の必須参照
+UI変更・コンポーネント追加時は **[AI実装ガード](docs/ai-implementation-guard.md)** を参照し、チェックリストを確認すること。
 
 ## 開発着手時の手順
 1. `docs/mvp_setup_guide.md` の手順をコピペで実行

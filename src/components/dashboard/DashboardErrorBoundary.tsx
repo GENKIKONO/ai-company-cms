@@ -166,19 +166,19 @@ export class DashboardErrorBoundary extends Component<Props, State> {
       // ダッシュボード内でのエラー表示（レイアウト維持）
       return (
         <div className="min-h-[400px] flex items-center justify-center p-6">
-          <div className="glass-card backdrop-blur-sm rounded-3xl border border-red-200 p-8 max-w-md w-full spring-bounce">
+          <div className="glass-card backdrop-blur-sm rounded-3xl border border-[var(--status-error)] p-8 max-w-md w-full spring-bounce">
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-6 bg-red-100 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-16 h-16 mx-auto mb-6 bg-[var(--aio-danger-muted)] rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-[var(--aio-danger)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+
+              <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-4">
                 {errorDisplay.title}
               </h2>
-              
-              <p className="text-gray-600 mb-6 leading-relaxed">
+
+              <p className="text-[var(--color-text-secondary)] mb-6 leading-relaxed">
                 {errorDisplay.message}
               </p>
               
@@ -204,10 +204,10 @@ export class DashboardErrorBoundary extends Component<Props, State> {
               
               {errorDisplay.showDetails && errorDisplay.details && (
                 <details className="mt-6 text-left">
-                  <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+                  <summary className="text-sm text-[var(--color-text-tertiary)] cursor-pointer hover:text-[var(--color-text-secondary)]">
                     詳細情報
                   </summary>
-                  <div className="mt-2 p-4 bg-gray-100 rounded-lg text-xs font-mono text-gray-800 overflow-auto max-h-32">
+                  <div className="mt-2 p-4 bg-[var(--aio-surface)] rounded-lg text-xs font-mono text-[var(--color-text-primary)] overflow-auto max-h-32">
                     <pre className="whitespace-pre-wrap">{errorDisplay.details}</pre>
                   </div>
                 </details>

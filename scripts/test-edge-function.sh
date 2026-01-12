@@ -36,7 +36,7 @@ echo "=== POST /functions/v1/admin-audit-log ==="
 HTTP_CODE=$(curl -s -X POST "https://chyicolujwhkycpkxbej.supabase.co/functions/v1/admin-audit-log" \
   -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   -H "Content-Type: application/json" \
-  -d '{"page":"/dashboard/admin/jobs","action":"filter_changed","detail":"status=running,q=abc"}' \
+  -d '{"page":"/dashboard/manage/jobs","action":"filter_changed","detail":"status=running,q=abc"}' \
   -o /tmp/edge-response.json -w "%{http_code}")
 
 echo "HTTP_CODE: $HTTP_CODE"

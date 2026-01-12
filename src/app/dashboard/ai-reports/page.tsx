@@ -86,19 +86,19 @@ function AiReportsContent() {
     switch (status) {
       case 'ready':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--aio-success-muted)] text-[var(--aio-success)]">
             完了
           </span>
         );
       case 'failed':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--aio-danger-muted)] text-[var(--aio-danger)]">
             失敗
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--aio-surface)] text-[var(--color-text-primary)]">
             {status}
           </span>
         );
@@ -121,10 +121,10 @@ function AiReportsContent() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="animate-pulse space-y-4">
-              <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-8 bg-[var(--dashboard-card-border)] rounded w-1/4"></div>
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-16 bg-gray-200 rounded"></div>
+                  <div key={i} className="h-16 bg-[var(--dashboard-card-border)] rounded"></div>
                 ))}
               </div>
             </div>
@@ -141,25 +141,25 @@ function AiReportsContent() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Brain className="w-8 h-8 text-[var(--aio-primary)]" />
-            <h1 className="text-2xl font-bold text-neutral-900">AI月次レポート</h1>
+            <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">AI月次レポート</h1>
           </div>
-          <p className="text-neutral-600">
+          <p className="text-[var(--color-text-secondary)]">
             組織のコンテンツパフォーマンスとAI活用状況を月次で分析したレポートです。
           </p>
         </div>
 
         {/* エラー表示 */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mb-6 p-4 bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-lg">
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600" />
+              <AlertCircle className="w-5 h-5 text-[var(--aio-danger)]" />
               <div>
-                <p className="font-medium text-red-900">エラーが発生しました</p>
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="font-medium text-[var(--aio-danger)]">エラーが発生しました</p>
+                <p className="text-sm text-[var(--aio-danger)]">{error}</p>
               </div>
               <button
                 onClick={fetchReports}
-                className="ml-auto p-1 text-red-600 hover:text-red-900"
+                className="ml-auto p-1 text-[var(--aio-danger)] hover:text-[var(--aio-danger)]"
               >
                 <RefreshCw className="w-4 h-4" />
               </button>
@@ -171,32 +171,32 @@ function AiReportsContent() {
         <div className="bg-white rounded-lg shadow">
           {reports.length === 0 ? (
             <div className="p-8 text-center">
-              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-neutral-900 mb-2">
+              <FileText className="w-12 h-12 text-[var(--color-icon-muted)] mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">
                 レポートがまだありません
               </h3>
-              <p className="text-neutral-600">
+              <p className="text-[var(--color-text-secondary)]">
                 月次レポートは毎月自動生成されます。しばらくお待ちください。
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-[var(--dashboard-card-border)]">
               {reports.map((report) => {
                 const periodYYYYMM = report.period_start.substring(0, 7); // YYYY-MM
                 
                 return (
-                  <div key={report.id} className="p-6 hover:bg-gray-50 transition-colors">
+                  <div key={report.id} className="p-6 hover:bg-[var(--aio-surface)] transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <Calendar className="w-5 h-5 text-[var(--aio-primary)]" />
-                          <h3 className="text-lg font-semibold text-neutral-900">
+                          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
                             {formatPeriod(report.period_start)}レポート
                           </h3>
                           {getStatusBadge(report.status)}
                         </div>
                         
-                        <div className="flex items-center gap-6 text-sm text-neutral-600">
+                        <div className="flex items-center gap-6 text-sm text-[var(--color-text-secondary)]">
                           <span>レベル: {getLevelLabel(report.level)}</span>
                           <span>作成日: {formatDate(report.created_at)}</span>
                           {report.updated_at !== report.created_at && (
@@ -222,7 +222,7 @@ function AiReportsContent() {
                             詳細を見る
                           </Link>
                         ) : (
-                          <span className="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed">
+                          <span className="px-4 py-2 bg-[var(--aio-surface)] text-[var(--color-icon-muted)] rounded-lg cursor-not-allowed">
                             詳細を見る
                           </span>
                         )}

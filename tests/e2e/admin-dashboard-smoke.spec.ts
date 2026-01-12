@@ -15,13 +15,13 @@ import { test, expect } from '@playwright/test';
 
 // テスト対象の管理ページ一覧
 const ADMIN_PAGES = [
-  { path: '/dashboard/admin', name: 'Admin Index' },
-  { path: '/dashboard/admin/jobs', name: 'Jobs Monitor' },
-  { path: '/dashboard/admin/ai-usage', name: 'AI Usage' },
-  { path: '/dashboard/admin/storage-logs', name: 'Storage Logs' },
-  { path: '/dashboard/admin/audit', name: 'Audit Logs' },
-  { path: '/dashboard/admin/security', name: 'Security Dashboard' },
-  { path: '/dashboard/admin/ai-visibility', name: 'AI Visibility' },
+  { path: '/dashboard/manage', name: 'Admin Index' },
+  { path: '/dashboard/manage/jobs', name: 'Jobs Monitor' },
+  { path: '/dashboard/manage/ai-usage', name: 'AI Usage' },
+  { path: '/dashboard/manage/storage-logs', name: 'Storage Logs' },
+  { path: '/dashboard/manage/audit', name: 'Audit Logs' },
+  { path: '/dashboard/manage/security', name: 'Security Dashboard' },
+  { path: '/dashboard/manage/ai-visibility', name: 'AI Visibility' },
 ];
 
 // 致命的なNext.jsエラーをチェック
@@ -83,7 +83,7 @@ test.describe('Admin Dashboard Pages - Basic Load Tests', () => {
 
 test.describe('Admin Dashboard Pages - Auth Redirect Tests', () => {
   test('should redirect unauthenticated users to login', async ({ page }) => {
-    const response = await page.goto('/dashboard/admin', {
+    const response = await page.goto('/dashboard/manage', {
       waitUntil: 'domcontentloaded',
     });
 
@@ -97,7 +97,7 @@ test.describe('Admin Dashboard Pages - Auth Redirect Tests', () => {
     } else {
       // 未認証の場合はリダイレクト
       expect([302, 307]).toContain(status);
-      expect(isLoginRedirect(finalUrl) || finalUrl.includes('/dashboard/admin')).toBe(true);
+      expect(isLoginRedirect(finalUrl) || finalUrl.includes('/dashboard/manage')).toBe(true);
     }
   });
 });
@@ -141,7 +141,7 @@ test.describe('Admin Dashboard Pages - Empty Data Handling', () => {
       });
     });
 
-    await page.goto('/dashboard/admin/ai-usage');
+    await page.goto('/dashboard/manage/ai-usage');
 
     // ページがクラッシュせずに表示されることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -166,7 +166,7 @@ test.describe('Admin Dashboard Pages - Empty Data Handling', () => {
       });
     });
 
-    await page.goto('/dashboard/admin/audit');
+    await page.goto('/dashboard/manage/audit');
 
     // ページがクラッシュせずに表示されることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -182,7 +182,7 @@ test.describe('Admin Dashboard Pages - Empty Data Handling', () => {
       });
     });
 
-    await page.goto('/dashboard/admin/security');
+    await page.goto('/dashboard/manage/security');
 
     // ページがクラッシュせずに表示されることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -198,7 +198,7 @@ test.describe('Admin Dashboard Pages - Empty Data Handling', () => {
       });
     });
 
-    await page.goto('/dashboard/admin/ai-visibility');
+    await page.goto('/dashboard/manage/ai-visibility');
 
     // ページがクラッシュせずに表示されることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -221,7 +221,7 @@ test.describe('Admin Dashboard Pages - Empty Data Handling', () => {
       });
     });
 
-    await page.goto('/dashboard/admin/jobs');
+    await page.goto('/dashboard/manage/jobs');
 
     // ページがクラッシュせずに表示されることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -237,7 +237,7 @@ test.describe('Admin Dashboard Pages - Empty Data Handling', () => {
       });
     });
 
-    await page.goto('/dashboard/admin/storage-logs');
+    await page.goto('/dashboard/manage/storage-logs');
 
     // ページがクラッシュせずに表示されることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -251,7 +251,7 @@ test.describe('Admin Dashboard Pages - Network Failure Handling', () => {
       route.abort('failed');
     });
 
-    await page.goto('/dashboard/admin/jobs');
+    await page.goto('/dashboard/manage/jobs');
 
     // ページがクラッシュせずに表示されることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -269,7 +269,7 @@ test.describe('Admin Dashboard Pages - Network Failure Handling', () => {
       });
     });
 
-    await page.goto('/dashboard/admin/jobs');
+    await page.goto('/dashboard/manage/jobs');
 
     // ページがクラッシュせずにエラー状態になることを確認
     await expect(page.locator('body')).toBeVisible();

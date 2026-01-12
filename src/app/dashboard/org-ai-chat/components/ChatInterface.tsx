@@ -148,9 +148,9 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
   return (
     <div className="bg-white rounded-lg shadow flex flex-col h-96 lg:h-[600px]">
       {/* Header */}
-      <div className="flex-shrink-0 border-b border-gray-200 p-4">
-        <h3 className="text-lg font-medium text-gray-900">AIチャット</h3>
-        <p className="text-sm text-gray-500 mt-1">
+      <div className="flex-shrink-0 border-b border-[var(--dashboard-card-border)] p-4">
+        <h3 className="text-lg font-medium text-[var(--color-text-primary)]">AIチャット</h3>
+        <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
           アップロードした文書をもとに回答します（β版）
         </p>
       </div>
@@ -167,8 +167,8 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
             <div
               className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                 message.role === 'user'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-900'
+                  ? 'bg-[var(--aio-indigo)] text-white'
+                  : 'bg-[var(--aio-surface)] text-[var(--color-text-primary)]'
               }`}
             >
               <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -178,7 +178,7 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
                 <div className="mt-2">
                   <button
                     onClick={() => toggleSources(index)}
-                    className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center"
+                    className="text-xs text-[var(--aio-indigo)] hover:text-[var(--aio-indigo)] flex items-center"
                   >
                     <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -190,11 +190,11 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
                     <div className="mt-2 space-y-1">
                       {message.sources.map((source, sourceIndex) => (
                         <div key={sourceIndex} className="text-xs bg-white p-2 rounded border">
-                          <div className="font-medium text-gray-700">{source.display_name}</div>
-                          <div className="text-gray-600 mt-1 line-clamp-2">
+                          <div className="font-medium text-[var(--color-text-secondary)]">{source.display_name}</div>
+                          <div className="text-[var(--color-text-secondary)] mt-1 line-clamp-2">
                             {source.content.slice(0, 100)}...
                           </div>
-                          <div className="text-gray-500 mt-1 flex justify-between">
+                          <div className="text-[var(--color-text-tertiary)] mt-1 flex justify-between">
                             <span>類似度: {Math.round(source.similarity * 100)}%</span>
                             <span>チャンク: {source.chunk_index + 1}</span>
                           </div>
@@ -215,14 +215,14 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
         {/* Loading indicator */}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-gray-100">
+            <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-[var(--aio-surface)]">
               <div className="flex items-center space-x-1">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-[var(--color-icon-muted)] rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-[var(--color-icon-muted)] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-[var(--color-icon-muted)] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
-                <span className="text-xs text-gray-600 ml-2">回答を生成中...</span>
+                <span className="text-xs text-[var(--color-text-secondary)] ml-2">回答を生成中...</span>
               </div>
             </div>
           </div>
@@ -232,7 +232,7 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
       </div>
 
       {/* Input */}
-      <div className="flex-shrink-0 border-t border-gray-200 p-4">
+      <div className="flex-shrink-0 border-t border-[var(--dashboard-card-border)] p-4">
         <div className="flex space-x-2">
           <textarea
             ref={textareaRef}
@@ -240,7 +240,7 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="文書について質問してください..."
-            className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="flex-1 resize-none border border-[var(--input-border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--aio-indigo)] focus:border-[var(--aio-indigo)]"
             rows={2}
             disabled={isLoading}
           />
@@ -257,7 +257,7 @@ export default function ChatInterface({ organizationId }: ChatInterfaceProps) {
           </DashboardButton>
         </div>
         
-        <div className="mt-2 text-xs text-gray-500">
+        <div className="mt-2 text-xs text-[var(--color-text-tertiary)]">
           Enter で送信、Shift + Enter で改行
         </div>
       </div>

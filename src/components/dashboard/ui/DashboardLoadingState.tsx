@@ -89,15 +89,15 @@ export const DashboardLoadingCard = React.forwardRef<HTMLDivElement, DashboardLo
       <DashboardCard ref={ref} className={cn('animate-pulse', className)} {...props}>
         {showHeader && (
           <div className="flex items-center justify-between mb-4">
-            <div className="h-5 bg-gray-200 rounded w-32" />
-            <div className="h-5 bg-gray-200 rounded w-20" />
+            <div className="h-5 bg-[var(--dashboard-card-border)] rounded w-32" />
+            <div className="h-5 bg-[var(--dashboard-card-border)] rounded w-20" />
           </div>
         )}
         <div className="space-y-3">
           {Array.from({ length: lines }).map((_, i) => (
             <div
               key={i}
-              className="h-4 bg-gray-200 rounded"
+              className="h-4 bg-[var(--dashboard-card-border)] rounded"
               style={{ width: `${100 - i * 15}%` }}
             />
           ))}

@@ -155,7 +155,7 @@ function SimpleBarChart({
                     
                     {/* ツールチップ */}
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                      <div className="bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                      <div className="bg-[var(--tooltip-bg)] text-[var(--tooltip-text)] text-xs rounded px-2 py-1 whitespace-nowrap">
                         <div className="font-medium">{item.date}</div>
                         <div>
                           {valueKey === 'completionRate' 
@@ -191,25 +191,25 @@ function SummaryCard({ summary }: { summary: AnalyticsSummary }) {
     switch (summary.icon) {
       case 'sessions':
         return (
-          <svg className={`${iconClass} text-blue-600`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`${iconClass} text-[var(--aio-info)]`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         );
       case 'completion':
         return (
-          <svg className={`${iconClass} text-green-600`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`${iconClass} text-[var(--aio-success)]`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
       case 'questions':
         return (
-          <svg className={`${iconClass} text-purple-600`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`${iconClass} text-[var(--aio-purple)]`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
       case 'ai':
         return (
-          <svg className={`${iconClass} text-orange-600`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`${iconClass} text-[var(--aio-pending)]`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         );
@@ -235,7 +235,7 @@ function SummaryCard({ summary }: { summary: AnalyticsSummary }) {
               </p>
               {summary.change && (
                 <span className={`ml-2 text-sm font-medium ${
-                  summary.change.isIncrease ? 'text-green-600' : 'text-red-600'
+                  summary.change.isIncrease ? 'text-[var(--aio-success)]' : 'text-[var(--aio-danger)]'
                 }`}>
                   {summary.change.isIncrease ? '+' : '-'}{Math.abs(summary.change.value)}%
                 </span>
@@ -304,6 +304,13 @@ export default function InterviewAnalyticsDashboard({
       setIsLoading(false);
     }
   }, [orgId]);
+
+  // マウント時のデータ取得（initialDataがnullの場合）
+  useEffect(() => {
+    if (!initialData && !isLoading && !data) {
+      fetchData(selectedPeriod);
+    }
+  }, [initialData, isLoading, data, selectedPeriod, fetchData]);
 
   // 期間変更時のデータ取得
   const handlePeriodChange = async (period: InterviewAnalyticsPeriod) => {
@@ -396,10 +403,10 @@ export default function InterviewAnalyticsDashboard({
         <div className="animate-pulse space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
+              <div key={i} className="h-32 bg-[var(--dashboard-card-border)] rounded-lg"></div>
             ))}
           </div>
-          <div className="h-96 bg-gray-200 rounded-lg"></div>
+          <div className="h-96 bg-[var(--dashboard-card-border)] rounded-lg"></div>
         </div>
       )}
 
@@ -432,7 +439,7 @@ export default function InterviewAnalyticsDashboard({
                   data={chartData}
                   title="日別AI呼び出し数"
                   valueKey="aiCallCount"
-                  color="bg-orange-500"
+                  color="bg-[var(--aio-pending-muted)]0"
                 />
               </DashboardCardContent>
             </DashboardCard>

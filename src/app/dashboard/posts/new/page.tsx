@@ -105,14 +105,14 @@ function NewPostContent() {
 
       <div className="mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">新しい記事</h1>
-          <p className="text-gray-600 mt-2">記事の情報を入力してください</p>
+          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">新しい記事</h1>
+          <p className="text-[var(--color-text-secondary)] mt-2">記事の情報を入力してください</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="title" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             タイトル *
           </label>
           <input
@@ -120,26 +120,26 @@ function NewPostContent() {
             id="title"
             name="title"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
             placeholder="記事のタイトルを入力"
           />
         </div>
 
         <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="slug" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             スラッグ（オプション）
           </label>
           <input
             type="text"
             id="slug"
             name="slug"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
             placeholder="URL用のスラッグ（空の場合は自動生成）"
           />
         </div>
 
         <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="content" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             内容 *
           </label>
           <textarea
@@ -147,19 +147,19 @@ function NewPostContent() {
             name="content"
             required
             rows={8}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
             placeholder="記事の内容を入力（Markdown形式）"
           />
         </div>
 
         <div>
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="status" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             ステータス
           </label>
           <select
             id="status"
             name="status"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="draft">下書き</option>
             <option value="published">公開</option>
@@ -167,8 +167,8 @@ function NewPostContent() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-red-800 text-sm">{error}</p>
+          <div className="bg-[var(--aio-danger-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4">
+            <p className="text-[var(--aio-danger)] text-sm">{error}</p>
           </div>
         )}
 
@@ -176,13 +176,13 @@ function NewPostContent() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 disabled:opacity-50"
+            className="bg-[var(--aio-purple)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-purple)] disabled:opacity-50"
           >
             {loading ? '作成中...' : '作成'}
           </button>
           <Link
             href="/dashboard/posts"
-            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 inline-block text-center"
+            className="bg-[var(--dashboard-card-border)] text-[var(--color-text-secondary)] px-6 py-2 rounded-md hover:bg-[var(--table-row-hover)] inline-block text-center"
             replace
           >
             キャンセル

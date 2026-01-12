@@ -1,8 +1,16 @@
 'use client';
 
+/**
+ * ダッシュボードメインコンテンツ
+ *
+ * NOTE: [CORE_ARCHITECTURE] DashboardPageShell の children として使用
+ * - 認証・権限・エラーハンドリングは Shell が担当
+ * - このコンポーネントはコンテンツ表示のみを責務とする
+ */
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { useOrganization } from '@/lib/hooks/useOrganization';
+import { useDashboardPageContext } from '@/components/dashboard/DashboardPageShell';
 import { getOrganizationStatsSafe, getCaseStudiesStatsSafe } from '@/lib/safeData';
 import PublishToggle from './PublishToggle';
 import DashboardClient from '@/components/dashboard/DashboardClient';
@@ -12,11 +20,14 @@ import AIVisibilityCard from './AIVisibilityCard';
 import { FirstTimeUserOnboarding } from '@/components/dashboard/FirstTimeUserOnboarding';
 import { logger } from '@/lib/utils/logger';
 import { useEffect, useState } from 'react';
-import { LockIcon, AlertTriangleIcon, BuildingIcon, BarChartIcon, DocumentIcon, BriefcaseIcon, CheckIcon } from '@/components/icons/HIGIcons';
 import {
-  DashboardCard,
+  BarChartIcon,
+  DocumentIcon,
+  BriefcaseIcon,
+  CheckIcon,
+} from '@/components/icons/HIGIcons';
+import {
   DashboardSection,
-  DashboardPageHeader,
   DashboardMetricCard,
   DashboardLoadingState,
   DashboardAlert,
@@ -34,37 +45,35 @@ interface CaseStudiesStats {
   published: number;
 }
 
-// Dashboard用の拡張組織型（useOrganizationの返却型を拡張）
+// Dashboard用の拡張組織型
 interface DashboardOrganization {
   id: string;
   name: string;
   slug?: string;
-  plan?: string;
+  plan?: string | null;
   logo_url?: string | null;
   is_published?: boolean;
-  feature_flags?: Record<string, boolean>;
 }
 
 export default function DashboardMain() {
-  const { 
-    user, 
-    organization, 
-    organizations, 
-    selectedOrganization, 
-    isLoading, 
-    error, 
-    hasPermissionError,
-    hasSystemError,
-    isDataFetched,
-    isReallyEmpty 
-  } = useOrganization();
-  
+  // Shell コンテキストから取得（エラー時は Shell がハンドル済み）
+  const { user, organization, organizations } = useDashboardPageContext();
+
   // 組織の最終チェック：organizationsに組織があるのにorganizationが未設定の場合の対処
   // NOTE: 境界で一度キャストし、以降は型安全にアクセス
-  const currentOrganization = (organization || (organizations.length > 0 ? organizations[0] : null)) as DashboardOrganization | null;
-  
-  const [stats, setStats] = useState<DashboardStats>({ total: 0, draft: 0, published: 0, archived: 0 });
-  const [caseStudiesStats, setCaseStudiesStats] = useState<CaseStudiesStats>({ total: 0, published: 0 });
+  const currentOrganization = (organization ||
+    (organizations.length > 0 ? organizations[0] : null)) as DashboardOrganization | null;
+
+  const [stats, setStats] = useState<DashboardStats>({
+    total: 0,
+    draft: 0,
+    published: 0,
+    archived: 0,
+  });
+  const [caseStudiesStats, setCaseStudiesStats] = useState<CaseStudiesStats>({
+    total: 0,
+    published: 0,
+  });
   const [statsLoading, setStatsLoading] = useState(true);
   const [statsError, setStatsError] = useState<string | null>(null);
 
@@ -77,9 +86,9 @@ export default function DashboardMain() {
           setStatsError(null);
           const [statsResult, caseStudiesResult] = await Promise.all([
             getOrganizationStatsSafe(),
-            getCaseStudiesStatsSafe(currentOrganization.id)
+            getCaseStudiesStatsSafe(currentOrganization.id),
           ]);
-          
+
           setStats(statsResult.data || { total: 0, draft: 0, published: 0, archived: 0 });
           setCaseStudiesStats(caseStudiesResult.data || { total: 0, published: 0 });
         } catch (error) {
@@ -91,229 +100,13 @@ export default function DashboardMain() {
       };
 
       fetchStats();
-    } else if (!isLoading && user && !currentOrganization) {
-      // 認証済みかつ組織がないことが確定した場合は統計ローディングを止める
+    } else {
+      // 組織がない場合は統計ローディングを止める
       setStatsLoading(false);
     }
-  }, [currentOrganization, isLoading, user]);
+  }, [currentOrganization?.id]);
 
-  // ローディング中の判定を明確化
-  if (isLoading) {
-    return (
-      <DashboardLoadingState
-        fullScreen
-        message="データを読み込んでいます"
-        subMessage="アカウント情報と企業情報を確認しています..."
-      />
-    );
-  }
-
-  // RLS権限エラーの場合（具体的な説明付き）
-  if (hasPermissionError && user) {
-    return (
-      <div className="min-h-screen bg-[var(--dashboard-bg)] flex items-center justify-center">
-        <DashboardCard className="max-w-lg w-full mx-4">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-[var(--status-error-bg)] rounded-full flex items-center justify-center mx-auto mb-4">
-              <LockIcon className="w-8 h-8 text-[var(--status-error)]" aria-hidden />
-            </div>
-            <h2 className="text-xl font-semibold text-[var(--status-error)] mb-3">企業情報にアクセスできません</h2>
-            <DashboardAlert variant="error" className="text-left mb-4">
-              <p className="text-sm mb-2">
-                <strong>問題:</strong> 企業のデータベースにアクセスする権限がありません
-              </p>
-              <p className="text-sm mb-2">
-                <strong>考えられる原因:</strong>
-              </p>
-              <ul className="text-xs ml-4 space-y-1">
-                <li>• 企業メンバーから除外された可能性があります</li>
-                <li>• 一時的なシステムエラーの可能性があります</li>
-                <li>• アカウントの設定に問題がある可能性があります</li>
-              </ul>
-            </DashboardAlert>
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              企業の管理者にご連絡いただくか、<br/>
-              一度ログアウトして再度ログインをお試しください。
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white font-medium py-2 px-4 rounded-lg transition-colors"
-            >
-              ページを再読み込みする
-            </button>
-
-            <Link
-              href="/auth/logout"
-              className="w-full bg-[var(--dashboard-card-border)] hover:bg-[var(--aio-muted)] text-[var(--color-text-primary)] font-medium py-2 px-4 rounded-lg text-center block transition-colors"
-            >
-              ログアウトして再度ログイン
-            </Link>
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-[var(--dashboard-card-border)] text-center">
-            <p className="text-xs text-[var(--color-text-secondary)]">
-              ログインユーザー: {user.email}
-            </p>
-            <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
-              問題が解決しない場合は、このメールアドレスを管理者にお伝えください
-            </p>
-          </div>
-        </DashboardCard>
-      </div>
-    );
-  }
-
-  // データ取得エラーの場合
-  if (error && !user) {
-    return (
-      <div className="min-h-screen bg-[var(--dashboard-bg)] flex items-center justify-center">
-        <DashboardCard className="max-w-md w-full mx-4">
-          <h2 className="text-xl font-semibold text-[var(--status-error)] mb-4">データ読み込みエラー</h2>
-          <p className="text-[var(--color-text-secondary)] mb-4">
-            ユーザー情報の取得に失敗しました。
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="w-full bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            再読み込み
-          </button>
-        </DashboardCard>
-      </div>
-    );
-  }
-
-  // 未認証
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-[var(--dashboard-bg)] flex items-center justify-center">
-        <DashboardCard className="max-w-md w-full mx-4">
-          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">サインインしてください</h2>
-          <p className="text-[var(--color-text-secondary)] mb-4">ダッシュボードにアクセスするにはログインが必要です。</p>
-          <Link
-            href="/auth/login"
-            className="w-full bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white font-medium py-2 px-4 rounded-lg text-center block transition-colors"
-          >
-            ログインページへ
-          </Link>
-        </DashboardCard>
-      </div>
-    );
-  }
-
-  // システム/DBエラーの場合（組織メンバーシップは確認できているが詳細取得失敗）
-  if (hasSystemError && user) {
-    return (
-      <div className="min-h-screen bg-[var(--dashboard-bg)] flex items-center justify-center">
-        <DashboardCard className="max-w-lg w-full mx-4">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-[var(--status-warning-bg)] rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangleIcon className="w-8 h-8 text-[var(--status-warning)]" aria-hidden />
-            </div>
-            <h2 className="text-xl font-semibold text-[var(--status-warning)] mb-3">データベースエラー</h2>
-            <DashboardAlert variant="warning" className="text-left mb-4">
-              <p className="text-sm mb-2">
-                <strong>状況:</strong> 組織のメンバーシップは確認できていますが、組織の詳細情報の取得中にエラーが発生しています
-              </p>
-              <p className="text-sm mb-2">
-                <strong>詳細:</strong> {error}
-              </p>
-              <p className="text-sm">
-                <strong>対処:</strong> 一時的なシステムエラーの可能性があります。しばらく待ってから再度お試しください
-              </p>
-            </DashboardAlert>
-          </div>
-
-          <div className="space-y-3">
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full bg-[var(--status-warning)] hover:opacity-90 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-            >
-              ページを再読み込みする
-            </button>
-
-            <Link
-              href="/"
-              className="w-full bg-[var(--dashboard-card-border)] hover:bg-[var(--aio-muted)] text-[var(--color-text-primary)] font-medium py-2 px-4 rounded-lg text-center block transition-colors"
-            >
-              ホームページに戻る
-            </Link>
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-[var(--dashboard-card-border)] text-center">
-            <p className="text-xs text-[var(--color-text-secondary)]">
-              ログインユーザー: {user.email}
-            </p>
-            <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
-              エラーが継続する場合は、このメールアドレスを添えてサポートにお問い合わせください
-            </p>
-          </div>
-        </DashboardCard>
-      </div>
-    );
-  }
-
-  // パターンB: userあり & org 0件 - 組織がない場合のオンボーディング（詳細説明付き）
-  // データ取得完了後に組織が本当に0件の場合のみオンボーディングを表示
-  if (user && isDataFetched && (!organizations || organizations.length === 0)) {
-    return (
-      <div className="min-h-screen bg-[var(--dashboard-bg)] flex items-center justify-center">
-        <DashboardCard className="max-w-lg w-full mx-4">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-[var(--status-info-bg)] rounded-full flex items-center justify-center mx-auto mb-4">
-              <BuildingIcon className="w-8 h-8 text-[var(--status-info)]" aria-hidden />
-            </div>
-            <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-3">企業情報をまだ登録していません</h2>
-            <DashboardAlert variant="info" className="text-left mb-4">
-              <p className="text-sm mb-2">
-                <strong>AIOHub をご利用いただくには:</strong>
-              </p>
-              <ul className="text-sm ml-4 space-y-1">
-                <li>• 企業情報の登録が必要です</li>
-                <li>• 登録は3〜5分程度で完了します</li>
-                <li>• 登録後すぐにAI機能をお使いいただけます</li>
-              </ul>
-            </DashboardAlert>
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              企業名、業界、基本的な情報を入力するだけで、<br/>
-              すぐにAI可視性分析を開始できます。
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <Link
-              href="/organizations/new"
-              className="w-full bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white font-medium py-3 px-4 rounded-lg text-center block transition-colors"
-              data-testid="create-organization"
-            >
-              企業を作成する
-            </Link>
-
-            <div className="text-center">
-              <p className="text-xs text-[var(--color-text-tertiary)] mb-2">既に企業に招待されている場合</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="text-sm text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] underline"
-              >
-                ページを再読み込み
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-[var(--dashboard-card-border)] text-center">
-            <p className="text-xs text-[var(--color-text-secondary)]">
-              ユーザーID: {user.email}
-            </p>
-          </div>
-        </DashboardCard>
-      </div>
-    );
-  }
-
-  // 最終的に現在の組織が決まっていない場合はローディング表示
+  // Shell がすでに isReallyEmpty をハンドルしているが、念のための最終フォールバック
   if (!currentOrganization) {
     return (
       <DashboardLoadingState
@@ -324,7 +117,9 @@ export default function DashboardMain() {
     );
   }
 
-  logger.debug(`[Dashboard] Rendering dashboard UI for user ${user.id}, org: ${currentOrganization.id}`);
+  logger.debug(
+    `[Dashboard] Rendering dashboard UI for user ${user?.id}, org: ${currentOrganization.id}`
+  );
 
   return (
     <>
@@ -351,10 +146,15 @@ export default function DashboardMain() {
                 </span>
               </div>
             )}
-            <span className="text-[var(--color-text-primary)] font-medium" data-testid="organization-name">
+            <span
+              className="text-[var(--color-text-primary)] font-medium"
+              data-testid="organization-name"
+            >
               {currentOrganization.name}
             </span>
-            <div className={`w-2 h-2 rounded-full ${currentOrganization.is_published ? 'bg-[var(--status-success)] animate-pulse' : 'bg-[var(--color-text-tertiary)]'}`}></div>
+            <div
+              className={`w-2 h-2 rounded-full ${currentOrganization.is_published ? 'bg-[var(--status-success)] animate-pulse' : 'bg-[var(--color-text-tertiary)]'}`}
+            ></div>
           </div>
 
           {/* Main headline */}
@@ -367,7 +167,11 @@ export default function DashboardMain() {
 
           {/* Quick actions */}
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-            <PublishToggle organizationId={currentOrganization.id} isPublished={currentOrganization.is_published} organizationName={currentOrganization.name} />
+            <PublishToggle
+              organizationId={currentOrganization.id}
+              isPublished={currentOrganization.is_published}
+              organizationName={currentOrganization.name}
+            />
             <Link
               href={`/organizations/${currentOrganization.id}`}
               className="flex-1 text-center px-4 py-2 rounded-lg border border-[var(--dashboard-card-border)] bg-[var(--dashboard-card-bg)] text-[var(--color-text-primary)] font-medium hover:bg-[var(--aio-muted)] transition-colors"
@@ -391,29 +195,31 @@ export default function DashboardMain() {
                 </div>
               </DashboardAlert>
             </div>
-          ) : !statsLoading && (
-            <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              <DashboardMetricCard
-                label="総コンテンツ数"
-                value={stats.total}
-                icon={<BarChartIcon className="w-5 h-5" aria-hidden />}
-              />
-              <DashboardMetricCard
-                label="公開済み"
-                value={stats.published}
-                icon={<CheckIcon className="w-5 h-5" aria-hidden />}
-              />
-              <DashboardMetricCard
-                label="下書き"
-                value={stats.draft}
-                icon={<DocumentIcon className="w-5 h-5" aria-hidden />}
-              />
-              <DashboardMetricCard
-                label="事例"
-                value={caseStudiesStats.total}
-                icon={<BriefcaseIcon className="w-5 h-5" aria-hidden />}
-              />
-            </div>
+          ) : (
+            !statsLoading && (
+              <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                <DashboardMetricCard
+                  label="総コンテンツ数"
+                  value={stats.total}
+                  icon={<BarChartIcon className="w-5 h-5" aria-hidden />}
+                />
+                <DashboardMetricCard
+                  label="公開済み"
+                  value={stats.published}
+                  icon={<CheckIcon className="w-5 h-5" aria-hidden />}
+                />
+                <DashboardMetricCard
+                  label="下書き"
+                  value={stats.draft}
+                  icon={<DocumentIcon className="w-5 h-5" aria-hidden />}
+                />
+                <DashboardMetricCard
+                  label="事例"
+                  value={caseStudiesStats.total}
+                  icon={<BriefcaseIcon className="w-5 h-5" aria-hidden />}
+                />
+              </div>
+            )
           )}
         </div>
       </DashboardSection>
@@ -430,13 +236,19 @@ export default function DashboardMain() {
           {/* Right column */}
           <div className="space-y-8">
             <DashboardActions organization={organization} />
-            <FirstTimeUserOnboarding organization={organization as DashboardOrganization} />
+            <FirstTimeUserOnboarding
+              organization={organization as DashboardOrganization}
+            />
           </div>
         </div>
 
         {/* Bottom section */}
         <div className="mt-12">
-          <DashboardClient organizationId={currentOrganization.id} organizationName={currentOrganization.name} isPublished={currentOrganization.is_published} />
+          <DashboardClient
+            organizationId={currentOrganization.id}
+            organizationName={currentOrganization.name}
+            isPublished={currentOrganization.is_published}
+          />
         </div>
       </DashboardSection>
     </>

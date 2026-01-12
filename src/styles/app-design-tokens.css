@@ -17,12 +17,12 @@
   --color-text-secondary: #636366;  /* AA準拠グレー */
   --color-text-tertiary: #767680;   /* 薄いグレー */
 
-  /* === Dashboard Specific Tokens === */
-  --dashboard-bg: #f3f4f6;          /* ダッシュボード背景 (gray-100) */
+  /* === Dashboard Specific Tokens (iCloud Dense統一) === */
+  --dashboard-bg: #f5f5f7;          /* Apple Gray - iCloud風に統一 */
   --dashboard-card-bg: #ffffff;     /* カード背景 */
-  --dashboard-card-border: #e5e7eb; /* カードボーダー (gray-200) */
-  --dashboard-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --dashboard-card-shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+  --dashboard-card-border: rgba(0, 0, 0, 0.06); /* 繊細なボーダー */
+  --dashboard-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+  --dashboard-card-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.08);
 
   /* === Status Colors === */
   --status-success: #22c55e;        /* green-500 */
@@ -46,6 +46,30 @@
   --aio-danger: #991b1b;            /* red-800 - danger badge text */
   --aio-danger-muted: #fee2e2;      /* red-100 - danger badge background */
 
+  /* === Pending Status (Orange系) === */
+  --status-pending: #f59e0b;        /* amber-500 - pending indicator */
+  --status-pending-bg: #fef3c7;     /* amber-100 - pending background */
+  --aio-pending: #92400e;           /* amber-800 - pending badge text */
+  --aio-pending-muted: #fef3c7;     /* amber-100 - pending badge background */
+  --aio-pending-surface: #fffbeb;   /* amber-50 - pending box background */
+  --aio-pending-border: #fde68a;    /* amber-200 - pending box border */
+
+  /* === Purple系 (AI機能・トレンド用) === */
+  --aio-purple: #7c3aed;            /* violet-600 - purple accent */
+  --aio-purple-muted: #ede9fe;      /* violet-100 - purple background */
+  --aio-purple-surface: #f5f3ff;    /* violet-50 - purple box background */
+  --aio-purple-border: #ddd6fe;     /* violet-200 - purple box border */
+
+  /* === Indigo系 (チャット・選択状態用) === */
+  --aio-indigo: #4f46e5;            /* indigo-600 - indigo accent */
+  --aio-indigo-muted: #e0e7ff;      /* indigo-100 - indigo background */
+  --aio-indigo-surface: #eef2ff;    /* indigo-50 - indigo box background */
+  --aio-indigo-border: #c7d2fe;     /* indigo-200 - indigo box border */
+
+  /* === Icon Colors === */
+  --color-icon: #6b7280;            /* gray-500 - default icon */
+  --color-icon-muted: #9ca3af;      /* gray-400 - muted icon */
+
   /* === Stripe-inspired Interaction Tokens === */
   --focus-ring: 0 0 0 3px rgba(0, 122, 255, 0.25);
   --focus-ring-error: 0 0 0 3px rgba(239, 68, 68, 0.25);
@@ -56,15 +80,26 @@
   --input-bg-disabled: #f9fafb;     /* gray-50 */
   --input-placeholder: #9ca3af;     /* gray-400 */
 
-  /* === Button Interaction States === */
+  /* === Button Interaction States (iCloud Dense統一) === */
   --btn-primary-bg: var(--aio-primary);
   --btn-primary-hover: var(--aio-primary-hover);
   --btn-primary-active: #0051b3;
   --btn-secondary-bg: #ffffff;
-  --btn-secondary-border: var(--dashboard-card-border);
+  --btn-secondary-border: rgba(0, 0, 0, 0.12);
   --btn-secondary-hover: #f9fafb;
   --btn-danger-bg: var(--status-error);
   --btn-danger-hover: #dc2626;
+
+  /* === Unified Button Sizes (iCloud Dense) === */
+  --btn-height-sm: 32px;    /* コンパクト */
+  --btn-height-md: 36px;    /* 標準 */
+  --btn-height-lg: 40px;    /* 大きめ */
+  --btn-height-xl: 44px;    /* タップターゲット最大 */
+  --btn-padding-sm: 12px;
+  --btn-padding-md: 16px;
+  --btn-padding-lg: 20px;
+  --btn-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --btn-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   /* === Table Tokens === */
   --table-header-bg: #f9fafb;       /* gray-50 */
@@ -96,13 +131,13 @@
   --duration-md: 280ms;
   --duration-lg: 350ms;
   
-  /* === Spacing (8pt Grid) === */
+  /* === Spacing (Compact 8pt Grid - iCloud Dense) === */
   --space-xs: 4px;
   --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
+  --space-md: 12px;      /* 16px → 12px: 密度向上 */
+  --space-lg: 16px;      /* 24px → 16px: 密度向上 */
+  --space-xl: 24px;      /* 32px → 24px: 密度向上 */
+  --space-2xl: 32px;     /* 48px → 32px: 密度向上 */
   
   /* === Typography === */
   --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
@@ -122,6 +157,14 @@
   --z-dropdown: 1000;
   --z-modal: 1050;
   --z-toast: 1080;
+
+  /* === Tooltip === */
+  --tooltip-bg: #1f2937;            /* gray-800 */
+  --tooltip-text: #ffffff;
+
+  /* === Code Block === */
+  --code-block-bg: #1f2937;         /* gray-800 */
+  --code-block-text: #4ade80;       /* green-400 */
 }
 
 /* === Utility Classes (iCloud Quality) === */

@@ -94,10 +94,10 @@ function AiReportDetailContent() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high': return 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)]';
+      case 'medium': return 'bg-[var(--aio-warning-muted)] text-[var(--aio-warning)]';
+      case 'low': return 'bg-[var(--aio-success-muted)] text-[var(--aio-success)]';
+      default: return 'bg-[var(--aio-surface)] text-[var(--color-text-primary)]';
     }
   };
 
@@ -116,11 +116,11 @@ function AiReportDetailContent() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="animate-pulse space-y-6">
-              <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-32 bg-gray-200 rounded"></div>
+              <div className="h-8 bg-[var(--dashboard-card-border)] rounded w-1/4"></div>
+              <div className="h-32 bg-[var(--dashboard-card-border)] rounded"></div>
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-24 bg-gray-200 rounded"></div>
+                  <div key={i} className="h-24 bg-[var(--dashboard-card-border)] rounded"></div>
                 ))}
               </div>
             </div>
@@ -136,14 +136,14 @@ function AiReportDetailContent() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-4">
-              <AlertCircle className="w-6 h-6 text-red-600" />
-              <h1 className="text-xl font-bold text-neutral-900">エラーが発生しました</h1>
+              <AlertCircle className="w-6 h-6 text-[var(--aio-danger)]" />
+              <h1 className="text-xl font-bold text-[var(--color-text-primary)]">エラーが発生しました</h1>
             </div>
-            <p className="text-neutral-600 mb-6">{error}</p>
+            <p className="text-[var(--color-text-secondary)] mb-6">{error}</p>
             <div className="flex gap-4">
               <Link 
                 href="/dashboard/ai-reports"
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 bg-[var(--aio-surface)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--dashboard-card-border)] transition-colors"
               >
                 レポート一覧に戻る
               </Link>
@@ -172,7 +172,7 @@ function AiReportDetailContent() {
           <div className="flex items-center gap-4 mb-4">
             <Link 
               href="/dashboard/ai-reports"
-              className="p-2 text-neutral-600 hover:text-neutral-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--aio-surface)] rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
@@ -180,10 +180,10 @@ function AiReportDetailContent() {
             <div className="flex items-center gap-3">
               <Brain className="w-8 h-8 text-[var(--aio-primary)]" />
               <div>
-                <h1 className="text-2xl font-bold text-neutral-900">
+                <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
                   {formatPeriod(report.period_start)} AI月次レポート
                 </h1>
-                <div className="flex items-center gap-4 text-sm text-neutral-600">
+                <div className="flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
                   <span>{getLevelLabel(report.level)}</span>
                   <span>プラン: {report.plan_id.toUpperCase()}</span>
                 </div>
@@ -205,16 +205,16 @@ function AiReportDetailContent() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <Brain className="w-6 h-6 text-[var(--aio-primary)]" />
-            <h2 className="text-xl font-semibold text-neutral-900">AIサマリー</h2>
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">AIサマリー</h2>
           </div>
-          <p className="text-neutral-700 leading-relaxed">{report.summary_text}</p>
+          <p className="text-[var(--color-text-secondary)] leading-relaxed">{report.summary_text}</p>
         </div>
 
         {/* 基本KPI */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <TrendingUp className="w-6 h-6 text-[var(--aio-primary)]" />
-            <h2 className="text-xl font-semibold text-neutral-900">基本指標</h2>
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">基本指標</h2>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -225,27 +225,27 @@ function AiReportDetailContent() {
               <div className="text-sm text-[var(--aio-primary)]">月間ページビュー</div>
             </div>
 
-            <div className="p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600 mb-1">
+            <div className="p-4 bg-[var(--aio-success-muted)] rounded-lg">
+              <div className="text-2xl font-bold text-[var(--aio-success)] mb-1">
                 {report.metrics?.unique_contents || 0}
               </div>
-              <div className="text-sm text-green-800">公開コンテンツ数</div>
+              <div className="text-sm text-[var(--aio-success)]">公開コンテンツ数</div>
             </div>
 
-            <div className="p-4 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600 mb-1">
+            <div className="p-4 bg-[var(--aio-purple-muted)] rounded-lg">
+              <div className="text-2xl font-bold text-[var(--aio-purple)] mb-1">
                 {report.metrics?.ai_generated_contents || 0}
               </div>
-              <div className="text-sm text-purple-800">AI生成コンテンツ</div>
+              <div className="text-sm text-[var(--aio-purple)]">AI生成コンテンツ</div>
             </div>
 
-            <div className="p-4 bg-orange-50 rounded-lg">
-              <div className="text-2xl font-bold text-orange-600 mb-1">
+            <div className="p-4 bg-[var(--aio-pending-muted)] rounded-lg">
+              <div className="text-2xl font-bold text-[var(--aio-pending)] mb-1">
                 {(report.metrics?.services_published || 0) + 
                  (report.metrics?.faqs_published || 0) + 
                  (report.metrics?.case_studies_published || 0)}
               </div>
-              <div className="text-sm text-orange-800">主要コンテンツ</div>
+              <div className="text-sm text-[var(--aio-pending)]">主要コンテンツ</div>
             </div>
           </div>
         </div>
@@ -264,22 +264,22 @@ function AiReportDetailContent() {
         {report.suggestions && report.suggestions.length > 0 && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
             <div className="flex items-center gap-3 mb-6">
-              <Crown className="w-6 h-6 text-yellow-600" />
-              <h2 className="text-xl font-semibold text-neutral-900">改善提案</h2>
+              <Crown className="w-6 h-6 text-[var(--aio-warning)]" />
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">改善提案</h2>
             </div>
 
             <div className="space-y-4">
               {report.suggestions.map((suggestion, index) => (
-                <div key={suggestion.id || index} className="border border-gray-200 rounded-lg p-4">
+                <div key={suggestion.id || index} className="border border-[var(--dashboard-card-border)] rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <div className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(suggestion.priority)}`}>
                       優先度: {getPriorityLabel(suggestion.priority)}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-neutral-900 mb-2">{suggestion.title}</h3>
-                      <p className="text-neutral-700 text-sm">{suggestion.description}</p>
+                      <h3 className="font-semibold text-[var(--color-text-primary)] mb-2">{suggestion.title}</h3>
+                      <p className="text-[var(--color-text-secondary)] text-sm">{suggestion.description}</p>
                       {suggestion.category && (
-                        <span className="inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                        <span className="inline-block mt-2 px-2 py-1 bg-[var(--aio-surface)] text-[var(--color-text-secondary)] text-xs rounded">
                           {suggestion.category}
                         </span>
                       )}
@@ -292,7 +292,7 @@ function AiReportDetailContent() {
         )}
 
         {/* フッター情報 */}
-        <div className="bg-gray-100 rounded-lg p-4 text-sm text-gray-600">
+        <div className="bg-[var(--aio-surface)] rounded-lg p-4 text-sm text-[var(--color-text-secondary)]">
           <div className="flex items-center gap-4">
             <Calendar className="w-4 h-4" />
             <span>対象期間: {report.period_start} 〜 {report.period_end}</span>

@@ -52,7 +52,7 @@
         { "route": "/dashboard/settings", "label": "設定" }
       ],
       "conditional_routes": [
-        { "route": "/dashboard/admin", "label": "管理", "condition": "isSiteAdmin" }
+        { "route": "/dashboard/manage", "label": "管理", "condition": "isSiteAdmin" }
       ]
     },
     {
@@ -122,7 +122,7 @@
 | /dashboard/billing | 請求管理 | サイドバー |
 | /dashboard/help | ヘルプ | サイドバー |
 | /dashboard/settings | 設定 | サイドバー |
-| /dashboard/admin | 管理 | **条件付き（isSiteAdmin）** |
+| /dashboard/manage | 管理 | **条件付き（isSiteAdmin）** |
 
 ### Account (必須: 1ルート)
 

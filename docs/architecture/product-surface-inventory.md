@@ -78,17 +78,17 @@
       { "route": "/dashboard/services-info", "label": "サービス情報", "in_sidebar": false }
     ],
     "dashboard_admin": [
-      { "route": "/dashboard/admin", "label": "管理", "in_sidebar": true, "condition": "isSiteAdmin" },
-      { "route": "/dashboard/admin/contents", "label": "コンテンツ管理", "in_sidebar": false },
-      { "route": "/dashboard/admin/billing-links", "label": "請求リンク", "in_sidebar": false },
-      { "route": "/dashboard/admin/ai-usage", "label": "AI使用量", "in_sidebar": false },
-      { "route": "/dashboard/admin/jobs", "label": "ジョブ管理", "in_sidebar": false },
-      { "route": "/dashboard/admin/storage-logs", "label": "ストレージログ", "in_sidebar": false },
-      { "route": "/dashboard/admin/ai-visibility", "label": "AI可視性", "in_sidebar": false },
-      { "route": "/dashboard/admin/alerts", "label": "アラート", "in_sidebar": false },
-      { "route": "/dashboard/admin/org-groups", "label": "組織グループ", "in_sidebar": false },
-      { "route": "/dashboard/admin/security", "label": "セキュリティ", "in_sidebar": false },
-      { "route": "/dashboard/admin/audit", "label": "監査ログ", "in_sidebar": false }
+      { "route": "/dashboard/manage", "label": "管理", "in_sidebar": true, "condition": "isSiteAdmin" },
+      { "route": "/dashboard/manage/contents", "label": "コンテンツ管理", "in_sidebar": false },
+      { "route": "/dashboard/manage/billing-links", "label": "請求リンク", "in_sidebar": false },
+      { "route": "/dashboard/manage/ai-usage", "label": "AI使用量", "in_sidebar": false },
+      { "route": "/dashboard/manage/jobs", "label": "ジョブ管理", "in_sidebar": false },
+      { "route": "/dashboard/manage/storage-logs", "label": "ストレージログ", "in_sidebar": false },
+      { "route": "/dashboard/manage/ai-visibility", "label": "AI可視性", "in_sidebar": false },
+      { "route": "/dashboard/manage/alerts", "label": "アラート", "in_sidebar": false },
+      { "route": "/dashboard/manage/org-groups", "label": "組織グループ", "in_sidebar": false },
+      { "route": "/dashboard/manage/security", "label": "セキュリティ", "in_sidebar": false },
+      { "route": "/dashboard/manage/audit", "label": "監査ログ", "in_sidebar": false }
     ],
     "account": [
       { "route": "/account", "label": "アカウント", "in_sidebar": true },

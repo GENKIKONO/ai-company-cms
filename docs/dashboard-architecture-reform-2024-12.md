@@ -58,7 +58,7 @@ const { data: userOrg } = await supabase
 **使用されるrole値**:
 | requiredRole | 対象ページ | 説明 |
 |--------------|-----------|------|
-| `admin` | /dashboard/admin/*, billing/new-session | 管理者専用 |
+| `admin` | /dashboard/manage/*, billing/new-session | 管理者専用 |
 | `editor` | services/edit, case-studies/new, posts/new | 編集権限が必要 |
 | `viewer` | その他すべて | 閲覧のみ |
 
@@ -76,16 +76,16 @@ const { data: userOrg } = await supabase
 
 | ページ | 参照テーブル |
 |--------|-------------|
-| `/dashboard/admin/ai-usage` | `ai_usage_logs`, `organizations` |
-| `/dashboard/admin/ai-visibility` | `ai_visibility_scores`, `ai_visibility_configs`, `ai_bot_logs` |
-| `/dashboard/admin/alerts` | `metrics_*` (MV), `security_incidents` |
-| `/dashboard/admin/audit` | `service_role_audit_log`, `ops_audit` |
-| `/dashboard/admin/billing-links` | `checkout_links` |
-| `/dashboard/admin/contents` | `posts`, `services`, `faqs`, `case_studies` |
-| `/dashboard/admin/jobs` | `translation_jobs`, `embedding_jobs` |
-| `/dashboard/admin/org-groups` | `org_groups`, `org_group_members`, `org_group_join_requests` |
-| `/dashboard/admin/security` | `intrusion_alerts`, `ip_reports`, `blocked_ips` |
-| `/dashboard/admin/storage-logs` | `storage_access_logs` |
+| `/dashboard/manage/ai-usage` | `ai_usage_logs`, `organizations` |
+| `/dashboard/manage/ai-visibility` | `ai_visibility_scores`, `ai_visibility_configs`, `ai_bot_logs` |
+| `/dashboard/manage/alerts` | `metrics_*` (MV), `security_incidents` |
+| `/dashboard/manage/audit` | `service_role_audit_log`, `ops_audit` |
+| `/dashboard/manage/billing-links` | `checkout_links` |
+| `/dashboard/manage/contents` | `posts`, `services`, `faqs`, `case_studies` |
+| `/dashboard/manage/jobs` | `translation_jobs`, `embedding_jobs` |
+| `/dashboard/manage/org-groups` | `org_groups`, `org_group_members`, `org_group_join_requests` |
+| `/dashboard/manage/security` | `intrusion_alerts`, `ip_reports`, `blocked_ips` |
+| `/dashboard/manage/storage-logs` | `storage_access_logs` |
 
 **RLSへの影響**:
 - これらのテーブルへのアクセスは、フロントエンドで `requiredRole="admin"` チェック後に行われる
@@ -248,7 +248,7 @@ DashboardPageShellは `supabase.auth.getSession()` を使用します：
 ## 変更ファイル一覧（参考）
 
 ```
-src/app/dashboard/admin/*.tsx (10ファイル)
+src/app/dashboard/manage/*.tsx (10ファイル)
 src/app/dashboard/interview/*.tsx (4ファイル)
 src/app/dashboard/embed/*.tsx (2ファイル)
 src/app/dashboard/billing/new-session/*.tsx

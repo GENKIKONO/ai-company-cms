@@ -165,7 +165,7 @@ export function cleanupAudit(): void {
  *
  * 使用例:
  * ```
- * useAdminPageAudit('/dashboard/admin/jobs');
+ * useAdminPageAudit('/dashboard/manage/jobs');
  * ```
  */
 export function useAdminPageAudit(page: string): void {

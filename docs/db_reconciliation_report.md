@@ -132,18 +132,18 @@
 
 | ページパス | 対象テーブル | 必要カラム（抜粋） | RLS状態 |
 |-----------|-------------|-------------------|---------|
-| `/dashboard/admin/ai-usage` | organization_ai_usage | organization_id, interview_count, message_count, citation_count, token_count, updated_at | ✅ `org_ai_usage_admin_read` 追加済 |
-| `/dashboard/admin/jobs` | translation_jobs | id, source_table, target_language, status, created_at, completed_at | ✅ `translation_jobs_admin_read` 追加済 |
-| `/dashboard/admin/jobs` | embedding_jobs | id, organization_id, source_table, status, priority, created_at | ✅ `embedding_jobs_admin_read` 追加済 |
-| `/dashboard/admin/audit` | service_role_audit | id, job_name, request_id, expected_row_count, affected_row_count, error_code, created_at | ⚠️ `is_admin()` ベース（統一検討） |
-| `/dashboard/admin/audit` | ops_audit | id, action, actor_id, target_type, target_id, details, created_at | ⚠️ 認証ユーザー全員SELECT可（要確認） |
-| `/dashboard/admin/security` | intrusion_detection_alerts | id, rule_id, source_ip, severity, description, detected_at, status | ⚠️ `is_admin()` ベース（統一検討） |
-| `/dashboard/admin/security` | ip_reports | id, ip_address, reason, reporter_id, status, created_at | ⚠️ 要確認 |
-| `/dashboard/admin/security` | ip_blocklist | id, ip_address, reason, blocked_at, expires_at, is_active | ⚠️ `is_admin()` ベース（統一検討） |
-| `/dashboard/admin/storage-logs` | storage_access_logs | id, bucket_id, object_path, action, user_id, ip_address, status_code, created_at | ✅ `storage_access_logs_admin_read` 追加済 |
-| `/dashboard/admin/ai-visibility` | ai_visibility_scores | id, organization_id, source_key, score, visibility_type, measured_at | ⚠️ 実質ALL許可（引き締め可能） |
-| `/dashboard/admin/ai-visibility` | ai_visibility_config | id, organization_id, enabled, check_interval_hours, notification_threshold, updated_at | ✅ `ai_visibility_config_admin_read` 追加済 |
-| `/dashboard/admin/ai-visibility` | ai_bot_logs | id, bot_name, user_agent, request_path, status_code, created_at | ⚠️ 要確認 |
+| `/dashboard/manage/ai-usage` | organization_ai_usage | organization_id, interview_count, message_count, citation_count, token_count, updated_at | ✅ `org_ai_usage_admin_read` 追加済 |
+| `/dashboard/manage/jobs` | translation_jobs | id, source_table, target_language, status, created_at, completed_at | ✅ `translation_jobs_admin_read` 追加済 |
+| `/dashboard/manage/jobs` | embedding_jobs | id, organization_id, source_table, status, priority, created_at | ✅ `embedding_jobs_admin_read` 追加済 |
+| `/dashboard/manage/audit` | service_role_audit | id, job_name, request_id, expected_row_count, affected_row_count, error_code, created_at | ⚠️ `is_admin()` ベース（統一検討） |
+| `/dashboard/manage/audit` | ops_audit | id, action, actor_id, target_type, target_id, details, created_at | ⚠️ 認証ユーザー全員SELECT可（要確認） |
+| `/dashboard/manage/security` | intrusion_detection_alerts | id, rule_id, source_ip, severity, description, detected_at, status | ⚠️ `is_admin()` ベース（統一検討） |
+| `/dashboard/manage/security` | ip_reports | id, ip_address, reason, reporter_id, status, created_at | ⚠️ 要確認 |
+| `/dashboard/manage/security` | ip_blocklist | id, ip_address, reason, blocked_at, expires_at, is_active | ⚠️ `is_admin()` ベース（統一検討） |
+| `/dashboard/manage/storage-logs` | storage_access_logs | id, bucket_id, object_path, action, user_id, ip_address, status_code, created_at | ✅ `storage_access_logs_admin_read` 追加済 |
+| `/dashboard/manage/ai-visibility` | ai_visibility_scores | id, organization_id, source_key, score, visibility_type, measured_at | ⚠️ 実質ALL許可（引き締め可能） |
+| `/dashboard/manage/ai-visibility` | ai_visibility_config | id, organization_id, enabled, check_interval_hours, notification_threshold, updated_at | ✅ `ai_visibility_config_admin_read` 追加済 |
+| `/dashboard/manage/ai-visibility` | ai_bot_logs | id, bot_name, user_agent, request_path, status_code, created_at | ⚠️ 要確認 |
 
 **管理者アクセス方式**:
 - `site_admins` テーブルに登録されたユーザーが管理者

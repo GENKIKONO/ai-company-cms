@@ -228,11 +228,11 @@ function TestInterviewContent() {
         <DashboardCardContent>
 
           {results.length > 0 && (
-            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+            <div className="mb-4 p-4 bg-[var(--aio-surface)] rounded-lg">
               <div className="flex space-x-4 text-sm">
-                <span className="text-green-600 font-medium">成功: {successCount}</span>
-                <span className="text-red-600 font-medium">失敗: {failCount}</span>
-                <span className="text-gray-600">合計: {results.length}</span>
+                <span className="text-[var(--aio-success)] font-medium">成功: {successCount}</span>
+                <span className="text-[var(--aio-danger)] font-medium">失敗: {failCount}</span>
+                <span className="text-[var(--color-text-secondary)]">合計: {results.length}</span>
               </div>
             </div>
           )}

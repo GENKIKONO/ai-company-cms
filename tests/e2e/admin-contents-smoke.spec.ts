@@ -1,6 +1,6 @@
 /**
  * Admin Contents Page Crash Prevention Smoke Tests
- * /dashboard/admin/contents ページの500エラー防止テスト
+ * /dashboard/manage/contents ページの500エラー防止テスト
  */
 
 import { test, expect } from '@playwright/test';
@@ -9,7 +9,7 @@ test.describe('Admin Contents Page Crash Prevention', () => {
   
   test('should handle page load without 500 error', async ({ page }) => {
     // 管理コンテンツページにアクセス
-    await page.goto('/dashboard/admin/contents');
+    await page.goto('/dashboard/manage/contents');
     
     // ページが正常に読み込まれることを確認（500エラーで止まらない）
     await expect(page.locator('body')).toBeVisible();
@@ -29,7 +29,7 @@ test.describe('Admin Contents Page Crash Prevention', () => {
       });
     });
     
-    await page.goto('/dashboard/admin/contents');
+    await page.goto('/dashboard/manage/contents');
     
     // ページの基本構造が維持されることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -49,7 +49,7 @@ test.describe('Admin Contents Page Crash Prevention', () => {
       });
     });
     
-    await page.goto('/dashboard/admin/contents');
+    await page.goto('/dashboard/manage/contents');
     
     // ページがクラッシュせずにエラー状態になることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -65,7 +65,7 @@ test.describe('Admin Contents Page Crash Prevention', () => {
       route.abort('failed');
     });
     
-    await page.goto('/dashboard/admin/contents');
+    await page.goto('/dashboard/manage/contents');
     
     // ページがクラッシュせずにエラー状態になることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -85,7 +85,7 @@ test.describe('Admin Contents Page Crash Prevention', () => {
       });
     });
     
-    await page.goto('/dashboard/admin/contents');
+    await page.goto('/dashboard/manage/contents');
     
     // ページの基本構造が維持されることを確認
     await expect(page.locator('body')).toBeVisible();
@@ -135,7 +135,7 @@ test.describe('Admin Contents Page Crash Prevention', () => {
       }
     });
     
-    await page.goto('/dashboard/admin/contents');
+    await page.goto('/dashboard/manage/contents');
     
     // 削除ボタンをクリック（存在する場合）
     const deleteButton = page.locator('button:has-text("削除")').first();

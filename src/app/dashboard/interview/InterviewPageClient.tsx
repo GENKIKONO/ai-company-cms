@@ -26,16 +26,16 @@ function QuestionSelector({ axes, questions, selectedQuestions, onQuestionToggle
   const filteredQuestions = questions.filter(q => q.axis_code === activeAxis && q.is_active);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900">質問を選択してください</h2>
-        <p className="text-sm text-gray-600 mt-1">
+    <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)]">
+      <div className="px-6 py-4 border-b border-[var(--dashboard-card-border)]">
+        <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">質問を選択してください</h2>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
           選択した質問でAIインタビューを開始します。後から追加・変更はできません。
         </p>
       </div>
 
       {/* 質問軸タブ */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-[var(--dashboard-card-border)]">
         <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
           {axes.filter(axis => axis.is_active).map((axis) => (
             <button
@@ -44,7 +44,7 @@ function QuestionSelector({ axes, questions, selectedQuestions, onQuestionToggle
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                 activeAxis === axis.axis_code
                   ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:border-[var(--input-border)]'
               }`}
             >
               {axis.label_ja}
@@ -57,24 +57,24 @@ function QuestionSelector({ axes, questions, selectedQuestions, onQuestionToggle
       <div className="p-6">
         <div className="space-y-3">
           {filteredQuestions.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
+            <p className="text-[var(--color-text-tertiary)] text-center py-8">
               この軸の質問はありません
             </p>
           ) : (
             filteredQuestions.map((question) => (
               <div
                 key={question.id}
-                className="flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+                className="flex items-start space-x-3 p-3 border border-[var(--dashboard-card-border)] rounded-lg hover:bg-[var(--aio-surface)]"
               >
                 <input
                   type="checkbox"
                   id={question.id}
                   checked={selectedQuestions.includes(question.id)}
                   onChange={() => onQuestionToggle(question.id)}
-                  className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded mt-0.5"
+                  className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-[var(--input-border)] rounded mt-0.5"
                 />
                 <label htmlFor={question.id} className="flex-1 cursor-pointer">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">
                     {question.question_text}
                   </p>
                   {question.content_type && (
@@ -90,7 +90,7 @@ function QuestionSelector({ axes, questions, selectedQuestions, onQuestionToggle
 
         {filteredQuestions.length > 0 && (
           <div className="mt-4 flex justify-between items-center">
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-[var(--color-text-tertiary)]">
               {selectedQuestions.filter(id => 
                 filteredQuestions.some(q => q.id === id)
               ).length} / {filteredQuestions.length} 選択済み
@@ -230,15 +230,15 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-[var(--aio-surface)]">
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="h-8 bg-[var(--dashboard-card-border)] rounded w-1/3 mb-6"></div>
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+              <div className="h-6 bg-[var(--dashboard-card-border)] rounded w-3/4 mb-4"></div>
               <div className="space-y-3">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-4 bg-gray-200 rounded"></div>
+                  <div key={i} className="h-4 bg-[var(--dashboard-card-border)] rounded"></div>
                 ))}
               </div>
             </div>
@@ -249,14 +249,14 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--aio-surface)]">
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ヘッダー */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">AIインタビュアー</h1>
+                <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">AIインタビュアー</h1>
                 {/* Phase 4-B: Quota表示 */}
                 <OrgQuotaBadge
                   label="AI面接"
@@ -264,14 +264,14 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
                   className="text-sm"
                 />
               </div>
-              <p className="text-lg text-gray-600 mt-2">
+              <p className="text-lg text-[var(--color-text-secondary)] mt-2">
                 質問に答えることで、AIがコンテンツを自動生成します
               </p>
             </div>
             <div className="flex space-x-4">
               <Link
                 href="/dashboard/interview/history"
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-[var(--input-border)] rounded-md text-[var(--color-text-secondary)] hover:bg-[var(--aio-surface)]"
               >
                 履歴を見る
               </Link>
@@ -287,24 +287,24 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
 
         {/* エラー表示 */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="mb-6 bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
             <div className="flex">
-              <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-[var(--aio-danger)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-[var(--aio-danger)]">{error}</p>
               </div>
             </div>
           </div>
         )}
 
         {/* 設定パネル */}
-        <div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">インタビュー設定</h2>
+        <div className="mb-8 bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)] p-6">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">インタビュー設定</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                 コンテンツタイプ
               </label>
               <select
@@ -313,7 +313,7 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
                   ...settings,
                   contentType: e.target.value as typeof settings.contentType
                 })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+                className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               >
                 <option value="service">サービス</option>
                 <option value="product">製品</option>
@@ -334,14 +334,14 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
 
         {/* Phase 4-C: Quota警告表示 */}
         {isInterviewDisabledByPlan && (
-          <div className="mt-8 bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="mt-8 bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
             <div className="flex">
-              <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-[var(--aio-danger)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">AIインタビュー機能が無効です</h3>
-                <p className="mt-1 text-sm text-red-700">
+                <h3 className="text-sm font-medium text-[var(--aio-danger)]">AIインタビュー機能が無効です</h3>
+                <p className="mt-1 text-sm text-[var(--aio-danger)]">
                   現在のプランではAIインタビュー機能をご利用いただけません。プランをアップグレードしてください。
                 </p>
               </div>
@@ -350,14 +350,14 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
         )}
         
         {isInterviewLimitReached && !isInterviewDisabledByPlan && (
-          <div className="mt-8 bg-orange-50 border border-orange-200 rounded-md p-4">
+          <div className="mt-8 bg-[var(--aio-pending-muted)] border border-[var(--aio-pending)] rounded-md p-4">
             <div className="flex">
-              <svg className="w-5 h-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-[var(--aio-pending)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-orange-800">AIインタビュー上限に達しました</h3>
-                <p className="mt-1 text-sm text-orange-700">
+                <h3 className="text-sm font-medium text-[var(--aio-pending)]">AIインタビュー上限に達しました</h3>
+                <p className="mt-1 text-sm text-[var(--aio-pending)]">
                   {aiInterviewQuota && `${aiInterviewQuota.usedInWindow}/${aiInterviewQuota.limit} のAIインタビューを使用済みです。`}
                   追加でAIインタビューを実行するには、プランをアップグレードしてください。
                 </p>
@@ -368,7 +368,7 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
 
         {/* アクションボタン */}
         <div className="mt-8 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-[var(--color-text-secondary)]">
             {selectedQuestions.length > 0 && (
               <span>{selectedQuestions.length}個の質問を選択中</span>
             )}
@@ -376,7 +376,7 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
           <div className="flex space-x-4">
             <Link
               href="/dashboard"
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-[var(--input-border)] rounded-md text-[var(--color-text-secondary)] hover:bg-[var(--aio-surface)]"
             >
               キャンセル
             </Link>

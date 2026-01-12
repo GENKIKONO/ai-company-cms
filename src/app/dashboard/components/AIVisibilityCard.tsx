@@ -166,25 +166,25 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
   };
 
   const getScoreColor = (score: number | undefined): string => {
-    if (score === undefined || score === null) return 'text-gray-400';
-    if (score >= 80) return 'text-green-600';
+    if (score === undefined || score === null) return 'text-[var(--color-icon-muted)]';
+    if (score >= 80) return 'text-[var(--aio-success)]';
     if (score >= 60) return 'text-[var(--aio-info)]';
-    if (score >= 40) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 40) return 'text-[var(--aio-warning)]';
+    return 'text-[var(--aio-danger)]';
   };
 
   const getScoreBgColor = (score: number | undefined): string => {
-    if (score === undefined || score === null) return 'bg-gray-100';
-    if (score >= 80) return 'bg-green-100';
+    if (score === undefined || score === null) return 'bg-[var(--aio-surface)]';
+    if (score >= 80) return 'bg-[var(--aio-success-muted)]';
     if (score >= 60) return 'bg-[var(--aio-muted)]';
-    if (score >= 40) return 'bg-yellow-100';
-    return 'bg-red-100';
+    if (score >= 40) return 'bg-[var(--aio-warning-muted)]';
+    return 'bg-[var(--aio-danger-muted)]';
   };
 
   return (
-    <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
+    <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-[var(--dashboard-card-border)] hover:border-[var(--input-border)] hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-6">
-        <div className="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+        <div className="w-16 h-16 bg-[var(--aio-purple)] rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
           </svg>
@@ -193,7 +193,7 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
         {/* effective-features ベースの表示制御 */}
         <div className="text-right">
           {!showAdvancedFeatures && (
-            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+            <span className="text-xs bg-[var(--aio-surface)] text-[var(--color-text-secondary)] px-2 py-1 rounded-full">
               Proプラン以上
             </span>
           )}
@@ -201,12 +201,12 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
       </div>
       
       <div>
-        <p className="text-sm font-medium text-gray-500 mb-2">AI可視性スコア</p>
+        <p className="text-sm font-medium text-[var(--color-text-tertiary)] mb-2">AI可視性スコア</p>
         
         {loading ? (
           <div className="space-y-3">
-            <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+            <div className="h-8 bg-[var(--dashboard-card-border)] rounded animate-pulse"></div>
+            <div className="h-4 bg-[var(--dashboard-card-border)] rounded w-3/4 animate-pulse"></div>
           </div>
         ) : (
           <>
@@ -217,11 +217,11 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
                 </span>
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-2xl font-bold text-[var(--color-text-primary)]">
                   {visibilityData?.overall_score ? `${formatScore(visibilityData.overall_score)}点` : 'データ収集中'}
                 </h3>
-                <p className="text-sm text-gray-500">
-                  {visibilityData?.summary?.last_calculation 
+                <p className="text-sm text-[var(--color-text-tertiary)]">
+                  {visibilityData?.summary?.last_calculation
                     ? `更新: ${formatDate(visibilityData.summary.last_calculation)}`
                     : '初回分析を準備中'
                   }
@@ -232,32 +232,32 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
             {/* 基本情報（全プラン表示） */}
             <div className="space-y-2 mb-4">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">分析対象URL</span>
+                <span className="text-[var(--color-text-secondary)]">分析対象URL</span>
                 <span className="font-medium">{visibilityData?.summary?.total_analyzed_urls || 0}件</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">AI botアクセス</span>
+                <span className="text-[var(--color-text-secondary)]">AI botアクセス</span>
                 <span className="font-medium">{botLogsData?.total_count || 0}回</span>
               </div>
             </div>
 
             {/* Pro以上限定の詳細情報 */}
             {showAdvancedFeatures && visibilityData && (
-              <div className="border-t border-gray-100 pt-4">
+              <div className="border-t border-[var(--dashboard-card-border)] pt-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="bg-green-50 rounded-lg p-3">
-                    <div className="font-medium text-green-800 mb-1">高評価コンテンツ</div>
-                    <div className="text-green-600 font-semibold">
+                  <div className="bg-[var(--aio-success-muted)] rounded-lg p-3">
+                    <div className="font-medium text-[var(--aio-success)] mb-1">高評価コンテンツ</div>
+                    <div className="text-[var(--status-success)] font-semibold">
                       {visibilityData.summary?.top_performing_urls || 0}件
                     </div>
-                    <div className="text-xs text-green-600">スコア80点以上</div>
+                    <div className="text-xs text-[var(--status-success)]">スコア80点以上</div>
                   </div>
-                  <div className="bg-yellow-50 rounded-lg p-3">
-                    <div className="font-medium text-yellow-800 mb-1">要改善</div>
-                    <div className="text-yellow-600 font-semibold">
+                  <div className="bg-[var(--aio-warning-muted)] rounded-lg p-3">
+                    <div className="font-medium text-[var(--aio-warning)] mb-1">要改善</div>
+                    <div className="text-[var(--status-warning)] font-semibold">
                       {visibilityData.summary?.improvement_needed_urls || 0}件
                     </div>
-                    <div className="text-xs text-yellow-600">スコア50点以下</div>
+                    <div className="text-xs text-[var(--status-warning)]">スコア50点以下</div>
                   </div>
                 </div>
               </div>
@@ -265,7 +265,7 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
 
             {/* プラン制限メッセージ */}
             {!showAdvancedFeatures && (
-              <div className="border-t border-gray-100 pt-4">
+              <div className="border-t border-[var(--dashboard-card-border)] pt-4">
                 <div className="bg-[var(--aio-muted)] rounded-lg p-3 text-sm">
                   <p className="text-[var(--aio-primary)] font-medium mb-1">詳細分析を利用するには</p>
                   <p className="text-[var(--aio-primary)]">Proプラン以上で、AI×SEO相関分析やトレンド分析などの高度な機能をご利用いただけます。</p>
@@ -276,13 +276,13 @@ export default function AIVisibilityCard({ organizationId, organizationPlan = 's
             {/* データなし状態 */}
             {!loading && !visibilityData && !botLogsData && (
               <div className="text-center py-4">
-                <div className="w-12 h-12 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center mb-3">
-                  <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 mx-auto bg-[var(--aio-surface)] rounded-2xl flex items-center justify-center mb-3">
+                  <svg className="w-6 h-6 text-[var(--color-icon-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <p className="text-gray-500 font-medium mb-1">データ収集中</p>
-                <p className="text-xs text-gray-400">公開コンテンツのAI分析を開始しています</p>
+                <p className="text-[var(--color-text-tertiary)] font-medium mb-1">データ収集中</p>
+                <p className="text-xs text-[var(--color-icon-muted)]">公開コンテンツのAI分析を開始しています</p>
               </div>
             )}
           </>

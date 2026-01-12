@@ -98,13 +98,13 @@ function NewServiceContent() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">新しいサービス</h1>
-        <p className="text-gray-600 mt-2">サービス情報を入力してください</p>
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">新しいサービス</h1>
+        <p className="text-[var(--color-text-secondary)] mt-2">サービス情報を入力してください</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             サービス名 *
           </label>
           <input
@@ -112,40 +112,40 @@ function NewServiceContent() {
             id="name"
             name="name"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="サービス名を入力"
           />
         </div>
 
         <div>
-          <label htmlFor="summary" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="summary" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             概要（オプション）
           </label>
           <textarea
             id="summary"
             name="summary"
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="サービスの概要を入力"
           />
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="description" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             詳細説明（オプション）
           </label>
           <textarea
             id="description"
             name="description"
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="サービスの詳細説明を入力"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="price" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
               価格（円）
             </label>
             <input
@@ -153,13 +153,13 @@ function NewServiceContent() {
               id="price"
               name="price"
               min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+              className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="10000"
             />
           </div>
 
           <div>
-            <label htmlFor="duration_months" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="duration_months" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
               期間（月）
             </label>
             <input
@@ -167,37 +167,37 @@ function NewServiceContent() {
               id="duration_months"
               name="duration_months"
               min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+              className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="12"
             />
           </div>
 
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="category" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
               カテゴリ
             </label>
             <input
               type="text"
               id="category"
               name="category"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+              className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="コンサルティング"
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="slug" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             スラッグ（オプション）
           </label>
           <input
             type="text"
             id="slug"
             name="slug"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="ai-consulting-service"
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
             URL用の識別子。空白の場合は自動生成されます。半角英数字とハイフンのみ使用可能。
           </p>
         </div>
@@ -209,7 +209,7 @@ function NewServiceContent() {
         />
 
         <div>
-          <label htmlFor="video_url" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="video_url" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             動画URL（YouTube等）
           </label>
           <input
@@ -217,16 +217,16 @@ function NewServiceContent() {
             id="video_url"
             value={videoUrl}
             onChange={(e) => setVideoUrl(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="https://www.youtube.com/watch?v=..."
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
             YouTube、Vimeo等の動画URLを入力してください
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             サービス機能・特徴
           </label>
           <div className="space-y-2">
@@ -240,7 +240,7 @@ function NewServiceContent() {
                     newFeatures[index] = e.target.value;
                     setFeatures(newFeatures);
                   }}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+                  className="flex-1 px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   placeholder="例: 高度な分析機能"
                 />
                 <button
@@ -249,7 +249,7 @@ function NewServiceContent() {
                     const newFeatures = features.filter((_, i) => i !== index);
                     setFeatures(newFeatures.length > 0 ? newFeatures : ['']);
                   }}
-                  className="px-3 py-2 text-red-600 hover:text-red-700"
+                  className="px-3 py-2 text-[var(--aio-danger)] hover:text-[var(--aio-danger)]"
                 >
                   削除
                 </button>
@@ -267,7 +267,7 @@ function NewServiceContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="cta_text" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="cta_text" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
               CTAボタンテキスト
             </label>
             <input
@@ -275,12 +275,12 @@ function NewServiceContent() {
               id="cta_text"
               value={ctaText}
               onChange={(e) => setCtaText(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+              className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="例: 詳細を見る"
             />
           </div>
           <div>
-            <label htmlFor="cta_url" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="cta_url" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
               CTAURL
             </label>
             <input
@@ -288,33 +288,33 @@ function NewServiceContent() {
               id="cta_url"
               value={ctaUrl}
               onChange={(e) => setCtaUrl(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+              className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="https://example.com/service"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             公開ステータス
           </label>
           <select
             value={publishStatus}
             onChange={(e) => setPublishStatus(e.target.value as 'draft' | 'published' | 'private')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
           >
             <option value="draft">下書き</option>
             <option value="published">公開</option>
             <option value="private">非公開</option>
           </select>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
             公開にすると企業ページに表示され、検索エンジンからも見つけられるようになります
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-red-800 text-sm">{error}</p>
+          <div className="bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
+            <p className="text-[var(--aio-danger)] text-sm">{error}</p>
           </div>
         )}
 
@@ -322,14 +322,14 @@ function NewServiceContent() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 disabled:opacity-50"
+            className="bg-[var(--aio-purple)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
           >
             {loading ? '作成中...' : '作成'}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
-            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400"
+            className="bg-[var(--dashboard-card-border)] text-[var(--color-text-secondary)] px-6 py-2 rounded-md hover:bg-[var(--table-row-hover)]"
           >
             キャンセル
           </button>

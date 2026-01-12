@@ -25,17 +25,17 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
       case 'top_contents':
         return <TrendingUp className="w-5 h-5 text-[var(--aio-primary)]" />;
       case 'weak_contents':
-        return <FileText className="w-5 h-5 text-orange-600" />;
+        return <FileText className="w-5 h-5 text-[var(--aio-pending)]" />;
       case 'qna_insights':
-        return <MessageSquare className="w-5 h-5 text-green-600" />;
+        return <MessageSquare className="w-5 h-5 text-[var(--aio-success)]" />;
       case 'trends':
-        return <TrendingUp className="w-5 h-5 text-purple-600" />;
+        return <TrendingUp className="w-5 h-5 text-[var(--aio-purple)]" />;
       case 'ai_content_effect':
         return <Brain className="w-5 h-5 text-[var(--aio-info)]" />;
       case 'interview_insights':
-        return <Users className="w-5 h-5 text-indigo-600" />;
+        return <Users className="w-5 h-5 text-[var(--aio-indigo)]" />;
       default:
-        return <FileText className="w-5 h-5 text-gray-600" />;
+        return <FileText className="w-5 h-5 text-[var(--color-text-secondary)]" />;
     }
   };
 
@@ -80,28 +80,28 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
         return (
           <div className="space-y-3">
             {data.items?.map((item: any, index: number) => (
-              <div key={item.id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={item.id || index} className="flex items-center justify-between p-3 bg-[var(--aio-surface)] rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="px-2 py-1 bg-[var(--aio-muted)] text-[var(--aio-primary)] text-xs rounded">
                       {getContentTypeLabel(item.type)}
                     </span>
-                    <span className="text-sm font-medium text-neutral-900">{item.title}</span>
+                    <span className="text-sm font-medium text-[var(--color-text-primary)]">{item.title}</span>
                   </div>
                   {item.url && (
-                    <div className="text-xs text-gray-500">{item.url}</div>
+                    <div className="text-xs text-[var(--color-text-tertiary)]">{item.url}</div>
                   )}
                 </div>
                 <div className="text-right">
                   <div className="text-lg font-bold text-[var(--aio-primary)]">
                     {item.page_views?.toLocaleString() || 0}
                   </div>
-                  <div className="text-xs text-gray-600">PV</div>
+                  <div className="text-xs text-[var(--color-text-secondary)]">PV</div>
                 </div>
               </div>
             ))}
             {(!data.items || data.items.length === 0) && (
-              <p className="text-gray-500 text-center py-4">データがありません</p>
+              <p className="text-[var(--color-text-tertiary)] text-center py-4">データがありません</p>
             )}
           </div>
         );
@@ -110,25 +110,25 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
         return (
           <div className="space-y-3">
             {data.items?.map((item: any, index: number) => (
-              <div key={item.id || index} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+              <div key={item.id || index} className="flex items-center justify-between p-3 bg-[var(--aio-pending-muted)] rounded-lg border border-[var(--aio-pending)]">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
+                    <span className="px-2 py-1 bg-[var(--aio-pending-muted)] text-[var(--aio-pending)] text-xs rounded">
                       {getContentTypeLabel(item.type)}
                     </span>
-                    <span className="text-sm font-medium text-neutral-900">{item.title}</span>
+                    <span className="text-sm font-medium text-[var(--color-text-primary)]">{item.title}</span>
                   </div>
-                  <div className="text-xs text-orange-700">{item.reason}</div>
+                  <div className="text-xs text-[var(--aio-pending)]">{item.reason}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-orange-800">
+                  <div className="text-sm text-[var(--aio-pending)]">
                     {item.page_views?.toLocaleString() || 0} PV
                   </div>
                 </div>
               </div>
             ))}
             {(!data.items || data.items.length === 0) && (
-              <p className="text-gray-500 text-center py-4">データがありません</p>
+              <p className="text-[var(--color-text-tertiary)] text-center py-4">データがありません</p>
             )}
           </div>
         );
@@ -138,15 +138,15 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
           <div className="space-y-4">
             {data.top_faqs && data.top_faqs.length > 0 && (
               <div>
-                <h4 className="font-medium text-neutral-900 mb-3">よく見られたQ&A</h4>
+                <h4 className="font-medium text-[var(--color-text-primary)] mb-3">よく見られたQ&A</h4>
                 <div className="space-y-2">
                   {data.top_faqs.map((faq: any, index: number) => (
-                    <div key={faq.id || index} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div key={faq.id || index} className="flex items-center justify-between p-3 bg-[var(--aio-success-muted)] rounded-lg">
                       <div className="flex-1">
-                        <div className="text-sm font-medium text-neutral-900">{faq.title}</div>
+                        <div className="text-sm font-medium text-[var(--color-text-primary)]">{faq.title}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-bold text-green-600">
+                        <div className="text-sm font-bold text-[var(--aio-success)]">
                           {faq.page_views?.toLocaleString() || 0} PV
                         </div>
                       </div>
@@ -158,15 +158,15 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
             
             {data.falling_faqs && data.falling_faqs.length > 0 && (
               <div>
-                <h4 className="font-medium text-neutral-900 mb-3">閲覧数が減少したQ&A</h4>
+                <h4 className="font-medium text-[var(--color-text-primary)] mb-3">閲覧数が減少したQ&A</h4>
                 <div className="space-y-2">
                   {data.falling_faqs.map((faq: any, index: number) => (
-                    <div key={faq.id || index} className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                    <div key={faq.id || index} className="flex items-center justify-between p-3 bg-[var(--aio-warning-muted)] rounded-lg">
                       <div className="flex-1">
-                        <div className="text-sm font-medium text-neutral-900">{faq.title}</div>
+                        <div className="text-sm font-medium text-[var(--color-text-primary)]">{faq.title}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-yellow-800">
+                        <div className="text-sm text-[var(--aio-warning)]">
                           {faq.page_views?.toLocaleString() || 0} PV
                         </div>
                       </div>
@@ -178,7 +178,7 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
 
             {(!data.top_faqs || data.top_faqs.length === 0) && 
              (!data.falling_faqs || data.falling_faqs.length === 0) && (
-              <p className="text-gray-500 text-center py-4">Q&Aデータがありません</p>
+              <p className="text-[var(--color-text-tertiary)] text-center py-4">Q&Aデータがありません</p>
             )}
           </div>
         );
@@ -186,16 +186,16 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
       case 'trends':
         return (
           <div className="space-y-4">
-            <div className="p-4 bg-purple-50 rounded-lg">
-              <p className="text-purple-800">{data.description || 'トレンドデータを分析中です'}</p>
+            <div className="p-4 bg-[var(--aio-purple-muted)] rounded-lg">
+              <p className="text-[var(--aio-purple)]">{data.description || 'トレンドデータを分析中です'}</p>
             </div>
             
             {data.monthly_data && data.monthly_data.length > 0 && (
               <div className="space-y-2">
-                <h4 className="font-medium text-neutral-900">月次推移</h4>
+                <h4 className="font-medium text-[var(--color-text-primary)]">月次推移</h4>
                 {data.monthly_data.map((monthData: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span className="text-sm text-neutral-700">{monthData.month}</span>
+                  <div key={index} className="flex items-center justify-between p-2 bg-[var(--aio-surface)] rounded">
+                    <span className="text-sm text-[var(--color-text-secondary)]">{monthData.month}</span>
                     <span className="text-sm font-medium">{monthData.page_views?.toLocaleString()} PV</span>
                   </div>
                 ))}
@@ -231,29 +231,29 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
         return (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-indigo-50 rounded-lg">
-                <div className="text-lg font-bold text-indigo-600">
+              <div className="p-4 bg-[var(--aio-info-muted)] rounded-lg">
+                <div className="text-lg font-bold text-[var(--aio-indigo)]">
                   {data.sessions_count || 0}
                 </div>
-                <div className="text-sm text-indigo-800">AI面談実施回数</div>
+                <div className="text-sm text-[var(--aio-indigo)]">AI面談実施回数</div>
               </div>
-              <div className="p-4 bg-indigo-50 rounded-lg">
-                <div className="text-lg font-bold text-indigo-600">
+              <div className="p-4 bg-[var(--aio-info-muted)] rounded-lg">
+                <div className="text-lg font-bold text-[var(--aio-indigo)]">
                   {data.generated_contents || 0}
                 </div>
-                <div className="text-sm text-indigo-800">生成コンテンツ数</div>
+                <div className="text-sm text-[var(--aio-indigo)]">生成コンテンツ数</div>
               </div>
             </div>
-            <div className="p-4 bg-indigo-50 rounded-lg">
-              <p className="text-indigo-800">{data.description || 'AI面談の実施状況を分析中です'}</p>
+            <div className="p-4 bg-[var(--aio-info-muted)] rounded-lg">
+              <p className="text-[var(--aio-indigo)]">{data.description || 'AI面談の実施状況を分析中です'}</p>
             </div>
           </div>
         );
 
       default:
         return (
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <pre className="text-sm text-gray-600 whitespace-pre-wrap">
+          <div className="p-4 bg-[var(--aio-surface)] rounded-lg">
+            <pre className="text-sm text-[var(--color-text-secondary)] whitespace-pre-wrap">
               {JSON.stringify(data, null, 2)}
             </pre>
           </div>
@@ -274,16 +274,16 @@ export function ReportSection({ title, data, level }: ReportSectionProps) {
       >
         <div className="flex items-center gap-3">
           {getSectionIcon(title)}
-          <h2 className="text-xl font-semibold text-neutral-900">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
             {getSectionTitle(title)}
           </h2>
         </div>
         
-        <button className="p-1 hover:bg-gray-100 rounded transition-colors">
+        <button className="p-1 hover:bg-[var(--aio-surface)] rounded transition-colors">
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-600" />
+            <ChevronUp className="w-5 h-5 text-[var(--color-text-secondary)]" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-600" />
+            <ChevronDown className="w-5 h-5 text-[var(--color-text-secondary)]" />
           )}
         </button>
       </div>

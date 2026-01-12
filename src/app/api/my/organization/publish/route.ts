@@ -81,15 +81,34 @@ export async function PUT(request: NextRequest) {
       throw error;
     }
 
+    // ユーザーの所属組織を取得（organization_members経由、ownerロール必須）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (membershipError || !membershipData) {
+      logger.warn('[my/organization/publish] Organization membership not found', { data: { userId: user.id, error: membershipError } });
+      return notFoundError('Organization');
+    }
+
+    // ownerロール必須チェック
+    if (membershipData.role !== 'owner') {
+      logger.warn('[my/organization/publish] User is not owner', { data: { userId: user.id, role: membershipData.role } });
+      return NextResponse.json({ message: 'Owner permission required' }, { status: 403 });
+    }
+
     // 企業の存在確認
     const { data: existingOrg, error: fetchError } = await supabase
       .from('organizations')
       .select('id, slug, is_published, status')
-      .eq('created_by', user.id)
+      .eq('id', membershipData.organization_id)
       .maybeSingle();
 
     if (fetchError || !existingOrg) {
-      logger.warn('[my/organization/publish] Organization not found', { data: { userId: user.id, error: fetchError } });
+      logger.warn('[my/organization/publish] Organization not found', { data: { userId: user.id, orgId: membershipData.organization_id, error: fetchError } });
       return notFoundError('Organization');
     }
 
@@ -161,11 +180,11 @@ export async function PUT(request: NextRequest) {
 
     logger.debug('[VERIFY] Updating publication state', updateData);
 
+    // ownerロールは既にmembershipDataで検証済み
     const { data, error } = await supabase
       .from('organizations')
       .update(updateData)
       .eq('id', existingOrg.id)
-      .eq('created_by', user.id) // セキュリティのため二重チェック
       .select()
       .maybeSingle();
 

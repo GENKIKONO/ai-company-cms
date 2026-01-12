@@ -55,11 +55,22 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Get user's organization (Single-Org Mode)
+    // Get user's organization via organization_members
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', (authResult as AuthContext).user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (membershipError || !membershipData) {
+      return notFoundError('Organization membership');
+    }
+
     const { data: organization, error: orgError } = await supabase
       .from('organizations')
       .select('id, name, slug, discount_group, original_signup_campaign')
-      .eq('created_by', (authResult as AuthContext).user.id)
+      .eq('id', membershipData.organization_id)
       .single();
 
     if (orgError || !organization) {

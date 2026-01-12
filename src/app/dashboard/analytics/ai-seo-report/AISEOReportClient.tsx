@@ -3,9 +3,11 @@
  *
  * NOTE: [FEATUREGATE_MIGRATION] プラン名ハードコード判定を廃止済み
  * [FEATUREGATE_PHASE2] featureGate(getEffectiveFeatures + Subject)経由に移行完了
+ * [CORE_ARCHITECTURE] DashboardPageShell コンテキスト経由に移行完了
  * - 旧: restrictedPlans = ['free', 'starter'] でプラン名判定
  * - 旧: feature_flags JSONB 直接読み取り
  * - 新: featureGate.getEffectiveFeatures(subject) で統一判定
+ * - 新: useDashboardPageContext() で認証・組織情報取得
  */
 
 'use client';
@@ -13,7 +15,7 @@
 import { useEffect, useState } from 'react';
 import { AISEODashboard } from '@/components/analytics/AISEODashboard';
 import { DashboardLoadingState } from '@/components/dashboard/ui';
-import { useOrganization } from '@/lib/hooks/useOrganization';
+import { useDashboardPageContext } from '@/components/dashboard/DashboardPageShell';
 import { createClient } from '@/lib/supabase/client';
 import { getEffectiveFeatures, type EffectiveFeature } from '@/lib/featureGate';
 import { FeatureLocked } from '@/components/feature/FeatureLocked';
@@ -45,8 +47,8 @@ function getAnalyticsFlagsFromFeatures(
 }
 
 export function AISEOReportClient() {
-  // 組織スコープ取得
-  const { user, organization, isLoading } = useOrganization();
+  // DashboardPageShell コンテキストから組織情報を取得
+  const { user, organization, organizationId, isLoading } = useDashboardPageContext();
 
   // featureGate 経由で機能フラグを取得（Subject型API）
   const [analyticsFlags, setAnalyticsFlags] = useState<AnalyticsFeatureFlags | null>(null);

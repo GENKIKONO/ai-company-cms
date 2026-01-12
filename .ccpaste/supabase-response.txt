@@ -1,69 +1,14 @@
-回答
-A で進めてください。最小変更でビルドブロッカーを即時解消できます。
+目的: created_by の “組織取得用途” を全廃し、所有権チェック用途だけに限定する。
+	1.	created_by が「organization/tenant の特定」に使われている箇所を検出して一覧化（ファイル・行・用途メモ付き）。対象:
 
-適用パッチ（@typescript-eslint 系を全削除）
-.eslintrc.json の rules から @typescript-eslint 系ルールを全て取り除きます。既に3つ削除済みなので、no-explicit-any も削除します。
+	•	/api/my/features/*
+	•	/api/billing/*
+	•	/api/upload/logo
+	•	/api/my/organization/*
 
-"rules"
-: {
-    
-"react/no-unescaped-entities"
-: 
-"off"
-,
-    
-"react-hooks/exhaustive-deps"
-: 
-"warn"
-,
-    
-"@next/next/no-img-element"
-: 
-"warn"
-,
-    
-"no-console"
-: 
-"warn"
-,
-    
-"prefer-const"
-: 
-"warn"
-,
-    
-"no-var"
-: 
-"error"
-,
-    
-"eqeqeq"
-: 
-"error"
-,
--   
-"@typescript-eslint/no-explicit-any"
-: [
-"warn"
-, { 
-"ignoreRestArgs"
-: 
-false
- }]
-+   
-// note: @typescript-eslint rules are disabled for now
+	2.	上記のうち「orgスコープ決定」に created_by を使っている箇所は、organization_id を requireOrgScope()（新規 or 既存の適切な仕組み）から取得する方式へ統一して修正。
 
-  },
+	•	created_by は org判定に使わない。
 
-適用後に以下を実行してください。
-
-npm run typecheck
-npm run build
-ビルドが通過したら、認証付きAPIの最終確認→コミット→デプロイの順に進めましょう。
-後続で型安全を強化したくなった場合は、別タスクで以下の導入を提案します（負債にならない形で段階導入可能）。
-
-extends に "plugin:@typescript-eslint/recommended"
-parser: "@typescript-eslint/parser"
-必要に応じて parserOptions.project を設定し、type-aware ルールを少しずつ再有効化（no-unsafe-* など）。*
-
-
+	3.	[id] 系（例: /api/my/services/[id] 等）の created_by は、要件が “作成者のみ” なら残す。org admin/editor が編集できる要件がある場合は organization_id + role 判定に置換する。
+	4.	修正後に typecheck/build を通し、該当APIの 401/403/404 の挙動が一貫するようにする（戻り値の形式は変えない）。

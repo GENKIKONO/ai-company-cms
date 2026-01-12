@@ -59,11 +59,11 @@ export const DashboardMetricCard = React.forwardRef<HTMLDivElement, DashboardMet
         <DashboardCard ref={ref} className={cn('animate-pulse', className)} {...props}>
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <div className="h-4 bg-gray-200 rounded w-20 mb-3" />
-              <div className="h-8 bg-gray-200 rounded w-16" />
+              <div className="h-4 bg-[var(--dashboard-card-border)] rounded w-20 mb-3" />
+              <div className="h-8 bg-[var(--dashboard-card-border)] rounded w-16" />
             </div>
             {icon && (
-              <div className="w-10 h-10 bg-gray-200 rounded-lg" />
+              <div className="w-10 h-10 bg-[var(--dashboard-card-border)] rounded-lg" />
             )}
           </div>
         </DashboardCard>

@@ -9,13 +9,13 @@ import { test, expect } from '@playwright/test';
 
 // 管理ページ一覧
 const ADMIN_PAGES = [
-  { path: '/dashboard/admin', name: 'Admin Index', testId: null },
-  { path: '/dashboard/admin/jobs', name: 'Jobs Monitor', testId: 'jobs-list' },
-  { path: '/dashboard/admin/ai-usage', name: 'AI Usage', testId: 'ai-usage-list' },
-  { path: '/dashboard/admin/storage-logs', name: 'Storage Logs', testId: 'storage-logs-list' },
-  { path: '/dashboard/admin/audit', name: 'Audit Logs', testId: 'audit-logs-list' },
-  { path: '/dashboard/admin/security', name: 'Security', testId: 'security-list' },
-  { path: '/dashboard/admin/ai-visibility', name: 'AI Visibility', testId: 'ai-visibility-list' },
+  { path: '/dashboard/manage', name: 'Admin Index', testId: null },
+  { path: '/dashboard/manage/jobs', name: 'Jobs Monitor', testId: 'jobs-list' },
+  { path: '/dashboard/manage/ai-usage', name: 'AI Usage', testId: 'ai-usage-list' },
+  { path: '/dashboard/manage/storage-logs', name: 'Storage Logs', testId: 'storage-logs-list' },
+  { path: '/dashboard/manage/audit', name: 'Audit Logs', testId: 'audit-logs-list' },
+  { path: '/dashboard/manage/security', name: 'Security', testId: 'security-list' },
+  { path: '/dashboard/manage/ai-visibility', name: 'AI Visibility', testId: 'ai-visibility-list' },
 ];
 
 test.describe('Admin Dashboard - Authenticated Access', () => {
@@ -83,7 +83,7 @@ test.describe('Admin Dashboard - Authenticated Access', () => {
 
 test.describe('Admin Dashboard - Page Content Verification', () => {
   test('Admin Index should show admin tools list', async ({ page }) => {
-    await page.goto('/dashboard/admin');
+    await page.goto('/dashboard/manage');
 
     if (page.url().includes('/login')) {
       test.skip();
@@ -96,7 +96,7 @@ test.describe('Admin Dashboard - Page Content Verification', () => {
   });
 
   test('Jobs page should show tabs', async ({ page }) => {
-    await page.goto('/dashboard/admin/jobs');
+    await page.goto('/dashboard/manage/jobs');
 
     if (page.url().includes('/login')) {
       test.skip();
@@ -118,7 +118,7 @@ test.describe('Admin Dashboard - Page Content Verification', () => {
   });
 
   test('AI Usage page should show table', async ({ page }) => {
-    await page.goto('/dashboard/admin/ai-usage');
+    await page.goto('/dashboard/manage/ai-usage');
 
     if (page.url().includes('/login')) {
       test.skip();
@@ -137,7 +137,7 @@ test.describe('Admin Dashboard - Page Content Verification', () => {
   });
 
   test('Storage Logs page should show filter', async ({ page }) => {
-    await page.goto('/dashboard/admin/storage-logs');
+    await page.goto('/dashboard/manage/storage-logs');
 
     if (page.url().includes('/login')) {
       test.skip();
@@ -155,7 +155,7 @@ test.describe('Admin Dashboard - Page Content Verification', () => {
   });
 
   test('Audit page should show tabs', async ({ page }) => {
-    await page.goto('/dashboard/admin/audit');
+    await page.goto('/dashboard/manage/audit');
 
     if (page.url().includes('/login')) {
       test.skip();
@@ -169,7 +169,7 @@ test.describe('Admin Dashboard - Page Content Verification', () => {
   });
 
   test('Security page should show content', async ({ page }) => {
-    await page.goto('/dashboard/admin/security');
+    await page.goto('/dashboard/manage/security');
 
     if (page.url().includes('/login')) {
       test.skip();
@@ -181,7 +181,7 @@ test.describe('Admin Dashboard - Page Content Verification', () => {
   });
 
   test('AI Visibility page should show content', async ({ page }) => {
-    await page.goto('/dashboard/admin/ai-visibility');
+    await page.goto('/dashboard/manage/ai-visibility');
 
     if (page.url().includes('/login')) {
       test.skip();

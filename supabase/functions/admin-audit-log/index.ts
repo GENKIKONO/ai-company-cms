@@ -6,7 +6,7 @@
  * 使用方法:
  * POST /functions/v1/admin-audit-log
  * Headers: Authorization: Bearer <access_token>
- * Body: { "page": "/dashboard/admin/jobs", "action": "filter_changed", "detail": "status=running" }
+ * Body: { "page": "/dashboard/manage/jobs", "action": "filter_changed", "detail": "status=running" }
  *
  * テーブル: ops_audit
  * カラム: action (text), actor (uuid), details (jsonb), target (text), created_at (timestamptz)

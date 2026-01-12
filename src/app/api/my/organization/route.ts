@@ -114,7 +114,31 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
-    // RLS 前提：created_by = auth.uid() を満たす行のみ返る
+    // ユーザーの所属組織を取得（organization_members経由、ownerロール必須）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (membershipError) {
+      logger.error('[my/organization] membership query error', { data: membershipError instanceof Error ? membershipError : new Error(String(membershipError)) });
+      return NextResponse.json({ data: null, message: 'Query error' }, { status: 500 });
+    }
+
+    if (!membershipData) {
+      logger.debug(`[my/organization] No organization membership found for user: ${user.id}`);
+      return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
+    }
+
+    // ownerロール必須チェック
+    if (membershipData.role !== 'owner') {
+      logger.warn(`[my/organization] User is not owner: ${user.id}, role: ${membershipData.role}`);
+      return NextResponse.json({ data: null, message: 'Owner permission required' }, { status: 403 });
+    }
+
+    // 組織データを取得
     const { data, error } = await supabase
       .from('organizations')
       .select(`
@@ -129,16 +153,16 @@ export async function GET(request: NextRequest) {
         current_period_end, trial_end_date, show_services, show_posts, show_case_studies, show_faqs,
         show_qa, show_news, show_partnership, show_contact
       `)
-      .eq('created_by', user.id)
+      .eq('id', membershipData.organization_id)
       .maybeSingle();
 
     if (error) {
       logger.error('[my/organization] org query error', { data: error instanceof Error ? error : new Error(String(error)) });
       return NextResponse.json({ data: null, message: 'Query error' }, { status: 500 });
     }
-    
+
     if (!data) {
-      logger.debug(`[my/organization] No organization found for user: ${user.id}`);
+      logger.debug(`[my/organization] No organization found for id: ${membershipData.organization_id}`);
       return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
     }
 
@@ -311,38 +335,48 @@ export async function POST(request: NextRequest) {
 
     // slugバリデーションは統一スキーマで処理済み
 
-    // 既に企業を持っているかチェック（idempotent処理）
-    const { data: existingOrg } = await supabase
-      .from('organizations')
-      .select(`
-        id, name, slug, description, legal_form, representative_name, corporate_number, verified,
-        established_at, capital, employees, address_country, address_region, address_locality,
-        address_postal_code, address_street, lat, lng, telephone, email, email_public, url, logo_url,
-        same_as, industries, status, is_published, partner_id, created_by, created_at, updated_at,
-        meta_title, meta_description, meta_keywords, keywords, website, website_url, size,
-        favicon_url, brand_color_primary, brand_color_secondary, social_media, business_hours, timezone,
-        languages_supported, certifications, awards, company_culture, mission_statement, vision_statement, values,
-        feature_flags, entitlements, stripe_customer_id, stripe_subscription_id, plan, subscription_status,
-        current_period_end, trial_end_date, show_services, show_posts, show_case_studies, show_faqs,
-        show_qa, show_news, show_partnership, show_contact
-      `)
-      .eq('created_by', user.id)
-      .not('status', 'eq', 'archived')
+    // 既に企業を持っているかチェック（idempotent処理）- organization_members経由
+    const { data: existingMembership } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('user_id', user.id)
+      .eq('role', 'owner')
+      .limit(1)
       .maybeSingle();
+
+    if (existingMembership) {
+      // 既存組織のデータを取得
+      const { data: existingOrg } = await supabase
+        .from('organizations')
+        .select(`
+          id, name, slug, description, legal_form, representative_name, corporate_number, verified,
+          established_at, capital, employees, address_country, address_region, address_locality,
+          address_postal_code, address_street, lat, lng, telephone, email, email_public, url, logo_url,
+          same_as, industries, status, is_published, partner_id, created_by, created_at, updated_at,
+          meta_title, meta_description, meta_keywords, keywords, website, website_url, size,
+          favicon_url, brand_color_primary, brand_color_secondary, social_media, business_hours, timezone,
+          languages_supported, certifications, awards, company_culture, mission_statement, vision_statement, values,
+          feature_flags, entitlements, stripe_customer_id, stripe_subscription_id, plan, subscription_status,
+          current_period_end, trial_end_date, show_services, show_posts, show_case_studies, show_faqs,
+          show_qa, show_news, show_partnership, show_contact
+        `)
+        .eq('id', existingMembership.organization_id)
+        .not('status', 'eq', 'archived')
+        .maybeSingle();
 
     if (existingOrg) {
       logger.debug('[POST /api/my/organization] Organization already exists, returning existing one');
       
       // ✅ FIXED: 統一キャッシュ無効化 for idempotent case
       await revalidateOrgCache(user.id, existingOrg.slug);
-      
+
       return NextResponse.json(
-        { 
+        {
           data: existingOrg,
           created: false,
           message: 'existing'
-        }, 
-        { 
+        },
+        {
           status: 200,
           headers: {
             'Cache-Control': 'no-store, must-revalidate'
@@ -350,6 +384,7 @@ export async function POST(request: NextRequest) {
         }
       );
     }
+    } // end existingMembership check
     
     logger.debug('🔍 About to insert with minimal data - no normalization');
 
@@ -543,8 +578,18 @@ export async function POST(request: NextRequest) {
       // 23505: unique constraint violation - idempotent処理
       const pgError = error as { code?: string };
       if (pgError.code === '23505') {
-        logger.debug('[POST /api/my/organization] Unique constraint violation, trying to fetch existing organization');
-        const { data: again } = await supabase
+        logger.debug('[POST /api/my/organization] Unique constraint violation, trying to fetch existing organization via membership');
+
+        // organization_members経由で既存組織を検索
+        const { data: membershipRetry } = await supabase
+          .from('organization_members')
+          .select('organization_id')
+          .eq('user_id', user.id)
+          .eq('role', 'owner')
+          .limit(1)
+          .maybeSingle();
+
+        const { data: again } = membershipRetry ? await supabase
           .from('organizations')
           .select(`
             id, name, slug, description, legal_form, representative_name, corporate_number, verified,
@@ -558,10 +603,10 @@ export async function POST(request: NextRequest) {
             current_period_end, trial_end_date, show_services, show_posts, show_case_studies, show_faqs,
             show_qa, show_news, show_partnership, show_contact
           `)
-          .eq('created_by', user.id)
+          .eq('id', membershipRetry.organization_id)
           .not('status', 'eq', 'archived')
-          .maybeSingle();
-        
+          .maybeSingle() : { data: null };
+
         if (again) {
           // ✅ FIXED: 統一キャッシュ無効化 for constraint violation case
           await revalidateOrgCache(user.id, again.slug);
@@ -693,16 +738,42 @@ export async function PUT(request: NextRequest) {
     // Client already filters dangerous fields, so body should be clean
     const updateInput = body;
 
-    // 企業の存在確認（RLS: created_by = auth.uid()）
+    // ユーザーの所属組織を取得（organization_members経由、ownerロール必須）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (membershipError || !membershipData) {
+      logger.error('[PUT organization] Organization membership not found', {
+        userId: user.id,
+        error: membershipError?.message
+      });
+      return notFoundError('Organization');
+    }
+
+    // ownerロール必須チェック
+    if (membershipData.role !== 'owner') {
+      logger.warn('[PUT organization] User is not owner', {
+        userId: user.id,
+        role: membershipData.role
+      });
+      return NextResponse.json({ message: 'Owner permission required' }, { status: 403 });
+    }
+
+    // 企業の存在確認
     const { data: existingOrg, error: fetchError } = await supabase
       .from('organizations')
       .select('id, slug, created_by')
-      .eq('created_by', user.id)
+      .eq('id', membershipData.organization_id)
       .maybeSingle();
 
     if (fetchError || !existingOrg) {
-      logger.error('[PUT organization] Organization not found or access denied', {
+      logger.error('[PUT organization] Organization not found', {
         userId: user.id,
+        organizationId: membershipData.organization_id,
         error: fetchError?.message,
         errorCode: fetchError?.code
       });
@@ -894,23 +965,43 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
+    // ユーザーの所属組織を取得（organization_members経由、ownerロール必須）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (membershipError || !membershipData) {
+      return notFoundError('Organization');
+    }
+
+    // ownerロール必須チェック
+    if (membershipData.role !== 'owner') {
+      logger.warn('[DELETE organization] User is not owner', {
+        userId: user.id,
+        role: membershipData.role
+      });
+      return NextResponse.json({ message: 'Owner permission required' }, { status: 403 });
+    }
+
     // 企業の存在確認
     const { data: existingOrg, error: fetchError } = await supabase
       .from('organizations')
       .select('id')
-      .eq('created_by', user.id)
+      .eq('id', membershipData.organization_id)
       .maybeSingle();
 
     if (fetchError || !existingOrg) {
       return notFoundError('Organization');
     }
 
-    // 削除実行（RLSポリシーにより自分の企業のみ削除可能）
+    // 削除実行（ownerロールは既に検証済み）
     const { error } = await supabase
       .from('organizations')
       .delete()
-      .eq('id', existingOrg.id)
-      .eq('created_by', user.id);
+      .eq('id', existingOrg.id);
 
     if (error) {
       logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });

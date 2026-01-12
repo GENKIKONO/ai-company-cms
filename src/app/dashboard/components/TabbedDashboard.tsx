@@ -169,8 +169,8 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
 
   const getStatusBadge = (status: string) => {
     const badges = {
-      draft: 'bg-yellow-100 text-yellow-800',
-      published: 'bg-green-100 text-green-800'
+      draft: 'bg-[var(--aio-warning-muted)] text-[var(--aio-warning)]',
+      published: 'bg-[var(--aio-success-muted)] text-[var(--aio-success)]'
     };
     return badges[status as keyof typeof badges] || badges.draft;
   };
@@ -195,21 +195,21 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-[var(--dashboard-card-bg)] rounded-lg border border-[var(--dashboard-card-border)] p-4">
           <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-2 bg-[var(--aio-purple-muted)] rounded-lg">
+              <svg className="w-5 h-5 text-[var(--aio-purple)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">記事</p>
-              <p className="text-xl font-bold text-gray-900">{stats.posts}</p>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)]">記事</p>
+              <p className="text-xl font-bold text-[var(--color-text-primary)]">{stats.posts}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-[var(--dashboard-card-bg)] rounded-lg border border-[var(--dashboard-card-border)] p-4">
           <div className="flex items-center">
             <div className="p-2 bg-[var(--aio-muted)] rounded-lg">
               <svg className="w-5 h-5 text-[var(--aio-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -217,91 +217,91 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">サービス</p>
-              <p className="text-xl font-bold text-gray-900">{stats.services}</p>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)]">サービス</p>
+              <p className="text-xl font-bold text-[var(--color-text-primary)]">{stats.services}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-[var(--dashboard-card-bg)] rounded-lg border border-[var(--dashboard-card-border)] p-4">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-2 bg-[var(--aio-success-muted)] rounded-lg">
+              <svg className="w-5 h-5 text-[var(--aio-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">導入事例</p>
-              <p className="text-xl font-bold text-gray-900">{stats.caseStudies}</p>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)]">導入事例</p>
+              <p className="text-xl font-bold text-[var(--color-text-primary)]">{stats.caseStudies}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-[var(--dashboard-card-bg)] rounded-lg border border-[var(--dashboard-card-border)] p-4">
           <div className="flex items-center">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-2 bg-[var(--aio-pending-muted)] rounded-lg">
+              <svg className="w-5 h-5 text-[var(--aio-pending)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">FAQ</p>
-              <p className="text-xl font-bold text-gray-900">{stats.faqs}</p>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)]">FAQ</p>
+              <p className="text-xl font-bold text-[var(--color-text-primary)]">{stats.faqs}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">クイック作成</h3>
+      <div className="bg-[var(--dashboard-card-bg)] rounded-lg border border-[var(--dashboard-card-border)] p-6">
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">クイック作成</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
             href="/dashboard/posts/new"
-            className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors"
+            className="flex items-center p-4 border-2 border-dashed border-[var(--input-border)] rounded-lg hover:border-[var(--aio-purple)] hover:bg-[var(--aio-purple-muted)] transition-colors"
           >
-            <div className="p-2 bg-purple-100 rounded-lg mr-3">
-              <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-2 bg-[var(--aio-purple-muted)] rounded-lg mr-3">
+              <svg className="w-5 h-5 text-[var(--aio-purple)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <span className="text-sm font-medium text-gray-900">新しい記事</span>
+            <span className="text-sm font-medium text-[var(--color-text-primary)]">新しい記事</span>
           </Link>
 
           <Link
             href="/dashboard/services/new"
-            className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-[var(--aio-primary)] hover:bg-[var(--aio-muted)] transition-colors"
+            className="flex items-center p-4 border-2 border-dashed border-[var(--input-border)] rounded-lg hover:border-[var(--aio-primary)] hover:bg-[var(--aio-muted)] transition-colors"
           >
             <div className="p-2 bg-[var(--aio-muted)] rounded-lg mr-3">
               <svg className="w-5 h-5 text-[var(--aio-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <span className="text-sm font-medium text-gray-900">新しいサービス</span>
+            <span className="text-sm font-medium text-[var(--color-text-primary)]">新しいサービス</span>
           </Link>
 
           <Link
             href="/dashboard/case-studies/new"
-            className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors"
+            className="flex items-center p-4 border-2 border-dashed border-[var(--input-border)] rounded-lg hover:border-[var(--status-success)] hover:bg-[var(--aio-success-muted)] transition-colors"
           >
-            <div className="p-2 bg-green-100 rounded-lg mr-3">
-              <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-2 bg-[var(--aio-success-muted)] rounded-lg mr-3">
+              <svg className="w-5 h-5 text-[var(--aio-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <span className="text-sm font-medium text-gray-900">新しい導入事例</span>
+            <span className="text-sm font-medium text-[var(--color-text-primary)]">新しい導入事例</span>
           </Link>
 
           <Link
             href="/dashboard/faqs/new"
-            className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
+            className="flex items-center p-4 border-2 border-dashed border-[var(--input-border)] rounded-lg hover:border-[var(--status-pending)] hover:bg-[var(--aio-pending-muted)] transition-colors"
           >
-            <div className="p-2 bg-orange-100 rounded-lg mr-3">
-              <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-2 bg-[var(--aio-pending-muted)] rounded-lg mr-3">
+              <svg className="w-5 h-5 text-[var(--aio-pending)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <span className="text-sm font-medium text-gray-900">新しいFAQ</span>
+            <span className="text-sm font-medium text-[var(--color-text-primary)]">新しいFAQ</span>
           </Link>
         </div>
       </div>
@@ -323,9 +323,9 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
       return (
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="animate-pulse bg-white rounded-lg border border-gray-200 p-4">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            <div key={i} className="animate-pulse bg-[var(--dashboard-card-bg)] rounded-lg border border-[var(--dashboard-card-border)] p-4">
+              <div className="h-4 bg-[var(--dashboard-card-border)] rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-[var(--dashboard-card-border)] rounded w-1/2"></div>
             </div>
           ))}
         </div>
@@ -336,11 +336,11 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
       return (
         <div className="text-center py-12">
           <div className="max-w-md mx-auto">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="mx-auto h-12 w-12 text-[var(--color-icon-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">コンテンツがありません</h3>
-            <p className="mt-1 text-sm text-gray-500">{emptyMessage}</p>
+            <h3 className="mt-2 text-sm font-medium text-[var(--color-text-primary)]">コンテンツがありません</h3>
+            <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">{emptyMessage}</p>
             <div className="mt-6">
               <Link
                 href={`/dashboard/${type}/new`}
@@ -360,7 +360,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
     return (
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
             {getContentTypeLabel(type)}一覧 ({items.length}件)
           </h3>
           <Link
@@ -376,18 +376,18 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
 
         <div className="space-y-3">
           {items.map((item: any) => (
-            <div key={item.id} className="bg-white rounded-lg border border-gray-200 p-4">
+            <div key={item.id} className="bg-[var(--dashboard-card-bg)] rounded-lg border border-[var(--dashboard-card-border)] p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <h4 className="text-lg font-medium text-gray-900">{item.title}</h4>
+                  <h4 className="text-lg font-medium text-[var(--color-text-primary)]">{item.title}</h4>
                   {item.description && (
-                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">{item.description}</p>
+                    <p className="text-sm text-[var(--color-text-secondary)] mt-1 line-clamp-2">{item.description}</p>
                   )}
                   <div className="flex items-center mt-2 space-x-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(item.status)}`}>
                       {getStatusText(item.status)}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-[var(--color-text-tertiary)]">
                       更新: {new Date(item.updated_at).toLocaleDateString()}
                     </span>
                   </div>
@@ -395,7 +395,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
                 <div className="flex items-center space-x-2 ml-4">
                   <Link
                     href={`/dashboard/${type}/${item.id}/edit`}
-                    className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    className="inline-flex items-center px-3 py-1 border border-[var(--input-border)] shadow-sm text-sm font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--dashboard-card-bg)] hover:bg-[var(--aio-surface)]"
                   >
                     編集
                   </Link>
@@ -405,7 +405,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
                         <Link
                           href={`/o/${organizationSlug}/${type}/${item.id}`}
                           target="_blank"
-                          className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                          className="inline-flex items-center px-3 py-1 border border-[var(--input-border)] shadow-sm text-sm font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--dashboard-card-bg)] hover:bg-[var(--aio-surface)]"
                         >
                           <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -416,7 +416,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
                         <Link
                           href={`/o/${organizationSlug}/${type}/${item.id}?preview=true`}
                           target="_blank"
-                          className="inline-flex items-center px-3 py-1 border border-orange-300 shadow-sm text-sm font-medium rounded-md text-orange-700 bg-orange-50 hover:bg-orange-100"
+                          className="inline-flex items-center px-3 py-1 border border-[var(--aio-pending-border)] shadow-sm text-sm font-medium rounded-md text-[var(--aio-pending)] bg-[var(--aio-pending-surface)] hover:bg-[var(--aio-pending-muted)]"
                         >
                           <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -429,7 +429,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
                   )}
                   <button
                     onClick={() => handleDelete(type, item.id)}
-                    className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                    className="inline-flex items-center px-3 py-1 border border-[var(--status-error)] shadow-sm text-sm font-medium rounded-md text-[var(--aio-danger)] bg-[var(--dashboard-card-bg)] hover:bg-[var(--aio-danger-muted)]"
                   >
                     削除
                   </button>
@@ -443,9 +443,9 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-[var(--dashboard-card-bg)] rounded-lg shadow-sm border border-[var(--dashboard-card-border)]">
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-[var(--dashboard-card-border)]">
         <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => (
             <button
@@ -454,13 +454,13 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
                   ? 'border-[var(--aio-primary)] text-[var(--aio-primary)]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:border-[var(--input-border)]'
               }`}
             >
               {tab.label}
               {tab.count !== null && (
                 <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  activeTab === tab.id ? 'bg-[var(--aio-muted)] text-[var(--aio-primary)]' : 'bg-gray-100 text-gray-600'
+                  activeTab === tab.id ? 'bg-[var(--aio-muted)] text-[var(--aio-primary)]' : 'bg-[var(--aio-surface)] text-[var(--color-text-secondary)]'
                 }`}>
                   {tab.count}
                 </span>

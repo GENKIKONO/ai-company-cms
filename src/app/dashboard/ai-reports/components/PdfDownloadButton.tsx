@@ -93,10 +93,10 @@ export function PdfDownloadButton({
 
   const getButtonColor = () => {
     if (error) {
-      return 'bg-red-100 text-red-800 border border-red-200';
+      return 'bg-[var(--aio-danger-muted)] text-[var(--aio-danger)] border border-[var(--aio-danger)]';
     }
     if (loading) {
-      return 'bg-gray-100 text-gray-700 border border-gray-300';
+      return 'bg-[var(--aio-surface)] text-[var(--color-text-secondary)] border border-[var(--input-border)]';
     }
     return 'bg-[var(--aio-primary)] text-white hover:bg-[var(--aio-primary)]/90';
   };
@@ -131,23 +131,23 @@ export function PdfDownloadButton({
 
       {/* エラーメッセージ */}
       {error && (
-        <div className="absolute top-full left-0 mt-2 p-3 bg-red-100 border border-red-200 rounded-lg shadow-lg z-10 whitespace-nowrap">
+        <div className="absolute top-full left-0 mt-2 p-3 bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-lg shadow-lg z-10 whitespace-nowrap">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-red-600" />
-            <span className="text-sm text-red-800">{error}</span>
+            <AlertCircle className="w-4 h-4 text-[var(--aio-danger)]" />
+            <span className="text-sm text-[var(--aio-danger)]">{error}</span>
           </div>
-          <div className="absolute top-0 left-4 -mt-1 w-2 h-2 bg-red-100 border-l border-t border-red-200 rotate-45"></div>
+          <div className="absolute top-0 left-4 -mt-1 w-2 h-2 bg-[var(--aio-danger-muted)] border-l border-t border-[var(--aio-danger)] rotate-45"></div>
         </div>
       )}
 
       {/* PDFアイコン付きの説明（オプション） */}
       {!loading && !error && size === 'md' && (
-        <div className="absolute top-full left-0 mt-2 p-2 bg-gray-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10">
+        <div className="absolute top-full left-0 mt-2 p-2 bg-[var(--tooltip-bg)] text-[var(--tooltip-text)] text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10">
           <div className="flex items-center gap-2">
             <FileText className="w-3 h-3" />
             <span>レポートをPDF形式でダウンロード</span>
           </div>
-          <div className="absolute top-0 left-4 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+          <div className="absolute top-0 left-4 -mt-1 w-2 h-2 bg-[var(--tooltip-bg)] rotate-45"></div>
         </div>
       )}
     </div>

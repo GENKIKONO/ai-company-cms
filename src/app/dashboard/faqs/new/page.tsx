@@ -66,13 +66,13 @@ function NewFAQContent() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">新しいFAQ</h1>
-        <p className="text-gray-600 mt-2">よくある質問の情報を入力してください</p>
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">新しいFAQ</h1>
+        <p className="text-[var(--color-text-secondary)] mt-2">よくある質問の情報を入力してください</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="question" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="question" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             質問 *
           </label>
           <input
@@ -80,13 +80,13 @@ function NewFAQContent() {
             id="question"
             name="question"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             placeholder="質問を入力"
           />
         </div>
 
         <div>
-          <label htmlFor="answer" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="answer" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
             回答 *
           </label>
           <textarea
@@ -94,14 +94,14 @@ function NewFAQContent() {
             name="answer"
             required
             rows={6}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             placeholder="回答を入力"
           />
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-red-800 text-sm">{error}</p>
+          <div className="bg-[var(--aio-danger-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4">
+            <p className="text-[var(--aio-danger)] text-sm">{error}</p>
           </div>
         )}
 
@@ -109,14 +109,14 @@ function NewFAQContent() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-orange-600 text-white px-6 py-2 rounded-md hover:bg-orange-700 disabled:opacity-50"
+            className="bg-[var(--aio-primary)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
           >
             {loading ? '作成中...' : '作成'}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
-            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400"
+            className="bg-[var(--dashboard-card-border)] text-[var(--color-text-secondary)] px-6 py-2 rounded-md hover:bg-[var(--table-row-hover)]"
           >
             キャンセル
           </button>

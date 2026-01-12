@@ -101,10 +101,10 @@ UIから到達できない機能を分類・管理します。
         "reason": "/dashboard/interview 内に導線はあるが、見つけにくい"
       },
       {
-        "route": "/dashboard/admin/*",
+        "route": "/dashboard/manage/*",
         "label": "管理サブページ群",
         "area": "dashboard_admin",
-        "reason": "/dashboard/admin のみ表示、各サブページへの導線は admin ページ内のみ"
+        "reason": "/dashboard/manage のみ表示、各サブページへの導線は admin ページ内のみ"
       },
       {
         "route": "/dashboard/questions",
@@ -217,7 +217,7 @@ UIから到達できない機能を分類・管理します。
 | Route | Label | Reason |
 |-------|-------|--------|
 | /dashboard/interview/history | インタビュー履歴 | インタビューページ内のみ |
-| /dashboard/admin/* | 管理サブページ群 | adminトップからのみ |
+| /dashboard/manage/* | 管理サブページ群 | adminトップからのみ |
 | /dashboard/questions | 質問管理 | Q&A統計からのみ |
 | /dashboard/my-questions | マイ質問 | 導線不明確 |
 

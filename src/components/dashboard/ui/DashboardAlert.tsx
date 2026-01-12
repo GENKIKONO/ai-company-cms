@@ -53,20 +53,20 @@ export const DashboardAlert = React.forwardRef<HTMLDivElement, DashboardAlertPro
       success: {
         container: 'bg-[var(--status-success-bg)] border-[var(--status-success)]',
         icon: 'text-[var(--status-success)]',
-        title: 'text-green-800',
-        text: 'text-green-700',
+        title: 'text-[var(--aio-success)]',
+        text: 'text-[var(--aio-success)]',
       },
       warning: {
         container: 'bg-[var(--status-warning-bg)] border-[var(--status-warning)]',
         icon: 'text-[var(--status-warning)]',
-        title: 'text-yellow-800',
-        text: 'text-yellow-700',
+        title: 'text-[var(--aio-warning)]',
+        text: 'text-[var(--aio-warning)]',
       },
       error: {
         container: 'bg-[var(--status-error-bg)] border-[var(--status-error)]',
         icon: 'text-[var(--status-error)]',
-        title: 'text-red-800',
-        text: 'text-red-700',
+        title: 'text-[var(--aio-danger)]',
+        text: 'text-[var(--aio-danger)]',
       },
       info: {
         container: 'bg-[var(--status-info-bg)] border-[var(--status-info)]',

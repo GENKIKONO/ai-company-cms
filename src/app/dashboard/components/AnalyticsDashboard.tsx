@@ -121,9 +121,9 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
           {[...Array(4)].map((_, i) => (
             <div key={i} className="card p-6">
               <div className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-20 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-[var(--dashboard-card-border)] rounded w-1/3 mb-4"></div>
+                <div className="h-8 bg-[var(--dashboard-card-border)] rounded w-1/2 mb-2"></div>
+                <div className="h-20 bg-[var(--dashboard-card-border)] rounded"></div>
               </div>
             </div>
           ))}
@@ -137,29 +137,29 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
       {/* Trial Status Banner */}
       {trialStatus?.isTrialing && (
         <div className={`p-4 rounded-lg border ${
-          trialStatus.isExpired 
-            ? 'bg-red-50 border-red-200' 
-            : trialStatus.daysRemaining <= 3 
-              ? 'bg-yellow-50 border-yellow-200' 
+          trialStatus.isExpired
+            ? 'bg-[var(--aio-danger-muted)] border-[var(--status-error)]'
+            : trialStatus.daysRemaining <= 3
+              ? 'bg-[var(--aio-warning-muted)] border-[var(--status-warning)]'
               : 'bg-[var(--aio-muted)] border-[var(--aio-primary)]/30'
         }`}>
           <div className="flex items-center gap-3">
             <AlertCircle className={`w-5 h-5 ${
-              trialStatus.isExpired 
-                ? 'text-red-600' 
-                : trialStatus.daysRemaining <= 3 
-                  ? 'text-yellow-600' 
+              trialStatus.isExpired
+                ? 'text-[var(--aio-danger)]'
+                : trialStatus.daysRemaining <= 3
+                  ? 'text-[var(--aio-warning)]'
                   : 'text-[var(--aio-primary)]'
             }`} />
             <div>
               <div className="font-medium">
-                {trialStatus.isExpired 
-                  ? 'トライアル期間が終了しました' 
+                {trialStatus.isExpired
+                  ? 'トライアル期間が終了しました'
                   : `トライアル期間残り${trialStatus.daysRemaining}日`}
               </div>
-              <div className="text-sm text-gray-600">
-                {trialStatus.isExpired 
-                  ? 'Starterプランで継続利用できます。' 
+              <div className="text-sm text-[var(--color-text-secondary)]">
+                {trialStatus.isExpired
+                  ? 'Starterプランで継続利用できます。'
                   : 'トライアル期間終了後はStarterプランに自動移行します。'}
               </div>
             </div>
@@ -173,39 +173,39 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
           <div className="text-2xl font-bold text-[var(--aio-primary)] mb-1">
             {stats?.contentCount.services || 0}
           </div>
-          <div className="text-sm text-gray-600">サービス</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-sm text-[var(--color-text-secondary)]">サービス</div>
+          <div className="text-xs text-[var(--color-text-tertiary)] mt-1">
             / {planLimits.services === Number.POSITIVE_INFINITY ? '無制限' : planLimits.services}
           </div>
         </div>
 
         <div className="card p-4 text-center">
-          <div className="text-2xl font-bold text-green-600 mb-1">
+          <div className="text-2xl font-bold text-[var(--aio-success)] mb-1">
             {stats?.contentCount.faqs || 0}
           </div>
-          <div className="text-sm text-gray-600">FAQ</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-sm text-[var(--color-text-secondary)]">FAQ</div>
+          <div className="text-xs text-[var(--color-text-tertiary)] mt-1">
             / {planLimits.qa_items === Number.POSITIVE_INFINITY ? '無制限' : planLimits.qa_items}
           </div>
         </div>
 
         <div className="card p-4 text-center">
-          <div className="text-2xl font-bold text-purple-600 mb-1">
+          <div className="text-2xl font-bold text-[var(--aio-purple)] mb-1">
             {stats?.contentCount.caseStudies || 0}
           </div>
-          <div className="text-sm text-gray-600">導入事例</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-sm text-[var(--color-text-secondary)]">導入事例</div>
+          <div className="text-xs text-[var(--color-text-tertiary)] mt-1">
             / {planLimits.case_studies === Number.POSITIVE_INFINITY ? '無制限' : planLimits.case_studies}
           </div>
         </div>
 
         {hasStructuredScoreFeature && (
           <div className="card p-4 text-center">
-            <div className="text-2xl font-bold text-orange-600 mb-1">
+            <div className="text-2xl font-bold text-[var(--aio-pending)] mb-1">
               {stats?.structuredScore || 0}
             </div>
-            <div className="text-sm text-gray-600">構造化スコア</div>
-            <div className="text-xs text-gray-500 mt-1">/ 100</div>
+            <div className="text-sm text-[var(--color-text-secondary)]">構造化スコア</div>
+            <div className="text-xs text-[var(--color-text-tertiary)] mt-1">/ 100</div>
           </div>
         )}
       </div>
@@ -226,26 +226,26 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
         <div className="card p-6">
           <div className="flex items-center gap-3 mb-4">
             <TrendingUp className="w-5 h-5 text-[var(--aio-primary)]" />
-            <h3 className="text-lg font-semibold text-neutral-900">最近の更新</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">最近の更新</h3>
           </div>
           
           {stats?.recentActivity && stats.recentActivity.length > 0 ? (
             <div className="space-y-3">
               {stats.recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
+                <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-[var(--aio-surface)]">
                   <div className={`w-2 h-2 rounded-full ${
                     activity.type === 'service' ? 'bg-[var(--aio-primary)]' :
-                    activity.type === 'faq' ? 'bg-green-500' : 'bg-purple-500'
+                    activity.type === 'faq' ? 'bg-[var(--status-success)]' : 'bg-[var(--aio-purple)]'
                   }`} />
                   <div className="flex-1">
-                    <div className="font-medium text-sm text-neutral-900">
+                    <div className="font-medium text-sm text-[var(--color-text-primary)]">
                       {activity.title}
                     </div>
-                    <div className="text-xs text-neutral-600">
+                    <div className="text-xs text-[var(--color-text-secondary)]">
                       {new Date(activity.date).toLocaleDateString('ja-JP')}
                     </div>
                   </div>
-                  <div className="text-xs text-neutral-500 capitalize">
+                  <div className="text-xs text-[var(--color-text-tertiary)] capitalize">
                     {activity.type === 'service' ? 'サービス' :
                      activity.type === 'faq' ? 'FAQ' : '導入事例'}
                   </div>
@@ -253,8 +253,8 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
-              <Eye className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+            <div className="text-center py-8 text-[var(--color-text-tertiary)]">
+              <Eye className="w-8 h-8 mx-auto mb-2 text-[var(--color-icon-muted)]" />
               <p>最近の更新はありません</p>
             </div>
           )}
@@ -263,30 +263,30 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
         {/* Plan Features */}
         <div className="card p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Crown className="w-5 h-5 text-yellow-600" />
-            <h3 className="text-lg font-semibold text-neutral-900">
+            <Crown className="w-5 h-5 text-[var(--aio-warning)]" />
+            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
               現在のプラン: {organization.plan?.toUpperCase() || 'STARTER'}
             </h3>
           </div>
           
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-neutral-700">構造化スコア表示</span>
-              <span className={`text-sm font-medium ${hasStructuredScoreFeature ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className="text-sm text-[var(--color-text-secondary)]">構造化スコア表示</span>
+              <span className={`text-sm font-medium ${hasStructuredScoreFeature ? 'text-[var(--aio-success)]' : 'text-[var(--color-icon-muted)]'}`}>
                 {hasStructuredScoreFeature ? '利用可能' : '未対応'}
               </span>
             </div>
-            
+
             <div className="flex items-center justify-between">
-              <span className="text-sm text-neutral-700">AI Visibilityレポート</span>
-              <span className={`text-sm font-medium ${hasAIVisibilityFeature ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className="text-sm text-[var(--color-text-secondary)]">AI Visibilityレポート</span>
+              <span className={`text-sm font-medium ${hasAIVisibilityFeature ? 'text-[var(--aio-success)]' : 'text-[var(--color-icon-muted)]'}`}>
                 {hasAIVisibilityFeature ? '利用可能' : 'Business以上'}
               </span>
             </div>
-            
+
             <div className="flex items-center justify-between">
-              <span className="text-sm text-neutral-700">チーム管理</span>
-              <span className={`text-sm font-medium ${hasTeamManagement ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className="text-sm text-[var(--color-text-secondary)]">チーム管理</span>
+              <span className={`text-sm font-medium ${hasTeamManagement ? 'text-[var(--aio-success)]' : 'text-[var(--color-icon-muted)]'}`}>
                 {hasTeamManagement ? '利用可能' : 'Business以上'}
               </span>
             </div>

@@ -1,6 +1,7 @@
 # AI実装ガード プロンプト
 
 > **目的**: AIが直書き・端折りをせず、既存のアーキテクチャとデザインシステムに忠実に実装するためのガイド
+> **デザインシステム**: iCloud Dense v3.0（iCloudの美しさ × Stripeの密度）
 
 ---
 
@@ -15,7 +16,7 @@
 | ファイル | 内容 | 参照タイミング |
 |---------|------|---------------|
 | `CLAUDE.md` | プロジェクト全体の指示 | 全タスク開始時 |
-| `DESIGN_SYSTEM.md` | UI/デザイン規約 | UI変更時 |
+| `DESIGN_SYSTEM.md` | UI/デザイン規約（iCloud Dense v3.0） | UI変更時 |
 | `docs/core-architecture.md` | 4領域アーキテクチャ | ページ/API作成時 |
 | `src/styles/app-design-tokens.css` | CSS変数一覧 | スタイル指定時 |
 
@@ -23,11 +24,18 @@
 
 ## 2. 領域別 参照ファイル
 
+### 統一コンポーネント（全領域共通）
+
+| ファイル | 用途 |
+|---------|------|
+| `src/components/ui/button.tsx` | **統一Buttonコンポーネント（メイン）** |
+| `src/components/ui/HIGButton.tsx` | 後方互換エイリアス |
+| `src/components/dashboard/ui/DashboardButton.tsx` | 後方互換エイリアス |
+
 ### Dashboard領域 (`/dashboard/**`)
 
 | ファイル | 用途 |
 |---------|------|
-| `src/components/dashboard/ui/DashboardButton.tsx` | ボタン実装パターン |
 | `src/components/dashboard/ui/DashboardCard.tsx` | カード実装パターン |
 | `src/components/dashboard/ui/DashboardBadge.tsx` | バッジ実装パターン |
 | `src/components/dashboard/ui/DashboardAlert.tsx` | アラート実装パターン |
@@ -39,7 +47,6 @@
 
 | ファイル | 用途 |
 |---------|------|
-| `src/components/ui/HIGButton.tsx` | ボタン |
 | `src/components/layout/AioSection.tsx` | セクション |
 
 ### DB/API
@@ -63,14 +70,13 @@
   - OK: `text-[var(--aio-danger)]`, `bg-[var(--aio-primary)]`, `hover:bg-[var(--aio-muted)]`
 
 ### コンポーネント
+- [ ] **統一Buttonを使用**
+  - 全ページで `Button` from `@/components/ui/button` を使用
+  - HIGButton/DashboardButtonは後方互換エイリアス（内部は統一Button）
+
 - [ ] **既存コンポーネント確認**
   - 新規作成前に `src/components/dashboard/ui/` の既存コンポーネントを確認
-  - `DashboardButton`, `DashboardCard`, `DashboardBadge` 等が使えないか検討
-
-### 領域違反
-- [ ] **領域を跨いだコンポーネント使用禁止**
-  - Dashboard領域で `HIGButton` 使用 → NG
-  - Public領域で `DashboardCard` 使用 → NG
+  - `DashboardCard`, `DashboardBadge` 等が使えないか検討
 
 ### DB/型
 - [ ] **型の確認**
@@ -153,9 +159,9 @@
 
 ### Core Brand
 ```css
---aio-primary          /* メインカラー（青） */
+--aio-primary          /* メインカラー（Apple Blue #007AFF） */
 --aio-primary-hover    /* ホバー状態 */
---aio-surface          /* 背景面（グレー） */
+--aio-surface          /* 背景面（Apple Gray #F5F5F7） */
 --aio-muted            /* 軽いグレー */
 ```
 
@@ -200,7 +206,7 @@
 --aio-indigo-muted     /* 藍背景 */
 ```
 
-### ボタン
+### ボタン（iCloud Dense）
 ```css
 --btn-primary-bg       /* プライマリボタン背景 */
 --btn-primary-hover    /* プライマリボタンホバー */
@@ -208,13 +214,20 @@
 --btn-secondary-border /* セカンダリボタンボーダー */
 --btn-danger-bg        /* 危険ボタン背景 */
 --btn-danger-hover     /* 危険ボタンホバー */
+--btn-shadow           /* ボタンシャドウ */
+--btn-shadow-hover     /* ボタンホバーシャドウ */
+--btn-height-sm        /* 32px */
+--btn-height-md        /* 36px */
+--btn-height-lg        /* 40px */
+--btn-height-xl        /* 44px */
 ```
 
 ### Dashboard
 ```css
---dashboard-bg         /* ダッシュボード背景 */
+--dashboard-bg         /* ダッシュボード背景（Apple Gray） */
 --dashboard-card-bg    /* カード背景 */
---dashboard-card-border/* カードボーダー */
+--dashboard-card-border/* カードボーダー（繊細） */
+--dashboard-card-shadow/* カードシャドウ（iCloud品質） */
 ```
 
 ### インプット
@@ -224,35 +237,104 @@
 --input-bg             /* 入力背景 */
 ```
 
+### スペーシング（iCloud Dense - コンパクト8ptグリッド）
+```css
+--space-xs             /* 4px */
+--space-sm             /* 8px */
+--space-md             /* 12px（密度向上） */
+--space-lg             /* 16px（密度向上） */
+--space-xl             /* 24px（密度向上） */
+--space-2xl            /* 32px（密度向上） */
+```
+
 ---
 
-## 7. 実装完了時の報告フォーマット
+## 7. 統一Buttonの使用方法
+
+### 基本使用
+
+```tsx
+import { Button } from '@/components/ui/button';
+
+// variant: primary | secondary | tertiary | danger | ghost | outline | link
+// size: sm | md | lg | xl | icon
+<Button variant="primary" size="md">保存</Button>
+<Button variant="secondary">キャンセル</Button>
+<Button variant="danger">削除</Button>
+```
+
+### 追加機能
+
+```tsx
+// ローディング状態
+<Button variant="primary" loading={isSubmitting}>送信中...</Button>
+
+// アイコン付き
+<Button variant="primary" leftIcon={<Plus className="w-4 h-4" />}>新規作成</Button>
+<Button variant="secondary" rightIcon={<ArrowRight className="w-4 h-4" />}>次へ</Button>
+
+// アイコンのみ
+import { IconButton } from '@/components/ui/button';
+<IconButton icon={<Edit className="w-4 h-4" />} aria-label="編集" />
+
+// ボタングループ
+import { ButtonGroup } from '@/components/ui/button';
+<ButtonGroup>
+  <Button variant="secondary">戻る</Button>
+  <Button variant="primary">次へ</Button>
+</ButtonGroup>
+
+// リンクボタン
+import { LinkButton } from '@/components/ui/button';
+<LinkButton href="/dashboard" variant="tertiary">ダッシュボードへ</LinkButton>
+```
+
+---
+
+## 8. 実装完了時の報告フォーマット
 
 ```markdown
 ## 実装報告
 - 参照したファイル: [ファイル名一覧]
 - 使用したCSS変数: [変数名一覧]
 - 使用した既存コンポーネント: [コンポーネント名]
-- 直書き確認: ✅ なし / ⚠️ あり（理由: ）
+- 直書き確認: なし / あり（理由: ）
 ```
 
 ---
 
-## 8. よくある間違いと正解
+## 9. よくある間違いと正解
 
-### ❌ 間違い
+### ボタン実装
+
 ```tsx
-// Tailwind直書き
+// NG: Tailwind直書き
 <button className="text-red-600 hover:bg-red-50">削除</button>
+
+// NG: 独自ボタン作成
+<MyCustomButton>削除</MyCustomButton>
+
+// OK: 統一Button使用
+import { Button } from '@/components/ui/button';
+<Button variant="danger">削除</Button>
+
+// OK: 後方互換エイリアス（既存コードはそのまま動作）
+import { DashboardButton } from '@/components/dashboard/ui/DashboardButton';
+<DashboardButton variant="danger">削除</DashboardButton>
 ```
 
-### ✅ 正解
-```tsx
-// CSS変数使用
-<button className="text-[var(--btn-danger-bg)] hover:bg-[var(--aio-danger-muted)]">削除</button>
+### カード実装
 
-// または既存コンポーネント使用
-<DashboardButton variant="danger">削除</DashboardButton>
+```tsx
+// NG: 独自スタイル
+<div className="bg-white border border-gray-200 rounded-lg shadow">
+
+// OK: CSS変数 + 既存コンポーネント
+import { DashboardCard } from '@/components/dashboard/ui';
+<DashboardCard title="タイトル">コンテンツ</DashboardCard>
+
+// または
+<div className="bg-[var(--dashboard-card-bg)] border border-[var(--dashboard-card-border)] rounded-lg shadow-[var(--dashboard-card-shadow)]">
 ```
 
 ---

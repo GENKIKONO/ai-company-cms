@@ -110,7 +110,7 @@ export async function runManualSecurityScan(actorId?: string): Promise<SecurityS
           body: JSON.stringify({
             action: 'security_scan_manual',
             actor: actorId,
-            target: '/dashboard/admin/security',
+            target: '/dashboard/manage/security',
             details: {
               source: 'manual',
               result,

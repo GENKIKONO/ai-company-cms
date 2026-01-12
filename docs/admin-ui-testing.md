@@ -2,19 +2,19 @@
 
 ## 概要
 
-管理ダッシュボード（`/dashboard/admin/*`）のE2Eテストおよびローカル動作確認手順です。
+管理ダッシュボード（`/dashboard/manage/*`）のE2Eテストおよびローカル動作確認手順です。
 
 ## テスト対象ページ
 
 | パス | 機能 | テーブル依存 |
 |------|------|-------------|
-| `/dashboard/admin` | 管理ツール一覧 | なし |
-| `/dashboard/admin/jobs` | ジョブ監視 | translation_jobs, embedding_jobs |
-| `/dashboard/admin/ai-usage` | AI使用量 | organization_ai_usage |
-| `/dashboard/admin/storage-logs` | ストレージログ | storage_access_logs |
-| `/dashboard/admin/audit` | 監査ログ | service_role_audit, ops_audit |
-| `/dashboard/admin/security` | セキュリティ | intrusion_detection_alerts, ip_blocklist, ip_reports |
-| `/dashboard/admin/ai-visibility` | AI可視性 | ai_visibility_scores, ai_visibility_config, ai_bot_logs |
+| `/dashboard/manage` | 管理ツール一覧 | なし |
+| `/dashboard/manage/jobs` | ジョブ監視 | translation_jobs, embedding_jobs |
+| `/dashboard/manage/ai-usage` | AI使用量 | organization_ai_usage |
+| `/dashboard/manage/storage-logs` | ストレージログ | storage_access_logs |
+| `/dashboard/manage/audit` | 監査ログ | service_role_audit, ops_audit |
+| `/dashboard/manage/security` | セキュリティ | intrusion_detection_alerts, ip_blocklist, ip_reports |
+| `/dashboard/manage/ai-visibility` | AI可視性 | ai_visibility_scores, ai_visibility_config, ai_bot_logs |
 
 ## ローカルセットアップ
 
@@ -91,10 +91,10 @@ npm run test:e2e
 import { logPageView, logFilterChange } from '@/lib/admin/access-audit';
 
 // ページビュー記録
-logPageView('/dashboard/admin/jobs');
+logPageView('/dashboard/manage/jobs');
 
 // フィルタ変更記録
-logFilterChange('/dashboard/admin/storage-logs', 'bucket', 'assets');
+logFilterChange('/dashboard/manage/storage-logs', 'bucket', 'assets');
 ```
 
 ## 既知の制限

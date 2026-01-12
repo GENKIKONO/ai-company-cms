@@ -12,7 +12,7 @@ export default function CreateOrganizationButton() {
   return (
     <button
       onClick={handleCreateOrganization}
-      className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-[var(--aio-primary)] hover:bg-[var(--aio-muted)] transition-colors"
+      className="flex items-center p-4 border-2 border-dashed border-[var(--input-border)] rounded-lg hover:border-[var(--aio-primary)] hover:bg-[var(--aio-muted)] transition-colors"
     >
       <div className="p-2 bg-[var(--aio-muted)] rounded-lg mr-3">
         <svg className="w-6 h-6 text-[var(--aio-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,8 +20,8 @@ export default function CreateOrganizationButton() {
         </svg>
       </div>
       <div className="text-left">
-        <p className="font-medium text-gray-900">新しい企業を追加</p>
-        <p className="text-sm text-gray-600">企業情報を登録して公開します</p>
+        <p className="font-medium text-[var(--color-text-primary)]">新しい企業を追加</p>
+        <p className="text-sm text-[var(--color-text-secondary)]">企業情報を登録して公開します</p>
       </div>
     </button>
   );

@@ -45,8 +45,8 @@ export default function PerformanceMetrics({ organizationId }: PerformanceMetric
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="text-center animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-16 mx-auto mb-1"></div>
-            <div className="h-4 bg-gray-200 rounded w-20 mx-auto"></div>
+            <div className="h-8 bg-[var(--dashboard-card-border)] rounded w-16 mx-auto mb-1"></div>
+            <div className="h-4 bg-[var(--dashboard-card-border)] rounded w-20 mx-auto"></div>
           </div>
         ))}
       </div>
@@ -56,7 +56,7 @@ export default function PerformanceMetrics({ organizationId }: PerformanceMetric
   if (!stats) {
     return (
       <div className="text-center py-4">
-        <p className="text-sm text-red-500">統計データの取得に失敗しました</p>
+        <p className="text-sm text-[var(--aio-danger)]">統計データの取得に失敗しました</p>
       </div>
     );
   }
@@ -78,54 +78,54 @@ export default function PerformanceMetrics({ organizationId }: PerformanceMetric
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div className="text-center">
-        <div className="text-2xl font-bold text-gray-700 mb-1">
+        <div className="text-2xl font-bold text-[var(--color-text-secondary)] mb-1">
           {safeStats.analytics.pageViews || '—'}
         </div>
-        <div className="text-sm text-gray-500">ページビュー</div>
+        <div className="text-sm text-[var(--color-text-tertiary)]">ページビュー</div>
         {safeStats.analytics.pageViews === 0 && (
-          <div className="text-xs text-gray-400 mt-1" title="解析テーブル未設定">
+          <div className="text-xs text-[var(--color-text-tertiary)] mt-1" title="解析テーブル未設定">
             未設定
           </div>
         )}
       </div>
-      
+
       <div className="text-center">
-        <div className="text-2xl font-bold text-gray-700 mb-1">
+        <div className="text-2xl font-bold text-[var(--color-text-secondary)] mb-1">
           {displayValue(safeStats.counts.contacts.count, safeStats.counts.contacts.missing)}
         </div>
-        <div className="text-sm text-gray-500">問い合わせ</div>
+        <div className="text-sm text-[var(--color-text-tertiary)]">問い合わせ</div>
         {safeStats.counts.contacts.missing && (
-          <div className="text-xs text-gray-400 mt-1" title="contactsテーブル未作成">
+          <div className="text-xs text-[var(--color-text-tertiary)] mt-1" title="contactsテーブル未作成">
             テーブル未作成
           </div>
         )}
       </div>
-      
+
       <div className="text-center">
-        <div className="text-2xl font-bold text-gray-700 mb-1">
-          {safeStats.analytics.conversionRate > 0 
-            ? `${safeStats.analytics.conversionRate}%` 
+        <div className="text-2xl font-bold text-[var(--color-text-secondary)] mb-1">
+          {safeStats.analytics.conversionRate > 0
+            ? `${safeStats.analytics.conversionRate}%`
             : '—'
           }
         </div>
-        <div className="text-sm text-gray-500">コンバージョン率</div>
+        <div className="text-sm text-[var(--color-text-tertiary)]">コンバージョン率</div>
         {safeStats.analytics.conversionRate === 0 && (
-          <div className="text-xs text-gray-400 mt-1" title="解析テーブル未設定">
+          <div className="text-xs text-[var(--color-text-tertiary)] mt-1" title="解析テーブル未設定">
             未設定
           </div>
         )}
       </div>
-      
+
       <div className="text-center">
-        <div className="text-2xl font-bold text-gray-700 mb-1">
-          {safeStats.analytics.avgDurationSec > 0 
+        <div className="text-2xl font-bold text-[var(--color-text-secondary)] mb-1">
+          {safeStats.analytics.avgDurationSec > 0
             ? formatDuration(safeStats.analytics.avgDurationSec)
             : '—'
           }
         </div>
-        <div className="text-sm text-gray-500">平均滞在時間</div>
+        <div className="text-sm text-[var(--color-text-tertiary)]">平均滞在時間</div>
         {safeStats.analytics.avgDurationSec === 0 && (
-          <div className="text-xs text-gray-400 mt-1" title="解析テーブル未設定">
+          <div className="text-xs text-[var(--color-text-tertiary)] mt-1" title="解析テーブル未設定">
             未設定
           </div>
         )}

@@ -149,7 +149,7 @@ export default function DocumentUpload({
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">
+      <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-4">
         文書アップロード
       </h3>
       
@@ -157,8 +157,8 @@ export default function DocumentUpload({
       <div
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
           dragActive 
-            ? 'border-indigo-500 bg-indigo-50' 
-            : 'border-gray-300 hover:border-indigo-400 hover:bg-gray-50'
+            ? 'border-[var(--aio-indigo)] bg-[var(--aio-info-muted)]' 
+            : 'border-[var(--input-border)] hover:border-[var(--aio-indigo)] hover:bg-[var(--aio-surface)]'
         } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -166,7 +166,7 @@ export default function DocumentUpload({
         onClick={uploading ? undefined : handleClick}
       >
         <svg 
-          className="mx-auto h-12 w-12 text-gray-400 mb-4" 
+          className="mx-auto h-12 w-12 text-[var(--color-icon-muted)] mb-4" 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
@@ -182,16 +182,16 @@ export default function DocumentUpload({
         {uploading ? (
           <div>
             <div className="flex justify-center mb-2">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--aio-indigo)]"></div>
             </div>
-            <p className="text-sm text-gray-600">アップロード中...</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">アップロード中...</p>
           </div>
         ) : (
           <div>
-            <p className="text-sm text-gray-600 mb-2">
+            <p className="text-sm text-[var(--color-text-secondary)] mb-2">
               PDFファイルをドラッグ&ドロップ
             </p>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-[var(--color-text-tertiary)] mb-4">
               または クリックして選択
             </p>
             <DashboardButton size="sm" disabled={uploading}>
@@ -210,7 +210,7 @@ export default function DocumentUpload({
         className="hidden"
       />
       
-      <div className="mt-4 text-xs text-gray-500">
+      <div className="mt-4 text-xs text-[var(--color-text-tertiary)]">
         <p>• PDF形式のみ対応</p>
         <p>• 最大ファイルサイズ: 10MB</p>
         <p>• アップロード後、自動的にAI検索に利用可能になります</p>

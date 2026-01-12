@@ -28,15 +28,15 @@ const badgeVariants = cva(
         ],
         success: [
           'bg-[var(--status-success-bg)]',
-          'text-green-700',
+          'text-[var(--aio-success)]',
         ],
         warning: [
           'bg-[var(--status-warning-bg)]',
-          'text-yellow-800',
+          'text-[var(--aio-warning)]',
         ],
         error: [
           'bg-[var(--status-error-bg)]',
-          'text-red-700',
+          'text-[var(--aio-danger)]',
         ],
         info: [
           'bg-[var(--status-info-bg)]',

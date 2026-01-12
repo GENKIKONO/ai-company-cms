@@ -11,12 +11,12 @@
 
 | # | ページパス | 接続テーブル | 機能概要 |
 |---|-----------|-------------|----------|
-| 1 | `/dashboard/admin/ai-usage` | organization_ai_usage | 組織別AI使用量ダッシュボード |
-| 2 | `/dashboard/admin/jobs` | translation_jobs, embedding_jobs | 翻訳・埋め込みジョブ監視 |
-| 3 | `/dashboard/admin/audit` | service_role_audit, ops_audit | 監査ログビューア |
-| 4 | `/dashboard/admin/security` | intrusion_detection_alerts, ip_reports, ip_blocklist | セキュリティダッシュボード |
-| 5 | `/dashboard/admin/storage-logs` | storage_access_logs | ストレージアクセスログ |
-| 6 | `/dashboard/admin/ai-visibility` | ai_visibility_scores, ai_visibility_config, ai_bot_logs | AI可視性ダッシュボード |
+| 1 | `/dashboard/manage/ai-usage` | organization_ai_usage | 組織別AI使用量ダッシュボード |
+| 2 | `/dashboard/manage/jobs` | translation_jobs, embedding_jobs | 翻訳・埋め込みジョブ監視 |
+| 3 | `/dashboard/manage/audit` | service_role_audit, ops_audit | 監査ログビューア |
+| 4 | `/dashboard/manage/security` | intrusion_detection_alerts, ip_reports, ip_blocklist | セキュリティダッシュボード |
+| 5 | `/dashboard/manage/storage-logs` | storage_access_logs | ストレージアクセスログ |
+| 6 | `/dashboard/manage/ai-visibility` | ai_visibility_scores, ai_visibility_config, ai_bot_logs | AI可視性ダッシュボード |
 
 ### TypeCheck結果
 
@@ -30,7 +30,7 @@
 
 ### B-1. AI使用量ダッシュボード
 
-**ファイル**: `src/app/dashboard/admin/ai-usage/page.tsx`
+**ファイル**: `src/app/dashboard/manage/ai-usage/page.tsx`
 
 **接続テーブル**:
 - `organization_ai_usage`
@@ -50,7 +50,7 @@
 
 ### B-2. ジョブ監視ダッシュボード
 
-**ファイル**: `src/app/dashboard/admin/jobs/page.tsx`
+**ファイル**: `src/app/dashboard/manage/jobs/page.tsx`
 
 **接続テーブル**:
 - `translation_jobs` - 翻訳ジョブ
@@ -80,7 +80,7 @@
 
 ### B-3. 監査ログビューア
 
-**ファイル**: `src/app/dashboard/admin/audit/page.tsx`
+**ファイル**: `src/app/dashboard/manage/audit/page.tsx`
 
 **接続テーブル**:
 - `service_role_audit` - Service Roleを使用したDB操作の監査
@@ -108,7 +108,7 @@
 
 ### B-4. セキュリティダッシュボード
 
-**ファイル**: `src/app/dashboard/admin/security/page.tsx`
+**ファイル**: `src/app/dashboard/manage/security/page.tsx`
 
 **接続テーブル**:
 - `intrusion_detection_alerts` - 侵入検知アラート
@@ -144,7 +144,7 @@
 
 ### B-5. ストレージアクセスログ
 
-**ファイル**: `src/app/dashboard/admin/storage-logs/page.tsx`
+**ファイル**: `src/app/dashboard/manage/storage-logs/page.tsx`
 
 **接続テーブル**:
 - `storage_access_logs`
@@ -165,7 +165,7 @@
 
 ### B-6. AI可視性ダッシュボード
 
-**ファイル**: `src/app/dashboard/admin/ai-visibility/page.tsx`
+**ファイル**: `src/app/dashboard/manage/ai-visibility/page.tsx`
 
 **接続テーブル**:
 - `ai_visibility_scores` - AI可視性スコア

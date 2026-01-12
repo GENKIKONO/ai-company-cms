@@ -73,18 +73,18 @@ function StructuredContent({ sections }: ContentSectionProps) {
   const getSectionIcon = (key: string) => {
     switch (key) {
       case 'summary': return <ClipboardIcon className="w-5 h-5 text-[var(--aio-info)]" aria-hidden />;
-      case 'analysis': return <SearchIcon className="w-5 h-5 text-green-600" aria-hidden />;
-      case 'recommendation': return <BulbIcon className="w-5 h-5 text-yellow-600" aria-hidden />;
-      default: return <DocumentIcon className="w-5 h-5 text-gray-600" aria-hidden />;
+      case 'analysis': return <SearchIcon className="w-5 h-5 text-[var(--aio-success)]" aria-hidden />;
+      case 'recommendation': return <BulbIcon className="w-5 h-5 text-[var(--aio-warning)]" aria-hidden />;
+      default: return <DocumentIcon className="w-5 h-5 text-[var(--color-text-secondary)]" aria-hidden />;
     }
   };
 
   const getSectionColor = (key: string) => {
     switch (key) {
       case 'summary': return 'bg-[var(--aio-muted)] border-[var(--aio-primary)]/30';
-      case 'analysis': return 'bg-green-50 border-green-200';
-      case 'recommendation': return 'bg-orange-50 border-orange-200';
-      default: return 'bg-gray-50 border-gray-200';
+      case 'analysis': return 'bg-[var(--aio-success-muted)] border-[var(--aio-success)]';
+      case 'recommendation': return 'bg-[var(--aio-pending-muted)] border-[var(--aio-pending)]';
+      default: return 'bg-[var(--aio-surface)] border-[var(--dashboard-card-border)]';
     }
   };
 
@@ -97,10 +97,10 @@ function StructuredContent({ sections }: ContentSectionProps) {
         >
           <div className="flex items-center mb-3">
             <span className="text-xl mr-2">{getSectionIcon(section.key)}</span>
-            <h3 className="text-lg font-semibold text-gray-900">{section.title || section.key}</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{section.title || section.key}</h3>
           </div>
           <div className="prose prose-sm max-w-none">
-            <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+            <div className="whitespace-pre-wrap text-[var(--color-text-secondary)] leading-relaxed">
               {section.content}
             </div>
           </div>
@@ -139,7 +139,7 @@ function AutoSaveStatus({ status, errorMessage, isCompact, conflictLatest, onRes
 
   if (status === 'saved') {
     return (
-      <div className={`flex items-center space-x-2 text-green-600 ${isCompact ? 'text-xs' : ''}`}>
+      <div className={`flex items-center space-x-2 text-[var(--aio-success)] ${isCompact ? 'text-xs' : ''}`}>
         <svg className={`${isCompact ? 'w-3 h-3' : 'w-4 h-4'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
@@ -150,14 +150,14 @@ function AutoSaveStatus({ status, errorMessage, isCompact, conflictLatest, onRes
 
   if (status === 'error') {
     return (
-      <div className={`bg-red-50 border border-red-200 rounded-md p-4 ${isCompact ? 'p-2' : ''}`}>
+      <div className={`bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4 ${isCompact ? 'p-2' : ''}`}>
         <div className="flex">
-          <svg className={`text-red-400 ${isCompact ? 'w-4 h-4' : 'w-5 h-5'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className={`text-[var(--aio-danger)] ${isCompact ? 'w-4 h-4' : 'w-5 h-5'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div className="ml-3">
-            <h3 className={`font-medium text-red-800 ${isCompact ? 'text-xs' : 'text-sm'}`}>自動保存エラー</h3>
-            <p className={`text-red-700 mt-1 ${isCompact ? 'text-xs' : 'text-sm'}`}>{errorMessage}</p>
+            <h3 className={`font-medium text-[var(--aio-danger)] ${isCompact ? 'text-xs' : 'text-sm'}`}>自動保存エラー</h3>
+            <p className={`text-[var(--aio-danger)] mt-1 ${isCompact ? 'text-xs' : 'text-sm'}`}>{errorMessage}</p>
           </div>
         </div>
       </div>
@@ -166,7 +166,7 @@ function AutoSaveStatus({ status, errorMessage, isCompact, conflictLatest, onRes
 
   if (status === 'conflict') {
     return (
-      <div className={`flex items-center space-x-2 text-orange-600 ${isCompact ? 'text-xs' : ''}`}>
+      <div className={`flex items-center space-x-2 text-[var(--aio-pending)] ${isCompact ? 'text-xs' : ''}`}>
         <svg className={`${isCompact ? 'w-3 h-3' : 'w-4 h-4'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
         </svg>
@@ -187,28 +187,28 @@ interface ErrorBannerProps {
 
 function ErrorBanner({ error, onRetry, onDismiss }: ErrorBannerProps) {
   return (
-    <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+    <div className="mb-6 bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-lg p-4">
       <div className="flex items-start">
-        <svg className="w-5 h-5 text-red-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-5 h-5 text-[var(--aio-danger)] mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <div className="ml-3 flex-1">
-          <h3 className="text-sm font-medium text-red-800">AI生成エラー</h3>
-          <p className="text-sm text-red-700 mt-1">{error.message}</p>
+          <h3 className="text-sm font-medium text-[var(--aio-danger)]">AI生成エラー</h3>
+          <p className="text-sm text-[var(--aio-danger)] mt-1">{error.message}</p>
           {error.code && (
-            <p className="text-xs text-red-600 mt-1">エラーコード: {error.code}</p>
+            <p className="text-xs text-[var(--aio-danger)] mt-1">エラーコード: {error.code}</p>
           )}
         </div>
         <div className="ml-3 flex space-x-2">
           <button
             onClick={onRetry}
-            className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200 transition-colors"
+            className="px-3 py-1 bg-[var(--aio-danger-muted)] text-[var(--aio-danger)] rounded text-sm hover:opacity-80 transition-colors"
           >
             再試行
           </button>
           <button
             onClick={onDismiss}
-            className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200 transition-colors"
+            className="px-3 py-1 bg-[var(--aio-surface)] text-[var(--color-text-secondary)] rounded text-sm hover:bg-[var(--dashboard-card-border)] transition-colors"
           >
             閉じる
           </button>
@@ -227,8 +227,8 @@ interface QuestionNavigatorProps {
 
 function QuestionNavigator({ questions, currentQuestionIndex, answers, onQuestionChange }: QuestionNavigatorProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">質問一覧</h3>
+    <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)] p-4 mb-6">
+      <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">質問一覧</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
         {questions.map((question, index) => {
           const answerValue = answers[question.id];
@@ -243,8 +243,8 @@ function QuestionNavigator({ questions, currentQuestionIndex, answers, onQuestio
                 isCurrent
                   ? 'bg-[var(--aio-primary)] text-white border-[var(--aio-primary)]'
                   : isAnswered
-                  ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                  ? 'bg-[var(--aio-success-muted)] text-[var(--aio-success)] border-[var(--aio-success)] hover:bg-[var(--aio-success-muted)]'
+                  : 'bg-[var(--aio-surface)] text-[var(--color-text-secondary)] border-[var(--dashboard-card-border)] hover:bg-[var(--aio-surface)]'
               }`}
             >
               <div className="font-medium">質問 {index + 1}</div>
@@ -275,11 +275,11 @@ function AnswerEditor({ question, answer, onAnswerChange, autoSaveStatus, autoSa
   const answerString = String(answer || '');
   
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)] p-6">
       <div className="mb-4">
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
               {question.question_text}
             </h2>
             {question.content_type && (
@@ -300,7 +300,7 @@ function AnswerEditor({ question, answer, onAnswerChange, autoSaveStatus, autoSa
       </div>
 
       <div className="mb-4">
-        <label htmlFor="answer" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="answer" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
           回答（自動保存）
         </label>
         <textarea
@@ -309,11 +309,11 @@ function AnswerEditor({ question, answer, onAnswerChange, autoSaveStatus, autoSa
           onChange={(e) => onAnswerChange(e.target.value)}
           rows={6}
           disabled={isGenerating} // Phase 2-3: 生成中は編集不可
-          className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] focus:border-transparent resize-vertical ${isGenerating ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+          className={`w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] focus:border-transparent resize-vertical ${isGenerating ? 'bg-[var(--aio-surface)] cursor-not-allowed' : ''}`}
           placeholder="こちらに回答を入力してください（1秒後に自動保存されます）..."
         />
         <div className="flex justify-between items-center mt-1">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-[var(--color-text-tertiary)]">
             {answerString.length} 文字 (最大 5000 文字)
           </p>
           {!isGenerating && (
@@ -322,7 +322,7 @@ function AnswerEditor({ question, answer, onAnswerChange, autoSaveStatus, autoSa
                 <p className="text-xs text-[var(--aio-info)]">保存中...</p>
               )}
               {autoSaveStatus === 'saved' && (
-                <p className="text-xs text-green-600">✓ 保存済み</p>
+                <p className="text-xs text-[var(--aio-success)]">✓ 保存済み</p>
               )}
             </>
           )}
@@ -574,12 +574,12 @@ function InterviewSessionContent() {
       <div className="">
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="h-8 bg-[var(--dashboard-card-border)] rounded w-1/3 mb-6"></div>
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-              <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+              <div className="h-6 bg-[var(--dashboard-card-border)] rounded w-3/4 mb-4"></div>
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-4 bg-gray-200 rounded"></div>
+                  <div key={i} className="h-4 bg-[var(--dashboard-card-border)] rounded"></div>
                 ))}
               </div>
             </div>
@@ -600,14 +600,14 @@ function InterviewSessionContent() {
             >
               ← インタビューに戻る
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900">エラーが発生しました</h1>
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">エラーが発生しました</h1>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-red-700">{error}</p>
+          <div className="bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
+            <p className="text-[var(--aio-danger)]">{error}</p>
             <div className="mt-4">
               <Link
                 href="/dashboard/interview"
-                className="px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 inline-block"
+                className="px-4 py-2 bg-[var(--aio-danger-muted)] text-[var(--aio-danger)] rounded hover:opacity-80 inline-block"
               >
                 質問選択に戻る
               </Link>
@@ -623,7 +623,7 @@ function InterviewSessionContent() {
       <div className="">
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">セッションが見つかりません</h1>
+            <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-4">セッションが見つかりません</h1>
             <Link href="/dashboard/interview" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)]">
               新しいインタビューを開始
             </Link>
@@ -649,17 +649,17 @@ function InterviewSessionContent() {
               >
                 ← インタビューに戻る
               </Link>
-              <h1 className="text-3xl font-bold text-gray-900">AIインタビュー</h1>
-              <p className="text-lg text-gray-600 mt-2">
+              <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">AIインタビュー</h1>
+              <p className="text-lg text-[var(--color-text-secondary)] mt-2">
                 質問に答えてAIにまとめてもらいましょう
               </p>
             </div>
             <div className="text-right">
-              <div className="text-sm text-gray-500">進捗</div>
+              <div className="text-sm text-[var(--color-text-tertiary)]">進捗</div>
               <div className="text-2xl font-bold text-[var(--aio-primary)]">
                 {progressPercentage}%
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-[var(--color-text-tertiary)]">
                 {answeredCount} / {questions.length} 完了
               </div>
             </div>
@@ -694,14 +694,14 @@ function InterviewSessionContent() {
 
         {/* Phase 2-3: 生成結果表示 */}
         {isGenerated && (generationResult?.content || session.generated_content) && (
-          <div className="mb-8 bg-green-50 border border-green-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-green-800 mb-4">
+          <div className="mb-8 bg-[var(--aio-success-muted)] border border-[var(--aio-success)] rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-[var(--aio-success)] mb-4">
               ✅ AIまとめ生成完了
             </h2>
             
             {/* Phase 2-3: 生成メタデータ表示 */}
             {generationResult && (
-              <div className="mb-4 text-sm text-gray-600 flex items-center space-x-4">
+              <div className="mb-4 text-sm text-[var(--color-text-secondary)] flex items-center space-x-4">
                 <span>モデル: {generationResult.usedModel}</span>
                 {generationResult.citations && generationResult.citations.length > 0 && (
                   <span>引用: {generationResult.citations.length}件</span>
@@ -725,7 +725,7 @@ function InterviewSessionContent() {
             ) : (
               /* プレーンテキストの場合は従来通り */
               <div className="bg-white rounded p-4 border">
-                <pre className="whitespace-pre-wrap text-gray-800 text-sm leading-relaxed">
+                <pre className="whitespace-pre-wrap text-[var(--color-text-primary)] text-sm leading-relaxed">
                   {generationResult?.content || session.generated_content}
                 </pre>
               </div>
@@ -780,14 +780,14 @@ function InterviewSessionContent() {
             <button
               onClick={() => handleQuestionChange(Math.max(0, currentQuestionIndex - 1))}
               disabled={currentQuestionIndex === 0 || isGenerated || isGenerating}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 border border-[var(--input-border)] rounded-md text-[var(--color-text-secondary)] hover:bg-[var(--aio-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               前の質問
             </button>
             <button
               onClick={() => handleQuestionChange(Math.min(questions.length - 1, currentQuestionIndex + 1))}
               disabled={currentQuestionIndex === questions.length - 1 || isGenerated || isGenerating}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 border border-[var(--input-border)] rounded-md text-[var(--color-text-secondary)] hover:bg-[var(--aio-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               次の質問
             </button>

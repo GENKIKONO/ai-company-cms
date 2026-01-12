@@ -1,266 +1,36 @@
 /**
- * HIG-Compliant Button Component
- * Follows Apple Human Interface Guidelines for buttons
+ * HIGButton - Legacy Alias for Unified Button
+ *
+ * @deprecated Use `Button` from '@/components/ui/button' instead.
+ * This file is maintained for backward compatibility only.
+ *
+ * Migration:
+ *   Before: import { HIGButton } from '@/components/ui/HIGButton';
+ *   After:  import { Button } from '@/components/ui/button';
  */
 
-import React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-import { LoadingIcon } from '../icons/HIGIcons';
+import {
+  Button,
+  ButtonGroup,
+  IconButton,
+  LinkButton,
+  buttonVariants,
+  type ButtonProps,
+  type ButtonGroupProps,
+  type IconButtonProps,
+  type LinkButtonProps,
+} from './button';
 
-const buttonVariants = cva(
-  [
-    // Base styles following HIG principles
-    'hig-button',
-    'relative',
-    'inline-flex',
-    'items-center',
-    'justify-center',
-    'gap-2',
-    'text-center',
-    'font-medium',
-    'spring-bounce',
-    'select-none',
-    'focus-visible:outline-none',
-    'focus-visible:ring-2',
-    'focus-visible:ring-offset-2',
-    'disabled:opacity-60',
-    'disabled:pointer-events-none',
-    'disabled:cursor-not-allowed',
-    // Ensure minimum tap target
-    'min-h-[44px]',
-    'min-w-[44px]',
-    // Japanese text optimization
-    'hig-jp-nowrap',
-  ],
-  {
-    variants: {
-      variant: {
-        primary: [
-          'bg-[var(--aio-primary)]',
-          'text-[var(--text-on-primary)]',
-          'border-0',
-          'hover:bg-[var(--aio-primary-hover)]',
-          'focus-visible:ring-[var(--aio-primary)]',
-          'active:opacity-90',
-          'shadow-sm',
-        ],
-        secondary: [
-          'bg-[var(--aio-surface)]',
-          'text-[var(--text-primary)]',
-          'border',
-          'border-[var(--border-light)]',
-          'hover:bg-[var(--color-gray-100)]',
-          'hover:border-[var(--border-default)]',
-          'focus-visible:ring-[var(--aio-primary)]',
-          'active:opacity-90',
-        ],
-        tertiary: [
-          'bg-transparent',
-          'text-[var(--aio-primary)]',
-          'border-0',
-          'hover:bg-[var(--aio-surface)]',
-          'focus-visible:ring-[var(--aio-primary)]',
-          'active:opacity-90',
-        ],
-        danger: [
-          'bg-[var(--color-danger)]',
-          'text-white',
-          'border-0',
-          'hover:opacity-90',
-          'focus-visible:ring-[var(--color-danger)]',
-          'active:opacity-90',
-          'shadow-sm',
-        ],
-        ghost: [
-          'bg-transparent',
-          'text-[var(--text-primary)]',
-          'border-0',
-          'hover:bg-[var(--aio-surface)]',
-          'focus-visible:ring-[var(--aio-primary)]',
-          'active:opacity-90',
-        ],
-      },
-      size: {
-        sm: [
-          'h-10',
-          'px-3',
-          'text-sm',
-          'rounded-lg',
-        ],
-        md: [
-          'h-11',
-          'px-4',
-          'text-base',
-          'rounded-lg',
-        ],
-        lg: [
-          'h-12',
-          'px-6',
-          'text-base',
-          'rounded-xl',
-        ],
-        xl: [
-          'h-14',
-          'px-8',
-          'text-lg',
-          'rounded-xl',
-        ],
-        icon: [
-          'h-10',
-          'w-10',
-          'p-0',
-          'rounded-lg',
-        ],
-      },
-      fullWidth: {
-        true: 'w-full',
-        false: 'w-auto',
-      },
-    },
-    defaultVariants: {
-      variant: 'primary',
-      size: 'md',
-      fullWidth: false,
-    },
-  }
-);
+// Re-export unified Button as HIGButton for backward compatibility
+export const HIGButton = Button;
+export const HIGLinkButton = LinkButton;
 
-export interface HIGButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-  loading?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  children?: React.ReactNode;
-}
+// Re-export types with legacy names
+export type HIGButtonProps = ButtonProps;
+export type HIGLinkButtonProps = LinkButtonProps;
 
-const HIGButton = React.forwardRef<HTMLButtonElement, HIGButtonProps>(
-  (
-    {
-      className,
-      variant,
-      size,
-      fullWidth,
-      loading = false,
-      leftIcon,
-      rightIcon,
-      children,
-      disabled,
-      type = 'button',
-      ...props
-    },
-    ref
-  ) => {
-    const isDisabled = disabled || loading;
+// Re-export buttonVariants for any direct usage
+export { buttonVariants };
 
-    return (
-      <button
-        className={cn(buttonVariants({ variant, size, fullWidth, className }))}
-        ref={ref}
-        disabled={isDisabled}
-        type={type}
-        aria-busy={loading}
-        {...props}
-      >
-        {loading && (
-          <>
-            <LoadingIcon 
-              size={16} 
-              className="animate-spin" 
-              aria-hidden={true}
-            />
-            <span className="hig-sr-only">読み込み中...</span>
-          </>
-        )}
-        
-        {!loading && leftIcon && (
-          <span className="flex-shrink-0" aria-hidden="true">
-            {leftIcon}
-          </span>
-        )}
-        
-        {children && (
-          <span className={cn(
-            size === 'icon' && 'hig-sr-only'
-          )}>
-            {children}
-          </span>
-        )}
-        
-        {!loading && rightIcon && (
-          <span className="flex-shrink-0" aria-hidden="true">
-            {rightIcon}
-          </span>
-        )}
-      </button>
-    );
-  }
-);
-
-HIGButton.displayName = 'HIGButton';
-
-export { HIGButton, buttonVariants };
-
-// Link variant for navigation
-export interface HIGLinkButtonProps
-  extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
-    VariantProps<typeof buttonVariants> {
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  external?: boolean;
-}
-
-export const HIGLinkButton = React.forwardRef<HTMLAnchorElement, HIGLinkButtonProps>(
-  (
-    {
-      className,
-      variant = 'tertiary',
-      size,
-      fullWidth,
-      leftIcon,
-      rightIcon,
-      children,
-      external = false,
-      href,
-      ...props
-    },
-    ref
-  ) => {
-    const linkProps = external ? {
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    } : {};
-
-    return (
-      <a
-        className={cn(buttonVariants({ variant, size, fullWidth, className }))}
-        ref={ref}
-        href={href}
-        {...linkProps}
-        {...props}
-      >
-        {leftIcon && (
-          <span className="flex-shrink-0" aria-hidden="true">
-            {leftIcon}
-          </span>
-        )}
-        
-        <span>{children}</span>
-        
-        {rightIcon && (
-          <span className="flex-shrink-0" aria-hidden="true">
-            {rightIcon}
-          </span>
-        )}
-        
-        {external && (
-          <span className="hig-sr-only">（新しいタブで開く）</span>
-        )}
-      </a>
-    );
-  }
-);
-
-HIGLinkButton.displayName = 'HIGLinkButton';
+// Default export for convenience
+export default HIGButton;

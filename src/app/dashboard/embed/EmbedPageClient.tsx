@@ -170,25 +170,25 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--aio-surface)] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
-        <span className="ml-3 text-gray-600">読み込み中...</span>
+        <span className="ml-3 text-[var(--color-text-secondary)]">読み込み中...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--aio-surface)] flex items-center justify-center">
         <div className="text-center max-w-md">
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+          <div className="bg-[var(--aio-danger-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4 mb-6">
             <div className="flex items-start">
-              <svg className="w-5 h-5 text-red-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-[var(--aio-danger)] mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">エラーが発生しました</h3>
-                <p className="mt-1 text-sm text-red-700">{error}</p>
+                <h3 className="text-sm font-medium text-[var(--aio-danger)]">エラーが発生しました</h3>
+                <p className="mt-1 text-sm text-[var(--aio-danger)]">{error}</p>
               </div>
             </div>
           </div>
@@ -219,9 +219,9 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
 
   if (!organization) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--aio-surface)] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900">企業情報が見つかりません</h2>
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">企業情報が見つかりません</h2>
           <div className="mt-4 space-y-2">
             <div>
               <button
@@ -245,14 +245,14 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://ai-company-cms.vercel.app';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--aio-surface)]">
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ヘッダー */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">Widget埋め込み</h1>
+                <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">Widget埋め込み</h1>
                 {/* Phase 4-B: Quota表示 */}
                 <OrgQuotaBadge
                   label="埋め込みウィジェット"
@@ -260,7 +260,7 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
                   className="text-sm"
                 />
               </div>
-              <p className="text-lg text-gray-600 mt-2">
+              <p className="text-lg text-[var(--color-text-secondary)] mt-2">
                 企業情報をWebサイトに埋め込むためのWidgetコードを生成します
               </p>
             </div>
@@ -276,12 +276,12 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
         {organization.slug ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* 設定パネル */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Widget設定</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)] p-6">
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6">Widget設定</h2>
               
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                     テーマ
                   </label>
                   <select
@@ -290,7 +290,7 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
                       ...widgetOptions, 
                       theme: e.target.value as 'light' | 'dark' | 'auto'
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+                    className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   >
                     <option value="light">ライト</option>
                     <option value="dark">ダーク</option>
@@ -299,7 +299,7 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                     サイズ
                   </label>
                   <select
@@ -308,7 +308,7 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
                       ...widgetOptions, 
                       size: e.target.value as 'small' | 'medium' | 'large'
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+                    className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                   >
                     <option value="small">小</option>
                     <option value="medium">中</option>
@@ -317,7 +317,7 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
                     表示項目
                   </label>
                   
@@ -330,9 +330,9 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
                         ...widgetOptions, 
                         showLogo: e.target.checked
                       })}
-                      className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded"
+                      className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-[var(--input-border)] rounded"
                     />
-                    <label htmlFor="showLogo" className="ml-2 text-sm text-gray-700">
+                    <label htmlFor="showLogo" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                       ロゴを表示
                     </label>
                   </div>
@@ -346,9 +346,9 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
                         ...widgetOptions, 
                         showDescription: e.target.checked
                       })}
-                      className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded"
+                      className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-[var(--input-border)] rounded"
                     />
-                    <label htmlFor="showDescription" className="ml-2 text-sm text-gray-700">
+                    <label htmlFor="showDescription" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                       説明文を表示
                     </label>
                   </div>
@@ -362,16 +362,16 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
                         ...widgetOptions, 
                         showServices: e.target.checked
                       })}
-                      className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-gray-300 rounded"
+                      className="h-4 w-4 text-[var(--aio-primary)] focus:ring-[var(--aio-primary)] border-[var(--input-border)] rounded"
                     />
-                    <label htmlFor="showServices" className="ml-2 text-sm text-gray-700">
+                    <label htmlFor="showServices" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                       サービスリストを表示
                     </label>
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="customCSS" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="customCSS" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                     カスタムCSS（オプション）
                   </label>
                   <textarea
@@ -382,10 +382,10 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
                       ...widgetOptions, 
                       customCSS: e.target.value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+                    className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
                     placeholder=".widget { border-radius: 12px; }"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
                     Widgetの見た目をカスタマイズするCSSを記述できます
                   </p>
                 </div>
@@ -393,10 +393,10 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
             </div>
 
             {/* プレビュー */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">プレビュー</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)] p-6">
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6">プレビュー</h2>
               
-              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <div className="border border-[var(--dashboard-card-border)] rounded-lg p-4 bg-[var(--aio-surface)]">
                 <WidgetPreview
                   organization={organization}
                   services={services}
@@ -407,22 +407,22 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
             </div>
           </div>
         ) : (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+          <div className="bg-[var(--aio-warning-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4">
             <div className="flex">
-              <svg className="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-[var(--aio-warning)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-21 12a9 9 0 1118 0 9 9 0 01-18 0z" />
               </svg>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800">
+                <h3 className="text-sm font-medium text-[var(--aio-warning)]">
                   公開スラッグが設定されていません
                 </h3>
-                <p className="mt-1 text-sm text-yellow-700">
+                <p className="mt-1 text-sm text-[var(--aio-warning)]">
                   Widget埋め込み機能を使用するには、企業情報で公開スラッグを設定してください。
                 </p>
                 <div className="mt-4">
                   <Link
                     href={`/organizations/${organization.id}`}
-                    className="px-4 py-2 bg-yellow-600 text-white text-sm rounded-md hover:bg-yellow-700"
+                    className="px-4 py-2 bg-[var(--aio-warning)] text-white text-sm rounded-md hover:bg-[var(--aio-warning)]"
                   >
                     企業情報を編集
                   </Link>
@@ -434,9 +434,9 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
 
         {/* 埋め込みコード */}
         {embedCode && (
-          <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="mt-8 bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)] p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">埋め込みコード</h2>
+              <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">埋め込みコード</h2>
               <DashboardButton
                 onClick={copyToClipboard}
                 variant="primary"
@@ -449,14 +449,14 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
             
             {/* Phase 4-C: Quota警告表示 */}
             {isEmbedsDisabledByPlan && (
-              <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+              <div className="mb-4 bg-[var(--aio-danger-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4">
                 <div className="flex">
-                  <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-[var(--aio-danger)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">埋め込みウィジェット機能が無効です</h3>
-                    <p className="mt-1 text-sm text-red-700">
+                    <h3 className="text-sm font-medium text-[var(--aio-danger)]">埋め込みウィジェット機能が無効です</h3>
+                    <p className="mt-1 text-sm text-[var(--aio-danger)]">
                       現在のプランでは埋め込みウィジェット機能をご利用いただけません。プランをアップグレードしてください。
                     </p>
                   </div>
@@ -465,14 +465,14 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
             )}
             
             {isEmbedsLimitReached && !isEmbedsDisabledByPlan && (
-              <div className="mb-4 bg-orange-50 border border-orange-200 rounded-md p-4">
+              <div className="mb-4 bg-[var(--aio-pending-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4">
                 <div className="flex">
-                  <svg className="w-5 h-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-[var(--aio-pending)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-orange-800">埋め込み上限に達しました</h3>
-                    <p className="mt-1 text-sm text-orange-700">
+                    <h3 className="text-sm font-medium text-[var(--aio-pending)]">埋め込み上限に達しました</h3>
+                    <p className="mt-1 text-sm text-[var(--aio-pending)]">
                       {embedsQuota && `${embedsQuota.usedInWindow}/${embedsQuota.limit} の埋め込みを使用済みです。`}
                       追加で埋め込みコードを生成するには、プランをアップグレードしてください。
                     </p>
@@ -481,13 +481,13 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
               </div>
             )}
             
-            <div className="bg-gray-100 rounded-md p-4 overflow-x-auto">
-              <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+            <div className="bg-[var(--aio-surface)] rounded-md p-4 overflow-x-auto">
+              <pre className="text-sm text-[var(--color-text-primary)] whitespace-pre-wrap">
                 <code>{embedCode}</code>
               </pre>
             </div>
             
-            <div className="mt-4 text-sm text-gray-600">
+            <div className="mt-4 text-sm text-[var(--color-text-secondary)]">
               <h3 className="font-medium mb-2">使用方法:</h3>
               <ol className="list-decimal list-inside space-y-1">
                 <li>上記のコードをコピーします</li>

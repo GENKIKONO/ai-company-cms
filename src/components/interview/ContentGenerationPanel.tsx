@@ -266,7 +266,7 @@ export default function ContentGenerationPanel({ sessionId, sessionStatus, class
         break;
       default:
         // フォールバック：CMS統合ダッシュボードに遷移
-        router.push(`/dashboard/admin/contents?filter=ai_generated`);
+        router.push(`/dashboard/manage/contents?filter=ai_generated`);
     }
   };
 

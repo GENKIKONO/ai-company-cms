@@ -20,16 +20,48 @@ export async function GET(request: NextRequest) {
       return createAuthError();
     }
 
-    // ユーザーの企業IDを取得（既存パターンに合わせる）
+    // ユーザーの所属組織を取得（organization_members経由）
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (membershipError) {
+      logger.error('[system-monitoring] Failed to fetch membership', {
+        userId: user.id,
+        error: membershipError.message
+      });
+      return NextResponse.json({
+        hasAccess: false,
+        plan: null,
+        reason: 'membership_error'
+      });
+    }
+
+    if (!membershipData) {
+      logger.debug('[system-monitoring] Organization membership not found', {
+        userId: user.id
+      });
+      return NextResponse.json({
+        hasAccess: false,
+        plan: null,
+        reason: 'organization_not_found'
+      });
+    }
+
+    // 組織のplan情報を取得
     const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select('id, plan')
-      .eq('created_by', user.id)
+      .eq('id', membershipData.organization_id)
       .single();
 
     if (orgError || !orgData) {
       logger.debug('[system-monitoring] Organization not found', {
         userId: user.id,
+        organizationId: membershipData.organization_id,
         error: orgError?.message
       });
       return NextResponse.json({

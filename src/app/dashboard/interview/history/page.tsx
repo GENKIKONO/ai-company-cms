@@ -30,13 +30,13 @@ function SessionTable({ sessions, onResume, onView, onDelete, loading }: Session
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'draft':
-        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">下書き</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--aio-surface)] text-[var(--color-text-primary)]">下書き</span>;
       case 'in_progress':
         return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--aio-muted)] text-[var(--aio-primary)]">進行中</span>;
       case 'completed':
-        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">完了</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--aio-success-muted)] text-[var(--aio-success)]">完了</span>;
       default:
-        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{status}</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--aio-surface)] text-[var(--color-text-primary)]">{status}</span>;
     }
   };
 
@@ -57,14 +57,14 @@ function SessionTable({ sessions, onResume, onView, onDelete, loading }: Session
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">セッション履歴</h2>
+      <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)]">
+        <div className="px-6 py-4 border-b border-[var(--dashboard-card-border)]">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">セッション履歴</h2>
         </div>
         <div className="p-6">
           <div className="animate-pulse space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded"></div>
+              <div key={i} className="h-16 bg-[var(--dashboard-card-border)] rounded"></div>
             ))}
           </div>
         </div>
@@ -73,41 +73,41 @@ function SessionTable({ sessions, onResume, onView, onDelete, loading }: Session
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900">セッション履歴</h2>
+    <div className="bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)]">
+      <div className="px-6 py-4 border-b border-[var(--dashboard-card-border)]">
+        <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">セッション履歴</h2>
       </div>
       
       {sessions.length === 0 ? (
         <div className="p-6 text-center">
-          <p className="text-gray-500">セッションがありません</p>
+          <p className="text-[var(--color-text-tertiary)]">セッションがありません</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-[var(--dashboard-card-border)]">
+            <thead className="bg-[var(--aio-surface)]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">
                   作成日時
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">
                   コンテンツタイプ
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">
                   ステータス
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">
                   アクション
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-[var(--dashboard-card-border)]">
               {sessions.map((session) => (
-                <tr key={session.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <tr key={session.id} className="hover:bg-[var(--aio-surface)]">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                     {formatDate(session.created_at)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                     {getContentTypeLabel(session.content_type)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -131,7 +131,7 @@ function SessionTable({ sessions, onResume, onView, onDelete, loading }: Session
                     )}
                     <button
                       onClick={() => onDelete(session.id)}
-                      className="text-red-600 hover:text-red-900 font-medium ml-4"
+                      className="text-[var(--aio-danger)] hover:text-[var(--aio-danger)] font-medium ml-4"
                     >
                       削除
                     </button>
@@ -275,8 +275,8 @@ function InterviewHistoryContent() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">AIインタビュー履歴</h1>
-              <p className="text-lg text-gray-600 mt-2">
+              <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">AIインタビュー履歴</h1>
+              <p className="text-lg text-[var(--color-text-secondary)] mt-2">
                 過去のインタビューセッションを確認・管理できます
               </p>
             </div>
@@ -298,30 +298,30 @@ function InterviewHistoryContent() {
 
         {/* エラー表示 */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="mb-6 bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
             <div className="flex">
-              <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-[var(--aio-danger)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-[var(--aio-danger)]">{error}</p>
               </div>
             </div>
           </div>
         )}
 
         {/* フィルター */}
-        <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">フィルター</h2>
+        <div className="mb-6 bg-white rounded-lg shadow-sm border border-[var(--dashboard-card-border)] p-6">
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">フィルター</h2>
           <div className="flex flex-wrap gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 ステータス
               </label>
               <select
                 value={filters.status}
                 onChange={(e) => handleStatusFilter(e.target.value as typeof filters.status)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] text-sm"
+                className="px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)] text-sm"
               >
                 <option value="">すべて</option>
                 <option value="draft">下書き</option>
@@ -344,24 +344,24 @@ function InterviewHistoryContent() {
         {/* ページネーション */}
         {pagination.total > pagination.pageSize && (
           <div className="mt-6 flex justify-between items-center">
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-[var(--color-text-secondary)]">
               {((pagination.page - 1) * pagination.pageSize) + 1} - {Math.min(pagination.page * pagination.pageSize, pagination.total)} / {pagination.total} 件
             </div>
             <div className="flex space-x-2">
               <button
                 onClick={handlePrevPage}
                 disabled={pagination.page === 1}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-[var(--input-border)] rounded-md text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--aio-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 前へ
               </button>
-              <span className="px-4 py-2 text-sm text-gray-700">
+              <span className="px-4 py-2 text-sm text-[var(--color-text-secondary)]">
                 {pagination.page} / {totalPages}
               </span>
               <button
                 onClick={handleNextPage}
                 disabled={pagination.page >= totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-[var(--input-border)] rounded-md text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--aio-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 次へ
               </button>
