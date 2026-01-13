@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
   const isLoggedIn = user && !error;
 
   // 保護されたパス（未ログインなら /auth/login へ）
-  const protectedPaths = [ROUTES.dashboard, '/admin', '/management-console', '/my'];
+  const protectedPaths = [ROUTES.dashboard, '/admin', '/management-console', '/my', '/account'];
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
 
   // 認証ページ（ログイン済みなら /dashboard へ）

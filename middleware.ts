@@ -20,8 +20,8 @@ const AUTH_PATHS = new Set([
   '/auth/reset-password-confirm',
 ]);
 
-// 要ログインのプレフィックス  
-const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/profile'];
+// 要ログインのプレフィックス
+const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/profile', '/account'];
 
 // 管理者専用パス（admin判定が必要）
 const ADMIN_PATHS = ['/management-console'];
@@ -62,7 +62,7 @@ const AUTH_PAGES = AUTH_PATHS; // 同じ定義を使用
 
 export async function middleware(req: NextRequest) {
   const startTime = Date.now();
-  
+
   try {
     const { pathname } = req.nextUrl;
     console.log(`[DEBUG] Middleware called for: ${pathname}`);
@@ -112,40 +112,33 @@ export async function middleware(req: NextRequest) {
     // 認証系ページの処理は下で行う
   }
 
-  // Supabase SSR クライアント（セキュアCookie設定付き）
+  // Supabase SSR クライアント（@supabase/ssr推奨のgetAll/setAllパターン）
+  // NOTE: server.tsと同じパターンを使用してCookie同期を確保
   const res = NextResponse.next();
   const isProduction = process.env.NODE_ENV === 'production';
-  const domain = isProduction && process.env.NEXT_PUBLIC_APP_URL?.includes('aiohub.jp') 
-    ? '.aiohub.jp' 
+  const domain = isProduction && process.env.NEXT_PUBLIC_APP_URL?.includes('aiohub.jp')
+    ? '.aiohub.jp'
     : undefined;
-    
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get: (name: string) => req.cookies.get(name)?.value,
-        set: (name: string, value: string, options: any) => {
-          const secureOptions = {
-            ...options,
-            sameSite: 'lax' as const,
-            secure: isProduction,
-            domain,
-            path: '/',
-            httpOnly: false, // Supabase needs client access to auth tokens
-          };
-          res.cookies.set(name, value, secureOptions);
+        getAll() {
+          return req.cookies.getAll();
         },
-        remove: (name: string, options: any) => {
-          const secureOptions = {
-            ...options,
-            sameSite: 'lax' as const,
-            secure: isProduction,
-            domain,
-            path: '/',
-            maxAge: 0,
-          };
-          res.cookies.set(name, '', secureOptions);
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            const secureOptions = {
+              ...options,
+              sameSite: 'lax' as const,
+              secure: isProduction,
+              domain,
+              path: '/',
+            };
+            res.cookies.set(name, value, secureOptions);
+          });
         },
       },
     }

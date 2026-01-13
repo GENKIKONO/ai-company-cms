@@ -4,9 +4,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createPortal } from 'react-dom';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import {
   dashboardNavGroups,
   isNavItemActive,
+  getActiveCategoryId,
+  getNavGroupById,
   NavGroup,
 } from '@/lib/nav';
 
@@ -44,24 +47,95 @@ function useIsMobile(lg = 1024) {
 }
 
 /**
- * モバイル用ナビグループコンポーネント
+ * カテゴリ表示用アイコンマッピング
  */
-function MobileNavGroup({
+const categoryIcons: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
+  home: dashboardNavGroups.find(g => g.id === 'home')?.items[0]?.icon || ChevronRightIcon,
+  overview: dashboardNavGroups.find(g => g.id === 'overview')?.items[0]?.icon || ChevronRightIcon,
+  mypage: dashboardNavGroups.find(g => g.id === 'mypage')?.items[0]?.icon || ChevronRightIcon,
+  aistudio: dashboardNavGroups.find(g => g.id === 'aistudio')?.items[0]?.icon || ChevronRightIcon,
+  insights: dashboardNavGroups.find(g => g.id === 'insights')?.items[0]?.icon || ChevronRightIcon,
+  settings: dashboardNavGroups.find(g => g.id === 'settings')?.items[0]?.icon || ChevronRightIcon,
+};
+
+/**
+ * モバイル用カテゴリボタン
+ */
+function MobileCategoryButton({
+  group,
+  isActive,
+  onClick,
+}: {
+  group: NavGroup;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  const Icon = categoryIcons[group.id] || ChevronRightIcon;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={classNames(
+        isActive
+          ? 'bg-[var(--aio-primary)] text-[var(--text-on-primary)]'
+          : 'text-[var(--color-text-secondary)] hover:text-[var(--aio-primary)] hover:bg-[var(--aio-surface)]',
+        'group flex w-full items-center justify-between gap-x-3 rounded-lg p-3 text-sm font-medium transition-all duration-200'
+      )}
+    >
+      <span className="flex items-center gap-x-3">
+        <Icon
+          className={classNames(
+            isActive ? 'text-[var(--text-on-primary)]' : 'text-[var(--color-icon-muted)] group-hover:text-[var(--aio-primary)]',
+            'h-5 w-5 shrink-0'
+          )}
+          aria-hidden="true"
+        />
+        {group.label}
+      </span>
+      <ChevronRightIcon
+        className={classNames(
+          isActive ? 'text-[var(--text-on-primary)]' : 'text-[var(--color-icon-muted)]',
+          'h-4 w-4 shrink-0'
+        )}
+        aria-hidden="true"
+      />
+    </button>
+  );
+}
+
+/**
+ * モバイル用子項目リスト
+ */
+function MobileSubItemsList({
   group,
   pathname,
   onNavigation,
+  onBack,
 }: {
   group: NavGroup;
   pathname: string;
   onNavigation: (href: string) => void;
+  onBack: () => void;
 }) {
   return (
-    <li>
-      {/* グループラベル */}
-      <div className="text-xs font-semibold leading-6 text-[var(--color-text-tertiary)] uppercase tracking-wider mb-2 px-3">
+    <div className="space-y-2">
+      {/* 戻るボタン */}
+      <button
+        type="button"
+        onClick={onBack}
+        className="group flex w-full items-center gap-x-2 rounded-lg p-3 text-sm font-medium text-[var(--color-text-tertiary)] hover:text-[var(--aio-primary)] hover:bg-[var(--aio-surface)] transition-all duration-200"
+      >
+        <ChevronLeftIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
+        Categories
+      </button>
+
+      {/* カテゴリラベル */}
+      <div className="text-xs font-semibold leading-6 text-[var(--color-text-tertiary)] uppercase tracking-wider px-3">
         {group.label}
       </div>
-      {/* グループ内の項目 */}
+
+      {/* 子項目リスト */}
       <ul className="space-y-1">
         {group.items.map((item) => {
           const isActive = isNavItemActive(item.href, pathname);
@@ -75,7 +149,7 @@ function MobileNavGroup({
                   isActive
                     ? 'bg-[var(--aio-primary)] text-[var(--text-on-primary)]'
                     : 'text-[var(--color-text-secondary)] hover:text-[var(--aio-primary)] hover:bg-[var(--aio-surface)]',
-                  'group flex gap-x-3 rounded-lg p-3 text-sm font-medium spring-bounce transition-all duration-200'
+                  'group flex gap-x-3 rounded-lg p-3 text-sm font-medium transition-all duration-200'
                 )}
               >
                 <Icon
@@ -91,7 +165,7 @@ function MobileNavGroup({
           );
         })}
       </ul>
-    </li>
+    </div>
   );
 }
 
@@ -101,6 +175,9 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   // アニメーション制御用state
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
+  // カテゴリ選択state
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
   const pathname = usePathname();
   const isMobile = useIsMobile(1024);
 
@@ -116,10 +193,30 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   // ダッシュボードページ判定
   const isDashboard = pathname.startsWith('/dashboard');
 
+  // 選択されたカテゴリのグループを取得
+  const selectedGroup = selectedCategoryId ? getNavGroupById(selectedCategoryId) : null;
+
   // マウント状態管理
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // deep link時にカテゴリを自動判定（ドロワーが開いたとき）
+  useEffect(() => {
+    if (isOpen && isDashboard) {
+      const activeCategoryId = getActiveCategoryId(pathname);
+      if (activeCategoryId) {
+        setSelectedCategoryId(activeCategoryId);
+      }
+    }
+  }, [isOpen, isDashboard, pathname]);
+
+  // ドロワーが閉じたときにカテゴリ選択をリセット
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedCategoryId(null);
+    }
+  }, [isOpen]);
 
   // アニメーション制御: 開く処理
   useEffect(() => {
@@ -135,22 +232,20 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
       const timer = setTimeout(() => {
         setIsClosing(false);
         setShouldRender(false);
-      }, 300); // CSS transitionの時間に合わせる
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen, shouldRender]);
 
-  // 改善1: 即座スクロールロック機能
+  // 即座スクロールロック機能
   const handleImmediateScrollLock = useCallback((shouldLock: boolean) => {
     if (shouldLock) {
-      // 開くとき: iOS Safari対応の即座スクロールロック
       scrollYRef.current = window.scrollY;
       document.documentElement.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollYRef.current}px`;
       document.body.style.width = '100%';
     } else {
-      // 閉じるとき: スクロール復元
       document.documentElement.style.overflow = '';
       document.body.style.position = '';
       document.body.style.top = '';
@@ -161,14 +256,11 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
     }
   }, []);
 
-  // 改善1+4: 統合されたトグル関数
+  // 統合されたトグル関数
   const handleToggle = useCallback(() => {
     const newIsOpen = !isOpen;
-
-    // 即座にスクロールロック適用
     handleImmediateScrollLock(newIsOpen);
 
-    // State 更新
     if (externalOnToggle) {
       externalOnToggle();
     } else {
@@ -176,21 +268,17 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
     }
   }, [isOpen, externalOnToggle, handleImmediateScrollLock]);
 
-  // 改善3: パスが変わったら自動でメニューを閉じる
+  // パスが変わったら自動でメニューを閉じる
   useEffect(() => {
     if (prevPathnameRef.current !== pathname && isOpen) {
-      // handleNavigationで既に閉じた場合はスキップ（二重クローズ防止）
       if (!navigationTriggeredRef.current) {
-        // ページが実際に変わったらメニューを閉じる（直接URL変更・ブラウザバック等）
-        handleImmediateScrollLock(false); // スクロールロック解除
+        handleImmediateScrollLock(false);
         if (externalOnToggle) {
           externalOnToggle();
         } else {
           setInternalIsOpen(false);
         }
       }
-
-      // フラグをリセット（次の遷移に備える）
       navigationTriggeredRef.current = false;
     }
     prevPathnameRef.current = pathname;
@@ -204,9 +292,8 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, handleToggle]);
 
-  // ナビゲーションハンドラー（リンククリック用）
+  // ナビゲーションハンドラー
   const handleNavigation = useCallback((href: string) => {
-    // すべてのリンククリック時に即座にメニューを閉じる
     handleImmediateScrollLock(false);
 
     if (externalOnToggle) {
@@ -215,16 +302,13 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
       setInternalIsOpen(false);
     }
 
-    // クローズ処理を記録（useEffectでの二重処理防止）
     navigationTriggeredRef.current = true;
-
-    // Linkコンポーネントが遷移処理を行うため、ここではメニューを閉じるだけ
   }, [externalOnToggle, handleImmediateScrollLock]);
 
   // モバイル以外では表示しない
   if (isMobile === null || !isMobile || !mounted) return null;
 
-  // 改善4: FAB (Floating Action Button) - クラスベース制御
+  // FAB
   const Fab = (
     <button
       type="button"
@@ -266,7 +350,7 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
     document.body
   ) : null;
 
-  // 改善2: メインドロワー（統一CSS変数使用）
+  // メインドロワー
   const Drawer = shouldRender ? createPortal(
     <nav
       id="unified-mobile-drawer"
@@ -326,17 +410,29 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
                 );
               })}
             </ul>
+          ) : selectedGroup ? (
+            // ダッシュボード：子項目表示
+            <MobileSubItemsList
+              group={selectedGroup}
+              pathname={pathname}
+              onNavigation={handleNavigation}
+              onBack={() => setSelectedCategoryId(null)}
+            />
           ) : (
-            // ダッシュボードナビゲーション（グループ化）
-            <ul className="space-y-6">
-              {dashboardNavGroups.map((group) => (
-                <MobileNavGroup
-                  key={group.id}
-                  group={group}
-                  pathname={pathname}
-                  onNavigation={handleNavigation}
-                />
-              ))}
+            // ダッシュボード：カテゴリ一覧
+            <ul className="space-y-2">
+              {dashboardNavGroups.map((group) => {
+                const isActive = getActiveCategoryId(pathname) === group.id;
+                return (
+                  <li key={group.id}>
+                    <MobileCategoryButton
+                      group={group}
+                      isActive={isActive}
+                      onClick={() => setSelectedCategoryId(group.id)}
+                    />
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

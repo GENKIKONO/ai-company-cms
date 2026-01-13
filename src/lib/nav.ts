@@ -131,3 +131,34 @@ export function isNavItemActive(itemHref: string, pathname: string): boolean {
   }
   return pathname === itemHref || pathname.startsWith(itemHref + '/');
 }
+
+/**
+ * パスからアクティブなカテゴリIDを取得
+ * deep link時にカテゴリを自動判定するために使用
+ */
+export function getActiveCategoryId(pathname: string): string | null {
+  // 条件付きナビ項目（管理）のチェック
+  for (const item of conditionalNavItems) {
+    if (isNavItemActive(item.href, pathname)) {
+      return 'admin';
+    }
+  }
+
+  // 通常のナビグループをチェック
+  for (const group of dashboardNavGroups) {
+    for (const item of group.items) {
+      if (isNavItemActive(item.href, pathname)) {
+        return group.id;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * カテゴリIDからナビグループを取得
+ */
+export function getNavGroupById(categoryId: string): NavGroup | null {
+  return dashboardNavGroups.find(group => group.id === categoryId) || null;
+}
