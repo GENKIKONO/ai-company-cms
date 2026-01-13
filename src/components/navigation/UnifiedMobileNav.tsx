@@ -4,17 +4,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createPortal } from 'react-dom';
-import { 
-  HomeIcon,
-  DocumentTextIcon,
-  BriefcaseIcon,
-  QuestionMarkCircleIcon,
-  ChartBarIcon,
-  Cog6ToothIcon,
-  UserGroupIcon,
-  ChatBubbleLeftRightIcon,
-  BuildingOfficeIcon,
-} from '@heroicons/react/24/outline';
+import {
+  dashboardNavGroups,
+  isNavItemActive,
+  NavGroup,
+} from '@/lib/nav';
 
 // 公開ページナビゲーション
 const publicNavigation = [
@@ -23,20 +17,6 @@ const publicNavigation = [
   { name: '企業ディレクトリ', href: '/organizations' },
   { name: 'ヒアリング代行', href: '/hearing-service' },
   { name: 'ログイン', href: '/auth/login', separator: true },
-];
-
-// ダッシュボードナビゲーション
-const dashboardNavigation = [
-  { name: 'ダッシュボード', href: '/dashboard', icon: HomeIcon },
-  { name: '記事管理', href: '/dashboard/posts', icon: DocumentTextIcon },
-  { name: 'サービス管理', href: '/dashboard/services', icon: BriefcaseIcon },
-  { name: '事例管理', href: '/dashboard/case-studies', icon: UserGroupIcon },
-  { name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },
-  { name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },
-  { name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },
-  { name: 'グループ会社管理', href: '/admin/org-groups', icon: BuildingOfficeIcon },
-  { name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },
-  { name: '設定', href: '/dashboard/settings', icon: Cog6ToothIcon },
 ];
 
 interface UnifiedMobileNavProps {
@@ -51,7 +31,7 @@ function classNames(...classes: string[]) {
 // モバイル判定カスタムHook
 function useIsMobile(lg = 1024) {
   const [mobile, setMobile] = useState<boolean | null>(null);
-  
+
   useEffect(() => {
     const mq = window.matchMedia(`(max-width:${lg - 1}px)`);
     const onChange = () => setMobile(mq.matches);
@@ -59,8 +39,60 @@ function useIsMobile(lg = 1024) {
     mq.addEventListener?.("change", onChange);
     return () => mq.removeEventListener?.("change", onChange);
   }, [lg]);
-  
+
   return mobile;
+}
+
+/**
+ * モバイル用ナビグループコンポーネント
+ */
+function MobileNavGroup({
+  group,
+  pathname,
+  onNavigation,
+}: {
+  group: NavGroup;
+  pathname: string;
+  onNavigation: (href: string) => void;
+}) {
+  return (
+    <li>
+      {/* グループラベル */}
+      <div className="text-xs font-semibold leading-6 text-[var(--color-text-tertiary)] uppercase tracking-wider mb-2 px-3">
+        {group.label}
+      </div>
+      {/* グループ内の項目 */}
+      <ul className="space-y-1">
+        {group.items.map((item) => {
+          const isActive = isNavItemActive(item.href, pathname);
+          const Icon = item.icon;
+          return (
+            <li key={item.name}>
+              <Link
+                href={item.href}
+                onClick={() => onNavigation(item.href)}
+                className={classNames(
+                  isActive
+                    ? 'bg-[var(--aio-primary)] text-[var(--text-on-primary)]'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--aio-primary)] hover:bg-[var(--aio-surface)]',
+                  'group flex gap-x-3 rounded-lg p-3 text-sm font-medium spring-bounce transition-all duration-200'
+                )}
+              >
+                <Icon
+                  className={classNames(
+                    isActive ? 'text-[var(--text-on-primary)]' : 'text-[var(--color-icon-muted)] group-hover:text-[var(--aio-primary)]',
+                    'h-5 w-5 shrink-0'
+                  )}
+                  aria-hidden="true"
+                />
+                {item.name}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </li>
+  );
 }
 
 export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnToggle }: UnifiedMobileNavProps) {
@@ -71,7 +103,7 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   const [shouldRender, setShouldRender] = useState(false);
   const pathname = usePathname();
   const isMobile = useIsMobile(1024);
-  
+
   // スクロール位置保存用
   const scrollYRef = useRef(0);
   const prevPathnameRef = useRef(pathname);
@@ -83,9 +115,6 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
 
   // ダッシュボードページ判定
   const isDashboard = pathname.startsWith('/dashboard');
-
-  // ナビゲーション決定
-  const navigation = isDashboard ? dashboardNavigation : publicNavigation;
 
   // マウント状態管理
   useEffect(() => {
@@ -135,10 +164,10 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   // 改善1+4: 統合されたトグル関数
   const handleToggle = useCallback(() => {
     const newIsOpen = !isOpen;
-    
+
     // 即座にスクロールロック適用
     handleImmediateScrollLock(newIsOpen);
-    
+
     // State 更新
     if (externalOnToggle) {
       externalOnToggle();
@@ -202,10 +231,10 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
       aria-label={isOpen ? "メニューを閉じる" : "メニューを開く"}
       aria-expanded={isOpen}
       aria-controls="unified-mobile-drawer"
-      onClick={(e) => { 
-        e.preventDefault(); 
-        e.stopPropagation(); 
-        handleToggle(); 
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleToggle();
       }}
       className={classNames(
         "fixed bottom-4 right-4 z-[9999] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--aio-primary)] text-[var(--text-on-primary)] shadow-lg hover:bg-[var(--aio-primary-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aio-primary)] spring-bounce",
@@ -244,7 +273,7 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
       role="navigation"
       aria-label={isDashboard ? "ダッシュボードメニュー" : "メインメニュー"}
       className={classNames(
-        "fixed top-0 right-0 z-50 h-screen w-80 max-w-[85vw] glass-card backdrop-blur-xl border border-gray-200/60 shadow-xl",
+        "fixed top-0 right-0 z-50 h-screen w-80 max-w-[85vw] glass-card backdrop-blur-xl border border-[var(--dashboard-card-border)] shadow-xl",
         "mobile-nav-drawer",
         isClosing ? "mobile-nav-drawer--exit" : "mobile-nav-drawer--enter"
       )}
@@ -255,12 +284,12 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
     >
       <div className="flex h-full flex-col">
         {/* ヘッダー */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200/60">
+        <div className="flex h-16 items-center justify-between px-6 border-b border-[var(--dashboard-card-border)]">
           <h2 className="text-lg font-semibold text-[var(--aio-primary)]">
-            {isDashboard ? "AIO Hub" : "メニュー"}
+            {isDashboard ? "AIOHub" : "メニュー"}
           </h2>
           <button
-            className="p-2 rounded-lg hover:bg-gray-100/60 transition-colors duration-200"
+            className="p-2 rounded-lg hover:bg-[var(--table-row-hover)] transition-colors duration-200"
             onClick={handleToggle}
             aria-label="閉じる"
           >
@@ -271,68 +300,51 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
         </div>
 
         {/* ナビゲーションメニュー */}
-        <div className="flex-1 overflow-y-auto px-6 py-6">
-          <ul className={isDashboard ? "space-y-2" : "space-y-1"}>
-            {navigation.map((item) => {
-              if (!isDashboard) {
-                // 公開ページナビゲーション
+        <div className="flex-1 overflow-y-auto px-4 py-6">
+          {!isDashboard ? (
+            // 公開ページナビゲーション
+            <ul className="space-y-1">
+              {publicNavigation.map((item) => {
                 const isActive = pathname === item.href;
                 const hasSeparator = 'separator' in item && item.separator;
-                
+
                 return (
-                  <li key={item.name} className={hasSeparator ? "mt-4 pt-2 border-t border-gray-200/60" : ""}>
+                  <li key={item.name} className={hasSeparator ? "mt-4 pt-2 border-t border-[var(--dashboard-card-border)]" : ""}>
                     <Link
                       className={classNames(
                         "block px-4 py-3 rounded-lg transition-all duration-200 spring-bounce",
-                        isActive 
-                          ? "bg-[var(--aio-primary)] text-[var(--text-on-primary)]" 
-                          : "hover:bg-gray-50/60 text-gray-700"
-                      )}
-                      href={item.href}
-                      onClick={() => handleNavigation(item.href)}
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                );
-              } else {
-                // ダッシュボードナビゲーション
-                const isActive = pathname === item.href || 
-                  (item.href !== '/dashboard' && pathname.startsWith(item.href));
-                const Icon = item.icon;
-                
-                return (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      onClick={() => handleNavigation(item.href)}
-                      className={classNames(
                         isActive
-                          ? 'bg-[var(--aio-primary)] text-[var(--text-on-primary)]'
-                          : 'text-gray-700 hover:text-[var(--aio-primary)] hover:bg-gray-50/60',
-                        'group flex gap-x-3 rounded-lg p-3 text-sm font-medium spring-bounce transition-all duration-200'
+                          ? "bg-[var(--aio-primary)] text-[var(--text-on-primary)]"
+                          : "hover:bg-[var(--aio-surface)] text-[var(--color-text-secondary)]"
                       )}
+                      href={item.href}
+                      onClick={() => handleNavigation(item.href)}
                     >
-                      <Icon
-                        className={classNames(
-                          isActive ? 'text-[var(--text-on-primary)]' : 'text-gray-400 group-hover:text-[var(--aio-primary)]',
-                          'h-5 w-5 shrink-0'
-                        )}
-                        aria-hidden="true"
-                      />
                       {item.name}
                     </Link>
                   </li>
                 );
-              }
-            })}
-          </ul>
+              })}
+            </ul>
+          ) : (
+            // ダッシュボードナビゲーション（グループ化）
+            <ul className="space-y-6">
+              {dashboardNavGroups.map((group) => (
+                <MobileNavGroup
+                  key={group.id}
+                  group={group}
+                  pathname={pathname}
+                  onNavigation={handleNavigation}
+                />
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* フッター */}
-        <div className="px-6 py-4 border-t border-gray-200/60">
-          <p className="text-xs text-gray-500 text-center">
-            © {new Date().getFullYear()} AIO Hub
+        <div className="px-6 py-4 border-t border-[var(--dashboard-card-border)]">
+          <p className="text-xs text-[var(--color-text-tertiary)] text-center">
+            © {new Date().getFullYear()} AIOHub
           </p>
         </div>
       </div>
