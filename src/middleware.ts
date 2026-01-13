@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/middleware';
-import { ROUTES } from '@/lib/routes';
+import { ROUTES, PROTECTED_ROUTE_PREFIXES } from '@/lib/routes';
 
+/**
+ * 認証ミドルウェア
+ *
+ * 【責務】
+ * - 未認証ユーザーを /auth/login へリダイレクト
+ * - 認証済みユーザーが認証ページにアクセスした場合 /dashboard へリダイレクト
+ * - Supabase セッションの Cookie 同期
+ *
+ * 【ハードコード禁止】
+ * - 保護パスは PROTECTED_ROUTE_PREFIXES (src/lib/routes.ts) を参照
+ * - ルート直書きは禁止、必ず ROUTES 定数を使用
+ */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -33,18 +45,18 @@ export async function middleware(request: NextRequest) {
   const isLoggedIn = user && !error;
 
   // 保護されたパス（未ログインなら /auth/login へ）
-  const protectedPaths = [ROUTES.dashboard, '/admin', '/management-console', '/my', '/account'];
-  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
+  // ⚠️ PROTECTED_ROUTE_PREFIXES を Single Source of Truth として使用
+  const isProtectedPath = PROTECTED_ROUTE_PREFIXES.some(path => pathname.startsWith(path));
 
   // 認証ページ（ログイン済みなら /dashboard へ）
-  const authPaths = ['/auth/login', '/auth/signin', '/login', '/signin'];
+  // ⚠️ ROUTES 定数を使用してハードコードを排除
+  const authPaths = [ROUTES.authLogin, ROUTES.authSignin, ROUTES.login, ROUTES.signin];
   const isAuthPath = authPaths.some(path => pathname.startsWith(path));
-
 
   // 未認証ユーザーが保護されたページにアクセス
   if (isProtectedPath && !isLoggedIn) {
     const url = request.nextUrl.clone();
-    url.pathname = '/auth/login';
+    url.pathname = ROUTES.authLogin;
     url.searchParams.set('redirect', pathname);
     return NextResponse.redirect(url);
   }
