@@ -8,15 +8,40 @@
  */
 
 export const ROUTES = {
-  // Dashboard routes
+  // Dashboard routes - Overview (統合トップ)
   dashboard: '/dashboard',
-  dashboardCompany: '/dashboard/company',
-  dashboardEmbed: '/dashboard/embed',
-  dashboardMaterials: '/dashboard/materials',
-  dashboardServices: '/dashboard/services',
+  dashboardActivity: '/dashboard/activity',
+
+  // Dashboard routes - My Page
+  dashboardPosts: '/dashboard/posts',
   dashboardFaqs: '/dashboard/faqs',
+  dashboardServices: '/dashboard/services',
+  dashboardCaseStudies: '/dashboard/case-studies',
+  dashboardMaterials: '/dashboard/materials',
+
+  // Dashboard routes - AI Studio
+  dashboardAiStudio: '/dashboard/ai-studio',
+  dashboardInterview: '/dashboard/interview',
+  dashboardOrgAiChat: '/dashboard/org-ai-chat',
+
+  // Dashboard routes - Insights
+  dashboardInsights: '/dashboard/insights',
+  dashboardQnaStats: '/dashboard/qna-stats',
+  dashboardAiSeoReport: '/dashboard/analytics/ai-seo-report',
+  dashboardAiReports: '/dashboard/ai-reports',
+  dashboardAiCitations: '/dashboard/ai-citations',
+
+  // Dashboard routes - Settings
+  dashboardEmbed: '/dashboard/embed',
   dashboardBilling: '/dashboard/billing',
   dashboardSettings: '/dashboard/settings',
+  dashboardHelp: '/dashboard/help',
+
+  // Dashboard routes - Admin (org manager)
+  dashboardManage: '/dashboard/manage',
+
+  // Legacy (後方互換)
+  dashboardCompany: '/dashboard/company',
 
   // Account routes（ユーザー個人設定）
   account: '/account',

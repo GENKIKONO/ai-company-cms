@@ -2,7 +2,9 @@
  * ナビゲーション定義 - 単一ソース
  *
  * Dashboard/Mobile ナビの共通定義
- * 新IA構成: Home / Overview / My Page / AI Studio / Insights / Settings
+ * モード切替型ナビゲーション: Overview / My Page / AI Studio / Insights / Settings
+ *
+ * ⚠️ ハードコード禁止: ルートは ROUTES (src/lib/routes.ts) を使用
  */
 
 import { ComponentType, SVGProps } from 'react';
@@ -14,11 +16,13 @@ import {
   UserGroupIcon,
   QuestionMarkCircleIcon,
   FolderIcon,
-  DocumentPlusIcon,
+  SparklesIcon,
   ChatBubbleBottomCenterTextIcon,
+  ChatBubbleOvalLeftEllipsisIcon,
   ChartBarIcon,
   DocumentChartBarIcon,
   LinkIcon,
+  PresentationChartLineIcon,
   CodeBracketIcon,
   CreditCardIcon,
   Cog6ToothIcon,
@@ -26,6 +30,7 @@ import {
   UserCircleIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
+import { ROUTES } from './routes';
 
 // アイコン型定義
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -37,10 +42,14 @@ export interface NavItem {
   icon: HeroIcon;
 }
 
-// ナビグループの型定義
-export interface NavGroup {
-  id: string;
+// ナビモードの型定義
+export type NavMode = 'overview' | 'myPage' | 'aiStudio' | 'insights' | 'settings';
+
+// モード定義
+export interface NavModeConfig {
+  id: NavMode;
   label: string;
+  icon: HeroIcon;
   items: NavItem[];
 }
 
@@ -50,62 +59,63 @@ export interface ConditionalNavItem extends NavItem {
 }
 
 /**
- * ダッシュボードナビゲーション構成
- * グループ化された新IA構造
+ * ナビゲーションモード定義
+ * 各モードの子項目を定義
  */
-export const dashboardNavGroups: NavGroup[] = [
-  {
-    id: 'home',
-    label: 'Home',
-    items: [
-      { name: 'ダッシュボード', href: '/dashboard', icon: HomeIcon },
-    ],
-  },
+export const navModeConfigs: NavModeConfig[] = [
   {
     id: 'overview',
     label: 'Overview',
+    icon: HomeIcon,
     items: [
-      { name: 'アクティビティ', href: '/dashboard/activity', icon: ClockIcon },
+      { name: 'ダッシュボード', href: ROUTES.dashboard, icon: HomeIcon },
+      { name: 'アクティビティ', href: ROUTES.dashboardActivity, icon: ClockIcon },
     ],
   },
   {
-    id: 'mypage',
+    id: 'myPage',
     label: 'My Page',
+    icon: DocumentTextIcon,
     items: [
-      { name: '記事管理', href: '/dashboard/posts', icon: DocumentTextIcon },
-      { name: 'サービス管理', href: '/dashboard/services', icon: BriefcaseIcon },
-      { name: '事例管理', href: '/dashboard/case-studies', icon: UserGroupIcon },
-      { name: 'FAQ管理', href: '/dashboard/faqs', icon: QuestionMarkCircleIcon },
-      { name: '営業資料', href: '/dashboard/materials', icon: FolderIcon },
+      { name: '記事管理', href: ROUTES.dashboardPosts, icon: DocumentTextIcon },
+      { name: 'FAQ管理', href: ROUTES.dashboardFaqs, icon: QuestionMarkCircleIcon },
+      { name: 'サービス管理', href: ROUTES.dashboardServices, icon: BriefcaseIcon },
+      { name: '事例管理', href: ROUTES.dashboardCaseStudies, icon: UserGroupIcon },
+      { name: '営業資料', href: ROUTES.dashboardMaterials, icon: FolderIcon },
     ],
   },
   {
-    id: 'aistudio',
+    id: 'aiStudio',
     label: 'AI Studio',
+    icon: SparklesIcon,
     items: [
-      { name: '企業専用AIチャット', href: '/dashboard/org-ai-chat', icon: DocumentPlusIcon },
-      { name: 'AIインタビュー', href: '/dashboard/interview', icon: ChatBubbleBottomCenterTextIcon },
+      { name: 'AI Studio', href: ROUTES.dashboardAiStudio, icon: SparklesIcon },
+      { name: 'AIインタビュー', href: ROUTES.dashboardInterview, icon: ChatBubbleBottomCenterTextIcon },
+      { name: '企業専用AIチャット', href: ROUTES.dashboardOrgAiChat, icon: ChatBubbleOvalLeftEllipsisIcon },
     ],
   },
   {
     id: 'insights',
     label: 'Insights',
+    icon: ChartBarIcon,
     items: [
-      { name: 'Q&A統計', href: '/dashboard/qna-stats', icon: ChartBarIcon },
-      { name: '分析レポート', href: '/dashboard/analytics/ai-seo-report', icon: ChartBarIcon },
-      { name: 'AIレポート', href: '/dashboard/ai-reports', icon: DocumentChartBarIcon },
-      { name: 'AI引用', href: '/dashboard/ai-citations', icon: LinkIcon },
+      { name: 'Insights', href: ROUTES.dashboardInsights, icon: PresentationChartLineIcon },
+      { name: 'Q&A統計', href: ROUTES.dashboardQnaStats, icon: ChartBarIcon },
+      { name: '分析レポート', href: ROUTES.dashboardAiSeoReport, icon: ChartBarIcon },
+      { name: 'AIレポート', href: ROUTES.dashboardAiReports, icon: DocumentChartBarIcon },
+      { name: 'AI引用', href: ROUTES.dashboardAiCitations, icon: LinkIcon },
     ],
   },
   {
     id: 'settings',
     label: 'Settings',
+    icon: Cog6ToothIcon,
     items: [
-      { name: '埋め込み設定', href: '/dashboard/embed', icon: CodeBracketIcon },
-      { name: '請求管理', href: '/dashboard/billing', icon: CreditCardIcon },
-      { name: '設定', href: '/dashboard/settings', icon: Cog6ToothIcon },
-      { name: 'ヘルプ', href: '/dashboard/help', icon: ChatBubbleLeftRightIcon },
-      { name: 'アカウント', href: '/account', icon: UserCircleIcon },
+      { name: '埋め込み設定', href: ROUTES.dashboardEmbed, icon: CodeBracketIcon },
+      { name: '請求管理', href: ROUTES.dashboardBilling, icon: CreditCardIcon },
+      { name: '設定', href: ROUTES.dashboardSettings, icon: Cog6ToothIcon },
+      { name: 'ヘルプ', href: ROUTES.dashboardHelp, icon: ChatBubbleLeftRightIcon },
+      { name: 'アカウント', href: ROUTES.account, icon: UserCircleIcon },
     ],
   },
 ];
@@ -116,7 +126,7 @@ export const dashboardNavGroups: NavGroup[] = [
 export const conditionalNavItems: ConditionalNavItem[] = [
   {
     name: '管理',
-    href: '/dashboard/manage',
+    href: ROUTES.dashboardManage,
     icon: ShieldCheckIcon,
     condition: 'orgManager',
   },
@@ -126,39 +136,80 @@ export const conditionalNavItems: ConditionalNavItem[] = [
  * パスがナビ項目にマッチするか判定
  */
 export function isNavItemActive(itemHref: string, pathname: string): boolean {
-  if (itemHref === '/dashboard') {
-    return pathname === '/dashboard';
+  if (itemHref === ROUTES.dashboard) {
+    return pathname === ROUTES.dashboard;
   }
   return pathname === itemHref || pathname.startsWith(itemHref + '/');
 }
 
 /**
- * パスからアクティブなカテゴリIDを取得
- * deep link時にカテゴリを自動判定するために使用
+ * パスからアクティブなモードを取得
+ * deep link時にモードを自動判定するために使用
  */
-export function getActiveCategoryId(pathname: string): string | null {
+export function getActiveModeFromPathname(pathname: string): NavMode | null {
   // 条件付きナビ項目（管理）のチェック
   for (const item of conditionalNavItems) {
     if (isNavItemActive(item.href, pathname)) {
-      return 'admin';
+      return null; // Admin は通常モードではない
     }
   }
 
-  // 通常のナビグループをチェック
-  for (const group of dashboardNavGroups) {
-    for (const item of group.items) {
+  // 各モードをチェック
+  for (const config of navModeConfigs) {
+    for (const item of config.items) {
       if (isNavItemActive(item.href, pathname)) {
-        return group.id;
+        return config.id;
       }
     }
   }
 
-  return null;
+  // デフォルトは overview
+  return 'overview';
 }
 
 /**
- * カテゴリIDからナビグループを取得
+ * モードIDから設定を取得
  */
+export function getNavModeConfig(mode: NavMode): NavModeConfig | null {
+  return navModeConfigs.find(config => config.id === mode) || null;
+}
+
+/**
+ * 全モードの一覧を取得（ボタン表示用）
+ */
+export function getAllNavModes(): NavModeConfig[] {
+  return navModeConfigs;
+}
+
+// ============================================================
+// 後方互換用エクスポート（既存コードとの互換性維持）
+// ============================================================
+
+// 旧 NavGroup 型（互換用）
+export interface NavGroup {
+  id: string;
+  label: string;
+  items: NavItem[];
+}
+
+// 旧 dashboardNavGroups（互換用 - NavModeConfig から変換）
+export const dashboardNavGroups: NavGroup[] = navModeConfigs.map(config => ({
+  id: config.id,
+  label: config.label,
+  items: config.items,
+}));
+
+// 旧関数（互換用）
+export function getActiveCategoryId(pathname: string): string | null {
+  return getActiveModeFromPathname(pathname);
+}
+
 export function getNavGroupById(categoryId: string): NavGroup | null {
-  return dashboardNavGroups.find(group => group.id === categoryId) || null;
+  const config = navModeConfigs.find(c => c.id === categoryId);
+  if (!config) return null;
+  return {
+    id: config.id,
+    label: config.label,
+    items: config.items,
+  };
 }
