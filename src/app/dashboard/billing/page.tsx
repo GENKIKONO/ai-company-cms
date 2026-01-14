@@ -109,11 +109,12 @@ function BillingContent() {
         return;
       }
 
+      // ReadContract準拠: secure view経由でcount取得（head:trueでpayload最小化）
       const [servicesRes, postsRes, caseStudiesRes, faqsRes] = await Promise.all([
-        supabase.from('services').select('id', { count: 'exact' }).eq('organization_id', org.id),
-        supabase.from('posts').select('id', { count: 'exact' }).eq('organization_id', org.id),
-        supabase.from('case_studies').select('id', { count: 'exact' }).eq('organization_id', org.id),
-        supabase.from('faqs').select('id', { count: 'exact' }).eq('organization_id', org.id),
+        supabase.from('v_dashboard_services_secure').select('id', { count: 'exact', head: true }).eq('organization_id', org.id),
+        supabase.from('v_dashboard_posts_secure').select('id', { count: 'exact', head: true }).eq('organization_id', org.id),
+        supabase.from('v_dashboard_case_studies_secure').select('id', { count: 'exact', head: true }).eq('organization_id', org.id),
+        supabase.from('v_dashboard_faqs_secure').select('id', { count: 'exact', head: true }).eq('organization_id', org.id),
       ]);
 
       const checkoutInfo = await fetchActiveCheckoutForOrg('starter', org);

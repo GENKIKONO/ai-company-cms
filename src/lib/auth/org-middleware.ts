@@ -36,31 +36,114 @@ export async function withOrgAuth(
       }, { status: 401 });
     }
 
-    // ユーザーの組織を取得（所有権確認）
-    const { data: organization, error: orgError } = await supabase
-      .from('organizations')
-      .select('id, created_by')
-      .eq('created_by', user.id)
-      .maybeSingle();
+    // クエリパラメータから organizationId を取得（優先）
+    const url = new URL(request.url);
+    const queryOrgId = url.searchParams.get('organizationId');
 
-    if (orgError) {
-      logger.error('[withOrgAuth] Failed to fetch organization', {
-        userId: user.id,
-        error: orgError,
-        code: orgError.code,
-        details: orgError.details,
-        hint: orgError.hint
-      });
-      return NextResponse.json({ 
-        error: '企業情報の取得に失敗しました',
-        code: orgError.code,
-        message: 'Failed to fetch organization' 
-      }, { status: 500 });
+    let organization: { id: string; created_by: string } | null = null;
+
+    if (queryOrgId) {
+      // クエリパラメータで指定された組織を取得（メンバーシップ確認）
+      const { data: membership, error: membershipError } = await supabase
+        .from('organization_members')
+        .select('organization_id, role')
+        .eq('user_id', user.id)
+        .eq('organization_id', queryOrgId)
+        .maybeSingle();
+
+      if (membershipError) {
+        logger.error('[withOrgAuth] Failed to check membership', {
+          userId: user.id,
+          orgId: queryOrgId,
+          error: membershipError
+        });
+        return NextResponse.json({
+          error: '組織メンバーシップの確認に失敗しました',
+          code: membershipError.code,
+          message: 'Failed to check membership'
+        }, { status: 500 });
+      }
+
+      if (membership) {
+        // 組織の詳細を取得
+        const { data: orgData } = await supabase
+          .from('organizations')
+          .select('id, created_by')
+          .eq('id', queryOrgId)
+          .maybeSingle();
+
+        if (orgData) {
+          organization = orgData;
+        }
+      }
+    }
+
+    // クエリパラメータで見つからない場合、v_current_user_orgs から最初の組織を取得
+    if (!organization) {
+      const { data: userOrgs, error: orgsError } = await supabase
+        .from('v_current_user_orgs')
+        .select('organization_id')
+        .limit(1);
+
+      if (!orgsError && userOrgs && userOrgs.length > 0) {
+        const { data: orgData } = await supabase
+          .from('organizations')
+          .select('id, created_by')
+          .eq('id', userOrgs[0].organization_id)
+          .maybeSingle();
+
+        if (orgData) {
+          organization = orgData;
+        }
+      }
+    }
+
+    /**
+     * 後方互換フォールバック: created_by による組織検索
+     *
+     * 発火条件:
+     * 1. クエリパラメータ organizationId で組織が見つからない
+     * 2. v_current_user_orgs (organization_members経由) に紐付けがない
+     * 3. かつ organizations.created_by が本ユーザーのIDと一致する
+     *
+     * 対象ケース:
+     * - 旧データ: organization_members にレコードがない組織作成者
+     * - マイグレーション未完了のユーザー
+     *
+     * 削除条件:
+     * - 全既存ユーザーに organization_members レコードが存在することを確認後
+     * - 確認SQL: SELECT COUNT(*) FROM organizations o
+     *            WHERE NOT EXISTS (SELECT 1 FROM organization_members m
+     *                              WHERE m.organization_id = o.id AND m.user_id = o.created_by)
+     * - 結果が0になればこのフォールバック削除可能
+     *
+     * @see docs/auth-architecture.md
+     */
+    if (!organization) {
+      const { data: orgData, error: orgError } = await supabase
+        .from('organizations')
+        .select('id, created_by')
+        .eq('created_by', user.id)
+        .maybeSingle();
+
+      if (orgError) {
+        logger.error('[withOrgAuth] Failed to fetch organization', {
+          userId: user.id,
+          error: orgError
+        });
+      } else if (orgData) {
+        // フォールバック発火を観測可能にする（PIIは出さない）
+        logger.warn('[withOrgAuth] created_by fallback triggered', {
+          orgId: orgData.id,
+          reason: 'no_membership_record'
+        });
+        organization = orgData;
+      }
     }
 
     if (!organization) {
       logger.debug('[withOrgAuth] No organization found for user', { userId: user.id });
-      return NextResponse.json({ 
+      return NextResponse.json({
         message: 'Organization not found',
         error: 'ORG_NOT_FOUND'
       }, { status: 404 });

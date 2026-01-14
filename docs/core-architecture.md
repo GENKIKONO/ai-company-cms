@@ -82,8 +82,29 @@ Analytics/Audit 記録
 | DashboardPageShell | `/dashboard/**` | 組織作業領域（主体=org） | `org_role` |
 | UserShell（Account） | `/account/**` | 個人管理領域（主体=user） | `auth.uid` |
 | AdminPageShell | `/admin/**` | 運営管理（主体=site） | `site_admin` |
-| OpsLayout | `/ops/**` | 運用管理（主体=site） | `ops_admin` |
+| OpsLayout | `/ops/**` | 運用管理（主体=site） | `ops_admin`（独立認証） |
 | ManagementConsoleLayout | `/management-console/**` | 管理コンソール（主体=site） | `site_admin` |
+
+#### 3.2.0 /ops 領域の独立認証（例外領域）
+
+`/ops/**` は Supabase認証から**独立した認証システム**を使用する例外領域である。
+
+**認証方式:**
+- `ADMIN_EMAIL` 環境変数に設定されたメールアドレスでのログイン
+- 認証成功時に `ops_admin` cookie を発行
+- Supabase session とは独立（middleware の `PROTECTED_ROUTE_PREFIXES` に含めない）
+
+**実装ファイル:**
+- ガード: `src/lib/ops-guard.ts` の `requireOpsAdminPage()`
+- ログイン: `src/app/ops/login/page.tsx`
+- レイアウト: `src/app/ops/layout.tsx`
+
+**設計意図:**
+- 通常ユーザーの Supabase 認証と完全分離
+- 運用担当者専用の独立したアクセス制御
+- middleware での共通認証チェックを回避（独立運用）
+
+**注意:** この設計は意図的であり、`PROTECTED_ROUTE_PREFIXES` への追加は**非推奨**。
 
 ### 3.2.1 Dashboard サブ領域
 
