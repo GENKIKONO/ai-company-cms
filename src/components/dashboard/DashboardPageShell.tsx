@@ -35,6 +35,7 @@ import {
   type OrgRole,
 } from '@/lib/authz';
 import { auditLogWriteClient } from '@/lib/core/audit-logger.client';
+import { logger } from '@/lib/utils/logger';
 import type { AppUser } from '@/types/legacy/database';
 import type { UserRole } from '@/types/utils/database';
 import { v4 as uuidv4 } from 'uuid';
@@ -241,50 +242,39 @@ export function DashboardPageShell({
           }
         }
 
-        // Get ALL user's organizations using view (v_current_user_orgs recommended)
-        // Fallback to organization_members if view doesn't exist
-        let memberships: { organization_id: string; role: string }[] = [];
-
-        // Try v_current_user_orgs first, fall back to organization_members if permission denied
-        const { data: viewData, error: viewError } = await supabase
-          .from('v_current_user_orgs')
-          .select('organization_id, role');
+        // 組織所属の判定: organization_members を唯一の正規ソースとして使用
+        // v_current_user_orgs は不整合があるため使用しない
+        const { data: membershipData, error: membershipError } = await supabase
+          .from('organization_members')
+          .select('organization_id, role')
+          .eq('user_id', currentUser.id);
 
         if (isStale()) return;
 
-        if (!viewError && viewData && viewData.length > 0) {
-          memberships = viewData;
-        }
-        // viewError (including 42501 permission denied) → fallback below
-
-        if (memberships.length === 0) {
-          // Fallback: direct query to organization_members
-          const { data: membershipData, error: membershipError } = await supabase
-            .from('organization_members')
-            .select('organization_id, role')
-            .eq('user_id', currentUser.id);
-
-          if (isStale()) return;
-
-          if (membershipError) {
-            if (isRLSDeniedError(membershipError)) {
-              setErrorCode('RLS_DENIED');
-              setError('アクセス権限がありません');
-              await logToAudit('page_access', 'denied', 'rls_denied');
-              return;
-            }
-            if (isSessionExpiredError(membershipError)) {
-              // NOTE: Don't redirect - might be a timing issue during navigation
-              // Middleware handles actual session expiration
-              setError('セッションの確認に失敗しました。ページを再読み込みしてください。');
-              setErrorCode('SESSION_ERROR');
-              return;
-            }
-            throw membershipError;
+        if (membershipError) {
+          if (isRLSDeniedError(membershipError)) {
+            setErrorCode('RLS_DENIED');
+            setError('アクセス権限がありません');
+            await logToAudit('page_access', 'denied', 'rls_denied');
+            return;
           }
-
-          memberships = membershipData || [];
+          if (isSessionExpiredError(membershipError)) {
+            // NOTE: Don't redirect - might be a timing issue during navigation
+            // Middleware handles actual session expiration
+            setError('セッションの確認に失敗しました。ページを再読み込みしてください。');
+            setErrorCode('SESSION_ERROR');
+            return;
+          }
+          // 取得失敗はエラー扱い（empty扱いにしない）
+          logger.error('[DashboardPageShell] organization_members query failed', {
+            error: { code: membershipError.code, message: membershipError.message, details: membershipError.details }
+          });
+          setError('組織情報の取得に失敗しました。ページを再読み込みしてください。');
+          setErrorCode('MEMBERSHIP_FETCH_ERROR');
+          return;
         }
+
+        const memberships = membershipData || [];
 
         if (memberships.length > 0) {
           // Get all organization details
@@ -297,13 +287,21 @@ export function DashboardPageShell({
           if (isStale()) return;
 
           if (orgsError) {
+            // 組織詳細の取得失敗はエラー扱い（empty扱いにしない）
+            logger.error('[DashboardPageShell] organizations query failed', {
+              error: { code: orgsError.code, message: orgsError.message, details: orgsError.details },
+              membershipRowsCount: memberships.length,
+              orgIds
+            });
             if (isRLSDeniedError(orgsError)) {
               setErrorCode('RLS_DENIED');
               setError('組織情報へのアクセス権限がありません');
               await logToAudit('page_access', 'denied', 'org_rls_denied');
               return;
             }
-            throw orgsError;
+            setError('組織情報の取得に失敗しました。ページを再読み込みしてください。');
+            setErrorCode('ORG_FETCH_ERROR');
+            return;
           }
 
           // Map organizations with their contexts
@@ -343,6 +341,12 @@ export function DashboardPageShell({
           }
         } else {
           // No organization membership - isReallyEmpty will be true
+          // ログ出力: 組織が0件になった理由を記録
+          logger.warn('[DashboardPageShell] No organization membership found', {
+            userId: currentUser.id,
+            membershipRowsCount: 0,
+            reason: 'organization_members returned empty for this user'
+          });
           setOrganizations([]);
           setOrganization(null);
 
@@ -391,8 +395,9 @@ export function DashboardPageShell({
       }
     }
   // pathname を依存配列に追加: クライアントサイドナビゲーション時にデータを再取得
+  // NOTE: router は fetchData 内で未使用のため依存から除外（unstable reference による無限ループ防止）
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPublic, requiredRole, siteAdminOnly, router, logToAudit, pathname]);
+  }, [isPublic, requiredRole, siteAdminOnly, logToAudit, pathname]);
 
   /**
    * 権限チェック関数（DBのRPCを使用）

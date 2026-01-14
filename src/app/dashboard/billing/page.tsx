@@ -5,12 +5,11 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PLAN_LIMITS } from '@/config/plans';
 import type { Organization } from '@/types/legacy/database';
 import { logger } from '@/lib/utils/logger';
-import { handleMaybeSingleResult } from '@/lib/error-mapping';
 import { getCurrentUserClient } from '@/lib/core/auth-state.client';
 import {
   fetchActiveCheckoutForOrg,
@@ -73,7 +72,6 @@ export default function BillingPage() {
 // =====================================================
 
 function BillingContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [data, setData] = useState<BillingData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -95,19 +93,45 @@ function BillingContent() {
         return;
       }
 
-      const orgResult = await supabase
-        .from('organizations')
-        .select('id, name, slug, status, is_published, logo_url, description, legal_form, representative_name, created_by, created_at')
-        .eq('created_by', user.id)
+      // 組織取得: organization_members を正規ソースとして使用
+      // /organizations/new へのリダイレクトは禁止（誤判定の温床）
+      const { data: membershipData, error: membershipError } = await supabase
+        .from('organization_members')
+        .select('organization_id')
+        .eq('user_id', user.id)
+        .limit(1)
         .maybeSingle();
 
-      let org;
-      try {
-        org = handleMaybeSingleResult(orgResult, '組織');
-      } catch {
-        router.push('/organizations/new');
+      if (membershipError) {
+        logger.error('[billing] organization_members query failed', {
+          error: { code: membershipError.code, message: membershipError.message }
+        });
+        setError('組織情報の取得に失敗しました。ページを再読み込みしてください。');
         return;
       }
+
+      if (!membershipData) {
+        logger.warn('[billing] No organization membership found', { userId: user.id });
+        setError('所属する組織が見つかりません。管理者にお問い合わせください。');
+        return;
+      }
+
+      const { data: orgData, error: orgError } = await supabase
+        .from('organizations')
+        .select('id, name, slug, status, is_published, logo_url, description, legal_form, representative_name, created_by, created_at, plan, subscription_status, current_period_end, stripe_customer_id')
+        .eq('id', membershipData.organization_id)
+        .maybeSingle();
+
+      if (orgError || !orgData) {
+        logger.error('[billing] organizations query failed', {
+          orgId: membershipData.organization_id,
+          error: orgError ? { code: orgError.code, message: orgError.message } : 'no data'
+        });
+        setError('組織情報の取得に失敗しました。ページを再読み込みしてください。');
+        return;
+      }
+
+      const org = orgData;
 
       // ReadContract準拠: secure view経由でcount取得（head:trueでpayload最小化）
       const [servicesRes, postsRes, caseStudiesRes, faqsRes] = await Promise.all([
@@ -135,7 +159,7 @@ function BillingContent() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     fetchBillingData();

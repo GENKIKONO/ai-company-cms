@@ -78,18 +78,25 @@ export async function withOrgAuth(
       }
     }
 
-    // クエリパラメータで見つからない場合、v_current_user_orgs から最初の組織を取得
+    // クエリパラメータで見つからない場合、organization_members から最初の組織を取得
+    // v_current_user_orgs は不整合があるため使用しない
     if (!organization) {
-      const { data: userOrgs, error: orgsError } = await supabase
-        .from('v_current_user_orgs')
+      const { data: membershipData, error: membershipError } = await supabase
+        .from('organization_members')
         .select('organization_id')
+        .eq('user_id', user.id)
         .limit(1);
 
-      if (!orgsError && userOrgs && userOrgs.length > 0) {
+      if (membershipError) {
+        logger.error('[withOrgAuth] Failed to fetch organization_members', {
+          userId: user.id,
+          error: { code: membershipError.code, message: membershipError.message }
+        });
+      } else if (membershipData && membershipData.length > 0) {
         const { data: orgData } = await supabase
           .from('organizations')
           .select('id, created_by')
-          .eq('id', userOrgs[0].organization_id)
+          .eq('id', membershipData[0].organization_id)
           .maybeSingle();
 
         if (orgData) {
@@ -103,12 +110,14 @@ export async function withOrgAuth(
      *
      * 発火条件:
      * 1. クエリパラメータ organizationId で組織が見つからない
-     * 2. v_current_user_orgs (organization_members経由) に紐付けがない
+     * 2. organization_members に紐付けがない
      * 3. かつ organizations.created_by が本ユーザーのIDと一致する
      *
      * 対象ケース:
      * - 旧データ: organization_members にレコードがない組織作成者
      * - マイグレーション未完了のユーザー
+     *
+     * 注意: organization_members が取れた場合はこのフォールバックに到達しない
      *
      * 削除条件:
      * - 全既存ユーザーに organization_members レコードが存在することを確認後
@@ -120,6 +129,10 @@ export async function withOrgAuth(
      * @see docs/auth-architecture.md
      */
     if (!organization) {
+      logger.debug('[withOrgAuth] organization_members empty, trying created_by fallback', {
+        userId: user.id
+      });
+
       const { data: orgData, error: orgError } = await supabase
         .from('organizations')
         .select('id, created_by')
@@ -127,9 +140,9 @@ export async function withOrgAuth(
         .maybeSingle();
 
       if (orgError) {
-        logger.error('[withOrgAuth] Failed to fetch organization', {
+        logger.error('[withOrgAuth] created_by fallback failed', {
           userId: user.id,
-          error: orgError
+          error: { code: orgError.code, message: orgError.message }
         });
       } else if (orgData) {
         // フォールバック発火を観測可能にする（PIIは出さない）
