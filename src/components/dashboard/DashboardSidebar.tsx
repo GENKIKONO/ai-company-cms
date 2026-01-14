@@ -30,10 +30,9 @@ interface DashboardSidebarProps {
  * カテゴリ表示用アイコンマッピング
  */
 const categoryIcons: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
-  home: dashboardNavGroups.find(g => g.id === 'home')?.items[0]?.icon || ChevronRightIcon,
   overview: dashboardNavGroups.find(g => g.id === 'overview')?.items[0]?.icon || ChevronRightIcon,
-  mypage: dashboardNavGroups.find(g => g.id === 'mypage')?.items[0]?.icon || ChevronRightIcon,
-  aistudio: dashboardNavGroups.find(g => g.id === 'aistudio')?.items[0]?.icon || ChevronRightIcon,
+  myPage: dashboardNavGroups.find(g => g.id === 'myPage')?.items[0]?.icon || ChevronRightIcon,
+  aiStudio: dashboardNavGroups.find(g => g.id === 'aiStudio')?.items[0]?.icon || ChevronRightIcon,
   insights: dashboardNavGroups.find(g => g.id === 'insights')?.items[0]?.icon || ChevronRightIcon,
   settings: dashboardNavGroups.find(g => g.id === 'settings')?.items[0]?.icon || ChevronRightIcon,
 };
