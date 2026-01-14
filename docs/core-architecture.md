@@ -116,6 +116,27 @@ Dashboard領域内には、組織管理者向けのサブ領域が存在する�
 
 **注意:** `org_role='admin'` は組織内の管理者ユーザーであり、`site_admin`（運営者）とは異なる。
 
+#### 3.2.1.1 /dashboard/manage/** のReadContract例外
+
+`/dashboard/manage/**`配下のページは、組織管理者専用の運用・監視機能であり、
+`v_dashboard_*_secure`ビュー経由ではなく、直接テーブルへアクセスすることを許可する。
+
+**例外対象テーブル:**
+
+| ページ | テーブル | 用途 |
+|--------|---------|------|
+| `manage/storage-logs` | `storage_access_logs` | ストレージアクセスログ閲覧 |
+| `manage/jobs` | `translation_jobs`, `embedding_jobs` | ジョブ状態監視 |
+| `manage/ai-usage` | `organization_ai_usage` | AI使用量確認 |
+| `manage/security` | `ip_reports`, `ip_blocklist` | セキュリティ監視 |
+| `manage/audit` | `service_role_audit` | 監査ログ閲覧 |
+| `manage/ai-visibility` | `ai_visibility_scores`, `ai_visibility_config`, `ai_bot_logs` | AI可視性分析 |
+
+**設計意図:**
+- これらは運用データであり、コンテンツ（services/posts/faqs等）とは性質が異なる
+- RLSは`organization_id`で制御されており、他組織のデータにはアクセス不可
+- 将来的にsecure view化する場合は、`v_manage_*_secure`命名規則を使用
+
 ### 3.3 Shell別責務マトリクス
 
 | 責務 | Info | Dashboard | Account | Admin | Ops | MgmtConsole |
