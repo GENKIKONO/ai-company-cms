@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/middleware';
-import { ROUTES, PROTECTED_ROUTE_PREFIXES } from '@/lib/routes';
+import { ROUTES } from '@/lib/routes';
 
 /**
  * 認証ミドルウェア
@@ -10,8 +10,13 @@ import { ROUTES, PROTECTED_ROUTE_PREFIXES } from '@/lib/routes';
  * - 認証済みユーザーが認証ページにアクセスした場合 /dashboard へリダイレクト
  * - Supabase セッションの Cookie 同期
  *
+ * 【認証戦略】
+ * - /dashboard, /account, /my: Cookie存在チェックのみ（認証保証はPageShellに委譲）
+ *   → クライアントナビゲーション時の cookie 同期問題を回避
+ * - /admin, /management-console: 厳密な getUser() チェック
+ *   → 管理者向けページは厳密に保護
+ *
  * 【ハードコード禁止】
- * - 保護パスは PROTECTED_ROUTE_PREFIXES (src/lib/routes.ts) を参照
  * - ルート直書きは禁止、必ず ROUTES 定数を使用
  */
 export async function middleware(request: NextRequest) {
@@ -36,33 +41,76 @@ export async function middleware(request: NextRequest) {
   // Supabaseクライアント作成（Cookieの同期処理込み）
   const { supabase, response } = createClient(request);
 
-  // 認証状態確認（getUser使用、getSessionは不可）
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  // =====================================================
+  // 認証戦略: ルート種別によってチェック方式を分ける
+  // =====================================================
 
-  const isLoggedIn = user && !error;
+  // 厳密認証が必要なパス（管理者向け）
+  const strictAuthPaths = [ROUTES.admin, ROUTES.managementConsole];
+  const isStrictAuthPath = strictAuthPaths.some(path => pathname.startsWith(path));
 
-  // 保護されたパス（未ログインなら /auth/login へ）
-  // ⚠️ PROTECTED_ROUTE_PREFIXES を Single Source of Truth として使用
-  const isProtectedPath = PROTECTED_ROUTE_PREFIXES.some(path => pathname.startsWith(path));
+  // ソフト認証パス（Cookie存在チェックのみ、認証保証はPageShellに委譲）
+  // → クライアントナビゲーション時の getUser() 不安定性を回避
+  const softAuthPaths = [ROUTES.dashboard, ROUTES.account, ROUTES.my];
+  const isSoftAuthPath = softAuthPaths.some(path => pathname.startsWith(path));
 
   // 認証ページ（ログイン済みなら /dashboard へ）
-  // ⚠️ ROUTES 定数を使用してハードコードを排除
   const authPaths = [ROUTES.authLogin, ROUTES.authSignin, ROUTES.login, ROUTES.signin];
   const isAuthPath = authPaths.some(path => pathname.startsWith(path));
 
-  // 未認証ユーザーが保護されたページにアクセス
-  if (isProtectedPath && !isLoggedIn) {
+  // =====================================================
+  // Cookie 存在チェック（ソフト認証用）
+  // =====================================================
+  const hasAuthCookie = request.cookies.getAll().some(cookie =>
+    cookie.name.startsWith('sb-') && cookie.name.includes('-auth-token')
+  );
+
+  // =====================================================
+  // 厳密認証パス: getUser() で検証
+  // =====================================================
+  if (isStrictAuthPath) {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    const isLoggedIn = user && !error;
+
+    if (!isLoggedIn) {
+      // デバッグ用ログ（再発時の原因特定用）
+      console.warn('[middleware] Strict auth failed', {
+        path: pathname,
+        hasAuthCookie,
+        errorCode: error?.code,
+      });
+
+      const url = request.nextUrl.clone();
+      url.pathname = ROUTES.authLogin;
+      url.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // =====================================================
+  // ソフト認証パス: Cookie存在チェックのみ
+  // 認証保証は DashboardPageShell / UserShell に委譲
+  // =====================================================
+  if (isSoftAuthPath && !hasAuthCookie) {
+    // 完全未ログイン（Cookie無し）のみブロック
+    // デバッグ用ログ
+    console.warn('[middleware] Soft auth failed - no auth cookie', {
+      path: pathname,
+      cookies: request.cookies.getAll().map(c => c.name).filter(n => n.startsWith('sb-')),
+    });
+
     const url = request.nextUrl.clone();
     url.pathname = ROUTES.authLogin;
     url.searchParams.set('redirect', pathname);
     return NextResponse.redirect(url);
   }
 
-  // 認証済みユーザーが認証ページにアクセス
-  if (isAuthPath && isLoggedIn) {
+  // =====================================================
+  // 認証ページ: ログイン済みなら /dashboard へ
+  // =====================================================
+  if (isAuthPath && hasAuthCookie) {
+    // Cookie があれば認証済みとみなしてリダイレクト
+    // 厳密チェックはしない（ログインページ表示の遅延を避ける）
     const url = request.nextUrl.clone();
     url.pathname = ROUTES.dashboard;
     return NextResponse.redirect(url);
