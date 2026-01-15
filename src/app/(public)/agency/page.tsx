@@ -7,7 +7,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-  title: 'Agency Dashboard - AIO Hub',
+  title: 'Agency Dashboard - AIOHub',
   description: '代理店ダッシュボード',
 };
 

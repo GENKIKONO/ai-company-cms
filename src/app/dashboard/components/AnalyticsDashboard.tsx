@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * NOTE: [FEATUREGATE_PHASE3] API経由でfeatureGate取得に移行完了
+ * - 旧: featureGate.ts を直接インポート（cookies() エラーの原因）
+ * - 新: /api/my/features/effective API経由で取得
+ */
+
 import { useState, useEffect } from 'react';
 import { Brain, TrendingUp, Users, Eye, AlertCircle, Crown } from 'lucide-react';
 import StructuredDataScore from '@/components/analytics/StructuredDataScore';
@@ -9,14 +15,39 @@ import { getTrialStatus, type TrialStatus } from '@/lib/trial-manager';
 import type { Organization } from '@/types/legacy/database';
 import { PLAN_LIMITS } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
-import { createClient } from '@/lib/supabase/client';
-import {
-  getEffectiveFeatures,
-  getFeatureEnabled,
-  getPlanUiLimitsFromFeatures,
-  type EffectiveFeature,
-  type PlanUiLimits,
-} from '@/lib/featureGate';
+
+/** API から返される EffectiveFeature 型 */
+interface EffectiveFeature {
+  feature_key: string;
+  is_enabled?: boolean;
+  enabled?: boolean;
+  limits?: Record<string, { value: number; period: string | null }>;
+}
+
+/** UI制限の型 */
+interface PlanUiLimits {
+  services: number;
+  qa_items: number;
+  case_studies: number;
+}
+
+/** 機能が有効かどうかを判定（クライアント用ヘルパー） */
+function getFeatureEnabled(features: EffectiveFeature[], featureKey: string): boolean {
+  const feature = features.find(f => f.feature_key === featureKey);
+  return feature?.is_enabled === true || feature?.enabled === true;
+}
+
+/** features からUI制限を取得（クライアント用ヘルパー） */
+function getPlanUiLimitsFromFeatures(features: EffectiveFeature[]): PlanUiLimits | null {
+  const limitsFeature = features.find(f => f.feature_key === 'ui_limits');
+  if (!limitsFeature?.limits) return null;
+  const limits = limitsFeature.limits;
+  return {
+    services: limits.services?.value ?? 5,
+    qa_items: limits.qa_items?.value ?? 20,
+    case_studies: limits.case_studies?.value ?? 3,
+  };
+}
 
 interface AnalyticsDashboardProps {
   organization: Organization;
@@ -56,18 +87,19 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
         const trial = getTrialStatus(organization);
         setTrialStatus(trial);
 
-        // featureGate 経由で機能フラグを取得（Subject型API）
+        // API経由でfeatureGateを呼び出し（Server-sideでcookies()実行）
         if (organization.id) {
           try {
-            const supabase = createClient();
-            const effectiveFeatures = await getEffectiveFeatures(supabase, {
-              type: 'org',
-              id: organization.id,
-            });
-            setFeatures(effectiveFeatures);
-            setUiLimits(getPlanUiLimitsFromFeatures(effectiveFeatures));
+            const res = await fetch(`/api/my/features/effective?org_id=${organization.id}`);
+            if (res.ok) {
+              const { data: effectiveFeatures } = await res.json();
+              setFeatures(effectiveFeatures || []);
+              setUiLimits(getPlanUiLimitsFromFeatures(effectiveFeatures || []));
+            } else {
+              logger.warn('Failed to fetch features from API', { status: res.status });
+            }
           } catch (err) {
-            logger.warn('Failed to fetch features from featureGate, using fallback', { error: err });
+            logger.warn('Failed to fetch features from API, using fallback', { error: err });
             // フォールバック: 空配列のままにして PLAN_LIMITS を使用
           }
         }

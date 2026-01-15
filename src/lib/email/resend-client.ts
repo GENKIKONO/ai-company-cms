@@ -30,7 +30,7 @@ export async function sendHtmlEmail({
   html, 
   requestId = crypto.randomUUID() 
 }: SendEmailParams): Promise<SendEmailResult> {
-  const fromEmail = process.env.RESEND_FROM_EMAIL || 'AIO Hub <noreply@aiohub.jp>';
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'AIOHub <noreply@aiohub.jp>';
   
   // Check if API key is available (for runtime)
   if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'dummy-key-for-build') {
@@ -137,7 +137,7 @@ export class AuthNotificationHelper {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIO Hubへようこそ</title>
+    <title>AIOHubへようこそ</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: var(--color-background-subtle); }
         .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(var(--shadow-black),0.1); }
@@ -159,7 +159,7 @@ export class AuthNotificationHelper {
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🚀 AIO Hub</div>
+            <div class="logo">🚀 AIOHub</div>
             <div class="subtitle">ビジネス成長のプラットフォーム</div>
         </div>
         
@@ -167,7 +167,7 @@ export class AuthNotificationHelper {
             <div class="greeting">こんにちは、${displayName} さん</div>
             
             <div class="message">
-                AIO Hubへのご登録ありがとうございます！<br>
+                AIOHubへのご登録ありがとうございます！<br>
                 このメールは登録完了をお知らせする補助通知です。
             </div>
             
@@ -187,12 +187,12 @@ export class AuthNotificationHelper {
             
             <div style="font-size: 14px; color: var(--color-text-light);">
                 ご質問やサポートが必要でしたら、お気軽にお問い合わせください。<br>
-                今後ともAIO Hubをよろしくお願いいたします。
+                今後ともAIOHubをよろしくお願いいたします。
             </div>
         </div>
         
         <div class="footer">
-            <div><strong>AIO Hub チーム</strong></div>
+            <div><strong>AIOHub チーム</strong></div>
             <div style="margin-top: 10px;">
                 <a href="https://aiohub.jp" style="color: var(--color-gradient-primary-start); text-decoration: none;">https://aiohub.jp</a>
             </div>
@@ -203,7 +203,7 @@ export class AuthNotificationHelper {
 
     return await sendHtmlEmail({
       to: email,
-      subject: '🚀 【AIO Hub】ご登録ありがとうございます',
+      subject: '🚀 【AIOHub】ご登録ありがとうございます',
       html,
       requestId: `welcome-${crypto.randomUUID()}`
     });
@@ -219,7 +219,7 @@ export class AuthNotificationHelper {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>パスワードリセット - AIO Hub</title>
+    <title>パスワードリセット - AIOHub</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: var(--color-background-subtle); }
         .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(var(--shadow-black),0.1); }
@@ -243,7 +243,7 @@ export class AuthNotificationHelper {
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🔒 AIO Hub</div>
+            <div class="logo">🔒 AIOHub</div>
             <div class="subtitle">セキュリティ通知</div>
         </div>
         
@@ -260,7 +260,7 @@ export class AuthNotificationHelper {
             <div class="step-box">
                 <div class="step-title">📧 次のステップ</div>
                 <div class="step-text">
-                    別途送信される「【AIO Hub】パスワードリセットのご案内」メール内のリンクをクリックして、新しいパスワードを設定してください。<br><br>
+                    別途送信される「【AIOHub】パスワードリセットのご案内」メール内のリンクをクリックして、新しいパスワードを設定してください。<br><br>
                     メールが見つからない場合は、迷惑メールフォルダもご確認ください。
                 </div>
             </div>
@@ -280,7 +280,7 @@ export class AuthNotificationHelper {
         </div>
         
         <div class="footer">
-            <div><strong>AIO Hub セキュリティチーム</strong></div>
+            <div><strong>AIOHub セキュリティチーム</strong></div>
             <div style="margin-top: 10px;">
                 <a href="https://aiohub.jp" style="color: var(--color-gradient-primary-start); text-decoration: none;">https://aiohub.jp</a>
             </div>
@@ -291,7 +291,7 @@ export class AuthNotificationHelper {
 
     return await sendHtmlEmail({
       to: email,
-      subject: '🔒 【AIO Hub】パスワードリセット要求を受け付けました',
+      subject: '🔒 【AIOHub】パスワードリセット要求を受け付けました',
       html,
       requestId: `password-reset-${crypto.randomUUID()}`
     });

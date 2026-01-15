@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import type { Database } from '@/types/supabase';
 
@@ -7,6 +7,9 @@ import type { Database } from '@/types/supabase';
 
 /**
  * Untyped server client (既存) - 互換性のため維持
+ *
+ * NOTE: @supabase/ssr推奨のgetAll/setAllパターンを使用
+ * これによりmiddleware.tsやlayout.tsxとのCookie同期が正しく動作する
  */
 export const createClient = async () => {
   const { cookies } = await import('next/headers');
@@ -17,21 +20,17 @@ export const createClient = async () => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
+        getAll() {
+          return cookieStore.getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
+        setAll(cookiesToSet) {
           try {
-            cookieStore.set({ name, value, ...options });
-          } catch (error) {
-            // 静的レンダリング時にエラーが発生する場合があるため、ここでキャッチして無視
-          }
-        },
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: '', ...options });
-          } catch (error) {
-            // 静的レンダリング時にエラーが発生する場合があるため、ここでキャッチして無視
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set({ name, value, ...options });
+            });
+          } catch {
+            // Server Component内ではCookieを設定できない場合がある
+            // Middlewareがセッション更新を担当するため、ここでは無視
           }
         },
       },
@@ -46,6 +45,8 @@ export { supabaseAdmin };
 /**
  * Typed server client - 新規/リファクタリング対象ファイル用
  * 型安全なSupabaseクエリを実行する場合に使用
+ *
+ * NOTE: @supabase/ssr推奨のgetAll/setAllパターンを使用
  */
 export const createTypedClient = async () => {
   const { cookies } = await import('next/headers');
@@ -56,21 +57,17 @@ export const createTypedClient = async () => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
+        getAll() {
+          return cookieStore.getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
+        setAll(cookiesToSet) {
           try {
-            cookieStore.set({ name, value, ...options });
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set({ name, value, ...options });
+            });
           } catch {
-            // 静的レンダリング時にエラーが発生する場合があるため、ここでキャッチして無視
-          }
-        },
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: '', ...options });
-          } catch {
-            // 静的レンダリング時にエラーが発生する場合があるため、ここでキャッチして無視
+            // Server Component内ではCookieを設定できない場合がある
+            // Middlewareがセッション更新を担当するため、ここでは無視
           }
         },
       },

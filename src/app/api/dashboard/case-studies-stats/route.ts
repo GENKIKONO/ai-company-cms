@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
+import { getUserWithClient } from '@/lib/core/auth-state';
 
 export async function GET(req: Request) {
   try {
-    // 認証チェック
+    // 認証チェック（Core auth-state wrapper経由）
     const supabaseAuth = await createServerClient();
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+    const user = await getUserWithClient(supabaseAuth);
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({
         error: 'Unauthorized - Authentication required'
       }, { status: 401 });

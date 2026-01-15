@@ -1,16 +1,21 @@
 'use client';
 
+/**
+ * EmbedPageClient - 埋め込みウィジェット設定ページ
+ *
+ * NOTE: [FEATUREGATE_PHASE3] DashboardPageShell コンテキスト経由に移行
+ * - 旧: /api/my/organization を直接呼び出し（owner限定でエラー）
+ * - 新: useDashboardPageContext() で組織情報を取得
+ */
+
 import { useState, useEffect, useCallback } from 'react';
-import { ROUTES } from '@/lib/routes';
-import { WidgetPreview } from '@/components/embed/WidgetPreview';
-import { getCurrentUserClient as getCurrentUser } from '@/lib/core/auth-state.client';
-import { DashboardPageShell } from '@/components/dashboard';
-import { DashboardButton } from '@/components/dashboard/ui';
-import { getOrganization } from '@/lib/organizations';
-import type { Organization, Service } from '@/types/legacy/database';
 import Link from 'next/link';
-import { logger } from '@/lib/utils/logger';
+import { WidgetPreview } from '@/components/embed/WidgetPreview';
+import { DashboardPageShell, useDashboardPageContext } from '@/components/dashboard';
+import { DashboardButton } from '@/components/dashboard/ui';
 import { OrgQuotaBadge, type SimpleQuotaProps } from '@/components/quota/OrgQuotaBadge';
+import type { Service } from '@/types/legacy/database';
+import { logger } from '@/lib/utils/logger';
 
 interface EmbedPageClientProps {
   embedsQuota: SimpleQuotaProps | null;
@@ -25,9 +30,12 @@ export default function EmbedPageClient({ embedsQuota }: EmbedPageClientProps) {
 }
 
 function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [organization, setOrganization] = useState<Organization | null>(null);
+  // DashboardPageShell コンテキストから組織情報を取得
+  // NOTE: /api/my/organization は owner 限定のため使用不可
+  const { organization: orgContext, isLoading: isOrgLoading } = useDashboardPageContext();
+
+  // サービス取得用の独自state
+  const [servicesLoading, setServicesLoading] = useState(true);
   const [services, setServices] = useState<Service[]>([]);
   const [widgetOptions, setWidgetOptions] = useState({
     theme: 'light' as 'light' | 'dark' | 'auto',
@@ -40,85 +48,53 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
   const [embedCode, setEmbedCode] = useState('');
 
   // Phase 4-C: Quota判定フラグ（fail-open設計）
-  const isEmbedsLimitReached = 
+  const isEmbedsLimitReached =
     !!embedsQuota &&
     !embedsQuota.unlimited &&
     embedsQuota.limit >= 0 &&
     embedsQuota.usedInWindow >= embedsQuota.limit;
 
-  const isEmbedsDisabledByPlan = 
+  const isEmbedsDisabledByPlan =
     !!embedsQuota &&
     !embedsQuota.unlimited &&
     embedsQuota.limit === 0;
 
-  const fetchData = useCallback(async () => {
+  // サービス一覧を取得（組織IDが確定してから）
+  const fetchServices = useCallback(async () => {
+    if (!orgContext?.id) {
+      setServicesLoading(false);
+      return;
+    }
+
     try {
-      setError(null);
-      const user = await getCurrentUser();
-      if (!user) {
-        setError('ログインが必要です。再度ログインしてください。');
-        return;
-      }
-
-      // Get user's organization
-      const orgResult = await fetch('/api/my/organization');
-      if (!orgResult.ok) {
-        const errorData = await orgResult.json().catch(() => ({}));
-        logger.error('Organization API error', { 
-          data: { 
-            status: orgResult.status, 
-            statusText: orgResult.statusText, 
-            errorData 
-          }
-        });
-        
-        if (orgResult.status === 401) {
-          setError('認証エラーが発生しました。再度ログインしてください。');
-        } else if (orgResult.status === 500) {
-          setError('サーバーエラーが発生しました。しばらく待ってから再試行してください。');
-        } else {
-          setError('組織情報の取得に失敗しました。');
-        }
-        return;
-      }
-      
-      const orgData = await orgResult.json();
-      const org = orgData.data;
-      
-      if (!org) {
-        setError('組織情報が見つかりません。先に企業情報を作成してください。');
-        return;
-      }
-      
-      setOrganization(org);
-
-      // Get services
-      try {
-        const servicesResult = await fetch('/api/my/services');
-        if (servicesResult.ok) {
-          const servicesData = await servicesResult.json();
-          setServices(servicesData.data || []);
-        } else {
-          logger.warn('Services fetch failed', { data: { status: servicesResult.status } });
-          setServices([]);
-        }
-      } catch (servicesError) {
-        logger.warn('Services fetch error', { data: servicesError });
+      const servicesResult = await fetch('/api/my/services');
+      if (servicesResult.ok) {
+        const servicesData = await servicesResult.json();
+        setServices(servicesData.data || []);
+      } else {
+        logger.warn('Services fetch failed', { data: { status: servicesResult.status } });
         setServices([]);
       }
-
-    } catch (error) {
-      logger.error('Failed to fetch data', { data: error instanceof Error ? error : new Error(String(error)) });
-      setError('データの取得中にエラーが発生しました。ページを再読み込みしてください。');
+    } catch (servicesError) {
+      logger.warn('Services fetch error', { data: servicesError });
+      setServices([]);
     } finally {
-      setLoading(false);
+      setServicesLoading(false);
     }
-  }, []);
+  }, [orgContext?.id]);
 
-  const retryFetch = () => {
-    setLoading(true);
-    fetchData();
-  };
+  // 組織コンテキストから organization を作成（WidgetPreview互換）
+  const organization = orgContext
+    ? {
+        id: orgContext.id,
+        name: orgContext.name,
+        slug: orgContext.slug,
+        plan: orgContext.plan,
+      }
+    : null;
+
+  // 総合ローディング状態
+  const loading = isOrgLoading || servicesLoading;
 
   const generateEmbedCode = useCallback(() => {
     if (!organization?.slug) {
@@ -160,9 +136,12 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
     }
   };
 
+  // 組織IDが確定したらサービスを取得
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (orgContext?.id && !isOrgLoading) {
+      fetchServices();
+    }
+  }, [orgContext?.id, isOrgLoading, fetchServices]);
 
   useEffect(() => {
     generateEmbedCode();
@@ -177,65 +156,19 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-[var(--aio-surface)] flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="bg-[var(--aio-danger-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4 mb-6">
-            <div className="flex items-start">
-              <svg className="w-5 h-5 text-[var(--aio-danger)] mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-[var(--aio-danger)]">エラーが発生しました</h3>
-                <p className="mt-1 text-sm text-[var(--aio-danger)]">{error}</p>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <button
-              onClick={retryFetch}
-              className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] transition-colors"
-            >
-              再試行
-            </button>
-            <div>
-              <Link href={ROUTES.dashboard} className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm" replace>
-                ダッシュボードに戻る
-              </Link>
-            </div>
-            {error.includes('企業情報を作成') && (
-              <div>
-                <Link href={ROUTES.dashboardCompany} className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] text-sm">
-                  企業情報を作成する
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // 組織がない場合（DashboardPageShell の onEmptyOrganization で処理されるが、念のため）
   if (!organization) {
     return (
       <div className="min-h-screen bg-[var(--aio-surface)] flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">企業情報が見つかりません</h2>
-          <div className="mt-4 space-y-2">
-            <div>
-              <button
-                onClick={retryFetch}
-                className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)]"
-              >
-                再試行
-              </button>
-            </div>
-            <div>
-              <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]" replace>
-                ダッシュボードに戻る
-              </Link>
-            </div>
+          <p className="mt-2 text-[var(--color-text-secondary)]">
+            先に企業情報を作成してください。
+          </p>
+          <div className="mt-4">
+            <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]" replace>
+              ダッシュボードに戻る
+            </Link>
           </div>
         </div>
       </div>

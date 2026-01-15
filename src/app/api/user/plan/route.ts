@@ -2,17 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserPlan } from '@/lib/user-plan';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
+import { getUserWithClient } from '@/lib/core/auth-state';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    // 認証チェックをAPIレベルで実装
+    // 認証チェック（Core auth-state wrapper経由）
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const user = await getUserWithClient(supabase);
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({
         error: 'Unauthorized - Authentication required'
       }, { status: 401 });

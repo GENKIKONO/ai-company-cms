@@ -265,7 +265,7 @@ export function generateEmbedWidget(config: EmbedGeneratorOptions): string {
         ${servicesHtml}
         <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--color-embed-border-light); text-align: center;">
           <a href="${escapeHtml(baseUrl)}" target="_blank" style="color: var(--color-embed-tertiary); text-decoration: none; font-size: 0.7em;">
-            Powered by LuxuCare CMS
+            Powered by AIOHub
           </a>
         </div>
       </div>
@@ -342,7 +342,7 @@ export function generateWidgetPreview(config: EmbedGeneratorOptions): string {
       ${orgHtml}
       ${servicesHtml}
       <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--color-embed-border-light); text-align: center;">
-        <span style="color: var(--color-embed-tertiary); font-size: 0.7em;">Powered by LuxuCare CMS</span>
+        <span style="color: var(--color-embed-tertiary); font-size: 0.7em;">Powered by AIOHub</span>
       </div>
     </div>
   `;

@@ -11,11 +11,11 @@ export async function GET() {
   const openApiSpec = {
     "openapi": "3.1.0",
     "info": {
-      "title": "LuxuCare CMS Public API",
+      "title": "AIOHub Public API",
       "version": "1.0.0",
       "description": "公開API仕様書 - 企業、サービス、FAQ、導入事例の取得エンドポイント",
       "contact": {
-        "name": "LuxuCare CMS",
+        "name": "AIOHub",
         "url": baseUrl
       },
       "license": {

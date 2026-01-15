@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: serviceCopy.metadata.title,
     description: serviceCopy.metadata.description,
     url: '/service',
-    siteName: 'AIO Hub',
+    siteName: 'AIOHub',
     type: 'website',
     images: [
       {

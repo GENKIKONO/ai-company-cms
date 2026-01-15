@@ -13,7 +13,7 @@ import {
 } from '@/config/unified-plans';
 
 /**
- * AIO Hub プラン用 JSON-LD 生成
+ * AIOHub プラン用 JSON-LD 生成
  * aio/page.tsx で使用
  */
 export function generateAIOPricingJsonLD() {
@@ -24,7 +24,7 @@ export function generateAIOPricingJsonLD() {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
-    "name": "AIO Hub - AI情報最適化プラットフォーム",
+    "name": "AIOHub - AI情報最適化プラットフォーム",
     "description": "AIが理解しやすい形で企業情報を構造化・整備するサービス",
     "provider": {
       "@type": "Organization",

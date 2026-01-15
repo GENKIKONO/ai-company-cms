@@ -40,7 +40,7 @@ export default async function SiteSettingsPage() {
     logger.error('Failed to fetch site settings:', { data: e });
     // フォールバック用デフォルト値
     currentSettings = {
-      hero_title: 'AIO Hub AI企業CMS',
+      hero_title: 'AIOHub AI企業CMS',
       hero_subtitle: 'AI技術を活用した企業情報の統合管理プラットフォーム',
       representative_message: '私たちは、AI技術を通じて企業の情報発信を支援し、より良いビジネス成果の実現をお手伝いします。',
       footer_links: []
@@ -101,7 +101,7 @@ export default async function SiteSettingsPage() {
                   {/* Hero Section Preview */}
                   <div className="text-center">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4" id="preview-hero-title">
-                      {currentSettings?.hero_title || 'AIO Hub AI企業CMS'}
+                      {currentSettings?.hero_title || 'AIOHub AI企業CMS'}
                     </h1>
                     <p className="text-xl text-gray-600 mb-8" id="preview-hero-subtitle">
                       {currentSettings?.hero_subtitle || 'AI技術を活用した企業情報の統合管理プラットフォーム'}

@@ -10,7 +10,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: '管理コンソール | AIO Hub',
+  title: '管理コンソール | AIOHub',
   description: 'システム管理・ユーザー管理・セキュリティ監視',
 };
 

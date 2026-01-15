@@ -20,6 +20,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { DashboardLayoutContent } from '@/components/dashboard/DashboardLayoutContent';
 import type { AccountStatus } from '@/lib/auth/account-status-guard';
+import { getUserWithClient } from '@/lib/core/auth-state';
 
 export default async function DashboardLayout({
   children,
@@ -48,7 +49,7 @@ export default async function DashboardLayout({
       }
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUserWithClient(supabase);
 
     if (user) {
       // Get account status (optional - for banner display)

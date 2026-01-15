@@ -3,15 +3,15 @@ import InfoPageShell from '@/components/common/InfoPageShell';
 import { SITE_CONFIG } from '@/lib/site-config';
 
 export const metadata: Metadata = {
-  title: 'サポート | AIO Hub',
-  description: 'AIO Hubのサポートセンターです。よくある質問や問い合わせ方法をご確認いただけます。',
+  title: 'サポート | AIOHub',
+  description: 'AIOHubのサポートセンターです。よくある質問や問い合わせ方法をご確認いただけます。',
 };
 
 export default function SupportPage() {
   const sections = [
     {
       title: 'よくある質問',
-      description: 'AIO Hubに関するよくある質問と回答をまとめています。',
+      description: 'AIOHubに関するよくある質問と回答をまとめています。',
       items: [
         {
           title: 'アカウント登録・ログインについて',
@@ -68,7 +68,7 @@ export default function SupportPage() {
   return (
     <InfoPageShell
       title="サポートセンター"
-      description="AIO Hubのご利用に関するサポート情報"
+      description="AIOHubのご利用に関するサポート情報"
       sections={sections}
     />
   );

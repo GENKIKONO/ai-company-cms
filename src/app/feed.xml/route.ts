@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     // 2. RSS 2.0 フィード生成（実DBスキーマ基準）
     const rssXml = generateRss({
-      title: 'LuxuCare CMS - 最新記事',
+      title: 'AIOHub - 最新記事',
       description: 'ビジネス向け最新記事とソリューション情報',
       link: baseUrl,
       language: 'ja',
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
  */
 function generateEmptyRssFeed(baseUrl: string, request: NextRequest): NextResponse {
   const emptyRssXml = generateRss({
-    title: 'LuxuCare CMS - 最新記事',
+    title: 'AIOHub - 最新記事',
     description: 'ビジネス向け最新記事とソリューション情報',
     link: baseUrl,
     language: 'ja',

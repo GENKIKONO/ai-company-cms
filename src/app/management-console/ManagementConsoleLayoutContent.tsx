@@ -113,7 +113,7 @@ export function ManagementConsoleLayoutContent({
             </button>
 
             <Link href="/management-console" className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">AIO Hub 管理コンソール</h1>
+              <h1 className="text-xl font-semibold text-gray-900">AIOHub 管理コンソール</h1>
               <span className="ml-3 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
                 Admin
               </span>

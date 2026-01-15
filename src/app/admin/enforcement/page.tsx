@@ -232,7 +232,7 @@ export default function EnforcementPage() {
             <div className="text-sm text-muted-foreground">
               最終更新: {new Date().toLocaleString('ja-JP')} |
               対象ユーザー: {userStatusData.user.email} |
-              システム: AIO Hub 制裁管理システム v1.0
+              システム: AIOHub 制裁管理システム v1.0
             </div>
           </div>
         )}

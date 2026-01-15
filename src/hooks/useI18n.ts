@@ -12,7 +12,7 @@ export function useI18n(): UseI18nReturn {
   const t = (key: string): string => {
     // Simple key-to-text mapping for common keys
     const translations: Record<string, string> = {
-      'pages.home.title': 'AIO Hub - AI企業CMS',
+      'pages.home.title': 'AIOHub - AI企業CMS',
       'pages.home.description': 'AI技術を活用した企業情報の統合管理プラットフォーム'
     };
     

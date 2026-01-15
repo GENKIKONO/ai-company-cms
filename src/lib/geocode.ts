@@ -94,7 +94,7 @@ async function queryNominatim(address: string): Promise<GeocodeResult | null> {
       for (const url of queries) {
         const response = await fetch(url, {
           headers: {
-            'User-Agent': 'AIO Hub Geocoding Service (https://aiohub.jp)'
+            'User-Agent': 'AIOHub Geocoding Service (https://aiohub.jp)'
           }
         });
         

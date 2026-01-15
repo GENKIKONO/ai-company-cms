@@ -550,7 +550,7 @@ export function generateHTMLReport(data: ReportData): string {
 
         <div class="footer">
             <p>本レポートは ${new Date().toLocaleDateString('ja-JP')} に生成されました</p>
-            <p>AIO Hub - AI可視化分析サービス</p>
+            <p>AIOHub - AI可視化分析サービス</p>
         </div>
     </div>
 </body>

@@ -50,9 +50,10 @@ export async function GET(request: NextRequest) {
     }
 
     // 対象テーブル単体＋organization_idフィルタで取得
+    // NOTE: DBスキーマに合わせたカラム名を使用
     const { data, error } = await supabase
       .from('sales_materials')
-      .select('id, organization_id, title, file_path, file_type, file_size, uploaded_by, created_at, updated_at')
+      .select('id, organization_id, title, description, file_path, mime_type, size_bytes, is_public, status, created_by, created_at')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 
@@ -187,13 +188,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 営業資料データの作成
+    // NOTE: DBスキーマに合わせたカラム名を使用
     const materialData = {
       organization_id: orgData.id,
       title: body.title,
       file_path: body.file_path,
-      file_type: body.file_type || null,
-      file_size: body.file_size || null,
-      uploaded_by: user.id
+      mime_type: body.file_type || body.mime_type || null,
+      size_bytes: body.file_size || body.size_bytes || null,
+      created_by: user.id
     };
 
     const { data, error } = await supabase

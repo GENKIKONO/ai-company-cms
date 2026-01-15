@@ -306,7 +306,7 @@ class AlertManager {
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Critical Alert - AIO Hub</title>
+    <title>Critical Alert - AIOHub</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -321,7 +321,7 @@ class AlertManager {
     <div class="container">
         <div class="header">
             <div class="alert-level">🚨 ${severity.toUpperCase()} ALERT</div>
-            <div>AIO Hub System Monitoring</div>
+            <div>AIOHub System Monitoring</div>
         </div>
         
         <div class="message">
@@ -339,7 +339,7 @@ class AlertManager {
         </div>
         
         <div class="footer">
-            This is an automated alert from AIO Hub monitoring system.<br>
+            This is an automated alert from AIOHub monitoring system.<br>
             Please investigate immediately if this is a critical alert.
         </div>
     </div>

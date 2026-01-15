@@ -47,7 +47,7 @@ export default function Footer() {
         <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <div className="flex items-center space-x-4">
-              <span className="text-2xl font-bold">AIO Hub</span>
+              <span className="text-2xl font-bold">AIOHub</span>
               <span className="text-gray-400">AI時代の企業情報プラットフォーム</span>
             </div>
           </div>

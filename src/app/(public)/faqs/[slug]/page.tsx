@@ -60,7 +60,7 @@ export async function generateMetadata(
 
   return {
     title: preferredRow?.question ?? 'FAQ',
-    description: `${preferredRow?.question ?? 'FAQ'} - AIO Hub`,
+    description: `${preferredRow?.question ?? 'FAQ'} - AIOHub`,
     alternates: {
       canonical,
       languages,
@@ -69,7 +69,7 @@ export async function generateMetadata(
       url: canonical,
       title: preferredRow?.question ?? 'FAQ',
       type: 'article',
-      siteName: 'AIO Hub',
+      siteName: 'AIOHub',
     },
     robots: {
       index: true,
@@ -104,7 +104,7 @@ export default async function FaqPage(
     answerPlain: preferred.answer_plain ?? undefined,
     inLanguage: preferred.lang,
     dateModified: preferred.updated_at ?? undefined,
-    publisher: { name: 'AIO Hub', url: site },
+    publisher: { name: 'AIOHub', url: site },
   });
 
   return (

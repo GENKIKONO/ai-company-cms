@@ -206,17 +206,17 @@ function MaterialViewContent() {
                     <span className="text-sm font-medium text-[var(--color-text-tertiary)]">ファイル名</span>
                     <p className="text-sm text-[var(--color-text-primary)]">{material.title}</p>
                   </div>
-                  {material.file_type && (
+                  {material.mime_type && (
                     <div>
                       <span className="text-sm font-medium text-[var(--color-text-tertiary)]">ファイル形式</span>
-                      <p className="text-sm text-[var(--color-text-primary)]">{material.file_type}</p>
+                      <p className="text-sm text-[var(--color-text-primary)]">{material.mime_type}</p>
                     </div>
                   )}
-                  {material.file_size && (
+                  {material.size_bytes && (
                     <div>
                       <span className="text-sm font-medium text-[var(--color-text-tertiary)]">ファイルサイズ</span>
                       <p className="text-sm text-[var(--color-text-primary)]">
-                        {(material.file_size / 1024 / 1024).toFixed(2)} MB
+                        {(material.size_bytes / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
                   )}

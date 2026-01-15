@@ -6,7 +6,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Agency Clients - AIO Hub',
+  title: 'Agency Clients - AIOHub',
   description: '代理店配下顧客一覧',
 };
 

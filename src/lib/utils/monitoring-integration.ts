@@ -378,7 +378,7 @@ export class MonitoringIntegration {
     await slackNotifier.notifySystemStatus({
       type: 'startup',
       status: 'success',
-      message: 'AIO Hub system started successfully',
+      message: 'AIOHub system started successfully',
       version: process.env.NEXT_PUBLIC_APP_VERSION,
       environment: process.env.NEXT_PUBLIC_APP_ENV,
     });

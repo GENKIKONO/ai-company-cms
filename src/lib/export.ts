@@ -48,7 +48,7 @@ export class ExportService {
       metadata: {
         exportDate: new Date().toISOString(),
         totalCount: organizations.length,
-        source: 'AIO Hub',
+        source: 'AIOHub',
         version: '1.0'
       },
       organizations: organizations
@@ -86,7 +86,7 @@ export class ExportService {
       "legalName": organization.name,
       "identifier": {
         "@type": "PropertyValue",
-        "name": "AIO Hub ID",
+        "name": "AIOHub ID",
         "value": organization.id
       }
     };
@@ -258,7 +258,7 @@ export class ExportService {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIO Hub 企業レポート</title>
+    <title>AIOHub 企業レポート</title>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 40px; color: var(--color-export-text); }
         .header { border-bottom: 2px solid var(--color-export-primary); padding-bottom: 20px; margin-bottom: 30px; }
@@ -277,7 +277,7 @@ export class ExportService {
 </head>
 <body>
     <div class="header">
-        <h1 class="title">AIO Hub 企業レポート</h1>
+        <h1 class="title">AIOHub 企業レポート</h1>
         <p class="subtitle">生成日: ${new Date().toLocaleDateString('ja-JP')} | 対象企業数: ${organizations.length}社</p>
     </div>
     
@@ -319,7 +319,7 @@ export class ExportService {
     `).join('')}
     
     <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-light); text-align: center; color: var(--color-export-secondary); font-size: 12px;">
-        Powered by AIO Hub - AI企業ディレクトリ
+        Powered by AIOHub - AI企業ディレクトリ
     </div>
 </body>
 </html>`;
@@ -350,7 +350,7 @@ export class ExportService {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>企業比較レポート - AIO Hub</title>
+    <title>企業比較レポート - AIOHub</title>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 40px; color: var(--color-export-text); }
         .header { border-bottom: 2px solid var(--color-export-primary); padding-bottom: 20px; margin-bottom: 30px; }
@@ -409,7 +409,7 @@ export class ExportService {
     </table>
     
     <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-light); text-align: center; color: var(--color-export-secondary); font-size: 12px;">
-        Powered by AIO Hub
+        Powered by AIOHub
     </div>
 </body>
 </html>`;

@@ -140,7 +140,7 @@ export function generateOrganizationJsonLd(
     sameAsUrls.push(...organization.same_as.filter(url => url.trim() !== ''));
   }
   
-  // Add organization's official website URL if different from AIO Hub page
+  // Add organization's official website URL if different from AIOHub page
   if (organization.url && organization.url.trim() !== '') {
     const officialUrl = organization.url.trim();
     const hubUrl = `${baseUrl}/o/${organization.slug}`;
@@ -149,7 +149,7 @@ export function generateOrganizationJsonLd(
     }
   }
   
-  // Add AIO Hub page URL as sameAs
+  // Add AIOHub page URL as sameAs
   if (organization.slug) {
     const hubUrl = `${baseUrl}/o/${organization.slug}`;
     if (!sameAsUrls.includes(hubUrl)) {

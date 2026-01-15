@@ -73,6 +73,7 @@ export default function EditOrganizationPage() {
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [industries, setIndustries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dataFetched, setDataFetched] = useState(false); // データ取得完了フラグ
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   // [VERIFY][DELETE_GUARD] Delete confirmation state removed for safety
@@ -142,6 +143,7 @@ export default function EditOrganizationPage() {
       router.replace('/dashboard');
     } finally {
       setLoading(false);
+      setDataFetched(true);
     }
   }, [organizationId, router]);
 
@@ -378,7 +380,8 @@ export default function EditOrganizationPage() {
     return text[status as keyof typeof text] || '不明';
   };
 
-  if (loading) {
+  // ローディング中、またはデータ取得完了前は読み込み中表示
+  if (loading || !dataFetched) {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--aio-primary)]"></div>
@@ -387,6 +390,7 @@ export default function EditOrganizationPage() {
     );
   }
 
+  // データ取得完了後に組織が見つからない場合のみ表示
   if (!organization) {
     return (
       <div className="flex items-center justify-center py-16">

@@ -152,6 +152,20 @@ interface MaterialListItemProps {
 }
 
 function MaterialListItem({ material, onDelete, isDeleting, canDelete }: MaterialListItemProps) {
+  // ファイルサイズを読みやすい形式に変換
+  const formatFileSize = (bytes?: number | null): string => {
+    if (!bytes) return '';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+  };
+
+  // MIMEタイプから拡張子を抽出
+  const getFileExtension = (mimeType?: string | null): string => {
+    if (!mimeType) return '';
+    return mimeType.split('/').pop() || mimeType;
+  };
+
   return (
     <div className="p-6 hover:bg-[var(--aio-muted)]/50 transition-colors">
       <div className="flex items-start justify-between gap-4">
@@ -163,11 +177,11 @@ function MaterialListItem({ material, onDelete, isDeleting, canDelete }: Materia
             {material.title}
           </Link>
           <div className="mt-2 flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
-            {material.file_type && (
-              <DashboardBadge variant="default">{material.file_type}</DashboardBadge>
+            {material.mime_type && (
+              <DashboardBadge variant="default">{getFileExtension(material.mime_type)}</DashboardBadge>
             )}
-            {material.file_size && (
-              <span>サイズ: {(material.file_size / 1024 / 1024).toFixed(2)} MB</span>
+            {material.size_bytes && (
+              <span>サイズ: {formatFileSize(material.size_bytes)}</span>
             )}
             <span>アップロード: {new Date(material.created_at).toLocaleDateString('ja-JP')}</span>
           </div>

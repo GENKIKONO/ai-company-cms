@@ -20,7 +20,7 @@ interface SiteSettings {
 
 // デフォルト設定
 const defaultSettings: SiteSettings = {
-  hero_title: 'AIO Hub AI企業CMS',
+  hero_title: 'AIOHub AI企業CMS',
   hero_subtitle: 'AI技術を活用した企業情報の統合管理プラットフォーム',
   representative_message: '私たちは、AI技術を通じて企業の情報発信を支援し、より良いビジネス成果の実現をお手伝いします。',
   hero_background_image: undefined,

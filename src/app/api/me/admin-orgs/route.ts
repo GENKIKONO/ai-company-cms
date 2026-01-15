@@ -11,6 +11,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/log';
+import { getUserWithClient } from '@/lib/core/auth-state';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,13 +44,10 @@ export async function GET() {
   try {
     const supabase = await createClient();
 
-    // 1) 認証チェック
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    // 1) 認証チェック（Core auth-state wrapper経由）
+    const user = await getUserWithClient(supabase);
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }

@@ -55,9 +55,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // 営業資料の存在確認と権限チェック
+    // NOTE: DBスキーマに合わせたカラム名を使用
     const { data: materials, error: materialError } = await supabase
       .from('sales_materials')
-      .select('id, organization_id, title, file_path, file_type, file_size')
+      .select('id, organization_id, title, file_path, mime_type, size_bytes')
       .eq('id', id)
       .eq('organization_id', organization.id);
 
@@ -97,13 +98,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     // ファイル名の決定
     const fileName = material.title || `material_${material.id}`;
-    const fileExtension = material.file_type ? 
-      material.file_type.split('/').pop() : 
+    const fileExtension = material.mime_type ?
+      material.mime_type.split('/').pop() :
       material.file_path.split('.').pop() || 'bin';
 
     // レスポンスヘッダーの設定
     const headers = new Headers();
-    headers.set('Content-Type', material.file_type || 'application/octet-stream');
+    headers.set('Content-Type', material.mime_type || 'application/octet-stream');
     headers.set('Content-Disposition', `attachment; filename="${fileName}.${fileExtension}"`);
     headers.set('Cache-Control', 'private, max-age=0');
 

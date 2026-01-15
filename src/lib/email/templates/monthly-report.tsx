@@ -245,7 +245,7 @@ export function MonthlyReportEmailTemplate({
             </div>
             
             <p>
-              いつもAIO Hubをご利用いただき、ありがとうございます。<br />
+              いつもAIOHubをご利用いただき、ありがとうございます。<br />
               {reportPeriod}の月次レポートが完成いたしました。
             </p>
             
@@ -304,7 +304,7 @@ export function MonthlyReportEmailTemplate({
           
           <div className="footer">
             <p>
-              <strong>AIO Hub</strong> - AI可視化分析サービス<br />
+              <strong>AIOHub</strong> - AI可視化分析サービス<br />
               <a href="https://aiohub.jp">aiohub.jp</a> | 
               <a href="https://aiohub.jp/support">サポート</a>
             </p>
@@ -538,7 +538,7 @@ export function renderMonthlyReportEmail(props: MonthlyReportEmailProps): string
       </div>
       
       <p>
-        いつもAIO Hubをご利用いただき、ありがとうございます。<br />
+        いつもAIOHubをご利用いただき、ありがとうございます。<br />
         ${props.reportPeriod}の月次レポートが完成いたしました。
       </p>
       
@@ -597,7 +597,7 @@ export function renderMonthlyReportEmail(props: MonthlyReportEmailProps): string
     
     <div class="footer">
       <p>
-        <strong>AIO Hub</strong> - AI可視化分析サービス<br />
+        <strong>AIOHub</strong> - AI可視化分析サービス<br />
         <a href="https://aiohub.jp">aiohub.jp</a> | 
         <a href="https://aiohub.jp/support">サポート</a>
       </p>

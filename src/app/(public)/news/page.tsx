@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { newsData, getCategoryStyle, getCategoryLabel } from '@/data/news';
 
 export const metadata: Metadata = {
-  title: 'お知らせ | AIO Hub',
-  description: 'AIO Hubの最新情報、機能追加、メンテナンス情報をお知らせします。',
+  title: 'お知らせ | AIOHub',
+  description: 'AIOHubの最新情報、機能追加、メンテナンス情報をお知らせします。',
 };
 
 export default function NewsPage() {
@@ -16,7 +16,7 @@ export default function NewsPage() {
         <div className="text-center mb-12">
           <h1 className="text-title1 text-gray-900 mb-4">最新のお知らせ</h1>
           <p className="text-body-large text-gray-600">
-            AIO Hubの最新情報、機能追加、重要な更新をお知らせします
+            AIOHubの最新情報、機能追加、重要な更新をお知らせします
           </p>
         </div>
 

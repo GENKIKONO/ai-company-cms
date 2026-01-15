@@ -156,7 +156,7 @@ export const getAIOHubProducts = async () => {
     });
     return products.data;
   } catch (error) {
-    logger.error('Error fetching AIO Hub products', { data: error instanceof Error ? error : new Error(String(error)) });
+    logger.error('Error fetching AIOHub products', { data: error instanceof Error ? error : new Error(String(error)) });
     return [];
   }
 };
@@ -205,7 +205,7 @@ export const createAIOHubProducts = async () => {
     
     return products;
   } catch (error) {
-    logger.error('Error creating AIO Hub products', { data: error instanceof Error ? error : new Error(String(error)) });
+    logger.error('Error creating AIOHub products', { data: error instanceof Error ? error : new Error(String(error)) });
     throw error;
   }
 };

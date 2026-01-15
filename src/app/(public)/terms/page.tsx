@@ -3,15 +3,15 @@ import InfoPageShell from '@/components/common/InfoPageShell';
 import { SITE_CONFIG } from '@/lib/site-config';
 
 export const metadata: Metadata = {
-  title: '利用規約 | AIO Hub',
-  description: 'AIO Hub（LuxuCare株式会社）の利用規約です。',
+  title: '利用規約 | AIOHub',
+  description: 'AIOHub（LuxuCare株式会社）の利用規約です。',
 };
 
 export default function TermsPage() {
   const sections = [
     {
       title: '第1条（適用）',
-      description: `本利用規約（以下「本規約」）は、${SITE_CONFIG.companyName}（以下「当社」）が提供するAIO Hub（以下「本サービス」）の利用に関して、本サービスを利用するお客様（以下「利用者」）と当社との間の権利義務関係を定めることを目的とし、利用者と当社との間の本サービスの利用に関わる一切の関係に適用されます。`
+      description: `本利用規約（以下「本規約」）は、${SITE_CONFIG.companyName}（以下「当社」）が提供するAIOHub（以下「本サービス」）の利用に関して、本サービスを利用するお客様（以下「利用者」）と当社との間の権利義務関係を定めることを目的とし、利用者と当社との間の本サービスの利用に関わる一切の関係に適用されます。`
     },
     {
       title: '第2条（利用登録）',
@@ -74,7 +74,7 @@ export default function TermsPage() {
   return (
     <InfoPageShell
       title="利用規約"
-      description="AIO Hubサービスのご利用にあたって"
+      description="AIOHubサービスのご利用にあたって"
       sections={sections}
       variant="policy"
     />

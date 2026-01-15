@@ -10,24 +10,24 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@aiohub.ai';
 // Email templates
 export const EMAIL_TEMPLATES = {
   WELCOME: {
-    subject: 'AIO Hub AI企業CMSへようこそ！',
+    subject: 'AIOHub AI企業CMSへようこそ！',
     getHtml: (userName: string) => `
       <!DOCTYPE html>
       <html>
         <head>
           <meta charset="utf-8">
-          <title>AIO Hub AI企業CMSへようこそ</title>
+          <title>AIOHub AI企業CMSへようこそ</title>
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: var(--color-email-text);">
           <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 40px;">
-              <h1 style="color: var(--color-email-primary); margin: 0;">AIO Hub AI企業CMS</h1>
+              <h1 style="color: var(--color-email-primary); margin: 0;">AIOHub AI企業CMS</h1>
               <p style="color: var(--text-muted); margin: 10px 0 0 0;">企業情報管理プラットフォーム</p>
             </div>
             
             <div style="background: var(--color-email-background); padding: 30px; border-radius: 8px; margin-bottom: 30px;">
               <h2 style="color: var(--color-email-dark); margin: 0 0 20px 0;">ようこそ、${userName}さん！</h2>
-              <p style="margin: 0 0 20px 0;">AIO Hub AI企業CMSにご登録いただき、ありがとうございます。</p>
+              <p style="margin: 0 0 20px 0;">AIOHub AI企業CMSにご登録いただき、ありがとうございます。</p>
               <p style="margin: 0 0 20px 0;">このプラットフォームでは、以下のことができます：</p>
               
               <ul style="padding-left: 20px; margin: 0 0 20px 0;">
@@ -57,11 +57,11 @@ export const EMAIL_TEMPLATES = {
       </html>
     `,
     getText: (userName: string) => `
-AIO Hub AI企業CMSへようこそ！
+AIOHub AI企業CMSへようこそ！
 
 ${userName}さん、
 
-AIO Hub AI企業CMSにご登録いただき、ありがとうございます。
+AIOHub AI企業CMSにご登録いただき、ありがとうございます。
 
 このプラットフォームでは、以下のことができます：
 - 企業情報の登録・管理
@@ -74,7 +74,7 @@ AIO Hub AI企業CMSにご登録いただき、ありがとうございます。
 
 ご質問がございましたら、support@aiohub.ai までお問い合わせください。
 
-AIO Hub チーム
+AIOHub チーム
     `
   },
 
@@ -156,7 +156,7 @@ ${userName}さん、
 
 お問い合わせ: support@aiohub.ai
 
-AIO Hub チーム
+AIOHub チーム
     `
   }
 } as const;

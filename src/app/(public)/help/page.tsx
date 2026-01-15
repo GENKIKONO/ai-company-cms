@@ -23,10 +23,10 @@ export default function HelpPage() {
               <div className="space-y-4">
                 <details className="border border-gray-200 rounded-lg p-4">
                   <summary className="font-medium text-gray-800 cursor-pointer">
-                    AIO Hubとは何ですか？
+                    AIOHubとは何ですか？
                   </summary>
                   <p className="mt-2 text-gray-600">
-                    AIO Hubは、AI企業の情報を一元管理し、構造化データとして公開できるプラットフォームです。
+                    AIOHubは、AI企業の情報を一元管理し、構造化データとして公開できるプラットフォームです。
                     企業情報をJSON-LD形式で出力し、検索エンジンでの表示を最適化します。
                   </p>
                 </details>

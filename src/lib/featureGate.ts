@@ -23,18 +23,16 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { cache } from 'react';
 
-// NOTE: [CLIENT_IMPORT_CHAIN_FIX] サーバーサイドモジュールを静的インポートすると
-// supabase-admin-client.ts (server-only) も引き込まれ、クライアントコンポーネント
-// からインポートされた場合にビルドエラーになる。
-// webpackIgnore を使用してビルド時のモジュール解析を回避。
+// NOTE: [CLIENT_IMPORT_CHAIN_FIX] サーバーサイドモジュールを動的インポート
+// webpackIgnore は削除（ランタイムでエイリアス解決できないため）
 const getSupabaseClient = async () => {
-  const mod = await import(/* webpackIgnore: true */ '@/lib/supabase/server');
+  const mod = await import('@/lib/supabase/server');
   return mod.createClient();
 };
 
 // auth-state.ts も supabase/server.ts を静的インポートするため動的インポートでラップ
 const getUserWithClientDynamic = async (supabase: SupabaseClient) => {
-  const mod = await import(/* webpackIgnore: true */ '@/lib/core/auth-state');
+  const mod = await import('@/lib/core/auth-state');
   return mod.getUserWithClient(supabase);
 };
 
@@ -1009,8 +1007,20 @@ export async function fetchOrgQuotaUsage(
   if (typeof window !== 'undefined') {
     throw new Error('fetchOrgQuotaUsage can only be called on the server side');
   }
-  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/quota');
-  return mod.fetchOrgQuotaUsage(organizationId, featureKey as any);
+  try {
+    const mod = await import('@/lib/org-features/quota');
+    return mod.fetchOrgQuotaUsage(organizationId, featureKey as any);
+  } catch (err) {
+    // NOTE: 動的インポート失敗時はエラー情報を返す
+    // eslint-disable-next-line no-console
+    console.error('[featureGate] fetchOrgQuotaUsage dynamic import failed:', err);
+    return {
+      error: {
+        type: 'unknown',
+        message: '機能使用量の取得に失敗しました',
+      }
+    };
+  }
 }
 
 /**
@@ -1025,8 +1035,15 @@ export async function isFeatureQuotaLimitReached(
   if (typeof window !== 'undefined') {
     throw new Error('isFeatureQuotaLimitReached can only be called on the server side');
   }
-  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/quota');
-  return mod.isFeatureQuotaLimitReached(organizationId, featureKey as any);
+  try {
+    const mod = await import('@/lib/org-features/quota');
+    return mod.isFeatureQuotaLimitReached(organizationId, featureKey as any);
+  } catch (err) {
+    // NOTE: 動的インポート失敗時はエラーログを出して安全側（true=上限到達扱い）で返す
+    // eslint-disable-next-line no-console
+    console.error('[featureGate] isFeatureQuotaLimitReached dynamic import failed:', err);
+    return true;
+  }
 }
 
 // =============================================================================
@@ -1047,8 +1064,15 @@ export async function canUseFeature(orgId: string, featureKey: string): Promise<
   if (typeof window !== 'undefined') {
     throw new Error('canUseFeature can only be called on the server side');
   }
-  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/effective-features');
-  return mod.canUseFeature(orgId, featureKey);
+  try {
+    const mod = await import('@/lib/org-features/effective-features');
+    return mod.canUseFeature(orgId, featureKey);
+  } catch (err) {
+    // NOTE: 動的インポート失敗時はエラーログを出して安全側（false）で返す
+    // eslint-disable-next-line no-console
+    console.error('[featureGate] canUseFeature dynamic import failed:', err);
+    return false;
+  }
 }
 
 /**
@@ -1061,8 +1085,15 @@ export async function getOrgFeatureLimit(orgId: string, featureKey: string): Pro
   if (typeof window !== 'undefined') {
     throw new Error('getOrgFeatureLimit can only be called on the server side');
   }
-  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/effective-features');
-  return mod.getFeatureLimit(orgId, featureKey);
+  try {
+    const mod = await import('@/lib/org-features/effective-features');
+    return mod.getFeatureLimit(orgId, featureKey);
+  } catch (err) {
+    // NOTE: 動的インポート失敗時はエラーログを出して安全側（null=制限なし情報なし）で返す
+    // eslint-disable-next-line no-console
+    console.error('[featureGate] getOrgFeatureLimit dynamic import failed:', err);
+    return null;
+  }
 }
 
 /**
@@ -1075,8 +1106,15 @@ export async function getFeatureLevel(orgId: string, featureKey: string): Promis
   if (typeof window !== 'undefined') {
     throw new Error('getFeatureLevel can only be called on the server side');
   }
-  const mod = await import(/* webpackIgnore: true */ '@/lib/org-features/effective-features');
-  return mod.getFeatureLevel(orgId, featureKey);
+  try {
+    const mod = await import('@/lib/org-features/effective-features');
+    return mod.getFeatureLevel(orgId, featureKey);
+  } catch (err) {
+    // NOTE: 動的インポート失敗時はエラーログを出して安全側（null）で返す
+    // eslint-disable-next-line no-console
+    console.error('[featureGate] getFeatureLevel dynamic import failed:', err);
+    return null;
+  }
 }
 
 // Type re-exports (サーバーサイドモジュールへの依存を避けるため @/types/features から取得)

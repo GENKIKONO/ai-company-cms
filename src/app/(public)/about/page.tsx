@@ -7,8 +7,8 @@ import AioSection from '@/components/layout/AioSection';
 export const revalidate = 1800; // 30分間隔での再生成
 
 export const metadata: Metadata = {
-  title: 'サービス概要 | AIO Hub AI企業CMS',
-  description: 'AIO Hub AI企業CMSのサービス概要。AI技術を活用した企業情報の統合管理プラットフォームについて詳しくご説明します。',
+  title: 'サービス概要 | AIOHub AI企業CMS',
+  description: 'AIOHub AI企業CMSのサービス概要。AI技術を活用した企業情報の統合管理プラットフォームについて詳しくご説明します。',
   keywords: ['AI', 'CMS', '企業管理', 'サービス概要', 'DX'],
 };
 
@@ -17,11 +17,11 @@ export default function AboutPage() {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: 'サービス概要',
-    description: 'AIO Hub AI企業CMSのサービス概要',
+    description: 'AIOHub AI企業CMSのサービス概要',
     url: 'https://aiohub.jp/about',
     isPartOf: {
       '@type': 'WebSite',
-      name: 'AIO Hub AI企業CMS',
+      name: 'AIOHub AI企業CMS',
       url: 'https://aiohub.jp'
     }
   };

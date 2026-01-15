@@ -1,6 +1,6 @@
 /**
  * SWR用データフェッチャー
- * AIO Hub API エンドポイント用の汎用フェッチャー
+ * AIOHub API エンドポイント用の汎用フェッチャー
  */
 
 import type { JsonValue } from '@/lib/utils/ab-testing';

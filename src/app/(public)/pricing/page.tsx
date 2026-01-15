@@ -6,8 +6,8 @@ import AioSection from '@/components/layout/AioSection';
 export const revalidate = 1800; // 30分間隔での再生成
 
 export const metadata: Metadata = {
-  title: '料金プラン - AI最適化CMSサービス | AIO Hub',
-  description: 'AIO HubのAI最適化料金プラン。無料から始められ、本格運用は月額5,000円〜。JSON-LD自動生成とCMS管理で企業情報をAI検索に最適化。',
+  title: '料金プラン - AI最適化CMSサービス | AIOHub',
+  description: 'AIOHubのAI最適化料金プラン。無料から始められ、本格運用は月額5,000円〜。JSON-LD自動生成とCMS管理で企業情報をAI検索に最適化。',
   keywords: ['料金プラン', 'AIO', 'JSON-LD', '構造化データ', 'AI最適化', 'CMS'],
 };
 
@@ -16,11 +16,11 @@ export default function PricingPage() {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: '料金プラン',
-    description: 'AIO Hub AI最適化CMSの料金プラン。無料から企業向けプランまで。',
+    description: 'AIOHub AI最適化CMSの料金プラン。無料から企業向けプランまで。',
     url: 'https://aiohub.jp/pricing',
     isPartOf: {
       '@type': 'WebSite',
-      name: 'AIO Hub',
+      name: 'AIOHub',
       url: 'https://aiohub.jp'
     }
   };

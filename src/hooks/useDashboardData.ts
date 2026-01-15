@@ -10,11 +10,37 @@
  * - リアルタイム更新対応（オプション）
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getDataSource, hasDataSourcePermission, type DataSourceKey } from '@/config/data-sources';
 import { allowedViews, isAllowedView, type AllowedViewName } from '@/lib/allowlist';
 import type { UserRole } from '@/types/utils/database';
+
+// =====================================================
+// ENVIRONMENT VALIDATION (run once at module load)
+// =====================================================
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+// Log environment check once at startup
+if (typeof window !== 'undefined') {
+  // eslint-disable-next-line no-console
+  console.debug('[useDashboardData] ENV CHECK:', {
+    SUPABASE_URL: SUPABASE_URL ? `${SUPABASE_URL.substring(0, 30)}...` : 'UNDEFINED',
+    SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? `${SUPABASE_ANON_KEY.substring(0, 10)}...` : 'UNDEFINED',
+    isValidUrl: SUPABASE_URL?.startsWith('https://') && SUPABASE_URL?.includes('.supabase.co'),
+  });
+}
+
+// Guard: prevent any fetch if env vars are missing
+const ENV_VALID = !!(SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL.startsWith('https://'));
+
+// =====================================================
+// STABLE DEFAULTS (prevent infinite re-render loops)
+// =====================================================
+
+const EMPTY_FILTERS: Record<string, unknown> = Object.freeze({});
 
 // =====================================================
 // HELPER FUNCTIONS
@@ -104,7 +130,7 @@ export function useDashboardData<T = Record<string, unknown>>(
   const {
     organizationId,
     userRole = 'viewer',
-    filters = {},
+    filters,
     select,
     orderBy,
     limit,
@@ -114,6 +140,9 @@ export function useDashboardData<T = Record<string, unknown>>(
     skipInitialFetch = false,
     transform,
   } = options;
+
+  // Use stable default for filters to prevent infinite re-render loops
+  const stableFilters = filters ?? EMPTY_FILTERS;
 
   // State
   const [data, setData] = useState<T[]>([]);
@@ -134,17 +163,68 @@ export function useDashboardData<T = Record<string, unknown>>(
 
   // Build filters with org scope
   const effectiveFilters = useMemo(() => {
-    const result: Record<string, unknown> = { ...filters };
+    const result: Record<string, unknown> = { ...stableFilters };
 
     if (config?.requiresOrgScope && organizationId) {
       result.organization_id = organizationId;
     }
 
     return result;
-  }, [config, organizationId, filters]);
+  }, [config, organizationId, stableFilters]);
 
-  // Fetch function
+  // Enabled guard: org-scoped sources require organizationId to be set
+  // This prevents queries from running before context is ready
+  const isEnabled = useMemo(() => {
+    if (!config) return false;
+    if (config.requiresOrgScope && !organizationId) return false;
+    return true;
+  }, [config, organizationId]);
+
+  // Track fetch state for debugging and preventing concurrent fetches
+  const fetchCountRef = useRef(0);
+  const inFlightRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const lastErrorTimeRef = useRef<number>(0);
+  const COOLDOWN_MS = 5000; // 5秒間のcooldown（エラー後の連打防止）
+
+  // Fetch function with inFlight guard and AbortController
   const fetchData = useCallback(async () => {
+    // ENV guard: prevent fetch if environment is invalid
+    if (!ENV_VALID) {
+      // eslint-disable-next-line no-console
+      console.error('[useDashboardData] BLOCKED: Invalid environment variables. SUPABASE_URL or ANON_KEY is missing/invalid.');
+      setError('環境設定エラー: Supabase接続情報が不正です');
+      setIsLoading(false);
+      return;
+    }
+
+    // inFlight guard: prevent concurrent fetches for the same query
+    if (inFlightRef.current) {
+      // eslint-disable-next-line no-console
+      console.debug(`[useDashboardData] SKIPPED: fetch already in flight for "${dataSourceKey}"`);
+      return;
+    }
+
+    // Cooldown guard: prevent rapid retries after error
+    const now = Date.now();
+    if (lastErrorTimeRef.current > 0 && now - lastErrorTimeRef.current < COOLDOWN_MS) {
+      // eslint-disable-next-line no-console
+      console.debug(`[useDashboardData] SKIPPED: cooldown active for "${dataSourceKey}" (${Math.ceil((COOLDOWN_MS - (now - lastErrorTimeRef.current)) / 1000)}s remaining)`);
+      return;
+    }
+
+    // Abort previous fetch if still pending
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
+    // Debug: track fetch execution count
+    fetchCountRef.current += 1;
+    const fetchId = fetchCountRef.current;
+    // eslint-disable-next-line no-console
+    console.debug(`[useDashboardData] fetchData #${fetchId} START for "${dataSourceKey}" (orgId: ${organizationId || 'null'})`);
+
     if (!config) {
       setError(`データソース "${dataSourceKey}" が見つかりません`);
       setIsLoading(false);
@@ -164,6 +244,8 @@ export function useDashboardData<T = Record<string, unknown>>(
       return;
     }
 
+    // Mark as in-flight
+    inFlightRef.current = true;
     setIsLoading(true);
     setError(null);
     setIsPermissionError(false);
@@ -196,6 +278,16 @@ export function useDashboardData<T = Record<string, unknown>>(
       const { data: result, error: fetchError } = await query;
 
       if (fetchError) {
+        // Detailed error logging for debugging network/preflight issues
+        // eslint-disable-next-line no-console
+        console.error(`[useDashboardData] fetchData #${fetchId} QUERY ERROR:`, {
+          table: config.table,
+          code: fetchError.code,
+          message: fetchError.message,
+          details: fetchError.details,
+          hint: fetchError.hint,
+          supabaseUrl: SUPABASE_URL?.substring(0, 40),
+        });
         throw new Error(fetchError.message || 'データの取得に失敗しました');
       }
 
@@ -216,21 +308,38 @@ export function useDashboardData<T = Record<string, unknown>>(
       const { count } = await countQuery;
       setTotalCount(count || 0);
 
+      // eslint-disable-next-line no-console
+      console.debug(`[useDashboardData] fetchData #${fetchId} SUCCESS: ${finalData.length} rows`);
+
     } catch (err) {
+      // Set cooldown to prevent rapid retries
+      lastErrorTimeRef.current = Date.now();
+
+      // Detailed error logging for network failures
+      const errorInfo = {
+        name: err instanceof Error ? err.name : 'Unknown',
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack?.split('\n').slice(0, 3).join('\n') : undefined,
+      };
+      // eslint-disable-next-line no-console
+      console.error(`[useDashboardData] fetchData #${fetchId} CATCH ERROR:`, errorInfo);
+
       const message = err instanceof Error ? err.message : 'データの取得に失敗しました';
       setError(message);
       setData([]);
     } finally {
+      // Reset inFlight flag
+      inFlightRef.current = false;
       setIsLoading(false);
     }
   }, [config, hasPermission, organizationId, effectiveFilters, select, orderBy, limit, offset, transform, dataSourceKey]);
 
-  // Initial fetch
+  // Initial fetch - only when enabled (organizationId confirmed for org-scoped sources)
   useEffect(() => {
-    if (!skipInitialFetch) {
+    if (!skipInitialFetch && isEnabled) {
       fetchData();
     }
-  }, [fetchData, skipInitialFetch]);
+  }, [fetchData, skipInitialFetch, isEnabled]);
 
   // Realtime subscription
   useEffect(() => {
@@ -305,7 +414,9 @@ export function useDashboardCount(
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { organizationId, filters = {} } = options;
+  const { organizationId, filters } = options;
+  // Use stable default for filters to prevent infinite re-render loops
+  const stableFilters = filters ?? EMPTY_FILTERS;
   const config = getDataSource(dataSourceKey);
 
   const fetchCount = useCallback(async () => {
@@ -319,7 +430,7 @@ export function useDashboardCount(
     setError(null);
 
     try {
-      const effectiveFilters: Record<string, unknown> = { ...filters };
+      const effectiveFilters: Record<string, unknown> = { ...stableFilters };
       if (config.requiresOrgScope && organizationId) {
         effectiveFilters.organization_id = organizationId;
       }
@@ -344,7 +455,7 @@ export function useDashboardCount(
     } finally {
       setIsLoading(false);
     }
-  }, [config, dataSourceKey, organizationId, filters]);
+  }, [config, dataSourceKey, organizationId, stableFilters]);
 
   useEffect(() => {
     fetchCount();

@@ -30,7 +30,7 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
               href="/" 
               className="focus-clean text-2xl font-bold text-gray-900 hover:text-[var(--aio-primary)]"
             >
-              AIO Hub AI企業CMS
+              AIOHub AI企業CMS
             </Link>
             {isAuthenticated && (
               <nav className="ml-10 hidden md:flex space-x-8">

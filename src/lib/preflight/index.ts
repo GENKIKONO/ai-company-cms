@@ -205,7 +205,7 @@ async function checkDomainValidation(org: Organization): Promise<PreflightCheck>
     if (isOwnSubdomain) {
       // 自社サブドメイン: 自動でOK
       check.status = 'pass';
-      check.message = 'Using AIO Hub subdomain (automatic configuration)';
+      check.message = 'Using AIOHub subdomain (automatic configuration)';
     } else {
       // 独自ドメイン: CNAME検証が必要（簡易版）
       check.status = 'warning';

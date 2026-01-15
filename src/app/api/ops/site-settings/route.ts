@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
 
     // データがない場合はデフォルト値を返す
     const defaultSettings = {
-      hero_title: 'AIO Hub AI企業CMS',
+      hero_title: 'AIOHub AI企業CMS',
       hero_subtitle: 'AI技術を活用した企業情報の統合管理プラットフォーム',
       representative_message: '私たちは、AI技術を通じて企業の情報発信を支援し、より良いビジネス成果の実現をお手伝いします。',
       footer_links: []

@@ -1,5 +1,5 @@
 /**
- * LuxuCare CMS プラン設定
+ * AIOHub プラン設定
  * 料金・制限・機能の一元管理
  * 
  * TODO: [SUPABASE_PLAN_MISMATCH] 下記設定は Supabase plan_features テーブルと矛盾する部分があります

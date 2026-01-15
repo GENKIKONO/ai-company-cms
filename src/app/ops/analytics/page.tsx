@@ -6,7 +6,7 @@ import { requireOpsAdminPage } from '@/lib/ops-guard';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'API使用状況 - AIO Hub 運用管理',
+  title: 'API使用状況 - AIOHub 運用管理',
   description: 'API使用パターン分析とパフォーマンス監視ダッシュボード'
 };
 

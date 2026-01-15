@@ -8,16 +8,19 @@
 export type SalesAction = 'view' | 'download';
 
 // Core Sales Types
+// NOTE: DBスキーマ (sales_materials) に合わせた型定義
 export interface SalesMaterial {
   id: string;
-  organization_id: string;
+  organization_id: string | null;
   title: string;
+  description?: string | null;
   file_path: string;
-  file_type?: string;
-  file_size?: number;
-  uploaded_by: string;
+  mime_type?: string | null;
+  size_bytes?: number | null;
+  is_public?: boolean;
+  status?: string | null;
+  created_by?: string | null;
   created_at: string;
-  updated_at: string;
 }
 
 export interface SalesMaterialStat {

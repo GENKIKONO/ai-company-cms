@@ -12,6 +12,7 @@
     "start": "next start",
     "lint": "next lint && npm run check:routes && npm run check:crash-vectors",
     "check:architecture": "bash scripts/check-architecture.sh",
+    "check:tailwind": "bash scripts/check-tailwind-colors.sh",
     "check:predeploy": "node scripts/predeploy-check.mjs",
     "check:routes": "node scripts/check-hardcoded-dashboard-routes.mjs",
     "check:routes:update-baseline": "node scripts/check-hardcoded-dashboard-routes.mjs --update",

@@ -5,15 +5,15 @@ import InfoPageShell from '@/components/common/InfoPageShell';
 export const revalidate = 1800; // 30分間隔での再生成
 
 export const metadata: Metadata = {
-  title: '機能一覧 | AIO Hub',
-  description: 'AIO Hubで現在提供している機能の一覧です。',
+  title: '機能一覧 | AIOHub',
+  description: 'AIOHubで現在提供している機能の一覧です。',
 };
 
 export default function FeaturesPage() {
   const sections = [
     {
       title: '主要機能',
-      description: 'AIO Hubで現在提供している機能の一覧です。',
+      description: 'AIOHubで現在提供している機能の一覧です。',
       items: [
         {
           title: 'AI検索最適化',
@@ -46,7 +46,7 @@ export default function FeaturesPage() {
   return (
     <InfoPageShell
       title="機能一覧"
-      description="AIO Hubで現在提供している機能の一覧です。"
+      description="AIOHubで現在提供している機能の一覧です。"
       sections={sections}
     />
   );

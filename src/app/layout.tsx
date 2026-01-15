@@ -7,7 +7,7 @@ import { UIProvider } from "@/lib/core/ui-provider";
 import { ErrorBoundary } from "@/lib/core/error-boundary";
 
 export const metadata: Metadata = {
-  title: "AIO Hub",
+  title: "AIOHub",
   description: "AI-optimized CMS for enterprise visibility",
   robots: "index, follow",
 };

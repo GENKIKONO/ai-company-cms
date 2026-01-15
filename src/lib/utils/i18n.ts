@@ -344,7 +344,7 @@ export const translations: Record<SupportedLocale, TranslationDictionary> = {
       services: 'サービス',
       caseStudies: '事例',
       blog: 'ブログ',
-      about: 'AIO Hubについて',
+      about: 'AIOHubについて',
       contact: 'お問い合わせ',
       login: 'ログイン',
       signup: '新規登録',
@@ -457,7 +457,7 @@ export const translations: Record<SupportedLocale, TranslationDictionary> = {
       }
     },
     messages: {
-      welcome: 'AIO Hubへようこそ',
+      welcome: 'AIOHubへようこそ',
       success: {
         created: '作成しました',
         updated: '更新しました',
@@ -475,26 +475,26 @@ export const translations: Record<SupportedLocale, TranslationDictionary> = {
     },
     seo: {
       title: {
-        home: 'AIO Hub - AI・DX企業ディレクトリ',
-        organizations: '企業一覧 - AIO Hub',
-        search: '企業検索 - AIO Hub',
-        about: 'AIO Hubについて',
-        contact: 'お問い合わせ - AIO Hub'
+        home: 'AIOHub - AI・DX企業ディレクトリ',
+        organizations: '企業一覧 - AIOHub',
+        search: '企業検索 - AIOHub',
+        about: 'AIOHubについて',
+        contact: 'お問い合わせ - AIOHub'
       },
       description: {
         home: 'AI・DX領域の企業情報を集約したディレクトリサービス。企業詳細、サービス、事例を検索・比較できます。',
         organizations: 'AI・DX企業の一覧ページ。業界、規模、サービス内容で企業を検索・比較できます。',
         search: 'AI・DX企業の検索ページ。キーワード、カテゴリ、地域で企業を絞り込めます。',
-        about: 'AIO Hubは、AI・DX領域の企業情報を集約したディレクトリサービスです。',
-        contact: 'AIO Hubへのお問い合わせ。サービスに関するご質問やご相談をお受けします。'
+        about: 'AIOHubは、AI・DX領域の企業情報を集約したディレクトリサービスです。',
+        contact: 'AIOHubへのお問い合わせ。サービスに関するご質問やご相談をお受けします。'
       }
     },
     pages: {
       home: {
-        title: 'AIO Hub - AI・DX企業ディレクトリ',
+        title: 'AIOHub - AI・DX企業ディレクトリ',
         description: 'AI技術を活用した企業情報の統合管理プラットフォーム',
         hero: {
-          title: 'AIO Hub AI企業CMS',
+          title: 'AIOHub AI企業CMS',
           subtitle: 'AI技術を活用した企業情報の統合管理プラットフォーム',
           viewDirectory: '企業ディレクトリを見る'
         },
@@ -541,13 +541,13 @@ export const translations: Record<SupportedLocale, TranslationDictionary> = {
           contact: 'お問い合わせ',
           terms: '利用規約',
           privacy: 'プライバシーポリシー',
-          copyright: '© 2025 AIO Hub. All rights reserved.'
+          copyright: '© 2025 AIOHub. All rights reserved.'
         }
       }
     },
     ui: {
       header: {
-        title: 'AIO Hub AI企業CMS',
+        title: 'AIOHub AI企業CMS',
         dashboard: 'ダッシュボード'
       },
       common: {

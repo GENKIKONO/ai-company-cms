@@ -59,9 +59,10 @@ export async function GET(request: NextRequest) {
     }
 
     // サービス取得（セキュアビュー経由、RLSにより組織メンバーのみアクセス可能）
+    // NOTE: v_dashboard_services_secure には description, duration_months, category, price カラムがないため除外
     const { data: services, error: servicesError } = await supabase
       .from('v_dashboard_services_secure')
-      .select('id, title, slug, status, is_published, published_at, organization_id, description, duration_months, category, price, created_at, updated_at, summary')
+      .select('id, title, slug, status, is_published, published_at, organization_id, created_at, updated_at, summary')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false });
 

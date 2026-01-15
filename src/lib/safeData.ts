@@ -122,22 +122,13 @@ export async function getCaseStudiesStatsSafe(orgId?: string): Promise<SafeDataR
     return { data: stats };
 
   } catch (error) {
-    const errorId = `case-studies-stats-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // API未実装の場合は警告レベルでログ（開発オーバーレイを表示しない）
     const errorNote = error instanceof Error ? error.message : 'Unknown error';
-    
-    logger.error('[getCaseStudiesStatsSafe] Error', { data: error instanceof Error ? error : new Error(String(error)) });
-    
-    await logToDiag({
-      errorId,
-      at: 'getCaseStudiesStatsSafe', 
-      note: errorNote
-    });
+    logger.warn('[getCaseStudiesStatsSafe] API not available, using defaults', { note: errorNote });
 
-    // エラー時もデフォルト値を返す
-    return { 
-      data: { total: 0, published: 0 },
-      error: errorNote,
-      errorId
+    // エラー時もデフォルト値を返す（正常なフォールバック）
+    return {
+      data: { total: 0, published: 0 }
     };
   }
 }

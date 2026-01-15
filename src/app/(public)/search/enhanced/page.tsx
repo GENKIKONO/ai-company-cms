@@ -53,7 +53,7 @@ function EnhancedSearchForm() {
 
   // SEO設定
   useSEO({
-    title: filters.query ? `"${filters.query}"の検索結果 | AIO Hub` : '高度検索 | AIO Hub',
+    title: filters.query ? `"${filters.query}"の検索結果 | AIOHub` : '高度検索 | AIOHub',
     description: 'AI・DX企業の高度検索。詳細なフィルタリングで理想の企業・サービス・事例を見つけましょう。',
     canonical: 'https://aiohub.jp/search/enhanced',
     keywords: ['AI企業検索', '高度検索', 'フィルタリング', 'DX', 'デジタル変革']
@@ -142,7 +142,7 @@ function EnhancedSearchForm() {
   // シェア機能
   const handleShare = useCallback(async (item: any) => {
     const url = window.location.origin + (item.slug ? `/o/${item.slug}` : '#');
-    const text = `${item.name || item.title} | AIO Hub`;
+    const text = `${item.name || item.title} | AIOHub`;
     
     if (navigator.share) {
       try {

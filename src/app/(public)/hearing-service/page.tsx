@@ -20,11 +20,11 @@ import { generateHearingServiceJsonLD } from '@/lib/generatePricingJsonLD';
 export const revalidate = 1800; // 30分間隔での再生成
 
 export const metadata: Metadata = {
-  title: 'AI最適化ヒアリング代行サービス | LuxuCare CMS',
+  title: 'AI最適化ヒアリング代行サービス | AIOHub',
   description: '企業情報をAIに理解される形へ。1時間のヒアリングで自社データを最適化。専任スタッフが企業の魅力を構造化し、検索性・発見性を向上させます。',
   keywords: 'ヒアリング代行, AI最適化, 企業情報, データ構造化, CMS, DX支援',
   openGraph: {
-    title: 'AI最適化ヒアリング代行サービス | LuxuCare CMS',
+    title: 'AI最適化ヒアリング代行サービス | AIOHub',
     description: '企業情報をAIに理解される形へ。1時間のヒアリングで自社データを最適化。',
     type: 'website',
     locale: 'ja_JP',

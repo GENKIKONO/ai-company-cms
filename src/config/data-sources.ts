@@ -181,7 +181,8 @@ export const DATA_SOURCES: Record<string, DataSourceConfig> = {
   sales_materials: {
     table: 'sales_materials',
     displayName: '営業資料',
-    defaultSelect: 'id, title, description, file_url, file_type, file_size, download_count, created_at, updated_at',
+    // NOTE: 実際のDBカラム名に合わせる（file_path, mime_type, size_bytes）
+    defaultSelect: 'id, title, description, file_path, mime_type, size_bytes, created_at, organization_id, is_public, status',
     defaultOrder: { column: 'created_at', ascending: false },
     permissions: {
       read: ['viewer', 'editor', 'admin'],

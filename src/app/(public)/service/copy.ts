@@ -13,7 +13,7 @@ export const serviceCopy = {
     items: [
       '企業：最新の会社情報・サービス情報を届けたい',
       'ユーザー：AIの回答内で信頼できる選択肢をすばやく比較したい',
-      'AIO Hub：AIが読みやすい構造で企業情報を整える場',
+      'AIOHub：AIが読みやすい構造で企業情報を整える場',
     ],
   },
 
@@ -30,7 +30,7 @@ export const serviceCopy = {
   // BigIdea (ビッグアイデア)
   bigIdea: {
     title: '"AIに読まれるかたち"で、企業情報をワンストップ管理',
-    description: 'AIO Hubは、入力した企業データを"AI最適化済み"のページに自動整形。AIにも検索にも理解されやすい構造へ。',
+    description: 'AIOHubは、入力した企業データを"AI最適化済み"のページに自動整形。AIにも検索にも理解されやすい構造へ。',
   },
 
   // Solution (解決策)
@@ -61,7 +61,7 @@ export const serviceCopy = {
 
   // メタデータ
   metadata: {
-    title: 'サービス概要 - AIO Hub',
-    description: 'AIO HubはAIが理解しやすい構造で企業情報を管理・公開するプラットフォーム。検索しない時代に向けた企業のAIO対策を支援します。',
+    title: 'サービス概要 - AIOHub',
+    description: 'AIOHubはAIが理解しやすい構造で企業情報を管理・公開するプラットフォーム。検索しない時代に向けた企業のAIO対策を支援します。',
   },
 } as const;

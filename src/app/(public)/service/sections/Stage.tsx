@@ -17,7 +17,7 @@ export default function Stage() {
               {serviceCopy.stage.title}
             </h1>
             <p className="hig-text-body text-[var(--color-text-secondary)] mb-[var(--space-xl)] hig-jp-body leading-relaxed">
-              ユーザーはChatGPTやGeminiなどのAIに「調べてもらう」のが当たり前に。AIO HubはAIが引用できる構造の情報を整え、貴社を選択肢から外さないための基盤を提供します。
+              ユーザーはChatGPTやGeminiなどのAIに「調べてもらう」のが当たり前に。AIOHubはAIが引用できる構造の情報を整え、貴社を選択肢から外さないための基盤を提供します。
             </p>
             
             <div className="flex flex-col sm:flex-row gap-[var(--space-md)]">

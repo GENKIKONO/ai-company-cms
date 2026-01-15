@@ -11,7 +11,7 @@ export default function FallbackHeader() {
               href="/" 
               className="text-2xl font-bold text-gray-900 hover:text-[var(--aio-primary)]"
             >
-              AIO Hub AI企業CMS
+              AIOHub AI企業CMS
             </Link>
           </div>
           

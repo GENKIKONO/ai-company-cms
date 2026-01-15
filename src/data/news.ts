@@ -17,7 +17,7 @@ export const newsData: NewsItem[] = [
     id: '2025-01-15-1',
     date: '2025-01-15',
     category: 'general',
-    title: 'AIO Hub 開発状況のお知らせ',
+    title: 'AIOHub 開発状況のお知らせ',
     body: '現在、管理画面機能の強化を進めています。ユーザビリティの向上とセキュリティの強化に取り組んでおります。',
     last_modified: '2025-01-15'
   },

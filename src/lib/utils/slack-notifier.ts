@@ -51,7 +51,7 @@ export class SlackNotifier {
     try {
       const payload = {
         channel: message.channel || this.defaultChannel,
-        username: message.username || 'AIO Hub Alert',
+        username: message.username || 'AIOHub Alert',
         icon_emoji: message.icon_emoji || ':warning:',
         ...message
       };
@@ -109,7 +109,7 @@ export class SlackNotifier {
           short: true,
         },
       ],
-      footer: 'AIO Hub Error Monitoring',
+      footer: 'AIOHub Error Monitoring',
       ts: Math.floor(new Date(error.timestamp || Date.now()).getTime() / 1000),
     };
 
@@ -173,7 +173,7 @@ export class SlackNotifier {
         value: String(value),
         short: true,
       })),
-      footer: 'AIO Hub Webhook Monitoring',
+      footer: 'AIOHub Webhook Monitoring',
       ts: Math.floor(Date.now() / 1000),
     };
 
@@ -201,7 +201,7 @@ export class SlackNotifier {
       title: `🔒 Security Alert: ${alert.type.replace(/_/g, ' ').toUpperCase()}`,
       text: alert.description,
       fields: [],
-      footer: 'AIO Hub Security Monitoring',
+      footer: 'AIOHub Security Monitoring',
       ts: Math.floor(new Date(alert.timestamp || Date.now()).getTime() / 1000),
     };
 
@@ -266,7 +266,7 @@ export class SlackNotifier {
       title: event.title,
       text: event.description,
       fields: [],
-      footer: 'AIO Hub Business Events',
+      footer: 'AIOHub Business Events',
       ts: Math.floor(Date.now() / 1000),
     };
 
@@ -375,7 +375,7 @@ export class SlackNotifier {
           short: true,
         },
       ],
-      footer: 'AIO Hub Performance Monitoring',
+      footer: 'AIOHub Performance Monitoring',
       ts: Math.floor(Date.now() / 1000),
     };
 
@@ -433,7 +433,7 @@ export class SlackNotifier {
           short: true,
         },
       ],
-      footer: 'AIO Hub Web Vitals Monitoring',
+      footer: 'AIOHub Web Vitals Monitoring',
       ts: Math.floor(new Date(alert.timestamp).getTime() / 1000),
     };
 
@@ -505,7 +505,7 @@ export class SlackNotifier {
           short: true,
         },
       ],
-      footer: 'AIO Hub System Monitoring',
+      footer: 'AIOHub System Monitoring',
       ts: Math.floor(Date.now() / 1000),
     };
 

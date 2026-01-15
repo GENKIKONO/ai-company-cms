@@ -124,7 +124,7 @@ export function generateRss(options: RssFeedOptions): string {
     <description>${channelDescription}</description>
     <language>${language}</language>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
-    <generator>LuxuCare CMS RSS Generator</generator>
+    <generator>AIOHub RSS Generator</generator>
     <atom:link href="${baseUrl}/${organizationSlug ? `o/${organizationSlug}/` : ''}feed.xml" rel="self" type="application/rss+xml" />${items}
   </channel>
 </rss>`;

@@ -165,13 +165,13 @@ export class StructuredDataGenerator {
 
   generateWebSiteData(locale: string = 'ja'): WebSiteStructuredData {
     const siteNames = {
-      ja: 'AIO Hub - AI企業ディレクトリ',
-      en: 'AIO Hub - AI Enterprise Directory',
-      zh: 'AIO Hub - AI企业目录',
-      ko: 'AIO Hub - AI 기업 디렉토리',
-      es: 'AIO Hub - Directorio de Empresas AI',
-      fr: 'AIO Hub - Répertoire d\'entreprises IA',
-      de: 'AIO Hub - KI-Unternehmensverzeichnis',
+      ja: 'AIOHub - AI企業ディレクトリ',
+      en: 'AIOHub - AI Enterprise Directory',
+      zh: 'AIOHub - AI企业目录',
+      ko: 'AIOHub - AI 기업 디렉토리',
+      es: 'AIOHub - Directorio de Empresas AI',
+      fr: 'AIOHub - Répertoire d\'entreprises IA',
+      de: 'AIOHub - KI-Unternehmensverzeichnis',
     };
 
     const siteDescriptions = {

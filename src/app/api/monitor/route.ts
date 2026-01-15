@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/utils/logger';
+import { getUserWithClient } from '@/lib/core/auth-state';
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
@@ -25,8 +26,8 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    const user = await getUserWithClient(supabase);
+    if (!user) {
       return NextResponse.json({
         error: 'Unauthorized - Authentication required for monitoring'
       }, { status: 401 });

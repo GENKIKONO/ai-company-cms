@@ -65,9 +65,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // 営業資料の取得
+    // NOTE: DBスキーマに合わせたカラム名を使用
     const { data: materials, error } = await supabase
       .from('sales_materials')
-      .select('id, organization_id, title, file_path, file_type, file_size, uploaded_by, created_at, updated_at')
+      .select('id, organization_id, title, description, file_path, mime_type, size_bytes, is_public, status, created_by, created_at')
       .eq('id', id)
       .eq('organization_id', organizationId);
 

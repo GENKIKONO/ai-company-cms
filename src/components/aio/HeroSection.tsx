@@ -62,7 +62,7 @@ export default async function HeroSection({
             
             {/* 説明文 */}
             <p className="hig-text-body text-[var(--color-text-secondary)] mb-[var(--space-xl)] hig-jp-body">
-              AIO Hubは、AIが理解・引用しやすい形に企業情報を最適化するCMS。
+              AIOHubは、AIが理解・引用しやすい形に企業情報を最適化するCMS。
               フォーム入力だけで<strong>JSON‑LD自動生成</strong>と
               <strong>構造化公開</strong>を実現し、検索からAI回答までの導線で
               企業が"選ばれる"状態をつくります。
@@ -122,7 +122,7 @@ export default async function HeroSection({
         {/* 価値訴求カード */}
         <section className="hig-section">
           <h2 className="hig-text-h1 text-[var(--color-text-primary)] text-center mb-[var(--space-xl)] hig-jp-heading">
-            AIO Hubで実現する価値
+            AIOHubで実現する価値
           </h2>
           <div className="hig-grid hig-grid--4-cols">
             {benefits.map((benefit, index) => (

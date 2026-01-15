@@ -45,7 +45,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             </div>
             
             <h1 className="text-4xl font-bold text-gray-900 mb-3">
-              AIO Hub にログイン
+              AIOHub にログイン
             </h1>
             <p className="text-lg text-gray-600">
               AI企業情報プラットフォーム

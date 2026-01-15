@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: aioCopy.metadata.title,
     description: aioCopy.metadata.description,
     url: '/aio',
-    siteName: 'AIO Hub',
+    siteName: 'AIOHub',
     type: 'website',
     locale: 'ja_JP',
     images: [

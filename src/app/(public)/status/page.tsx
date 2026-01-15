@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import InfoPageShell from '@/components/common/InfoPageShell';
 
 export const metadata: Metadata = {
-  title: 'システム稼働状況 | AIO Hub',
-  description: 'AIO Hubのシステム稼働状況とサービス状態をリアルタイムで確認できます。',
+  title: 'システム稼働状況 | AIOHub',
+  description: 'AIOHubのシステム稼働状況とサービス状態をリアルタイムで確認できます。',
 };
 
 export default function StatusPage() {
@@ -63,7 +63,7 @@ export default function StatusPage() {
   return (
     <InfoPageShell
       title="システム稼働状況"
-      description="AIO Hubのサービス状態をリアルタイムで確認"
+      description="AIOHubのサービス状態をリアルタイムで確認"
       sections={sections}
     />
   );

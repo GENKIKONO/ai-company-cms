@@ -230,7 +230,7 @@ export const aioCopy = {
           },
           {
             question: '自社サイトにJSON-LDを設置する必要がありますか？',
-            answer: 'いいえ。AIO HubではホストされたページとしてJSON-LDが自動生成・公開されます。自社サイトへの技術的な変更は不要で、既存サイトとの連携も可能です。'
+            answer: 'いいえ。AIOHubではホストされたページとしてJSON-LDが自動生成・公開されます。自社サイトへの技術的な変更は不要で、既存サイトとの連携も可能です。'
           }
         ]
       },
@@ -268,7 +268,7 @@ export const aioCopy = {
 
   // メタデータ
   metadata: {
-    title: 'AIOとは - AI情報構造化で検索エンジン理解を支援 | AIO Hub',
+    title: 'AIOとは - AI情報構造化で検索エンジン理解を支援 | AIOHub',
     description: 'AIO（AI Information Optimization）で企業情報を構造化。JSON-LD自動生成とCMS管理で、検索エンジンやAIが解釈しやすい形での情報整備を支援。フリープラン永続無料。',
   },
 } as const;

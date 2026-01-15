@@ -363,7 +363,7 @@ ${xmlSitemaps}</sitemapindex>`;
       url,
       image,
       type = 'website',
-      siteName = 'AIO Hub',
+      siteName = 'AIOHub',
       locale = 'ja_JP',
       twitterCard = 'summary_large_image'
     } = options;

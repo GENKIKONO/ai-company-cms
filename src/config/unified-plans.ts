@@ -1,5 +1,5 @@
 /**
- * AIO Hub 統一価格設定
+ * AIOHub 統一価格設定
  * 
  * ⚠️ 価格の唯一の参照元（Single Source of Truth）
  * 全ての価格表示、Stripe設定、JSON-LD構造化データは必ずこのファイルを参照すること

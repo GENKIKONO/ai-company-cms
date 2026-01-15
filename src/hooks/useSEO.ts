@@ -113,8 +113,8 @@ export function useOrganizationSEO(organization: {
   address_region?: string;
   updated_at: string;
 }) {
-  const title = `${organization.name} | AIO Hub`;
-  const description = organization.description || `${organization.name}の企業情報をAIO Hubでチェック。`;
+  const title = `${organization.name} | AIOHub`;
+  const description = organization.description || `${organization.name}の企業情報をAIOHubでチェック。`;
   const canonical = sitemapGenerator.generateCanonicalUrl(`/o/${organization.slug}`);
   
   const location = [organization.address_locality, organization.address_region]
@@ -152,7 +152,7 @@ export function useServiceSEO(service: {
   name: string;
   slug: string;
 }) {
-  const title = `${service.name} - ${organization.name} | AIO Hub`;
+  const title = `${service.name} - ${organization.name} | AIOHub`;
   const description = service.description || `${organization.name}の${service.name}サービス詳細。`;
   const canonical = sitemapGenerator.generateCanonicalUrl(`/o/${organization.slug}/services/${service.id}`);
   
@@ -186,7 +186,7 @@ export function usePostSEO(post: {
   name: string;
   slug: string;
 }) {
-  const title = `${post.title} | ${organization.name} - AIO Hub`;
+  const title = `${post.title} | ${organization.name} - AIOHub`;
   const description = extractDescription(post.content_markdown);
   const canonical = sitemapGenerator.generateCanonicalUrl(`/o/${organization.slug}/posts/${post.id}`);
   
@@ -285,7 +285,7 @@ function removeStructuredData() {
 
 function extractDescription(markdown?: string, maxLength = 160): string {
   if (!markdown) {
-    return 'AI・DX企業の情報をAIO Hubで発見。企業詳細、サービス、事例をチェックできます。';
+    return 'AI・DX企業の情報をAIOHubで発見。企業詳細、サービス、事例をチェックできます。';
   }
 
   // Markdownから平文テキストを抽出

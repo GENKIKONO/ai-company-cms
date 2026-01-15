@@ -72,7 +72,7 @@ export default function PartnersPage() {
           <div className="text-center">
             <HandshakeIcon className="mx-auto h-16 w-16 text-blue-600 mb-8" />
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              AIO Hub
+              AIOHub
               <span className="block text-blue-600">パートナープログラム</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -103,7 +103,7 @@ export default function PartnersPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              なぜAIO Hubパートナーなのか？
+              なぜAIOHubパートナーなのか？
             </h2>
             <p className="text-lg text-gray-600">
               業界最高レベルの条件と充実したサポートでパートナー様の成功をお約束します

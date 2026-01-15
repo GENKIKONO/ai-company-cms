@@ -3,8 +3,8 @@ import InfoPageShell from '@/components/common/InfoPageShell';
 import { SITE_CONFIG } from '@/lib/site-config';
 
 export const metadata: Metadata = {
-  title: 'プライバシーポリシー | AIO Hub',
-  description: 'AIO Hub（LuxuCare株式会社）のプライバシーポリシーです。',
+  title: 'プライバシーポリシー | AIOHub',
+  description: 'AIOHub（LuxuCare株式会社）のプライバシーポリシーです。',
 };
 
 export default function PrivacyPage() {
@@ -15,7 +15,7 @@ export default function PrivacyPage() {
     },
     {
       title: '収集する個人情報',
-      description: '当社は、AIO Hub（以下「本サービス」）の提供にあたり、以下の個人情報を収集いたします。',
+      description: '当社は、AIOHub（以下「本サービス」）の提供にあたり、以下の個人情報を収集いたします。',
       items: [
         {
           title: '利用者から直接収集する情報',
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
   return (
     <InfoPageShell
       title="プライバシーポリシー"
-      description="AIO Hubにおける個人情報の取り扱いについて"
+      description="AIOHubにおける個人情報の取り扱いについて"
       sections={sections}
       variant="policy"
     />

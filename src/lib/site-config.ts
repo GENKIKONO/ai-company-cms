@@ -10,7 +10,7 @@ export const SITE_CONFIG = {
   
   // Company Information
   companyName: 'LuxuCare株式会社',
-  siteName: 'AIO Hub',
+  siteName: 'AIOHub',
   
   // Support Hours
   supportDescription: 'メールサポート（平日対応）',

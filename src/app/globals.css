@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* === AIO Hub Unified Design System === */
+/* === AIOHub Unified Design System === */
 @import '../styles/app-design-tokens.css';
 
 /* 一旦、広域ハックは止める（バグ源） */

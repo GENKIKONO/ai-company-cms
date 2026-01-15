@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import InfoPageShell from '@/components/common/InfoPageShell';
 
 export const metadata: Metadata = {
-  title: 'セキュリティとデータ保護 | AIO Hub',
-  description: 'AIO Hubのセキュリティポリシー、データ保護の取り組みについて説明します。',
+  title: 'セキュリティとデータ保護 | AIOHub',
+  description: 'AIOHubのセキュリティポリシー、データ保護の取り組みについて説明します。',
 };
 
 export default function SecurityPage() {

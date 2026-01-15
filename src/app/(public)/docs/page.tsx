@@ -2,15 +2,15 @@ import { Metadata } from 'next';
 import InfoPageShell from '@/components/common/InfoPageShell';
 
 export const metadata: Metadata = {
-  title: 'ドキュメント | AIO Hub',
-  description: 'AIO Hubの使い方や機能についてのドキュメントです。',
+  title: 'ドキュメント | AIOHub',
+  description: 'AIOHubの使い方や機能についてのドキュメントです。',
 };
 
 export default function DocsPage() {
   const sections = [
     {
       title: 'サービス概要',
-      description: 'AIO Hubは企業情報をAI検索エンジンで見つけやすくするプラットフォームです。',
+      description: 'AIOHubは企業情報をAI検索エンジンで見つけやすくするプラットフォームです。',
       items: [
         {
           title: '企業情報管理',
@@ -34,8 +34,8 @@ export default function DocsPage() {
       title: 'よくある質問',
       items: [
         {
-          title: 'AIO Hubとは何ですか？',
-          body: 'AIO Hubは、企業情報をAI検索エンジンで見つけやすくするためのプラットフォームです。ChatGPTやBardなどのAI検索で企業が適切に表示されるよう最適化します。'
+          title: 'AIOHubとは何ですか？',
+          body: 'AIOHubは、企業情報をAI検索エンジンで見つけやすくするためのプラットフォームです。ChatGPTやBardなどのAI検索で企業が適切に表示されるよう最適化します。'
         },
         {
           title: 'どのような企業に適していますか？',
@@ -47,8 +47,8 @@ export default function DocsPage() {
 
   return (
     <InfoPageShell
-      title="AIO Hub ドキュメント"
-      description="AIO Hubの機能と使い方について詳しく説明します。"
+      title="AIOHub ドキュメント"
+      description="AIOHubの機能と使い方について詳しく説明します。"
       sections={sections}
     />
   );

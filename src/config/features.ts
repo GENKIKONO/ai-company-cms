@@ -1,5 +1,5 @@
 /**
- * AIO Hub 機能レジストリ
+ * AIOHub 機能レジストリ
  * プラン機能の一元管理
  */
 
@@ -66,7 +66,7 @@ export const FEATURES: Record<FeatureId, {
   faqModule: {
     id: 'faqModule',
     label: 'FAQセクション',
-    description: 'AIO Hubに掲載するFAQブロックの表示/編集に関わる機能。',
+    description: 'AIOHubに掲載するFAQブロックの表示/編集に関わる機能。',
     category: 'content',
     status: 'stable',
   },

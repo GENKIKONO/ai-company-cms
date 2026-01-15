@@ -23,7 +23,7 @@ export default function SiteSettingsForm({ initialData }: SiteSettingsFormProps)
   const { addToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<SiteSettingsData>({
-    hero_title: initialData?.hero_title || 'AIO Hub AI企業CMS',
+    hero_title: initialData?.hero_title || 'AIOHub AI企業CMS',
     hero_subtitle: initialData?.hero_subtitle || 'AI技術を活用した企業情報の統合管理プラットフォーム',
     representative_message: initialData?.representative_message || '私たちは、AI技術を通じて企業の情報発信を支援し、より良いビジネス成果の実現をお手伝いします。',
     footer_links: initialData?.footer_links || []
@@ -98,7 +98,7 @@ export default function SiteSettingsForm({ initialData }: SiteSettingsFormProps)
       if (response.ok) {
         // デフォルト値にリセット
         const defaultData = {
-          hero_title: 'AIO Hub AI企業CMS',
+          hero_title: 'AIOHub AI企業CMS',
           hero_subtitle: 'AI技術を活用した企業情報の統合管理プラットフォーム',
           representative_message: '私たちは、AI技術を通じて企業の情報発信を支援し、より良いビジネス成果の実現をお手伝いします。',
           footer_links: []

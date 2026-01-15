@@ -33,7 +33,7 @@ export default function Characters() {
             <div className="aspect-video flex items-center justify-center p-12">
               <div className="text-center text-gray-600">
                 <div className="text-6xl mb-6">🏢👤🤖</div>
-                <p className="text-xl font-medium mb-2">企業・ユーザー・AIO Hubの関係図</p>
+                <p className="text-xl font-medium mb-2">企業・ユーザー・AIOHubの関係図</p>
                 <p className="text-gray-500">3者間のデータ連携フロー</p>
               </div>
             </div>

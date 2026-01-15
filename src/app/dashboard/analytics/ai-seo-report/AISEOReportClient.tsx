@@ -2,12 +2,10 @@
  * AI × SEO 相関分析 クライアントコンポーネント
  *
  * NOTE: [FEATUREGATE_MIGRATION] プラン名ハードコード判定を廃止済み
- * [FEATUREGATE_PHASE2] featureGate(getEffectiveFeatures + Subject)経由に移行完了
+ * [FEATUREGATE_PHASE3] API経由でfeatureGate取得に移行完了
  * [CORE_ARCHITECTURE] DashboardPageShell コンテキスト経由に移行完了
- * - 旧: restrictedPlans = ['free', 'starter'] でプラン名判定
- * - 旧: feature_flags JSONB 直接読み取り
- * - 新: featureGate.getEffectiveFeatures(subject) で統一判定
- * - 新: useDashboardPageContext() で認証・組織情報取得
+ * - 旧: featureGate.ts を直接インポート（cookies() エラーの原因）
+ * - 新: /api/my/features/effective API経由で取得（Server-side で cookies() 実行）
  */
 
 'use client';
@@ -16,20 +14,24 @@ import { useEffect, useState } from 'react';
 import { AISEODashboard } from '@/components/analytics/AISEODashboard';
 import { DashboardLoadingState } from '@/components/dashboard/ui';
 import { useDashboardPageContext } from '@/components/dashboard/DashboardPageShell';
-import { createClient } from '@/lib/supabase/client';
-import { getEffectiveFeatures, type EffectiveFeature } from '@/lib/featureGate';
 import { FeatureLocked } from '@/components/feature/FeatureLocked';
 
-/** 機能フラグの型（featureGate経由で取得） */
+/** 機能フラグの型（API経由で取得） */
 interface AnalyticsFeatureFlags {
   ai_bot_analytics: boolean;
   ai_visibility_analytics: boolean;
   ai_reports: boolean;
 }
 
+/** API から返される EffectiveFeature 型 */
+interface EffectiveFeature {
+  feature_key: string;
+  is_enabled?: boolean;
+  enabled?: boolean;
+}
+
 /**
  * EffectiveFeature[] から対象キーの有効状態を取得
- * NOTE: [FEATUREGATE_PHASE2] featureGate統一API経由
  */
 function getAnalyticsFlagsFromFeatures(
   features: EffectiveFeature[]
@@ -62,13 +64,22 @@ export function AISEOReportClient() {
 
     const fetchFeatures = async () => {
       try {
-        const supabase = createClient();
-        // featureGate.getEffectiveFeatures (Subject型API)
-        const features = await getEffectiveFeatures(supabase, {
-          type: 'org',
-          id: organization.id,
-        });
-        setAnalyticsFlags(getAnalyticsFlagsFromFeatures(features));
+        // API経由でfeatureGateを呼び出し（Server-sideでcookies()実行）
+        const res = await fetch(`/api/my/features/effective?org_id=${organization.id}`);
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          // eslint-disable-next-line no-console
+          console.error('[AISEOReportClient] API error:', {
+            status: res.status,
+            code: errorData?.error?.code,
+            message: errorData?.error?.message,
+          });
+          throw new Error(errorData?.error?.message || 'Failed to fetch features');
+        }
+
+        const { data: features } = await res.json();
+        setAnalyticsFlags(getAnalyticsFlagsFromFeatures(features || []));
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error('[AISEOReportClient] Failed to fetch features:', err);

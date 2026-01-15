@@ -22,7 +22,7 @@ export default function LandingPage({ stats }: Props) {
     // trackPageView({
     //   url: '/',
     //   referrer: document.referrer,
-    //   title: 'AIO Hub - AI企業ディレクトリ',
+    //   title: 'AIOHub - AI企業ディレクトリ',
     // });
 
   }, [stats]);
@@ -40,7 +40,7 @@ export default function LandingPage({ stats }: Props) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-indigo-600">AIO Hub</h1>
+              <h1 className="text-2xl font-bold text-indigo-600">AIOHub</h1>
               <span className="ml-2 text-sm text-gray-500">AI企業ディレクトリ</span>
             </div>
             <nav className="flex space-x-4">
@@ -79,7 +79,7 @@ export default function LandingPage({ stats }: Props) {
                 <span className="text-indigo-600">企業情報プラットフォーム</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                AIO Hubは企業情報を効率的に管理・公開できるAI企業ディレクトリプラットフォームです。
+                AIOHubは企業情報を効率的に管理・公開できるAI企業ディレクトリプラットフォームです。
                 SEO最適化、構造化データ、自動テキスト抽出で企業の魅力を最大限に伝えます。
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -383,7 +383,7 @@ export default function LandingPage({ stats }: Props) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
-              <h3 className="text-xl font-bold">AIO Hub</h3>
+              <h3 className="text-xl font-bold">AIOHub</h3>
               <p className="text-gray-300">AI対応企業ディレクトリプラットフォーム</p>
             </div>
             <div className="flex space-x-6">
@@ -392,7 +392,7 @@ export default function LandingPage({ stats }: Props) {
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-            <p>&copy; 2024 AIO Hub. AI企業ディレクトリプラットフォーム - Next.js, Supabase, Stripe で構築</p>
+            <p>&copy; 2024 AIOHub. AI企業ディレクトリプラットフォーム - Next.js, Supabase, Stripe で構築</p>
           </div>
         </div>
       </footer>

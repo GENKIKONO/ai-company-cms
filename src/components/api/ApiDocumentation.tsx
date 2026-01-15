@@ -194,10 +194,10 @@ export default function ApiDocumentation() {
 npm install @aiohub/sdk
 
 // 初期化
-import { AIO HubSDK } from '@aiohub/sdk';
+import { AIOHubSDK } from '@aiohub/sdk';
 import { logger } from '@/lib/utils/logger';
 
-const client = new AIO HubSDK({
+const client = new AIOHubSDK({
   apiKey: 'your-api-key',
   baseURL: 'https://api.aiohub.jp'
 });
@@ -233,9 +233,9 @@ collaboration.on('fieldEdit', (edit) => {
 pip install aiohub-sdk
 
 # 初期化
-from aiohub import AIO HubSDK
+from aiohub import AIOHubSDK
 
-client = AIO HubSDK(
+client = AIOHubSDK(
     api_key="your-api-key",
     base_url="https://api.aiohub.jp"
 )
@@ -352,9 +352,9 @@ curl -X GET "https://api.aiohub.jp/api/search?q=キーワード&industries=IT" \
       case 'overview':
         return (
           <div className="prose max-w-none">
-            <h1>AIO Hub API ドキュメント</h1>
+            <h1>AIOHub API ドキュメント</h1>
             <p className="text-lg text-gray-600">
-              AIO Hub APIは、企業組織情報の管理、検索、リアルタイム共同編集機能を提供するRESTful APIです。
+              AIOHub APIは、企業組織情報の管理、検索、リアルタイム共同編集機能を提供するRESTful APIです。
             </p>
 
             <h2>主な機能</h2>
@@ -398,12 +398,12 @@ curl -X GET "https://api.aiohub.jp/api/search?q=キーワード&industries=IT" \
         return (
           <div className="prose max-w-none">
             <h1>認証</h1>
-            <p>AIO Hub APIは Bearer Token による認証を使用します。</p>
+            <p>AIOHub APIは Bearer Token による認証を使用します。</p>
 
             <h2>APIキーの取得</h2>
             <p>APIキーは管理画面から取得できます：</p>
             <ol>
-              <li>AIO Hubにログイン</li>
+              <li>AIOHubにログイン</li>
               <li>設定 → API キー管理にアクセス</li>
               <li>「新しいAPIキー」をクリック</li>
               <li>必要な権限を選択して作成</li>
@@ -513,7 +513,7 @@ curl -X GET "https://api.aiohub.jp/api/search?q=キーワード&industries=IT" \
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-6">SDK</h1>
             <p className="text-lg text-gray-600 mb-8">
-              公式SDKを使用してAIO Hub APIを簡単に統合できます。
+              公式SDKを使用してAIOHub APIを簡単に統合できます。
             </p>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

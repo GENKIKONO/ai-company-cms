@@ -419,7 +419,7 @@ function generateFooter(baseUrl: string): string {
   return `
     <div class="footer">
       <a href="${escapeHtml(baseUrl)}" target="_blank" rel="noopener noreferrer">
-        Powered by LuxuCare CMS
+        Powered by AIOHub
       </a>
     </div>
   `;

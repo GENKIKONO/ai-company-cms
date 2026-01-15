@@ -236,7 +236,7 @@ export default function OrganizationsPage() {
           <div className="mb-8">
           <h1 className="jp-heading text-3xl font-bold text-gray-900 mb-2">企業ディレクトリ</h1>
           <p className="jp-body text-lg text-gray-600">
-            AIO Hubに登録された<span className="jp-number-unit">{organizations.length}社</span>の企業情報を検索・閲覧できます
+            AIOHubに登録された<span className="jp-number-unit">{organizations.length}社</span>の企業情報を検索・閲覧できます
           </p>
         </div>
 

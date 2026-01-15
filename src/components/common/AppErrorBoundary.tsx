@@ -118,7 +118,7 @@ export class AppErrorBoundary extends Component<Props, State> {
               </h2>
               
               <p className="text-gray-600 mb-6 leading-relaxed">
-                AIO Hubで問題が発生しました。<br />
+                AIOHubで問題が発生しました。<br />
                 再読み込みするか、数分後にもう一度お試しください。
               </p>
               

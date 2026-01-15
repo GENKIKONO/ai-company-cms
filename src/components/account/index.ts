@@ -8,3 +8,5 @@
 export { UserShell } from './UserShell';
 export { AccountRestrictedMessage } from './AccountRestrictedMessage';
 export { AccountStatusBanner } from './AccountStatusBanner';
+export { AccountSidebar } from './AccountSidebar';
+export { AccountLayoutContent } from './AccountLayoutContent';

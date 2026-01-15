@@ -56,14 +56,14 @@ export function generateOrganizationOGP(organization: {
   const ogpImageUrl = organization.logo_url || `${baseUrl}/api/ogp/generate?${ogpParams.toString()}`;
   
   return {
-    title: `${organization.name} | AIO Hub`,
+    title: `${organization.name} | AIOHub`,
     description: organization.description.length > 155 
       ? organization.description.substring(0, 155) + '...' 
       : organization.description,
     image: ogpImageUrl,
     url: pageUrl,
     type: 'website',
-    siteName: 'AIO Hub',
+    siteName: 'AIOHub',
     locale: 'ja_JP'
   };
 }
@@ -106,7 +106,7 @@ export function generateSEOMetadata(organization: {
   ];
 
   return {
-    title: `${organization.name} - 企業情報 | AIO Hub`,
+    title: `${organization.name} - 企業情報 | AIOHub`,
     description: organization.description,
     keywords,
     canonical: `${baseUrl}/o/${organization.slug}`,
@@ -132,7 +132,7 @@ export function generateNextMetadata(organization: {
     title: seo.title,
     description: seo.description,
     keywords: seo.keywords?.join(', '),
-    authors: [{ name: 'AIO Hub' }],
+    authors: [{ name: 'AIOHub' }],
     robots: seo.robots,
     viewport: seo.viewport,
     canonical: seo.canonical,
