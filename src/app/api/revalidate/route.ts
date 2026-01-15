@@ -64,24 +64,34 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const { scope, paths } = requestBody;
+    const { scope, paths, tags } = requestBody;
 
     // リクエスト形式の検証
-    if (!scope || !['url', 'prefix', 'all'].includes(scope)) {
+    if (!scope || !['url', 'prefix', 'all', 'tag'].includes(scope)) {
       return NextResponse.json(
-        { 
+        {
           error: 'Bad Request',
-          message: 'scope must be one of: url, prefix, all' 
+          message: 'scope must be one of: url, prefix, all, tag'
         },
         { status: 400 }
       );
     }
 
-    if (scope !== 'all' && (!Array.isArray(paths) || paths.length === 0)) {
+    if (scope === 'tag' && (!Array.isArray(tags) || tags.length === 0)) {
       return NextResponse.json(
-        { 
+        {
           error: 'Bad Request',
-          message: 'paths array is required for url and prefix scopes' 
+          message: 'tags array is required for tag scope'
+        },
+        { status: 400 }
+      );
+    }
+
+    if (['url', 'prefix'].includes(scope) && (!Array.isArray(paths) || paths.length === 0)) {
+      return NextResponse.json(
+        {
+          error: 'Bad Request',
+          message: 'paths array is required for url and prefix scopes'
         },
         { status: 400 }
       );
@@ -141,29 +151,45 @@ export async function POST(request: NextRequest) {
           }
           break;
 
+        case 'tag':
+          // タグベース: 指定されたタグのキャッシュを無効化
+          for (const tag of tags) {
+            // タグ名の検証（org-public, org:slug, org:slug:content_type のみ許可）
+            if (isAllowedTag(tag)) {
+              logger.debug(`[Revalidate API] Tag revalidating: ${tag}`);
+              revalidateTag(tag);
+              results.push({ tag, status: 'success' });
+            } else {
+              logger.warn(`[Revalidate API] Unauthorized tag skipped: ${tag}`);
+              results.push({ tag, status: 'skipped', reason: 'unauthorized' });
+            }
+          }
+          break;
+
         case 'all':
           // 全体: 公開サイト全体を再検証
           logger.debug('[Revalidate API] Full site revalidation');
-          
+
           // 主要な公開パスを再検証
           const allPublicPaths = await getAllPublicPaths();
           for (const path of allPublicPaths) {
             revalidatePath(path);
             processedPaths.push(path);
           }
-          
+
           // ルートパスも再検証
           revalidatePath('/');
           processedPaths.push('/');
-          
+
           // 公開関連のタグも無効化
           revalidateTag('public-content');
           revalidateTag('organization-content');
-          
-          results.push({ 
-            scope: 'all', 
-            status: 'success', 
-            affected_paths: processedPaths.length 
+          revalidateTag('org-public');
+
+          results.push({
+            scope: 'all',
+            status: 'success',
+            affected_paths: processedPaths.length
           });
           break;
       }
@@ -220,12 +246,36 @@ export async function POST(request: NextRequest) {
 }
 
 /**
+ * Helper: タグの許可チェック
+ * 許可パターン: org-public, org:{slug}, org:{slug}:{content_type}
+ */
+function isAllowedTag(tag: string): boolean {
+  // 全組織タグ
+  if (tag === 'org-public') return true;
+
+  // 組織単位タグ: org:{slug} or org:{slug}:{content_type}
+  if (tag.startsWith('org:')) {
+    const parts = tag.split(':');
+    // org:{slug} (2 parts) or org:{slug}:{content_type} (3 parts)
+    if (parts.length === 2 || parts.length === 3) {
+      const contentTypes = ['services', 'posts', 'faqs', 'case_studies', 'qa_entries'];
+      if (parts.length === 3 && !contentTypes.includes(parts[2])) {
+        return false;
+      }
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
  * Helper: パスの許可チェック
  */
 function isAllowedPath(path: string): boolean {
   const allowedPrefixes = [
     '/',           // ルート
-    '/aio',        // AIO Hub page
+    '/aio',        // AIOHub page
     '/o/',         // 組織ページ: /o/{slug}
     '/hearing-service',
     '/about',      // 静的ページ
@@ -287,15 +337,22 @@ export async function GET() {
           authorization: 'Bearer <REVALIDATE_TOKEN>'
         },
         body: {
-          scope: 'url | prefix | all',
-          paths: ['array of paths'] 
+          scope: 'url | prefix | all | tag',
+          paths: ['array of paths (for url/prefix scope)'],
+          tags: ['array of tags (for tag scope)']
         }
       },
       legacy_usage: 'POST /api/revalidate?path=/your-path (deprecated)',
       scopes: {
         url: 'Revalidate specific URLs',
-        prefix: 'Revalidate all paths under given prefixes', 
+        prefix: 'Revalidate all paths under given prefixes',
+        tag: 'Revalidate by cache tags (recommended for org content)',
         all: 'Revalidate entire public site'
+      },
+      allowed_tags: {
+        pattern: 'org-public | org:{slug} | org:{slug}:{content_type}',
+        content_types: ['services', 'posts', 'faqs', 'case_studies', 'qa_entries'],
+        examples: ['org-public', 'org:luxucare', 'org:luxucare:services']
       },
       allowed_prefixes: [
         '/',

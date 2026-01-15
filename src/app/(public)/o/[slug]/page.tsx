@@ -14,15 +14,10 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { isVerifiedBadgeAllowed } from '@/config/plans';
 import { createFullAddress } from '@/lib/structured-data/organization';
 import type { Organization, Post, Service, CaseStudy, FAQ } from '@/types/legacy/database';
-import type { QAEntry } from '@/types/domain/qa-system';;
+import type { QAEntry } from '@/types/domain/qa-system';
 
-// [DEBUG] キャッシュ原因切り分け用: force-dynamic で完全にキャッシュ回避
-// 恒久対応後に ISR に戻す
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-
-// Build marker for deployment verification
-const BUILD_SHA = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) || 'local';
+// ISR: 10分キャッシュ + on-demand revalidate
+export const revalidate = 600;
 
 // P4-2: generateStaticParams適用（公開組織の事前生成）
 export async function generateStaticParams() {
@@ -239,68 +234,29 @@ const getOrganizationDataCached = (slug: string) => {
         qa_entries: qaEntriesResult.data || []
       };
     },
-    [`org-public-v2-${safeSlug}`],  // v2: RLS修正後のキャッシュリセット
+    [`org-public-${safeSlug}`],
     {
-      tags: [`org-public-v2:${safeSlug}`, `org-public-v2`],
-      revalidate: 600 // 10分キャッシュ（P4-2: 組織ページ）
+      // タグベースon-demand revalidate対応
+      tags: [
+        'org-public',                        // 全組織一括無効化用
+        `org:${safeSlug}`,                   // 組織単位無効化用
+        `org:${safeSlug}:services`,          // サービス更新時
+        `org:${safeSlug}:posts`,             // 記事更新時
+        `org:${safeSlug}:faqs`,              // FAQ更新時
+        `org:${safeSlug}:case_studies`,      // 事例更新時
+      ],
+      revalidate: 600 // 10分キャッシュ（フォールバック）
     }
   )();
 };
 
 async function getOrganizationData(slug: string): Promise<OrganizationPageData | null> {
   try {
-    // [DEBUG] キャッシュ回避テスト: unstable_cache をスキップして直接取得
-    // 恒久対応後に getOrganizationDataCached に戻す
-    return await getOrganizationDataDirect(slug);
+    return await getOrganizationDataCached(slug);
   } catch (error) {
     logger.error('Failed to fetch organization data', { data: error instanceof Error ? error : new Error(String(error)) });
     return null;
   }
-}
-
-// [DEBUG] キャッシュなしで直接取得（原因切り分け用）
-async function getOrganizationDataDirect(slug: string): Promise<OrganizationPageData | null> {
-  const safeSlug = slug.toLowerCase().trim();
-  logger.info(`[DEBUG] Direct fetch (no cache) for slug: ${safeSlug}`);
-
-  const { createClient } = await import('@supabase/supabase-js');
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
-
-  const { data: organization, error: orgError } = await supabase
-    .from('organizations')
-    .select('id, name, slug, status, is_published, logo_url, description, website_url, legal_form, representative_name, address, phone, email, established_at, capital, employees, show_services, show_posts, show_case_studies, show_faqs, show_qa, show_contact, created_at, updated_at')
-    .eq('slug', safeSlug)
-    .eq('status', 'published')
-    .eq('is_published', true)
-    .maybeSingle();
-
-  if (orgError || !organization) {
-    logger.error(`[DEBUG] Organization not found: ${safeSlug}`, { error: orgError?.message });
-    return null;
-  }
-
-  const [postsResult, servicesResult, caseStudiesResult, faqsResult, qaEntriesResult] = await Promise.all([
-    supabase.from('posts').select('*').eq('organization_id', organization.id).order('created_at', { ascending: false }).limit(10),
-    supabase.from('services').select('*').eq('organization_id', organization.id).order('created_at', { ascending: false }),
-    supabase.from('case_studies').select('*').eq('organization_id', organization.id).order('created_at', { ascending: false }),
-    supabase.from('faqs').select('*').eq('organization_id', organization.id).order('display_order', { ascending: true }),
-    supabase.from('qa_entries').select('*, qa_categories!left(id, name, slug)').eq('organization_id', organization.id).eq('status', 'published').eq('visibility', 'public').limit(20)
-  ]);
-
-  logger.info(`[DEBUG] Content counts - services: ${servicesResult.data?.length || 0}, posts: ${postsResult.data?.length || 0}`);
-
-  return {
-    organization: organization as Organization,
-    posts: (postsResult.data || []) as Post[],
-    services: (servicesResult.data || []).map(s => ({ ...s, title: s.name })) as Service[],
-    case_studies: (caseStudiesResult.data || []) as CaseStudy[],
-    faqs: (faqsResult.data || []) as FAQ[],
-    qa_entries: qaEntriesResult.data || []
-  };
 }
 
 export async function generateMetadata(
@@ -871,8 +827,6 @@ export default async function OrganizationDetailPage({
               </svg>
               企業ディレクトリに戻る
             </Link>
-            {/* [DEBUG] Build marker - デプロイ反映確認用 */}
-            <p className="mt-4 text-xs text-gray-400">build: {BUILD_SHA}</p>
           </div>
         </main>
       </div>
