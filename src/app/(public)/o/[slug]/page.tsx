@@ -91,7 +91,7 @@ const getOrganizationDataCached = (slug: string) => {
       // ✅ P0: published のみを公開対象とする（enum準拠）
       const { data: organization, error: orgError } = await supabase
         .from('organizations')
-        .select('id, name, slug, status, is_published, logo_url, description, website_url, legal_form, representative_name, address, phone, email, established_date, capital, employees_count, business_overview, vision, mission, show_services, show_posts, show_case_studies, show_faqs, show_qa, show_contact, created_at, updated_at')
+        .select('id, name, slug, status, is_published, logo_url, description, website_url, legal_form, representative_name, address, phone, email, established_at, capital, employees, show_services, show_posts, show_case_studies, show_faqs, show_qa, show_contact, created_at, updated_at')
         .eq('slug', safeSlug)
         .eq('status', 'published')
         .eq('is_published', true)
@@ -268,7 +268,7 @@ export async function generateMetadata(
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   return {
-    title: organization.meta_title || `${organization.name} - AIO Hub企業ディレクトリ`,
+    title: organization.meta_title || `${organization.name} - AIOHub企業ディレクトリ`,
     description: organization.meta_description || organization.description || `${organization.name}の企業情報、サービス、記事を紹介します。`,
     keywords: organization.meta_keywords?.join(', '),
     openGraph: {
@@ -276,7 +276,7 @@ export async function generateMetadata(
       description: organization.description || '',
       type: 'website',
       url: `${baseUrl}/o/${organization.slug}`,
-      siteName: 'AIO Hub企業ディレクトリ',
+      siteName: 'AIOHub企業ディレクトリ',
       images: organization.logo_url ? [{
         url: organization.logo_url,
         width: 1200,

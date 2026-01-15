@@ -201,8 +201,13 @@ export function UnifiedMobileNav({ isOpen: externalIsOpen, onToggle: externalOnT
   }, []);
 
   // deep link時にカテゴリを自動判定（ドロワーが開いたとき）
+  // /dashboard 直接アクセス時はカテゴリ一覧を維持（期待仕様）
   useEffect(() => {
     if (isOpen && isDashboard) {
+      if (pathname === '/dashboard') {
+        setSelectedCategoryId(null); // カテゴリ一覧を表示
+        return;
+      }
       const activeCategoryId = getActiveCategoryId(pathname);
       if (activeCategoryId) {
         setSelectedCategoryId(activeCategoryId);

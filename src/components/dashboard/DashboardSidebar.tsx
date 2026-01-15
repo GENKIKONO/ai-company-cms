@@ -160,7 +160,12 @@ export function DashboardSidebar({ canSeeAdminNav = false }: DashboardSidebarPro
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
   // deep link時にカテゴリを自動判定
+  // /dashboard 直接アクセス時はカテゴリ一覧を維持（期待仕様）
   useEffect(() => {
+    if (pathname === '/dashboard') {
+      setSelectedCategoryId(null); // カテゴリ一覧を表示
+      return;
+    }
     const activeCategoryId = getActiveCategoryId(pathname);
     if (activeCategoryId) {
       setSelectedCategoryId(activeCategoryId);
