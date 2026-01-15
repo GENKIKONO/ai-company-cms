@@ -234,10 +234,10 @@ const getOrganizationDataCached = (slug: string) => {
         qa_entries: qaEntriesResult.data || []
       };
     },
-    [`org-public-${safeSlug}`],
-    { 
-      tags: [`org-public:${safeSlug}`, `org-public`], 
-      revalidate: 600 // 10分キャッシュ（P4-2: 組織ページ） 
+    [`org-public-v2-${safeSlug}`],  // v2: RLS修正後のキャッシュリセット
+    {
+      tags: [`org-public-v2:${safeSlug}`, `org-public-v2`],
+      revalidate: 600 // 10分キャッシュ（P4-2: 組織ページ）
     }
   )();
 };
