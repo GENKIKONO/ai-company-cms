@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabaseBrowser as supabase } from '@/lib/supabase/client';
 import { getDataSource, hasDataSourcePermission, type DataSourceKey } from '@/config/data-sources';
 import { allowedViews, isAllowedView, type AllowedViewName } from '@/lib/allowlist';
 import type { UserRole } from '@/types/utils/database';
