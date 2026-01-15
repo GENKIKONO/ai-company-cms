@@ -238,12 +238,18 @@ async function checkInternalApis(): Promise<InternalApiResult> {
   return result;
 }
 
-function getVersionInfo(): VersionInfo {
-  const version: VersionInfo = {
-    sha: process.env.VERCEL_GIT_COMMIT_SHA,
-    pkg: '0.1.0' // package.jsonから取得
+function getVersionInfo(): VersionInfo & { buildTime: string; env: string } {
+  const version: VersionInfo & { buildTime: string; env: string } = {
+    sha: process.env.VERCEL_GIT_COMMIT_SHA ||
+         process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
+         'unknown',
+    pkg: '0.1.0', // package.jsonから取得
+    buildTime: process.env.BUILD_TIME || new Date().toISOString(),
+    env: process.env.VERCEL_ENV ||
+         process.env.NODE_ENV ||
+         'development'
   };
-  
+
   // package.jsonからバージョンを読み取る
   try {
     const packageJsonPath = path.join(process.cwd(), 'package.json');
@@ -254,6 +260,6 @@ function getVersionInfo(): VersionInfo {
   } catch (error) {
     // エラーの場合はデフォルト値を使用
   }
-  
+
   return version;
 }

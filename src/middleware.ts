@@ -19,8 +19,14 @@ import { ROUTES } from '@/lib/routes';
  * 【ハードコード禁止】
  * - ルート直書きは禁止、必ず ROUTES 定数を使用
  */
+// Phase 0-3: デプロイSHAとリクエストIDを全ログに付与
+const DEPLOY_SHA = process.env.VERCEL_GIT_COMMIT_SHA ||
+                   process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
+                   'unknown';
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const requestId = crypto.randomUUID();
 
   // スルーするパス（認証チェックしない）
   if (
@@ -81,6 +87,8 @@ export async function middleware(request: NextRequest) {
     if (!isLoggedIn) {
       // デバッグ用ログ（cookie名のみ、値は出さない）
       console.warn('[middleware] strict-auth redirect', {
+        sha: DEPLOY_SHA,
+        requestId,
         path: pathname,
         sbCookieNames: sbCookies.map(c => c.name),
         hasAuthCookie,
@@ -90,7 +98,9 @@ export async function middleware(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = ROUTES.authLogin;
       url.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(url);
+      const redirectResponse = NextResponse.redirect(url);
+      redirectResponse.headers.set('x-request-id', requestId);
+      return redirectResponse;
     }
   }
 
@@ -102,6 +112,8 @@ export async function middleware(request: NextRequest) {
     // 完全未ログイン（Cookie無し）のみブロック
     // デバッグ用ログ（cookie名のみ、値は出さない）
     console.warn('[middleware] soft-auth redirect', {
+      sha: DEPLOY_SHA,
+      requestId,
       path: pathname,
       sbCookieNames: sbCookies.map(c => c.name),
       allCookieCount: allCookies.length,
@@ -111,7 +123,9 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = ROUTES.authLogin;
     url.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    redirectResponse.headers.set('x-request-id', requestId);
+    return redirectResponse;
   }
 
   // =====================================================
@@ -122,10 +136,14 @@ export async function middleware(request: NextRequest) {
     // 厳密チェックはしない（ログインページ表示の遅延を避ける）
     const url = request.nextUrl.clone();
     url.pathname = ROUTES.dashboard;
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    redirectResponse.headers.set('x-request-id', requestId);
+    return redirectResponse;
   }
 
   // その他はresponse（Cookie更新済み）をそのまま返す
+  // x-request-id ヘッダーを追加
+  response.headers.set('x-request-id', requestId);
   return response;
 }
 
