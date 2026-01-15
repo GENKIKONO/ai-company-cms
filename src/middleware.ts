@@ -60,10 +60,16 @@ export async function middleware(request: NextRequest) {
 
   // =====================================================
   // Cookie 存在チェック（ソフト認証用）
+  // Supabase の cookie パターン:
+  // - sb-<project>-auth-token (単一)
+  // - sb-<project>-auth-token.0, .1, ... (チャンク分割)
+  // - sb-<project>-refresh-token (リフレッシュ)
+  // - supabase-auth-token (レガシー)
   // =====================================================
-  const hasAuthCookie = request.cookies.getAll().some(cookie =>
-    cookie.name.startsWith('sb-') && cookie.name.includes('-auth-token')
-  );
+  const supabaseAuthCookiePattern = /^(sb-.*-(auth-token|refresh-token)(\.\d+)?|supabase-auth-token)$/;
+  const allCookies = request.cookies.getAll();
+  const sbCookies = allCookies.filter(c => c.name.startsWith('sb-') || c.name.startsWith('supabase-'));
+  const hasAuthCookie = allCookies.some(cookie => supabaseAuthCookiePattern.test(cookie.name));
 
   // =====================================================
   // 厳密認証パス: getUser() で検証
@@ -73,9 +79,10 @@ export async function middleware(request: NextRequest) {
     const isLoggedIn = user && !error;
 
     if (!isLoggedIn) {
-      // デバッグ用ログ（再発時の原因特定用）
-      console.warn('[middleware] Strict auth failed', {
+      // デバッグ用ログ（cookie名のみ、値は出さない）
+      console.warn('[middleware] strict-auth redirect', {
         path: pathname,
+        sbCookieNames: sbCookies.map(c => c.name),
         hasAuthCookie,
         errorCode: error?.code,
       });
@@ -93,10 +100,12 @@ export async function middleware(request: NextRequest) {
   // =====================================================
   if (isSoftAuthPath && !hasAuthCookie) {
     // 完全未ログイン（Cookie無し）のみブロック
-    // デバッグ用ログ
-    console.warn('[middleware] Soft auth failed - no auth cookie', {
+    // デバッグ用ログ（cookie名のみ、値は出さない）
+    console.warn('[middleware] soft-auth redirect', {
       path: pathname,
-      cookies: request.cookies.getAll().map(c => c.name).filter(n => n.startsWith('sb-')),
+      sbCookieNames: sbCookies.map(c => c.name),
+      allCookieCount: allCookies.length,
+      hasAuthCookie,
     });
 
     const url = request.nextUrl.clone();
