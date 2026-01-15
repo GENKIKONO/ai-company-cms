@@ -80,10 +80,12 @@ export async function POST(request: NextRequest) {
       isPublished: validatedData.is_published
     });
 
-    // published_at の設定
-    const publishedAt = (validatedData.status === 'published' || validatedData.is_published) 
-      ? new Date().toISOString() 
-      : null;
+    // 公開状態の決定（DB制約 posts_publish_consistent に準拠）
+    // - is_published=true のとき status='published' が必須
+    // - is_published=false のとき status='draft' を使用
+    const isPublished = validatedData.is_published === true || validatedData.status === 'published';
+    const finalStatus = isPublished ? 'published' : 'draft';
+    const publishedAt = isPublished ? new Date().toISOString() : null;
 
     // 投稿データを準備（organization_id前提）
     const postData = {
@@ -92,8 +94,9 @@ export async function POST(request: NextRequest) {
       title: validatedData.title,
       slug: slug,
       content: validatedData.content_markdown || validatedData.content || '',
-      status: validatedData.is_published ? 'published' : validatedData.status,
-      is_published: true, // 作成されたポストは即座に公開対象とする
+      // NOTE: posts_publish_consistent 制約により、is_published と status は連動必須
+      status: finalStatus,
+      is_published: isPublished,
       published_at: publishedAt,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()

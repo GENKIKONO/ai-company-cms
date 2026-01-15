@@ -136,16 +136,27 @@ export function normalizePostPayload(data: Record<string, unknown>): Record<stri
 
 /**
  * Service データの正規化
+ * NOTE: services の status は 'active'/'inactive'/'deleted' のみ許可
+ *       公開制御は is_published + published_at で行う（DB制約準拠）
  */
 export function normalizeServicePayload(data: Record<string, unknown>): Record<string, any> {
   // 実際のデータベース スキーマに存在するフィールドのみ抽出
   const allowedFields = [
     'name',
+    'summary',
     'description',
     'category',
     'price',
+    'duration_months',
     'is_published',
+    'published_at',
+    'image_url',
+    'video_url',
+    'features',
+    'cta_text',
+    'cta_url',
     'organization_id'
+    // NOTE: 'status' は意図的に除外（'published' を送ると DB 制約違反）
   ];
 
   // 許可されたフィールドのみを保持
@@ -157,30 +168,46 @@ export function normalizeServicePayload(data: Record<string, unknown>): Record<s
   });
 
   normalized = normalizeEmptyStrings(normalized, [
+    'summary',
     'description',
-    'category'
+    'category',
+    'image_url',
+    'video_url',
+    'cta_text',
+    'cta_url'
   ]);
-  
+
   normalized = normalizeNumericFields(normalized, [
-    'price'
+    'price',
+    'duration_months'
   ]);
-  
+
+  // is_published が変更された場合、published_at を連動更新
+  if (normalized.is_published === true && !normalized.published_at) {
+    normalized.published_at = new Date().toISOString();
+  } else if (normalized.is_published === false) {
+    normalized.published_at = null;
+  }
+
   // features配列の正規化
-  if (normalized.features) {
-    if (Array.isArray(normalized.features)) {
+  if (data.features) {
+    if (Array.isArray(data.features)) {
       // 空文字やnull要素を除去
-      normalized.features = normalized.features
+      normalized.features = (data.features as unknown[])
         .filter((feature): feature is string => isNonEmptyString(feature));
+      if ((normalized.features as string[]).length === 0) {
+        normalized.features = null;
+      }
     } else {
       normalized.features = null;
     }
   }
 
   // media配列の正規化
-  if (normalized.media) {
-    if (Array.isArray(normalized.media)) {
+  if (data.media) {
+    if (Array.isArray(data.media)) {
       // 各メディアオブジェクトの正規化とバリデーション
-      normalized.media = normalized.media
+      normalized.media = (data.media as unknown[])
         .filter((m): m is MediaInput => isMediaInput(m) && isNonEmptyString(m.url))
         .map((media) => ({
           type: media.type || 'image',
@@ -188,11 +215,14 @@ export function normalizeServicePayload(data: Record<string, unknown>): Record<s
           alt_text: media.alt_text?.trim() || null,
           caption: media.caption?.trim() || null
         }));
+      if ((normalized.media as MediaInput[]).length === 0) {
+        normalized.media = null;
+      }
     } else {
       normalized.media = null;
     }
   }
-  
+
   return normalized;
 }
 

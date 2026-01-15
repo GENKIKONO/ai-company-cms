@@ -86,8 +86,12 @@ export async function PUT(
       ? validatedData.slug.trim()
       : (validatedData.title !== existingPost.title ? generateSlug(validatedData.title) : existingPost.slug);
 
-    // published_at の設定
-    const publishedAt = (validatedData.status === 'published' || validatedData.is_published) 
+    // 公開状態の決定（DB制約 posts_publish_consistent に準拠）
+    // - is_published=true のとき status='published' が必須
+    // - is_published=false のとき status='draft' を使用
+    const isPublished = validatedData.is_published === true || validatedData.status === 'published';
+    const finalStatus = isPublished ? 'published' : 'draft';
+    const publishedAt = isPublished
       ? (existingPost.published_at || new Date().toISOString())
       : null;
 
@@ -96,8 +100,9 @@ export async function PUT(
       title: validatedData.title,
       slug: slug,
       content: validatedData.content_markdown || validatedData.content || '',
-      status: validatedData.is_published ? 'published' : validatedData.status,
-      is_published: validatedData.is_published !== undefined ? validatedData.is_published : (validatedData.status === 'published'),
+      // NOTE: posts_publish_consistent 制約により、is_published と status は連動必須
+      status: finalStatus,
+      is_published: isPublished,
       published_at: publishedAt,
       updated_at: new Date().toISOString()
     };

@@ -127,6 +127,9 @@ export async function POST(request: NextRequest) {
 
     // データベース挿入
     try {
+      // is_published フラグの決定（デフォルトは false）
+      const isPublished = validatedData.is_published ?? false;
+
       const payload = {
         organization_id: orgData.id,
         name: validatedData.name,
@@ -137,6 +140,12 @@ export async function POST(request: NextRequest) {
         category: validatedData.category,
         slug: slug,
         created_by: user.id,
+        // 公開フラグ: is_published で制御（status は 'active' 固定、DB制約に準拠）
+        is_published: isPublished,
+        published_at: isPublished ? new Date().toISOString() : null,
+        // NOTE: services の status は 'active'/'inactive'/'deleted' のみ許可
+        // 'published' は DB 制約違反となるため使用しない
+        status: 'active',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };

@@ -1,7 +1,12 @@
 /**
- * Type-Safe Supabase Client Library
+ * Type-Safe Supabase Client Library (SERVER-ONLY)
  * Phase 4: Complete Type Safety Implementation
+ *
+ * @note このファイルはサーバーサイド専用です。
+ *       クライアントコンポーネント（hooks/components）からは
+ *       @/lib/supabase/client を使用してください。
  */
+import 'server-only';
 
 import { createClient } from '@supabase/supabase-js';
 import type {

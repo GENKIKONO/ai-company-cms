@@ -162,33 +162,38 @@ const getOrganizationDataCached = (slug: string) => {
       logger.info(`[VERIFY] Public organization loaded successfully: ${organization.name} (${slug})`);
 
       // 公開されたコンテンツを並行取得
+      // NOTE: is_published=true を明示的にフィルタ（RLS + 明示フィルタの二重防御）
       const [postsResult, servicesResult, caseStudiesResult, faqsResult, qaEntriesResult] = await Promise.all([
         supabase
           .from('posts')
           .select('id, organization_id, slug, title, content, excerpt, featured_image, status, published_at, created_by, sort_order, created_at, updated_at')
           .eq('organization_id', organization.id)
-          .order('created_at', { ascending: false })
+          .eq('is_published', true)  // 公開フラグ明示
+          .order('published_at', { ascending: false })
           .limit(10),
 
         supabase
           .from('services')
           .select('id, organization_id, name, slug, summary, description, price, price_range, category, image_url, features, status, created_by, sort_order, created_at, updated_at')
           .eq('organization_id', organization.id)
+          .eq('is_published', true)  // 公開フラグ明示
           .order('created_at', { ascending: false }),
 
         supabase
           .from('case_studies')
           .select('id, organization_id, title, slug, summary, content, client_name, industry, challenge, solution, results, image_url, tags, status, created_by, sort_order, created_at, updated_at')
           .eq('organization_id', organization.id)
+          .eq('is_published', true)  // 公開フラグ明示
           .order('created_at', { ascending: false }),
 
         supabase
           .from('faqs')
           .select('id, organization_id, question, answer, category, display_order, sort_order, status, created_by, created_at, updated_at')
           .eq('organization_id', organization.id)
+          .eq('is_published', true)  // 公開フラグ明示
           .order('display_order', { ascending: true })
           .order('created_at', { ascending: false }),
-        
+
         supabase
           .from('qa_entries')
           .select(`
