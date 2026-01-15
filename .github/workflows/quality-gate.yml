@@ -31,6 +31,9 @@ jobs:
       - name: 📲 Install dependencies
         run: npm ci
 
+      - name: 🎨 Tailwind direct write check
+        run: npm run check:tailwind
+
       - name: 🔤 TypeScript (strict)
         run: npm run typecheck
 
