@@ -111,9 +111,9 @@ export async function hasOrgRole(
 export async function assertSiteAdmin(
   supabase: SupabaseClient
 ): Promise<void> {
-  // Core経由で判定
-  const { isSiteAdminWithClient } = await import('@/lib/core/auth-state');
-  const isAdmin = await isSiteAdminWithClient(supabase);
+  // Core経由で判定（クライアント対応版を使用）
+  const { isSiteAdminClient } = await import('@/lib/core/auth-state.client');
+  const isAdmin = await isSiteAdminClient(supabase);
 
   if (!isAdmin) {
     throw new AuthorizationError(
@@ -124,13 +124,12 @@ export async function assertSiteAdmin(
 }
 
 /**
- * サイト管理者かどうかをチェック（boolean版）
+ * サイト管理者かどうかをチェック（boolean版 - クライアント対応）
  *
- * @deprecated `@/lib/core/auth-state` の `isSiteAdminWithClient` を使用してください
  * @param supabase - Supabaseクライアント
  * @returns サイト管理者であればtrue
  */
-export { isSiteAdminWithClient as isSiteAdmin } from '@/lib/core/auth-state';
+export { isSiteAdminClient as isSiteAdmin } from '@/lib/core/auth-state.client';
 
 /**
  * requiredRoleからDB関数用のロール名へマッピング

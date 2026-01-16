@@ -1,12 +1,14 @@
 /**
- * Type-Safe Supabase Client Library (SERVER-ONLY)
- * Phase 4: Complete Type Safety Implementation
+ * @deprecated このファイルは非推奨です。
  *
- * @note このファイルはサーバーサイド専用です。
- *       クライアントコンポーネント（hooks/components）からは
- *       @/lib/supabase/client を使用してください。
+ * 代わりに以下を使用してください：
+ * - サーバー: @/lib/supabase/server
+ * - クライアント: @/lib/supabase/client
+ *
+ * NOTE: このファイルに import 'server-only' があると
+ * Next.js ビルドでクライアントバンドル検証時にエラーになるため削除。
+ * server-only は @/lib/supabase/server.ts に移動済み。
  */
-import 'server-only';
 
 import { createClient } from '@supabase/supabase-js';
 import type {

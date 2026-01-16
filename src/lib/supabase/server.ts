@@ -1,3 +1,12 @@
+/**
+ * Server-only Supabase Client
+ *
+ * @note このファイルはサーバーサイド専用です。
+ *       クライアントコンポーネント（hooks/components）からは
+ *       @/lib/supabase/client を使用してください。
+ */
+import 'server-only';
+
 import { createServerClient } from '@supabase/ssr';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import type { Database } from '@/types/supabase';

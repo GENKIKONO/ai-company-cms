@@ -8,15 +8,14 @@
  * - 権限チェックを自動実行
  * - 楽観的更新対応（オプション）
  * - エラーハンドリング統一
+ *
+ * @note SSR対応: @/lib/supabase/client (createBrowserClient) を使用
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { insertInto, updateRecord, deleteRecord } from '@/lib/supabase';
-import { getDataSource, hasDataSourcePermission, type DataSourceKey, type TableName } from '@/config/data-sources';
+import { supabaseBrowser } from '@/lib/supabase/client';
+import { getDataSource, hasDataSourcePermission, type DataSourceKey } from '@/config/data-sources';
 import type { UserRole } from '@/types/utils/database';
-import type { TableInsert, TableUpdate, SupabaseDatabase } from '@/types/database.types';
-
-type WritableTableName = keyof SupabaseDatabase['public']['Tables'];
 
 // =====================================================
 // HELPER FUNCTIONS
@@ -140,11 +139,12 @@ export function useDashboardMutation<
           : data;
 
         // Use writeTable if defined, otherwise fall back to table (for non-view sources)
-        const targetTable = (config.writeTable || config.table) as WritableTableName;
-        const { data: result, error: insertError } = await insertInto(
-          targetTable,
-          insertData as TableInsert<typeof targetTable>
-        );
+        const targetTable = config.writeTable || config.table;
+        const { data: result, error: insertError } = await supabaseBrowser
+          .from(targetTable)
+          .insert(insertData as Record<string, unknown>)
+          .select()
+          .single();
 
         if (insertError) {
           throw new Error(insertError.message || '作成に失敗しました');
@@ -181,12 +181,13 @@ export function useDashboardMutation<
 
       try {
         // Use writeTable if defined, otherwise fall back to table (for non-view sources)
-        const targetTable = (config.writeTable || config.table) as WritableTableName;
-        const { data: result, error: updateError } = await updateRecord(
-          targetTable,
-          id,
-          data as TableUpdate<typeof targetTable>
-        );
+        const targetTable = config.writeTable || config.table;
+        const { data: result, error: updateError } = await supabaseBrowser
+          .from(targetTable)
+          .update(data as Record<string, unknown>)
+          .eq('id', id)
+          .select()
+          .single();
 
         if (updateError) {
           throw new Error(updateError.message || '更新に失敗しました');
@@ -220,8 +221,11 @@ export function useDashboardMutation<
 
       try {
         // Use writeTable if defined, otherwise fall back to table (for non-view sources)
-        const targetTable = (config.writeTable || config.table) as WritableTableName;
-        const { error: deleteError } = await deleteRecord(targetTable, id);
+        const targetTable = config.writeTable || config.table;
+        const { error: deleteError } = await supabaseBrowser
+          .from(targetTable)
+          .delete()
+          .eq('id', id);
 
         if (deleteError) {
           throw new Error(deleteError.message || '削除に失敗しました');

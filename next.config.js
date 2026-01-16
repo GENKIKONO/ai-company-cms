@@ -180,15 +180,8 @@ const nextConfig = {
     optimizeCss: true, // CSS最適化を有効化
   },
   
-  // Turbopack設定（非推奨のturbo設定から移行）
-  turbopack: {
-    rules: {
-      '*.css': {
-        loaders: ['css-loader'],
-        as: 'css',
-      },
-    },
-  },
+  // NOTE: turbopack キーは Next.js 15 で非推奨/無効のため削除
+  // Vercel ビルドで "Unrecognized key(s): 'turbopack'" 警告が出るため
 
   // 本番ビルド最適化
   compress: true,

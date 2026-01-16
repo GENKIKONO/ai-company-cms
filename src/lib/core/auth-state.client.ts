@@ -182,3 +182,51 @@ export async function refreshSessionClient(): Promise<{ error: AuthError | null 
  * getUserClient の別名（getCurrentUserClient と同じ）
  */
 export const getUserClient = getCurrentUserClient;
+
+// ─────────────────────────────────────────────────────────────
+// Site Admin Check (Client-side)
+// ─────────────────────────────────────────────────────────────
+
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+/**
+ * 既存のSupabaseクライアントを使ってsite_adminかどうかを判定（クライアント側専用）
+ *
+ * DBの `is_site_admin()` RPC を呼び出し
+ * DashboardPageShell等のクライアントコンポーネントで使用
+ *
+ * @param supabase - Supabaseクライアント
+ * @returns サイト管理者であればtrue
+ */
+export async function isSiteAdminClient(
+  supabase: SupabaseClient
+): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.rpc('is_site_admin');
+
+    if (error) {
+      // RPC が存在しない場合はフォールバック（site_adminsテーブル直接）
+      if (error.code === '42883') {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return false;
+
+        const { data: adminData } = await supabase
+          .from('site_admins')
+          .select('user_id')
+          .eq('user_id', user.id)
+          .single();
+
+        return !!adminData;
+      }
+      // eslint-disable-next-line no-console
+      console.error('[core/auth-state.client] isSiteAdminClient RPC error:', error);
+      return false;
+    }
+
+    return !!data;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('[core/auth-state.client] isSiteAdminClient error:', err);
+    return false;
+  }
+}
