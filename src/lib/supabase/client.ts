@@ -15,6 +15,13 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 let _supabaseInstance: SupabaseClient | null = null;
 
 /**
+ * Check if running in browser environment
+ */
+function isBrowser(): boolean {
+  return typeof window !== 'undefined' && typeof document !== 'undefined';
+}
+
+/**
  * Check if environment is properly configured
  */
 function validateEnv(): { valid: boolean; missing: string } {
@@ -31,9 +38,23 @@ function validateEnv(): { valid: boolean; missing: string } {
 
 /**
  * Create or return cached Supabase browser client
+ *
+ * IMPORTANT: This function is SSR-safe - it will only create a real client
+ * in browser environment. During SSR, it throws to prevent singleton pollution.
+ *
  * Throws at runtime if env vars are missing (fail-fast on actual usage)
  */
 export const createClient = (): SupabaseClient => {
+  // SSR Guard: Prevent creating browser client during server-side rendering
+  // This prevents singleton pollution where a broken client is cached
+  if (!isBrowser()) {
+    throw new Error(
+      '[Supabase Client] createClient() was called during SSR. ' +
+      'Browser client should only be created on client-side. ' +
+      'Use @/lib/supabase/server for server-side operations.'
+    );
+  }
+
   // Return cached instance if already created
   if (_supabaseInstance) {
     return _supabaseInstance;
@@ -68,8 +89,40 @@ export const createClient = (): SupabaseClient => {
   return _supabaseInstance;
 };
 
-// Legacy exports for compatibility (lazy initialization via getter)
-// These are evaluated lazily on first access, not at module load time
-export const supabaseBrowser = createClient();
+// =====================================================
+// LEGACY EXPORTS: Lazy getters to prevent SSR issues
+// These use Proxy to defer client creation until actual property access
+// =====================================================
+
+/**
+ * Lazy Supabase browser client getter
+ *
+ * DEPRECATED: Use createClient() directly for clearer semantics.
+ * This export exists for backward compatibility only.
+ *
+ * Uses Proxy to defer client creation until a property is accessed,
+ * preventing SSR-time singleton pollution.
+ */
+const createLazyClient = (): SupabaseClient => {
+  // During SSR, return a proxy that will throw on any property access
+  // This prevents accidental usage during SSR
+  if (!isBrowser()) {
+    return new Proxy({} as SupabaseClient, {
+      get(_, prop) {
+        // Allow checking for existence without throwing
+        if (prop === 'then' || prop === Symbol.toStringTag) {
+          return undefined;
+        }
+        throw new Error(
+          `[Supabase Client] Attempted to access supabaseBrowser.${String(prop)} during SSR. ` +
+          'Use createClient() inside useEffect or event handlers.'
+        );
+      },
+    });
+  }
+  return createClient();
+};
+
+export const supabaseBrowser = createLazyClient();
 export const supabaseClient = supabaseBrowser;
 export default createClient;

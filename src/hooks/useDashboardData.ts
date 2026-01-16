@@ -8,13 +8,18 @@
  * - ローディング・エラー状態を統一管理
  * - 組織スコープを自動適用
  * - リアルタイム更新対応（オプション）
+ *
+ * @note SSR Safety
+ * - createClient() is called only inside hooks/callbacks (client-side only)
+ * - Never call createClient() at module level or during render
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { supabaseBrowser as supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { getDataSource, hasDataSourcePermission, type DataSourceKey } from '@/config/data-sources';
 import { allowedViews, isAllowedView, type AllowedViewName } from '@/lib/allowlist';
 import type { UserRole } from '@/types/utils/database';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // =====================================================
 // ENVIRONMENT VALIDATION (run once at module load)
@@ -59,8 +64,11 @@ function normalizeRole(role: UserRole | string): UserRole {
 /**
  * Create a query for the given table/view
  * Returns any to avoid infinite type instantiation with complex Supabase types
+ *
+ * @note supabase client is passed as parameter to ensure SSR safety
  */
 function createQuery(
+  supabase: SupabaseClient,
   tableName: string,
   selectColumns: string,
   options?: { count?: 'exact' | 'planned' | 'estimated'; head?: boolean }
@@ -251,8 +259,11 @@ export function useDashboardData<T = Record<string, unknown>>(
     setIsPermissionError(false);
 
     try {
+      // Create Supabase client (SSR-safe: only called inside callback)
+      const supabase = createClient();
+
       // Build query using type-safe helper (supports views via allowlist)
-      let query = createQuery(config.table, select || config.defaultSelect);
+      let query = createQuery(supabase, config.table, select || config.defaultSelect);
 
       // Apply filters
       Object.entries(effectiveFilters).forEach(([key, value]) => {
@@ -299,7 +310,7 @@ export function useDashboardData<T = Record<string, unknown>>(
       setData(finalData);
 
       // Get total count using head: true for efficiency
-      let countQuery = createQuery(config.table, '*', { count: 'exact', head: true });
+      let countQuery = createQuery(supabase, config.table, '*', { count: 'exact', head: true });
 
       Object.entries(effectiveFilters).forEach(([key, value]) => {
         countQuery = countQuery.eq(key, value);
@@ -345,6 +356,8 @@ export function useDashboardData<T = Record<string, unknown>>(
   useEffect(() => {
     if (!realtime || !config || !organizationId) return;
 
+    // Create client inside useEffect (SSR-safe)
+    const supabase = createClient();
     const channel = supabase
       .channel(`dashboard:${config.table}:${organizationId}`)
       .on(
@@ -430,13 +443,16 @@ export function useDashboardCount(
     setError(null);
 
     try {
+      // Create Supabase client (SSR-safe: only called inside callback)
+      const supabase = createClient();
+
       const effectiveFilters: Record<string, unknown> = { ...stableFilters };
       if (config.requiresOrgScope && organizationId) {
         effectiveFilters.organization_id = organizationId;
       }
 
       // Use type-safe helper (supports views via allowlist)
-      let countQuery = createQuery(config.table, '*', { count: 'exact', head: true });
+      let countQuery = createQuery(supabase, config.table, '*', { count: 'exact', head: true });
 
       Object.entries(effectiveFilters).forEach(([key, value]) => {
         countQuery = countQuery.eq(key, value);
