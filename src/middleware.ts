@@ -109,6 +109,12 @@ export async function middleware(request: NextRequest) {
   // 認証保証は DashboardPageShell / UserShell に委譲
   // =====================================================
 
+  // Next.js プリフェッチリクエストの検出
+  // プリフェッチは Cookie なしで送信されることがあるため、リダイレクトしない
+  const isPrefetch = request.headers.get('Next-Router-Prefetch') === '1' ||
+                     request.headers.get('RSC') === '1' ||
+                     request.headers.get('Purpose') === 'prefetch';
+
   // デバッグ: ソフト認証パスへのすべてのリクエストをログ
   if (isSoftAuthPath) {
     console.log('[middleware] soft-auth check', {
@@ -118,12 +124,13 @@ export async function middleware(request: NextRequest) {
       hasAuthCookie,
       allCookieCount: allCookies.length,
       sbCookieNames: sbCookies.map(c => c.name),
-      allCookieNames: allCookies.map(c => c.name).slice(0, 10), // 最初の10件
+      isPrefetch,
     });
   }
 
-  if (isSoftAuthPath && !hasAuthCookie) {
+  if (isSoftAuthPath && !hasAuthCookie && !isPrefetch) {
     // 完全未ログイン（Cookie無し）のみブロック
+    // ただしプリフェッチリクエストはリダイレクトしない（Cookie送信されないため）
     console.warn('[middleware] soft-auth REDIRECT (no auth cookie)', {
       sha: DEPLOY_SHA,
       requestId,
