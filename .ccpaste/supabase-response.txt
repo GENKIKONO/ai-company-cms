@@ -1,123 +1,51 @@
-あなたはこのリポジトリの技術責任者として、以下の2症状を確実に解消してください。
-推測で「直った」宣言は禁止。必ず「再現→原因特定→最小差分修正→本番確認」で完了させてください。
-また、既存の コアアーキテクチャ/ルールを破壊しないこと（単一ソース/ガード/契約）を最優先にしてください。
+AIOHubの「/dashboard/posts を押すとログインに戻る」が f145bcd0 デプロイ後も継続しています。
+ErrorBoundary の 401 強制遷移は潰したので、次は middleware 307 が原因かをコード側で確定し、確実に止めてください（ユーザーにDevToolsやVercelログ作業をさせない前提で、アプリ側に診断導線を作って解決する）。
+
+ゴール
+ • 「ログインに戻る」が起きたときに、原因が **307（middleware）**か 別の遷移かをアプリ自身が記録・表示できる
+ • 307 が原因なら、Cookie判定の問題を確実に潰す（prefetch/edge/cookie属性含め）
+
+Step 1（必須）：原因確定のための“自己診断”を実装
+ 1. middleware でリダイレクトする直前に、必ずレスポンスヘッダーを付与する
+例：
+
+ • x-auth-redirect-reason: soft-auth-no-cookie または strict-auth-getuser-failed
+ • x-auth-cookie-names: sb-...（値は禁止、名前だけ）
+ • x-request-id（既にあるなら統一して必ず付与）
+
+ 2. ダッシュボード側（DashboardPageShell か共通の薄いClient）で
+
+ • 「直前のナビゲーションが 307 を踏んだか」を検出できるようにする
+（例：/auth/login に飛ばされた場合、クエリに reason/requestId を付与して、UIに“原因コード”を表示）
+
+ユーザーにログを見させない。UIに「原因コード」と「requestId」を出す。
+
+Step 2（必須）：307の根本対策
+
+以下の順に潰す（推測禁止、Step1の証拠で断定してから）
+ • Cookie名パターン漏れ（既に正規表現対応済みだが、実際に matchedCookieNames が空ならここ）
+ • prefetch が絡む誤判定（Nextの prefetch/edge の可能性）：prefetch時は“常に通す”など安全側へ倒す
+ • Cookie属性（Secure/SameSite/Domain/Path）問題：サーバ側で観測できる Cookie 名が空ならここ
+
+Step 3（再発防止）
+ • /dashboard/** 配下では、クライアント側で /auth/login に飛ぶコードを禁止（CI grepでfail）
+ • middleware の “soft-auth redirect” が発生したら 必ず reason を残す（観測可能に固定）
+
+Step 4（検証）
+ • typecheck/build
+ • ローカル→本番で /dashboard → /dashboard/posts を繰り返し、ログイン送還が消えること
+ • 消えない場合は、UIに出た reason/requestId を根拠に次の修正に進む
+
+成果物：変更ファイル一覧、原因の断定（reasonベース）、修正内容、再発防止策。
 
 ⸻
 
-ゴール（必達）
+/o/luxucare の「表示が欠ける」件
 
-症状A（最優先）
- • 本番で /dashboard → 記事管理(/dashboard/posts) を押すとログイン画面に戻る問題を解消する
- • 戻るときに **Dashboard上で「組織のメンバーシップは確認できていますが、組織の詳細情報の取得中にエラー」**が出る
- • つまり「ログイン状態のはずなのに /auth/login に戻る」＋「org詳細取得失敗」が同時に起きている
+DB側は anonで services=3 / posts=1 が安定して取れるところまで確認済みなので、アプリ側（キャッシュ or 条件分岐）の問題です。
 
-症状B
- • 本番の公開企業ページ /o/luxucare で、サービス/記事などの表示が減ったり（基本情報と連絡先だけになる等）揺れる
+この件は「ログイン戻り（幹）」を止めてからやるのが正攻法ですが、並行するなら
+ • revalidate tag org:luxucare を叩いてキャッシュを確実に更新
+（REVALIDATE_TOKEN が必要）
 
 ⸻
-
-重要な確定事実（DB側の診断結果）
-
-Supabase側の単発SELECT結果（推測なしの事実）：
-
-publicページに必要な公開データはDB上で常に取れる
- • anon で organizations(slug=luxucare, published & is_published=true) は取得できる
- • anon で services 公開条件（is_published=true, deleted_at is null, published_at<=now）を満たす件数は 3
- • anon で posts 同条件は 1
- • services の published_at は未来日ではなく、deleted_atもnull → DB/RLS条件的には 常に3件表示できる状態
-
-secure view はただの SELECT（orgスコープも付いていない）
- • v_dashboard_posts_secure = SELECT ... FROM posts
- • v_dashboard_services_secure = SELECT ... FROM services
-→ orgスコープは viewではなくRLSに依存している
-
-ただし membership の単発確認で 0行が出ている（ここが矛盾点）
- • authenticated impersonation で organization_members where user_id=auth.uid() が 0行
- • でも organizations(id/slug) は取れる（公開orgなので）
-
-👉 つまり、公開ページ欠落はDB要因ではなさそう。
-一方でダッシュボードは「org membership / org詳細取得」をどう判定しているかでコケている可能性が高い。
-この矛盾は **コード側の参照元（organization_members / has_org_role / created_by fallback / cookie/auth）**のズレで起きうる。
-
-⸻
-
-進め方（周り道なし：LSP/静的解析＋最小の実行ログで確定）
-
-Step 1: まず「戻ってる原因」が 307 か 401 かをコードで確定する
- 1. 本番で「記事管理を押すとログインに戻る」のは、下記どちらか：
-
- • A1: middleware の 307（cookie判定で弾かれて /auth/login へ）
- • A2: APIが401→DashboardErrorBoundaryなどでログイン導線へ
-
- 2. 既に middleware に cookie名ログが出るはずなので、ログが出る設計になってるか・出ているかをコードから追い、必要ならログ出力を「1箇所に集約」して確実に判定できるようにする（PII/値は出さず cookie名と判定だけ）。
- 3. この判定が曖昧なまま修正を始めないこと。
-最初に “307か401か” を確定させる。
-
-⸻
-
-Step 2: 症状A（ダッシュボード）を「再現→原因特定→修正」
-
-2-1. org取得フローを LSP で追い、失敗条件を列挙
- • DashboardPageShell（＋関連hooks/guards）で
- • membership取得
- • organization取得（by id? slug? roleチェック?）
- • permissionError / error のセット
- • その後の挙動（エラー表示か、ログイン導線か）
-をコールチェーンで追う。
-
-2-2. “membershipはOKだが org詳細取得が失敗” が起きる論理パスを潰す
- • 「membership OK」判定と「org取得」判定が別ソースになっていないか（例：membershipは org-middleware 由来、org詳細は別client/別条件で落ちる等）
- • 認証クライアントの混在（browser/server/old client）がないか
- • org id の参照元がぶれていないか（cookie / query param / localStorage / pathname など）
- • **RLS頼みの view を “org_id 絞りなしで叩いている”**場合、RLS条件が満たせず0件になりうる（draft・created_by一致・org_members一致のどれでも見えないと0件）
- • ここが「org詳細エラー」の引き金になっていないか確認
-
-2-3. 修正は「最小差分」で、かつ再発防止（ガード）を入れる
- • 直すべきは **症状（ログイン戻り＋org詳細エラー）**であって、場当たりの例外分岐を増やさない
- • “org membership が無いなら無い”を正として扱い、ダッシュボードは
- • 正しいメッセージで止める（ログインへ戻さない）
- • もしくは membership を正しく取れるようにする（クエリ/参照元/ロールの整合）
- • 重要：直った根拠を必ず提示
- • 「本番で /dashboard/posts が 200」
- • 「該当リクエストのヘッダーとステータス」
- • 「middlewareログで redirect=false」
- • を揃える
-
-⸻
-
-Step 3: 症状B（公開ページの表示揺れ）を「DBではなくアプリ側」で確定させる
-
-DB上は anon で services=3/posts=1 が取れるのが確定しているので、揺れるなら原因はほぼアプリ側：
- • キャッシュ/ISR/unstable_cache が古いデータを返していないか
- • /o/[slug]/page.tsx の表示条件（show_services等）で落としていないか
- • 取得した配列が空になる経路（fetch失敗→空扱い、例外握りつぶし）を確認
- • 公開ページで「基本情報と連絡先だけ」になるなら、サブクエリの失敗時に丸ごと空にしている可能性がある
-→ エラーを握りつぶしていないか確認し、失敗なら失敗として可視化する（開発中のみでもOK、ただし本番は過剰表示しない）
-
-⸻
-
-Supabaseに投げるSQLは「Claudeが作る」が、実行はしない
-
-必要なら、Claudeは次の確認SQLをプロンプトとして生成するだけにする（あなたがSupabaseアシスタントに投げる）。
-特に、矛盾点である organization_membersに本当に該当行があるかを “auth.uidではなく素のwhere” で確かめるSQLを作ること。
-
-例（Claudeが作るべきSQLの方向性）：
- • select * from organization_members where organization_id='...' limit 20;
- • select * from organization_members where user_id='...' limit 20;
- • select policyname, roles, qual from pg_policies where tablename='organization_members';
-
-⸻
-
-成果物（これを必ず出す）
- 1. 原因の断定（1行）：症状Aは 307/401 どっちで、どの条件で発火していたか
- 2. 最小差分の修正：変更ファイル一覧＋要点（diffは短く）
- 3. 本番で直った証拠：
- • /dashboard/posts が 200 になったこと
- • ログイン画面に戻らないこと
- 4. 症状Bについても、DBではなくアプリ側原因として「どの条件/キャッシュ/握りつぶし」で減っていたかを断定し、必要な最小修正まで完了させる
-
-⸻
-
-実行開始
-
-今からリポジトリを見て、LSP/検索で Step1→Step2→Step3 を順に実行し、上の成果物フォーマットで報告→修正→検証まで完了してください。

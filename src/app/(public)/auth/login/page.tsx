@@ -10,7 +10,11 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 interface LoginPageProps {
-  searchParams: Promise<{ redirect?: string }>;
+  searchParams: Promise<{
+    redirect?: string;
+    reason?: string;  // 診断用: middleware リダイレクト理由
+    rid?: string;     // 診断用: request ID (短縮)
+  }>;
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
@@ -30,11 +34,28 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     logger.error('[Login] Session check error', { data: error instanceof Error ? error : new Error(String(error)) });
   }
 
+  // 診断情報
+  const redirectReason = resolvedSearchParams.reason;
+  const requestIdShort = resolvedSearchParams.rid;
+
   // ログインフォームを表示
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center relative overflow-hidden">
-      
+
       <div className="relative max-w-lg w-full mx-4">
+        {/* 診断バナー: middleware 307 リダイレクトの場合に表示 */}
+        {redirectReason && (
+          <div className="mb-4 p-4 bg-[var(--aio-warning-muted)] border border-[var(--aio-warning)] rounded-2xl text-sm">
+            <div className="font-semibold text-[var(--aio-warning)] mb-1">
+              セッションが切れました
+            </div>
+            <div className="text-[var(--color-text-secondary)] font-mono text-xs">
+              reason: {redirectReason}
+              {requestIdShort && <> | rid: {requestIdShort}</>}
+            </div>
+          </div>
+        )}
+
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200 p-12">
           <div className="text-center mb-10">
             {/* Logo/Icon */}
@@ -43,7 +64,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            
+
             <h1 className="text-4xl font-bold text-gray-900 mb-3">
               AIOHub にログイン
             </h1>

@@ -71,11 +71,15 @@ export async function middleware(request: NextRequest) {
   // - sb-<project>-auth-token.0, .1, ... (チャンク分割)
   // - sb-<project>-refresh-token (リフレッシュ)
   // - supabase-auth-token (レガシー)
+  //
+  // 【重要】soft-auth では緩い判定を採用:
+  // sb- または supabase- で始まる cookie があれば「認証済みの可能性あり」と判定
+  // 厳密な認証チェックは DashboardPageShell に委譲
   // =====================================================
-  const supabaseAuthCookiePattern = /^(sb-.*-(auth-token|refresh-token)(\.\d+)?|supabase-auth-token)$/;
   const allCookies = request.cookies.getAll();
   const sbCookies = allCookies.filter(c => c.name.startsWith('sb-') || c.name.startsWith('supabase-'));
-  const hasAuthCookie = allCookies.some(cookie => supabaseAuthCookiePattern.test(cookie.name));
+  // 緩い判定: sb- or supabase- cookie が1つでもあれば通す
+  const hasAuthCookie = sbCookies.length > 0;
 
   // =====================================================
   // 厳密認証パス: getUser() で検証
@@ -85,10 +89,14 @@ export async function middleware(request: NextRequest) {
     const isLoggedIn = user && !error;
 
     if (!isLoggedIn) {
+      const reason = 'strict-auth-getuser-failed';
+      const cookieNames = sbCookies.map(c => c.name).join(',') || 'none';
+
       // デバッグ用ログ（cookie名のみ、値は出さない）
       console.warn('[middleware] strict-auth redirect', {
         sha: DEPLOY_SHA,
         requestId,
+        reason,
         path: pathname,
         sbCookieNames: sbCookies.map(c => c.name),
         hasAuthCookie,
@@ -98,8 +106,15 @@ export async function middleware(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = ROUTES.authLogin;
       url.searchParams.set('redirect', pathname);
+      // 診断用クエリパラメータ（UIに表示）
+      url.searchParams.set('reason', reason);
+      url.searchParams.set('rid', requestId.slice(0, 8)); // 短縮ID
+
       const redirectResponse = NextResponse.redirect(url);
+      // 診断用ヘッダー
       redirectResponse.headers.set('x-request-id', requestId);
+      redirectResponse.headers.set('x-auth-redirect-reason', reason);
+      redirectResponse.headers.set('x-auth-cookie-names', cookieNames);
       return redirectResponse;
     }
   }
@@ -129,11 +144,15 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isSoftAuthPath && !hasAuthCookie && !isPrefetch) {
+    const reason = 'soft-auth-no-cookie';
+    const cookieNames = sbCookies.map(c => c.name).join(',') || 'none';
+
     // 完全未ログイン（Cookie無し）のみブロック
     // ただしプリフェッチリクエストはリダイレクトしない（Cookie送信されないため）
     console.warn('[middleware] soft-auth REDIRECT (no auth cookie)', {
       sha: DEPLOY_SHA,
       requestId,
+      reason,
       path: pathname,
       sbCookieNames: sbCookies.map(c => c.name),
       allCookieCount: allCookies.length,
@@ -143,8 +162,15 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = ROUTES.authLogin;
     url.searchParams.set('redirect', pathname);
+    // 診断用クエリパラメータ（UIに表示）
+    url.searchParams.set('reason', reason);
+    url.searchParams.set('rid', requestId.slice(0, 8)); // 短縮ID
+
     const redirectResponse = NextResponse.redirect(url);
+    // 診断用ヘッダー
     redirectResponse.headers.set('x-request-id', requestId);
+    redirectResponse.headers.set('x-auth-redirect-reason', reason);
+    redirectResponse.headers.set('x-auth-cookie-names', cookieNames);
     return redirectResponse;
   }
 
