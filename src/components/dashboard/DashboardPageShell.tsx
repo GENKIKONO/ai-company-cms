@@ -157,6 +157,14 @@ export function DashboardPageShell({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  // 診断用: Supabase エラー詳細（PII なし）
+  const [errorDetails, setErrorDetails] = useState<{
+    supabaseCode?: string;
+    supabaseMessage?: string;
+    supabaseDetails?: string;
+    supabaseHint?: string;
+    context?: string;
+  } | null>(null);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [isDataFetched, setIsDataFetched] = useState(false);
 
@@ -202,6 +210,7 @@ export function DashboardPageShell({
     setIsLoading(true);
     setError(null);
     setErrorCode(null);
+    setErrorDetails(null);
     setPermissionError(null);
     setIsDataFetched(false);
 
@@ -252,6 +261,15 @@ export function DashboardPageShell({
         if (isStale()) return;
 
         if (membershipError) {
+          // 診断用: エラー詳細をキャプチャ
+          setErrorDetails({
+            supabaseCode: membershipError.code,
+            supabaseMessage: membershipError.message,
+            supabaseDetails: membershipError.details,
+            supabaseHint: membershipError.hint,
+            context: 'organization_members SELECT',
+          });
+
           if (isRLSDeniedError(membershipError)) {
             setErrorCode('RLS_DENIED');
             setError('アクセス権限がありません');
@@ -287,6 +305,15 @@ export function DashboardPageShell({
           if (isStale()) return;
 
           if (orgsError) {
+            // 診断用: エラー詳細をキャプチャ
+            setErrorDetails({
+              supabaseCode: orgsError.code,
+              supabaseMessage: orgsError.message,
+              supabaseDetails: orgsError.details,
+              supabaseHint: orgsError.hint,
+              context: `organizations SELECT (ids: ${orgIds.length}件)`,
+            });
+
             // 組織詳細の取得失敗はエラー扱い（empty扱いにしない）
             logger.error('[DashboardPageShell] organizations query failed', {
               error: { code: orgsError.code, message: orgsError.message, details: orgsError.details },
@@ -510,6 +537,28 @@ export function DashboardPageShell({
           <span className="block mt-2 text-xs text-[var(--color-text-tertiary)]">
             リクエストID: {requestId}
           </span>
+          {/* 診断用: Supabase エラー詳細（開発者向け、PII なし） */}
+          {errorDetails && (
+            <details className="mt-3 text-xs">
+              <summary className="cursor-pointer text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
+                診断情報を表示
+              </summary>
+              <div className="mt-2 p-2 bg-[var(--aio-surface)] rounded text-left font-mono">
+                <div>エラーコード: {errorCode || 'N/A'}</div>
+                <div>Supabase Code: {errorDetails.supabaseCode || 'N/A'}</div>
+                <div>Message: {errorDetails.supabaseMessage || 'N/A'}</div>
+                {errorDetails.supabaseDetails && (
+                  <div>Details: {errorDetails.supabaseDetails}</div>
+                )}
+                {errorDetails.supabaseHint && (
+                  <div>Hint: {errorDetails.supabaseHint}</div>
+                )}
+                {errorDetails.context && (
+                  <div>Context: {errorDetails.context}</div>
+                )}
+              </div>
+            </details>
+          )}
         </DashboardAlert>
       </DashboardSection>
     );

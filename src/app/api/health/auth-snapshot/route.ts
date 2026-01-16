@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 
 // Supabase auth cookie パターン
 const SB_AUTH_COOKIE_PATTERNS = [
@@ -52,12 +53,33 @@ export async function GET(request: NextRequest) {
     const testPath = '/dashboard/posts';
     const middlewareWouldRedirect = wouldMiddlewareRedirect(allCookieNames, testPath);
 
+    // Supabase getUser チェック（PIIなし、成否のみ）
+    let getUserStatus: 'success' | 'error' | 'no_user' = 'error';
+    let getUserErrorCode: string | null = null;
+    try {
+      const supabase = await createClient();
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) {
+        getUserStatus = 'error';
+        getUserErrorCode = error.message || 'unknown_error';
+      } else if (user) {
+        getUserStatus = 'success';
+      } else {
+        getUserStatus = 'no_user';
+      }
+    } catch (e) {
+      getUserStatus = 'error';
+      getUserErrorCode = e instanceof Error ? e.message : 'exception';
+    }
+
     const response = NextResponse.json({
       hasSbAuthCookie,
       matchedCookieNames,
       middlewareWouldRedirect,
       requestPath: testPath,
       totalCookieCount: allCookieNames.length,
+      getUserStatus,
+      getUserErrorCode,
       sha,
       requestId,
       timestamp: new Date().toISOString()

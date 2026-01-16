@@ -1,100 +1,105 @@
-あなたは “修正して本番ビルドが通る状態にする” のがゴールです。推測は禁止、証拠（grep結果/ビルド結果）で進めてください。まず原因特定→最小差分修正→再発防止の順でやってください。
+あなたの要望どおり、調査→証拠→最小修正→再発防止を一気通貫でやらせるプロンプトを作りました。
+（SQL実行はあなたがSupabaseに投げる段取り、という条件も入れています）
 
 ⸻
+
+✅ Claude Code 用プロンプト（これをそのまま貼って実行）
 
 目的
+本番で発生している以下2点を「推測なし」で原因確定し、最小修正で解消し、再発防止まで入れる。
+ • (A) /dashboard/posts を押すとログイン画面へ戻る
+ • (B) Dashboardで「メンバーシップは確認できるが、組織詳細取得中にエラー」が出る
+ • (C) /o/luxucare で services/posts 等が消えて基本情報しか出ない（表示が揺れる/欠ける）
 
-Vercel の npm run build で落ちている以下エラーを確実に解消する：
- • src/lib/supabase.ts の import 'server-only' が原因で Failed to compile
- • 追加で next.config.js の turbopack が invalid option と警告
-
-⸻
-
-Phase 1: 事実確認（必須：どこが supabase.ts を読んでいるか断定）
- 1. import 参照の全棚卸し（行番号付き）
-
- • src/lib/supabase.ts を import している箇所を全部列挙し、ファイルパス + 行番号 + import文を報告
- • 検索対象: src/** と ルート直下の **/*.ts(x)
- • キーワード例：@/lib/supabase, ../lib/supabase, from 'src/lib/supabase'
-
- 2. そのうち **「pages 互換文脈」または「Client Component」**に入っている import を特定
-
- • 具体例："use client" のあるファイル、middleware.ts、app/**/page.tsx でもクライアント境界になっているもの、components/** など
- • ここで “Vercel が pages/ と言っているが実際に pages がない” 問題の説明は要らない。
-Vercel がそう判断する import 経路（import chain）を必ず出すこと。
+制約
+ • 憶測で修正しない。必ず「本番の証拠（Status code / ログ / エラー文字列）」→「原因断定」→「修正」
+ • SQLは私がSupabaseに投げる。あなたは「投げるべきSQL」を作るだけ
+ • 直せたと言うのは「本番で確認できる手順」と「確認ポイント」を提示できた時だけ
 
 ⸻
 
-Phase 2: 最小差分で直す（server-only を「正しく置く」）
+Phase 1：本番で“何が起きているか”を確定（最優先）
+ 1. /dashboard/posts クリック時の実態を確定
 
-方針：server-only を消して誤魔化すのは禁止。
-server-only を “サーバー専用モジュール” に隔離し、クライアント側から絶対に辿れない import 構造にする。
+ • ブラウザで発生するリクエストのうち「最初に失敗したもの」を特定できるように、以下を用意：
+ • middleware：リダイレクト時に x-request-id を付与（既にあるなら確認）
+ • 307の場合：レスポンスヘッダの Location と x-request-id を記録できるようにする
+ • 401/403/500の場合：Dashboard側で “原因エラー本文（supabase error code/message）” を画面に表示できるようにする（PIIは出さない）
 
-2-1) ファイル分割（これを正にする）
- • src/lib/supabase/server.ts を新設し、ここに server-only + server client を置く
- • ここだけが import 'server-only' を持つ
- • createClient（@supabase/supabase-js）や server用 helper もここ
- • src/lib/supabase.ts は 廃止 or client-safe にする
- • 推奨：src/lib/supabase.ts を 互換の薄い barrel にしない（クライアントが誤って掴むため）
- • どうしても残すなら：export * from './supabase/server' のような “危険な再export” は禁止
- • 既存の src/lib/supabase/client.ts（browser用）はそのまま使う
+ 2. /api/health/deployment と /api/health/auth-snapshot を本番で使って、証拠を揃える
 
-2-2) import を一括置換（壊さず）
- • サーバーで使う箇所は @/lib/supabase/server へ
- • **クライアント（hooks/components）**は @/lib/supabase/client へ
- • “どっちか分からない” ものは、そのファイルが server component か client component かを判定してから置換する（推測禁止）
+ • ここは私がcurlできる前提で、返却JSONに以下を含める：
+ • sha（コミット）
+ • requestPath
+ • hasSbAuthCookie / matchedCookieNames（値ではなくcookie名のみ）
+ • middlewareWouldRedirect（true/false）
+ • 可能なら supabase側 getUser 成否（成功/失敗のみ、PIIなし）
 
-2-3) 再発防止（どっちか必須）
-
-どちらか片方は必ず入れる：
-
-A) eslint / tsconfig の import 制約（推奨）
- • client 側から @/lib/supabase/server を import したら CI で落ちるルール
-
-または
-
-B) src/lib/supabase/server.ts の先頭に明確なコメント + 名前で誤用を防ぐ（最低限）
+→ ここまでで「ログイン戻り」が 307（cookie判定）なのか、401/403（API権限）なのかを確定する。
 
 ⸻
 
-Phase 3: next.config.js 警告を止める（確実に）
+Phase 2：症状B（組織詳細取得エラー）の原因断定
+ 3. DashboardPageShell（組織取得処理）で以下を “ログ＋UI” に出す（開発者向け表示でOK、PII禁止）
 
-Vercel の警告：
-Unrecognized key(s) in object: 'turbopack'
+ • memberships 取得：成功/失敗、件数、organization_id一覧（idのみ）
+ • organizations 詳細取得：成功/失敗、Supabase errorの code/message/details/hint を表示
+ • 失敗時にログインへ飛ばさない（今の設計維持）
 
-対応：
- • next.config.js から turbopack キーを削除して警告をゼロにする
-（Next のバージョン差でまた燃えるので、今は余計なキーを持たない方針）
+ 4. 原因がDB/RLSなら、Supabaseに投げるSQLを作る（私は実行する）
 
-⸻
-
-Phase 4: 検証（ここまでやって初めて「直った」と言える）
- 1. ローカルで：
-
- • npm run build が PASS
- • npm run typecheck が PASS
-
- 2. 変更後に以下を grep で保証：
-
- • import 'server-only' が src/lib/supabase/server.ts 以外に存在しない
- • @/lib/supabase.ts が client から import されていない（0件）
+ • organizations取得が失敗する場合の最小確認SQL：
+ • select ... from organizations where id in (...)
+ • select has_org_role(<id>, array['owner','admin','member','viewer']) が期待通りか
+ • pg_policies で organizations の authenticated SELECT policy を確認
+ • エラーコードが 42501/permission denied 系ならRLS、22P02/invalid input ならid/型、PGRST 系ならselect列 等
 
 ⸻
 
-出力フォーマット（守って）
- • (1) どの import chain が原因だったか（ファイル→ファイルの順で）
- • (2) 変更ファイル一覧（最小差分）
- • (3) npm run build / typecheck の結果
- • (4) Vercel が通る見込みの説明（短く、断定は build 成功後のみ）
+Phase 3：症状A（ログイン戻り）の最小修正
+ 5. 307（middleware）だった場合
+
+ • hasAuthCookie 判定が本当に正しいか、本番ログの cookie名（名だけ）で照合し、パターン修正
+ • 併せて “ソフト認証” の判定条件を sb cookie だけに頼り切らない 安全な形にする（例：supabase-auth-token等も含む）
+ • 修正後、/api/health/auth-snapshot で middlewareWouldRedirect=false を確認できる状態にする
+
+ 6. 401/403（API）だった場合
+
+ • /dashboard/posts が呼ぶAPI・view（v_dashboard_posts_secure等）が 401/403 になる理由を特定
+ • それが「apikey欠落」なのか「RLS拒否」なのかを error code で断定
+ • クライアント作成経路（supabase/client）とcookie連携が正しいか再確認
+ • 最小修正を実施して再発防止（誤import防止/ガード/CI）を入れる
 
 ⸻
 
-注意
- • “直ったはず” は禁止。build が通った事実が出るまで完了宣言しない
- • コードの挙動変更は最小限。今回は ビルドを通すことが最優先
+Phase 4：症状C（公開ページで項目が欠ける）の原因断定と止血
+ 7. /o/[slug] の欠ける条件を証拠で切り分け
+
+ • DBは is_published=true になっている前提
+ • それでも欠けるなら「キャッシュが古い」「show_services等フラグで抑制」「RLSでanonが取れてない」のどれか
+ • “今そのページがどのsha/どのキャッシュ状態で描画されたか” が分かる軽量診断を入れる（例：レスポンスヘッダに sha / cache-hit など）
+
+ 8. キャッシュ原因なら
+
+ • revalidate API を使って org:${slug} と各タグを叩く手順を提示
+ • 恒久的には「ダッシュボードで公開更新したらrevalidateを呼ぶ」導線を提案（実装は別PRでもOK）
 
 ⸻
 
-これで進めてください。
+出力（必須）
+ • (1) 症状A：307/401/403/500のどれか、証拠（ログ or status）付きで断定
+ • (2) 症状B：organizations詳細取得失敗の Supabase error code/message を提示し、原因を断定
+ • (3) 症状C：欠ける原因を cache/RLS/flag のどれかに断定し、再現/回避手順を出す
+ • (4) 変更ファイル一覧（最小差分）
+ • (5) 私がSupabaseに投げるべきSQL（必要なら）を1セット提示
 
 ⸻
+
+これを実行して。
+
+⸻
+
+補足（あなたにとっての“無駄な作業”を止めるための約束）
+
+今後は 「何が起きてるか（307/401/403/500）」を確定してからしか直さない 形に切り替えるのが一番効きます。
+今の状況は、たぶん「ログインに戻る」の中身が “認証が切れた” ではなく “組織詳細取得が落ちた/権限拒否” の可能性が高いので、そこをまず証拠で固定します。
