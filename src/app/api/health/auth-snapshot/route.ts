@@ -7,10 +7,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 
-// Supabase auth cookie パターン
+// Supabase auth cookie パターン（middleware と完全一致させる）
 const SB_AUTH_COOKIE_PATTERNS = [
   /^sb-.*-auth-token$/,
   /^sb-.*-auth-token\.\d+$/,
+  /^sb-.*-refresh-token$/,
+  /^sb-.*-refresh-token\.\d+$/,
+  /^supabase-auth-token$/,
 ];
 
 // middleware の判定ロジックを再現
@@ -75,6 +78,7 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.json({
       hasSbAuthCookie,
       matchedCookieNames,
+      allCookieNames, // デバッグ用：すべての Cookie 名
       middlewareWouldRedirect,
       requestPath: testPath,
       totalCookieCount: allCookieNames.length,
