@@ -3,23 +3,23 @@ import { createClient } from '@/utils/supabase/middleware';
 import { ROUTES } from '@/lib/routes';
 
 /**
- * 認証ミドルウェア
+ * 認証ミドルウェア（世界商用レベル）
  *
- * 【責務】
- * - 未認証ユーザーを /auth/login へリダイレクト
- * - 認証済みユーザーが認証ページにアクセスした場合 /dashboard へリダイレクト
+ * 【設計原則】
+ * - Middleware は「交通整理」に徹する（門番ではない）
+ * - 認証の責務は各領域の Shell に委譲
+ * - Cookie/RSC の不安定性に依存しない
+ *
+ * 【責務の分離】
+ * - /admin, /management-console → 厳密認証（getUser）
+ * - /dashboard, /account, /my → Middleware は何もしない（DashboardPageShell に委譲）
+ * - /auth/login 等 → Cookie があれば /dashboard へ
  * - Supabase セッションの Cookie 同期
- *
- * 【認証戦略】
- * - /dashboard, /account, /my: Cookie存在チェックのみ（認証保証はPageShellに委譲）
- *   → クライアントナビゲーション時の cookie 同期問題を回避
- * - /admin, /management-console: 厳密な getUser() チェック
- *   → 管理者向けページは厳密に保護
  *
  * 【ハードコード禁止】
  * - ルート直書きは禁止、必ず ROUTES 定数を使用
  */
-// Phase 0-3: デプロイSHAとリクエストIDを全ログに付与
+
 const DEPLOY_SHA = process.env.VERCEL_GIT_COMMIT_SHA ||
                    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
                    'unknown';
@@ -28,7 +28,9 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const requestId = crypto.randomUUID();
 
-  // スルーするパス（認証チェックしない）
+  // =====================================================
+  // 1. スルーするパス（認証チェック不要）
+  // =====================================================
   if (
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/api/') ||
@@ -48,147 +50,52 @@ export async function middleware(request: NextRequest) {
   const { supabase, response } = createClient(request);
 
   // =====================================================
-  // 認証戦略: ルート種別によってチェック方式を分ける
+  // 2. パス分類
   // =====================================================
-
-  // 厳密認証が必要なパス（管理者向け）
   const strictAuthPaths = [ROUTES.admin, ROUTES.managementConsole];
   const isStrictAuthPath = strictAuthPaths.some(path => pathname.startsWith(path));
 
-  // ソフト認証パス（Cookie存在チェックのみ、認証保証はPageShellに委譲）
-  // → クライアントナビゲーション時の getUser() 不安定性を回避
-  const softAuthPaths = [ROUTES.dashboard, ROUTES.account, ROUTES.my];
-  const isSoftAuthPath = softAuthPaths.some(path => pathname.startsWith(path));
-
-  // 認証ページ（ログイン済みなら /dashboard へ）
   const authPaths = [ROUTES.authLogin, ROUTES.authSignin, ROUTES.login, ROUTES.signin];
   const isAuthPath = authPaths.some(path => pathname.startsWith(path));
 
-  // =====================================================
-  // Cookie 存在チェック（ソフト認証用）
-  // Supabase の cookie パターン:
-  // - sb-<project>-auth-token (単一)
-  // - sb-<project>-auth-token.0, .1, ... (チャンク分割)
-  // - sb-<project>-refresh-token (リフレッシュ)
-  // - supabase-auth-token (レガシー)
-  //
-  // 【重要】soft-auth では緩い判定を採用:
-  // sb- または supabase- で始まる cookie があれば「認証済みの可能性あり」と判定
-  // 厳密な認証チェックは DashboardPageShell に委譲
-  // =====================================================
+  // Cookie 存在チェック（認証ページのリダイレクト判定用）
   const allCookies = request.cookies.getAll();
   const sbCookies = allCookies.filter(c => c.name.startsWith('sb-') || c.name.startsWith('supabase-'));
-  // 緩い判定: sb- or supabase- cookie が1つでもあれば通す
   const hasAuthCookie = sbCookies.length > 0;
 
   // =====================================================
-  // 厳密認証パス: getUser() で検証
+  // 3. 厳密認証パス: /admin, /management-console
+  //    → getUser() で検証、失敗なら /auth/login
   // =====================================================
   if (isStrictAuthPath) {
     const { data: { user }, error } = await supabase.auth.getUser();
     const isLoggedIn = user && !error;
 
     if (!isLoggedIn) {
-      const reason = 'strict-auth-getuser-failed';
-      const cookieNames = sbCookies.map(c => c.name).join(',') || 'none';
-
-      // デバッグ用ログ（cookie名のみ、値は出さない）
       console.warn('[middleware] strict-auth redirect', {
         sha: DEPLOY_SHA,
         requestId,
-        reason,
         path: pathname,
-        sbCookieNames: sbCookies.map(c => c.name),
-        hasAuthCookie,
         errorCode: error?.code,
       });
 
       const url = request.nextUrl.clone();
       url.pathname = ROUTES.authLogin;
       url.searchParams.set('redirect', pathname);
-      // 診断用クエリパラメータ（UIに表示）
-      url.searchParams.set('reason', reason);
-      url.searchParams.set('rid', requestId.slice(0, 8)); // 短縮ID
+      url.searchParams.set('reason', 'strict-auth');
+      url.searchParams.set('rid', requestId.slice(0, 8));
 
       const redirectResponse = NextResponse.redirect(url);
-      // 診断用ヘッダー
       redirectResponse.headers.set('x-request-id', requestId);
-      redirectResponse.headers.set('x-auth-redirect-reason', reason);
-      redirectResponse.headers.set('x-auth-cookie-names', cookieNames);
       return redirectResponse;
     }
   }
 
   // =====================================================
-  // ソフト認証パス: Cookie存在チェックのみ
-  // 認証保証は DashboardPageShell / UserShell に委譲
-  // =====================================================
-
-  // Next.js プリフェッチ/RSCリクエストの検出
-  // これらのリクエストは Cookie が正しく送信されないことがあるため、リダイレクトしない
-  // 実際の認証チェックは DashboardPageShell に委譲
-  const isPrefetch = request.headers.get('Next-Router-Prefetch') === '1' ||
-                     request.headers.get('Purpose') === 'prefetch';
-
-  // RSC（React Server Components）リクエスト: クライアントナビゲーション時に送信される
-  // Cookie が middleware に届かないケースがあるため、RSC リクエストは通す
-  const isRSCRequest = request.headers.get('RSC') === '1';
-
-  // スキップ条件: prefetch または RSC
-  const shouldSkipAuthCheck = isPrefetch || isRSCRequest;
-
-  // デバッグ: ソフト認証パスへのすべてのリクエストをログ
-  if (isSoftAuthPath) {
-    console.log('[middleware] soft-auth check', {
-      sha: DEPLOY_SHA,
-      requestId,
-      path: pathname,
-      hasAuthCookie,
-      allCookieCount: allCookies.length,
-      sbCookieNames: sbCookies.map(c => c.name),
-      isPrefetch,
-      isRSCRequest,
-      shouldSkipAuthCheck,
-    });
-  }
-
-  if (isSoftAuthPath && !hasAuthCookie && !shouldSkipAuthCheck) {
-    const reason = 'soft-auth-no-cookie';
-    const cookieNames = sbCookies.map(c => c.name).join(',') || 'none';
-
-    // 完全未ログイン（Cookie無し）のみブロック
-    // ただしプリフェッチリクエストはリダイレクトしない（Cookie送信されないため）
-    console.warn('[middleware] soft-auth REDIRECT (no auth cookie)', {
-      sha: DEPLOY_SHA,
-      requestId,
-      reason,
-      path: pathname,
-      sbCookieNames: sbCookies.map(c => c.name),
-      allCookieCount: allCookies.length,
-      hasAuthCookie,
-    });
-
-    const url = request.nextUrl.clone();
-    url.pathname = ROUTES.authLogin;
-    url.searchParams.set('redirect', pathname);
-    // 診断用クエリパラメータ（UIに表示）
-    url.searchParams.set('reason', reason);
-    url.searchParams.set('rid', requestId.slice(0, 8)); // 短縮ID
-
-    const redirectResponse = NextResponse.redirect(url);
-    // 診断用ヘッダー
-    redirectResponse.headers.set('x-request-id', requestId);
-    redirectResponse.headers.set('x-auth-redirect-reason', reason);
-    redirectResponse.headers.set('x-auth-cookie-names', cookieNames);
-    return redirectResponse;
-  }
-
-  // =====================================================
-  // 認証ページ: ログイン済みなら /dashboard へ
+  // 4. 認証ページ: /auth/login 等
+  //    → Cookie があれば /dashboard へ
   // =====================================================
   if (isAuthPath && hasAuthCookie) {
-    // Cookie があれば認証済みとみなしてリダイレクト
-    // 厳密チェックはしない（ログインページ表示の遅延を避ける）
     const url = request.nextUrl.clone();
     url.pathname = ROUTES.dashboard;
     const redirectResponse = NextResponse.redirect(url);
@@ -196,21 +103,17 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  // その他はresponse（Cookie更新済み）をそのまま返す
-  // x-request-id ヘッダーを追加
+  // =====================================================
+  // 5. その他（/dashboard, /account, /my, 公開ページ等）
+  //    → Middleware は何もしない
+  //    → 認証は DashboardPageShell / UserShell に完全委譲
+  // =====================================================
   response.headers.set('x-request-id', requestId);
   return response;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - api (API routes)
-     */
     '/((?!_next/static|_next/image|favicon.ico|api|static).*)',
   ],
 };
