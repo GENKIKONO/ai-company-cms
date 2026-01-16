@@ -104,9 +104,23 @@ export async function middleware(request: NextRequest) {
   }
 
   // =====================================================
-  // 5. その他（/dashboard, /account, /my, 公開ページ等）
+  // 5. セッション更新パス: /dashboard, /account, /my
+  //    → getUser() でセッション更新 + Cookie 再発行
+  //    → リダイレクトはしない（認証は Shell に委譲）
+  // =====================================================
+  const sessionRefreshPaths = [ROUTES.dashboard, '/account', '/my'];
+  const isSessionRefreshPath = sessionRefreshPaths.some(path => pathname.startsWith(path));
+
+  if (isSessionRefreshPath) {
+    // getUser() を呼ぶことで、Supabase SSR がセッションを検証し、
+    // 必要に応じて Cookie を更新する（setAll が呼ばれる）
+    // ここではリダイレクトせず、Cookie 更新のみ行う
+    await supabase.auth.getUser();
+  }
+
+  // =====================================================
+  // 6. その他（公開ページ等）
   //    → Middleware は何もしない
-  //    → 認証は DashboardPageShell / UserShell に完全委譲
   // =====================================================
   response.headers.set('x-request-id', requestId);
   return response;
