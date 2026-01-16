@@ -124,11 +124,18 @@ export async function middleware(request: NextRequest) {
   // 認証保証は DashboardPageShell / UserShell に委譲
   // =====================================================
 
-  // Next.js プリフェッチリクエストの検出
-  // プリフェッチは Cookie なしで送信されることがあるため、リダイレクトしない
-  // 注意: RSC ヘッダー単独ではプリフェッチ判定しない（実際のナビゲーションでも送信される）
+  // Next.js プリフェッチ/RSCリクエストの検出
+  // これらのリクエストは Cookie が正しく送信されないことがあるため、リダイレクトしない
+  // 実際の認証チェックは DashboardPageShell に委譲
   const isPrefetch = request.headers.get('Next-Router-Prefetch') === '1' ||
                      request.headers.get('Purpose') === 'prefetch';
+
+  // RSC（React Server Components）リクエスト: クライアントナビゲーション時に送信される
+  // Cookie が middleware に届かないケースがあるため、RSC リクエストは通す
+  const isRSCRequest = request.headers.get('RSC') === '1';
+
+  // スキップ条件: prefetch または RSC
+  const shouldSkipAuthCheck = isPrefetch || isRSCRequest;
 
   // デバッグ: ソフト認証パスへのすべてのリクエストをログ
   if (isSoftAuthPath) {
@@ -140,10 +147,12 @@ export async function middleware(request: NextRequest) {
       allCookieCount: allCookies.length,
       sbCookieNames: sbCookies.map(c => c.name),
       isPrefetch,
+      isRSCRequest,
+      shouldSkipAuthCheck,
     });
   }
 
-  if (isSoftAuthPath && !hasAuthCookie && !isPrefetch) {
+  if (isSoftAuthPath && !hasAuthCookie && !shouldSkipAuthCheck) {
     const reason = 'soft-auth-no-cookie';
     const cookieNames = sbCookies.map(c => c.name).join(',') || 'none';
 
