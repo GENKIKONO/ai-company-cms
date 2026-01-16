@@ -108,10 +108,23 @@ export async function middleware(request: NextRequest) {
   // ソフト認証パス: Cookie存在チェックのみ
   // 認証保証は DashboardPageShell / UserShell に委譲
   // =====================================================
+
+  // デバッグ: ソフト認証パスへのすべてのリクエストをログ
+  if (isSoftAuthPath) {
+    console.log('[middleware] soft-auth check', {
+      sha: DEPLOY_SHA,
+      requestId,
+      path: pathname,
+      hasAuthCookie,
+      allCookieCount: allCookies.length,
+      sbCookieNames: sbCookies.map(c => c.name),
+      allCookieNames: allCookies.map(c => c.name).slice(0, 10), // 最初の10件
+    });
+  }
+
   if (isSoftAuthPath && !hasAuthCookie) {
     // 完全未ログイン（Cookie無し）のみブロック
-    // デバッグ用ログ（cookie名のみ、値は出さない）
-    console.warn('[middleware] soft-auth redirect', {
+    console.warn('[middleware] soft-auth REDIRECT (no auth cookie)', {
       sha: DEPLOY_SHA,
       requestId,
       path: pathname,

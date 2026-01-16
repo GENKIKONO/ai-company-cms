@@ -1,105 +1,123 @@
-あなたの要望どおり、調査→証拠→最小修正→再発防止を一気通貫でやらせるプロンプトを作りました。
-（SQL実行はあなたがSupabaseに投げる段取り、という条件も入れています）
+あなたはこのリポジトリの技術責任者として、以下の2症状を確実に解消してください。
+推測で「直った」宣言は禁止。必ず「再現→原因特定→最小差分修正→本番確認」で完了させてください。
+また、既存の コアアーキテクチャ/ルールを破壊しないこと（単一ソース/ガード/契約）を最優先にしてください。
 
 ⸻
 
-✅ Claude Code 用プロンプト（これをそのまま貼って実行）
+ゴール（必達）
 
-目的
-本番で発生している以下2点を「推測なし」で原因確定し、最小修正で解消し、再発防止まで入れる。
- • (A) /dashboard/posts を押すとログイン画面へ戻る
- • (B) Dashboardで「メンバーシップは確認できるが、組織詳細取得中にエラー」が出る
- • (C) /o/luxucare で services/posts 等が消えて基本情報しか出ない（表示が揺れる/欠ける）
+症状A（最優先）
+ • 本番で /dashboard → 記事管理(/dashboard/posts) を押すとログイン画面に戻る問題を解消する
+ • 戻るときに **Dashboard上で「組織のメンバーシップは確認できていますが、組織の詳細情報の取得中にエラー」**が出る
+ • つまり「ログイン状態のはずなのに /auth/login に戻る」＋「org詳細取得失敗」が同時に起きている
 
-制約
- • 憶測で修正しない。必ず「本番の証拠（Status code / ログ / エラー文字列）」→「原因断定」→「修正」
- • SQLは私がSupabaseに投げる。あなたは「投げるべきSQL」を作るだけ
- • 直せたと言うのは「本番で確認できる手順」と「確認ポイント」を提示できた時だけ
+症状B
+ • 本番の公開企業ページ /o/luxucare で、サービス/記事などの表示が減ったり（基本情報と連絡先だけになる等）揺れる
 
 ⸻
 
-Phase 1：本番で“何が起きているか”を確定（最優先）
- 1. /dashboard/posts クリック時の実態を確定
+重要な確定事実（DB側の診断結果）
 
- • ブラウザで発生するリクエストのうち「最初に失敗したもの」を特定できるように、以下を用意：
- • middleware：リダイレクト時に x-request-id を付与（既にあるなら確認）
- • 307の場合：レスポンスヘッダの Location と x-request-id を記録できるようにする
- • 401/403/500の場合：Dashboard側で “原因エラー本文（supabase error code/message）” を画面に表示できるようにする（PIIは出さない）
+Supabase側の単発SELECT結果（推測なしの事実）：
 
- 2. /api/health/deployment と /api/health/auth-snapshot を本番で使って、証拠を揃える
+publicページに必要な公開データはDB上で常に取れる
+ • anon で organizations(slug=luxucare, published & is_published=true) は取得できる
+ • anon で services 公開条件（is_published=true, deleted_at is null, published_at<=now）を満たす件数は 3
+ • anon で posts 同条件は 1
+ • services の published_at は未来日ではなく、deleted_atもnull → DB/RLS条件的には 常に3件表示できる状態
 
- • ここは私がcurlできる前提で、返却JSONに以下を含める：
- • sha（コミット）
- • requestPath
- • hasSbAuthCookie / matchedCookieNames（値ではなくcookie名のみ）
- • middlewareWouldRedirect（true/false）
- • 可能なら supabase側 getUser 成否（成功/失敗のみ、PIIなし）
+secure view はただの SELECT（orgスコープも付いていない）
+ • v_dashboard_posts_secure = SELECT ... FROM posts
+ • v_dashboard_services_secure = SELECT ... FROM services
+→ orgスコープは viewではなくRLSに依存している
 
-→ ここまでで「ログイン戻り」が 307（cookie判定）なのか、401/403（API権限）なのかを確定する。
+ただし membership の単発確認で 0行が出ている（ここが矛盾点）
+ • authenticated impersonation で organization_members where user_id=auth.uid() が 0行
+ • でも organizations(id/slug) は取れる（公開orgなので）
 
-⸻
-
-Phase 2：症状B（組織詳細取得エラー）の原因断定
- 3. DashboardPageShell（組織取得処理）で以下を “ログ＋UI” に出す（開発者向け表示でOK、PII禁止）
-
- • memberships 取得：成功/失敗、件数、organization_id一覧（idのみ）
- • organizations 詳細取得：成功/失敗、Supabase errorの code/message/details/hint を表示
- • 失敗時にログインへ飛ばさない（今の設計維持）
-
- 4. 原因がDB/RLSなら、Supabaseに投げるSQLを作る（私は実行する）
-
- • organizations取得が失敗する場合の最小確認SQL：
- • select ... from organizations where id in (...)
- • select has_org_role(<id>, array['owner','admin','member','viewer']) が期待通りか
- • pg_policies で organizations の authenticated SELECT policy を確認
- • エラーコードが 42501/permission denied 系ならRLS、22P02/invalid input ならid/型、PGRST 系ならselect列 等
+👉 つまり、公開ページ欠落はDB要因ではなさそう。
+一方でダッシュボードは「org membership / org詳細取得」をどう判定しているかでコケている可能性が高い。
+この矛盾は **コード側の参照元（organization_members / has_org_role / created_by fallback / cookie/auth）**のズレで起きうる。
 
 ⸻
 
-Phase 3：症状A（ログイン戻り）の最小修正
- 5. 307（middleware）だった場合
+進め方（周り道なし：LSP/静的解析＋最小の実行ログで確定）
 
- • hasAuthCookie 判定が本当に正しいか、本番ログの cookie名（名だけ）で照合し、パターン修正
- • 併せて “ソフト認証” の判定条件を sb cookie だけに頼り切らない 安全な形にする（例：supabase-auth-token等も含む）
- • 修正後、/api/health/auth-snapshot で middlewareWouldRedirect=false を確認できる状態にする
+Step 1: まず「戻ってる原因」が 307 か 401 かをコードで確定する
+ 1. 本番で「記事管理を押すとログインに戻る」のは、下記どちらか：
 
- 6. 401/403（API）だった場合
+ • A1: middleware の 307（cookie判定で弾かれて /auth/login へ）
+ • A2: APIが401→DashboardErrorBoundaryなどでログイン導線へ
 
- • /dashboard/posts が呼ぶAPI・view（v_dashboard_posts_secure等）が 401/403 になる理由を特定
- • それが「apikey欠落」なのか「RLS拒否」なのかを error code で断定
- • クライアント作成経路（supabase/client）とcookie連携が正しいか再確認
- • 最小修正を実施して再発防止（誤import防止/ガード/CI）を入れる
+ 2. 既に middleware に cookie名ログが出るはずなので、ログが出る設計になってるか・出ているかをコードから追い、必要ならログ出力を「1箇所に集約」して確実に判定できるようにする（PII/値は出さず cookie名と判定だけ）。
+ 3. この判定が曖昧なまま修正を始めないこと。
+最初に “307か401か” を確定させる。
 
 ⸻
 
-Phase 4：症状C（公開ページで項目が欠ける）の原因断定と止血
- 7. /o/[slug] の欠ける条件を証拠で切り分け
+Step 2: 症状A（ダッシュボード）を「再現→原因特定→修正」
 
- • DBは is_published=true になっている前提
- • それでも欠けるなら「キャッシュが古い」「show_services等フラグで抑制」「RLSでanonが取れてない」のどれか
- • “今そのページがどのsha/どのキャッシュ状態で描画されたか” が分かる軽量診断を入れる（例：レスポンスヘッダに sha / cache-hit など）
+2-1. org取得フローを LSP で追い、失敗条件を列挙
+ • DashboardPageShell（＋関連hooks/guards）で
+ • membership取得
+ • organization取得（by id? slug? roleチェック?）
+ • permissionError / error のセット
+ • その後の挙動（エラー表示か、ログイン導線か）
+をコールチェーンで追う。
 
- 8. キャッシュ原因なら
+2-2. “membershipはOKだが org詳細取得が失敗” が起きる論理パスを潰す
+ • 「membership OK」判定と「org取得」判定が別ソースになっていないか（例：membershipは org-middleware 由来、org詳細は別client/別条件で落ちる等）
+ • 認証クライアントの混在（browser/server/old client）がないか
+ • org id の参照元がぶれていないか（cookie / query param / localStorage / pathname など）
+ • **RLS頼みの view を “org_id 絞りなしで叩いている”**場合、RLS条件が満たせず0件になりうる（draft・created_by一致・org_members一致のどれでも見えないと0件）
+ • ここが「org詳細エラー」の引き金になっていないか確認
 
- • revalidate API を使って org:${slug} と各タグを叩く手順を提示
- • 恒久的には「ダッシュボードで公開更新したらrevalidateを呼ぶ」導線を提案（実装は別PRでもOK）
+2-3. 修正は「最小差分」で、かつ再発防止（ガード）を入れる
+ • 直すべきは **症状（ログイン戻り＋org詳細エラー）**であって、場当たりの例外分岐を増やさない
+ • “org membership が無いなら無い”を正として扱い、ダッシュボードは
+ • 正しいメッセージで止める（ログインへ戻さない）
+ • もしくは membership を正しく取れるようにする（クエリ/参照元/ロールの整合）
+ • 重要：直った根拠を必ず提示
+ • 「本番で /dashboard/posts が 200」
+ • 「該当リクエストのヘッダーとステータス」
+ • 「middlewareログで redirect=false」
+ • を揃える
 
 ⸻
 
-出力（必須）
- • (1) 症状A：307/401/403/500のどれか、証拠（ログ or status）付きで断定
- • (2) 症状B：organizations詳細取得失敗の Supabase error code/message を提示し、原因を断定
- • (3) 症状C：欠ける原因を cache/RLS/flag のどれかに断定し、再現/回避手順を出す
- • (4) 変更ファイル一覧（最小差分）
- • (5) 私がSupabaseに投げるべきSQL（必要なら）を1セット提示
+Step 3: 症状B（公開ページの表示揺れ）を「DBではなくアプリ側」で確定させる
+
+DB上は anon で services=3/posts=1 が取れるのが確定しているので、揺れるなら原因はほぼアプリ側：
+ • キャッシュ/ISR/unstable_cache が古いデータを返していないか
+ • /o/[slug]/page.tsx の表示条件（show_services等）で落としていないか
+ • 取得した配列が空になる経路（fetch失敗→空扱い、例外握りつぶし）を確認
+ • 公開ページで「基本情報と連絡先だけ」になるなら、サブクエリの失敗時に丸ごと空にしている可能性がある
+→ エラーを握りつぶしていないか確認し、失敗なら失敗として可視化する（開発中のみでもOK、ただし本番は過剰表示しない）
 
 ⸻
 
-これを実行して。
+Supabaseに投げるSQLは「Claudeが作る」が、実行はしない
+
+必要なら、Claudeは次の確認SQLをプロンプトとして生成するだけにする（あなたがSupabaseアシスタントに投げる）。
+特に、矛盾点である organization_membersに本当に該当行があるかを “auth.uidではなく素のwhere” で確かめるSQLを作ること。
+
+例（Claudeが作るべきSQLの方向性）：
+ • select * from organization_members where organization_id='...' limit 20;
+ • select * from organization_members where user_id='...' limit 20;
+ • select policyname, roles, qual from pg_policies where tablename='organization_members';
 
 ⸻
 
-補足（あなたにとっての“無駄な作業”を止めるための約束）
+成果物（これを必ず出す）
+ 1. 原因の断定（1行）：症状Aは 307/401 どっちで、どの条件で発火していたか
+ 2. 最小差分の修正：変更ファイル一覧＋要点（diffは短く）
+ 3. 本番で直った証拠：
+ • /dashboard/posts が 200 になったこと
+ • ログイン画面に戻らないこと
+ 4. 症状Bについても、DBではなくアプリ側原因として「どの条件/キャッシュ/握りつぶし」で減っていたかを断定し、必要な最小修正まで完了させる
 
-今後は 「何が起きてるか（307/401/403/500）」を確定してからしか直さない 形に切り替えるのが一番効きます。
-今の状況は、たぶん「ログインに戻る」の中身が “認証が切れた” ではなく “組織詳細取得が落ちた/権限拒否” の可能性が高いので、そこをまず証拠で固定します。
+⸻
+
+実行開始
+
+今からリポジトリを見て、LSP/検索で Step1→Step2→Step3 を順に実行し、上の成果物フォーマットで報告→修正→検証まで完了してください。
