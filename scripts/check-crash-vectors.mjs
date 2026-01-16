@@ -2,14 +2,15 @@
 
 /**
  * Crash Vector Detection Script
- * 
+ *
  * Detects patterns that could cause dashboard crashes:
  * 1. Client-side throw new Error (UI crashes)
- * 2. Unguarded response.json() calls 
+ * 2. Unguarded response.json() calls
  * 3. Supabase .single() usage (PGRST116 → 500)
  * 4. Hardcoded /dashboard URLs (should use ROUTES constants)
  * 5. Server Component importing client-only auth (@/lib/auth)
- * 
+ * 6. Forbidden /auth/login redirects in dashboard code (middleware responsibility)
+ *
  * Uses baseline difference to allow existing violations while blocking new ones.
  */
 
@@ -39,14 +40,22 @@ const apiRouteExcludePatterns = ['src/app/api/**'];
 function getScanPatterns(scanRoot = 'src') {
   return {
     throwError: [
-      `${scanRoot}/app/dashboard/**/*.{ts,tsx}`, 
+      `${scanRoot}/app/dashboard/**/*.{ts,tsx}`,
       `${scanRoot}/components/**/*.{ts,tsx}`
     ],
     responseJson: [`${scanRoot}/**/*.{ts,tsx}`],
     supabaseSingle: [`${scanRoot}/**/*.{ts,tsx}`],
     hardcodedDashboard: [`${scanRoot}/**/*.{ts,tsx}`],
     serverClientBoundary: [`${scanRoot}/app/**/*.{ts,tsx}`],
-    nextDocumentInAppRouter: [`${scanRoot}/app/**/*.{ts,tsx}`]
+    nextDocumentInAppRouter: [`${scanRoot}/app/**/*.{ts,tsx}`],
+    // Dashboard/Account code should NEVER redirect to /auth/login
+    // Middleware is the sole authority for auth redirects
+    forbiddenLoginRedirect: [
+      `${scanRoot}/app/dashboard/**/*.{ts,tsx}`,
+      `${scanRoot}/app/account/**/*.{ts,tsx}`,
+      `${scanRoot}/components/dashboard/**/*.{ts,tsx}`,
+      `${scanRoot}/components/account/**/*.{ts,tsx}`
+    ]
   };
 }
 
@@ -56,7 +65,10 @@ const patterns = {
   responseJson: /(?<!\/\/.*?)response\.json\(\)(?![.\s]*\.catch)/g,
   supabaseSingle: /\.single\s*\(\s*\)/g,
   hardcodedDashboard: /['"`]\/dashboard(?:\/[^'"`]*)?['"`]/g,
-  nextDocumentInAppRouter: /from\s+['"]next\/document['"]/g
+  nextDocumentInAppRouter: /from\s+['"]next\/document['"]/g,
+  // Forbidden: Direct /auth/login redirects in dashboard/account code
+  // Patterns: window.location.href = '/auth/login', router.push('/auth/login'), redirect('/auth/login')
+  forbiddenLoginRedirect: /(?:window\.location(?:\.href)?\s*=|(?:router|Router)\.(?:push|replace)\(|redirect\().*?['"`]\/auth\/login['"`]/g
 };
 
 /**
@@ -268,7 +280,8 @@ async function loadBaseline() {
       throwError: { count: 0, violations: [] },
       responseJson: { count: 0, violations: [] },
       supabaseSingle: { count: 0, violations: [] },
-      hardcodedDashboard: { count: 0, violations: [] }
+      hardcodedDashboard: { count: 0, violations: [] },
+      forbiddenLoginRedirect: { count: 0, violations: [] }
     };
   }
 }
@@ -381,6 +394,12 @@ async function main() {
     ),
     serverClientBoundary: await scanServerClientBoundary(
       scanPatterns.serverClientBoundary,
+      scanRoot
+    ),
+    forbiddenLoginRedirect: await scanFiles(
+      scanPatterns.forbiddenLoginRedirect,
+      patterns.forbiddenLoginRedirect,
+      'Forbidden /auth/login redirects in dashboard/account (middleware responsibility)',
       scanRoot
     )
   };

@@ -13,7 +13,9 @@ import { isStandardError, type StandardError } from '@/lib/error-mapping';
 import { HIGButton } from '@/design-system';
 
 // アクション種別の一元管理
-type ActionKind = 'login' | 'back' | 'reload' | 'retry';
+// NOTE: 'login' は削除済み - Middleware が認証リダイレクトの唯一の責任者
+// ai-implementation-guard.md 準拠: Dashboard内で /auth/login への遷移は禁止
+type ActionKind = 'back' | 'reload' | 'retry';
 
 interface Props {
   children: ReactNode;
@@ -142,9 +144,6 @@ export class DashboardErrorBoundary extends Component<Props, State> {
 
   private handleAction(action: ActionKind) {
     switch (action) {
-      case 'login':
-        window.location.href = '/auth/login';
-        break;
       case 'back':
         window.history.back();
         break;
@@ -226,8 +225,6 @@ export class DashboardErrorBoundary extends Component<Props, State> {
 
   private getActionLabel(action: ActionKind): string {
     switch (action) {
-      case 'login':
-        return 'ログインページへ';
       case 'back':
         return '前のページに戻る';
       case 'reload':
