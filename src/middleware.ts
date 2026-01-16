@@ -111,8 +111,8 @@ export async function middleware(request: NextRequest) {
 
   // Next.js プリフェッチリクエストの検出
   // プリフェッチは Cookie なしで送信されることがあるため、リダイレクトしない
+  // 注意: RSC ヘッダー単独ではプリフェッチ判定しない（実際のナビゲーションでも送信される）
   const isPrefetch = request.headers.get('Next-Router-Prefetch') === '1' ||
-                     request.headers.get('RSC') === '1' ||
                      request.headers.get('Purpose') === 'prefetch';
 
   // デバッグ: ソフト認証パスへのすべてのリクエストをログ
