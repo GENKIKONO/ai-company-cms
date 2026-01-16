@@ -1,51 +1,39 @@
-AIOHubの「/dashboard/posts を押すとログインに戻る」が f145bcd0 デプロイ後も継続しています。
-ErrorBoundary の 401 強制遷移は潰したので、次は middleware 307 が原因かをコード側で確定し、確実に止めてください（ユーザーにDevToolsやVercelログ作業をさせない前提で、アプリ側に診断導線を作って解決する）。
+目的：
+本番ダッシュボードが「Unauthorized / Not authenticated」でコンテンツ表示できない原因を、推測なしで“1回で断定→最小修正”する。
+前提：
+- ユーザーはダッシュボードで「認証情報の取得に失敗しました」等が出る
+- APIレスポンスが {"error":"Unauthorized - Authentication required"} 等
+- GitHub main には push 済み（例: 701be4b3）だが、Vercel がデプロイを作成していない疑いがある
+- DB側は secure view のGRANTと実アクセス検証は Supabase Assistant で通っている（permission denied は解消済み）
 
-ゴール
- • 「ログインに戻る」が起きたときに、原因が **307（middleware）**か 別の遷移かをアプリ自身が記録・表示できる
- • 307 が原因なら、Cookie判定の問題を確実に潰す（prefetch/edge/cookie属性含め）
+Phase 1：まず「本番が最新コードか」をユーザー作業ゼロで可能な限り断定
+1) リポジトリ内の /api/health/deployment が返す sha を確認し、そこが 701be4b3（または最新）を返す設計になっているか確認。
+   - もしshaが返らない/古い可能性があるなら、shaを返すエンドポイントを最小で整備（既存があれば改修しない）。
+2) Vercelがデプロイを作成していない場合に備え、ユーザーが1分で確認できるチェックリストを“必要最小限”で提示（Production branch / Auto Deploy / Ignored Build Step / GitHub App 連携）。
+   ※ただし、これは「原因の切り分け」に必要な最低限だけ。能書き不要。
 
-Step 1（必須）：原因確定のための“自己診断”を実装
- 1. middleware でリダイレクトする直前に、必ずレスポンスヘッダーを付与する
-例：
+Phase 2：Unauthorized の“発火点”をコード側で特定（ユーザーにDevToolsを要求しない）
+3) ダッシュボード表示時に発生する 401/Unauthorized を、サーバログで追えるようにする。
+   - すべての /api/* ルートで requestId を生成し、レスポンスヘッダー x-request-id を付与
+   - 401返却時は「どのルート/どの処理で認証失敗したか」を必ずログに出す（トークン値は出さない）
+4) ユーザーが提示した requestId「6bc30640-0748-4725-87ba-c7185036bf09」でログを引けるようにし、どのAPIが401を返しているかを確定する。
 
- • x-auth-redirect-reason: soft-auth-no-cookie または strict-auth-getuser-failed
- • x-auth-cookie-names: sb-...（値は禁止、名前だけ）
- • x-request-id（既にあるなら統一して必ず付与）
+Phase 3：401の原因を“3択に圧縮して断定”→最小修正
+5) 401の原因は次のどれかに必ず分類できるので、ログから断定して修正する：
+   A) Cookieがリクエストに来ていない（SameSite/Domain/Secure/サブドメイン不一致）
+   B) Cookieは来ているが Supabase側で user が取れない（プロジェクト不一致や鍵不一致が多い）
+   C) userは取れるが、内部APIが Authorization なし前提で実装されている（APIルートが createServerClient/cookies を正しく使ってない等）
 
- 2. ダッシュボード側（DashboardPageShell か共通の薄いClient）で
+6) とくにBの「プロジェクト不一致」を最優先で疑う：
+   - sb-<projectRef>-auth-token の <projectRef> と、
+     NEXT_PUBLIC_SUPABASE_URL の projectRef が一致しているかをサーバ側で検査してログに出す（値そのものではなく一致/不一致だけでも良い）
+   - 不一致なら、環境変数/接続先のズレを直すのが最短（コード修正より先）
 
- • 「直前のナビゲーションが 307 を踏んだか」を検出できるようにする
-（例：/auth/login に飛ばされた場合、クエリに reason/requestId を付与して、UIに“原因コード”を表示）
+7) APIルート側の修正方針（必要なら実装）：
+   - App Router の route handler では @supabase/ssr の createServerClient を使い、cookies() を渡して getUser できることを保証
+   - “ブラウザでログイン済みなのにAPIが401” の再発を防ぐため、401時は理由コード（NO_COOKIE / USER_FETCH_FAILED / PROJECT_MISMATCH など）をレスポンスに含める（ユーザー表示はしない、ログ・診断用）
 
-ユーザーにログを見させない。UIに「原因コード」と「requestId」を出す。
-
-Step 2（必須）：307の根本対策
-
-以下の順に潰す（推測禁止、Step1の証拠で断定してから）
- • Cookie名パターン漏れ（既に正規表現対応済みだが、実際に matchedCookieNames が空ならここ）
- • prefetch が絡む誤判定（Nextの prefetch/edge の可能性）：prefetch時は“常に通す”など安全側へ倒す
- • Cookie属性（Secure/SameSite/Domain/Path）問題：サーバ側で観測できる Cookie 名が空ならここ
-
-Step 3（再発防止）
- • /dashboard/** 配下では、クライアント側で /auth/login に飛ぶコードを禁止（CI grepでfail）
- • middleware の “soft-auth redirect” が発生したら 必ず reason を残す（観測可能に固定）
-
-Step 4（検証）
- • typecheck/build
- • ローカル→本番で /dashboard → /dashboard/posts を繰り返し、ログイン送還が消えること
- • 消えない場合は、UIに出た reason/requestId を根拠に次の修正に進む
-
-成果物：変更ファイル一覧、原因の断定（reasonベース）、修正内容、再発防止策。
-
-⸻
-
-/o/luxucare の「表示が欠ける」件
-
-DB側は anonで services=3 / posts=1 が安定して取れるところまで確認済みなので、アプリ側（キャッシュ or 条件分岐）の問題です。
-
-この件は「ログイン戻り（幹）」を止めてからやるのが正攻法ですが、並行するなら
- • revalidate tag org:luxucare を叩いてキャッシュを確実に更新
-（REVALIDATE_TOKEN が必要）
-
-⸻
+成果物：
+- どのAPIが401を返しているか（ルート名）を確定
+- A/B/Cどれが原因か断定し、最小差分の修正PR（もしくは環境変数修正の指示）を出す
+- “今後同じことが起きない”ために、CIまたはヘルスチェックで PROJECT_MISMATCH を検知できるようにする

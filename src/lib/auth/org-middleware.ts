@@ -2,6 +2,36 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/log';
 import type { User } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
+import { v4 as uuidv4 } from 'uuid';
+
+// 環境変数から projectRef を抽出
+function getEnvProjectRef(): string | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!url) return null;
+  // https://chyicolujwhkycpkxbej.supabase.co -> chyicolujwhkycpkxbej
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match ? match[1] : null;
+}
+
+// Cookie から projectRef を抽出（sb-XXX-auth-token）
+async function getCookieProjectRefs(): Promise<string[]> {
+  try {
+    const cookieStore = await cookies();
+    const allCookies = cookieStore.getAll();
+    const refs: string[] = [];
+    for (const cookie of allCookies) {
+      // sb-chyicolujwhkycpkxbej-auth-token -> chyicolujwhkycpkxbej
+      const match = cookie.name.match(/^sb-([^-]+)-auth-token/);
+      if (match) {
+        refs.push(match[1]);
+      }
+    }
+    return refs;
+  } catch {
+    return [];
+  }
+}
 
 export interface OrgAuthContext {
   userId: string;
@@ -23,17 +53,47 @@ export async function withOrgAuth(
   request: NextRequest,
   handler: (context: OrgAuthContext) => Promise<NextResponse>
 ): Promise<NextResponse> {
+  // リクエストID生成（診断用）
+  const requestId = uuidv4();
+  const route = request.nextUrl.pathname;
+
   try {
     const supabase = await createClient();
-    
+
+    // 診断情報を収集
+    const envProjectRef = getEnvProjectRef();
+    const cookieProjectRefs = await getCookieProjectRefs();
+    const hasCookie = cookieProjectRefs.length > 0;
+    const projectMismatch = hasCookie && envProjectRef && !cookieProjectRefs.includes(envProjectRef);
+
     // 認証チェック
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      logger.debug('[withOrgAuth] Not authenticated');
-      return NextResponse.json({ 
+      // 401 診断ログ（トークン値は出さない）
+      const reasonCode = !hasCookie ? 'NO_COOKIE' :
+                         projectMismatch ? 'PROJECT_MISMATCH' :
+                         authError ? 'USER_FETCH_FAILED' : 'UNKNOWN';
+
+      logger.warn('[withOrgAuth] 401 Unauthorized', {
+        requestId,
+        route,
+        reasonCode,
+        hasCookie,
+        cookieProjectRefs: cookieProjectRefs.length > 0 ? cookieProjectRefs : 'none',
+        envProjectRef: envProjectRef || 'not_set',
+        projectMismatch,
+        authErrorCode: authError?.code,
+        authErrorMessage: authError?.message,
+      });
+
+      const response = NextResponse.json({
         message: 'Not authenticated',
-        error: 'UNAUTHORIZED'
+        error: 'UNAUTHORIZED',
+        reasonCode, // 診断用（UIには表示しない）
+        requestId,
       }, { status: 401 });
+      response.headers.set('x-request-id', requestId);
+      return response;
     }
 
     // クエリパラメータから organizationId を取得（優先）

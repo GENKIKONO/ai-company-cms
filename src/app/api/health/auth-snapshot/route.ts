@@ -1,5 +1,6 @@
 // Phase 0-2: 認証診断エンドポイント
 // 目的: 「Cookieが来てないのか」「判定ロジックが間違いか」を本番で即断できるようにする
+// Phase 3追加: PROJECT_MISMATCH 検出
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,26 @@ const SB_AUTH_COOKIE_PATTERNS = [
   /^sb-.*-refresh-token\.\d+$/,
   /^supabase-auth-token$/,
 ];
+
+// 環境変数から projectRef を抽出
+function getEnvProjectRef(): string | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!url) return null;
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match ? match[1] : null;
+}
+
+// Cookie から projectRef を抽出（sb-XXX-auth-token）
+function getCookieProjectRefs(cookieNames: string[]): string[] {
+  const refs: string[] = [];
+  for (const name of cookieNames) {
+    const match = name.match(/^sb-([^-]+)-auth-token/);
+    if (match) {
+      refs.push(match[1]);
+    }
+  }
+  return [...new Set(refs)]; // 重複排除
+}
 
 // middleware の判定ロジックを再現
 function wouldMiddlewareRedirect(cookieNames: string[], path: string): boolean {
@@ -52,6 +73,11 @@ export async function GET(request: NextRequest) {
 
     const hasSbAuthCookie = matchedCookieNames.length > 0;
 
+    // PROJECT_MISMATCH 検出
+    const envProjectRef = getEnvProjectRef();
+    const cookieProjectRefs = getCookieProjectRefs(allCookieNames);
+    const projectMismatch = hasSbAuthCookie && envProjectRef !== null && !cookieProjectRefs.includes(envProjectRef);
+
     // テスト用パス（固定）
     const testPath = '/dashboard/posts';
     const middlewareWouldRedirect = wouldMiddlewareRedirect(allCookieNames, testPath);
@@ -84,6 +110,10 @@ export async function GET(request: NextRequest) {
       totalCookieCount: allCookieNames.length,
       getUserStatus,
       getUserErrorCode,
+      // PROJECT_MISMATCH 診断
+      envProjectRef,
+      cookieProjectRefs,
+      projectMismatch,
       sha,
       requestId,
       timestamp: new Date().toISOString()
