@@ -125,7 +125,10 @@ export class DashboardErrorBoundary extends Component<Props, State> {
   private getErrorAction(status: number): ActionKind {
     switch (status) {
       case 401:
-        return 'login';
+        // NOTE: ai-implementation-guard.md準拠
+        // Middlewareが認証リダイレクトの唯一の責任者
+        // 401でもダッシュボード内でエラー表示し、リロードを促す
+        return 'reload';
       case 403:
       case 404:
         return 'back';
