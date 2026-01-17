@@ -61,9 +61,17 @@ export async function GET(request: NextRequest) {
 
   const queries: QueryResult[] = [];
   let authState: AuthState = 'UNAUTHENTICATED';
+  let getUserStatus: 'success' | 'error' | 'no_user' | 'no_cookie' = 'no_cookie';
   let userId: string | null = null;
   let userEmail: string | null = null;
   let whyBlocked: string | null = null;
+
+  // 共通ヘッダー
+  const responseHeaders = {
+    'Cache-Control': 'no-store, must-revalidate',
+    'Content-Type': 'application/json',
+    'x-request-id': requestId,
+  };
 
   try {
     // Step 1: Cookie の有無をチェック
@@ -74,10 +82,13 @@ export async function GET(request: NextRequest) {
 
     if (!hasCookie) {
       authState = 'UNAUTHENTICATED';
+      getUserStatus = 'no_cookie';
       whyBlocked = 'No auth cookie found';
 
       return NextResponse.json({
+        ok: true,
         authState,
+        getUserStatus,
         hasCookie: false,
         userId: null,
         userEmail: null,
@@ -88,14 +99,7 @@ export async function GET(request: NextRequest) {
         host,
         proto,
         timestamp: new Date().toISOString(),
-      }, {
-        status: 200,
-        headers: {
-          'Cache-Control': 'no-store, must-revalidate',
-          'Content-Type': 'application/json',
-          'x-request-id': requestId,
-        },
-      });
+      }, { status: 200, headers: responseHeaders });
     }
 
     // Step 2: Supabase クライアント作成 & getUser()
@@ -124,57 +128,63 @@ export async function GET(request: NextRequest) {
 
     if (getUserError) {
       authState = 'AUTH_FAILED';
+      getUserStatus = 'error';
       whyBlocked = `getUser failed: ${getUserError.message}`;
 
       return NextResponse.json({
+        ok: false,
         authState,
+        getUserStatus,
         hasCookie: true,
         userId: null,
         userEmail: null,
         whyBlocked,
-        getUserError: getUserError.message,
+        whichQuery: 'getUser',
+        error: {
+          code: getUserError.code || 'AUTH_ERROR',
+          message: getUserError.message,
+          details: null,
+          hint: null,
+        },
         queries,
         sha,
         requestId,
         host,
         proto,
         timestamp: new Date().toISOString(),
-      }, {
-        status: 200,
-        headers: {
-          'Cache-Control': 'no-store, must-revalidate',
-          'Content-Type': 'application/json',
-          'x-request-id': requestId,
-        },
-      });
+      }, { status: 200, headers: responseHeaders });
     }
 
     if (!user) {
       authState = 'AUTH_FAILED';
+      getUserStatus = 'no_user';
       whyBlocked = 'Cookie present but no user session';
 
       return NextResponse.json({
+        ok: false,
         authState,
+        getUserStatus,
         hasCookie: true,
         userId: null,
         userEmail: null,
         whyBlocked,
+        whichQuery: 'getUser',
+        error: {
+          code: 'NO_USER_SESSION',
+          message: 'Cookie present but no user session',
+          details: null,
+          hint: 'Session may have expired. Try logging in again.',
+        },
         queries,
         sha,
         requestId,
         host,
         proto,
         timestamp: new Date().toISOString(),
-      }, {
-        status: 200,
-        headers: {
-          'Cache-Control': 'no-store, must-revalidate',
-          'Content-Type': 'application/json',
-          'x-request-id': requestId,
-        },
-      });
+      }, { status: 200, headers: responseHeaders });
     }
 
+    getUserStatus = 'success';
     userId = user.id;
     userEmail = user.email || null;
 
@@ -200,57 +210,121 @@ export async function GET(request: NextRequest) {
 
       authState = 'AUTH_FAILED';
       whyBlocked = `organization_members query failed: ${membershipError.code} - ${membershipError.message}`;
-    } else {
+
+      // 即座にエラーレスポンスを返す
+      return NextResponse.json({
+        ok: false,
+        authState,
+        getUserStatus,
+        hasCookie: true,
+        userId,
+        userEmail,
+        whyBlocked,
+        whichQuery: 'organization_members',
+        error: {
+          code: membershipError.code,
+          message: membershipError.message,
+          details: membershipError.details,
+          hint: membershipError.hint,
+        },
+        queries,
+        sha,
+        requestId,
+        host,
+        proto,
+        timestamp: new Date().toISOString(),
+      }, { status: 200, headers: responseHeaders });
+    }
+
+    queries.push({
+      queryName: 'organization_members',
+      status: 'success',
+      rowCount: memberships?.length || 0,
+      data: memberships?.map(m => ({ organization_id: m.organization_id, role: m.role })),
+    });
+
+    // メンバーシップなし
+    if (!memberships || memberships.length === 0) {
+      authState = 'AUTHENTICATED_NO_ORG';
+      whyBlocked = 'User has no organization membership';
+
+      return NextResponse.json({
+        ok: true,
+        authState,
+        getUserStatus,
+        hasCookie: true,
+        userId,
+        userEmail,
+        whyBlocked,
+        queries,
+        sha,
+        requestId,
+        host,
+        proto,
+        timestamp: new Date().toISOString(),
+      }, { status: 200, headers: responseHeaders });
+    }
+
+    // ========================================
+    // Step 4: organizations クエリ
+    // ========================================
+    const orgIds = memberships.map(m => m.organization_id);
+
+    const { data: orgsData, error: orgsError } = await supabase
+      .from('organizations')
+      .select('id, name, slug, plan')
+      .in('id', orgIds);
+
+    if (orgsError) {
       queries.push({
-        queryName: 'organization_members',
-        status: 'success',
-        rowCount: memberships?.length || 0,
-        data: memberships?.map(m => ({ organization_id: m.organization_id, role: m.role })),
+        queryName: 'organizations',
+        status: 'error',
+        supabaseError: {
+          code: orgsError.code,
+          message: orgsError.message,
+          details: orgsError.details,
+          hint: orgsError.hint,
+        },
       });
 
-      // メンバーシップなし
-      if (!memberships || memberships.length === 0) {
-        authState = 'AUTHENTICATED_NO_ORG';
-        whyBlocked = 'User has no organization membership';
-      } else {
-        // ========================================
-        // Step 4: organizations クエリ
-        // ========================================
-        const orgIds = memberships.map(m => m.organization_id);
+      authState = 'AUTH_FAILED';
+      whyBlocked = `organizations query failed: ${orgsError.code} - ${orgsError.message}`;
 
-        const { data: orgsData, error: orgsError } = await supabase
-          .from('organizations')
-          .select('id, name, slug, plan')
-          .in('id', orgIds);
-
-        if (orgsError) {
-          queries.push({
-            queryName: 'organizations',
-            status: 'error',
-            supabaseError: {
-              code: orgsError.code,
-              message: orgsError.message,
-              details: orgsError.details,
-              hint: orgsError.hint,
-            },
-          });
-
-          authState = 'AUTH_FAILED';
-          whyBlocked = `organizations query failed: ${orgsError.code} - ${orgsError.message}`;
-        } else {
-          queries.push({
-            queryName: 'organizations',
-            status: 'success',
-            rowCount: orgsData?.length || 0,
-            data: orgsData?.map(o => ({ id: o.id, name: o.name, slug: o.slug, plan: o.plan })),
-          });
-
-          // 全て成功
-          authState = 'AUTHENTICATED_READY';
-          whyBlocked = null;
-        }
-      }
+      // 即座にエラーレスポンスを返す
+      return NextResponse.json({
+        ok: false,
+        authState,
+        getUserStatus,
+        hasCookie: true,
+        userId,
+        userEmail,
+        whyBlocked,
+        whichQuery: 'organizations',
+        error: {
+          code: orgsError.code,
+          message: orgsError.message,
+          details: orgsError.details,
+          hint: orgsError.hint,
+        },
+        queries,
+        sha,
+        requestId,
+        host,
+        proto,
+        timestamp: new Date().toISOString(),
+      }, { status: 200, headers: responseHeaders });
     }
+
+    queries.push({
+      queryName: 'organizations',
+      status: 'success',
+      rowCount: orgsData?.length || 0,
+      data: orgsData?.map(o => ({ id: o.id, name: o.name, slug: o.slug, plan: o.plan })),
+    });
+
+    // 全て成功
+    authState = 'AUTHENTICATED_READY';
+    whyBlocked = null;
 
     // ログ出力（Vercel Logs で追跡可能）
     console.log('[dashboard-probe]', {
@@ -263,7 +337,9 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
+      ok: true,
       authState,
+      getUserStatus,
       hasCookie: true,
       userId,
       userEmail,
@@ -274,14 +350,7 @@ export async function GET(request: NextRequest) {
       host,
       proto,
       timestamp: new Date().toISOString(),
-    }, {
-      status: 200,
-      headers: {
-        'Cache-Control': 'no-store, must-revalidate',
-        'Content-Type': 'application/json',
-        'x-request-id': requestId,
-      },
-    });
+    }, { status: 200, headers: responseHeaders });
 
   } catch (error) {
     console.error('[dashboard-probe] Error:', {
@@ -290,24 +359,26 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
+      ok: false,
       authState: 'AUTH_FAILED',
+      getUserStatus: 'error' as const,
       hasCookie: cookieHeaderPresent,
       userId: null,
       userEmail: null,
       whyBlocked: `Exception: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      whichQuery: 'unknown',
+      error: {
+        code: 'EXCEPTION',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        details: null,
+        hint: null,
+      },
       queries,
       sha,
       requestId,
       host,
       proto,
       timestamp: new Date().toISOString(),
-    }, {
-      status: 200,
-      headers: {
-        'Cache-Control': 'no-store, must-revalidate',
-        'Content-Type': 'application/json',
-        'x-request-id': requestId,
-      },
-    });
+    }, { status: 200, headers: responseHeaders });
   }
 }
