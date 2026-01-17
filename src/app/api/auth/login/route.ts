@@ -136,7 +136,23 @@ export async function POST(request: NextRequest) {
       return errorResponse;
     }
 
-    // setAll が呼ばれたか確認（公式パターンでは signInWithPassword 成功後に自動で呼ばれるはず）
+    // ========================================
+    // 【重要】setAll が自動で呼ばれない問題への対応
+    // signInWithPassword 成功後、明示的に setSession を呼んで
+    // 内部ストレージハンドラに Cookie 書き込みをトリガーさせる
+    // ========================================
+    await supabase.auth.setSession({
+      access_token: data.session.access_token,
+      refresh_token: data.session.refresh_token,
+    });
+
+    console.log('[api/auth/login] setSession called to trigger setAll', {
+      requestId,
+      setAllCalledCount,
+      setAllCookieNames,
+    });
+
+    // setAll が呼ばれたか確認
     console.log('[api/auth/login] Login successful', {
       requestId,
       userId: data.user?.id,
