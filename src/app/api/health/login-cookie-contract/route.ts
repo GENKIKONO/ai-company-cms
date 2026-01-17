@@ -36,7 +36,7 @@ export interface LoginCookieContractResponse {
   supabaseCookieNames: string[];
 
   // 契約状態
-  contractStatus: 'VALID' | 'INVALID_NO_AUTH_TOKEN' | 'INVALID_NO_COOKIES';
+  contractStatus: 'VALID' | 'INVALID_NO_AUTH_TOKEN' | 'INVALID_NO_REFRESH_TOKEN' | 'INVALID_BOTH_MISSING' | 'INVALID_NO_COOKIES';
   contractMessage: string;
 
   // メタ情報
@@ -81,22 +81,31 @@ export async function GET(request: NextRequest): Promise<NextResponse<LoginCooki
   const refreshTokenCookieNames = cookieNames.filter(name => refreshTokenPattern.test(name));
   const hasRefreshTokenCookie = refreshTokenCookieNames.length > 0;
 
-  // 契約状態の判定
-  let contractStatus: 'VALID' | 'INVALID_NO_AUTH_TOKEN' | 'INVALID_NO_COOKIES';
+  // 契約状態の判定（詳細版）
+  const hasAnyAuthToken = authTokenCookieNames.length > 0;
+  let contractStatus: 'VALID' | 'INVALID_NO_AUTH_TOKEN' | 'INVALID_NO_REFRESH_TOKEN' | 'INVALID_BOTH_MISSING' | 'INVALID_NO_COOKIES';
   let contractMessage: string;
 
-  if (authTokenCookieNames.length > 0) {
-    contractStatus = 'VALID';
-    contractMessage = `auth-token Cookie detected: ${authTokenCookieNames.join(', ')}`;
-  } else if (hasRefreshTokenCookie) {
-    contractStatus = 'INVALID_NO_AUTH_TOKEN';
-    contractMessage = 'refresh-token exists but auth-token is missing. This causes "Auth session missing!" error.';
-  } else if (supabaseCookieNames.length === 0) {
+  if (supabaseCookieNames.length === 0) {
+    // Supabase Cookie が全くない
     contractStatus = 'INVALID_NO_COOKIES';
     contractMessage = 'No Supabase cookies found. User is not logged in.';
-  } else {
+  } else if (!hasAnyAuthToken && !hasRefreshTokenCookie) {
+    // 両方ない
+    contractStatus = 'INVALID_BOTH_MISSING';
+    contractMessage = `Supabase cookies found (${supabaseCookieNames.join(', ')}) but both auth-token and refresh-token are missing.`;
+  } else if (!hasAnyAuthToken) {
+    // auth-token がない（refresh-token はある）
     contractStatus = 'INVALID_NO_AUTH_TOKEN';
-    contractMessage = `Supabase cookies found (${supabaseCookieNames.join(', ')}) but no auth-token.`;
+    contractMessage = 'refresh-token exists but auth-token is missing. This causes "Auth session missing!" error.';
+  } else if (!hasRefreshTokenCookie) {
+    // refresh-token がない（auth-token はある）
+    contractStatus = 'INVALID_NO_REFRESH_TOKEN';
+    contractMessage = `auth-token exists (${authTokenCookieNames.join(', ')}) but refresh-token is missing. Session may expire soon.`;
+  } else {
+    // 両方ある = VALID
+    contractStatus = 'VALID';
+    contractMessage = `Cookie contract valid. auth-token: ${authTokenCookieNames.join(', ')}, refresh-token: ${refreshTokenCookieNames.join(', ')}`;
   }
 
   console.log('[login-cookie-contract] Cookie analysis', {
