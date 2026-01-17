@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
 
 interface LoginFormProps {
@@ -25,42 +24,43 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
     setError('');
 
     try {
-      const supabase = createClient();
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Route Handler 経由でサーバーサイドログイン（Cookie を確実に発行）
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          redirectTo: redirectUrl || '/dashboard',
+        }),
+        credentials: 'include', // Cookie を確実に受け取る
       });
 
-      if (signInError) {
-        let errorMessage = signInError.message;
-        
-        if (signInError.message.includes('Invalid login credentials')) {
-          errorMessage = 'メールアドレスまたはパスワードが正しくありません。';
-        } else if (signInError.message.includes('Email not confirmed') || 
-                   signInError.message.includes('email_not_confirmed') ||
-                   signInError.message.includes('signup_disabled')) {
-          errorMessage = 'メールアドレスが確認されていません。';
+      const result = await response.json();
+
+      if (!response.ok) {
+        let errorMessage = result.error || 'ログインに失敗しました。';
+
+        if (errorMessage.includes('メールアドレスが確認されていません')) {
           setShowResendConfirmation(true);
-        } else if (signInError.message.includes('Too many requests')) {
-          errorMessage = '試行回数が上限に達しました。しばらく時間をおいてからお試しください。';
         }
-        
+
         setError(errorMessage);
+        logger.warn('[LoginForm] Login failed', { requestId: result.requestId, error: errorMessage });
         return;
       }
 
-      if (data.session) {
-        logger.debug('[LoginForm] ログイン成功、リダイレクト開始');
-        
-        // 認証状態をリフレッシュしてからリダイレクト
-        router.refresh();
-        
-        const targetUrl = redirectUrl || '/dashboard';
-        router.push(targetUrl);
-      } else {
-        setError('ログインに失敗しました。セッションが作成されませんでした。');
-      }
-      
+      logger.debug('[LoginForm] ログイン成功、リダイレクト開始', { requestId: result.requestId });
+
+      // Cookie が設定された状態でリダイレクト
+      // router.refresh() で RSC を再取得してからナビゲーション
+      router.refresh();
+
+      const targetUrl = result.redirectTo || '/dashboard';
+      router.push(targetUrl);
+
     } catch (err) {
       logger.error('Login error:', { data: err });
       setError('ログインに失敗しました。');
