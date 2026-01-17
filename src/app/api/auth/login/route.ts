@@ -2,9 +2,10 @@
  * Email/Password Login Route Handler
  *
  * サーバーサイドで signInWithPassword を実行し、Cookie を確実に発行する。
- * クライアントサイドのみの認証では本番で Cookie が設定されない問題を解決。
  *
- * @supabase/ssr 推奨パターンに準拠
+ * 【重要】@supabase/ssr の setAll が自動的に呼ばれない問題への対応：
+ * - signInWithPassword 成功後、明示的にセッショントークンを Cookie に設定
+ * - これにより、setAll の呼び出しに依存しない確実な Cookie 発行を保証
  *
  * デバッグヘッダ（値は出さない）:
  * - x-auth-set-cookie-count: Cookie発行数
@@ -15,14 +16,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
+// Supabase プロジェクト参照を環境変数から取得
+function getProjectRef(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match ? match[1] : 'unknown';
+}
+
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
   const host = request.headers.get('host') || 'unknown';
   const proto = request.headers.get('x-forwarded-proto') || 'unknown';
+  const projectRef = getProjectRef();
 
   // Cookie 診断用の変数
-  let setCookieCount = 0;
-  let setCookieNames: string[] = [];
+  let setAllCalledCount = 0;
+  let setAllCookieNames: string[] = [];
+  let manualCookieCount = 0;
 
   try {
     const body = await request.json();
@@ -35,7 +45,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Cookie を設定するための response を先に作成（公式パターン）
+    // Cookie を設定するための response を先に作成
     const response = NextResponse.json(
       { ok: true, redirectTo: redirectTo || '/dashboard', requestId },
       { status: 200 }
@@ -51,20 +61,16 @@ export async function POST(request: NextRequest) {
             return request.cookies.getAll();
           },
           setAll(cookiesToSet) {
-            // 診断用に記録
-            setCookieCount = cookiesToSet.length;
-            setCookieNames = cookiesToSet.map(c => c.name);
+            // 診断用に記録（setAll が呼ばれたかどうかを確認）
+            setAllCalledCount = cookiesToSet.length;
+            setAllCookieNames = cookiesToSet.map(c => c.name);
 
-            // サーバーログ（Step 3-B）
-            console.log('[api/auth/login] setAll called', {
+            console.log('[api/auth/login] setAll called (automatic)', {
               requestId,
-              count: setCookieCount,
-              names: setCookieNames,
-              host,
-              proto,
+              count: setAllCalledCount,
+              names: setAllCookieNames,
             });
 
-            // response.cookies.set に書く（これが Set-Cookie ヘッダになる）
             cookiesToSet.forEach(({ name, value, options }) => {
               response.cookies.set(name, value, options);
             });
@@ -84,10 +90,9 @@ export async function POST(request: NextRequest) {
         requestId,
         errorCode: error.code,
         errorMessage: error.message,
-        setCookieCount, // エラー時も setAll が走ったか確認
+        setAllCalledCount,
       });
 
-      // エラーメッセージを日本語化
       let errorMessage = error.message;
       if (error.message.includes('Invalid login credentials')) {
         errorMessage = 'メールアドレスまたはパスワードが正しくありません。';
@@ -104,8 +109,7 @@ export async function POST(request: NextRequest) {
         { ok: false, error: errorMessage, code: error.code, requestId },
         { status: 401 }
       );
-      // エラー時もデバッグヘッダを付与
-      errorResponse.headers.set('x-auth-set-cookie-count', String(setCookieCount));
+      errorResponse.headers.set('x-auth-set-cookie-count', String(setAllCalledCount));
       errorResponse.headers.set('x-auth-host', host);
       errorResponse.headers.set('x-auth-proto', proto);
       return errorResponse;
@@ -119,21 +123,55 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // デバッグヘッダを付与（Step 3-A）
-    response.headers.set('x-auth-set-cookie-count', String(setCookieCount));
-    response.headers.set('x-auth-set-cookie-names', setCookieNames.join(','));
+    // ========================================
+    // 【重要】明示的に Cookie を設定（setAll に依存しない）
+    // ========================================
+    const session = data.session;
+    const cookieOptions = {
+      path: '/',
+      httpOnly: false, // Supabase クライアントがアクセスできるように
+      secure: proto === 'https',
+      sameSite: 'lax' as const,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    };
+
+    // Access token (チャンク分割が必要な場合は後で対応)
+    const accessTokenCookieName = `sb-${projectRef}-auth-token`;
+    response.cookies.set(accessTokenCookieName, session.access_token, cookieOptions);
+    manualCookieCount++;
+
+    // Refresh token
+    const refreshTokenCookieName = `sb-${projectRef}-refresh-token`;
+    response.cookies.set(refreshTokenCookieName, session.refresh_token, cookieOptions);
+    manualCookieCount++;
+
+    console.log('[api/auth/login] Manual cookies set', {
+      requestId,
+      manualCookieCount,
+      cookieNames: [accessTokenCookieName, refreshTokenCookieName],
+      setAllCalledCount,
+      setAllCookieNames,
+    });
+
+    // デバッグヘッダを付与
+    const totalCookieCount = setAllCalledCount > 0 ? setAllCalledCount : manualCookieCount;
+    response.headers.set('x-auth-set-cookie-count', String(totalCookieCount));
+    response.headers.set('x-auth-set-cookie-names', setAllCalledCount > 0
+      ? setAllCookieNames.join(',')
+      : [accessTokenCookieName, refreshTokenCookieName].join(','));
     response.headers.set('x-auth-host', host);
     response.headers.set('x-auth-proto', proto);
     response.headers.set('x-request-id', requestId);
+    response.headers.set('x-auth-setall-called', String(setAllCalledCount > 0));
+    response.headers.set('x-auth-manual-cookies', String(manualCookieCount));
 
-    // 成功ログ
     console.log('[api/auth/login] Login successful', {
       requestId,
       userId: data.user?.id,
-      hasSession: !!data.session,
-      setCookieCount,
-      setCookieNames,
-      setCookieHeaderPresent: response.headers.has('set-cookie'),
+      hasSession: true,
+      setAllCalledCount,
+      manualCookieCount,
+      totalCookieCount,
     });
 
     return response;
