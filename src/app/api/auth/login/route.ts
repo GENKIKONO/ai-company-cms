@@ -138,21 +138,71 @@ export async function POST(request: NextRequest) {
 
     // ========================================
     // 【重要】setAll が自動で呼ばれない問題への対応
-    // signInWithPassword 成功後、明示的に setSession を呼んで
-    // 内部ストレージハンドラに Cookie 書き込みをトリガーさせる
+    // @supabase/ssr の setAll が確実に呼ばれない場合があるため、
+    // 手動で Cookie を設定する（フォールバック）
     // ========================================
+
+    // まず setSession を試して setAll をトリガー
     await supabase.auth.setSession({
       access_token: data.session.access_token,
       refresh_token: data.session.refresh_token,
     });
 
-    console.log('[api/auth/login] setSession called to trigger setAll', {
-      requestId,
-      setAllCalledCount,
-      setAllCookieNames,
-    });
+    // setAll が呼ばれなかった場合、手動で Cookie を設定
+    if (setAllCalledCount === 0) {
+      console.log('[api/auth/login] setAll was NOT called, setting cookies manually', { requestId });
 
-    // setAll が呼ばれたか確認
+      const session = data.session;
+      const isSecure = proto === 'https';
+
+      // Supabase SSR 形式: セッション情報を Base64 エンコードして Cookie に設定
+      const sessionData = {
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+        expires_at: session.expires_at,
+        expires_in: session.expires_in,
+        token_type: session.token_type || 'bearer',
+        user: session.user,
+      };
+
+      const cookieValue = Buffer.from(JSON.stringify(sessionData)).toString('base64');
+      const cookieName = `sb-${projectRef}-auth-token`;
+
+      // チャンク分割が必要な場合（4KB制限）
+      const CHUNK_SIZE = 3500;
+      if (cookieValue.length > CHUNK_SIZE) {
+        const chunks = Math.ceil(cookieValue.length / CHUNK_SIZE);
+        for (let i = 0; i < chunks; i++) {
+          const chunkName = `${cookieName}.${i}`;
+          const chunkValue = cookieValue.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+          response.cookies.set(chunkName, chunkValue, {
+            path: '/',
+            httpOnly: false,
+            secure: isSecure,
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+          });
+          setAllCookieNames.push(chunkName);
+        }
+      } else {
+        response.cookies.set(cookieName, cookieValue, {
+          path: '/',
+          httpOnly: false,
+          secure: isSecure,
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+        });
+        setAllCookieNames.push(cookieName);
+      }
+
+      setAllCalledCount = setAllCookieNames.length;
+      console.log('[api/auth/login] Manual cookies set', {
+        requestId,
+        cookieNames: setAllCookieNames,
+        cookieValueLength: cookieValue.length,
+      });
+    }
+
     console.log('[api/auth/login] Login successful', {
       requestId,
       userId: data.user?.id,
