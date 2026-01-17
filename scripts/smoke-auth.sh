@@ -100,18 +100,78 @@ if [ -n "$SMOKE_EMAIL" ] && [ -n "$SMOKE_PASSWORD" ]; then
   echo ""
   echo "=== Authenticated Tests (SMOKE_EMAIL set) ==="
 
-  # 7a. ログイン実行（Cookie取得）
+  # 7a. ログイン実行（Cookie取得 + Set-Cookie ヘッダー検証）
   echo "7a. Logging in with SMOKE_EMAIL..."
   COOKIE_JAR=$(mktemp)
-  LOGIN_RESPONSE=$(curl -s -c "$COOKIE_JAR" -X POST "$BASE_URL/api/auth/login" \
+  HEADER_FILE=$(mktemp)
+
+  # Set-Cookie ヘッダーも取得（-D でヘッダーをファイルに保存）
+  LOGIN_RESPONSE=$(curl -s -c "$COOKIE_JAR" -D "$HEADER_FILE" -X POST "$BASE_URL/api/auth/login" \
     -H "Content-Type: application/json" \
     -d "{\"email\":\"$SMOKE_EMAIL\",\"password\":\"$SMOKE_PASSWORD\"}")
 
   if echo "$LOGIN_RESPONSE" | grep -q '"ok":true'; then
-    echo "   OK: Login successful"
+    echo "   OK: Login response ok:true"
 
-    # 7b. auth-snapshot確認（ログイン後）
-    echo "7b. Checking auth-snapshot after login..."
+    # Set-Cookie ヘッダーの検証（最重要）
+    echo ""
+    echo "   === Set-Cookie Header Analysis ==="
+    SET_COOKIE_COUNT=$(grep -i "^Set-Cookie:" "$HEADER_FILE" | wc -l | tr -d ' ')
+    echo "   Set-Cookie count: $SET_COOKIE_COUNT"
+
+    # auth-token の存在確認（chunk も含む）
+    HAS_AUTH_TOKEN=$(grep -i "^Set-Cookie:.*auth-token" "$HEADER_FILE" | head -1 || echo "")
+    if [ -n "$HAS_AUTH_TOKEN" ]; then
+      echo "   OK: auth-token found in Set-Cookie"
+      # auth-token の名前を表示
+      AUTH_TOKEN_NAME=$(echo "$HAS_AUTH_TOKEN" | grep -o 'sb-[^=]*auth-token[^=]*' | head -1)
+      echo "   auth-token cookie name: $AUTH_TOKEN_NAME"
+    else
+      echo "   FAIL: auth-token NOT found in Set-Cookie headers!"
+      echo "   Set-Cookie headers:"
+      grep -i "^Set-Cookie:" "$HEADER_FILE" | head -5
+      rm -f "$COOKIE_JAR" "$HEADER_FILE"
+      exit 1
+    fi
+
+    # refresh-token の存在確認
+    HAS_REFRESH_TOKEN=$(grep -i "^Set-Cookie:.*refresh-token" "$HEADER_FILE" | head -1 || echo "")
+    if [ -n "$HAS_REFRESH_TOKEN" ]; then
+      echo "   OK: refresh-token found in Set-Cookie"
+    else
+      echo "   WARN: refresh-token not found in Set-Cookie"
+    fi
+
+    # x-auth-has-auth-token ヘッダーの確認
+    AUTH_TOKEN_HEADER=$(grep -i "^x-auth-has-auth-token:" "$HEADER_FILE" | head -1 || echo "")
+    echo "   $AUTH_TOKEN_HEADER"
+
+    rm -f "$HEADER_FILE"
+    echo "   ==================================="
+    echo ""
+
+    # 7b. login-cookie-contract 確認（Cookie がブラウザに保存されているか）
+    echo "7b. Checking /api/health/login-cookie-contract..."
+    CONTRACT_RESPONSE=$(curl -s -b "$COOKIE_JAR" "$BASE_URL/api/health/login-cookie-contract")
+    CONTRACT_STATUS=$(echo "$CONTRACT_RESPONSE" | grep -o '"contractStatus":"[^"]*"' | sed 's/"contractStatus":"\([^"]*\)"/\1/')
+    CONTRACT_HAS_AUTH=$(echo "$CONTRACT_RESPONSE" | grep -o '"hasAuthTokenCookie":[^,}]*' | head -1)
+    CONTRACT_AUTH_NAMES=$(echo "$CONTRACT_RESPONSE" | grep -o '"authTokenCookieNames":\[[^]]*\]' | head -1)
+
+    echo "   contractStatus: $CONTRACT_STATUS"
+    echo "   $CONTRACT_HAS_AUTH"
+    echo "   $CONTRACT_AUTH_NAMES"
+
+    if [ "$CONTRACT_STATUS" = "VALID" ]; then
+      echo "   OK: Cookie contract is VALID"
+    else
+      echo "   FAIL: Cookie contract is $CONTRACT_STATUS"
+      echo "   Full response: $CONTRACT_RESPONSE"
+      rm -f "$COOKIE_JAR"
+      exit 1
+    fi
+
+    # 7c. auth-snapshot確認（ログイン後）
+    echo "7c. Checking auth-snapshot after login..."
     AUTH_RESPONSE=$(curl -s -b "$COOKIE_JAR" "$BASE_URL/api/health/auth-snapshot")
     AUTH_STATE=$(echo "$AUTH_RESPONSE" | grep -o '"authState":"[^"]*"' | sed 's/"authState":"\([^"]*\)"/\1/')
 
@@ -127,8 +187,8 @@ if [ -n "$SMOKE_EMAIL" ] && [ -n "$SMOKE_PASSWORD" ]; then
       exit 1
     fi
 
-    # 7c. dashboard-probe確認（ログイン後）
-    echo "7c. Checking dashboard-probe after login..."
+    # 7d. dashboard-probe確認（ログイン後）
+    echo "7d. Checking dashboard-probe after login..."
     PROBE_RESPONSE=$(curl -s -b "$COOKIE_JAR" "$BASE_URL/api/health/dashboard-probe")
     PROBE_STATE=$(echo "$PROBE_RESPONSE" | grep -o '"authState":"[^"]*"' | sed 's/"authState":"\([^"]*\)"/\1/')
     WHY_BLOCKED=$(echo "$PROBE_RESPONSE" | grep -o '"whyBlocked":"[^"]*"' | sed 's/"whyBlocked":"\([^"]*\)"/\1/' || echo "null")
@@ -142,16 +202,18 @@ if [ -n "$SMOKE_EMAIL" ] && [ -n "$SMOKE_PASSWORD" ]; then
       echo "   WARN: dashboard-probe shows $PROBE_STATE"
     fi
 
-    # 7d. /api/dashboard/init 確認（ログイン後）- 最重要テスト
-    echo "7d. Checking /api/dashboard/init after login..."
+    # 7e. /api/dashboard/init 確認（ログイン後）- 最重要テスト
+    echo "7e. Checking /api/dashboard/init after login..."
     INIT_RESPONSE=$(curl -s -b "$COOKIE_JAR" "$BASE_URL/api/dashboard/init")
     INIT_OK=$(echo "$INIT_RESPONSE" | grep -o '"ok":[^,]*' | head -1)
     INIT_WHICH_STEP=$(echo "$INIT_RESPONSE" | grep -o '"whichStep":"[^"]*"' | head -1)
     INIT_SESSION_RECOVERED=$(echo "$INIT_RESPONSE" | grep -o '"sessionRecovered":[^,}]*' | head -1)
+    INIT_HAS_AUTH=$(echo "$INIT_RESPONSE" | grep -o '"hasAuthTokenCookie":[^,}]*' | head -1)
 
     echo "   $INIT_OK"
     echo "   $INIT_WHICH_STEP"
     echo "   $INIT_SESSION_RECOVERED"
+    echo "   $INIT_HAS_AUTH"
 
     if echo "$INIT_RESPONSE" | grep -q '"ok":true'; then
       echo "   OK: /api/dashboard/init returns ok:true"
@@ -162,8 +224,8 @@ if [ -n "$SMOKE_EMAIL" ] && [ -n "$SMOKE_PASSWORD" ]; then
       exit 1
     fi
 
-    # 7e. /dashboard/posts ページ確認
-    echo "7e. Checking /dashboard/posts page..."
+    # 7f. /dashboard/posts ページ確認
+    echo "7f. Checking /dashboard/posts page..."
     DASHBOARD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -b "$COOKIE_JAR" "$BASE_URL/dashboard/posts")
     if [ "$DASHBOARD_STATUS" = "200" ]; then
       echo "   OK: /dashboard/posts returns 200"

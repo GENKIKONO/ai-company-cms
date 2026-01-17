@@ -15,6 +15,10 @@
  * - x-auth-supabase-ref: projectRef
  * - x-auth-host: リクエストHost
  * - x-auth-proto: プロトコル
+ *
+ * 2024-01: Cookie発行を公式chunk方式に統一
+ * - httpOnly は削除（Supabase SSR はクライアントアクセス可能にする必要あり）
+ * - Set-Cookie ヘッダーの詳細をログ出力
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
@@ -49,7 +53,7 @@ export async function GET() {
   });
 }
 
-// Cookie属性を診断用にマスクして文字列化
+// Cookie属性を診断用に記録
 interface CookieDiagnostic {
   name: string;
   path: string;
@@ -109,7 +113,7 @@ export async function POST(request: NextRequest) {
             setAllCalledCount = cookiesToSet.length;
             setAllCookieNames = cookiesToSet.map(c => c.name);
 
-            // Task 1: 各Cookieの属性を診断用に記録
+            // 各Cookieの属性を診断用に記録
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieDiagnostics.push({
                 name,
@@ -130,26 +134,28 @@ export async function POST(request: NextRequest) {
               diagnostics: cookieDiagnostics,
             });
 
-            // Task 2: Cookie属性を強制的に正規化（Path問題を確実に潰す）
+            // 公式パターン: Supabase SSR が渡すオプションをそのまま使用
+            // ただし path は必ず "/" にする（重要）
+            // httpOnly は false にする（Supabase クライアントがアクセスする必要あり）
             cookiesToSet.forEach(({ name, value, options }) => {
-              const normalizedOptions = {
+              // 重要: Supabase SSR のデフォルトオプションを尊重しつつ、path のみ強制
+              const cookieOptions = {
                 ...options,
                 path: '/',  // 最重要: 必ず "/" にする
-                sameSite: 'lax' as const,
-                secure: isSecure,
-                httpOnly: true,
+                // httpOnly は Supabase のデフォルト（false）を使う
+                // secure は options から継承
+                // sameSite は options から継承
               };
 
-              console.log('[api/auth/login] Setting cookie with normalized options', {
+              console.log('[api/auth/login] Setting cookie', {
                 requestId,
                 name,
+                valueLength: value.length,
                 originalPath: options?.path,
-                normalizedPath: normalizedOptions.path,
-                secure: normalizedOptions.secure,
-                sameSite: normalizedOptions.sameSite,
+                finalOptions: cookieOptions,
               });
 
-              response.cookies.set(name, value, normalizedOptions);
+              response.cookies.set(name, value, cookieOptions);
             });
           },
         },
@@ -212,12 +218,48 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // 公式パターン: signInWithPassword が setAll を自動で呼ぶ
-    // 手動Cookie発行は禁止（混線の原因）
-    // setSession の追加呼び出しも禁止（上書きの原因）
+    // Set-Cookie ヘッダーの検証（重要）
     // ========================================
+    const setCookieHeaders = response.headers.getSetCookie();
+    const setCookieNames = setCookieHeaders.map(header => {
+      const match = header.match(/^([^=]+)=/);
+      return match ? match[1] : 'unknown';
+    });
+    const setCookieSizes = setCookieHeaders.map(header => header.length);
 
-    // setAll が呼ばれなかった場合は警告ログのみ（手動設定しない）
+    // auth-token が含まれているか確認
+    const hasAuthTokenInSetCookie = setCookieNames.some(name =>
+      name.includes('auth-token') || name.match(/auth-token\.\d+/)
+    );
+    const hasRefreshTokenInSetCookie = setCookieNames.some(name =>
+      name.includes('refresh-token')
+    );
+
+    console.log('[api/auth/login] Final Set-Cookie analysis', {
+      requestId,
+      userId: data.user?.id,
+      setAllCalledCount,
+      setAllCookieNames,
+      setCookieHeaderCount: setCookieHeaders.length,
+      setCookieNames,
+      setCookieSizes,
+      hasAuthTokenInSetCookie,
+      hasRefreshTokenInSetCookie,
+      // 各Set-Cookieヘッダーの最初の50文字（デバッグ用）
+      setCookiePreviews: setCookieHeaders.map(h => h.substring(0, 80) + '...'),
+    });
+
+    // 警告: auth-token が Set-Cookie に含まれていない場合
+    if (!hasAuthTokenInSetCookie) {
+      console.warn('[api/auth/login] WARNING: auth-token NOT in Set-Cookie headers!', {
+        requestId,
+        setCookieNames,
+        setAllCookieNames,
+        diagnostics: cookieDiagnostics,
+      });
+    }
+
+    // setAll が呼ばれなかった場合は警告
     if (setAllCalledCount === 0) {
       console.warn('[api/auth/login] WARNING: setAll was NOT called by signInWithPassword', {
         requestId,
@@ -232,12 +274,15 @@ export async function POST(request: NextRequest) {
       hasSession: true,
       setAllCalledCount,
       setAllCookieNames,
+      setCookieHeaderCount: setCookieHeaders.length,
     });
 
     // デバッグヘッダを付与
     response.headers.set('x-auth-request-id', requestId);
-    response.headers.set('x-auth-set-cookie-count', String(setAllCalledCount));
-    response.headers.set('x-auth-cookie-names', setAllCookieNames.join(','));
+    response.headers.set('x-auth-set-cookie-count', String(setCookieHeaders.length));
+    response.headers.set('x-auth-set-cookie-names', setCookieNames.join(','));
+    response.headers.set('x-auth-has-auth-token', String(hasAuthTokenInSetCookie));
+    response.headers.set('x-auth-has-refresh-token', String(hasRefreshTokenInSetCookie));
     response.headers.set('x-auth-supabase-ref', projectRef);
     response.headers.set('x-auth-host', host);
     response.headers.set('x-auth-proto', proto);

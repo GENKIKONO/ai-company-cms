@@ -40,8 +40,9 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
 
       const result = await response.json();
 
-      if (!response.ok) {
-        // 401時は絶対に /dashboard に遷移しない
+      // 契約: 200 かつ ok:true の時だけ遷移する
+      // 401/404/500 はすべてエラー表示のみ（遷移禁止）
+      if (!response.ok || result.ok !== true) {
         const errorMessage = result.error || result.message || 'ログインに失敗しました。';
         const errorCode = result.code || 'unknown';
 
@@ -56,12 +57,13 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
           code: errorCode,
           error: errorMessage,
           status: response.status,
+          resultOk: result.ok,
         });
         // 明示的に return してナビゲーションを防止
         return;
       }
 
-      logger.debug('[LoginForm] ログイン成功、リダイレクト開始', { requestId: result.requestId });
+      logger.debug('[LoginForm] ログイン成功（200 + ok:true）、リダイレクト開始', { requestId: result.requestId });
 
       // Cookie が設定された状態でリダイレクト
       // router.refresh() で RSC を再取得してからナビゲーション
