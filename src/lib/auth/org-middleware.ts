@@ -14,20 +14,22 @@ function getEnvProjectRef(): string | null {
   return match ? match[1] : null;
 }
 
-// Cookie から projectRef を抽出（sb-XXX-auth-token）
+// Cookie から projectRef を抽出（sb-XXX-auth-token または sb-XXX-refresh-token）
+// Supabase Auth v2: auth-token は常在しないため refresh-token も対応
 async function getCookieProjectRefs(): Promise<string[]> {
   try {
     const cookieStore = await cookies();
     const allCookies = cookieStore.getAll();
-    const refs: string[] = [];
+    const refs = new Set<string>();
     for (const cookie of allCookies) {
       // sb-chyicolujwhkycpkxbej-auth-token -> chyicolujwhkycpkxbej
-      const match = cookie.name.match(/^sb-([^-]+)-auth-token/);
+      // sb-chyicolujwhkycpkxbej-refresh-token -> chyicolujwhkycpkxbej
+      const match = cookie.name.match(/^sb-([^-]+)-(auth-token|refresh-token)/);
       if (match) {
-        refs.push(match[1]);
+        refs.add(match[1]);
       }
     }
-    return refs;
+    return Array.from(refs);
   } catch {
     return [];
   }

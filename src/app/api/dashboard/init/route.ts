@@ -119,9 +119,11 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
     // ========================================
     // Cookie 契約チェック（最優先）
     // ========================================
+    // Supabase Auth v2 仕様: refresh-token Cookie があれば認証可能
+    // auth-token Cookie は常在しない（getUser() で都度取得される）
 
-    // Cookie が全くない場合
-    if (!hasAuthToken && !hasRefreshToken) {
+    // refresh-token Cookie がない場合のみ未認証扱い
+    if (!hasRefreshToken) {
       whichStep = 'no_cookies';
       return NextResponse.json({
         ok: false,
@@ -132,33 +134,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
         error: {
           code: 'NO_AUTH_COOKIE',
           message: 'No auth cookie found. Please login.',
-        },
-        requestId,
-        sha,
-        timestamp,
-      }, { status: 401, headers: responseHeaders });
-    }
-
-    // auth-token がない場合は COOKIE_CONTRACT_INVALID を返す
-    // これが根本問題なので、復旧を試みずに即エラー
-    if (!hasAuthToken) {
-      whichStep = 'cookie_contract_invalid';
-
-      console.error('[dashboard/init] COOKIE_CONTRACT_INVALID: auth-token missing', {
-        requestId,
-        cookieNames,
-        hasRefreshToken,
-      });
-
-      return NextResponse.json({
-        ok: false,
-        user: null,
-        organizations: [],
-        memberships: [],
-        diagnostics: { ...diagnostics, whichStep },
-        error: {
-          code: 'COOKIE_CONTRACT_INVALID',
-          message: 'auth-token Cookie is missing. Please login again.',
         },
         requestId,
         sha,
