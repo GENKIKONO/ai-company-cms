@@ -1,81 +1,60 @@
-あなたはClaude Codeです。AIOHub本番のログイン問題を最短で収束させます。推測で終わらせず、サーバー側の診断エンドポイントとUI上の判定で「原因がどれか」を確定して直してください。
+あなたはClaude Code。AIOHub本番の最優先バグは「ログイン後もCookieが0で、ダッシュボードが未認証扱いになる」こと。DB側（RLS/権限/ビュー）はOK、supabaseプロジェクト参照も一致（supabase-envで projectRef=chyicolujwhkycpkxbej / projectMismatch=false）。
+**“Claude側でできる検証はClaudeが完結させ、ユーザー確認はClaudeだけでは不可能な箇所に限定する”**方針で収束させる。
 
-0) 事実（Supabase SQLで確定済み）
+完了条件（Definition of Done）
+ 1. 自動テスト or 自動検証ログで「ログイン成功→Cookie発行→auth-snapshot success」まで確認できる
+ 2. 失敗時はログイン画面で理由が確定表示され、ダッシュボードへ遷移しない
+ 3. ユーザーがやる確認は「ブラウザの実ユーザー環境でしか起きない差分（Cookie保存/拡張機能/ブラウザ設定）」の確認だけ
 
-対象user_id: f57ee6af-e55e-4852-87db-d5a2c59f64ac
- • auth.users に存在する
- • email: ggg.golf.66@gmail.com
- • email_confirmed_at あり（メール確認済み）
- • auth.identities.provider = 'email'（= Email/Passwordログイン可能な区分）
- • last_sign_in_at = 2026-01-17 02:53:34+00（最近サインインが記録されている）
-→ DBの「ユーザー不在/未確認/OAuth専用」ではない。
+⸻
 
-従って、現象 invalid_credentials と Cookie=0 の原因候補は次の3つに絞られる：
-A. 入力パスワードが違う（UIがエラーでも /dashboard に進んでしまう等のUX不備含む）
-B. 本番アプリが別Supabaseプロジェクト/別キー/別URLを向いている（環境変数や参照のズレ）
-C. ログイン成功しても Cookie が発行・保存されていない（@supabase/ssrの使い方・SameSite/Domain/Path/secure 等）
+Phase 1（Claudeだけで完結させる：自動検証の整備）
 
-1) 完了条件（ここに到達するまで終わらない）
- 1. /auth/login で成功ログイン後、GET /api/health/auth-snapshot が
- • hasSbAuthCookie: true
- • totalCookieCount > 0
- • getUserStatus: success
- 2. ログイン失敗（invalid_credentials等）では
- • 絶対に /dashboard に遷移しない
- • 画面に code/message を表示する
- 3. 本番がどのSupabaseを向いているか、ユーザー作業ゼロで判定できる
- • /api/health/supabase-env でURL/ProjectRef/anonKey先頭/host/protoを返す
+Task A: サーバー側で100%確定できるログを揃える（必須）
+ • /api/auth/login（Email/Password）成功時・失敗時の両方で、必ず以下をVercel Logsに出す（requestId付き）
+ • result: success/fail
+ • errorCode / errorMessage（failのみ）
+ • setCookieHeaderPresent（true/false）
+ • setCookieCount（数だけ。cookieの中身は出さない）
+ • cookieNames（安全な範囲：sb-***-auth-token, refresh-token の名称だけ）
+ • response status
+ • /api/health/auth-snapshot はすでにあるので、cookieHeaderPresentも返す（なければ追加）
 
-2) まず「切り分け」を実装（これが最優先）
+Task B: “200なのにCookie=0”を成功扱いしない（必須）
 
-Task A: /api/health/supabase-env を追加（必須）
- • NEXT_PUBLIC_SUPABASE_URL の hostname
- • URLから projectRef を抽出して返す（例: chyicolujwhkycpkxbej）
- • NEXT_PUBLIC_SUPABASE_ANON_KEY の先頭8〜12文字だけ返す（漏洩しない）
- • server が見ている host/proto も返す
- • これを本番で叩けば「別プロジェクト参照」が即断定できる
+LoginFormの契約を固定：
+ • /api/auth/login が 401 → 絶対に遷移しない（画面に code/message 表示）
+ • /api/auth/login が 200 → 直後に /api/health/auth-snapshot を fetch
+ • hasSbAuthCookie=true & getUserStatus=success になった場合のみ /dashboard へ遷移
+ • 200なのに Cookie=0 のままなら「Cookie保存/送信失敗」として画面に確定表示し、遷移しない
 
-Task B: /api/auth/login のレスポンス契約を固定（必須）
+Task C: Claudeが自動で動作確認できる“E2E(ヘッドレス)”を入れる（必須）
+ • Playwrightで /auth/login → ログイン → /api/health/auth-snapshot の success を確認するテストを追加
+ • 認証情報は Vercel/Supabase の環境変数（E2E専用アカウント）で注入できるようにする
+ • もし本番でE2Eアカウントが用意できないなら、Preview環境で必ず通す（Productionはユーザー確認へ）
+ • テストは「ログイン成功後に sb-*-auth-token がブラウザCookieに存在する」まで確認する
 
-Route Handlerで signInWithPassword を行う。
- • 失敗時：HTTP 401 で { ok:false, code, message, requestId }
- • 成功時：HTTP 200 で { ok:true, requestId }
- • さらにレスポンスヘッダで診断可能にする：
- • x-auth-request-id
- • x-auth-set-cookie-count（Set-Cookieの数）
- • x-auth-cookie-names（名前だけ）
- • x-auth-supabase-ref（envから抽出したprojectRef）
-※「手動でaccess_token/refresh_tokenをcookieに直書き」しているなら一旦戻してよい。
-　最初は @supabase/ssr公式パターンでcookiesに確実に反映することを最優先。
+Task D: パスワード要因を切り離す（高レバレッジ）
+ • Magic Link（OTP）ログインを追加（/api/auth/magiclink）
+ • 目的：password起因かCookie起因かを即切り分け
+ • 成功/失敗をログイン画面に表示（ユーザーが迷わない）
 
-Task C: LoginForm の挙動を必ず修正（必須）
- • /api/auth/login が 401 を返したら router.push/replace を絶対にしない
- • 401時は画面に code/message を表示
- • 200 のときだけ /dashboard へ遷移
+⸻
 
-3) 追加で「ログイン成功なのにCookieが0」を潰す
+Phase 2（ユーザー確認が必要な部分：Claudeだけでは確定できない）
 
-Task D: Cookieがセットされているかをサーバーで断定できるようにする
- • /api/auth/login 成功時に cookies().getAll() を見て
- • sb--auth-token / refresh-token が存在しているかをログに出す
- • /api/health/auth-snapshot は既にあるので、
- • cookieHeaderPresent
- • allCookieNames
- • matchedCookieNames
-を必ず返して「ブラウザから送られてきているか」を確定できるようにする
+※ここは「ユーザーにやらせる」ではなく、「ユーザー環境でしか起きない差分を確認」するために最小限依頼する。
 
-4) 期待する検証フロー（ユーザー作業最小）
- 1. GET /api/health/supabase-env をブラウザで開くだけで「向いてるSupabase」が分かる
- 2. /auth/login でログイン → DevToolsで /api/auth/login を見る
- • 401なら code/message が画面に出て終わり（/dashboardに行かない）
- • 200なら x-auth-set-cookie-count>=1 が見える
- 3. 直後に /api/health/auth-snapshot
- • hasSbAuthCookie:true / getUserStatus:success で合格
+ユーザーに依頼するのは次の2点だけ：
+ 1. ブラウザで /auth/login 実行後、Networkで /api/auth/login のレスポンスヘッダを確認
+ • x-auth-set-cookie-count が 2 以上か
+ • Set-Cookie が返っているか（ヘッダが返ってるのに保存されないならブラウザ要因が濃厚）
+ 2. 直後に /api/health/auth-snapshot を開き、hasSbAuthCookie/totalCookieCount を確認
+→ この2点だけで「サーバーはCookieを返してるのに保存されない」か「そもそも返してない」かが確定する
 
-5) 実装後の報告フォーマット（必須）
- • デプロイSHA
- • /api/health/supabase-env の返却例
- • /api/auth/login 成功時のレスポンスヘッダ例（x-auth-set-cookie-count等）
- • auth-snapshot 成功例（hasSbAuthCookie:true）
+⸻
 
-以上。
+禁止事項（ループ防止）
+ • “ユーザーが試すまで分からない”を理由に実装を止めない
+ • 状態機械などの大規模リファクタは、Cookie問題の収束後
+ • 401/200の契約が曖昧なまま遷移させない（200+Cookie0は失敗扱い）
