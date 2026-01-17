@@ -26,6 +26,8 @@ import { DashboardAlert } from './ui/DashboardAlert';
 import { DashboardSection } from './ui/DashboardSection';
 import { getCurrentUserClient as getCurrentUser } from '@/lib/core/auth-state.client';
 import { createClient } from '@/lib/supabase/client';
+import type { AuthState } from '@/lib/auth/auth-state';
+import { canFetchDB } from '@/lib/auth/auth-state';
 import {
   hasOrgRole,
   isSiteAdmin,
@@ -157,6 +159,8 @@ export function DashboardPageShell({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  // Phase 3: AuthState による状態管理
+  const [authState, setAuthState] = useState<AuthState>('UNAUTHENTICATED');
   // 診断用: Supabase エラー詳細（PII なし）
   const [errorDetails, setErrorDetails] = useState<{
     supabaseCode?: string;
@@ -215,183 +219,225 @@ export function DashboardPageShell({
     setIsDataFetched(false);
 
     try {
-      // Get current user
-      // NOTE: Middleware handles auth redirect. If we reach here, user should be authenticated.
-      // Don't redirect on auth failure - show error instead to avoid redirect loops during navigation.
-      const currentUser = await getCurrentUser();
+      // ========================================
+      // Phase 3: AuthState 判定（DB fetch 前に必須）
+      // Cookieが無い状態で DB fetch が1本も飛ばない
+      // ========================================
+      const supabase = createClient();
 
-      // Check if this fetch is stale before proceeding
-      if (isStale()) {
+      // Step 1: getUser() でセッション確認（DB fetch ではない）
+      const { data: { user: authUser }, error: getUserError } = await supabase.auth.getUser();
+
+      if (isStale()) return;
+
+      // getUserError → AUTH_FAILED
+      if (getUserError) {
+        logger.warn('[DashboardPageShell] getUser failed', {
+          error: getUserError.message,
+          requestId,
+        });
+        setAuthState('AUTH_FAILED');
+        setError(`認証エラー: ${getUserError.message}`);
+        setErrorCode('AUTH_FAILED');
         return;
       }
 
-      if (!currentUser && !isPublic) {
-        // User should be authenticated (middleware passed), but client auth failed
-        // This can happen during navigation due to cookie sync timing
-        // Don't redirect - let the user retry or show error
+      // user なし → UNAUTHENTICATED
+      if (!authUser && !isPublic) {
+        setAuthState('UNAUTHENTICATED');
         setError('認証情報の取得に失敗しました。ページを再読み込みしてください。');
-        setErrorCode('AUTH_SYNC_ERROR');
+        setErrorCode('UNAUTHENTICATED');
+        return;
+      }
+
+      // Public ページの場合は認証不要
+      if (!authUser && isPublic) {
+        setAuthState('UNAUTHENTICATED');
+        setIsLoading(false);
+        setIsDataFetched(true);
+        return;
+      }
+
+      // ここから authUser は必ず存在する
+      // getCurrentUser で AppUser 型に変換
+      const currentUser = await getCurrentUser();
+
+      if (isStale()) return;
+
+      if (!currentUser) {
+        // getCurrentUser が null を返した（auth は OK だが profile がない等）
+        setAuthState('AUTH_FAILED');
+        setError('ユーザー情報の取得に失敗しました。');
+        setErrorCode('USER_PROFILE_ERROR');
         return;
       }
 
       setUser(currentUser);
 
-      if (currentUser) {
-        const supabase = createClient();
-        const mappedRole = mapRequiredRole(requiredRole);
+      // ========================================
+      // Phase 3: ここから DB fetch を許可
+      // AuthState は AUTHENTICATED_NO_ORG または AUTHENTICATED_READY のいずれか
+      // ========================================
+      const mappedRole = mapRequiredRole(requiredRole);
 
-        // サイト管理者専用ページの場合
-        if (siteAdminOnly || (requiredRole === 'admin' && !organization)) {
-          const isAdmin = await isSiteAdmin(supabase);
-          if (isStale()) return;
-          if (!isAdmin) {
-            setPermissionError('このページにアクセスするにはサイト管理者権限が必要です');
-            await logToAudit('page_access', 'denied', 'site_admin_required');
-            return;
-          }
+      // サイト管理者専用ページの場合
+      if (siteAdminOnly || (requiredRole === 'admin' && !organization)) {
+        const isAdmin = await isSiteAdmin(supabase);
+        if (isStale()) return;
+        if (!isAdmin) {
+          setPermissionError('このページにアクセスするにはサイト管理者権限が必要です');
+          await logToAudit('page_access', 'denied', 'site_admin_required');
+          return;
         }
+      }
 
-        // 組織所属の判定: organization_members を唯一の正規ソースとして使用
-        // v_current_user_orgs は不整合があるため使用しない
-        const { data: membershipData, error: membershipError } = await supabase
-          .from('organization_members')
-          .select('organization_id, role')
-          .eq('user_id', currentUser.id);
+      // 組織所属の判定: organization_members を唯一の正規ソースとして使用
+      // v_current_user_orgs は不整合があるため使用しない
+      const { data: membershipData, error: membershipError } = await supabase
+        .from('organization_members')
+        .select('organization_id, role')
+        .eq('user_id', currentUser.id);
+
+      if (isStale()) return;
+
+      if (membershipError) {
+        // 診断用: エラー詳細をキャプチャ
+        setErrorDetails({
+          supabaseCode: membershipError.code,
+          supabaseMessage: membershipError.message,
+          supabaseDetails: membershipError.details,
+          supabaseHint: membershipError.hint,
+          context: 'organization_members SELECT',
+        });
+
+        if (isRLSDeniedError(membershipError)) {
+          setErrorCode('RLS_DENIED');
+          setError('アクセス権限がありません');
+          await logToAudit('page_access', 'denied', 'rls_denied');
+          return;
+        }
+        if (isSessionExpiredError(membershipError)) {
+          // NOTE: Don't redirect - might be a timing issue during navigation
+          // Middleware handles actual session expiration
+          setError('セッションの確認に失敗しました。ページを再読み込みしてください。');
+          setErrorCode('SESSION_ERROR');
+          return;
+        }
+        // 取得失敗はエラー扱い（empty扱いにしない）
+        logger.error('[DashboardPageShell] organization_members query failed', {
+          error: { code: membershipError.code, message: membershipError.message, details: membershipError.details }
+        });
+        setError('組織情報の取得に失敗しました。ページを再読み込みしてください。');
+        setErrorCode('MEMBERSHIP_FETCH_ERROR');
+        return;
+      }
+
+      const memberships = membershipData || [];
+
+      // Phase 3: メンバーシップに基づいて AuthState を設定
+      if (memberships.length === 0) {
+        setAuthState('AUTHENTICATED_NO_ORG');
+      } else {
+        setAuthState('AUTHENTICATED_READY');
+      }
+
+      if (memberships.length > 0) {
+        // Get all organization details
+        const orgIds = memberships.map(m => m.organization_id);
+        const { data: orgsData, error: orgsError } = await supabase
+          .from('organizations')
+          .select('id, name, slug, plan')
+          .in('id', orgIds);
 
         if (isStale()) return;
 
-        if (membershipError) {
+        if (orgsError) {
           // 診断用: エラー詳細をキャプチャ
           setErrorDetails({
-            supabaseCode: membershipError.code,
-            supabaseMessage: membershipError.message,
-            supabaseDetails: membershipError.details,
-            supabaseHint: membershipError.hint,
-            context: 'organization_members SELECT',
+            supabaseCode: orgsError.code,
+            supabaseMessage: orgsError.message,
+            supabaseDetails: orgsError.details,
+            supabaseHint: orgsError.hint,
+            context: `organizations SELECT (ids: ${orgIds.length}件)`,
           });
 
-          if (isRLSDeniedError(membershipError)) {
-            setErrorCode('RLS_DENIED');
-            setError('アクセス権限がありません');
-            await logToAudit('page_access', 'denied', 'rls_denied');
-            return;
-          }
-          if (isSessionExpiredError(membershipError)) {
-            // NOTE: Don't redirect - might be a timing issue during navigation
-            // Middleware handles actual session expiration
-            setError('セッションの確認に失敗しました。ページを再読み込みしてください。');
-            setErrorCode('SESSION_ERROR');
-            return;
-          }
-          // 取得失敗はエラー扱い（empty扱いにしない）
-          logger.error('[DashboardPageShell] organization_members query failed', {
-            error: { code: membershipError.code, message: membershipError.message, details: membershipError.details }
+          // 組織詳細の取得失敗はエラー扱い（empty扱いにしない）
+          logger.error('[DashboardPageShell] organizations query failed', {
+            error: { code: orgsError.code, message: orgsError.message, details: orgsError.details },
+            membershipRowsCount: memberships.length,
+            orgIds
           });
+          if (isRLSDeniedError(orgsError)) {
+            setErrorCode('RLS_DENIED');
+            setError('組織情報へのアクセス権限がありません');
+            await logToAudit('page_access', 'denied', 'org_rls_denied');
+            return;
+          }
           setError('組織情報の取得に失敗しました。ページを再読み込みしてください。');
-          setErrorCode('MEMBERSHIP_FETCH_ERROR');
+          setErrorCode('ORG_FETCH_ERROR');
           return;
         }
 
-        const memberships = membershipData || [];
+        // Map organizations with their contexts
+        const orgContexts: OrganizationContext[] = (orgsData || []).map(org => ({
+          id: org.id,
+          name: org.name,
+          slug: org.slug,
+          plan: org.plan,
+        }));
 
-        if (memberships.length > 0) {
-          // Get all organization details
-          const orgIds = memberships.map(m => m.organization_id);
-          const { data: orgsData, error: orgsError } = await supabase
-            .from('organizations')
-            .select('id, name, slug, plan')
-            .in('id', orgIds);
+        setOrganizations(orgContexts);
 
-          if (isStale()) return;
+        // Set the first organization as the current one (or could be selected)
+        const firstMembership = memberships[0];
+        const currentOrg = orgContexts.find(o => o.id === firstMembership.organization_id) || orgContexts[0];
 
-          if (orgsError) {
-            // 診断用: エラー詳細をキャプチャ
-            setErrorDetails({
-              supabaseCode: orgsError.code,
-              supabaseMessage: orgsError.message,
-              supabaseDetails: orgsError.details,
-              supabaseHint: orgsError.hint,
-              context: `organizations SELECT (ids: ${orgIds.length}件)`,
-            });
+        if (currentOrg) {
+          setOrganization(currentOrg);
 
-            // 組織詳細の取得失敗はエラー扱い（empty扱いにしない）
-            logger.error('[DashboardPageShell] organizations query failed', {
-              error: { code: orgsError.code, message: orgsError.message, details: orgsError.details },
-              membershipRowsCount: memberships.length,
-              orgIds
-            });
-            if (isRLSDeniedError(orgsError)) {
-              setErrorCode('RLS_DENIED');
-              setError('組織情報へのアクセス権限がありません');
-              await logToAudit('page_access', 'denied', 'org_rls_denied');
+          // Set user role from first membership (for display purposes only)
+          const role = (firstMembership.role as UserRole) || 'viewer';
+          setUserRole(role);
+
+          // Check required permission via DB RPC
+          // 権限判定はDBに完全委譲 - JSでの比較は行わない
+          if (requiredRole !== 'viewer') {
+            const hasPermission = await hasOrgRole(supabase, currentOrg.id, mappedRole);
+            if (isStale()) return;
+            if (!hasPermission) {
+              setPermissionError(
+                `このページにアクセスするには${getRoleDisplayName(requiredRole)}以上の権限が必要です`
+              );
+              await logToAudit('page_access', 'denied', `required_role_${requiredRole}`);
               return;
             }
-            setError('組織情報の取得に失敗しました。ページを再読み込みしてください。');
-            setErrorCode('ORG_FETCH_ERROR');
-            return;
           }
+        }
+      } else {
+        // No organization membership - isReallyEmpty will be true
+        // ログ出力: 組織が0件になった理由を記録
+        logger.warn('[DashboardPageShell] No organization membership found', {
+          userId: currentUser.id,
+          membershipRowsCount: 0,
+          reason: 'organization_members returned empty for this user'
+        });
+        setOrganizations([]);
+        setOrganization(null);
 
-          // Map organizations with their contexts
-          const orgContexts: OrganizationContext[] = (orgsData || []).map(org => ({
-            id: org.id,
-            name: org.name,
-            slug: org.slug,
-            plan: org.plan,
-          }));
-
-          setOrganizations(orgContexts);
-
-          // Set the first organization as the current one (or could be selected)
-          const firstMembership = memberships[0];
-          const currentOrg = orgContexts.find(o => o.id === firstMembership.organization_id) || orgContexts[0];
-
-          if (currentOrg) {
-            setOrganization(currentOrg);
-
-            // Set user role from first membership (for display purposes only)
-            const role = (firstMembership.role as UserRole) || 'viewer';
-            setUserRole(role);
-
-            // Check required permission via DB RPC
-            // 権限判定はDBに完全委譲 - JSでの比較は行わない
-            if (requiredRole !== 'viewer') {
-              const hasPermission = await hasOrgRole(supabase, currentOrg.id, mappedRole);
-              if (isStale()) return;
-              if (!hasPermission) {
-                setPermissionError(
-                  `このページにアクセスするには${getRoleDisplayName(requiredRole)}以上の権限が必要です`
-                );
-                await logToAudit('page_access', 'denied', `required_role_${requiredRole}`);
-                return;
-              }
-            }
-          }
-        } else {
-          // No organization membership - isReallyEmpty will be true
-          // ログ出力: 組織が0件になった理由を記録
-          logger.warn('[DashboardPageShell] No organization membership found', {
-            userId: currentUser.id,
-            membershipRowsCount: 0,
-            reason: 'organization_members returned empty for this user'
-          });
-          setOrganizations([]);
-          setOrganization(null);
-
-          if (requiredRole !== 'viewer') {
-            // Admin pages without org might need site_admin check
-            if (requiredRole === 'admin') {
-              const isAdmin = await isSiteAdmin(supabase);
-              if (isStale()) return;
-              if (!isAdmin) {
-                setPermissionError('組織に所属していないか、権限がありません');
-                await logToAudit('page_access', 'denied', 'no_org_membership');
-                return;
-              }
-            } else {
-              setPermissionError('組織に所属していません');
+        if (requiredRole !== 'viewer') {
+          // Admin pages without org might need site_admin check
+          if (requiredRole === 'admin') {
+            const isAdmin = await isSiteAdmin(supabase);
+            if (isStale()) return;
+            if (!isAdmin) {
+              setPermissionError('組織に所属していないか、権限がありません');
               await logToAudit('page_access', 'denied', 'no_org_membership');
               return;
             }
+          } else {
+            setPermissionError('組織に所属していません');
+            await logToAudit('page_access', 'denied', 'no_org_membership');
+            return;
           }
         }
       }

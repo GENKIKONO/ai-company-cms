@@ -1,60 +1,80 @@
-あなたはClaude Code。AIOHub本番の最優先バグは「ログイン後もCookieが0で、ダッシュボードが未認証扱いになる」こと。DB側（RLS/権限/ビュー）はOK、supabaseプロジェクト参照も一致（supabase-envで projectRef=chyicolujwhkycpkxbej / projectMismatch=false）。
-**“Claude側でできる検証はClaudeが完結させ、ユーザー確認はClaudeだけでは不可能な箇所に限定する”**方針で収束させる。
+あなたはClaude Code。AIOHubの「幹」を固定するために、DashboardPageShell を useAuthState()/determineAuthState に完全統合して、認証状態の判定ロジックを一箇所に集約し、二重実装を排除して収束させてください。
 
-完了条件（Definition of Done）
- 1. 自動テスト or 自動検証ログで「ログイン成功→Cookie発行→auth-snapshot success」まで確認できる
- 2. 失敗時はログイン画面で理由が確定表示され、ダッシュボードへ遷移しない
- 3. ユーザーがやる確認は「ブラウザの実ユーザー環境でしか起きない差分（Cookie保存/拡張機能/ブラウザ設定）」の確認だけ
-
-⸻
-
-Phase 1（Claudeだけで完結させる：自動検証の整備）
-
-Task A: サーバー側で100%確定できるログを揃える（必須）
- • /api/auth/login（Email/Password）成功時・失敗時の両方で、必ず以下をVercel Logsに出す（requestId付き）
- • result: success/fail
- • errorCode / errorMessage（failのみ）
- • setCookieHeaderPresent（true/false）
- • setCookieCount（数だけ。cookieの中身は出さない）
- • cookieNames（安全な範囲：sb-***-auth-token, refresh-token の名称だけ）
- • response status
- • /api/health/auth-snapshot はすでにあるので、cookieHeaderPresentも返す（なければ追加）
-
-Task B: “200なのにCookie=0”を成功扱いしない（必須）
-
-LoginFormの契約を固定：
- • /api/auth/login が 401 → 絶対に遷移しない（画面に code/message 表示）
- • /api/auth/login が 200 → 直後に /api/health/auth-snapshot を fetch
- • hasSbAuthCookie=true & getUserStatus=success になった場合のみ /dashboard へ遷移
- • 200なのに Cookie=0 のままなら「Cookie保存/送信失敗」として画面に確定表示し、遷移しない
-
-Task C: Claudeが自動で動作確認できる“E2E(ヘッドレス)”を入れる（必須）
- • Playwrightで /auth/login → ログイン → /api/health/auth-snapshot の success を確認するテストを追加
- • 認証情報は Vercel/Supabase の環境変数（E2E専用アカウント）で注入できるようにする
- • もし本番でE2Eアカウントが用意できないなら、Preview環境で必ず通す（Productionはユーザー確認へ）
- • テストは「ログイン成功後に sb-*-auth-token がブラウザCookieに存在する」まで確認する
-
-Task D: パスワード要因を切り離す（高レバレッジ）
- • Magic Link（OTP）ログインを追加（/api/auth/magiclink）
- • 目的：password起因かCookie起因かを即切り分け
- • 成功/失敗をログイン画面に表示（ユーザーが迷わない）
+ゴール（完了条件）
+ 1. /dashboard と /dashboard/posts が、AuthState に従って必ず同じ挙動になる（ズレない）
+ 2. Cookieが無い/壊れている時に DB fetch を走らせない（無駄な401/UNAUTHORIZED連発を止める）
+ 3. 画面に出るエラーは必ず authState と whyBlocked と requestId で説明できる
+ 4. リリース前ゲートとして、最低限の自動テスト（orスモーク）を追加して再発を防ぐ
 
 ⸻
 
-Phase 2（ユーザー確認が必要な部分：Claudeだけでは確定できない）
+Task 1: DashboardPageShell を完全統合（最優先）
 
-※ここは「ユーザーにやらせる」ではなく、「ユーザー環境でしか起きない差分を確認」するために最小限依頼する。
+対象: src/components/dashboard/DashboardPageShell.tsx
 
-ユーザーに依頼するのは次の2点だけ：
- 1. ブラウザで /auth/login 実行後、Networkで /api/auth/login のレスポンスヘッダを確認
- • x-auth-set-cookie-count が 2 以上か
- • Set-Cookie が返っているか（ヘッダが返ってるのに保存されないならブラウザ要因が濃厚）
- 2. 直後に /api/health/auth-snapshot を開き、hasSbAuthCookie/totalCookieCount を確認
-→ この2点だけで「サーバーはCookieを返してるのに保存されない」か「そもそも返してない」かが確定する
+要件
+ • 既存の「独自判定ロジック」を削除し、useAuthState() の戻り値のみで分岐する
+ • 分岐はこの4状態に限定する（それ以外の判定は禁止）
+ • UNAUTHENTICATED: ログイン導線（ただし window.location で飛ばさない。UIで案内＋ログインボタン）
+ • AUTH_FAILED: ログイン失敗/セッション欠落をUI表示（再ログイン/再試行の導線）
+ • AUTHENTICATED_NO_ORG: 組織未設定のUI（作成/参加の導線）
+ • AUTHENTICATED_READY: ここで初めて dashboard のデータ取得を開始してよい
+ • Cookieなし or AUTH_FAILED の時は、organization_members / organizations / v_dashboard_ を一切叩かない*
+ • UIに必ず以下を表示できるようにする（開発用でもOK）
+ • authState
+ • whyBlocked
+ • requestId（既存のID利用）
 
 ⸻
 
-禁止事項（ループ防止）
- • “ユーザーが試すまで分からない”を理由に実装を止めない
- • 状態機械などの大規模リファクタは、Cookie問題の収束後
- • 401/200の契約が曖昧なまま遷移させない（200+Cookie0は失敗扱い）
+Task 2: useAuthState の責務を確定（ブレ禁止）
+
+対象: src/lib/auth/use-auth-state.ts と src/lib/auth/determine-auth-state.ts
+
+要件
+ • whyBlocked は必ず機械的に決まるようにする（曖昧文言禁止）
+ • AUTH判定の順序を固定する
+ 1. Cookie有無
+ 2. getUser 成否
+ 3. membership 有無
+ 4. ready
+ • どこで membership を取るか（APIか直接か）を統一する
+ • DashboardPageShell側で勝手に membership を取りに行かない（Hook側に寄せる）
+
+⸻
+
+Task 3: API/ログの収束（ユーザー確認を最小化）
+
+対象: /api/health/auth-snapshot
+
+要件
+ • authState, whyBlocked, requestId を常に返す
+ • 可能なら cookieHeaderPresent, totalCookieCount も返す（既にあれば維持）
+ • 401が出る場合は「どの段階で詰まったか」を whyBlocked に固定文言で出す
+
+⸻
+
+Task 4: 再発防止ゲート（最低限でいい）
+ • 既存のCIチェック（forbiddenLoginRedirect）に加えて、
+ • DashboardPageShell 内に createClient().from('organization_members') などが残っていないことを grep で検査（Hook以外からの直叩きを禁止）
+ • 可能なら Playwright で
+ • 未ログイン → authState=UNAUTHENTICATED を確認
+ • （E2E用アカウントが無理なら）少なくとも auth-snapshot のフォーマット検査だけでも入れる
+
+⸻
+
+禁止事項
+ • “進めますか？”の確認で止めない。統合してPR/commitまで完了させる
+ • 追加の大型設計（別StateMachine拡張など）に広げない。今回の目的は「幹の統一」だけ
+ • /auth/login への強制リダイレクト復活は禁止（CIで落ちるようにする）
+
+⸻
+
+成果物（出力して）
+ • 変更ファイル一覧
+ • DashboardPageShell の分岐が AuthState だけになったことの証拠（抜粋でOK）
+ • 「UNAUTHENTICATED / AUTH_FAILED の時にDB fetchが走らない」ことの確認（ログ or grep）
+
+⸻
+
+これで「診断の幹」と「表示の幹」が一致し、同じ問題をぐるぐるしなくなります。
