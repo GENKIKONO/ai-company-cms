@@ -59,7 +59,8 @@ export const ROUTES = {
   // Auth routes
   auth: '/auth',
   authLogin: '/auth/login',
-  authSignin: '/auth/signin',
+  /** @deprecated Use authLogin instead. /auth/signin is removed. */
+  authSignin: '/auth/login', // 後方互換: /auth/login にリダイレクト
   authSignup: '/auth/signup',
   login: '/login',
   signin: '/signin',

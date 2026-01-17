@@ -7,12 +7,13 @@
  * Layout: (public)/layout.tsx provides Header/Footer
  * ToastProvider: Root layout provides
  *
+ * 認証は POST /api/auth/login を経由（クライアントサイド signInWithPassword 禁止）
+ *
  * @see docs/architecture/boundaries.md
  */
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabaseBrowser } from '@/lib/supabase/client';
 import { useErrorToast } from '@/components/ui/toast';
 import { logger } from '@/lib/utils/logger';
 
@@ -28,36 +29,51 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const supabase = supabaseBrowser;
-
-      // ログイン実行
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // POST /api/auth/login を経由してログイン（Cookie を確実に発行）
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          redirectTo: '/management-console',
+        }),
+        credentials: 'include',
       });
 
-      if (error) {
-        logger.error('Login error', { data: error instanceof Error ? error : new Error(String(error)) });
-        errorToast('ログインに失敗しました: ' + error.message);
+      const result = await response.json();
+
+      if (!response.ok || result.ok !== true) {
+        logger.error('Admin login failed', { result });
+        errorToast(result.error || result.message || 'ログインに失敗しました');
         return;
       }
 
       // 管理者権限チェック
-      const response = await fetch('/api/admin/verify');
-      const result = await response.json();
-      logger.debug('Admin verification result', result);
+      const verifyResponse = await fetch('/api/admin/verify', {
+        credentials: 'include',
+      });
+      const verifyResult = await verifyResponse.json();
+      logger.debug('Admin verification result', verifyResult);
 
-      if (!result.isAdmin) {
+      if (!verifyResult.isAdmin) {
         // 管理者でない場合はログアウト
-        await supabase.auth.signOut();
-        errorToast(`管理者権限がありません。デバッグ情報: ${JSON.stringify(result.debug)}`);
+        await fetch('/api/auth/signout', {
+          method: 'POST',
+          credentials: 'include',
+        });
+        errorToast(`管理者権限がありません。デバッグ情報: ${JSON.stringify(verifyResult.debug)}`);
         return;
       }
 
       // 管理コンソールにリダイレクト
+      router.refresh();
       router.push('/management-console');
 
     } catch (error) {
+      logger.error('Admin login error', { error });
       errorToast('予期しないエラーが発生しました');
     } finally {
       setLoading(false);

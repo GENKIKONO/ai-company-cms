@@ -118,6 +118,7 @@
     "audit:ux:report": "npx ts-node scripts/generate-ux-audit-summary.ts",
     "fix:useeffect": "node ./scripts/fix-useeffect-warnings.js",
     "check:select-star": "bash scripts/check-select-star.sh",
+    "check:client-signin": "bash scripts/check-client-signin.sh",
     "count:any": "bash scripts/count-any.sh",
     "ci:mandatory": "npm run typecheck && npm run lint && npm run build",
     "ci:types": "npm run db:types:check",

@@ -1,9 +1,13 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+/**
+ * /auth/signin は廃止されました。
+ * 308 Permanent Redirect で /auth/login へ転送します。
+ * UI/フォーム/クライアント認証処理は禁止。
+ */
 export default function SignInRedirect() {
-  // 301 permanent redirect to canonical login URL
-  redirect('/auth/login');
+  permanentRedirect('/auth/login');
 }

@@ -10,6 +10,17 @@ echo "=== Auth Smoke Test ==="
 echo "Base URL: $BASE_URL"
 echo ""
 
+# 0. /auth/signin が 308 リダイレクトを返すことを確認（経路統一の保護）
+echo "0. Checking /auth/signin returns 308 redirect..."
+SIGNIN_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/auth/signin")
+if [ "$SIGNIN_STATUS" = "308" ] || [ "$SIGNIN_STATUS" = "307" ]; then
+  echo "   OK: /auth/signin returns $SIGNIN_STATUS (redirect to /auth/login)"
+else
+  echo "   FAIL: /auth/signin returns $SIGNIN_STATUS (expected 307 or 308)"
+  echo "   /auth/signin must redirect to /auth/login to prevent dual login paths"
+  exit 1
+fi
+
 # 1. /api/auth/login ルート存在確認（GET）
 echo "1. Checking /api/auth/login route exists..."
 STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/auth/login")
