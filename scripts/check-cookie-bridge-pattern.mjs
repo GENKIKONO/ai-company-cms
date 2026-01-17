@@ -2,16 +2,15 @@
 /**
  * Cookie Bridge Pattern CI Check
  *
- * Route Handler で request.cookies 由来の Supabase SSR Cookie ブリッジを検出し、
- * 公式パターン (cookies() from next/headers) の使用を強制する。
+ * Route Handler で危険な Supabase SSR Cookie ブリッジパターンを検出する。
  *
  * 禁止パターン:
- * 1. Route Handler内で request.cookies.getAll() を createServerClient に渡す
- * 2. setAll で response.cookies にコピーするための配列収集パターン
+ * 1. setAll で配列に収集するだけで request.cookies を更新しない
+ *    → 後続の getAll が古い値を返し、auth-token が設定されない
  *
  * 許可パターン:
  * - middleware.ts での request/response パターン (公式)
- * - Route Handler での cookies() (next/headers) パターン (公式)
+ * - Route Handler で request.cookies.set + response.cookies.set の両方を呼ぶパターン
  * - createServerClient を使用しないRoute Handler
  */
 
@@ -42,17 +41,38 @@ const EXCLUDED_PATHS = [
 // 禁止パターン
 const FORBIDDEN_PATTERNS = [
   {
-    name: 'request.cookies in Route Handler getAll',
-    // createServerClient の cookies.getAll 内で request.cookies.getAll() を使用
-    pattern: /createServerClient[\s\S]{0,500}cookies\s*:\s*\{[\s\S]{0,300}getAll\s*\(\s*\)\s*\{[\s\S]{0,100}request\.cookies\.getAll\s*\(\s*\)/,
-    message: 'Route Handler では request.cookies.getAll() ではなく cookies() (next/headers) を使用してください',
-  },
-  {
-    name: 'Cookie collection for response.cookies.set',
-    // setAll 内で配列に push して、後で response.cookies.set にコピーするパターン
-    // 例: supabaseSetCookies.push({ name, value, options })
-    pattern: /setAll[\s\S]{0,50}cookiesToSet[\s\S]{0,200}supabaseSetCookies\.push|cookiesToSet\.forEach[\s\S]{0,100}supabaseSetCookies\.push/,
-    message: 'setAll 内で配列に収集して response.cookies にコピーするパターンは禁止です。cookieStore.set() を直接呼んでください',
+    name: 'setAll without request.cookies.set',
+    // setAll 内で response.cookies.set のみを呼び、request.cookies.set を呼ばないパターン
+    // これは後続の getAll が古い値を返す原因になる
+    check: (content) => {
+      // createServerClient を使っているか
+      if (!content.includes('createServerClient')) return false;
+
+      // setAll の実装を探す
+      const setAllMatch = content.match(/setAll\s*\([^)]*\)\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/s);
+      if (!setAllMatch) return false;
+
+      const setAllBody = setAllMatch[1];
+
+      // request.cookies.set を呼んでいるか
+      const hasRequestCookiesSet = /request\.cookies\.set/.test(setAllBody);
+
+      // response.cookies.set または cookieStore.set を呼んでいるか
+      const hasResponseCookiesSet = /response\.cookies\.set|cookieStore\.set/.test(setAllBody);
+
+      // response側だけ設定してrequest側を更新していない場合は危険
+      if (hasResponseCookiesSet && !hasRequestCookiesSet) {
+        // ただし cookies() (next/headers) を使っている場合は OK
+        // cookies() は自動的に同期されるため
+        const usesCookiesAPI = /import\s*\{[^}]*cookies[^}]*\}\s*from\s*['"]next\/headers['"]/.test(content);
+        if (usesCookiesAPI) return false;
+
+        return true;
+      }
+
+      return false;
+    },
+    message: 'setAll 内で request.cookies.set を呼ばずに response.cookies.set のみを呼ぶと、後続の getAll が古い値を返します。request.cookies.set(name, value) も追加してください。',
   },
 ];
 
@@ -72,31 +92,17 @@ async function checkFile(filePath) {
   }
 
   // createServerClient を直接インポートして使用していないファイルはスキップ
-  // createClient (server.ts経由) は別のレイヤーでCookieを処理するので対象外
   if (!content.includes("from '@supabase/ssr'") && !content.includes('from "@supabase/ssr"')) {
     return errors;
   }
 
   // 禁止パターンのチェック
-  for (const { name, pattern, message } of FORBIDDEN_PATTERNS) {
-    if (pattern.test(content)) {
+  for (const { name, check, message } of FORBIDDEN_PATTERNS) {
+    if (check(content)) {
       errors.push({
         file: relativePath,
         pattern: name,
         message,
-        severity: 'error',
-      });
-    }
-  }
-
-  // createServerClient を直接使っている場合、cookies() インポートが必要
-  if (content.includes('createServerClient(')) {
-    const hasCookiesImport = /import\s*\{[^}]*cookies[^}]*\}\s*from\s*['"]next\/headers['"]/.test(content);
-    if (!hasCookiesImport) {
-      errors.push({
-        file: relativePath,
-        pattern: 'Missing cookies() import',
-        message: 'createServerClient を直接使用する Route Handler では cookies を next/headers からインポートしてください',
         severity: 'error',
       });
     }
@@ -117,7 +123,7 @@ async function main() {
   }
 
   if (allErrors.length === 0) {
-    console.log('✅ Cookie Bridge Pattern: すべてのファイルが公式パターンに準拠しています\n');
+    console.log('✅ Cookie Bridge Pattern: すべてのファイルが安全なパターンを使用しています\n');
     process.exit(0);
   }
 
@@ -133,22 +139,15 @@ async function main() {
   console.log('📖 修正方法:');
   console.log('   Route Handler で createServerClient を使う場合は以下のパターンを使用:');
   console.log('');
-  console.log('   import { cookies } from "next/headers";');
-  console.log('   import { createServerClient } from "@supabase/ssr";');
-  console.log('');
-  console.log('   const cookieStore = await cookies();');
-  console.log('   const supabase = createServerClient(..., {');
-  console.log('     cookies: {');
-  console.log('       getAll() { return cookieStore.getAll(); },');
-  console.log('       setAll(cookiesToSet) {');
-  console.log('         cookiesToSet.forEach(({ name, value, options }) => {');
-  console.log('           cookieStore.set(name, value, options);');
-  console.log('         });');
-  console.log('       },');
-  console.log('     },');
-  console.log('   });');
-  console.log('');
-  console.log('   ※ request.cookies パターンは middleware.ts でのみ使用可');
+  console.log('   setAll(cookiesToSet) {');
+  console.log('     // 重要: request.cookies も更新すること');
+  console.log('     cookiesToSet.forEach(({ name, value }) => {');
+  console.log('       request.cookies.set(name, value);  // ← これが重要');
+  console.log('     });');
+  console.log('     cookiesToSet.forEach(({ name, value, options }) => {');
+  console.log('       response.cookies.set(name, value, options);');
+  console.log('     });');
+  console.log('   }');
   console.log('');
 
   process.exit(1);

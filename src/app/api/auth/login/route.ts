@@ -1,10 +1,10 @@
 /**
- * Email/Password Login Route Handler - Supabase SSR 公式パターン準拠版
+ * Email/Password Login Route Handler - Middleware パターン準拠版
  *
- * @supabase/ssr 公式パターンに完全準拠:
- * - cookies() (next/headers) を使用してCookieの読み書き
- * - getAll/setAll でCookieブリッジを実装
- * - cookieStore.set() でNext.jsが自動的にSet-Cookieヘッダーを追加
+ * @supabase/ssr 公式の middleware パターンを Route Handler に適用:
+ * - request.cookies で読み取り + 同時に更新
+ * - response.cookies で書き込み
+ * - setAll 内で request.cookies.set も呼ぶことで後続の getAll が最新値を返す
  *
  * レスポンス契約:
  * - GET: 200 + { ok: true, route, methods, sha, timestamp }（診断用）
@@ -12,7 +12,6 @@
  * - POST 成功時: HTTP 200 で { ok: true, requestId } + Set-Cookie
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 // Supabase プロジェクト参照を環境変数から取得
@@ -74,11 +73,17 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // 公式パターン: cookies() (next/headers) を使用
-    // Route Handler では cookieStore.set() が呼ばれると
-    // Next.js が自動的にレスポンスに Set-Cookie ヘッダーを追加
+    // Middleware パターン: request/response を使用
+    // setAll 内で request.cookies.set も呼ぶことで
+    // Supabase SSR が再度 getAll を呼んだ時に最新値を返す
     // ========================================
-    const cookieStore = await cookies();
+
+    // レスポンスを先に作成（後で body を差し替え）
+    let response = NextResponse.next({
+      request: {
+        headers: request.headers,
+      },
+    });
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -86,7 +91,7 @@ export async function POST(request: NextRequest) {
       {
         cookies: {
           getAll() {
-            const allCookies = cookieStore.getAll();
+            const allCookies = request.cookies.getAll();
             console.log('[api/auth/login] getAll called', {
               requestId,
               count: allCookies.length,
@@ -101,28 +106,18 @@ export async function POST(request: NextRequest) {
               names: cookiesToSet.map(c => c.name),
             });
 
-            // Cookie を直接 cookieStore に設定
-            // Next.js が自動的にレスポンスの Set-Cookie ヘッダーに追加
+            // 重要: request.cookies も更新することで、後続の getAll が最新値を返す
+            cookiesToSet.forEach(({ name, value }) => {
+              request.cookies.set(name, value);
+            });
+
+            // response.cookies に設定
             cookiesToSet.forEach(({ name, value, options }) => {
               setCookieNames.push(name);
-              try {
-                cookieStore.set(name, value, {
-                  ...options,
-                  // セキュリティ設定を明示
-                  path: options.path || '/',
-                  httpOnly: options.httpOnly !== false,
-                  secure: process.env.NODE_ENV === 'production',
-                  sameSite: (options.sameSite as 'lax' | 'strict' | 'none') || 'lax',
-                });
-              } catch (error) {
-                // Server Component から呼ばれた場合のエラーを無視
-                // Route Handler では発生しないはず
-                console.error('[api/auth/login] cookieStore.set error', {
-                  requestId,
-                  name,
-                  error: error instanceof Error ? error.message : 'Unknown',
-                });
-              }
+              response.cookies.set(name, value, {
+                ...options,
+                path: options.path || '/',
+              });
             });
           },
         },
@@ -187,11 +182,10 @@ export async function POST(request: NextRequest) {
     });
 
     // ========================================
-    // レスポンス作成
-    // cookieStore.set() で設定した Cookie は
-    // Next.js が自動的にレスポンスヘッダーに追加
+    // 最終レスポンス作成
+    // response.cookies から Cookie をコピー
     // ========================================
-    const response = NextResponse.json(
+    const finalResponse = NextResponse.json(
       {
         ok: true,
         redirectTo: redirectTo || '/dashboard',
@@ -200,27 +194,39 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
+    // response.cookies の内容を finalResponse にコピー
+    response.cookies.getAll().forEach(cookie => {
+      finalResponse.cookies.set(cookie.name, cookie.value, {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+    });
+
     console.log('[api/auth/login] Login successful', {
       requestId,
       userId: data.user?.id,
       cookiesSet: setCookieNames,
+      finalCookies: finalResponse.cookies.getAll().map(c => c.name),
     });
 
     // デバッグヘッダを付与（診断用）
-    response.headers.set('x-auth-request-id', requestId);
-    response.headers.set('x-auth-set-cookie-names', setCookieNames.join(','));
-    response.headers.set('x-auth-has-auth-token', String(finalHasAuthToken));
-    response.headers.set('x-auth-supabase-ref', projectRef);
-    response.headers.set('x-auth-host', host);
-    response.headers.set('x-auth-proto', proto);
-    response.headers.set('x-auth-sha', sha);
+    finalResponse.headers.set('x-auth-request-id', requestId);
+    finalResponse.headers.set('x-auth-set-cookie-names', setCookieNames.join(','));
+    finalResponse.headers.set('x-auth-has-auth-token', String(finalHasAuthToken));
+    finalResponse.headers.set('x-auth-supabase-ref', projectRef);
+    finalResponse.headers.set('x-auth-host', host);
+    finalResponse.headers.set('x-auth-proto', proto);
+    finalResponse.headers.set('x-auth-sha', sha);
 
-    return response;
+    return finalResponse;
 
   } catch (error) {
     console.error('[api/auth/login] Unexpected error', {
       requestId,
       error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
     });
 
     return NextResponse.json(
