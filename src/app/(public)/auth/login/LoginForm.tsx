@@ -8,6 +8,11 @@ interface LoginFormProps {
   redirectUrl?: string;
 }
 
+// クライアントサイドで requestId を生成
+function generateRequestId(): string {
+  return `lf-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 export default function LoginForm({ redirectUrl }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,10 +23,23 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
   const [resendMessage, setResendMessage] = useState('');
   const router = useRouter();
 
+  // Task B: 診断用 - 最後に発火したリクエストの情報
+  const [lastRequestId, setLastRequestId] = useState<string | null>(null);
+  const [lastResponseInfo, setLastResponseInfo] = useState<string | null>(null);
+
+  // Task C: API疎通確認用
+  const [apiCheckResult, setApiCheckResult] = useState<string | null>(null);
+  const [apiCheckLoading, setApiCheckLoading] = useState(false);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    setLastResponseInfo(null);
+
+    // Task B: クライアントサイドで requestId を生成
+    const clientRequestId = generateRequestId();
+    setLastRequestId(clientRequestId);
 
     try {
       // Route Handler 経由でサーバーサイドログイン（Cookie を確実に発行）
@@ -29,16 +47,21 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-client-request-id': clientRequestId, // サーバーログとの紐付け用
         },
         body: JSON.stringify({
           email,
           password,
           redirectTo: redirectUrl || '/dashboard',
+          clientRequestId, // body にも含める
         }),
         credentials: 'include', // Cookie を確実に受け取る
       });
 
       const result = await response.json();
+
+      // Task B: レスポンス情報を記録
+      setLastResponseInfo(`status=${response.status} ok=${result.ok} serverRequestId=${result.requestId || 'n/a'}`);
 
       // 契約: 200 かつ ok:true の時だけ遷移する
       // 401/404/500 はすべてエラー表示のみ（遷移禁止）
@@ -116,6 +139,28 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
     }
   };
 
+  // Task C: API疎通確認
+  const handleApiCheck = async () => {
+    setApiCheckLoading(true);
+    setApiCheckResult(null);
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const result = await response.json();
+      if (result.ok && result.sha) {
+        setApiCheckResult(`OK: sha=${result.sha.slice(0, 12)}...`);
+      } else {
+        setApiCheckResult(`Error: ${JSON.stringify(result)}`);
+      }
+    } catch (err) {
+      setApiCheckResult(`Network Error: ${err instanceof Error ? err.message : 'Unknown'}`);
+    } finally {
+      setApiCheckLoading(false);
+    }
+  };
+
   return (
     <form className="mt-8 space-y-6" onSubmit={handleLogin}>
       {error && (
@@ -190,6 +235,41 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
         >
           {isLoading ? 'ログイン中...' : 'ログイン'}
         </button>
+      </div>
+
+      {/* Task B & C: 診断情報表示 */}
+      <div className="mt-6 pt-4 border-t border-gray-200">
+        <details className="text-xs text-gray-500">
+          <summary className="cursor-pointer hover:text-gray-700 font-medium">
+            診断情報 (Debug)
+          </summary>
+          <div className="mt-2 p-3 bg-gray-50 rounded font-mono space-y-2">
+            {/* Task B: 最後のリクエスト情報 */}
+            <div>
+              <span className="font-semibold">Last Request ID:</span>{' '}
+              {lastRequestId || '(未発火)'}
+            </div>
+            <div>
+              <span className="font-semibold">Last Response:</span>{' '}
+              {lastResponseInfo || '(未取得)'}
+            </div>
+
+            {/* Task C: API疎通確認 */}
+            <div className="pt-2 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={handleApiCheck}
+                disabled={apiCheckLoading}
+                className="text-[var(--aio-primary)] hover:underline disabled:opacity-50"
+              >
+                {apiCheckLoading ? 'チェック中...' : 'API疎通チェック (GET /api/auth/login)'}
+              </button>
+              {apiCheckResult && (
+                <div className="mt-1 text-gray-600">{apiCheckResult}</div>
+              )}
+            </div>
+          </div>
+        </details>
       </div>
     </form>
   );
