@@ -45,13 +45,25 @@ else
   exit 1
 fi
 
-# 4. /api/health/auth-snapshot 確認
+# 4. /api/health/auth-snapshot 確認（Cookie診断含む）
 echo "4. Checking /api/health/auth-snapshot..."
 STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/health/auth-snapshot")
 if [ "$STATUS" = "200" ]; then
   echo "   OK: GET /api/health/auth-snapshot returns 200"
-  AUTH_STATE=$(curl -s "$BASE_URL/api/health/auth-snapshot" | grep -o '"authState":"[^"]*"' | head -1)
+  SNAPSHOT_RESPONSE=$(curl -s "$BASE_URL/api/health/auth-snapshot")
+  AUTH_STATE=$(echo "$SNAPSHOT_RESPONSE" | grep -o '"authState":"[^"]*"' | head -1)
+  HAS_AUTH_TOKEN=$(echo "$SNAPSHOT_RESPONSE" | grep -o '"hasAuthTokenCookie":[^,}]*' | head -1)
+  HAS_REFRESH_TOKEN=$(echo "$SNAPSHOT_RESPONSE" | grep -o '"hasRefreshTokenCookie":[^,}]*' | head -1)
+  COOKIE_NAMES=$(echo "$SNAPSHOT_RESPONSE" | grep -o '"cookieNames":\[[^]]*\]' | head -1)
   echo "   $AUTH_STATE"
+  echo "   $HAS_AUTH_TOKEN"
+  echo "   $HAS_REFRESH_TOKEN"
+  # cookieNames が返っていることを確認（配列なので存在確認のみ）
+  if echo "$SNAPSHOT_RESPONSE" | grep -q '"cookieNames":'; then
+    echo "   OK: cookieNames field present"
+  else
+    echo "   WARN: cookieNames field missing"
+  fi
 else
   echo "   FAIL: GET /api/health/auth-snapshot returns $STATUS"
   exit 1

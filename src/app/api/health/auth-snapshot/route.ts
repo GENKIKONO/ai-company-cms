@@ -20,10 +20,18 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { determineAuthState, summarizeAuthState } from '@/lib/auth/determine-auth-state';
 
+// Supabase プロジェクト参照を環境変数から取得
+function getProjectRef(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match ? match[1] : 'unknown';
+}
+
 export async function GET(request: NextRequest) {
   const sha = process.env.VERCEL_GIT_COMMIT_SHA ||
               process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
               'unknown';
+  const projectRef = getProjectRef();
 
   // リクエスト診断
   const host = request.headers.get('host') || 'unknown';
@@ -31,6 +39,17 @@ export async function GET(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   const userAgentHint = userAgent.slice(0, 50) + (userAgent.length > 50 ? '...' : '');
   const cookieHeaderPresent = request.headers.has('cookie');
+
+  // Cookie 診断（Task B: cookie名を返す）
+  const allCookies = request.cookies.getAll();
+  const cookieNames = allCookies.map(c => c.name);
+  const matchedCookieNames = cookieNames.filter(name => name.startsWith('sb-'));
+  const hasAuthTokenCookie = cookieNames.some(name =>
+    name === `sb-${projectRef}-auth-token` || name.startsWith(`sb-${projectRef}-auth-token.`)
+  );
+  const hasRefreshTokenCookie = cookieNames.some(name =>
+    name === `sb-${projectRef}-refresh-token` || name.startsWith(`sb-${projectRef}-refresh-token.`)
+  );
 
   try {
     // 一元化された判定関数を使用
@@ -51,6 +70,13 @@ export async function GET(request: NextRequest) {
       getUserError: authResult.getUserError || null,
       userId: authResult.userId || null,
       organizationId: authResult.organizationId || null,
+
+      // === Cookie 診断（Task B） ===
+      cookieNames,
+      matchedCookieNames,
+      hasAuthTokenCookie,
+      hasRefreshTokenCookie,
+      projectRef,
 
       // === リクエスト診断 ===
       host,
@@ -88,6 +114,13 @@ export async function GET(request: NextRequest) {
       getUserStatus: 'error',
       organizationStatus: 'error',
       whyBlocked: `Exception: ${error instanceof Error ? error.message : 'Unknown error'}`,
+
+      // === Cookie 診断（Task B） ===
+      cookieNames,
+      matchedCookieNames,
+      hasAuthTokenCookie,
+      hasRefreshTokenCookie,
+      projectRef,
 
       // === リクエスト診断 ===
       host,
