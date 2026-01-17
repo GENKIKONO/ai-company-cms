@@ -302,17 +302,33 @@ export function DashboardPageShell({
 
       if (membershipError) {
         // 診断用: エラー詳細をキャプチャ
+        const queryName = 'organization_members';
         setErrorDetails({
           supabaseCode: membershipError.code,
           supabaseMessage: membershipError.message,
           supabaseDetails: membershipError.details,
           supabaseHint: membershipError.hint,
-          context: 'organization_members SELECT',
+          context: `${queryName} SELECT`,
+        });
+
+        // Phase 1: 詳細ログ（Vercel Logs で追跡可能）
+        logger.error(`[DashboardPageShell] ${queryName} query failed`, {
+          requestId,
+          route: pathname,
+          authState,
+          userId: currentUser.id,
+          queryName,
+          supabaseError: {
+            code: membershipError.code,
+            message: membershipError.message,
+            details: membershipError.details,
+            hint: membershipError.hint,
+          },
         });
 
         if (isRLSDeniedError(membershipError)) {
           setErrorCode('RLS_DENIED');
-          setError('アクセス権限がありません');
+          setError(`${queryName} へのアクセス権限がありません (${membershipError.code || 'RLS'})`);
           await logToAudit('page_access', 'denied', 'rls_denied');
           return;
         }
@@ -324,10 +340,7 @@ export function DashboardPageShell({
           return;
         }
         // 取得失敗はエラー扱い（empty扱いにしない）
-        logger.error('[DashboardPageShell] organization_members query failed', {
-          error: { code: membershipError.code, message: membershipError.message, details: membershipError.details }
-        });
-        setError('組織情報の取得に失敗しました。ページを再読み込みしてください。');
+        setError(`${queryName} の取得に失敗しました (${membershipError.code || 'UNKNOWN'})`);
         setErrorCode('MEMBERSHIP_FETCH_ERROR');
         return;
       }
@@ -353,27 +366,39 @@ export function DashboardPageShell({
 
         if (orgsError) {
           // 診断用: エラー詳細をキャプチャ
+          const queryName = 'organizations';
           setErrorDetails({
             supabaseCode: orgsError.code,
             supabaseMessage: orgsError.message,
             supabaseDetails: orgsError.details,
             supabaseHint: orgsError.hint,
-            context: `organizations SELECT (ids: ${orgIds.length}件)`,
+            context: `${queryName} SELECT (ids: ${orgIds.length}件)`,
           });
 
-          // 組織詳細の取得失敗はエラー扱い（empty扱いにしない）
-          logger.error('[DashboardPageShell] organizations query failed', {
-            error: { code: orgsError.code, message: orgsError.message, details: orgsError.details },
+          // Phase 1: 詳細ログ（Vercel Logs で追跡可能）
+          logger.error(`[DashboardPageShell] ${queryName} query failed`, {
+            requestId,
+            route: pathname,
+            authState,
+            userId: currentUser.id,
+            queryName,
             membershipRowsCount: memberships.length,
-            orgIds
+            orgIds,
+            supabaseError: {
+              code: orgsError.code,
+              message: orgsError.message,
+              details: orgsError.details,
+              hint: orgsError.hint,
+            },
           });
+
           if (isRLSDeniedError(orgsError)) {
             setErrorCode('RLS_DENIED');
-            setError('組織情報へのアクセス権限がありません');
+            setError(`${queryName} へのアクセス権限がありません (${orgsError.code || 'RLS'})`);
             await logToAudit('page_access', 'denied', 'org_rls_denied');
             return;
           }
-          setError('組織情報の取得に失敗しました。ページを再読み込みしてください。');
+          setError(`${queryName} の取得に失敗しました (${orgsError.code || 'UNKNOWN'})`);
           setErrorCode('ORG_FETCH_ERROR');
           return;
         }

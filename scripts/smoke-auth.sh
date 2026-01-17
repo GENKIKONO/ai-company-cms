@@ -57,8 +57,23 @@ else
   exit 1
 fi
 
-# 5. POST /api/auth/login with invalid credentials (should return 401)
-echo "5. Checking POST /api/auth/login with invalid credentials..."
+# 5. /api/health/dashboard-probe 確認（Phase 3-A）
+echo "5. Checking /api/health/dashboard-probe..."
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/health/dashboard-probe")
+if [ "$STATUS" = "200" ]; then
+  echo "   OK: GET /api/health/dashboard-probe returns 200"
+  PROBE_RESPONSE=$(curl -s "$BASE_URL/api/health/dashboard-probe")
+  AUTH_STATE=$(echo "$PROBE_RESPONSE" | grep -o '"authState":"[^"]*"' | head -1)
+  WHY_BLOCKED=$(echo "$PROBE_RESPONSE" | grep -o '"whyBlocked":"[^"]*"' | head -1 || echo '"whyBlocked":null')
+  echo "   $AUTH_STATE"
+  echo "   $WHY_BLOCKED"
+else
+  echo "   FAIL: GET /api/health/dashboard-probe returns $STATUS"
+  exit 1
+fi
+
+# 6. POST /api/auth/login with invalid credentials (should return 401)
+echo "6. Checking POST /api/auth/login with invalid credentials..."
 STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"wrongpassword"}')
