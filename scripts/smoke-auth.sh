@@ -142,8 +142,28 @@ if [ -n "$SMOKE_EMAIL" ] && [ -n "$SMOKE_PASSWORD" ]; then
       echo "   WARN: dashboard-probe shows $PROBE_STATE"
     fi
 
-    # 7d. /dashboard/posts ページ確認
-    echo "7d. Checking /dashboard/posts page..."
+    # 7d. /api/dashboard/init 確認（ログイン後）- 最重要テスト
+    echo "7d. Checking /api/dashboard/init after login..."
+    INIT_RESPONSE=$(curl -s -b "$COOKIE_JAR" "$BASE_URL/api/dashboard/init")
+    INIT_OK=$(echo "$INIT_RESPONSE" | grep -o '"ok":[^,]*' | head -1)
+    INIT_WHICH_STEP=$(echo "$INIT_RESPONSE" | grep -o '"whichStep":"[^"]*"' | head -1)
+    INIT_SESSION_RECOVERED=$(echo "$INIT_RESPONSE" | grep -o '"sessionRecovered":[^,}]*' | head -1)
+
+    echo "   $INIT_OK"
+    echo "   $INIT_WHICH_STEP"
+    echo "   $INIT_SESSION_RECOVERED"
+
+    if echo "$INIT_RESPONSE" | grep -q '"ok":true'; then
+      echo "   OK: /api/dashboard/init returns ok:true"
+    else
+      echo "   FAIL: /api/dashboard/init returns ok:false"
+      echo "   Response: $INIT_RESPONSE"
+      rm -f "$COOKIE_JAR"
+      exit 1
+    fi
+
+    # 7e. /dashboard/posts ページ確認
+    echo "7e. Checking /dashboard/posts page..."
     DASHBOARD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -b "$COOKIE_JAR" "$BASE_URL/dashboard/posts")
     if [ "$DASHBOARD_STATUS" = "200" ]; then
       echo "   OK: /dashboard/posts returns 200"
