@@ -49,15 +49,29 @@ export async function GET() {
   });
 }
 
+// Cookie属性を診断用にマスクして文字列化
+interface CookieDiagnostic {
+  name: string;
+  path: string;
+  domain: string | undefined;
+  sameSite: string | undefined;
+  secure: boolean | undefined;
+  httpOnly: boolean | undefined;
+  maxAge: number | undefined;
+  valueLength: number;
+}
+
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
   const host = request.headers.get('host') || 'unknown';
   const proto = request.headers.get('x-forwarded-proto') || 'unknown';
   const projectRef = getProjectRef();
+  const isSecure = proto === 'https';
 
   // Cookie 診断用の変数
   let setAllCalledCount = 0;
   let setAllCookieNames: string[] = [];
+  const cookieDiagnostics: CookieDiagnostic[] = [];
 
   try {
     const body = await request.json();
@@ -70,9 +84,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Cookie を設定するための response を先に作成
+    // 成功時のレスポンスを先に作成（@supabase/ssr公式パターン）
+    // setAll内でこのresponseにCookieをセットする
     const response = NextResponse.json(
-      { ok: true, redirectTo: redirectTo || '/dashboard', requestId },
+      {
+        ok: true,
+        redirectTo: redirectTo || '/dashboard',
+        requestId,
+      },
       { status: 200 }
     );
 
@@ -90,15 +109,47 @@ export async function POST(request: NextRequest) {
             setAllCalledCount = cookiesToSet.length;
             setAllCookieNames = cookiesToSet.map(c => c.name);
 
+            // Task 1: 各Cookieの属性を診断用に記録
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieDiagnostics.push({
+                name,
+                path: options?.path || '(not set)',
+                domain: options?.domain,
+                sameSite: options?.sameSite as string | undefined,
+                secure: options?.secure,
+                httpOnly: options?.httpOnly,
+                maxAge: options?.maxAge,
+                valueLength: value.length,
+              });
+            });
+
             console.log('[api/auth/login] setAll called', {
               requestId,
               count: setAllCalledCount,
               names: setAllCookieNames,
+              diagnostics: cookieDiagnostics,
             });
 
-            // 公式パターン: cookiesToSet を response.cookies に設定
+            // Task 2: Cookie属性を強制的に正規化（Path問題を確実に潰す）
             cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
+              const normalizedOptions = {
+                ...options,
+                path: '/',  // 最重要: 必ず "/" にする
+                sameSite: 'lax' as const,
+                secure: isSecure,
+                httpOnly: true,
+              };
+
+              console.log('[api/auth/login] Setting cookie with normalized options', {
+                requestId,
+                name,
+                originalPath: options?.path,
+                normalizedPath: normalizedOptions.path,
+                secure: normalizedOptions.secure,
+                sameSite: normalizedOptions.sameSite,
+              });
+
+              response.cookies.set(name, value, normalizedOptions);
             });
           },
         },
