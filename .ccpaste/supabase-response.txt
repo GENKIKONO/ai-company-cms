@@ -1,80 +1,70 @@
-あなたはClaude Code。AIOHubの「幹」を固定するために、DashboardPageShell を useAuthState()/determineAuthState に完全統合して、認証状態の判定ロジックを一箇所に集約し、二重実装を排除して収束させてください。
+あなたは Claude Code。AIOHub 本番で /api/auth/login が 404 になっており、LoginForm が叩けないため、ダッシュボードが常に未認証で落ちています。推測で終わらせず、/api/auth/login を確実に生やして到達確認までを完了してください。
 
 ゴール（完了条件）
- 1. /dashboard と /dashboard/posts が、AuthState に従って必ず同じ挙動になる（ズレない）
- 2. Cookieが無い/壊れている時に DB fetch を走らせない（無駄な401/UNAUTHORIZED連発を止める）
- 3. 画面に出るエラーは必ず authState と whyBlocked と requestId で説明できる
- 4. リリース前ゲートとして、最低限の自動テスト（orスモーク）を追加して再発を防ぐ
+ 1. Production https://aiohub.jp/api/auth/login が 404 ではなくなる
+ 2. GET /api/auth/login は 200 or 405（とにかく “ルートが存在する” 状態）
+ 3. POST /api/auth/login は
+
+ • 成功: 200 + Set-Cookie が返り、/api/health/auth-snapshot が AUTHENTICATED_READY に到達
+ • 失敗: 401 + { ok:false, code, message } を返し、LoginForm は遷移しない
+
+ 4. 上記を コード側で自動検証できる（curl で機械的に確認）
 
 ⸻
 
-Task 1: DashboardPageShell を完全統合（最優先）
+Task 1: 404の原因をコードで特定（最優先）
 
-対象: src/components/dashboard/DashboardPageShell.tsx
-
-要件
- • 既存の「独自判定ロジック」を削除し、useAuthState() の戻り値のみで分岐する
- • 分岐はこの4状態に限定する（それ以外の判定は禁止）
- • UNAUTHENTICATED: ログイン導線（ただし window.location で飛ばさない。UIで案内＋ログインボタン）
- • AUTH_FAILED: ログイン失敗/セッション欠落をUI表示（再ログイン/再試行の導線）
- • AUTHENTICATED_NO_ORG: 組織未設定のUI（作成/参加の導線）
- • AUTHENTICATED_READY: ここで初めて dashboard のデータ取得を開始してよい
- • Cookieなし or AUTH_FAILED の時は、organization_members / organizations / v_dashboard_ を一切叩かない*
- • UIに必ず以下を表示できるようにする（開発用でもOK）
- • authState
- • whyBlocked
- • requestId（既存のID利用）
+次を全部確認して、原因を断定して直す：
+ • src/app/api/auth/login/route.ts が 存在するか（大小文字含む）
+ • ルートが app/api/... ではなく 別の場所（例: pages/api や src/pages）に誤配置されてないか
+ • middleware.ts の matcher が /api を巻き込んで rewrite/redirect していないか（特に /api/auth/login を除外する）
+ • ルートグループや構成の問題で、意図した path にビルドされていない可能性
+ • Vercel の “Root Directory” がズレて 別ディレクトリをデプロイしていないか（ただし sha は health で取れているので、同一ビルド内で route が欠けている線が濃い）
 
 ⸻
 
-Task 2: useAuthState の責務を確定（ブレ禁止）
+Task 2: /api/auth/login に “存在確認GET” を必ず追加
 
-対象: src/lib/auth/use-auth-state.ts と src/lib/auth/determine-auth-state.ts
+POST専用だとブラウザ/DevToolsで判断が難しいので、必ず GET を実装して 200 を返す（診断用）。
 
-要件
- • whyBlocked は必ず機械的に決まるようにする（曖昧文言禁止）
- • AUTH判定の順序を固定する
- 1. Cookie有無
- 2. getUser 成否
- 3. membership 有無
- 4. ready
- • どこで membership を取るか（APIか直接か）を統一する
- • DashboardPageShell側で勝手に membership を取りに行かない（Hook側に寄せる）
+例：
+ • GET → { ok:true, route:"/api/auth/login", methods:["POST"] , sha, timestamp } を返す
+ • POST → 既存のログイン処理
+
+これで 404 かどうかを即判定できる。
 
 ⸻
 
-Task 3: API/ログの収束（ユーザー確認を最小化）
+Task 3: LoginForm が 404/401 でも勝手に遷移しない
 
-対象: /api/health/auth-snapshot
-
-要件
- • authState, whyBlocked, requestId を常に返す
- • 可能なら cookieHeaderPresent, totalCookieCount も返す（既にあれば維持）
- • 401が出る場合は「どの段階で詰まったか」を whyBlocked に固定文言で出す
+LoginForm 側は必ず：
+ • fetch('/api/auth/login') が 404/401 のときは画面にエラー表示のみ（router.push/replace 禁止）
+ • 200 のときだけ /dashboard へ遷移
 
 ⸻
 
-Task 4: 再発防止ゲート（最低限でいい）
- • 既存のCIチェック（forbiddenLoginRedirect）に加えて、
- • DashboardPageShell 内に createClient().from('organization_members') などが残っていないことを grep で検査（Hook以外からの直叩きを禁止）
- • 可能なら Playwright で
- • 未ログイン → authState=UNAUTHENTICATED を確認
- • （E2E用アカウントが無理なら）少なくとも auth-snapshot のフォーマット検査だけでも入れる
+Task 4: 機械テストをリポジトリに入れる（ユーザーに依存しない）
+
+npm run smoke:auth 的なスクリプトを追加して、デプロイ後に以下が確認できるようにする：
+ 1. ルート存在確認（404排除）
+
+curl -i https://aiohub.jp/api/auth/login | head
+
+期待: HTTP/2 200 or HTTP/2 405（404は禁止）
+ 2. supabase-env が sha を返す（既にある）
+
+curl -s https://aiohub.jp/api/health/supabase-env | jq .sha
+
 
 ⸻
 
-禁止事項
- • “進めますか？”の確認で止めない。統合してPR/commitまで完了させる
- • 追加の大型設計（別StateMachine拡張など）に広げない。今回の目的は「幹の統一」だけ
- • /auth/login への強制リダイレクト復活は禁止（CIで落ちるようにする）
+期待する成果物
+ • 404 の原因の断定（どの設定/ファイル配置/middleware が原因かを明記）
+ • src/app/api/auth/login/route.ts の修正（GET追加含む）
+ • middleware が /api/auth/login を邪魔しない保証
+ • smoke スクリプト追加
+ • commit + push + デプロイ（sha提示）
 
 ⸻
 
-成果物（出力して）
- • 変更ファイル一覧
- • DashboardPageShell の分岐が AuthState だけになったことの証拠（抜粋でOK）
- • 「UNAUTHENTICATED / AUTH_FAILED の時にDB fetchが走らない」ことの確認（ログ or grep）
-
-⸻
-
-これで「診断の幹」と「表示の幹」が一致し、同じ問題をぐるぐるしなくなります。
+これで「ログイン以前の段階」で詰まっている状態を終わらせます。まずは /api/auth/login の 404 をゼロにすることだけに集中して完了させてください。

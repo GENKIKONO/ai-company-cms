@@ -37,6 +37,7 @@
     "test:unit": "jest --config jest.config.js",
     "test:integration": "jest --config jest.integration.config.js",
     "test:smoke": "jest --config jest.smoke.config.js",
+    "smoke:auth": "bash scripts/smoke-auth.sh",
     "test:health": "jest --config jest.health.config.js",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

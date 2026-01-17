@@ -4,8 +4,9 @@
  * サーバーサイドで signInWithPassword を実行し、@supabase/ssr 公式パターンで Cookie を発行。
  *
  * レスポンス契約:
- * - 失敗時: HTTP 401 で { ok: false, code, message, requestId }
- * - 成功時: HTTP 200 で { ok: true, requestId }
+ * - GET: 200 + { ok: true, route, methods, sha, timestamp }（診断用）
+ * - POST 失敗時: HTTP 401 で { ok: false, code, message, requestId }
+ * - POST 成功時: HTTP 200 で { ok: true, requestId } + Set-Cookie
  *
  * デバッグヘッダ:
  * - x-auth-request-id: リクエストID
@@ -23,6 +24,29 @@ function getProjectRef(): string {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
   return match ? match[1] : 'unknown';
+}
+
+/**
+ * GET /api/auth/login - 診断用エンドポイント
+ * ルートが存在するかを確認するため
+ */
+export async function GET() {
+  const sha = process.env.VERCEL_GIT_COMMIT_SHA ||
+              process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
+              'unknown';
+
+  return NextResponse.json({
+    ok: true,
+    route: '/api/auth/login',
+    methods: ['GET', 'POST'],
+    sha,
+    timestamp: new Date().toISOString(),
+  }, {
+    status: 200,
+    headers: {
+      'Cache-Control': 'no-store, must-revalidate',
+    },
+  });
 }
 
 export async function POST(request: NextRequest) {
