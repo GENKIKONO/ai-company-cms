@@ -249,13 +249,79 @@ export async function POST(request: NextRequest) {
       setCookiePreviews: setCookieHeaders.map(h => h.substring(0, 80) + '...'),
     });
 
-    // 警告: auth-token が Set-Cookie に含まれていない場合
-    if (!hasAuthTokenInSetCookie) {
-      console.warn('[api/auth/login] WARNING: auth-token NOT in Set-Cookie headers!', {
+    // ========================================
+    // A-2: auth-token がない場合のフォールバック
+    // ========================================
+    if (!hasAuthTokenInSetCookie && data.session?.access_token) {
+      console.warn('[api/auth/login] auth-token NOT in Set-Cookie, applying fallback', {
         requestId,
         setCookieNames,
         setAllCookieNames,
-        diagnostics: cookieDiagnostics,
+        accessTokenLength: data.session.access_token.length,
+      });
+
+      // access_token を手動で Cookie にセット
+      const authTokenCookieName = `sb-${projectRef}-auth-token`;
+      const accessToken = data.session.access_token;
+
+      // JWT が大きい場合はチャンク化が必要（4096バイト制限）
+      const MAX_COOKIE_SIZE = 3500; // 余裕を持たせる
+
+      if (accessToken.length <= MAX_COOKIE_SIZE) {
+        // 単一 Cookie でセット
+        response.cookies.set(authTokenCookieName, accessToken, {
+          path: '/',
+          secure: isSecure,
+          sameSite: 'lax',
+          httpOnly: false, // Supabase クライアントがアクセスする必要あり
+          maxAge: 3600, // 1時間（access_token の標準有効期限）
+        });
+
+        console.log('[api/auth/login] Fallback: Set single auth-token cookie', {
+          requestId,
+          cookieName: authTokenCookieName,
+          tokenLength: accessToken.length,
+        });
+      } else {
+        // チャンク化してセット
+        const chunks = [];
+        for (let i = 0; i < accessToken.length; i += MAX_COOKIE_SIZE) {
+          chunks.push(accessToken.slice(i, i + MAX_COOKIE_SIZE));
+        }
+
+        chunks.forEach((chunk, index) => {
+          const chunkName = `${authTokenCookieName}.${index}`;
+          response.cookies.set(chunkName, chunk, {
+            path: '/',
+            secure: isSecure,
+            sameSite: 'lax',
+            httpOnly: false,
+            maxAge: 3600,
+          });
+        });
+
+        console.log('[api/auth/login] Fallback: Set chunked auth-token cookies', {
+          requestId,
+          chunkCount: chunks.length,
+          chunkNames: chunks.map((_, i) => `${authTokenCookieName}.${i}`),
+        });
+      }
+    }
+
+    // refresh-token も確認（両方揃うことを保証）
+    if (!hasRefreshTokenInSetCookie && data.session?.refresh_token) {
+      const refreshTokenCookieName = `sb-${projectRef}-refresh-token`;
+      response.cookies.set(refreshTokenCookieName, data.session.refresh_token, {
+        path: '/',
+        secure: isSecure,
+        sameSite: 'lax',
+        httpOnly: false,
+        maxAge: 60 * 60 * 24 * 365, // 1年
+      });
+
+      console.log('[api/auth/login] Fallback: Set refresh-token cookie', {
+        requestId,
+        cookieName: refreshTokenCookieName,
       });
     }
 

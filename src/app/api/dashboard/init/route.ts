@@ -22,6 +22,19 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 
 // =====================================================
+// ヘルパー関数
+// =====================================================
+
+/**
+ * Supabase プロジェクト参照を環境変数から取得
+ */
+function getProjectRef(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match ? match[1] : 'unknown';
+}
+
+// =====================================================
 // Cookie 判定ヘルパー
 // =====================================================
 
@@ -207,6 +220,36 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
             user = retryResult.data.user;
             getUserError = null;
             sessionRecovered = true;
+
+            // 契約復旧: auth-token Cookie を再セット
+            const { data: newSessionData } = await supabase.auth.getSession();
+            if (newSessionData?.session?.access_token) {
+              const projectRef = getProjectRef();
+              const accessToken = newSessionData.session.access_token;
+              const authTokenCookieName = `sb-${projectRef}-auth-token`;
+
+              try {
+                // Cookie Store に直接セット（Next.js が Set-Cookie ヘッダーに追加）
+                cookieStore.set(authTokenCookieName, accessToken, {
+                  path: '/',
+                  secure: true,
+                  sameSite: 'lax',
+                  httpOnly: false,
+                  maxAge: 3600,
+                });
+
+                console.log('[dashboard/init] Contract recovered: auth-token cookie set', {
+                  requestId,
+                  cookieName: authTokenCookieName,
+                  tokenLength: accessToken.length,
+                });
+              } catch (cookieError) {
+                console.warn('[dashboard/init] Failed to set auth-token cookie', {
+                  requestId,
+                  error: cookieError instanceof Error ? cookieError.message : 'Unknown',
+                });
+              }
+            }
 
             // ログ出力
             console.log('[dashboard/init] Session recovered via refreshSession', {
