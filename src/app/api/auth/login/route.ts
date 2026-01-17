@@ -1,10 +1,9 @@
 /**
- * Email/Password Login Route Handler - Middleware パターン準拠版
+ * Email/Password Login Route Handler
  *
- * @supabase/ssr 公式の middleware パターンを Route Handler に適用:
- * - request.cookies で読み取り + 同時に更新
- * - response.cookies で書き込み
- * - setAll 内で request.cookies.set も呼ぶことで後続の getAll が最新値を返す
+ * @supabase/ssr パターンを Route Handler に適用:
+ * - request.cookies で読み取り + setAll で更新
+ * - 最終レスポンスに Cookie を直接設定
  *
  * レスポンス契約:
  * - GET: 200 + { ok: true, route, methods, sha, timestamp }（診断用）
@@ -58,8 +57,8 @@ export async function POST(request: NextRequest) {
   const proto = request.headers.get('x-forwarded-proto') || 'unknown';
   const projectRef = getProjectRef();
 
-  // 診断用: setAll で設定された Cookie 名を記録
-  const setCookieNames: string[] = [];
+  // setAll で設定された Cookie を収集
+  const cookiesToSetOnResponse: Array<{ name: string; value: string; options: CookieOptions }> = [];
 
   try {
     const body = await request.json();
@@ -71,19 +70,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    // ========================================
-    // Middleware パターン: request/response を使用
-    // setAll 内で request.cookies.set も呼ぶことで
-    // Supabase SSR が再度 getAll を呼んだ時に最新値を返す
-    // ========================================
-
-    // レスポンスを先に作成（後で body を差し替え）
-    let response = NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -106,18 +92,14 @@ export async function POST(request: NextRequest) {
               names: cookiesToSet.map(c => c.name),
             });
 
-            // 重要: request.cookies も更新することで、後続の getAll が最新値を返す
+            // request.cookies を更新（後続の getAll が最新値を返すように）
             cookiesToSet.forEach(({ name, value }) => {
               request.cookies.set(name, value);
             });
 
-            // response.cookies に設定
+            // レスポンスに設定する Cookie を収集
             cookiesToSet.forEach(({ name, value, options }) => {
-              setCookieNames.push(name);
-              response.cookies.set(name, value, {
-                ...options,
-                path: options.path || '/',
-              });
+              cookiesToSetOnResponse.push({ name, value, options });
             });
           },
         },
@@ -168,9 +150,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ========================================
     // Cookie 検証（診断用）
-    // ========================================
+    const setCookieNames = cookiesToSetOnResponse.map(c => c.name);
     const finalHasAuthToken = hasAuthTokenCookie(setCookieNames, projectRef);
 
     console.log('[api/auth/login] Cookie verification', {
@@ -181,11 +162,8 @@ export async function POST(request: NextRequest) {
       sessionRefreshToken: !!data.session.refresh_token,
     });
 
-    // ========================================
-    // 最終レスポンス作成
-    // response.cookies から Cookie をコピー
-    // ========================================
-    const finalResponse = NextResponse.json(
+    // レスポンス作成
+    const response = NextResponse.json(
       {
         ok: true,
         redirectTo: redirectTo || '/dashboard',
@@ -194,13 +172,11 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    // response.cookies の内容を finalResponse にコピー
-    response.cookies.getAll().forEach(cookie => {
-      finalResponse.cookies.set(cookie.name, cookie.value, {
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+    // 収集した Cookie をレスポンスに設定
+    cookiesToSetOnResponse.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, {
+        ...options,
+        path: options.path || '/',
       });
     });
 
@@ -208,19 +184,18 @@ export async function POST(request: NextRequest) {
       requestId,
       userId: data.user?.id,
       cookiesSet: setCookieNames,
-      finalCookies: finalResponse.cookies.getAll().map(c => c.name),
     });
 
     // デバッグヘッダを付与（診断用）
-    finalResponse.headers.set('x-auth-request-id', requestId);
-    finalResponse.headers.set('x-auth-set-cookie-names', setCookieNames.join(','));
-    finalResponse.headers.set('x-auth-has-auth-token', String(finalHasAuthToken));
-    finalResponse.headers.set('x-auth-supabase-ref', projectRef);
-    finalResponse.headers.set('x-auth-host', host);
-    finalResponse.headers.set('x-auth-proto', proto);
-    finalResponse.headers.set('x-auth-sha', sha);
+    response.headers.set('x-auth-request-id', requestId);
+    response.headers.set('x-auth-set-cookie-names', setCookieNames.join(','));
+    response.headers.set('x-auth-has-auth-token', String(finalHasAuthToken));
+    response.headers.set('x-auth-supabase-ref', projectRef);
+    response.headers.set('x-auth-host', host);
+    response.headers.set('x-auth-proto', proto);
+    response.headers.set('x-auth-sha', sha);
 
-    return finalResponse;
+    return response;
 
   } catch (error) {
     console.error('[api/auth/login] Unexpected error', {
