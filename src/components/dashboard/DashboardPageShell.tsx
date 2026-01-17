@@ -16,10 +16,14 @@
  * @note 権限判定はDBを正とする
  * - フロントでは role 名の解釈/比較ロジックを持たない
  * - DBの関数 `user_has_org_role` / `is_site_admin` に完全委譲
+ *
+ * @note 2024-01: organizations 取得を API Route 経由に変更
+ * - クライアントサイドの createBrowserClient では auth.uid() が NULL になる問題を回避
+ * - /api/dashboard/init で server-side の createServerClient を使用
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { DashboardErrorBoundary } from './DashboardErrorBoundary';
 import { DashboardLoadingState } from './ui/DashboardLoadingState';
 import { DashboardAlert } from './ui/DashboardAlert';
@@ -27,13 +31,10 @@ import { DashboardSection } from './ui/DashboardSection';
 import { getCurrentUserClient as getCurrentUser } from '@/lib/core/auth-state.client';
 import { createClient } from '@/lib/supabase/client';
 import type { AuthState } from '@/lib/auth/auth-state';
-import { canFetchDB } from '@/lib/auth/auth-state';
 import {
   hasOrgRole,
   isSiteAdmin,
   mapRequiredRole,
-  isRLSDeniedError,
-  isSessionExpiredError,
   type OrgRole,
 } from '@/lib/authz';
 import { auditLogWriteClient } from '@/lib/core/audit-logger.client';
@@ -41,6 +42,7 @@ import { logger } from '@/lib/utils/logger';
 import type { AppUser } from '@/types/legacy/database';
 import type { UserRole } from '@/types/utils/database';
 import { v4 as uuidv4 } from 'uuid';
+import type { DashboardInitResponse } from '@/app/api/dashboard/init/route';
 
 // =====================================================
 // TYPES
@@ -147,6 +149,10 @@ export function DashboardPageShell({
 }: DashboardPageShellProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // 診断モード: ?diag=1 で有効化
+  const isDiagMode = searchParams?.get('diag') === '1';
 
   // Request ID for error tracking
   const [requestId] = useState(() => uuidv4());
@@ -163,6 +169,7 @@ export function DashboardPageShell({
   const [authState, setAuthState] = useState<AuthState>('UNAUTHENTICATED');
   // 診断用: Supabase エラー詳細（PII なし）
   const [errorDetails, setErrorDetails] = useState<{
+    whichQuery?: string;
     supabaseCode?: string;
     supabaseMessage?: string;
     supabaseDetails?: string;
@@ -171,6 +178,8 @@ export function DashboardPageShell({
   } | null>(null);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [isDataFetched, setIsDataFetched] = useState(false);
+  // ビルドSHA（APIから取得）
+  const [buildSha, setBuildSha] = useState<string>('loading...');
 
   // Fetch counter ref to track current fetch and ignore stale results
   // This prevents race conditions during client-side navigation
@@ -198,6 +207,10 @@ export function DashboardPageShell({
   /**
    * ユーザーと組織データを取得
    *
+   * 2024-01: API Route 経由で取得に変更
+   * - クライアントサイドの createBrowserClient では auth.uid() が NULL になる問題を回避
+   * - /api/dashboard/init で server-side の createServerClient を使用
+   *
    * Race condition対策:
    * - fetchCounterRef で現在のfetchを追跡
    * - 古いfetchの結果は無視（stale closure問題を防止）
@@ -219,53 +232,88 @@ export function DashboardPageShell({
     setIsDataFetched(false);
 
     try {
-      // ========================================
-      // Phase 3: AuthState 判定（DB fetch 前に必須）
-      // Cookieが無い状態で DB fetch が1本も飛ばない
-      // ========================================
-      const supabase = createClient();
-
-      // Step 1: getUser() でセッション確認（DB fetch ではない）
-      const { data: { user: authUser }, error: getUserError } = await supabase.auth.getUser();
-
-      if (isStale()) return;
-
-      // getUserError → AUTH_FAILED
-      if (getUserError) {
-        logger.warn('[DashboardPageShell] getUser failed', {
-          error: getUserError.message,
-          requestId,
-        });
-        setAuthState('AUTH_FAILED');
-        setError(`認証エラー: ${getUserError.message}`);
-        setErrorCode('AUTH_FAILED');
-        return;
-      }
-
-      // user なし → UNAUTHENTICATED
-      if (!authUser && !isPublic) {
-        setAuthState('UNAUTHENTICATED');
-        setError('認証情報の取得に失敗しました。ページを再読み込みしてください。');
-        setErrorCode('UNAUTHENTICATED');
-        return;
-      }
-
       // Public ページの場合は認証不要
-      if (!authUser && isPublic) {
+      if (isPublic) {
         setAuthState('UNAUTHENTICATED');
         setIsLoading(false);
         setIsDataFetched(true);
         return;
       }
 
-      // ここから authUser は必ず存在する
-      // getCurrentUser で AppUser 型に変換
+      // ========================================
+      // API Route 経由で organizations/memberships を取得
+      // サーバーサイドの createServerClient を使用することで
+      // auth.uid() の解決を確実に行う
+      // ========================================
+      const initResponse = await fetch('/api/dashboard/init', {
+        credentials: 'include', // Cookie を送信
+        cache: 'no-store',
+      });
+
+      if (isStale()) return;
+
+      const initData: DashboardInitResponse = await initResponse.json();
+
+      // ビルド SHA を取得
+      if (initData.sha) {
+        setBuildSha(initData.sha);
+      }
+
+      // エラーハンドリング
+      if (!initData.ok && initData.error) {
+        const { code, message, whichQuery, details, hint } = initData.error;
+
+        // 診断用: エラー詳細をキャプチャ
+        setErrorDetails({
+          whichQuery: whichQuery || 'unknown',
+          supabaseCode: code,
+          supabaseMessage: message,
+          supabaseDetails: details || undefined,
+          supabaseHint: hint || undefined,
+          context: `${whichQuery || 'unknown'} (server-side via API Route)`,
+        });
+
+        // ログ出力
+        const logPayload = {
+          requestId: initData.requestId,
+          route: pathname,
+          queryName: whichQuery,
+          clientType: 'createServerClient (API Route)',
+          supabaseError: { code, message, details, hint },
+        };
+        logger.error(`[DashboardPageShell] ${whichQuery || 'init'} query failed`, logPayload);
+        // eslint-disable-next-line no-console
+        console.error('[DashboardPageShell] Query failed:', logPayload);
+
+        // 認証エラー
+        if (code === 'NO_AUTH_COOKIE' || code === 'NO_USER_SESSION' || code === 'AUTH_ERROR') {
+          setAuthState('AUTH_FAILED');
+          setError('認証情報の取得に失敗しました。ページを再読み込みしてください。');
+          setErrorCode(code);
+          return;
+        }
+
+        // その他のエラー
+        setAuthState('AUTH_FAILED');
+        setError(`${whichQuery || 'データ'} の取得に失敗しました (${code})`);
+        setErrorCode(code);
+        return;
+      }
+
+      // ユーザー情報がない場合
+      if (!initData.user) {
+        setAuthState('UNAUTHENTICATED');
+        setError('認証情報の取得に失敗しました。ページを再読み込みしてください。');
+        setErrorCode('UNAUTHENTICATED');
+        return;
+      }
+
+      // getCurrentUser で AppUser 型に変換（profile 情報を含む）
       const currentUser = await getCurrentUser();
 
       if (isStale()) return;
 
       if (!currentUser) {
-        // getCurrentUser が null を返した（auth は OK だが profile がない等）
         setAuthState('AUTH_FAILED');
         setError('ユーザー情報の取得に失敗しました。');
         setErrorCode('USER_PROFILE_ERROR');
@@ -275,9 +323,9 @@ export function DashboardPageShell({
       setUser(currentUser);
 
       // ========================================
-      // Phase 3: ここから DB fetch を許可
-      // AuthState は AUTHENTICATED_NO_ORG または AUTHENTICATED_READY のいずれか
+      // 権限チェック
       // ========================================
+      const supabase = createClient();
       const mappedRole = mapRequiredRole(requiredRole);
 
       // サイト管理者専用ページの場合
@@ -291,61 +339,8 @@ export function DashboardPageShell({
         }
       }
 
-      // 組織所属の判定: organization_members を唯一の正規ソースとして使用
-      // v_current_user_orgs は不整合があるため使用しない
-      const { data: membershipData, error: membershipError } = await supabase
-        .from('organization_members')
-        .select('organization_id, role')
-        .eq('user_id', currentUser.id);
-
-      if (isStale()) return;
-
-      if (membershipError) {
-        // 診断用: エラー詳細をキャプチャ
-        const queryName = 'organization_members';
-        setErrorDetails({
-          supabaseCode: membershipError.code,
-          supabaseMessage: membershipError.message,
-          supabaseDetails: membershipError.details,
-          supabaseHint: membershipError.hint,
-          context: `${queryName} SELECT`,
-        });
-
-        // Phase 1: 詳細ログ（Vercel Logs で追跡可能）
-        logger.error(`[DashboardPageShell] ${queryName} query failed`, {
-          requestId,
-          route: pathname,
-          authState,
-          userId: currentUser.id,
-          queryName,
-          supabaseError: {
-            code: membershipError.code,
-            message: membershipError.message,
-            details: membershipError.details,
-            hint: membershipError.hint,
-          },
-        });
-
-        if (isRLSDeniedError(membershipError)) {
-          setErrorCode('RLS_DENIED');
-          setError(`${queryName} へのアクセス権限がありません (${membershipError.code || 'RLS'})`);
-          await logToAudit('page_access', 'denied', 'rls_denied');
-          return;
-        }
-        if (isSessionExpiredError(membershipError)) {
-          // NOTE: Don't redirect - might be a timing issue during navigation
-          // Middleware handles actual session expiration
-          setError('セッションの確認に失敗しました。ページを再読み込みしてください。');
-          setErrorCode('SESSION_ERROR');
-          return;
-        }
-        // 取得失敗はエラー扱い（empty扱いにしない）
-        setError(`${queryName} の取得に失敗しました (${membershipError.code || 'UNKNOWN'})`);
-        setErrorCode('MEMBERSHIP_FETCH_ERROR');
-        return;
-      }
-
-      const memberships = membershipData || [];
+      const memberships = initData.memberships || [];
+      const orgsData = initData.organizations || [];
 
       // Phase 3: メンバーシップに基づいて AuthState を設定
       if (memberships.length === 0) {
@@ -354,57 +349,9 @@ export function DashboardPageShell({
         setAuthState('AUTHENTICATED_READY');
       }
 
-      if (memberships.length > 0) {
-        // Get all organization details
-        const orgIds = memberships.map(m => m.organization_id);
-        const { data: orgsData, error: orgsError } = await supabase
-          .from('organizations')
-          .select('id, name, slug, plan')
-          .in('id', orgIds);
-
-        if (isStale()) return;
-
-        if (orgsError) {
-          // 診断用: エラー詳細をキャプチャ
-          const queryName = 'organizations';
-          setErrorDetails({
-            supabaseCode: orgsError.code,
-            supabaseMessage: orgsError.message,
-            supabaseDetails: orgsError.details,
-            supabaseHint: orgsError.hint,
-            context: `${queryName} SELECT (ids: ${orgIds.length}件)`,
-          });
-
-          // Phase 1: 詳細ログ（Vercel Logs で追跡可能）
-          logger.error(`[DashboardPageShell] ${queryName} query failed`, {
-            requestId,
-            route: pathname,
-            authState,
-            userId: currentUser.id,
-            queryName,
-            membershipRowsCount: memberships.length,
-            orgIds,
-            supabaseError: {
-              code: orgsError.code,
-              message: orgsError.message,
-              details: orgsError.details,
-              hint: orgsError.hint,
-            },
-          });
-
-          if (isRLSDeniedError(orgsError)) {
-            setErrorCode('RLS_DENIED');
-            setError(`${queryName} へのアクセス権限がありません (${orgsError.code || 'RLS'})`);
-            await logToAudit('page_access', 'denied', 'org_rls_denied');
-            return;
-          }
-          setError(`${queryName} の取得に失敗しました (${orgsError.code || 'UNKNOWN'})`);
-          setErrorCode('ORG_FETCH_ERROR');
-          return;
-        }
-
+      if (memberships.length > 0 && orgsData.length > 0) {
         // Map organizations with their contexts
-        const orgContexts: OrganizationContext[] = (orgsData || []).map(org => ({
+        const orgContexts: OrganizationContext[] = orgsData.map(org => ({
           id: org.id,
           name: org.name,
           slug: org.slug,
@@ -472,19 +419,8 @@ export function DashboardPageShell({
 
       const message = err instanceof Error ? err.message : 'データの取得に失敗しました';
       setError(message);
-
-      // Check for specific error types
-      if (isRLSDeniedError(err)) {
-        setErrorCode('RLS_DENIED');
-        await logToAudit('page_access', 'error', 'rls_denied');
-      } else if (isSessionExpiredError(err)) {
-        // NOTE: Don't redirect - might be a timing issue during navigation
-        // Middleware handles actual session expiration
-        setErrorCode('SESSION_ERROR');
-        await logToAudit('page_access', 'error', 'session_error');
-      } else {
-        await logToAudit('page_access', 'error', message);
-      }
+      setErrorCode('FETCH_ERROR');
+      await logToAudit('page_access', 'error', message);
     } finally {
       // Only update loading state if this fetch is still current
       if (!isStale()) {
@@ -528,7 +464,7 @@ export function DashboardPageShell({
     // Mark component as mounted
     isMountedRef.current = true;
 
-    // Fetch data
+    // Fetch data (buildSha is now fetched from /api/dashboard/init)
     fetchData();
 
     // Cleanup: mark component as unmounted to prevent stale updates
@@ -594,38 +530,86 @@ export function DashboardPageShell({
       );
     }
 
+    // 診断情報をまとめる（コピペ用）
+    const diagData = {
+      sha: buildSha,
+      requestId,
+      authState,
+      errorCode,
+      userId: user?.id || null,
+      organizationId: organization?.id || null,
+      whichQuery: errorDetails?.whichQuery || null,
+      error: {
+        code: errorDetails?.supabaseCode || null,
+        message: errorDetails?.supabaseMessage || error,
+        details: errorDetails?.supabaseDetails || null,
+        hint: errorDetails?.supabaseHint || null,
+      },
+      context: errorDetails?.context || null,
+      timestamp: new Date().toISOString(),
+    };
+
     return (
       <DashboardSection>
         <DashboardAlert
           variant="error"
-          title={errorCode === 'RLS_DENIED' ? '権限エラー' : 'エラーが発生しました'}
+          title={errorCode === 'RLS_DENIED' ? '権限エラー' : 'データベースエラー'}
           action={{
             label: '再読み込み',
             onClick: () => window.location.reload(),
           }}
         >
           {error}
-          <span className="block mt-2 text-xs text-[var(--color-text-tertiary)]">
-            リクエストID: {requestId}
-          </span>
-          {/* 診断用: Supabase エラー詳細（開発者向け、PII なし） */}
-          {errorDetails && (
+
+          {/* 常に表示: 基本診断情報 */}
+          <div className="mt-3 p-2 bg-[var(--aio-surface)] rounded text-xs font-mono text-left">
+            <div><strong>whichQuery:</strong> {errorDetails?.whichQuery || 'N/A'}</div>
+            <div><strong>code:</strong> {errorDetails?.supabaseCode || errorCode || 'N/A'}</div>
+            <div><strong>message:</strong> {errorDetails?.supabaseMessage || 'N/A'}</div>
+            <div><strong>requestId:</strong> {requestId}</div>
+            <div><strong>sha:</strong> {buildSha}</div>
+          </div>
+
+          {/* 診断モードまたはdetails展開時: 詳細情報 */}
+          {isDiagMode ? (
+            <div className="mt-3 p-2 bg-[var(--aio-surface)] rounded text-xs font-mono text-left">
+              <div className="font-bold mb-2">【診断モード: 詳細情報】</div>
+              <div><strong>authState:</strong> {authState}</div>
+              <div><strong>userId:</strong> {user?.id || 'null'}</div>
+              <div><strong>organizationId:</strong> {organization?.id || 'null'}</div>
+              {errorDetails?.supabaseDetails && (
+                <div><strong>details:</strong> {errorDetails.supabaseDetails}</div>
+              )}
+              {errorDetails?.supabaseHint && (
+                <div><strong>hint:</strong> {errorDetails.supabaseHint}</div>
+              )}
+              {errorDetails?.context && (
+                <div><strong>context:</strong> {errorDetails.context}</div>
+              )}
+              <div className="mt-2 pt-2 border-t border-[var(--dashboard-card-border)]">
+                <div className="font-bold">コピー用JSON:</div>
+                <pre className="mt-1 p-1 bg-white rounded overflow-auto max-h-32 text-[10px]">
+                  {JSON.stringify(diagData, null, 2)}
+                </pre>
+              </div>
+            </div>
+          ) : (
             <details className="mt-3 text-xs">
               <summary className="cursor-pointer text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
-                診断情報を表示
+                詳細診断情報を表示（?diag=1 で自動展開）
               </summary>
               <div className="mt-2 p-2 bg-[var(--aio-surface)] rounded text-left font-mono">
-                <div>エラーコード: {errorCode || 'N/A'}</div>
-                <div>Supabase Code: {errorDetails.supabaseCode || 'N/A'}</div>
-                <div>Message: {errorDetails.supabaseMessage || 'N/A'}</div>
-                {errorDetails.supabaseDetails && (
-                  <div>Details: {errorDetails.supabaseDetails}</div>
+                <div><strong>authState:</strong> {authState}</div>
+                <div><strong>userId:</strong> {user?.id || 'null'}</div>
+                <div><strong>organizationId:</strong> {organization?.id || 'null'}</div>
+                {errorDetails?.supabaseDetails && (
+                  <div><strong>details:</strong> {errorDetails.supabaseDetails}</div>
                 )}
-                {errorDetails.supabaseHint && (
-                  <div>Hint: {errorDetails.supabaseHint}</div>
+                {errorDetails?.supabaseHint && (
+                  <div><strong>hint:</strong> {errorDetails.supabaseHint}</div>
                 )}
-                {errorDetails.context && (
-                  <div>Context: {errorDetails.context}</div>
+                {errorDetails?.context && (
+                  <div><strong>context:</strong> {errorDetails.context}</div>
                 )}
               </div>
             </details>
