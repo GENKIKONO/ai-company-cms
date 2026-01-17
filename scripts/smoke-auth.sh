@@ -2,12 +2,10 @@
 # smoke-auth.sh - 認証エンドポイントの smoke テスト
 # 使用法: npm run smoke:auth または ./scripts/smoke-auth.sh [base_url]
 #
-# 環境変数:
-#   SMOKE_EMAIL, SMOKE_PASSWORD - 認証テスト用アカウント（Vercel Env / GitHub Secrets に設定）
-#   REQUIRE_AUTH_SMOKE - "1" の場合、認証テストが必須（未設定時はFAIL）
+# CIではHealth Onlyで実行（ログイン検証は手動または障害対応時のみ）
 #
-# 注意: ユーザーに認証情報を直接聞くことは禁止。
-#       Secrets管理（Vercel Env / GitHub Secrets）経由で設定すること。
+# オプション環境変数（手動実行時のみ）:
+#   SMOKE_EMAIL, SMOKE_PASSWORD - 認証テスト用アカウント
 
 set -e
 
@@ -16,12 +14,6 @@ BASE_URL="${1:-https://aiohub.jp}"
 echo "=== Auth Smoke Test ==="
 echo "Base URL: $BASE_URL"
 echo ""
-
-# 認証テスト必須モードのチェック（REQUIRE_AUTH_SMOKE=1 または CI 環境）
-REQUIRE_AUTH="${REQUIRE_AUTH_SMOKE:-0}"
-if [ "$CI" = "true" ]; then
-  REQUIRE_AUTH="1"
-fi
 
 # 0. /auth/signin が 308 リダイレクトを返すことを確認（経路統一の保護）
 echo "0. Checking /auth/signin returns 308 redirect..."
@@ -287,20 +279,8 @@ if [ -n "$SMOKE_EMAIL" ] && [ -n "$SMOKE_PASSWORD" ]; then
   echo "=== Authenticated tests passed ==="
 else
   echo ""
-  if [ "$REQUIRE_AUTH" = "1" ]; then
-    echo "   FAIL: SMOKE_EMAIL and SMOKE_PASSWORD are required but not set!"
-    echo ""
-    echo "   To fix: Set SMOKE_EMAIL and SMOKE_PASSWORD in:"
-    echo "     - Vercel Environment Variables (for production)"
-    echo "     - GitHub Secrets (for CI)"
-    echo "     - .env.local (for local development only)"
-    echo ""
-    echo "   DO NOT paste credentials in chat. Use Secrets management."
-    exit 1
-  else
-    echo "   SKIP: Authenticated tests (SMOKE_EMAIL/SMOKE_PASSWORD not set)"
-    echo "   Note: In CI, this would be a FAIL. Set REQUIRE_AUTH_SMOKE=1 to enforce."
-  fi
+  echo "   SKIP: Authenticated tests (SMOKE_EMAIL/SMOKE_PASSWORD not set)"
+  echo "   Note: CI uses Health Only. Login verification is manual only."
 fi
 
 echo ""

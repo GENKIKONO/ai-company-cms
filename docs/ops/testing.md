@@ -87,53 +87,34 @@ npm run typecheck:test
 2. ファイルが適切なカテゴリに分類されているかチェック
 3. 必要に応じて設定ファイルを調整
 
-## Auth Smoke Test
+## Auth Smoke Test (Health Only)
 
 ### 概要
 
-認証エンドポイントの smoke テストは、本番環境での Cookie 契約（auth-token / refresh-token の発行）を検証します。
+認証エンドポイントの smoke テストは、**CI では Health Only**（未ログイン状態での auth / dashboard health のみ）で実行します。
 
-### 実行方法
-
-```bash
-# ローカル実行（認証テストはスキップ）
-npm run smoke:auth
-
-# 認証テスト込みで実行（Secrets 設定必須）
-SMOKE_EMAIL=xxx SMOKE_PASSWORD=xxx npm run smoke:auth
-```
-
-### Secrets の設定
-
-**重要**: ユーザーに認証情報を直接聞くことは禁止。以下の方法で設定してください。
-
-#### GitHub Secrets（CI 用）
-
-1. リポジトリの Settings → Secrets and variables → Actions
-2. 以下を追加:
-   - `SMOKE_EMAIL`: テスト用アカウントのメールアドレス
-   - `SMOKE_PASSWORD`: テスト用アカウントのパスワード
-
-#### Vercel Environment Variables（本番確認用）
-
-1. Vercel ダッシュボード → Settings → Environment Variables
-2. 以下を追加（Production のみ推奨）:
-   - `SMOKE_EMAIL`
-   - `SMOKE_PASSWORD`
-
-#### テスト用アカウントの作成
-
-Supabase Auth にテスト専用アカウントを作成してください：
-- メール確認済みのアカウントを使用
-- 本番組織へのアクセス権限は不要（ログイン検証のみ）
+ログイン検証は**手動**または**障害対応時のみ**行います。
 
 ### CI での動作
 
-- CI 環境（`CI=true`）では認証テストが必須
-- `SMOKE_EMAIL` / `SMOKE_PASSWORD` が未設定の場合は FAIL
 - GitHub Actions workflow: `.github/workflows/smoke-auth.yml`
+- `deployment_status` (成功時) と `workflow_dispatch` (手動) で実行
+- **ログイン認証は行わない**（Health Only）
+- 検証対象:
+  - `/auth/signin` → 308 リダイレクト
+  - `/api/auth/login` → 200 (GET)
+  - `/api/health/supabase-env` → 200
+  - `/api/health/auth-snapshot` → 200
+  - `/api/health/dashboard-probe` → 200
 
-### 診断ヘッダー
+### 手動でのログイン検証（障害対応時）
+
+```bash
+# ローカルで認証テスト込みで実行
+SMOKE_EMAIL=xxx SMOKE_PASSWORD=xxx npm run smoke:auth
+```
+
+### 診断ヘッダー（障害調査用）
 
 ログイン成功時、以下のヘッダーが返されます：
 

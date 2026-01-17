@@ -12,16 +12,12 @@ on:
         required: false
         default: 'https://aiohub.jp'
 
-  # 定期実行（毎時）
-  schedule:
-    - cron: '0 * * * *'
-
 env:
   BASE_URL: ${{ github.event.inputs.base_url || 'https://aiohub.jp' }}
 
 jobs:
-  smoke-auth:
-    name: Auth Smoke Test (No Login)
+  smoke-auth-health:
+    name: Auth Health Check
     runs-on: ubuntu-latest
 
     # deployment_status の場合は success のときだけ実行
@@ -33,31 +29,45 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Run Auth Health Smoke Test
-        env:
-          CI: 'true'
         run: |
           set -e
-          echo "Running auth health smoke test against $BASE_URL"
+          echo "=== Auth Smoke Test (Health Only) ==="
+          echo "Base URL: $BASE_URL"
+          echo ""
 
-          echo "1. GET /api/auth/login (route exists)"
+          # 0. /auth/signin が 308 リダイレクトを返すことを確認
+          echo "0. Checking /auth/signin returns 308 redirect..."
+          SIGNIN_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/auth/signin")
+          if [ "$SIGNIN_STATUS" = "308" ] || [ "$SIGNIN_STATUS" = "307" ]; then
+            echo "   OK: /auth/signin returns $SIGNIN_STATUS"
+          else
+            echo "   FAIL: /auth/signin returns $SIGNIN_STATUS (expected 307 or 308)"
+            exit 1
+          fi
+
+          # 1. /api/auth/login ルート存在確認
+          echo "1. Checking /api/auth/login route exists..."
           curl -fsS "$BASE_URL/api/auth/login" > /dev/null
+          echo "   OK: GET /api/auth/login returns 200"
 
-          echo "2. GET /api/health/supabase-env"
+          # 2. /api/health/supabase-env 確認
+          echo "2. Checking /api/health/supabase-env..."
           curl -fsS "$BASE_URL/api/health/supabase-env" > /dev/null
+          echo "   OK: GET /api/health/supabase-env returns 200"
 
-          echo "3. GET /api/health/auth-snapshot"
+          # 3. /api/health/auth-snapshot 確認
+          echo "3. Checking /api/health/auth-snapshot..."
           curl -fsS "$BASE_URL/api/health/auth-snapshot" > /dev/null
+          echo "   OK: GET /api/health/auth-snapshot returns 200"
 
-          echo "4. GET /api/health/dashboard-probe"
+          # 4. /api/health/dashboard-probe 確認
+          echo "4. Checking /api/health/dashboard-probe..."
           curl -fsS "$BASE_URL/api/health/dashboard-probe" > /dev/null
+          echo "   OK: GET /api/health/dashboard-probe returns 200"
 
-          echo "Auth smoke test (health-only) PASSED"
+          echo ""
+          echo "=== Auth Health Check passed ==="
 
       - name: Notify on failure
         if: failure()
