@@ -93,8 +93,14 @@ export async function POST(request: NextRequest) {
             });
 
             // request.cookies を更新（後続の getAll が最新値を返すように）
+            // Note: 一部の環境では request.cookies.set が失敗する可能性があるため try-catch
             cookiesToSet.forEach(({ name, value }) => {
-              request.cookies.set(name, value);
+              try {
+                request.cookies.set(name, value);
+              } catch {
+                // Vercel Edge や特定の環境では request.cookies が読み取り専用の場合がある
+                // この場合は無視して続行（Cookie はレスポンスにセットされる）
+              }
             });
 
             // レスポンスに設定する Cookie を収集
