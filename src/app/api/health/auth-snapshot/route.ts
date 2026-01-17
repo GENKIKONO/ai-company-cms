@@ -61,6 +61,13 @@ export async function GET(request: NextRequest) {
               process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
               'unknown';
 
+  // Step 4 強化: リクエスト診断情報
+  const host = request.headers.get('host') || 'unknown';
+  const proto = request.headers.get('x-forwarded-proto') || 'unknown';
+  const userAgent = request.headers.get('user-agent') || '';
+  const userAgentHint = userAgent.slice(0, 50) + (userAgent.length > 50 ? '...' : '');
+  const cookieHeaderPresent = request.headers.has('cookie');
+
   try {
     const cookieStore = await cookies();
     const allCookies = cookieStore.getAll();
@@ -114,6 +121,11 @@ export async function GET(request: NextRequest) {
       envProjectRef,
       cookieProjectRefs,
       projectMismatch,
+      // Step 4 強化: リクエスト診断
+      host,
+      proto,
+      userAgentHint,
+      cookieHeaderPresent,
       sha,
       requestId,
       timestamp: new Date().toISOString()

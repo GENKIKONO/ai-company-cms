@@ -59,7 +59,7 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
       router.refresh();
 
       const targetUrl = result.redirectTo || '/dashboard';
-      router.push(targetUrl);
+      router.replace(targetUrl); // replace で履歴を汚さない
 
     } catch (err) {
       logger.error('Login error:', { data: err });
