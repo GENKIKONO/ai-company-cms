@@ -1,21 +1,19 @@
 /**
- * Email/Password Login Route Handler - 自己検証型
+ * Email/Password Login Route Handler - Supabase SSR 公式パターン準拠版
  *
- * サーバーサイドで signInWithPassword を実行し、Cookie 契約を保証する。
- *
- * 自己検証:
- * - signIn 成功後、response.cookies.getAll() で Cookie を機械判定
- * - auth-token / refresh-token が不足していれば強制補完
- * - 補完後も auth-token が存在しなければ 500 エラー
+ * @supabase/ssr 公式パターンに完全準拠:
+ * - cookies() (next/headers) を使用してCookieの読み書き
+ * - getAll/setAll でCookieブリッジを実装
+ * - cookieStore.set() でNext.jsが自動的にSet-Cookieヘッダーを追加
  *
  * レスポンス契約:
  * - GET: 200 + { ok: true, route, methods, sha, timestamp }（診断用）
  * - POST 失敗時: HTTP 401 で { ok: false, code, message, requestId }
  * - POST 成功時: HTTP 200 で { ok: true, requestId } + Set-Cookie
- * - Cookie契約違反: HTTP 500 で { ok: false, code: COOKIE_CONTRACT_BROKEN }
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 // Supabase プロジェクト参照を環境変数から取得
 function getProjectRef(): string {
@@ -52,19 +50,6 @@ function hasAuthTokenCookie(cookieNames: string[], projectRef: string): boolean 
   return cookieNames.some(name => pattern.test(name));
 }
 
-function hasRefreshTokenCookie(cookieNames: string[], projectRef: string): boolean {
-  return cookieNames.includes(`sb-${projectRef}-refresh-token`);
-}
-
-// チャンク化ヘルパー
-function chunkString(str: string, size: number): string[] {
-  const chunks: string[] = [];
-  for (let i = 0; i < str.length; i += size) {
-    chunks.push(str.slice(i, i + size));
-  }
-  return chunks;
-}
-
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
   const sha = process.env.VERCEL_GIT_COMMIT_SHA ||
@@ -73,14 +58,9 @@ export async function POST(request: NextRequest) {
   const host = request.headers.get('host') || 'unknown';
   const proto = request.headers.get('x-forwarded-proto') || 'unknown';
   const projectRef = getProjectRef();
-  const isSecure = proto === 'https';
 
-  // Cookie サイズ上限（余裕を持たせる）
-  const MAX_COOKIE_SIZE = 3500;
-
-  // 診断用: Supabase SSR が setAll で設定しようとした Cookie 名を記録
-  const supabaseSetCookieNames: string[] = [];
-  let fallbackUsed = false;
+  // 診断用: setAll で設定された Cookie 名を記録
+  const setCookieNames: string[] = [];
 
   try {
     const body = await request.json();
@@ -94,42 +74,55 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // A-1: 返却する NextResponse を最初に作る
+    // 公式パターン: cookies() (next/headers) を使用
+    // Route Handler では cookieStore.set() が呼ばれると
+    // Next.js が自動的にレスポンスに Set-Cookie ヘッダーを追加
     // ========================================
-    const response = NextResponse.json(
-      {
-        ok: true,
-        redirectTo: redirectTo || '/dashboard',
-        requestId,
-      },
-      { status: 200 }
-    );
+    const cookieStore = await cookies();
 
-    // サーバー側 Supabase クライアントを作成
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            // Supabase SSR が設定する Cookie をそのまま response にセット
-            cookiesToSet.forEach(({ name, value, options }) => {
-              // 診断用: Supabase SSR が設定しようとした Cookie 名を記録
-              supabaseSetCookieNames.push(name);
-
-              response.cookies.set(name, value, {
-                ...options,
-                path: '/',  // 必ず "/" にする
-              });
+            const allCookies = cookieStore.getAll();
+            console.log('[api/auth/login] getAll called', {
+              requestId,
+              count: allCookies.length,
+              names: allCookies.map(c => c.name),
             });
-
+            return allCookies;
+          },
+          setAll(cookiesToSet: Array<{ name: string; value: string; options: CookieOptions }>) {
             console.log('[api/auth/login] setAll called', {
               requestId,
               count: cookiesToSet.length,
               names: cookiesToSet.map(c => c.name),
+            });
+
+            // Cookie を直接 cookieStore に設定
+            // Next.js が自動的にレスポンスの Set-Cookie ヘッダーに追加
+            cookiesToSet.forEach(({ name, value, options }) => {
+              setCookieNames.push(name);
+              try {
+                cookieStore.set(name, value, {
+                  ...options,
+                  // セキュリティ設定を明示
+                  path: options.path || '/',
+                  httpOnly: options.httpOnly !== false,
+                  secure: process.env.NODE_ENV === 'production',
+                  sameSite: (options.sameSite as 'lax' | 'strict' | 'none') || 'lax',
+                });
+              } catch (error) {
+                // Server Component から呼ばれた場合のエラーを無視
+                // Route Handler では発生しないはず
+                console.error('[api/auth/login] cookieStore.set error', {
+                  requestId,
+                  name,
+                  error: error instanceof Error ? error.message : 'Unknown',
+                });
+              }
             });
           },
         },
@@ -181,130 +174,46 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // A-2: response.cookies.getAll() で機械判定
+    // Cookie 検証（診断用）
     // ========================================
-    const currentCookies = response.cookies.getAll();
-    let cookieNames = currentCookies.map(c => c.name);
+    const finalHasAuthToken = hasAuthTokenCookie(setCookieNames, projectRef);
 
-    console.log('[api/auth/login] After signIn - Cookie check', {
+    console.log('[api/auth/login] Cookie verification', {
       requestId,
-      cookieNames,
-      hasAuthToken: hasAuthTokenCookie(cookieNames, projectRef),
-      hasRefreshToken: hasRefreshTokenCookie(cookieNames, projectRef),
-    });
-
-    // auth-token が不足していれば強制補完（フォールバック）
-    if (!hasAuthTokenCookie(cookieNames, projectRef) && data.session.access_token) {
-      fallbackUsed = true;
-      console.log('[api/auth/login] auth-token missing, FALLBACK triggered', { requestId });
-
-      const authTokenCookieName = `sb-${projectRef}-auth-token`;
-      const accessToken = data.session.access_token;
-
-      if (accessToken.length <= MAX_COOKIE_SIZE) {
-        // 単一 Cookie
-        response.cookies.set(authTokenCookieName, accessToken, {
-          path: '/',
-          secure: isSecure,
-          sameSite: 'lax',
-          httpOnly: false,
-          maxAge: 3600,
-        });
-      } else {
-        // チャンク化
-        const chunks = chunkString(accessToken, MAX_COOKIE_SIZE);
-        chunks.forEach((chunk, index) => {
-          response.cookies.set(`${authTokenCookieName}.${index}`, chunk, {
-            path: '/',
-            secure: isSecure,
-            sameSite: 'lax',
-            httpOnly: false,
-            maxAge: 3600,
-          });
-        });
-
-        console.log('[api/auth/login] auth-token chunked', {
-          requestId,
-          chunkCount: chunks.length,
-        });
-      }
-    }
-
-    // refresh-token が不足していれば強制補完
-    if (!hasRefreshTokenCookie(cookieNames, projectRef) && data.session.refresh_token) {
-      console.log('[api/auth/login] refresh-token missing, force setting', { requestId });
-
-      response.cookies.set(`sb-${projectRef}-refresh-token`, data.session.refresh_token, {
-        path: '/',
-        secure: isSecure,
-        sameSite: 'lax',
-        httpOnly: false,
-        maxAge: 60 * 60 * 24 * 365, // 1年
-      });
-    }
-
-    // ========================================
-    // A-3: 自己検証 - 補完後も確認して失敗なら 500
-    // ========================================
-    const finalCookies = response.cookies.getAll();
-    const finalCookieNames = finalCookies.map(c => c.name);
-
-    const finalHasAuthToken = hasAuthTokenCookie(finalCookieNames, projectRef);
-    const finalHasRefreshToken = hasRefreshTokenCookie(finalCookieNames, projectRef);
-
-    console.log('[api/auth/login] Final verification', {
-      requestId,
-      finalCookieNames,
+      setCookieNames,
       finalHasAuthToken,
-      finalHasRefreshToken,
+      sessionAccessToken: !!data.session.access_token,
+      sessionRefreshToken: !!data.session.refresh_token,
     });
 
-    // auth-token がない場合は契約違反
-    if (!finalHasAuthToken) {
-      console.error('[api/auth/login] COOKIE_CONTRACT_BROKEN: auth-token still missing', {
+    // ========================================
+    // レスポンス作成
+    // cookieStore.set() で設定した Cookie は
+    // Next.js が自動的にレスポンスヘッダーに追加
+    // ========================================
+    const response = NextResponse.json(
+      {
+        ok: true,
+        redirectTo: redirectTo || '/dashboard',
         requestId,
-        finalCookieNames,
-        accessTokenAvailable: !!data.session.access_token,
-        accessTokenLength: data.session.access_token?.length,
-      });
+      },
+      { status: 200 }
+    );
 
-      return NextResponse.json(
-        {
-          ok: false,
-          code: 'COOKIE_CONTRACT_BROKEN',
-          message: 'auth-token Cookie の設定に失敗しました',
-          cookieNames: finalCookieNames,
-          requestId,
-          sha,
-        },
-        { status: 500 }
-      );
-    }
-
-    // refresh-token がない場合も警告（ただしログインは成功扱い）
-    if (!finalHasRefreshToken) {
-      console.warn('[api/auth/login] WARNING: refresh-token missing', {
-        requestId,
-        finalCookieNames,
-      });
-    }
-
-    console.log('[api/auth/login] Login successful with valid cookie contract', {
+    console.log('[api/auth/login] Login successful', {
       requestId,
       userId: data.user?.id,
-      finalCookieNames,
+      cookiesSet: setCookieNames,
     });
 
     // デバッグヘッダを付与（診断用）
     response.headers.set('x-auth-request-id', requestId);
-    response.headers.set('x-auth-set-cookie-names', supabaseSetCookieNames.join(','));  // Supabase SSR が setAll で設定した名前
-    response.headers.set('x-auth-cookie-names', finalCookieNames.join(','));  // 最終的な Cookie 名
+    response.headers.set('x-auth-set-cookie-names', setCookieNames.join(','));
     response.headers.set('x-auth-has-auth-token', String(finalHasAuthToken));
-    response.headers.set('x-auth-has-refresh-token', String(finalHasRefreshToken));
-    response.headers.set('x-auth-fallback-used', String(fallbackUsed));  // フォールバック使用有無
     response.headers.set('x-auth-supabase-ref', projectRef);
     response.headers.set('x-auth-host', host);
     response.headers.set('x-auth-proto', proto);
+    response.headers.set('x-auth-sha', sha);
 
     return response;
 
