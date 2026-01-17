@@ -87,6 +87,65 @@ npm run typecheck:test
 2. ファイルが適切なカテゴリに分類されているかチェック
 3. 必要に応じて設定ファイルを調整
 
+## Auth Smoke Test
+
+### 概要
+
+認証エンドポイントの smoke テストは、本番環境での Cookie 契約（auth-token / refresh-token の発行）を検証します。
+
+### 実行方法
+
+```bash
+# ローカル実行（認証テストはスキップ）
+npm run smoke:auth
+
+# 認証テスト込みで実行（Secrets 設定必須）
+SMOKE_EMAIL=xxx SMOKE_PASSWORD=xxx npm run smoke:auth
+```
+
+### Secrets の設定
+
+**重要**: ユーザーに認証情報を直接聞くことは禁止。以下の方法で設定してください。
+
+#### GitHub Secrets（CI 用）
+
+1. リポジトリの Settings → Secrets and variables → Actions
+2. 以下を追加:
+   - `SMOKE_EMAIL`: テスト用アカウントのメールアドレス
+   - `SMOKE_PASSWORD`: テスト用アカウントのパスワード
+
+#### Vercel Environment Variables（本番確認用）
+
+1. Vercel ダッシュボード → Settings → Environment Variables
+2. 以下を追加（Production のみ推奨）:
+   - `SMOKE_EMAIL`
+   - `SMOKE_PASSWORD`
+
+#### テスト用アカウントの作成
+
+Supabase Auth にテスト専用アカウントを作成してください：
+- メール確認済みのアカウントを使用
+- 本番組織へのアクセス権限は不要（ログイン検証のみ）
+
+### CI での動作
+
+- CI 環境（`CI=true`）では認証テストが必須
+- `SMOKE_EMAIL` / `SMOKE_PASSWORD` が未設定の場合は FAIL
+- GitHub Actions workflow: `.github/workflows/smoke-auth.yml`
+
+### 診断ヘッダー
+
+ログイン成功時、以下のヘッダーが返されます：
+
+| ヘッダー | 説明 |
+|---------|------|
+| `x-auth-set-cookie-names` | Supabase SSR が setAll で設定した Cookie 名 |
+| `x-auth-has-auth-token` | auth-token Cookie が存在するか |
+| `x-auth-has-refresh-token` | refresh-token Cookie が存在するか |
+| `x-auth-fallback-used` | フォールバック（手動 Cookie 設定）が使用されたか |
+
+`x-auth-fallback-used: true` は Supabase SSR が auth-token を設定しなかったことを示します。
+
 ## 参考資料
 
 - [TypeScript Configuration](https://www.typescriptlang.org/tsconfig)

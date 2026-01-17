@@ -1,0 +1,54 @@
+name: Auth Smoke Test
+
+on:
+  # 本番デプロイ後に実行
+  deployment_status:
+  # 手動実行
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Target URL (default: https://aiohub.jp)'
+        required: false
+        default: 'https://aiohub.jp'
+  # スケジュール実行（毎時）
+  schedule:
+    - cron: '0 * * * *'
+
+env:
+  BASE_URL: ${{ github.event.inputs.base_url || 'https://aiohub.jp' }}
+
+jobs:
+  smoke-auth:
+    name: Auth Smoke Test
+    runs-on: ubuntu-latest
+    # deployment_status の場合は success 時のみ実行
+    if: |
+      github.event_name != 'deployment_status' ||
+      github.event.deployment_status.state == 'success'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Run Auth Smoke Test
+        env:
+          SMOKE_EMAIL: ${{ secrets.SMOKE_EMAIL }}
+          SMOKE_PASSWORD: ${{ secrets.SMOKE_PASSWORD }}
+          REQUIRE_AUTH_SMOKE: '1'
+          CI: 'true'
+        run: |
+          echo "Running auth smoke test against $BASE_URL"
+          chmod +x scripts/smoke-auth.sh
+          ./scripts/smoke-auth.sh "$BASE_URL"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Auth smoke test failed! Check the logs above for details."
+          echo "If SMOKE_EMAIL/SMOKE_PASSWORD are not set, add them to GitHub Secrets."
