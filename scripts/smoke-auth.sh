@@ -95,5 +95,78 @@ else
   echo "   WARN: POST with invalid credentials returns $STATUS (expected 401)"
 fi
 
+# 7. ログイン後のテスト（SMOKE_EMAIL/SMOKE_PASSWORD設定時のみ）
+if [ -n "$SMOKE_EMAIL" ] && [ -n "$SMOKE_PASSWORD" ]; then
+  echo ""
+  echo "=== Authenticated Tests (SMOKE_EMAIL set) ==="
+
+  # 7a. ログイン実行（Cookie取得）
+  echo "7a. Logging in with SMOKE_EMAIL..."
+  COOKIE_JAR=$(mktemp)
+  LOGIN_RESPONSE=$(curl -s -c "$COOKIE_JAR" -X POST "$BASE_URL/api/auth/login" \
+    -H "Content-Type: application/json" \
+    -d "{\"email\":\"$SMOKE_EMAIL\",\"password\":\"$SMOKE_PASSWORD\"}")
+
+  if echo "$LOGIN_RESPONSE" | grep -q '"ok":true'; then
+    echo "   OK: Login successful"
+
+    # 7b. auth-snapshot確認（ログイン後）
+    echo "7b. Checking auth-snapshot after login..."
+    AUTH_RESPONSE=$(curl -s -b "$COOKIE_JAR" "$BASE_URL/api/health/auth-snapshot")
+    AUTH_STATE=$(echo "$AUTH_RESPONSE" | grep -o '"authState":"[^"]*"' | sed 's/"authState":"\([^"]*\)"/\1/')
+
+    echo "   authState: $AUTH_STATE"
+
+    if [ "$AUTH_STATE" = "AUTHENTICATED_READY" ]; then
+      echo "   OK: authState is AUTHENTICATED_READY"
+    elif [ "$AUTH_STATE" = "AUTHENTICATED_NO_ORG" ]; then
+      echo "   WARN: authState is AUTHENTICATED_NO_ORG (user has no organization)"
+    else
+      echo "   FAIL: authState is $AUTH_STATE (expected AUTHENTICATED_READY)"
+      rm -f "$COOKIE_JAR"
+      exit 1
+    fi
+
+    # 7c. dashboard-probe確認（ログイン後）
+    echo "7c. Checking dashboard-probe after login..."
+    PROBE_RESPONSE=$(curl -s -b "$COOKIE_JAR" "$BASE_URL/api/health/dashboard-probe")
+    PROBE_STATE=$(echo "$PROBE_RESPONSE" | grep -o '"authState":"[^"]*"' | sed 's/"authState":"\([^"]*\)"/\1/')
+    WHY_BLOCKED=$(echo "$PROBE_RESPONSE" | grep -o '"whyBlocked":"[^"]*"' | sed 's/"whyBlocked":"\([^"]*\)"/\1/' || echo "null")
+
+    echo "   authState: $PROBE_STATE"
+    echo "   whyBlocked: $WHY_BLOCKED"
+
+    if [ "$PROBE_STATE" = "AUTHENTICATED_READY" ]; then
+      echo "   OK: dashboard-probe shows AUTHENTICATED_READY"
+    else
+      echo "   WARN: dashboard-probe shows $PROBE_STATE"
+    fi
+
+    # 7d. /dashboard/posts ページ確認
+    echo "7d. Checking /dashboard/posts page..."
+    DASHBOARD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -b "$COOKIE_JAR" "$BASE_URL/dashboard/posts")
+    if [ "$DASHBOARD_STATUS" = "200" ]; then
+      echo "   OK: /dashboard/posts returns 200"
+    else
+      echo "   FAIL: /dashboard/posts returns $DASHBOARD_STATUS"
+      rm -f "$COOKIE_JAR"
+      exit 1
+    fi
+
+  else
+    echo "   FAIL: Login failed"
+    echo "   Response: $LOGIN_RESPONSE"
+    rm -f "$COOKIE_JAR"
+    exit 1
+  fi
+
+  rm -f "$COOKIE_JAR"
+  echo ""
+  echo "=== Authenticated tests passed ==="
+else
+  echo ""
+  echo "   SKIP: Authenticated tests (set SMOKE_EMAIL and SMOKE_PASSWORD to enable)"
+fi
+
 echo ""
 echo "=== All smoke tests passed ==="
