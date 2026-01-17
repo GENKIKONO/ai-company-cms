@@ -153,9 +153,25 @@ if [ -n "$SMOKE_EMAIL" ] && [ -n "$SMOKE_PASSWORD" ]; then
       echo "   WARN: refresh-token not found in Set-Cookie"
     fi
 
-    # x-auth-has-auth-token ヘッダーの確認
-    AUTH_TOKEN_HEADER=$(grep -i "^x-auth-has-auth-token:" "$HEADER_FILE" | head -1 || echo "")
-    echo "   $AUTH_TOKEN_HEADER"
+    # 診断ヘッダーの確認（Task A-1）
+    echo ""
+    echo "   === Diagnostic Headers (x-auth-*) ==="
+    X_AUTH_SET_COOKIE_NAMES=$(grep -i "^x-auth-set-cookie-names:" "$HEADER_FILE" | head -1 || echo "")
+    X_AUTH_HAS_AUTH_TOKEN=$(grep -i "^x-auth-has-auth-token:" "$HEADER_FILE" | head -1 || echo "")
+    X_AUTH_HAS_REFRESH_TOKEN=$(grep -i "^x-auth-has-refresh-token:" "$HEADER_FILE" | head -1 || echo "")
+    X_AUTH_FALLBACK_USED=$(grep -i "^x-auth-fallback-used:" "$HEADER_FILE" | head -1 || echo "")
+
+    echo "   $X_AUTH_SET_COOKIE_NAMES"
+    echo "   $X_AUTH_HAS_AUTH_TOKEN"
+    echo "   $X_AUTH_HAS_REFRESH_TOKEN"
+    echo "   $X_AUTH_FALLBACK_USED"
+
+    # フォールバック使用時は警告
+    if echo "$X_AUTH_FALLBACK_USED" | grep -qi "true"; then
+      echo ""
+      echo "   ⚠️  WARNING: Fallback was used (Supabase SSR did not set auth-token)"
+      echo "   This indicates Supabase SSR's setAll did not include auth-token."
+    fi
 
     rm -f "$HEADER_FILE"
     echo "   ==================================="

@@ -78,6 +78,10 @@ export async function POST(request: NextRequest) {
   // Cookie サイズ上限（余裕を持たせる）
   const MAX_COOKIE_SIZE = 3500;
 
+  // 診断用: Supabase SSR が setAll で設定しようとした Cookie 名を記録
+  const supabaseSetCookieNames: string[] = [];
+  let fallbackUsed = false;
+
   try {
     const body = await request.json();
     const { email, password, redirectTo } = body;
@@ -113,6 +117,9 @@ export async function POST(request: NextRequest) {
           setAll(cookiesToSet) {
             // Supabase SSR が設定する Cookie をそのまま response にセット
             cookiesToSet.forEach(({ name, value, options }) => {
+              // 診断用: Supabase SSR が設定しようとした Cookie 名を記録
+              supabaseSetCookieNames.push(name);
+
               response.cookies.set(name, value, {
                 ...options,
                 path: '/',  // 必ず "/" にする
@@ -186,9 +193,10 @@ export async function POST(request: NextRequest) {
       hasRefreshToken: hasRefreshTokenCookie(cookieNames, projectRef),
     });
 
-    // auth-token が不足していれば強制補完
+    // auth-token が不足していれば強制補完（フォールバック）
     if (!hasAuthTokenCookie(cookieNames, projectRef) && data.session.access_token) {
-      console.log('[api/auth/login] auth-token missing, force setting', { requestId });
+      fallbackUsed = true;
+      console.log('[api/auth/login] auth-token missing, FALLBACK triggered', { requestId });
 
       const authTokenCookieName = `sb-${projectRef}-auth-token`;
       const accessToken = data.session.access_token;
@@ -287,11 +295,13 @@ export async function POST(request: NextRequest) {
       finalCookieNames,
     });
 
-    // デバッグヘッダを付与
+    // デバッグヘッダを付与（診断用）
     response.headers.set('x-auth-request-id', requestId);
-    response.headers.set('x-auth-cookie-names', finalCookieNames.join(','));
+    response.headers.set('x-auth-set-cookie-names', supabaseSetCookieNames.join(','));  // Supabase SSR が setAll で設定した名前
+    response.headers.set('x-auth-cookie-names', finalCookieNames.join(','));  // 最終的な Cookie 名
     response.headers.set('x-auth-has-auth-token', String(finalHasAuthToken));
     response.headers.set('x-auth-has-refresh-token', String(finalHasRefreshToken));
+    response.headers.set('x-auth-fallback-used', String(fallbackUsed));  // フォールバック使用有無
     response.headers.set('x-auth-supabase-ref', projectRef);
     response.headers.set('x-auth-host', host);
     response.headers.set('x-auth-proto', proto);
