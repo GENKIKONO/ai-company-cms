@@ -41,14 +41,23 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
       const result = await response.json();
 
       if (!response.ok) {
-        let errorMessage = result.error || 'ログインに失敗しました。';
+        // 401時は絶対に /dashboard に遷移しない
+        const errorMessage = result.error || result.message || 'ログインに失敗しました。';
+        const errorCode = result.code || 'unknown';
 
         if (errorMessage.includes('メールアドレスが確認されていません')) {
           setShowResendConfirmation(true);
         }
 
-        setError(errorMessage);
-        logger.warn('[LoginForm] Login failed', { requestId: result.requestId, error: errorMessage });
+        // エラーコードも表示（診断用）
+        setError(`${errorMessage} (code: ${errorCode})`);
+        logger.warn('[LoginForm] Login failed - NOT navigating to dashboard', {
+          requestId: result.requestId,
+          code: errorCode,
+          error: errorMessage,
+          status: response.status,
+        });
+        // 明示的に return してナビゲーションを防止
         return;
       }
 

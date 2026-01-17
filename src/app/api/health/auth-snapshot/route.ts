@@ -108,24 +108,33 @@ export async function GET(request: NextRequest) {
       getUserErrorCode = e instanceof Error ? e.message : 'exception';
     }
 
+    // 診断用: Cookie ヘッダの値長さ（中身は出さない）
+    const cookieHeader = request.headers.get('cookie') || '';
+    const cookieHeaderLength = cookieHeader.length;
+
     const response = NextResponse.json({
+      // 認証状態
       hasSbAuthCookie,
       matchedCookieNames,
-      allCookieNames, // デバッグ用：すべての Cookie 名
-      middlewareWouldRedirect,
-      requestPath: testPath,
       totalCookieCount: allCookieNames.length,
       getUserStatus,
       getUserErrorCode,
+      // Cookie 詳細
+      allCookieNames,
+      cookieHeaderPresent,
+      cookieHeaderLength,
       // PROJECT_MISMATCH 診断
       envProjectRef,
       cookieProjectRefs,
       projectMismatch,
-      // Step 4 強化: リクエスト診断
+      // ミドルウェア判定シミュレーション
+      middlewareWouldRedirect,
+      requestPath: testPath,
+      // リクエスト診断
       host,
       proto,
       userAgentHint,
-      cookieHeaderPresent,
+      // メタ
       sha,
       requestId,
       timestamp: new Date().toISOString()

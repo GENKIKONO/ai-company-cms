@@ -1,39 +1,81 @@
-目的：
-本番ダッシュボードが「Unauthorized / Not authenticated」でコンテンツ表示できない原因を、推測なしで“1回で断定→最小修正”する。
-前提：
-- ユーザーはダッシュボードで「認証情報の取得に失敗しました」等が出る
-- APIレスポンスが {"error":"Unauthorized - Authentication required"} 等
-- GitHub main には push 済み（例: 701be4b3）だが、Vercel がデプロイを作成していない疑いがある
-- DB側は secure view のGRANTと実アクセス検証は Supabase Assistant で通っている（permission denied は解消済み）
+あなたはClaude Codeです。AIOHub本番のログイン問題を最短で収束させます。推測で終わらせず、サーバー側の診断エンドポイントとUI上の判定で「原因がどれか」を確定して直してください。
 
-Phase 1：まず「本番が最新コードか」をユーザー作業ゼロで可能な限り断定
-1) リポジトリ内の /api/health/deployment が返す sha を確認し、そこが 701be4b3（または最新）を返す設計になっているか確認。
-   - もしshaが返らない/古い可能性があるなら、shaを返すエンドポイントを最小で整備（既存があれば改修しない）。
-2) Vercelがデプロイを作成していない場合に備え、ユーザーが1分で確認できるチェックリストを“必要最小限”で提示（Production branch / Auto Deploy / Ignored Build Step / GitHub App 連携）。
-   ※ただし、これは「原因の切り分け」に必要な最低限だけ。能書き不要。
+0) 事実（Supabase SQLで確定済み）
 
-Phase 2：Unauthorized の“発火点”をコード側で特定（ユーザーにDevToolsを要求しない）
-3) ダッシュボード表示時に発生する 401/Unauthorized を、サーバログで追えるようにする。
-   - すべての /api/* ルートで requestId を生成し、レスポンスヘッダー x-request-id を付与
-   - 401返却時は「どのルート/どの処理で認証失敗したか」を必ずログに出す（トークン値は出さない）
-4) ユーザーが提示した requestId「6bc30640-0748-4725-87ba-c7185036bf09」でログを引けるようにし、どのAPIが401を返しているかを確定する。
+対象user_id: f57ee6af-e55e-4852-87db-d5a2c59f64ac
+ • auth.users に存在する
+ • email: ggg.golf.66@gmail.com
+ • email_confirmed_at あり（メール確認済み）
+ • auth.identities.provider = 'email'（= Email/Passwordログイン可能な区分）
+ • last_sign_in_at = 2026-01-17 02:53:34+00（最近サインインが記録されている）
+→ DBの「ユーザー不在/未確認/OAuth専用」ではない。
 
-Phase 3：401の原因を“3択に圧縮して断定”→最小修正
-5) 401の原因は次のどれかに必ず分類できるので、ログから断定して修正する：
-   A) Cookieがリクエストに来ていない（SameSite/Domain/Secure/サブドメイン不一致）
-   B) Cookieは来ているが Supabase側で user が取れない（プロジェクト不一致や鍵不一致が多い）
-   C) userは取れるが、内部APIが Authorization なし前提で実装されている（APIルートが createServerClient/cookies を正しく使ってない等）
+従って、現象 invalid_credentials と Cookie=0 の原因候補は次の3つに絞られる：
+A. 入力パスワードが違う（UIがエラーでも /dashboard に進んでしまう等のUX不備含む）
+B. 本番アプリが別Supabaseプロジェクト/別キー/別URLを向いている（環境変数や参照のズレ）
+C. ログイン成功しても Cookie が発行・保存されていない（@supabase/ssrの使い方・SameSite/Domain/Path/secure 等）
 
-6) とくにBの「プロジェクト不一致」を最優先で疑う：
-   - sb-<projectRef>-auth-token の <projectRef> と、
-     NEXT_PUBLIC_SUPABASE_URL の projectRef が一致しているかをサーバ側で検査してログに出す（値そのものではなく一致/不一致だけでも良い）
-   - 不一致なら、環境変数/接続先のズレを直すのが最短（コード修正より先）
+1) 完了条件（ここに到達するまで終わらない）
+ 1. /auth/login で成功ログイン後、GET /api/health/auth-snapshot が
+ • hasSbAuthCookie: true
+ • totalCookieCount > 0
+ • getUserStatus: success
+ 2. ログイン失敗（invalid_credentials等）では
+ • 絶対に /dashboard に遷移しない
+ • 画面に code/message を表示する
+ 3. 本番がどのSupabaseを向いているか、ユーザー作業ゼロで判定できる
+ • /api/health/supabase-env でURL/ProjectRef/anonKey先頭/host/protoを返す
 
-7) APIルート側の修正方針（必要なら実装）：
-   - App Router の route handler では @supabase/ssr の createServerClient を使い、cookies() を渡して getUser できることを保証
-   - “ブラウザでログイン済みなのにAPIが401” の再発を防ぐため、401時は理由コード（NO_COOKIE / USER_FETCH_FAILED / PROJECT_MISMATCH など）をレスポンスに含める（ユーザー表示はしない、ログ・診断用）
+2) まず「切り分け」を実装（これが最優先）
 
-成果物：
-- どのAPIが401を返しているか（ルート名）を確定
-- A/B/Cどれが原因か断定し、最小差分の修正PR（もしくは環境変数修正の指示）を出す
-- “今後同じことが起きない”ために、CIまたはヘルスチェックで PROJECT_MISMATCH を検知できるようにする
+Task A: /api/health/supabase-env を追加（必須）
+ • NEXT_PUBLIC_SUPABASE_URL の hostname
+ • URLから projectRef を抽出して返す（例: chyicolujwhkycpkxbej）
+ • NEXT_PUBLIC_SUPABASE_ANON_KEY の先頭8〜12文字だけ返す（漏洩しない）
+ • server が見ている host/proto も返す
+ • これを本番で叩けば「別プロジェクト参照」が即断定できる
+
+Task B: /api/auth/login のレスポンス契約を固定（必須）
+
+Route Handlerで signInWithPassword を行う。
+ • 失敗時：HTTP 401 で { ok:false, code, message, requestId }
+ • 成功時：HTTP 200 で { ok:true, requestId }
+ • さらにレスポンスヘッダで診断可能にする：
+ • x-auth-request-id
+ • x-auth-set-cookie-count（Set-Cookieの数）
+ • x-auth-cookie-names（名前だけ）
+ • x-auth-supabase-ref（envから抽出したprojectRef）
+※「手動でaccess_token/refresh_tokenをcookieに直書き」しているなら一旦戻してよい。
+　最初は @supabase/ssr公式パターンでcookiesに確実に反映することを最優先。
+
+Task C: LoginForm の挙動を必ず修正（必須）
+ • /api/auth/login が 401 を返したら router.push/replace を絶対にしない
+ • 401時は画面に code/message を表示
+ • 200 のときだけ /dashboard へ遷移
+
+3) 追加で「ログイン成功なのにCookieが0」を潰す
+
+Task D: Cookieがセットされているかをサーバーで断定できるようにする
+ • /api/auth/login 成功時に cookies().getAll() を見て
+ • sb--auth-token / refresh-token が存在しているかをログに出す
+ • /api/health/auth-snapshot は既にあるので、
+ • cookieHeaderPresent
+ • allCookieNames
+ • matchedCookieNames
+を必ず返して「ブラウザから送られてきているか」を確定できるようにする
+
+4) 期待する検証フロー（ユーザー作業最小）
+ 1. GET /api/health/supabase-env をブラウザで開くだけで「向いてるSupabase」が分かる
+ 2. /auth/login でログイン → DevToolsで /api/auth/login を見る
+ • 401なら code/message が画面に出て終わり（/dashboardに行かない）
+ • 200なら x-auth-set-cookie-count>=1 が見える
+ 3. 直後に /api/health/auth-snapshot
+ • hasSbAuthCookie:true / getUserStatus:success で合格
+
+5) 実装後の報告フォーマット（必須）
+ • デプロイSHA
+ • /api/health/supabase-env の返却例
+ • /api/auth/login 成功時のレスポンスヘッダ例（x-auth-set-cookie-count等）
+ • auth-snapshot 成功例（hasSbAuthCookie:true）
+
+以上。
