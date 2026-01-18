@@ -178,7 +178,7 @@ export async function validateSession(
 
     const { data: session, error } = await supabase
       .from('user_sessions')
-      .select('*')
+      .select('id, user_id, fingerprint, created_at, last_activity_at, expires_at, ip_address, user_agent, device_type, is_valid, revoked_reason')
       .eq('id', sessionId)
       .single();
 
@@ -339,7 +339,7 @@ export async function getUserSessions(
 
     const { data: sessions, error } = await supabase
       .from('user_sessions')
-      .select('*')
+      .select('id, user_id, fingerprint, created_at, last_activity_at, expires_at, ip_address, user_agent, device_type, is_valid')
       .eq('user_id', userId)
       .eq('is_valid', true)
       .gte('expires_at', now.toISOString())
