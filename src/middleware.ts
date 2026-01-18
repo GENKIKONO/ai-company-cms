@@ -24,6 +24,35 @@ const DEPLOY_SHA = process.env.VERCEL_GIT_COMMIT_SHA ||
                    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
                    'unknown';
 
+// Supabase プロジェクト参照を環境変数から取得
+function getProjectRef(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match ? match[1] : 'unknown';
+}
+
+/**
+ * 壊れた Supabase Cookie を全削除する
+ * refresh-token はあるが getUser() が失敗する状態を解消
+ */
+function clearSupabaseCookies(response: NextResponse, projectRef: string, allCookies: { name: string }[]): void {
+  // 削除対象のパターン
+  const deletePatternsPrefix = `sb-${projectRef}-`;
+
+  allCookies.forEach(cookie => {
+    if (cookie.name.startsWith(deletePatternsPrefix)) {
+      // Cookie を削除（expires を過去にする）
+      response.cookies.set(cookie.name, '', {
+        path: '/',
+        expires: new Date(0),
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+    }
+  });
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const requestId = crypto.randomUUID();
@@ -105,17 +134,63 @@ export async function middleware(request: NextRequest) {
 
   // =====================================================
   // 5. セッション更新パス: /dashboard, /account, /my
-  //    → getUser() でセッション更新 + Cookie 再発行
-  //    → リダイレクトはしない（認証は Shell に委譲）
+  //    → getUser() でセッション検証
+  //    → 「refresh-token があるのに getUser 失敗」= 壊れた状態
+  //    → Cookie を全削除して /auth/login にリダイレクト
   // =====================================================
   const sessionRefreshPaths = [ROUTES.dashboard, '/account', '/my'];
   const isSessionRefreshPath = sessionRefreshPaths.some(path => pathname.startsWith(path));
 
   if (isSessionRefreshPath) {
-    // getUser() を呼ぶことで、Supabase SSR がセッションを検証し、
-    // 必要に応じて Cookie を更新する（setAll が呼ばれる）
-    // ここではリダイレクトせず、Cookie 更新のみ行う
-    await supabase.auth.getUser();
+    const projectRef = getProjectRef();
+    const hasRefreshToken = allCookies.some(c => c.name === `sb-${projectRef}-refresh-token`);
+
+    // getUser() でセッション検証
+    const { data: { user }, error } = await supabase.auth.getUser();
+    const isValidSession = user && !error;
+
+    // 壊れた状態: refresh-token があるのに getUser が失敗
+    if (hasRefreshToken && !isValidSession) {
+      console.warn('[middleware] Broken session detected - clearing cookies and redirecting', {
+        sha: DEPLOY_SHA,
+        requestId,
+        path: pathname,
+        hasRefreshToken,
+        errorCode: error?.code,
+        errorMessage: error?.message,
+      });
+
+      // Cookie を全削除してリダイレクト
+      const url = request.nextUrl.clone();
+      url.pathname = ROUTES.authLogin;
+      url.searchParams.set('reason', 'session_missing');
+      url.searchParams.set('rid', requestId.slice(0, 8));
+
+      const redirectResponse = NextResponse.redirect(url);
+      clearSupabaseCookies(redirectResponse, projectRef, allCookies);
+      redirectResponse.headers.set('x-request-id', requestId);
+      redirectResponse.headers.set('x-auth-recover', 'clear-cookies-and-relogin');
+      return redirectResponse;
+    }
+
+    // Cookie がないのにダッシュボードにアクセス → ログインへ
+    if (!hasAuthCookie) {
+      console.warn('[middleware] No auth cookie - redirecting to login', {
+        sha: DEPLOY_SHA,
+        requestId,
+        path: pathname,
+      });
+
+      const url = request.nextUrl.clone();
+      url.pathname = ROUTES.authLogin;
+      url.searchParams.set('redirect', pathname);
+      url.searchParams.set('reason', 'no_cookie');
+      url.searchParams.set('rid', requestId.slice(0, 8));
+
+      const redirectResponse = NextResponse.redirect(url);
+      redirectResponse.headers.set('x-request-id', requestId);
+      return redirectResponse;
+    }
   }
 
   // =====================================================

@@ -549,17 +549,46 @@ export function DashboardPageShell({
       timestamp: new Date().toISOString(),
     };
 
+    // セッション関連のエラーかどうかを判定
+    const isSessionError = errorCode === 'AUTH_ERROR' ||
+                           errorCode === 'NO_USER_SESSION' ||
+                           errorDetails?.supabaseMessage?.includes('Auth session missing') ||
+                           errorDetails?.whichQuery === 'getUser';
+
+    // ログインし直す処理
+    const handleRelogin = async () => {
+      try {
+        // Cookie をクリアしてログインページへ
+        await fetch('/auth/signout', { method: 'POST', credentials: 'include' });
+      } catch {
+        // fetch失敗してもリダイレクトは実行
+      }
+      window.location.href = '/auth/login?reason=session_missing';
+    };
+
     return (
       <DashboardSection>
         <DashboardAlert
           variant="error"
-          title={errorCode === 'RLS_DENIED' ? '権限エラー' : 'データベースエラー'}
+          title={isSessionError ? 'セッションエラー' : (errorCode === 'RLS_DENIED' ? '権限エラー' : 'データベースエラー')}
           action={{
             label: '再読み込み',
             onClick: () => window.location.reload(),
           }}
         >
-          {error}
+          {isSessionError ? 'セッションが無効です。ログインし直してください。' : error}
+
+          {/* セッションエラー時は「ログインし直す」ボタンを表示 */}
+          {isSessionError && (
+            <div className="mt-4">
+              <button
+                onClick={handleRelogin}
+                className="px-4 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:bg-[var(--aio-primary-hover)] font-medium"
+              >
+                ログインし直す
+              </button>
+            </div>
+          )}
 
           {/* 常に表示: 基本診断情報 */}
           <div className="mt-3 p-2 bg-[var(--aio-surface)] rounded text-xs font-mono text-left">

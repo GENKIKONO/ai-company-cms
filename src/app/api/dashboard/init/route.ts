@@ -176,6 +176,14 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
         cookieNames,
       });
 
+      // 壊れたセッション検出用ヘッダーを追加
+      const isSessionMissing = getUserError.message?.includes('Auth session missing');
+      const authRecoverHeaders = {
+        ...responseHeaders,
+        'x-auth-recover': isSessionMissing ? 'clear-cookies-and-relogin' : 'none',
+        'x-auth-reason': isSessionMissing ? 'session_missing' : (getUserError.code || 'auth_error'),
+      };
+
       return NextResponse.json({
         ok: false,
         user: null,
@@ -190,10 +198,17 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
         requestId,
         sha,
         timestamp,
-      }, { status: 401, headers: responseHeaders });
+      }, { status: 401, headers: authRecoverHeaders });
     }
 
     if (!user) {
+      // Cookie あるが user なし = 壊れたセッション
+      const noUserHeaders = {
+        ...responseHeaders,
+        'x-auth-recover': 'clear-cookies-and-relogin',
+        'x-auth-reason': 'no_user_session',
+      };
+
       return NextResponse.json({
         ok: false,
         user: null,
@@ -208,7 +223,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
         requestId,
         sha,
         timestamp,
-      }, { status: 401, headers: responseHeaders });
+      }, { status: 401, headers: noUserHeaders });
     }
 
     // Step 4: organization_members クエリ
