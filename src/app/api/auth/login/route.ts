@@ -69,10 +69,17 @@ export async function POST(request: NextRequest) {
     const { email, password, redirectTo } = body;
 
     if (!email || !password) {
-      return NextResponse.json(
+      const errorResponse = NextResponse.json(
         { ok: false, error: 'メールアドレスとパスワードは必須です', code: 'missing_credentials', requestId },
         { status: 400 }
       );
+      errorResponse.headers.set('x-debug-route', 'api-auth-login');
+      errorResponse.headers.set('x-debug-sha', sha);
+      errorResponse.headers.set('x-debug-request-id', requestId);
+      errorResponse.headers.set('x-debug-set-cookie-names', '');
+      errorResponse.headers.set('x-debug-has-auth-token-set-cookie', 'false');
+      errorResponse.headers.set('x-debug-has-refresh-token-set-cookie', 'false');
+      return errorResponse;
     }
 
     // ========================================
@@ -148,18 +155,32 @@ export async function POST(request: NextRequest) {
         errorCode = 'too_many_requests';
       }
 
-      return NextResponse.json(
+      const authErrorResponse = NextResponse.json(
         { ok: false, error: errorMessage, code: errorCode, message: errorMessage, requestId },
         { status: 401 }
       );
+      authErrorResponse.headers.set('x-debug-route', 'api-auth-login');
+      authErrorResponse.headers.set('x-debug-sha', sha);
+      authErrorResponse.headers.set('x-debug-request-id', requestId);
+      authErrorResponse.headers.set('x-debug-set-cookie-names', '');
+      authErrorResponse.headers.set('x-debug-has-auth-token-set-cookie', 'false');
+      authErrorResponse.headers.set('x-debug-has-refresh-token-set-cookie', 'false');
+      return authErrorResponse;
     }
 
     if (!data.session) {
       console.error('[api/auth/login] No session created', { requestId });
-      return NextResponse.json(
+      const noSessionResponse = NextResponse.json(
         { ok: false, error: 'セッションの作成に失敗しました', code: 'no_session', requestId },
         { status: 500 }
       );
+      noSessionResponse.headers.set('x-debug-route', 'api-auth-login');
+      noSessionResponse.headers.set('x-debug-sha', sha);
+      noSessionResponse.headers.set('x-debug-request-id', requestId);
+      noSessionResponse.headers.set('x-debug-set-cookie-names', '');
+      noSessionResponse.headers.set('x-debug-has-auth-token-set-cookie', 'false');
+      noSessionResponse.headers.set('x-debug-has-refresh-token-set-cookie', 'false');
+      return noSessionResponse;
     }
 
     // ========================================
@@ -230,14 +251,16 @@ export async function POST(request: NextRequest) {
       })),
     });
 
-    // デバッグヘッダを付与（診断用）
+    // デバッグヘッダを付与（指定された名前で）
+    const hasAuthTokenSetCookie = actualSetCookieNames.some(n => n.includes('auth-token'));
+    const hasRefreshTokenSetCookie = actualSetCookieNames.some(n => n.includes('refresh-token'));
+
+    response.headers.set('x-debug-route', 'api-auth-login');
     response.headers.set('x-debug-sha', sha);
     response.headers.set('x-debug-request-id', requestId);
     response.headers.set('x-debug-set-cookie-names', actualSetCookieNames.join(','));
-    response.headers.set('x-debug-supabase-setall-names', supabaseSetCookieNames.join(','));
-    response.headers.set('x-debug-response-cookies-names', finalCookieNames.join(','));
-    response.headers.set('x-debug-has-auth-token', String(actualSetCookieNames.some(n => n.includes('auth-token'))));
-    response.headers.set('x-debug-has-refresh-token', String(finalHasRefreshToken));
+    response.headers.set('x-debug-has-auth-token-set-cookie', String(hasAuthTokenSetCookie));
+    response.headers.set('x-debug-has-refresh-token-set-cookie', String(hasRefreshTokenSetCookie));
     response.headers.set('x-debug-host', host);
     response.headers.set('x-debug-proto', proto);
 
@@ -249,9 +272,16 @@ export async function POST(request: NextRequest) {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
 
-    return NextResponse.json(
+    const catchErrorResponse = NextResponse.json(
       { ok: false, error: 'ログイン処理中にエラーが発生しました', code: 'unexpected_error', requestId },
       { status: 500 }
     );
+    catchErrorResponse.headers.set('x-debug-route', 'api-auth-login');
+    catchErrorResponse.headers.set('x-debug-sha', sha);
+    catchErrorResponse.headers.set('x-debug-request-id', requestId);
+    catchErrorResponse.headers.set('x-debug-set-cookie-names', '');
+    catchErrorResponse.headers.set('x-debug-has-auth-token-set-cookie', 'false');
+    catchErrorResponse.headers.set('x-debug-has-refresh-token-set-cookie', 'false');
+    return catchErrorResponse;
   }
 }
