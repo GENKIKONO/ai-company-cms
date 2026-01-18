@@ -1,5 +1,6 @@
 // Server Component: 認証状態を毎回SSRで評価するヘッダー
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import { supabaseServer } from '@/lib/supabase/server';
 import { getUserFullWithClient } from '@/lib/core/auth-state';
 import SignOutButton from './SignOutButton';
@@ -34,14 +35,14 @@ export default async function AuthHeader({ currentPage, pathname }: AuthHeaderPr
             </Link>
             {isAuthenticated && (
               <nav className="ml-10 hidden md:flex space-x-8">
-                <Link 
-                  href="/dashboard" 
+                <Link
+                  href={ROUTES.dashboard}
                   className={`focus-clean ${isMyPageActive ? 'text-[var(--aio-primary)] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                   マイページ
                 </Link>
-                <Link 
-                  href="/dashboard/billing" 
+                <Link
+                  href={ROUTES.dashboardBilling}
                   className={`focus-clean ${currentPage === 'billing' ? 'text-[var(--aio-primary)] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                   サブスクリプション

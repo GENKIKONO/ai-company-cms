@@ -43,6 +43,7 @@ export default function MaterialsManagementPage() {
     <DashboardPageShell
       title="営業資料管理"
       requiredRole="viewer"
+      featureFlag="materials"
       loadingSkeleton={<ListLoadingSkeleton />}
     >
       <MaterialsContent />

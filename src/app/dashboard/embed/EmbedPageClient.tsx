@@ -8,8 +8,9 @@
  * - 新: useDashboardPageContext() で組織情報を取得
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import { WidgetPreview } from '@/components/embed/WidgetPreview';
 import { DashboardPageShell, useDashboardPageContext } from '@/components/dashboard';
 import { DashboardButton } from '@/components/dashboard/ui';
@@ -23,7 +24,7 @@ interface EmbedPageClientProps {
 
 export default function EmbedPageClient({ embedsQuota }: EmbedPageClientProps) {
   return (
-    <DashboardPageShell title="埋め込みウィジェット" requiredRole="viewer">
+    <DashboardPageShell title="埋め込みウィジェット" requiredRole="viewer" featureFlag="embeds">
       <EmbedPageContent embedsQuota={embedsQuota} />
     </DashboardPageShell>
   );
@@ -84,14 +85,18 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
   }, [orgContext?.id]);
 
   // 組織コンテキストから organization を作成（WidgetPreview互換）
-  const organization = orgContext
-    ? {
-        id: orgContext.id,
-        name: orgContext.name,
-        slug: orgContext.slug,
-        plan: orgContext.plan,
-      }
-    : null;
+  // useMemoでメモ化してuseCallbackの依存関係を安定化
+  // 個別プロパティを依存関係にしてオブジェクト参照の安定化を実現
+  const organization = useMemo(() => {
+    if (!orgContext) return null;
+    return {
+      id: orgContext.id,
+      name: orgContext.name,
+      slug: orgContext.slug,
+      plan: orgContext.plan,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orgContext?.id, orgContext?.name, orgContext?.slug, orgContext?.plan]);
 
   // 総合ローディング状態
   const loading = isOrgLoading || servicesLoading;
@@ -166,7 +171,7 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
             先に企業情報を作成してください。
           </p>
           <div className="mt-4">
-            <Link href="/dashboard" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]" replace>
+            <Link href={ROUTES.dashboard} className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]" replace>
               ダッシュボードに戻る
             </Link>
           </div>
@@ -198,7 +203,7 @@ function EmbedPageContent({ embedsQuota }: EmbedPageClientProps) {
               </p>
             </div>
             <Link
-              href="/dashboard"
+              href={ROUTES.dashboard}
               className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
             >
               ← ダッシュボードに戻る

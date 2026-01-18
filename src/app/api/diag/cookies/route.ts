@@ -3,8 +3,8 @@
  *
  * 目的: auth-token Cookie 消失問題の切り分け
  * - Request の Cookie 名一覧
- * - supabase.auth.getSession() の結果（user id のみ）
- * - supabase.auth.getUser() の成功/失敗と error message/code
+ * - Core wrapper経由でセッション取得（user id のみ）
+ * - Core wrapper経由でユーザー取得（成功/失敗）
  *
  * 本番で一時的に使う。後で削除予定。
  */
@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { getSessionWithClient, getUserWithClient } from '@/lib/core/auth-state';
 
 function getProjectRef(): string {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -53,31 +54,26 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  // getSession の結果
+  // getSession の結果（Core wrapper経由）
   let sessionUserId: string | null = null;
   let sessionError: string | null = null;
   try {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    if (error) {
-      sessionError = `${error.code || 'UNKNOWN'}: ${error.message}`;
-    } else if (session?.user) {
+    const session = await getSessionWithClient(supabase);
+    if (session?.user) {
       sessionUserId = session.user.id;
     }
   } catch (e) {
     sessionError = `EXCEPTION: ${e instanceof Error ? e.message : String(e)}`;
   }
 
-  // getUser の結果
+  // getUser の結果（Core wrapper経由）
   let getUserUserId: string | null = null;
   let getUserError: string | null = null;
   let getUserErrorCode: string | null = null;
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) {
-      getUserError = error.message;
-      getUserErrorCode = error.code || 'UNKNOWN';
-    } else if (user) {
-      getUserUserId = user.id;
+    const authUser = await getUserWithClient(supabase);
+    if (authUser) {
+      getUserUserId = authUser.id;
     }
   } catch (e) {
     getUserError = `EXCEPTION: ${e instanceof Error ? e.message : String(e)}`;

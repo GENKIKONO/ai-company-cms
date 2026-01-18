@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import { DashboardPageShell } from '@/components/dashboard';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
 import { DashboardButton } from '@/components/dashboard/ui';
@@ -125,7 +126,7 @@ function EditServiceContent() {
       const result = await response.json().catch(() => ({ ok: false, error: 'Failed to parse response' }));
 
       if (result.ok) {
-        router.replace('/dashboard/services');
+        router.replace(ROUTES.dashboardServices);
       } else {
         setError(result.error || '更新に失敗しました');
       }
@@ -166,7 +167,7 @@ function EditServiceContent() {
         <div className="text-center">
           <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">サービスが見つかりません</h2>
           <Link
-            href="/dashboard/services"
+            href={ROUTES.dashboardServices}
             className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-block"
             replace
           >
@@ -186,7 +187,7 @@ function EditServiceContent() {
             <p className="text-[var(--color-text-secondary)] mt-2">サービス情報を更新してください</p>
           </div>
           <Link
-            href="/dashboard/services"
+            href={ROUTES.dashboardServices}
             className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
           >
             ← サービス一覧に戻る
@@ -399,7 +400,7 @@ function EditServiceContent() {
             {saving ? '更新中...' : '更新'}
           </DashboardButton>
           <Link
-            href="/dashboard/services"
+            href={ROUTES.dashboardServices}
             className="bg-[var(--dashboard-card-border)] text-[var(--color-text-secondary)] px-6 py-2 rounded-md hover:bg-[var(--table-row-hover)] inline-block text-center"
             replace
           >

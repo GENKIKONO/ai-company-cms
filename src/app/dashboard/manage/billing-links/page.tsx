@@ -86,7 +86,7 @@ function BillingLinksContent() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     fetchLinks();

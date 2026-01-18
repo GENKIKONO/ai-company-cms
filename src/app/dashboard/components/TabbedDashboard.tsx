@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import type { Post, Service, CaseStudy, FAQ } from '@/types/legacy/database';
 import { OrganizationPreview } from '@/components/ui/organization-preview';
 import { useSuccessToast, useErrorToast } from '@/components/ui/toast';
@@ -257,7 +258,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">クイック作成</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
-            href="/dashboard/posts/new"
+            href={ROUTES.dashboardPostsNew}
             className="flex items-center p-4 border-2 border-dashed border-[var(--input-border)] rounded-lg hover:border-[var(--aio-purple)] hover:bg-[var(--aio-purple-muted)] transition-colors"
           >
             <div className="p-2 bg-[var(--aio-purple-muted)] rounded-lg mr-3">
@@ -269,7 +270,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
           </Link>
 
           <Link
-            href="/dashboard/services/new"
+            href={ROUTES.dashboardServicesNew}
             className="flex items-center p-4 border-2 border-dashed border-[var(--input-border)] rounded-lg hover:border-[var(--aio-primary)] hover:bg-[var(--aio-muted)] transition-colors"
           >
             <div className="p-2 bg-[var(--aio-muted)] rounded-lg mr-3">
@@ -281,7 +282,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
           </Link>
 
           <Link
-            href="/dashboard/case-studies/new"
+            href={ROUTES.dashboardCaseStudiesNew}
             className="flex items-center p-4 border-2 border-dashed border-[var(--input-border)] rounded-lg hover:border-[var(--status-success)] hover:bg-[var(--aio-success-muted)] transition-colors"
           >
             <div className="p-2 bg-[var(--aio-success-muted)] rounded-lg mr-3">
@@ -293,7 +294,7 @@ export default function TabbedDashboard({ organizationId, organizationSlug, orga
           </Link>
 
           <Link
-            href="/dashboard/faqs/new"
+            href={ROUTES.dashboardFaqsNew}
             className="flex items-center p-4 border-2 border-dashed border-[var(--input-border)] rounded-lg hover:border-[var(--status-pending)] hover:bg-[var(--aio-pending-muted)] transition-colors"
           >
             <div className="p-2 bg-[var(--aio-pending-muted)] rounded-lg mr-3">

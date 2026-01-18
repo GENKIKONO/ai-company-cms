@@ -11,6 +11,7 @@ import { logger } from '@/lib/utils/logger';
 import { useAutoSaveDiffInterviewAnswers, type DiffAutoSaveStatus } from '@/hooks/useAutoSaveDiffInterviewAnswers';
 import ConflictDialog from '@/components/interview/ConflictDialog';
 import { ClipboardIcon, SearchIcon, BulbIcon, DocumentIcon } from '@/components/icons/HIGIcons';
+import { ROUTES } from '@/lib/routes';
 
 interface SessionData {
   id: string;
@@ -595,7 +596,7 @@ function InterviewSessionContent() {
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <Link
-              href="/dashboard/interview"
+              href={ROUTES.dashboardInterview}
               className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4"
             >
               ← インタビューに戻る
@@ -606,7 +607,7 @@ function InterviewSessionContent() {
             <p className="text-[var(--aio-danger)]">{error}</p>
             <div className="mt-4">
               <Link
-                href="/dashboard/interview"
+                href={ROUTES.dashboardInterview}
                 className="px-4 py-2 bg-[var(--aio-danger-muted)] text-[var(--aio-danger)] rounded hover:opacity-80 inline-block"
               >
                 質問選択に戻る
@@ -624,7 +625,7 @@ function InterviewSessionContent() {
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-4">セッションが見つかりません</h1>
-            <Link href="/dashboard/interview" className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)]">
+            <Link href={ROUTES.dashboardInterview} className="text-[var(--aio-primary)] hover:text-[var(--aio-primary)]">
               新しいインタビューを開始
             </Link>
           </div>
@@ -644,7 +645,7 @@ function InterviewSessionContent() {
           <div className="flex items-center justify-between">
             <div>
               <Link
-                href="/dashboard/interview"
+                href={ROUTES.dashboardInterview}
                 className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4"
               >
                 ← インタビューに戻る
@@ -813,7 +814,7 @@ function InterviewSessionContent() {
             )}
             {isGenerated && (
               <Link
-                href="/dashboard/interview"
+                href={ROUTES.dashboardInterview}
                 className="px-6 py-2 bg-[var(--aio-primary)] text-white rounded-md hover:opacity-90"
               >
                 新しいインタビューを開始

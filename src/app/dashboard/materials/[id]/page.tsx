@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import { DashboardPageShell } from '@/components/dashboard';
 import type { SalesMaterial } from '@/types/domain/sales';
 import { logger } from '@/lib/utils/logger';
@@ -163,7 +164,7 @@ function MaterialViewContent() {
             <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-4">営業資料が見つかりません</h1>
             <p className="text-[var(--color-text-secondary)] mb-6">{error || '指定された営業資料が存在しないか、アクセス権限がありません。'}</p>
             <Link
-              href="/dashboard/materials"
+              href={ROUTES.dashboardMaterials}
               className="bg-[var(--aio-primary)] hover:bg-[var(--aio-primary-hover)] text-white font-medium py-2 px-4 rounded-md"
             >
               営業資料一覧に戻る
@@ -180,7 +181,7 @@ function MaterialViewContent() {
         {/* ナビゲーション */}
         <div className="mb-6">
           <Link
-            href="/dashboard/materials"
+            href={ROUTES.dashboardMaterials}
             className="text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)] inline-flex items-center"
           >
             <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

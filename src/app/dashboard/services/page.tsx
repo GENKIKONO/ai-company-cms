@@ -6,6 +6,7 @@
 
 import Link from 'next/link';
 import { useCallback } from 'react';
+import { ROUTES } from '@/lib/routes';
 import type { Service } from '@/types/legacy/database';
 import {
   DashboardPageShell,
@@ -55,6 +56,7 @@ export default function ServicesManagementPage() {
     <DashboardPageShell
       title="サービス管理"
       requiredRole="viewer"
+      featureFlag="services"
       loadingSkeleton={<ListLoadingSkeleton />}
     >
       <ServicesContent />
@@ -106,7 +108,7 @@ function ServicesContent() {
       <DashboardPageHeader
         title="サービス管理"
         description="提供サービスを管理します"
-        backLink={{ href: '/dashboard', label: 'ダッシュボード' }}
+        backLink={{ href: ROUTES.dashboard, label: 'ダッシュボード' }}
         actions={
           <>
             {publicUrl && (
@@ -116,7 +118,7 @@ function ServicesContent() {
                 </DashboardButton>
               </a>
             )}
-            <Link href="/dashboard/services/new">
+            <Link href={ROUTES.dashboardServicesNew}>
               <DashboardButton variant="primary" leftIcon={<PlusIcon />}>
                 新しいサービス
               </DashboardButton>
@@ -142,7 +144,7 @@ function ServicesContent() {
           icon={<ServiceIcon />}
           title="サービスがありません"
           description="最初のサービスを作成してみましょう。"
-          action={{ label: 'サービスを作成', href: '/dashboard/services/new' }}
+          action={{ label: 'サービスを作成', href: ROUTES.dashboardServicesNew }}
         />
       ) : (
         <DashboardCard padding="none">

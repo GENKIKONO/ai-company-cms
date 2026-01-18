@@ -16,6 +16,10 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { canUseFeature } from '@/lib/featureGate';
+import { getFeatureGateInfo } from '@/lib/feature-metadata';
+import type { FeatureGateInfo } from '@/types/feature-metadata';
+import type { PlanType } from '@/config/plans';
 
 // =====================================================
 // ヘルパー関数
@@ -46,6 +50,17 @@ export interface DashboardInitResponse {
   user: {
     id: string;
     email: string | null;
+    /** プロフィール情報（Phase 1 最適化で追加） */
+    profile?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    };
+    /** 認証メタデータ */
+    email_verified: boolean;
+    created_at: string;
+    app_metadata?: {
+      role?: string;
+    };
   } | null;
   organizations: Array<{
     id: string;
@@ -57,6 +72,36 @@ export interface DashboardInitResponse {
     organization_id: string;
     role: string;
   }>;
+  /** 機能チェック結果（featureCheckクエリパラメータ指定時のみ） - Legacy */
+  featureCheck?: {
+    key: string;
+    available: boolean;
+  };
+  /** 機能ゲート情報（featureCheckクエリパラメータ指定時のみ） - 拡張版 */
+  featureGate?: {
+    key: string;
+    available: boolean;
+    metadata: {
+      displayName: string;
+      description: string;
+      category: string;
+      controlType: string;
+      availableFrom: string;
+      icon?: string;
+    };
+    currentPlan: string;
+    currentPlanName: string;
+    upgradePlan?: string;
+    upgradePlanName?: string;
+    upgradePlanPrice?: number;
+    quota?: {
+      used: number;
+      limit: number;
+      unlimited: boolean;
+      resetDate?: string;
+      period?: string;
+    };
+  };
   diagnostics: {
     cookieHeaderPresent: boolean;
     cookieNames: string[];
@@ -86,6 +131,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
               process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
               'unknown';
   const projectRef = getProjectRef();
+
+  // 機能チェック用クエリパラメータ（早期プラン判定用）
+  const featureCheckKey = request.nextUrl.searchParams.get('featureCheck');
 
   const responseHeaders = {
     'Cache-Control': 'no-store, must-revalidate',
@@ -164,44 +212,13 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }
     );
 
-    // Step 3: getUser（復旧ロジックなし - 診断型）
+    // Step 3: getUser（直接呼び出し - 完全なUserオブジェクトが必要）
+    // Phase 1 最適化: DashboardPageShell での getCurrentUser() 削減のため
+    // email_confirmed_at, created_at, app_metadata を取得する必要がある
     whichStep = 'getUser';
-    const { data: { user }, error: getUserError } = await supabase.auth.getUser();
+    const { data: { user: rawUser }, error: userError } = await supabase.auth.getUser();
 
-    if (getUserError) {
-      console.error('[dashboard/init] getUser error', {
-        requestId,
-        errorCode: getUserError.code,
-        errorMessage: getUserError.message,
-        cookieNames,
-      });
-
-      // 壊れたセッション検出用ヘッダーを追加
-      const isSessionMissing = getUserError.message?.includes('Auth session missing');
-      const authRecoverHeaders = {
-        ...responseHeaders,
-        'x-auth-recover': isSessionMissing ? 'clear-cookies-and-relogin' : 'none',
-        'x-auth-reason': isSessionMissing ? 'session_missing' : (getUserError.code || 'auth_error'),
-      };
-
-      return NextResponse.json({
-        ok: false,
-        user: null,
-        organizations: [],
-        memberships: [],
-        diagnostics: { ...diagnostics, whichStep },
-        error: {
-          code: getUserError.code || 'AUTH_ERROR',
-          message: getUserError.message,
-          whichQuery: 'getUser',
-        },
-        requestId,
-        sha,
-        timestamp,
-      }, { status: 401, headers: authRecoverHeaders });
-    }
-
-    if (!user) {
+    if (userError || !rawUser) {
       // Cookie あるが user なし = 壊れたセッション
       const noUserHeaders = {
         ...responseHeaders,
@@ -226,24 +243,58 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }, { status: 401, headers: noUserHeaders });
     }
 
-    // Step 4: organization_members クエリ
-    whichStep = 'organization_members';
-    const { data: memberships, error: membershipError } = await supabase
+    // Step 3.5: profiles テーブルからプロフィール情報を取得（Phase 1 最適化）
+    // DashboardPageShell での getCurrentUser() 呼び出しを削減するため
+    whichStep = 'profile';
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('full_name, avatar_url')
+      .eq('id', rawUser.id)
+      .maybeSingle();
+
+    // ユーザー情報を構築（profile情報を含む）
+    const userInfo = {
+      id: rawUser.id,
+      email: rawUser.email ?? null,
+      profile: profileData ? {
+        full_name: profileData.full_name,
+        avatar_url: profileData.avatar_url,
+      } : undefined,
+      email_verified: !!rawUser.email_confirmed_at,
+      created_at: rawUser.created_at || new Date().toISOString(),
+      app_metadata: rawUser.app_metadata ? {
+        role: (rawUser.app_metadata as Record<string, unknown>).role as string | undefined,
+      } : undefined,
+    };
+
+    // Step 4: organization_members + organizations を JOIN で一括取得（Phase 2A 最適化）
+    // 以前: 2回のDB往復 → 現在: 1回のDB往復
+    whichStep = 'membership_with_orgs';
+    const { data: membershipWithOrgs, error: membershipError } = await supabase
       .from('organization_members')
-      .select('organization_id, role')
-      .eq('user_id', user.id);
+      .select(`
+        organization_id,
+        role,
+        organizations (
+          id,
+          name,
+          slug,
+          plan
+        )
+      `)
+      .eq('user_id', rawUser.id);
 
     if (membershipError) {
       return NextResponse.json({
         ok: false,
-        user: { id: user.id, email: user.email || null },
+        user: userInfo,
         organizations: [],
         memberships: [],
         diagnostics: { ...diagnostics, whichStep },
         error: {
           code: membershipError.code || 'MEMBERSHIP_ERROR',
           message: membershipError.message,
-          whichQuery: 'organization_members',
+          whichQuery: 'membership_with_orgs',
           details: membershipError.details,
           hint: membershipError.hint,
         },
@@ -254,11 +305,11 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
     }
 
     // メンバーシップなし
-    if (!memberships || memberships.length === 0) {
+    if (!membershipWithOrgs || membershipWithOrgs.length === 0) {
       whichStep = 'success_no_org';
       return NextResponse.json({
         ok: true,
-        user: { id: user.id, email: user.email || null },
+        user: userInfo,
         organizations: [],
         memberships: [],
         diagnostics: { ...diagnostics, whichStep },
@@ -268,46 +319,104 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }, { status: 200, headers: responseHeaders });
     }
 
-    // Step 5: organizations クエリ
-    whichStep = 'organizations';
-    const orgIds = memberships.map(m => m.organization_id);
-
-    const { data: orgsData, error: orgsError } = await supabase
-      .from('organizations')
-      .select('id, name, slug, plan')
-      .in('id', orgIds);
-
-    if (orgsError) {
-      return NextResponse.json({
-        ok: false,
-        user: { id: user.id, email: user.email || null },
-        organizations: [],
-        memberships: memberships.map(m => ({ organization_id: m.organization_id, role: m.role })),
-        diagnostics: { ...diagnostics, whichStep },
-        error: {
-          code: orgsError.code || 'ORG_ERROR',
-          message: orgsError.message,
-          whichQuery: 'organizations',
-          details: orgsError.details,
-          hint: orgsError.hint,
-        },
-        requestId,
-        sha,
-        timestamp,
-      }, { status: 200, headers: responseHeaders });
+    // JOINデータを分解
+    // Supabase の nested select では many-to-one は単一オブジェクトを返す
+    interface OrgData {
+      id: string;
+      name: string;
+      slug: string;
+      plan: string | null;
     }
+
+    const memberships = membershipWithOrgs.map(m => ({
+      organization_id: m.organization_id,
+      role: m.role,
+    }));
+
+    // organizations は単一オブジェクト（many-to-one）、null の場合もある
+    // Supabase の型推論が配列を返すが、実際は単一オブジェクト
+    const orgsData: OrgData[] = membershipWithOrgs
+      .map(m => {
+        const org = m.organizations;
+        if (!org) return null;
+        // Supabase が配列として型推論するケースへの対応
+        if (Array.isArray(org)) {
+          return org[0] as OrgData | undefined ?? null;
+        }
+        return org as unknown as OrgData;
+      })
+      .filter((org): org is OrgData => org !== null);
 
     // 成功
     whichStep = 'success';
+    // eslint-disable-next-line no-console
     console.log('[dashboard/init] Success', {
       requestId,
-      userId: user.id,
+      userId: rawUser.id,
       orgCount: orgsData?.length || 0,
     });
 
+    // 機能チェック（オプション）
+    // featureCheckクエリパラメータが指定されている場合、最初の組織で機能が使えるかチェック
+    let featureCheck: { key: string; available: boolean } | undefined;
+    let featureGate: DashboardInitResponse['featureGate'] | undefined;
+    if (featureCheckKey && orgsData && orgsData.length > 0) {
+      try {
+        whichStep = 'featureCheck';
+        const firstOrg = orgsData[0];
+        const firstOrgId = firstOrg.id;
+        const currentPlan = (firstOrg.plan || 'trial') as PlanType;
+
+        // 拡張版: FeatureGateInfo を取得
+        const gateInfo: FeatureGateInfo = await getFeatureGateInfo(
+          firstOrgId,
+          featureCheckKey,
+          currentPlan
+        );
+
+        // Legacy互換: featureCheck も返す
+        featureCheck = { key: featureCheckKey, available: gateInfo.available };
+
+        // 拡張版: featureGate を返す
+        featureGate = {
+          key: featureCheckKey,
+          available: gateInfo.available,
+          metadata: {
+            displayName: gateInfo.metadata.displayName,
+            description: gateInfo.metadata.description,
+            category: gateInfo.metadata.category,
+            controlType: gateInfo.metadata.controlType,
+            availableFrom: gateInfo.metadata.availableFrom,
+            icon: gateInfo.metadata.icon,
+          },
+          currentPlan: gateInfo.currentPlan,
+          currentPlanName: gateInfo.currentPlanName,
+          upgradePlan: gateInfo.upgradePlan,
+          upgradePlanName: gateInfo.upgradePlanName,
+          upgradePlanPrice: gateInfo.upgradePlanPrice,
+          quota: gateInfo.quota ? {
+            used: gateInfo.quota.used,
+            limit: gateInfo.quota.limit,
+            unlimited: gateInfo.quota.unlimited,
+            resetDate: gateInfo.quota.resetDate,
+            period: gateInfo.quota.period,
+          } : undefined,
+        };
+      } catch (err) {
+        // 機能チェック失敗時はavailable: falseにしてフェイルセーフ
+        console.warn('[dashboard/init] featureCheck failed', {
+          requestId,
+          featureKey: featureCheckKey,
+          error: err instanceof Error ? err.message : 'Unknown',
+        });
+        featureCheck = { key: featureCheckKey, available: false };
+        // featureGate は undefined のまま（エラー時はLegacy APIのみ）
+      }
+    }
+
     return NextResponse.json({
       ok: true,
-      user: { id: user.id, email: user.email || null },
+      user: userInfo,
       organizations: (orgsData || []).map(org => ({
         id: org.id,
         name: org.name,
@@ -315,6 +424,8 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
         plan: org.plan,
       })),
       memberships: memberships.map(m => ({ organization_id: m.organization_id, role: m.role })),
+      featureCheck,
+      featureGate,
       diagnostics: {
         cookieHeaderPresent,
         cookieNames,

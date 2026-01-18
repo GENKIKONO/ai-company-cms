@@ -8,6 +8,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { DashboardPageShell } from '@/components/dashboard';
+import { ROUTES } from '@/lib/routes';
 import {
   DashboardCard,
   DashboardCardContent,
@@ -551,7 +552,7 @@ function AdminContentsContent() {
 
         {/* ナビゲーション */}
         <Link
-          href="/dashboard"
+          href={ROUTES.dashboard}
           className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4"
         >
           ← ダッシュボードに戻る

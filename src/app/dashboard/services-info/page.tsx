@@ -5,6 +5,7 @@
  */
 
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import { PLAN_LIMITS } from '@/config/plans';
 import {
   DashboardPageShell,
@@ -45,7 +46,7 @@ function ServicesInfoContent() {
       <DashboardPageHeader
         title="サービス紹介"
         description="AI Company CMSの機能とプランをご紹介します"
-        backLink={{ href: '/dashboard', label: 'ダッシュボード' }}
+        backLink={{ href: ROUTES.dashboard, label: 'ダッシュボード' }}
       />
 
       {/* サービス概要 */}
@@ -131,7 +132,7 @@ function ServicesInfoContent() {
       {/* アクションボタン */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         {organization ? (
-          <Link href="/dashboard">
+          <Link href={ROUTES.dashboard}>
             <DashboardButton variant="primary" size="lg">
               ダッシュボードに戻る
             </DashboardButton>

@@ -28,7 +28,7 @@ import { DashboardErrorBoundary } from './DashboardErrorBoundary';
 import { DashboardLoadingState } from './ui/DashboardLoadingState';
 import { DashboardAlert } from './ui/DashboardAlert';
 import { DashboardSection } from './ui/DashboardSection';
-import { getCurrentUserClient as getCurrentUser } from '@/lib/core/auth-state.client';
+import { FeatureGateUI } from './FeatureGateUI';
 import { createClient } from '@/lib/supabase/client';
 import type { AuthState } from '@/lib/auth/auth-state';
 import {
@@ -43,6 +43,7 @@ import type { AppUser } from '@/types/legacy/database';
 import type { UserRole } from '@/types/utils/database';
 import { v4 as uuidv4 } from 'uuid';
 import type { DashboardInitResponse } from '@/app/api/dashboard/init/route';
+import { ROUTES } from '@/lib/routes';
 
 // =====================================================
 // TYPES
@@ -165,6 +166,10 @@ export function DashboardPageShell({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  // 機能利用不可フラグ（プラン制限用）
+  const [featureUnavailable, setFeatureUnavailable] = useState(false);
+  // 機能ゲート情報（プラン制限時の詳細情報）
+  const [featureGateInfo, setFeatureGateInfo] = useState<DashboardInitResponse['featureGate'] | null>(null);
   // Phase 3: AuthState による状態管理
   const [authState, setAuthState] = useState<AuthState>('UNAUTHENTICATED');
   // 診断用: Supabase エラー詳細（PII なし）
@@ -229,6 +234,8 @@ export function DashboardPageShell({
     setErrorCode(null);
     setErrorDetails(null);
     setPermissionError(null);
+    setFeatureUnavailable(false);
+    setFeatureGateInfo(null);
     setIsDataFetched(false);
 
     try {
@@ -245,7 +252,12 @@ export function DashboardPageShell({
       // サーバーサイドの createServerClient を使用することで
       // auth.uid() の解決を確実に行う
       // ========================================
-      const initResponse = await fetch('/api/dashboard/init', {
+      // featureFlag が指定されている場合は featureCheck クエリパラメータを追加
+      // これによりプラン制限を早期に判定できる
+      const initUrl = featureFlag
+        ? `/api/dashboard/init?featureCheck=${encodeURIComponent(featureFlag)}`
+        : '/api/dashboard/init';
+      const initResponse = await fetch(initUrl, {
         credentials: 'include', // Cookie を送信
         cache: 'no-store',
       });
@@ -308,17 +320,21 @@ export function DashboardPageShell({
         return;
       }
 
-      // getCurrentUser で AppUser 型に変換（profile 情報を含む）
-      const currentUser = await getCurrentUser();
+      // Phase 1 最適化: APIレスポンスから直接AppUserを構築
+      // getCurrentUser() の呼び出しを削除（auth.getUser + profiles の2回分のDB往復を削減）
+      const apiUser = initData.user;
+      const currentUser: AppUser = {
+        id: apiUser.id,
+        email: apiUser.email || '',
+        full_name: apiUser.profile?.full_name ?? null,
+        avatar_url: apiUser.profile?.avatar_url ?? null,
+        role: (apiUser.app_metadata?.role as 'admin' | 'editor' | 'viewer') || 'viewer',
+        created_at: apiUser.created_at,
+        updated_at: apiUser.created_at, // profile updated_at がないため created_at で代用
+        email_verified: apiUser.email_verified,
+      };
 
       if (isStale()) return;
-
-      if (!currentUser) {
-        setAuthState('AUTH_FAILED');
-        setError('ユーザー情報の取得に失敗しました。');
-        setErrorCode('USER_PROFILE_ERROR');
-        return;
-      }
 
       setUser(currentUser);
 
@@ -341,6 +357,17 @@ export function DashboardPageShell({
 
       const memberships = initData.memberships || [];
       const orgsData = initData.organizations || [];
+
+      // 機能チェック結果の確認（featureFlag が指定されている場合）
+      if (featureFlag && initData.featureCheck) {
+        if (!initData.featureCheck.available) {
+          setFeatureUnavailable(true);
+          // featureGate 情報も保存（FeatureGateUI用）
+          if (initData.featureGate) {
+            setFeatureGateInfo(initData.featureGate);
+          }
+        }
+      }
 
       // Phase 3: メンバーシップに基づいて AuthState を設定
       if (memberships.length === 0) {
@@ -431,7 +458,7 @@ export function DashboardPageShell({
   // pathname を依存配列に追加: クライアントサイドナビゲーション時にデータを再取得
   // NOTE: router は fetchData 内で未使用のため依存から除外（unstable reference による無限ループ防止）
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPublic, requiredRole, siteAdminOnly, logToAudit, pathname]);
+  }, [isPublic, requiredRole, siteAdminOnly, logToAudit, pathname, featureFlag]);
 
   /**
    * 権限チェック関数（DBのRPCを使用）
@@ -668,10 +695,47 @@ export function DashboardPageShell({
           title="アクセス権限がありません"
           action={{
             label: 'ダッシュボードに戻る',
-            onClick: () => router.push('/dashboard'),
+            onClick: () => router.push(ROUTES.dashboard),
           }}
         >
           {permissionError}
+          <span className="block mt-2 text-xs text-[var(--color-text-tertiary)]">
+            リクエストID: {requestId}
+          </span>
+        </DashboardAlert>
+      </DashboardSection>
+    );
+  }
+
+  // Render feature unavailable state (plan restriction)
+  // FeatureGateUI を使用して統一されたUXを提供
+  if (featureUnavailable && featureFlag) {
+    // featureGateInfo がある場合は統一UIを表示
+    if (featureGateInfo) {
+      return (
+        <PageContext.Provider value={contextValue}>
+          <DashboardErrorBoundary>
+            <FeatureGateUI gateInfo={featureGateInfo} variant="full" />
+          </DashboardErrorBoundary>
+        </PageContext.Provider>
+      );
+    }
+
+    // featureGateInfo がない場合（フォールバック）
+    return (
+      <DashboardSection>
+        <DashboardAlert
+          variant="info"
+          title="この機能はご利用いただけません"
+          action={{
+            label: 'プランを確認する',
+            onClick: () => router.push(ROUTES.dashboardBilling),
+          }}
+        >
+          <p>
+            ご利用中のプランでは「{featureFlag}」機能はご利用いただけません。
+            プランをアップグレードすることでご利用いただけます。
+          </p>
           <span className="block mt-2 text-xs text-[var(--color-text-tertiary)]">
             リクエストID: {requestId}
           </span>

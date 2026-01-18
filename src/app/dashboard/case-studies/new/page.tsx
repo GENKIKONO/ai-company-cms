@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardPageShell } from '@/components/dashboard';
+import {
+  DashboardPageHeader,
+  DashboardAlert,
+} from '@/components/dashboard/ui';
 
 export default function NewCaseStudyPage() {
   return (
@@ -55,11 +59,14 @@ function NewCaseStudyContent() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">新しい導入事例</h1>
-        <p className="text-[var(--color-text-secondary)] mt-2">導入事例の情報を入力してください</p>
-      </div>
+    <>
+      <DashboardPageHeader
+        title="新しい導入事例"
+        description="導入事例の情報を入力してください"
+        backLink={{ href: '/dashboard/case-studies', label: '導入事例一覧' }}
+      />
+
+      <div className="max-w-2xl">
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -71,7 +78,7 @@ function NewCaseStudyContent() {
             id="title"
             name="title"
             required
-            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="導入事例のタイトルを入力"
           />
         </div>
@@ -85,22 +92,24 @@ function NewCaseStudyContent() {
             name="summary"
             required
             rows={4}
-            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="導入事例の概要を入力"
           />
         </div>
 
         {error && (
-          <div className="bg-[var(--aio-danger-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4">
-            <p className="text-[var(--aio-danger)] text-sm">{error}</p>
-          </div>
+          <DashboardAlert
+            variant="error"
+            title="エラー"
+            description={error}
+          />
         )}
 
         <div className="flex space-x-4">
           <button
             type="submit"
             disabled={loading}
-            className="bg-[var(--aio-success)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-success)] disabled:opacity-50"
+            className="bg-[var(--aio-primary)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
           >
             {loading ? '作成中...' : '作成'}
           </button>
@@ -113,6 +122,7 @@ function NewCaseStudyContent() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }

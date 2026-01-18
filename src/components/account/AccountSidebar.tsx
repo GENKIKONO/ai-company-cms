@@ -9,6 +9,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ROUTES } from '@/lib/routes';
 import {
   UserCircleIcon,
   ShieldCheckIcon,
@@ -43,7 +44,7 @@ export function AccountSidebar() {
           {/* ダッシュボードへ戻る */}
           <li>
             <Link
-              href="/dashboard"
+              href={ROUTES.dashboard}
               className="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-[var(--color-text-secondary)] hover:text-[var(--aio-primary)] hover:bg-[var(--aio-surface)]"
             >
               <ArrowLeftIcon

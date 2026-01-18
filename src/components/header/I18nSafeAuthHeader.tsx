@@ -2,6 +2,7 @@
 
 import { useI18n } from '@/components/layout/I18nProvider';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import { User } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
@@ -122,7 +123,7 @@ export default function I18nSafeAuthHeader({
 
   const getCtaHref = () => {
     if (!effectiveAuthState) return '/auth/login';
-    return hasOrganization ? '/dashboard' : '/organizations/new';
+    return hasOrganization ? ROUTES.dashboard : '/organizations/new';
   };
 
   const getCtaText = () => {
@@ -145,13 +146,13 @@ export default function I18nSafeAuthHeader({
             {effectiveAuthState && (
               <nav className="ml-10 hidden md:flex space-x-8">
                 <button
-                  onClick={() => window.location.href = '/dashboard'}
+                  onClick={() => window.location.href = ROUTES.dashboard}
                   className="text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   {t('ui.header.dashboard')}
                 </button>
-                <Link 
-                  href="/dashboard/billing" 
+                <Link
+                  href={ROUTES.dashboardBilling}
                   className="text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   {t('ui.header.subscription')}

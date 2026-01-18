@@ -38,6 +38,7 @@ export default function AiReportsPage() {
     <DashboardPageShell
       title="AI月次レポート"
       requiredRole="viewer"
+      featureFlag="ai_reports"
     >
       <AiReportsContent />
     </DashboardPageShell>

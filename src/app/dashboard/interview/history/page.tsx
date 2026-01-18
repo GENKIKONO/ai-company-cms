@@ -7,6 +7,7 @@ import { DashboardPageShell } from '@/components/dashboard';
 import { DashboardButton } from '@/components/dashboard/ui';
 import type { InterviewSession, SessionListResponse } from '@/types/interview-session';
 import { logger } from '@/lib/utils/logger';
+import { ROUTES } from '@/lib/routes';
 
 interface SessionTableProps {
   sessions: InterviewSession[];
@@ -282,12 +283,12 @@ function InterviewHistoryContent() {
             </div>
             <div className="flex space-x-4">
               <Link
-                href="/dashboard"
+                href={ROUTES.dashboard}
                 className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
               >
                 ← ダッシュボードに戻る
               </Link>
-              <Link href="/dashboard/interview">
+              <Link href={ROUTES.dashboardInterview}>
                 <DashboardButton variant="primary">
                   新しいインタビューを開始
                 </DashboardButton>

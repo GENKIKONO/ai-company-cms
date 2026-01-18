@@ -96,11 +96,14 @@ function NewServiceContent() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">新しいサービス</h1>
-        <p className="text-[var(--color-text-secondary)] mt-2">サービス情報を入力してください</p>
-      </div>
+    <>
+      <DashboardPageHeader
+        title="新しいサービス"
+        description="サービス情報を入力してください"
+        backLink={{ href: '/dashboard/services', label: 'サービス一覧' }}
+      />
+
+      <div className="max-w-2xl">
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -313,16 +316,18 @@ function NewServiceContent() {
         </div>
 
         {error && (
-          <div className="bg-[var(--aio-danger-muted)] border border-[var(--aio-danger)] rounded-md p-4">
-            <p className="text-[var(--aio-danger)] text-sm">{error}</p>
-          </div>
+          <DashboardAlert
+            variant="error"
+            title="エラー"
+            description={error}
+          />
         )}
 
         <div className="flex space-x-4">
           <button
             type="submit"
             disabled={loading}
-            className="bg-[var(--aio-purple)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
+            className="bg-[var(--aio-primary)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
           >
             {loading ? '作成中...' : '作成'}
           </button>
@@ -335,6 +340,7 @@ function NewServiceContent() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }

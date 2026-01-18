@@ -10,6 +10,7 @@ import { logger } from '@/lib/utils/logger';
 import type { AppUser } from '@/types/legacy/database';
 import type { OrganizationFormData } from '@/types/domain/organizations';;
 import OrgLogoUploader from '@/components/OrgLogoUploader';
+import { ROUTES } from '@/lib/routes';
 
 // プラン別タグ数制限
 const TAG_LIMIT: Record<string, number | 'unlimited'> = {
@@ -383,7 +384,7 @@ export default function NewOrganizationPage() {
       if (isSuccessful) {
         logger.info('Organization creation/retrieval successful');
         // Single-Org モードでは企業作成後はダッシュボードにリダイレクト
-        router.replace('/dashboard');
+        router.replace(ROUTES.dashboard);
       } else {
         logger.error('Organization creation failed - unexpected response structure', { data: result });
         setErrors({ submit: '企業の作成に失敗しました' });
@@ -421,7 +422,7 @@ export default function NewOrganizationPage() {
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-4">
             <li>
-              <Link href="/dashboard" replace className="text-gray-500 hover:text-gray-700">
+              <Link href={ROUTES.dashboard} replace className="text-gray-500 hover:text-gray-700">
                 マイページ
               </Link>
             </li>
@@ -895,7 +896,7 @@ export default function NewOrganizationPage() {
             
             <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
               <Link
-                href="/dashboard"
+                href={ROUTES.dashboard}
                 className="inline-flex justify-center items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
               >
                 キャンセル

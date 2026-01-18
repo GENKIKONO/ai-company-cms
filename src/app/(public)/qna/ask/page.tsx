@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ROUTES } from '@/lib/routes';
 import { 
   HIGCard,
   HIGCardHeader,
@@ -131,7 +132,7 @@ function AskQuestionForm() {
         
         // 3秒後にマイページにリダイレクト
         setTimeout(() => {
-          router.push('/dashboard/my-questions');
+          router.push(ROUTES.dashboardMyQuestions);
         }, 3000);
       } else {
         const errorData = await response.json();
@@ -164,7 +165,7 @@ function AskQuestionForm() {
                 回答があり次第、メールでお知らせいたします。
               </p>
               <div className="flex gap-3 justify-center">
-                <Link href="/dashboard/my-questions">
+                <Link href={ROUTES.dashboardMyQuestions}>
                   <HIGButton variant="primary">
                     投稿した質問を確認
                   </HIGButton>
@@ -325,7 +326,7 @@ function AskQuestionForm() {
                 </HIGButton>
                 
                 {user && (
-                  <Link href="/dashboard/my-questions">
+                  <Link href={ROUTES.dashboardMyQuestions}>
                     <HIGButton variant="secondary">
                       投稿済み質問を確認
                     </HIGButton>

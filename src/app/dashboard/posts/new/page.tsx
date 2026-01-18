@@ -6,7 +6,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { DashboardPageShell } from '@/components/dashboard';
 import {
   DashboardPageHeader,
@@ -95,20 +94,14 @@ function NewPostContent() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <Link
-        href="/dashboard/posts"
-        className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4"
-      >
-        ← 記事一覧に戻る
-      </Link>
+    <>
+      <DashboardPageHeader
+        title="新しい記事"
+        description="記事の情報を入力してください"
+        backLink={{ href: '/dashboard/posts', label: '記事一覧' }}
+      />
 
-      <div className="mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">新しい記事</h1>
-          <p className="text-[var(--color-text-secondary)] mt-2">記事の情報を入力してください</p>
-        </div>
-      </div>
+      <div className="max-w-2xl">
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -120,7 +113,7 @@ function NewPostContent() {
             id="title"
             name="title"
             required
-            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="記事のタイトルを入力"
           />
         </div>
@@ -133,7 +126,7 @@ function NewPostContent() {
             type="text"
             id="slug"
             name="slug"
-            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="URL用のスラッグ（空の場合は自動生成）"
           />
         </div>
@@ -147,7 +140,7 @@ function NewPostContent() {
             name="content"
             required
             rows={8}
-            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
             placeholder="記事の内容を入力（Markdown形式）"
           />
         </div>
@@ -159,7 +152,7 @@ function NewPostContent() {
           <select
             id="status"
             name="status"
-            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
           >
             <option value="draft">下書き</option>
             <option value="published">公開</option>
@@ -167,28 +160,31 @@ function NewPostContent() {
         </div>
 
         {error && (
-          <div className="bg-[var(--aio-danger-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4">
-            <p className="text-[var(--aio-danger)] text-sm">{error}</p>
-          </div>
+          <DashboardAlert
+            variant="error"
+            title="エラー"
+            description={error}
+          />
         )}
 
         <div className="flex space-x-4">
           <button
             type="submit"
             disabled={loading}
-            className="bg-[var(--aio-purple)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-purple)] disabled:opacity-50"
+            className="bg-[var(--aio-primary)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
           >
             {loading ? '作成中...' : '作成'}
           </button>
-          <Link
-            href="/dashboard/posts"
-            className="bg-[var(--dashboard-card-border)] text-[var(--color-text-secondary)] px-6 py-2 rounded-md hover:bg-[var(--table-row-hover)] inline-block text-center"
-            replace
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="bg-[var(--dashboard-card-border)] text-[var(--color-text-secondary)] px-6 py-2 rounded-md hover:bg-[var(--table-row-hover)]"
           >
             キャンセル
-          </Link>
+          </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }

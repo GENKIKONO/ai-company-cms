@@ -13,7 +13,7 @@ import { AISEOReportClient } from './AISEOReportClient';
 
 export default function AISEOReportPage() {
   return (
-    <DashboardPageShell title="AI × SEO分析" requiredRole="viewer">
+    <DashboardPageShell title="AI × SEO分析" requiredRole="viewer" featureFlag="ai_visibility_analytics">
       <div className="min-h-screen bg-[var(--aio-surface)]">
         <Suspense fallback={<DashboardLoadingState message="読み込み中" />}>
           <AISEOReportClient />

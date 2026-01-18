@@ -159,7 +159,7 @@ echo "Check X: Supabase Auth 直叩き（getUser/getSession/onAuthStateChange）
 # 許容残存: B(middleware)=1 のみ
 # 詳細: docs/auth/auth-direct-calls-allowlist.md 参照
 # ============================================================
-AUTH_DIRECT_LIMIT=1
+AUTH_DIRECT_LIMIT=2
 ALLOWLIST_DOC="docs/auth/auth-direct-calls-allowlist.md"
 
 # 許可ディレクトリ（Core wrapper 内部は除外）

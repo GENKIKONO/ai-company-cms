@@ -9,6 +9,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ROUTES } from '@/lib/routes';
 import { MobileDrawerLayout } from '@/components/navigation/MobileDrawerLayout';
 
 interface ManagementConsoleLayoutContentProps {
@@ -63,7 +64,7 @@ export function ManagementConsoleLayoutContent({
 
         <div className="border-t border-gray-200 mt-4 pt-4 px-3">
           <Link
-            href="/dashboard"
+            href={ROUTES.dashboard}
             className="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100"
           >
             ユーザー画面へ
@@ -137,7 +138,7 @@ export function ManagementConsoleLayoutContent({
             ))}
             <div className="w-px h-6 bg-gray-200 mx-2" />
             <Link
-              href="/dashboard"
+              href={ROUTES.dashboard}
               className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg text-sm hover:bg-gray-100"
             >
               ユーザー画面

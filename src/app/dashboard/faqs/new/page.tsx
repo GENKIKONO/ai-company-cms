@@ -64,64 +64,70 @@ function NewFAQContent() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">新しいFAQ</h1>
-        <p className="text-[var(--color-text-secondary)] mt-2">よくある質問の情報を入力してください</p>
-      </div>
+    <>
+      <DashboardPageHeader
+        title="新しいFAQ"
+        description="よくある質問の情報を入力してください"
+        backLink={{ href: '/dashboard/faqs', label: 'FAQ一覧' }}
+      />
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="question" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
-            質問 *
-          </label>
-          <input
-            type="text"
-            id="question"
-            name="question"
-            required
-            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-            placeholder="質問を入力"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="answer" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
-            回答 *
-          </label>
-          <textarea
-            id="answer"
-            name="answer"
-            required
-            rows={6}
-            className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-            placeholder="回答を入力"
-          />
-        </div>
-
-        {error && (
-          <div className="bg-[var(--aio-danger-muted)] border border-[var(--dashboard-card-border)] rounded-md p-4">
-            <p className="text-[var(--aio-danger)] text-sm">{error}</p>
+      <div className="max-w-2xl">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="question" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
+              質問 *
+            </label>
+            <input
+              type="text"
+              id="question"
+              name="question"
+              required
+              className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+              placeholder="質問を入力"
+            />
           </div>
-        )}
 
-        <div className="flex space-x-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-[var(--aio-primary)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
-          >
-            {loading ? '作成中...' : '作成'}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="bg-[var(--dashboard-card-border)] text-[var(--color-text-secondary)] px-6 py-2 rounded-md hover:bg-[var(--table-row-hover)]"
-          >
-            キャンセル
-          </button>
-        </div>
-      </form>
-    </div>
+          <div>
+            <label htmlFor="answer" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
+              回答 *
+            </label>
+            <textarea
+              id="answer"
+              name="answer"
+              required
+              rows={6}
+              className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+              placeholder="回答を入力"
+            />
+          </div>
+
+          {error && (
+            <DashboardAlert
+              variant="error"
+              title="エラー"
+              description={error}
+              className="mb-4"
+            />
+          )}
+
+          <div className="flex space-x-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-[var(--aio-primary)] text-white px-6 py-2 rounded-md hover:bg-[var(--aio-primary-hover)] disabled:opacity-50"
+            >
+              {loading ? '作成中...' : '作成'}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="bg-[var(--dashboard-card-border)] text-[var(--color-text-secondary)] px-6 py-2 rounded-md hover:bg-[var(--table-row-hover)]"
+            >
+              キャンセル
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

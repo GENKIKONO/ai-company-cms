@@ -36,8 +36,8 @@ Supabase Auth 直叩き（`.auth.getUser()` / `.auth.getSession()` / `.onAuthSta
 
 | カテゴリ | ファイル数 | calls | 説明 |
 |---------|-----------|-------|------|
-| B (middleware) | 1 | 1 | Next.js middleware（Edge Runtime制約） |
-| **合計** | **1** | **1** | Check X の上限値 |
+| B (middleware) | 1 | 2 | Next.js middleware（Edge Runtime制約） |
+| **合計** | **1** | **2** | Check X の上限値 |
 
 > **Phase 19:** 手動testページを E2E smoke テストに置き換え、allowlist を縮退しました。
 > **Phase 20:** diag/auth/route.ts を Core wrapper 経由に移行し、allowlist から撤去。

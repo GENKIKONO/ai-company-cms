@@ -6,6 +6,7 @@
 
 import Link from 'next/link';
 import { useCallback } from 'react';
+import { ROUTES } from '@/lib/routes';
 import type { CaseStudy } from '@/types/legacy/database';
 import {
   DashboardPageShell,
@@ -55,6 +56,7 @@ export default function CaseStudiesManagementPage() {
     <DashboardPageShell
       title="事例管理"
       requiredRole="viewer"
+      featureFlag="case_studies"
       loadingSkeleton={<ListLoadingSkeleton />}
     >
       <CaseStudiesContent />
@@ -106,7 +108,7 @@ function CaseStudiesContent() {
       <DashboardPageHeader
         title="事例管理"
         description="成功事例・実績を管理します"
-        backLink={{ href: '/dashboard', label: 'ダッシュボード' }}
+        backLink={{ href: ROUTES.dashboard, label: 'ダッシュボード' }}
         actions={
           <>
             {publicUrl && (
@@ -116,7 +118,7 @@ function CaseStudiesContent() {
                 </DashboardButton>
               </a>
             )}
-            <Link href="/dashboard/case-studies/new">
+            <Link href={ROUTES.dashboardCaseStudiesNew}>
               <DashboardButton variant="primary" leftIcon={<PlusIcon />}>
                 新しい事例
               </DashboardButton>
@@ -142,7 +144,7 @@ function CaseStudiesContent() {
           icon={<CaseStudyIcon />}
           title="事例がありません"
           description="最初の事例を作成してみましょう。"
-          action={{ label: '事例を作成', href: '/dashboard/case-studies/new' }}
+          action={{ label: '事例を作成', href: ROUTES.dashboardCaseStudiesNew }}
         />
       ) : (
         <DashboardCard padding="none">

@@ -10,6 +10,7 @@ import { getFAQ, updateFAQ, deleteFAQ, getFAQCategories, getPopularFAQCategories
 import type { AppUser, Organization, FAQ } from '@/types/legacy/database';
 import type { FAQFormData } from '@/types/domain/content';;
 import { logger } from '@/lib/utils/logger';
+import { ROUTES } from '@/lib/routes';
 
 export default function EditFAQPage() {
   const router = useRouter();
@@ -55,7 +56,7 @@ export default function EditFAQPage() {
         if (orgResult.data) {
           setOrganization(orgResult.data);
         } else {
-          router.replace('/dashboard');
+          router.replace(ROUTES.dashboard);
           return;
         }
 
@@ -78,7 +79,7 @@ export default function EditFAQPage() {
         }
       } catch (error) {
         logger.error('Failed to fetch data', { data: error instanceof Error ? error : new Error(String(error)) });
-        router.replace('/dashboard');
+        router.replace(ROUTES.dashboard);
       } finally {
         setLoading(false);
       }
@@ -165,7 +166,7 @@ export default function EditFAQPage() {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">FAQが見つかりません</h2>
-          <Link href="/dashboard" replace className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
+          <Link href={ROUTES.dashboard} replace className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
             ダッシュボードに戻る
           </Link>
         </div>
@@ -180,7 +181,7 @@ export default function EditFAQPage() {
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-4">
             <li>
-              <Link href="/dashboard" replace className="text-gray-500 hover:text-gray-700">
+              <Link href={ROUTES.dashboard} replace className="text-gray-500 hover:text-gray-700">
                 ダッシュボード
               </Link>
             </li>

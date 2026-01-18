@@ -7,6 +7,7 @@ import {
   ShieldExclamationIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+import { ROUTES } from '@/lib/routes';
 
 interface AlertData {
   key: string;
@@ -114,7 +115,7 @@ export function SecurityAlertBanner({ className = '' }: SecurityAlertBannerProps
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/dashboard/manage/security"
+              href={ROUTES.dashboardManageSecurity}
               className="text-sm font-medium hover:underline"
             >
               詳細を確認

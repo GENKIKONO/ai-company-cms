@@ -7,6 +7,7 @@ import { ArrowLeft, Calendar, Mail, Users, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { HIGButton } from '@/design-system';
 import { logger } from '@/lib/utils/logger';
+import { ROUTES } from '@/lib/routes';
 
 interface HearingRequestFormData {
   purpose: string;
@@ -82,7 +83,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
       if (response.ok) {
         setIsSubmitted(true);
         setTimeout(() => {
-          router.replace('/dashboard');
+          router.replace(ROUTES.dashboard);
         }, 3000);
       } else {
         const error = await response.json();
@@ -110,7 +111,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
             ご依頼いただきありがとうございます。<br />
             担当者より3営業日以内にご連絡いたします。
           </p>
-          <Link href="/dashboard" replace>
+          <Link href={ROUTES.dashboard} replace>
             <HIGButton
               variant="primary"
               size="lg"
@@ -129,7 +130,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
         {/* ヘッダー */}
         <div className="mb-8">
           <Link
-            href="/dashboard"
+            href={ROUTES.dashboard}
             replace
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
           >
@@ -222,7 +223,7 @@ export default function HearingRequestPage({ params }: { params: Promise<{ id: s
             {/* 送信ボタン */}
             <div className="flex gap-4">
               <Link
-                href="/dashboard"
+                href={ROUTES.dashboard}
                 className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-center"
               >
                 キャンセル

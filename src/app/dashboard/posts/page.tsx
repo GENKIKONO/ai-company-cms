@@ -11,6 +11,7 @@
 
 import Link from 'next/link';
 import { useCallback } from 'react';
+import { ROUTES } from '@/lib/routes';
 import type { Post } from '@/types/legacy/database';
 import {
   DashboardPageShell,
@@ -60,6 +61,7 @@ export default function PostsManagementPage() {
     <DashboardPageShell
       title="記事管理"
       requiredRole="viewer"
+      featureFlag="posts"
       loadingSkeleton={<PostsLoadingSkeleton />}
     >
       <PostsContent />
@@ -123,7 +125,7 @@ function PostsContent() {
         title="記事管理"
         description="ブログ記事やニュースを管理します"
         backLink={{
-          href: '/dashboard',
+          href: ROUTES.dashboard,
           label: 'ダッシュボード',
         }}
         actions={
@@ -142,7 +144,7 @@ function PostsContent() {
                 </DashboardButton>
               </a>
             )}
-            <Link href="/dashboard/posts/new">
+            <Link href={ROUTES.dashboardPostsNew}>
               <DashboardButton
                 variant="primary"
                 leftIcon={<PlusIcon />}
@@ -178,7 +180,7 @@ function PostsContent() {
           description="最初の記事を作成してみましょう。"
           action={{
             label: '記事を作成',
-            href: '/dashboard/posts/new',
+            href: ROUTES.dashboardPostsNew,
           }}
         />
       ) : (

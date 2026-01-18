@@ -20,6 +20,7 @@ import OrgLogoUploader from '@/components/OrgLogoUploader';
 import AddressDisplay from '@/components/address/AddressDisplay';
 import QAManager from '@/components/qa/QAManager';
 import { logger } from '@/lib/utils/logger';
+import { ROUTES } from '@/lib/routes';
 
 // プラン別タグ数制限
 const TAG_LIMIT: Record<string, number | 'unlimited'> = {
@@ -132,7 +133,7 @@ export default function EditOrganizationPage() {
         // フォームデータはuseEffectで自動同期される
       } else {
         logger.warn('[VERIFY] No organization data found, redirecting to dashboard');
-        router.replace('/dashboard');
+        router.replace(ROUTES.dashboard);
       }
       
       if (industriesResult.data) {
@@ -140,7 +141,7 @@ export default function EditOrganizationPage() {
       }
     } catch (error) {
       logger.error('Failed to fetch data', { data: error instanceof Error ? error : new Error(String(error)) });
-      router.replace('/dashboard');
+      router.replace(ROUTES.dashboard);
     } finally {
       setLoading(false);
       setDataFetched(true);
@@ -396,7 +397,7 @@ export default function EditOrganizationPage() {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900">企業が見つかりません</h2>
-          <Link href="/dashboard" replace className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
+          <Link href={ROUTES.dashboard} replace className="mt-4 text-[var(--aio-primary)] hover:text-[var(--aio-primary-hover)]">
             ダッシュボードに戻る
           </Link>
         </div>
@@ -411,7 +412,7 @@ export default function EditOrganizationPage() {
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-4">
             <li>
-              <Link href="/dashboard" replace className="text-gray-500 hover:text-gray-700">
+              <Link href={ROUTES.dashboard} replace className="text-gray-500 hover:text-gray-700">
                 ダッシュボード
               </Link>
             </li>
@@ -1129,7 +1130,7 @@ export default function EditOrganizationPage() {
               {/* アクションボタン */}
               <div className="flex space-x-3">
                 <Link
-                  href="/dashboard"
+                  href={ROUTES.dashboard}
                   className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                 >
                   戻る

@@ -14,14 +14,19 @@ export const ROUTES = {
 
   // Dashboard routes - My Page
   dashboardPosts: '/dashboard/posts',
+  dashboardPostsNew: '/dashboard/posts/new',
   dashboardFaqs: '/dashboard/faqs',
+  dashboardFaqsNew: '/dashboard/faqs/new',
   dashboardServices: '/dashboard/services',
+  dashboardServicesNew: '/dashboard/services/new',
   dashboardCaseStudies: '/dashboard/case-studies',
+  dashboardCaseStudiesNew: '/dashboard/case-studies/new',
   dashboardMaterials: '/dashboard/materials',
 
   // Dashboard routes - AI Studio
   dashboardAiStudio: '/dashboard/ai-studio',
   dashboardInterview: '/dashboard/interview',
+  dashboardInterviewHistory: '/dashboard/interview/history',
   dashboardOrgAiChat: '/dashboard/org-ai-chat',
 
   // Dashboard routes - Insights
@@ -30,15 +35,26 @@ export const ROUTES = {
   dashboardAiSeoReport: '/dashboard/analytics/ai-seo-report',
   dashboardAiReports: '/dashboard/ai-reports',
   dashboardAiCitations: '/dashboard/ai-citations',
+  dashboardMyQuestions: '/dashboard/my-questions',
 
   // Dashboard routes - Settings
   dashboardEmbed: '/dashboard/embed',
   dashboardBilling: '/dashboard/billing',
   dashboardSettings: '/dashboard/settings',
+  dashboardSettingsPlan: '/dashboard/settings/plan',
   dashboardHelp: '/dashboard/help',
 
   // Dashboard routes - Admin (org manager)
   dashboardManage: '/dashboard/manage',
+  dashboardManageSecurity: '/dashboard/manage/security',
+  dashboardManageContents: '/dashboard/manage/contents',
+  dashboardManageAiUsage: '/dashboard/manage/ai-usage',
+  dashboardManageAiVisibility: '/dashboard/manage/ai-visibility',
+  dashboardManageAlerts: '/dashboard/manage/alerts',
+  dashboardManageAudit: '/dashboard/manage/audit',
+  dashboardManageJobs: '/dashboard/manage/jobs',
+  dashboardManageOrgGroups: '/dashboard/manage/org-groups',
+  dashboardManageStorageLogs: '/dashboard/manage/storage-logs',
 
   // Legacy (後方互換)
   dashboardCompany: '/dashboard/company',

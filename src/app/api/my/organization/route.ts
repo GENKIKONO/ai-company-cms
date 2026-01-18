@@ -114,10 +114,27 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
     }
 
-    // ユーザーの所属組織を取得（organization_members経由、ownerロール必須）
-    const { data: membershipData, error: membershipError } = await supabase
+    // Phase 2A 最適化: JOINで1回のクエリに統合
+    // 以前: organization_members + organizations で2回のDB往復
+    // 現在: nested select で1回のDB往復
+    const { data: membershipWithOrg, error: membershipError } = await supabase
       .from('organization_members')
-      .select('organization_id, role')
+      .select(`
+        organization_id,
+        role,
+        organizations (
+          id, name, slug, description, legal_form, representative_name, corporate_number, verified,
+          established_at, capital, employees, address_country, address_region, address_locality,
+          address_postal_code, address_street, lat, lng, telephone, email, email_public, url, logo_url,
+          same_as, industries, status, is_published, partner_id, created_by, created_at, updated_at,
+          meta_title, meta_description, meta_keywords, keywords, website, website_url, size,
+          favicon_url, brand_color_primary, brand_color_secondary, social_media, business_hours, timezone,
+          languages_supported, certifications, awards, company_culture, mission_statement, vision_statement, values,
+          feature_flags, entitlements, stripe_customer_id, stripe_subscription_id, plan, subscription_status,
+          current_period_end, trial_end_date, show_services, show_posts, show_case_studies, show_faqs,
+          show_qa, show_news, show_partnership, show_contact
+        )
+      `)
       .eq('user_id', user.id)
       .limit(1)
       .maybeSingle();
@@ -127,42 +144,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ data: null, message: 'Query error' }, { status: 500 });
     }
 
-    if (!membershipData) {
+    if (!membershipWithOrg) {
       logger.debug(`[my/organization] No organization membership found for user: ${user.id}`);
       return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
     }
 
     // ownerロール必須チェック
-    if (membershipData.role !== 'owner') {
-      logger.warn(`[my/organization] User is not owner: ${user.id}, role: ${membershipData.role}`);
+    if (membershipWithOrg.role !== 'owner') {
+      logger.warn(`[my/organization] User is not owner: ${user.id}, role: ${membershipWithOrg.role}`);
       return NextResponse.json({ data: null, message: 'Owner permission required' }, { status: 403 });
     }
 
-    // 組織データを取得
-    const { data, error } = await supabase
-      .from('organizations')
-      .select(`
-        id, name, slug, description, legal_form, representative_name, corporate_number, verified,
-        established_at, capital, employees, address_country, address_region, address_locality,
-        address_postal_code, address_street, lat, lng, telephone, email, email_public, url, logo_url,
-        same_as, industries, status, is_published, partner_id, created_by, created_at, updated_at,
-        meta_title, meta_description, meta_keywords, keywords, website, website_url, size,
-        favicon_url, brand_color_primary, brand_color_secondary, social_media, business_hours, timezone,
-        languages_supported, certifications, awards, company_culture, mission_statement, vision_statement, values,
-        feature_flags, entitlements, stripe_customer_id, stripe_subscription_id, plan, subscription_status,
-        current_period_end, trial_end_date, show_services, show_posts, show_case_studies, show_faqs,
-        show_qa, show_news, show_partnership, show_contact
-      `)
-      .eq('id', membershipData.organization_id)
-      .maybeSingle();
-
-    if (error) {
-      logger.error('[my/organization] org query error', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json({ data: null, message: 'Query error' }, { status: 500 });
-    }
+    // 組織データを取得（JOINから）
+    const data = membershipWithOrg.organizations as unknown as Organization | null;
 
     if (!data) {
-      logger.debug(`[my/organization] No organization found for id: ${membershipData.organization_id}`);
+      logger.debug(`[my/organization] No organization found for id: ${membershipWithOrg.organization_id}`);
       return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
     }
 

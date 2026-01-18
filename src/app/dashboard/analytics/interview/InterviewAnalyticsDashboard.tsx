@@ -7,6 +7,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import {
   DashboardCard,
   DashboardCardContent,
@@ -333,7 +334,7 @@ export default function InterviewAnalyticsDashboard({
     <div className="space-y-6">
       {/* ナビゲーション */}
       <Link
-        href="/dashboard"
+        href={ROUTES.dashboard}
         className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
       >
         ← ダッシュボードに戻る

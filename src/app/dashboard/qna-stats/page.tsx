@@ -40,6 +40,7 @@ export default function CompanyQAStatsPage() {
     <DashboardPageShell
       title="Q&A統計分析"
       requiredRole="viewer"
+      featureFlag="system_monitoring"
     >
       <QAStatsContent />
     </DashboardPageShell>

@@ -6,6 +6,7 @@
 
 import Link from 'next/link';
 import { useCallback } from 'react';
+import { ROUTES } from '@/lib/routes';
 import type { FAQ } from '@/types/legacy/database';
 import {
   DashboardPageShell,
@@ -55,6 +56,7 @@ export default function FAQsManagementPage() {
     <DashboardPageShell
       title="FAQ管理"
       requiredRole="viewer"
+      featureFlag="faqs"
       loadingSkeleton={<ListLoadingSkeleton />}
     >
       <FAQsContent />
@@ -106,7 +108,7 @@ function FAQsContent() {
       <DashboardPageHeader
         title="FAQ管理"
         description="お客様からよくある簡単な質問と回答を管理します。詳しい解説が必要な場合はナレッジベース機能をご利用ください。"
-        backLink={{ href: '/dashboard', label: 'ダッシュボード' }}
+        backLink={{ href: ROUTES.dashboard, label: 'ダッシュボード' }}
         actions={
           <>
             {publicUrl && (
@@ -116,7 +118,7 @@ function FAQsContent() {
                 </DashboardButton>
               </a>
             )}
-            <Link href="/dashboard/faqs/new">
+            <Link href={ROUTES.dashboardFaqsNew}>
               <DashboardButton variant="primary" leftIcon={<PlusIcon />}>
                 新しいFAQ
               </DashboardButton>
@@ -142,7 +144,7 @@ function FAQsContent() {
           icon={<FAQIcon />}
           title="FAQがありません"
           description="お客様からよくある簡単な質問と回答を登録しましょう。"
-          action={{ label: 'FAQを作成', href: '/dashboard/faqs/new' }}
+          action={{ label: 'FAQを作成', href: ROUTES.dashboardFaqsNew }}
         />
       ) : (
         <DashboardCard padding="none">

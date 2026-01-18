@@ -36,3 +36,10 @@ export * from './ui';
 // Page Templates
 // ============================================
 export * from './templates';
+
+// ============================================
+// Feature Gate UI (プラン制限時の統一UI)
+// ============================================
+export { FeatureGateUI, type FeatureGateUIProps } from './FeatureGateUI';
+export { UpgradeCTA, type UpgradeCTAProps } from './UpgradeCTA';
+export { QuotaWarning, type QuotaWarningProps } from './QuotaWarning';

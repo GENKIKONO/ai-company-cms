@@ -173,7 +173,10 @@ function getCachedFeatureSet(userId: string, orgId?: string | null): FeatureSet 
 }
 
 function setCachedFeatureSet(featureSet: FeatureSet): void {
-  const key = getCacheKey(featureSet.userId, featureSet.orgId);
+  // Subject型からIDを取得、Legacy互換性も維持
+  const userId = featureSet.userId ?? featureSet.subject.id;
+  if (!userId) return; // IDがない場合はキャッシュしない
+  const key = getCacheKey(userId, featureSet.orgId);
   featureSetCache.set(key, featureSet);
 }
 
@@ -383,10 +386,24 @@ export async function getFeatureLimit(
   if (!featureSet) return null;
 
   const feature = featureSet.features.get(featureKey);
-  const limit = feature?.limits?.[limitKey];
+  if (!feature?.limits) return null;
+
+  // limits は Array または Record のいずれかの形式
+  let limit: { value: number; period: string | null } | undefined;
+  if (Array.isArray(feature.limits)) {
+    const found = feature.limits.find((l) => l.limit_key === limitKey);
+    if (found) {
+      limit = { value: found.limit_value, period: found.period };
+    }
+  } else {
+    const found = feature.limits[limitKey];
+    if (found) {
+      limit = { value: found.value, period: found.period };
+    }
+  }
   if (!limit) return null;
 
-  return { value: limit.value, period: limit.period };
+  return limit;
 }
 
 // =============================================================================

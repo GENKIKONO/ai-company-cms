@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import {
   ArrowLeft,
   Brain,
@@ -141,8 +142,8 @@ function AiReportDetailContent() {
             </div>
             <p className="text-[var(--color-text-secondary)] mb-6">{error}</p>
             <div className="flex gap-4">
-              <Link 
-                href="/dashboard/ai-reports"
+              <Link
+                href={ROUTES.dashboardAiReports}
                 className="px-4 py-2 bg-[var(--aio-surface)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--dashboard-card-border)] transition-colors"
               >
                 レポート一覧に戻る
@@ -170,8 +171,8 @@ function AiReportDetailContent() {
         {/* ヘッダー */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            <Link 
-              href="/dashboard/ai-reports"
+            <Link
+              href={ROUTES.dashboardAiReports}
               className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--aio-surface)] rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />

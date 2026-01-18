@@ -18,6 +18,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { getUserWithClient } from '@/lib/core/auth-state';
 import type { AuthState } from '@/lib/auth/auth-state';
 
 // Supabase auth cookie パターン
@@ -124,38 +125,10 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { data: { user }, error: getUserError } = await supabase.auth.getUser();
+    // Core wrapper経由でユーザー取得
+    const authUser = await getUserWithClient(supabase);
 
-    if (getUserError) {
-      authState = 'AUTH_FAILED';
-      getUserStatus = 'error';
-      whyBlocked = `getUser failed: ${getUserError.message}`;
-
-      return NextResponse.json({
-        ok: false,
-        authState,
-        getUserStatus,
-        hasCookie: true,
-        userId: null,
-        userEmail: null,
-        whyBlocked,
-        whichQuery: 'getUser',
-        error: {
-          code: getUserError.code || 'AUTH_ERROR',
-          message: getUserError.message,
-          details: null,
-          hint: null,
-        },
-        queries,
-        sha,
-        requestId,
-        host,
-        proto,
-        timestamp: new Date().toISOString(),
-      }, { status: 200, headers: responseHeaders });
-    }
-
-    if (!user) {
+    if (!authUser) {
       authState = 'AUTH_FAILED';
       getUserStatus = 'no_user';
       whyBlocked = 'Cookie present but no user session';
@@ -185,8 +158,8 @@ export async function GET(request: NextRequest) {
     }
 
     getUserStatus = 'success';
-    userId = user.id;
-    userEmail = user.email || null;
+    userId = authUser.id;
+    userEmail = authUser.email;
 
     // ========================================
     // Step 3: organization_members クエリ
@@ -194,7 +167,7 @@ export async function GET(request: NextRequest) {
     const { data: memberships, error: membershipError } = await supabase
       .from('organization_members')
       .select('organization_id, role')
-      .eq('user_id', user.id);
+      .eq('user_id', authUser.id);
 
     if (membershipError) {
       queries.push({

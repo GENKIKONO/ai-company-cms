@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 import {
   UserGroupIcon,
   PlusIcon,
@@ -217,13 +218,13 @@ function OrgGroupsContent() {
         <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link href="/dashboard" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
+              <Link href={ROUTES.dashboard} className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 ダッシュボード
               </Link>
             </li>
             <li><span className="text-[var(--color-text-tertiary)]">/</span></li>
             <li>
-              <Link href="/dashboard/manage" className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
+              <Link href={ROUTES.dashboardManage} className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
                 管理
               </Link>
             </li>

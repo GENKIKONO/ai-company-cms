@@ -409,7 +409,8 @@ async function getEffectiveOrgFeaturesFromEntitlements(orgId: string): Promise<E
 
     if (error || !org) {
       logger.warn('Failed to fetch organization from entitlements fallback, using static fallback', error, context);
-      return getEffectiveOrgFeaturesFromStaticConfig(org?.plan || 'starter');
+      // org が null/undefined の場合は starter をデフォルトとして使用
+      return getEffectiveOrgFeaturesFromStaticConfig('starter');
     }
 
     // entitlements + プラン標準設定から構築

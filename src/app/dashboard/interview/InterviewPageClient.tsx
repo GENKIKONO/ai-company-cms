@@ -8,6 +8,7 @@ import { DashboardButton } from '@/components/dashboard/ui';
 import type { InterviewQuestion, InterviewAxis } from '@/types/interview-session';
 import { logger } from '@/lib/utils/logger';
 import { OrgQuotaBadge, type SimpleQuotaProps } from '@/components/quota/OrgQuotaBadge';
+import { ROUTES } from '@/lib/routes';
 
 interface InterviewPageClientProps {
   aiInterviewQuota: SimpleQuotaProps | null;
@@ -104,7 +105,7 @@ function QuestionSelector({ axes, questions, selectedQuestions, onQuestionToggle
 
 export default function InterviewPageClient({ aiInterviewQuota }: InterviewPageClientProps) {
   return (
-    <DashboardPageShell title="AIインタビュー" requiredRole="viewer">
+    <DashboardPageShell title="AIインタビュー" requiredRole="viewer" featureFlag="ai_interview">
       <InterviewPageContent aiInterviewQuota={aiInterviewQuota} />
     </DashboardPageShell>
   );
@@ -270,13 +271,13 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
             </div>
             <div className="flex space-x-4">
               <Link
-                href="/dashboard/interview/history"
+                href={ROUTES.dashboardInterviewHistory}
                 className="px-4 py-2 border border-[var(--input-border)] rounded-md text-[var(--color-text-secondary)] hover:bg-[var(--aio-surface)]"
               >
                 履歴を見る
               </Link>
               <Link
-                href="/dashboard"
+                href={ROUTES.dashboard}
                 className="inline-flex items-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
               >
                 ← ダッシュボードに戻る
@@ -375,7 +376,7 @@ function InterviewPageContent({ aiInterviewQuota }: InterviewPageClientProps) {
           </div>
           <div className="flex space-x-4">
             <Link
-              href="/dashboard"
+              href={ROUTES.dashboard}
               className="px-4 py-2 border border-[var(--input-border)] rounded-md text-[var(--color-text-secondary)] hover:bg-[var(--aio-surface)]"
             >
               キャンセル
