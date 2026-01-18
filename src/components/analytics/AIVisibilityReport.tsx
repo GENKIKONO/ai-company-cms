@@ -1,23 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Brain, TrendingUp, Search, Eye, Download, RefreshCw } from 'lucide-react';
+import { Brain, TrendingUp, Search, Eye, RefreshCw } from 'lucide-react';
 import type { Organization } from '@/types/legacy/database';;
 import { logger } from '@/lib/utils/logger';
 
 interface AIVisibilityMetrics {
+  overallScore: number;
   structuredDataScore: number;
-  aiDiscoverabilityIndex: number;
-  searchVisibilityScore: number;
-  brandMentions: number;
-  competitorAnalysis: {
-    ranking: number;
-    totalCompetitors: number;
-    strongerAreas: string[];
-    improvementAreas: string[];
-  };
-  recommendations: string[];
-  lastUpdated: string;
+  aiAccessScore: number;
+  seoPerformanceScore: number;
+  totalAnalyzedUrls: number;
+  topPerformingUrls: number;
+  improvementNeededUrls: number;
+  lastUpdated: string | null;
+  hasData: boolean;
 }
 
 interface AIVisibilityReportProps {
@@ -37,33 +34,74 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
   const generateReport = async () => {
     setGenerating(true);
     try {
-      // モック実装 - 実際の実装ではClaude APIやOpenAI APIを使用
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2秒のローディング
+      // 実際のAPIからデータを取得
+      const response = await fetch(`/api/analytics/ai/visibility?organization_id=${organization.id}`);
 
-      const mockMetrics: AIVisibilityMetrics = {
-        structuredDataScore: Math.floor(Math.random() * 40) + 60, // 60-100
-        aiDiscoverabilityIndex: Math.floor(Math.random() * 30) + 70, // 70-100
-        searchVisibilityScore: Math.floor(Math.random() * 50) + 50, // 50-100
-        brandMentions: Math.floor(Math.random() * 50) + 10,
-        competitorAnalysis: {
-          ranking: Math.floor(Math.random() * 10) + 1,
-          totalCompetitors: 15,
-          strongerAreas: ['技術力', 'サービス多様性'],
-          improvementAreas: ['ブランド認知', 'コンテンツマーケティング']
-        },
-        recommendations: [
-          '専門技術キーワードでのSEO強化',
-          '導入事例の詳細化（業界・規模別）',
-          'FAQ項目の拡充（月次更新推奨）',
-          'サービス説明の構造化データ最適化',
-          '競合他社分析に基づくポジショニング改善'
-        ],
-        lastUpdated: new Date().toISOString()
-      };
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
 
-      setMetrics(mockMetrics);
+      const data = await response.json();
+
+      // APIレスポンスが空またはデータなしの場合
+      if (!data || data.is_fallback || data.summary?.total_analyzed_urls === 0) {
+        setMetrics({
+          overallScore: 0,
+          structuredDataScore: 0,
+          aiAccessScore: 0,
+          seoPerformanceScore: 0,
+          totalAnalyzedUrls: 0,
+          topPerformingUrls: 0,
+          improvementNeededUrls: 0,
+          lastUpdated: null,
+          hasData: false,
+        });
+        return;
+      }
+
+      // content_scoresから平均スコアを計算
+      const contentScores = data.content_scores || [];
+      let avgStructuredData = 0;
+      let avgAiAccess = 0;
+      let avgSeoPerformance = 0;
+
+      if (contentScores.length > 0) {
+        let sumStructured = 0, sumAi = 0, sumSeo = 0;
+        for (const score of contentScores) {
+          sumStructured += score.component_scores?.structured_data || 0;
+          sumAi += score.component_scores?.ai_access || 0;
+          sumSeo += score.component_scores?.seo_performance || 0;
+        }
+        avgStructuredData = Math.round(sumStructured / contentScores.length);
+        avgAiAccess = Math.round(sumAi / contentScores.length);
+        avgSeoPerformance = Math.round(sumSeo / contentScores.length);
+      }
+
+      setMetrics({
+        overallScore: data.overall_score || 0,
+        structuredDataScore: avgStructuredData,
+        aiAccessScore: avgAiAccess,
+        seoPerformanceScore: avgSeoPerformance,
+        totalAnalyzedUrls: data.summary?.total_analyzed_urls || 0,
+        topPerformingUrls: data.summary?.top_performing_urls || 0,
+        improvementNeededUrls: data.summary?.improvement_needed_urls || 0,
+        lastUpdated: data.summary?.last_calculation || null,
+        hasData: true,
+      });
     } catch (error) {
-      logger.error('Failed to generate AI visibility report', { data: error instanceof Error ? error : new Error(String(error)) });
+      logger.error('Failed to fetch AI visibility report', { data: error instanceof Error ? error : new Error(String(error)) });
+      // エラー時は空データを設定
+      setMetrics({
+        overallScore: 0,
+        structuredDataScore: 0,
+        aiAccessScore: 0,
+        seoPerformanceScore: 0,
+        totalAnalyzedUrls: 0,
+        topPerformingUrls: 0,
+        improvementNeededUrls: 0,
+        lastUpdated: null,
+        hasData: false,
+      });
     } finally {
       setLoading(false);
       setGenerating(false);
@@ -77,31 +115,52 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
     return 'text-red-600';
   };
 
-  const getScoreBgColor = (score: number) => {
-    if (score >= 80) return 'bg-green-500';
-    if (score >= 60) return 'bg-blue-500';
-    if (score >= 40) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
 
-  if (loading || !metrics) {
+  if (loading) {
     return (
       <div className={`card p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-6">
           <Brain className="w-6 h-6 text-purple-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">AI Visibilityレポート</h3>
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Visibilityレポート</h3>
         </div>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <RefreshCw className="w-8 h-8 text-neutral-400 animate-spin mx-auto mb-4" />
-              <p className="text-neutral-600">AI分析レポートを生成中...</p>
-              <p className="text-sm text-neutral-500 mt-2">
-                企業情報の構造化データを分析しています
-              </p>
+              <RefreshCw className="w-8 h-8 text-[var(--color-icon-muted)] animate-spin mx-auto mb-4" />
+              <p className="text-[var(--color-text-secondary)]">分析データを取得中...</p>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // データがない場合のUI
+  if (!metrics || !metrics.hasData) {
+    return (
+      <div className={`card p-6 ${className}`}>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Brain className="w-6 h-6 text-purple-600" />
+            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Visibilityレポート</h3>
+          </div>
+          <button
+            onClick={generateReport}
+            disabled={generating}
+            className="btn btn-secondary btn-small"
+          >
+            <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
+            更新
+          </button>
+        </div>
+
+        <div className="text-center py-8">
+          <Eye className="w-12 h-12 text-[var(--color-icon-muted)] mx-auto mb-4" />
+          <p className="text-[var(--color-text-secondary)] mb-2">分析データがまだありません</p>
+          <p className="text-sm text-[var(--color-text-tertiary)]">
+            コンテンツを追加すると、AI Visibility分析が利用可能になります
+          </p>
         </div>
       </div>
     );
@@ -113,117 +172,96 @@ export function AIVisibilityReport({ organization, className = '' }: AIVisibilit
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Brain className="w-6 h-6 text-purple-600" />
-          <h3 className="text-lg font-semibold text-neutral-900">AI Visibilityレポート</h3>
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Visibilityレポート</h3>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={generateReport}
-            disabled={generating}
-            className="btn btn-secondary btn-small"
-          >
-            <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
-            更新
-          </button>
-          <button className="btn btn-primary btn-small">
-            <Download className="w-4 h-4" />
-            PDF出力
-          </button>
+        <button
+          onClick={generateReport}
+          disabled={generating}
+          className="btn btn-secondary btn-small"
+        >
+          <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
+          更新
+        </button>
+      </div>
+
+      {/* 総合スコア */}
+      <div className="mb-6 p-4 rounded-lg bg-purple-50">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium text-purple-900 mb-1">総合スコア</div>
+            <div className={`text-3xl font-bold ${getScoreColor(metrics.overallScore)}`}>
+              {metrics.overallScore}/100
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-sm text-[var(--color-text-tertiary)]">分析URL数</div>
+            <div className="text-lg font-semibold text-[var(--color-text-primary)]">
+              {metrics.totalAnalyzedUrls}件
+            </div>
+          </div>
         </div>
       </div>
 
       {/* メトリクス概要 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 rounded-lg bg-purple-50">
+        <div className="p-4 rounded-lg bg-[var(--aio-surface)]">
           <div className="flex items-center gap-3 mb-2">
             <Brain className="w-5 h-5 text-purple-600" />
-            <span className="text-sm font-medium text-purple-900">AI発見可能性</span>
+            <span className="text-sm font-medium text-[var(--color-text-secondary)]">構造化データ</span>
           </div>
-          <div className={`text-2xl font-bold ${getScoreColor(metrics.aiDiscoverabilityIndex)}`}>
-            {metrics.aiDiscoverabilityIndex}/100
+          <div className={`text-2xl font-bold ${getScoreColor(metrics.structuredDataScore)}`}>
+            {metrics.structuredDataScore}/100
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-[var(--aio-info-surface)]">
+        <div className="p-4 rounded-lg bg-[var(--aio-surface)]">
           <div className="flex items-center gap-3 mb-2">
             <Search className="w-5 h-5 text-[var(--aio-primary)]" />
-            <span className="text-sm font-medium text-[var(--aio-info)]">検索可視性</span>
+            <span className="text-sm font-medium text-[var(--color-text-secondary)]">AIアクセス</span>
           </div>
-          <div className={`text-2xl font-bold ${getScoreColor(metrics.searchVisibilityScore)}`}>
-            {metrics.searchVisibilityScore}/100
+          <div className={`text-2xl font-bold ${getScoreColor(metrics.aiAccessScore)}`}>
+            {metrics.aiAccessScore}/100
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-green-50">
+        <div className="p-4 rounded-lg bg-[var(--aio-surface)]">
           <div className="flex items-center gap-3 mb-2">
-            <Eye className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-medium text-green-900">ブランド言及</span>
+            <TrendingUp className="w-5 h-5 text-green-600" />
+            <span className="text-sm font-medium text-[var(--color-text-secondary)]">SEOパフォーマンス</span>
           </div>
-          <div className="text-2xl font-bold text-green-600">
-            {metrics.brandMentions}件
+          <div className={`text-2xl font-bold ${getScoreColor(metrics.seoPerformanceScore)}`}>
+            {metrics.seoPerformanceScore}/100
           </div>
         </div>
       </div>
 
-      {/* 競合分析 */}
+      {/* サマリー */}
       <div className="mb-6 p-4 rounded-lg bg-slate-50">
-        <h4 className="font-medium text-neutral-900 mb-3 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4" />
-          競合分析
-        </h4>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <div className="text-sm text-neutral-600 mb-1">業界内ランキング</div>
-            <div className="text-lg font-bold text-neutral-900">
-              {metrics.competitorAnalysis.ranking}位 / {metrics.competitorAnalysis.totalCompetitors}社
-            </div>
-          </div>
-          
-          <div>
-            <div className="text-sm text-neutral-600 mb-1">強み領域</div>
-            <div className="flex flex-wrap gap-1">
-              {metrics.competitorAnalysis.strongerAreas.map((area, index) => (
-                <span key={index} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                  {area}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
+        <h4 className="font-medium text-[var(--color-text-primary)] mb-3">パフォーマンスサマリー</h4>
 
-        <div className="mt-3">
-          <div className="text-sm text-neutral-600 mb-1">改善領域</div>
-          <div className="flex flex-wrap gap-1">
-            {metrics.competitorAnalysis.improvementAreas.map((area, index) => (
-              <span key={index} className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                {area}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 推奨アクション */}
-      <div className="mb-6">
-        <h4 className="font-medium text-neutral-900 mb-3">推奨アクション</h4>
-        <div className="space-y-2">
-          {metrics.recommendations.map((rec, index) => (
-            <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-[var(--aio-info-surface)]">
-              <div className="w-6 h-6 rounded-full bg-[var(--aio-muted)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-medium text-[var(--aio-primary)]">{index + 1}</span>
-              </div>
-              <span className="text-sm text-neutral-700">{rec}</span>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="text-sm text-[var(--color-text-tertiary)] mb-1">高パフォーマンス（80点以上）</div>
+            <div className="text-lg font-bold text-green-600">
+              {metrics.topPerformingUrls}件
             </div>
-          ))}
+          </div>
+
+          <div>
+            <div className="text-sm text-[var(--color-text-tertiary)] mb-1">改善が必要（50点以下）</div>
+            <div className="text-lg font-bold text-[var(--aio-warning)]">
+              {metrics.improvementNeededUrls}件
+            </div>
+          </div>
         </div>
       </div>
 
       {/* フッター */}
-      <div className="text-xs text-neutral-500 border-t pt-4">
-        最終更新: {new Date(metrics.lastUpdated).toLocaleString('ja-JP')}
-        <br />
-        ※ このレポートはAI分析に基づく推定値です。実際の検索結果とは異なる場合があります。
-      </div>
+      {metrics.lastUpdated && (
+        <div className="text-xs text-[var(--color-text-tertiary)] border-t pt-4">
+          最終更新: {new Date(metrics.lastUpdated).toLocaleString('ja-JP')}
+        </div>
+      )}
     </div>
   );
 }

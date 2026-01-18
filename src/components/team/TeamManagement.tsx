@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Users, UserPlus, Shield, Crown, Edit3, Eye, Trash2, Mail } from 'lucide-react';
+import { createBrowserClient } from '@supabase/ssr';
 import type { UserRole } from '@/types/utils/database';
 import { logger } from '@/lib/utils/logger';
 
 interface TeamMember {
   id: string;
+  user_id: string;
   email: string;
   full_name?: string;
   role: UserRole;
@@ -25,97 +27,105 @@ interface TeamManagementProps {
 export function TeamManagement({ organizationId, currentUserRole, className = '' }: TeamManagementProps) {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<UserRole>('viewer');
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchTeamMembers();
-  }, [organizationId]);
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-  const fetchTeamMembers = async () => {
+  const fetchTeamMembers = useCallback(async () => {
     try {
       setLoading(true);
-      // モック実装 - 実際の実装ではSupabaseからチームメンバーを取得
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      setError(null);
 
-      const mockMembers: TeamMember[] = [
-        {
-          id: '1',
-          email: 'admin@example.com',
-          full_name: '管理者 太郎',
-          role: 'admin',
-          avatar_url: undefined,
-          created_at: '2024-01-01T00:00:00Z',
-          last_active: '2024-01-15T10:30:00Z',
-          status: 'active'
-        },
-        {
-          id: '2',
-          email: 'editor@example.com',
-          full_name: '編集者 花子',
-          role: 'editor',
-          avatar_url: undefined,
-          created_at: '2024-01-05T00:00:00Z',
-          last_active: '2024-01-14T16:45:00Z',
-          status: 'active'
-        },
-        {
-          id: '3',
-          email: 'viewer@example.com',
-          full_name: '閲覧者 次郎',
-          role: 'viewer',
-          avatar_url: undefined,
-          created_at: '2024-01-10T00:00:00Z',
-          last_active: '2024-01-12T09:15:00Z',
-          status: 'active'
-        }
-      ];
+      // 現在のユーザーIDを取得
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
 
-      setMembers(mockMembers);
-    } catch (error) {
-      logger.error('Failed to fetch team members', { data: error instanceof Error ? error : new Error(String(error)) });
+      // organization_members と profiles を JOIN して取得
+      const { data: membersData, error: membersError } = await supabase
+        .from('organization_members')
+        .select(`
+          id,
+          user_id,
+          role,
+          created_at,
+          profiles (
+            email,
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('organization_id', organizationId);
+
+      if (membersError) {
+        throw membersError;
+      }
+
+      // データを TeamMember 形式に変換
+      const teamMembers: TeamMember[] = (membersData || []).map((member: any) => ({
+        id: member.id,
+        user_id: member.user_id,
+        email: member.profiles?.email || '',
+        full_name: member.profiles?.full_name || undefined,
+        role: member.role as UserRole,
+        avatar_url: member.profiles?.avatar_url || undefined,
+        created_at: member.created_at,
+        last_active: undefined, // 実際の last_active は別テーブルで管理
+        status: 'active' as const,
+      }));
+
+      setMembers(teamMembers);
+    } catch (err) {
+      logger.error('Failed to fetch team members', { data: err instanceof Error ? err : new Error(String(err)) });
+      setError('チームメンバーの取得に失敗しました');
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId, supabase]);
+
+  useEffect(() => {
+    fetchTeamMembers();
+  }, [fetchTeamMembers]);
 
   const handleInviteMember = async () => {
     if (!inviteEmail) return;
 
     try {
-      // モック実装 - 実際の実装ではSupabaseでメンバー招待
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const newMember: TeamMember = {
-        id: Date.now().toString(),
-        email: inviteEmail,
-        full_name: undefined,
-        role: inviteRole,
-        avatar_url: undefined,
-        created_at: new Date().toISOString(),
-        last_active: undefined,
-        status: 'pending'
-      };
-
-      setMembers([...members, newMember]);
+      // TODO: 実際のメンバー招待機能を実装
+      // 現状は招待機能が未実装のため、UIのみ表示
+      alert('メンバー招待機能は現在開発中です');
       setInviteEmail('');
       setShowInviteForm(false);
-    } catch (error) {
-      logger.error('Failed to invite member', { data: error instanceof Error ? error : new Error(String(error)) });
+    } catch (err) {
+      logger.error('Failed to invite member', { data: err instanceof Error ? err : new Error(String(err)) });
     }
   };
 
   const handleRoleChange = async (memberId: string, newRole: UserRole) => {
     try {
-      // モック実装 - 実際の実装ではSupabaseでロール更新
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const { error: updateError } = await supabase
+        .from('organization_members')
+        .update({ role: newRole })
+        .eq('id', memberId);
 
-      setMembers(members.map(member => 
+      if (updateError) {
+        throw updateError;
+      }
+
+      setMembers(members.map(member =>
         member.id === memberId ? { ...member, role: newRole } : member
       ));
-    } catch (error) {
-      logger.error('Failed to update member role', { data: error instanceof Error ? error : new Error(String(error)) });
+    } catch (err) {
+      logger.error('Failed to update member role', { data: err instanceof Error ? err : new Error(String(err)) });
+      alert('ロールの更新に失敗しました');
     }
   };
 
@@ -123,12 +133,19 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
     if (!confirm('このメンバーを削除しますか？')) return;
 
     try {
-      // モック実装 - 実際の実装ではSupabaseでメンバー削除
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const { error: deleteError } = await supabase
+        .from('organization_members')
+        .delete()
+        .eq('id', memberId);
+
+      if (deleteError) {
+        throw deleteError;
+      }
 
       setMembers(members.filter(member => member.id !== memberId));
-    } catch (error) {
-      logger.error('Failed to remove member', { data: error instanceof Error ? error : new Error(String(error)) });
+    } catch (err) {
+      logger.error('Failed to remove member', { data: err instanceof Error ? err : new Error(String(err)) });
+      alert('メンバーの削除に失敗しました');
     }
   };
 
@@ -174,10 +191,30 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
       <div className={`card p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-6">
           <Users className="w-6 h-6 text-[var(--aio-primary)]" />
-          <h3 className="text-lg font-semibold text-neutral-900">チーム管理</h3>
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">チーム管理</h3>
         </div>
         <div className="text-center py-8">
-          <div className="text-neutral-600">読み込み中...</div>
+          <div className="text-[var(--color-text-secondary)]">読み込み中...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`card p-6 ${className}`}>
+        <div className="flex items-center gap-3 mb-6">
+          <Users className="w-6 h-6 text-[var(--aio-primary)]" />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">チーム管理</h3>
+        </div>
+        <div className="text-center py-8">
+          <div className="text-[var(--aio-danger)]">{error}</div>
+          <button
+            onClick={fetchTeamMembers}
+            className="mt-4 btn btn-secondary btn-small"
+          >
+            再試行
+          </button>
         </div>
       </div>
     );
@@ -304,7 +341,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
                     value={member.role}
                     onChange={(e) => handleRoleChange(member.id, e.target.value as UserRole)}
                     className="text-sm border border-gray-300 rounded px-2 py-1"
-                    disabled={member.id === '1'} // 自分自身の権限は変更不可（仮実装）
+                    disabled={member.user_id === currentUserId} // 自分自身の権限は変更不可
                   >
                     <option value="viewer">閲覧者</option>
                     <option value="editor">編集者</option>
@@ -316,7 +353,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
               </div>
 
               {/* アクション */}
-              {canManageMembers && member.id !== '1' && (
+              {canManageMembers && member.user_id !== currentUserId && (
                 <button
                   onClick={() => handleRemoveMember(member.id)}
                   className="p-1 text-gray-400 hover:text-red-500 transition-colors"

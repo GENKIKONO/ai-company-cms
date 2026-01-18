@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Brain, TrendingUp, Users, Eye, AlertCircle, Crown } from 'lucide-react';
+import { TrendingUp, Eye, AlertCircle, Crown } from 'lucide-react';
 import StructuredDataScore from '@/components/analytics/StructuredDataScore';
 import AIVisibilityReport from '@/components/analytics/AIVisibilityReport';
 import TeamManagement from '@/components/team/TeamManagement';
@@ -55,15 +55,13 @@ interface AnalyticsDashboardProps {
 }
 
 interface DashboardStats {
-  structuredScore: number;
-  aiVisibilityIndex: number;
   contentCount: {
     services: number;
     faqs: number;
     caseStudies: number;
   };
   recentActivity: {
-    type: 'service' | 'faq' | 'case_study';
+    type: 'service' | 'faq' | 'case_study' | 'post';
     title: string;
     date: string;
   }[];
@@ -104,25 +102,77 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
           }
         }
 
-        // Mock analytics data - in real implementation, fetch from API
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const mockStats: DashboardStats = {
-          structuredScore: Math.floor(Math.random() * 40) + 60,
-          aiVisibilityIndex: Math.floor(Math.random() * 30) + 70,
-          contentCount: {
-            services: organization.services?.length || 0,
-            faqs: organization.faqs?.length || 0,
-            caseStudies: organization.case_studies?.length || 0,
-          },
-          recentActivity: [
-            { type: 'service', title: 'Webアプリケーション開発', date: '2024-01-15' },
-            { type: 'faq', title: 'プロジェクトの進行について', date: '2024-01-14' },
-            { type: 'case_study', title: 'EC サイトリニューアル事例', date: '2024-01-13' }
-          ]
+        // /api/dashboard/stats から実際のデータを取得
+        const statsRes = await fetch('/api/dashboard/stats');
+        let contentCounts = {
+          services: 0,
+          faqs: 0,
+          caseStudies: 0,
         };
 
-        setStats(mockStats);
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          if (statsData.ok && statsData.counts) {
+            contentCounts = {
+              services: statsData.counts.services?.count || 0,
+              faqs: statsData.counts.faqs?.count || 0,
+              caseStudies: statsData.counts.case_studies?.count || 0,
+            };
+          }
+        }
+
+        // 最近の更新を取得（各コンテンツから最新3件）
+        const recentActivity: DashboardStats['recentActivity'] = [];
+        try {
+          const [servicesRes, postsRes, caseStudiesRes] = await Promise.all([
+            fetch('/api/my/services?limit=3'),
+            fetch('/api/my/posts?limit=3'),
+            fetch('/api/my/case-studies?limit=3'),
+          ]);
+
+          if (servicesRes.ok) {
+            const data = await servicesRes.json();
+            (data.data || []).slice(0, 2).forEach((item: { title?: string; name?: string; updated_at?: string }) => {
+              recentActivity.push({
+                type: 'service',
+                title: item.title || item.name || '無題',
+                date: item.updated_at || new Date().toISOString(),
+              });
+            });
+          }
+
+          if (postsRes.ok) {
+            const data = await postsRes.json();
+            (data.data || []).slice(0, 2).forEach((item: { title?: string; updated_at?: string }) => {
+              recentActivity.push({
+                type: 'post',
+                title: item.title || '無題',
+                date: item.updated_at || new Date().toISOString(),
+              });
+            });
+          }
+
+          if (caseStudiesRes.ok) {
+            const data = await caseStudiesRes.json();
+            (data.data || []).slice(0, 2).forEach((item: { title?: string; updated_at?: string }) => {
+              recentActivity.push({
+                type: 'case_study',
+                title: item.title || '無題',
+                date: item.updated_at || new Date().toISOString(),
+              });
+            });
+          }
+
+          // 日付順にソートして最新5件
+          recentActivity.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        } catch (activityErr) {
+          logger.warn('Failed to fetch recent activity', { error: activityErr });
+        }
+
+        setStats({
+          contentCount: contentCounts,
+          recentActivity: recentActivity.slice(0, 5),
+        });
       } catch (error) {
         logger.error('Failed to fetch dashboard data', { data: error instanceof Error ? error : new Error(String(error)) });
       } finally {
@@ -231,15 +281,6 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
           </div>
         </div>
 
-        {hasStructuredScoreFeature && (
-          <div className="card p-4 text-center">
-            <div className="text-2xl font-bold text-[var(--aio-pending)] mb-1">
-              {stats?.structuredScore || 0}
-            </div>
-            <div className="text-sm text-[var(--color-text-secondary)]">構造化スコア</div>
-            <div className="text-xs text-[var(--color-text-tertiary)] mt-1">/ 100</div>
-          </div>
-        )}
       </div>
 
       {/* Main Analytics */}
@@ -267,7 +308,8 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
                 <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-[var(--aio-surface)]">
                   <div className={`w-2 h-2 rounded-full ${
                     activity.type === 'service' ? 'bg-[var(--aio-primary)]' :
-                    activity.type === 'faq' ? 'bg-[var(--status-success)]' : 'bg-[var(--aio-purple)]'
+                    activity.type === 'post' ? 'bg-[var(--aio-purple)]' :
+                    activity.type === 'faq' ? 'bg-[var(--status-success)]' : 'bg-[var(--aio-warning)]'
                   }`} />
                   <div className="flex-1">
                     <div className="font-medium text-sm text-[var(--color-text-primary)]">
@@ -279,6 +321,7 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
                   </div>
                   <div className="text-xs text-[var(--color-text-tertiary)] capitalize">
                     {activity.type === 'service' ? 'サービス' :
+                     activity.type === 'post' ? '記事' :
                      activity.type === 'faq' ? 'FAQ' : '導入事例'}
                   </div>
                 </div>
