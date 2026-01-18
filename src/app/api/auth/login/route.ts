@@ -190,20 +190,56 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log('[api/auth/login] Login successful', {
+    // ========================================
+    // 診断: 実際の Set-Cookie ヘッダーを取得
+    // ========================================
+    // response.headers.getSetCookie() で実際に返る Set-Cookie を取得
+    const actualSetCookies = response.headers.getSetCookie?.() || [];
+    const actualSetCookieNames = actualSetCookies.map(sc => {
+      const match = sc.match(/^([^=]+)=/);
+      return match ? match[1] : 'unknown';
+    });
+
+    // 各 Cookie の属性をパース（診断用）
+    const cookieAttributes = actualSetCookies.map(sc => {
+      const parts = sc.split(';').map(p => p.trim());
+      const nameValue = parts[0];
+      const name = nameValue.split('=')[0];
+      const attrs: Record<string, string> = { name };
+      parts.slice(1).forEach(attr => {
+        const [key, val] = attr.split('=');
+        attrs[key.toLowerCase()] = val || 'true';
+      });
+      return attrs;
+    });
+
+    console.log('[api/auth/login] === DIAGNOSTIC: Set-Cookie Analysis ===', {
       requestId,
       userId: data.user?.id,
-      finalCookieNames,
+      supabaseSetAllNames: supabaseSetCookieNames,
+      responseCookiesGetAllNames: finalCookieNames,
+      actualSetCookieHeaders: actualSetCookieNames,
+      cookieAttributes: cookieAttributes.map(a => ({
+        name: a.name,
+        path: a.path,
+        secure: a.secure,
+        samesite: a.samesite,
+        domain: a.domain,
+        httponly: a.httponly,
+        'max-age': a['max-age'],
+      })),
     });
 
     // デバッグヘッダを付与（診断用）
-    response.headers.set('x-auth-request-id', requestId);
-    response.headers.set('x-auth-set-cookie-names', supabaseSetCookieNames.join(','));
-    response.headers.set('x-auth-cookie-names', finalCookieNames.join(','));
-    response.headers.set('x-auth-has-refresh-token', String(finalHasRefreshToken));
-    response.headers.set('x-auth-supabase-ref', projectRef);
-    response.headers.set('x-auth-host', host);
-    response.headers.set('x-auth-proto', proto);
+    response.headers.set('x-debug-sha', sha);
+    response.headers.set('x-debug-request-id', requestId);
+    response.headers.set('x-debug-set-cookie-names', actualSetCookieNames.join(','));
+    response.headers.set('x-debug-supabase-setall-names', supabaseSetCookieNames.join(','));
+    response.headers.set('x-debug-response-cookies-names', finalCookieNames.join(','));
+    response.headers.set('x-debug-has-auth-token', String(actualSetCookieNames.some(n => n.includes('auth-token'))));
+    response.headers.set('x-debug-has-refresh-token', String(finalHasRefreshToken));
+    response.headers.set('x-debug-host', host);
+    response.headers.set('x-debug-proto', proto);
 
     return response;
 
