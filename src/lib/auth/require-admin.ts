@@ -6,8 +6,9 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { logger } from '@/lib/utils/logger';
+import { checkIPAllowlist } from '@/lib/security/ip-allowlist';
 
 export interface AdminCheckResult {
   isAdmin: boolean;
@@ -100,8 +101,32 @@ export async function checkAdminAuth(): Promise<AdminCheckResult> {
 /**
  * Route Handler用のガード関数
  * 管理者でない場合は適切なエラーレスポンスを返す
+ *
+ * @param request - オプション。IPアローリストチェック用
  */
-export async function requireAdmin(): Promise<AdminAuthResult> {
+export async function requireAdmin(request?: NextRequest | Request): Promise<AdminAuthResult> {
+  // IPアローリストチェック（有効な場合のみ）
+  if (request) {
+    const ipCheck = checkIPAllowlist(request);
+    if (!ipCheck.allowed) {
+      logger.warn('[requireAdmin] IP not in allowlist', {
+        clientIP: ipCheck.clientIP,
+        reason: ipCheck.reason
+      });
+      return {
+        authorized: false,
+        response: NextResponse.json(
+          {
+            success: false,
+            error_code: 'FORBIDDEN' as const,
+            message: 'Access denied',
+          },
+          { status: 403 }
+        ),
+      };
+    }
+  }
+
   const result = await checkAdminAuth();
 
   if (!result.isAdmin || !result.userId) {

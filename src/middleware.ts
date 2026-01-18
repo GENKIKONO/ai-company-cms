@@ -24,6 +24,53 @@ const DEPLOY_SHA = process.env.VERCEL_GIT_COMMIT_SHA ||
                    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
                    'unknown';
 
+// =====================================================
+// セキュリティヘッダー設定（世界商用レベル）
+// =====================================================
+function setSecurityHeaders(response: NextResponse): void {
+  // XSS対策
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+
+  // クリックジャッキング対策
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+
+  // HTTPS強制（本番環境のみ）
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  }
+
+  // リファラーポリシー
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  // 権限ポリシー（不要な機能を無効化）
+  response.headers.set('Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+  );
+
+  // Content Security Policy
+  const cspDirectives = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://vercel.live https://*.vercel-scripts.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "img-src 'self' data: blob: https: http:",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://vercel.live https://*.vercel-scripts.com https://*.openai.com",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://vercel.live",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'self'",
+    "upgrade-insecure-requests",
+  ];
+  response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
+
+  // キャッシュ制御（セキュリティ関連ページ）
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  response.headers.set('Pragma', 'no-cache');
+  response.headers.set('Expires', '0');
+}
+
 // Supabase プロジェクト参照を環境変数から取得
 function getProjectRef(): string {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -194,9 +241,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // =====================================================
-  // 6. その他（公開ページ等）
-  //    → Middleware は何もしない
+  // 6. セキュリティヘッダー追加
   // =====================================================
+  setSecurityHeaders(response);
   response.headers.set('x-request-id', requestId);
   return response;
 }
