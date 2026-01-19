@@ -10,6 +10,7 @@ import { logger } from '@/lib/utils/logger';
 export const revalidate = 600; // 10分間隔での再生成
 
 // P4-2: generateStaticParams適用（公開組織サービス一覧の事前生成）
+// 🔒 VIEW経由でSST強制（世界商用レベル）
 export async function generateStaticParams() {
   try {
     const { createClient } = await import('@supabase/supabase-js');
@@ -24,14 +25,14 @@ export async function generateStaticParams() {
       }
     );
 
-    // サービスを持つ公開中組織のslugsを取得
+    // 🔒 VIEW経由で公開中組織のslugsを取得（非公開組織は絶対に含まれない）
     const { data: orgs } = await supabase
-      .from('organizations')
+      .from('v_organizations_public')
       .select('slug')
       .eq('status', 'published')
       .eq('is_published', true)
       .eq('show_services', true)
-      .limit(100); // サービスページの制限
+      .limit(100);
 
     if (!orgs) return [];
 

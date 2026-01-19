@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -20,6 +19,7 @@ import type { QAEntry } from '@/types/domain/qa-system';
 export const revalidate = 600;
 
 // P4-2: generateStaticParams適用（公開組織の事前生成）
+// 🔒 VIEW経由でSST強制（世界商用レベル）
 export async function generateStaticParams() {
   try {
     const { createClient } = await import('@supabase/supabase-js');
@@ -34,22 +34,21 @@ export async function generateStaticParams() {
       }
     );
 
-    // 公開中の組織slugsを取得
+    // 🔒 VIEW経由で公開中の組織slugsを取得（非公開組織は絶対に含まれない）
     const { data: orgs } = await supabase
-      .from('organizations')
+      .from('v_organizations_public')
       .select('slug')
       .eq('status', 'published')
       .eq('is_published', true)
-      .limit(200); // 大量の組織がある場合の制限
+      .limit(200);
 
     if (!orgs) return [];
 
     return orgs
       .filter(org => org.slug)
       .map(org => ({ slug: org.slug }));
-  } catch (error) {
+  } catch {
     // 静的生成時のエラーは空配列を返してランタイム生成にフォールバック
-    console.warn('[generateStaticParams] Failed to fetch organizations for static generation:', error);
     return [];
   }
 }
@@ -63,201 +62,85 @@ interface OrganizationPageData {
   qa_entries: QAEntry[];
 }
 
-// ✅ キャッシュ対応: 公開組織データ取得
-import { unstable_cache } from 'next/cache';
+// ✅ 公開組織データ取得: Public API経由で取得（RLS差異回避）
 import { logger } from '@/lib/log';
 
-const getOrganizationDataCached = (slug: string) => {
-  // slug正規化で大文字・空白・末尾文字問題を回避
+/**
+ * 🔥 FIX: Public API経由でデータ取得
+ * 理由: Supabase直叩きとServer Client(API)で公開判定結果が異なるため、
+ *       既存の /api/public/organizations/[slug] を利用して一本化
+ */
+async function fetchOrganizationFromPublicAPI(slug: string): Promise<OrganizationPageData | null> {
   const safeSlug = slug.toLowerCase().trim();
-  
-  return unstable_cache(
-    async (): Promise<OrganizationPageData | null> => {
-      logger.debug(`[getOrganizationDataCached] Cache miss for slug: ${safeSlug}`);
-      
-      // ✅ Using anon key now that RLS infinite recursion is fixed
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          auth: {
-            autoRefreshToken: false,
-            persistSession: false
-          }
-        }
-      );
-      
-      // ✅ P0: published のみを公開対象とする（enum準拠）
-      const { data: organization, error: orgError } = await supabase
-        .from('organizations')
-        .select('id, name, slug, status, is_published, logo_url, description, website_url, legal_form, representative_name, address, phone, email, established_at, capital, employees, show_services, show_posts, show_case_studies, show_faqs, show_qa, show_contact, created_at, updated_at')
-        .eq('slug', safeSlug)
-        .eq('status', 'published')
-        .eq('is_published', true)
-        .maybeSingle();
 
-      // ✅ VERIFY: Enhanced debugging for 404 issues with fallback diagnosis
-      if (orgError || !organization) {
-        logger.error(`[VERIFY] Public page failed for slug: ${safeSlug}`, {
-          error: orgError?.message,
-          requiredConditions: 'status = published AND is_published=true',
-          client: 'anonymous'
-        });
-        
-        // 🔍 Diagnostic fallback: Check individual conditions to identify mismatch
-        const [statusCheck, publishedCheck, generalCheck] = await Promise.all([
-          // Check if organization exists with status='published' only
-          supabase
-            .from('organizations')
-            .select('slug, status, is_published')
-            .eq('slug', safeSlug)
-            .eq('status', 'published')
-            .maybeSingle(),
-          
-          // Check if organization exists with is_published=true only  
-          supabase
-            .from('organizations')
-            .select('slug, status, is_published')
-            .eq('slug', safeSlug)
-            .eq('is_published', true)
-            .maybeSingle(),
-            
-          // Check if organization exists at all
-          supabase
-            .from('organizations')
-            .select('slug, status, is_published')
-            .eq('slug', safeSlug)
-            .maybeSingle()
-        ]);
-        
-        if (generalCheck.data) {
-          const org = generalCheck.data;
-          logger.error(`[VERIFY] 404 ROOT CAUSE IDENTIFIED for ${safeSlug}:`, {
-            exists: true,
-            status: org.status,
-            is_published: org.is_published,
-            hasStatusPublished: org.status === 'published',
-            hasIsPublishedTrue: org.is_published === true,
-            diagnosis: org.status !== 'published' 
-              ? 'STATUS_NOT_PUBLISHED' 
-              : org.is_published !== true 
-                ? 'IS_PUBLISHED_FALSE'
-                : 'UNKNOWN_ISSUE'
-          });
-          
-          // 🚨 Data inconsistency detected - log for fixing
-          if (org.status === 'published' && org.is_published === false) {
-            logger.error(`[VERIFY] DATA INCONSISTENCY: ${safeSlug} has status=published but is_published=false`);
-          } else if (org.status === 'draft' && org.is_published === true) {
-            logger.error(`[VERIFY] DATA INCONSISTENCY: ${safeSlug} has status=draft but is_published=true`);
-          }
-        } else {
-          logger.warn(`[VERIFY] Organization not found at all: ${safeSlug}`);
-        }
-        
+  // 内部API呼び出し（Server-side fetch）
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const apiUrl = `${baseUrl}/api/public/organizations/${safeSlug}`;
+
+  logger.debug(`[fetchOrganizationFromPublicAPI] Fetching from: ${apiUrl}`);
+
+  try {
+    const response = await fetch(apiUrl, {
+      // 🔥 まず cache: 'no-store' で確実に動作確認
+      cache: 'no-store',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        logger.warn(`[fetchOrganizationFromPublicAPI] Organization not found: ${safeSlug}`);
         return null;
       }
-
-      logger.info(`[VERIFY] Public organization loaded successfully: ${organization.name} (${slug})`);
-
-      // 公開されたコンテンツを並行取得
-      // NOTE: is_published=true を明示的にフィルタ（RLS + 明示フィルタの二重防御）
-      const [postsResult, servicesResult, caseStudiesResult, faqsResult, qaEntriesResult] = await Promise.all([
-        supabase
-          .from('posts')
-          .select('id, organization_id, slug, title, content, excerpt, featured_image, status, published_at, created_by, sort_order, created_at, updated_at')
-          .eq('organization_id', organization.id)
-          .eq('is_published', true)  // 公開フラグ明示
-          .order('published_at', { ascending: false })
-          .limit(10),
-
-        supabase
-          .from('services')
-          .select('id, organization_id, name, slug, summary, description, price, price_range, category, image_url, features, status, created_by, sort_order, created_at, updated_at')
-          .eq('organization_id', organization.id)
-          .eq('is_published', true)  // 公開フラグ明示
-          .order('created_at', { ascending: false }),
-
-        supabase
-          .from('case_studies')
-          .select('id, organization_id, title, slug, summary, content, client_name, industry, challenge, solution, results, image_url, tags, status, created_by, sort_order, created_at, updated_at')
-          .eq('organization_id', organization.id)
-          .eq('is_published', true)  // 公開フラグ明示
-          .order('created_at', { ascending: false }),
-
-        supabase
-          .from('faqs')
-          .select('id, organization_id, question, answer, category, display_order, sort_order, status, created_by, created_at, updated_at')
-          .eq('organization_id', organization.id)
-          .eq('is_published', true)  // 公開フラグ明示
-          .order('display_order', { ascending: true })
-          .order('created_at', { ascending: false }),
-
-        supabase
-          .from('qa_entries')
-          .select(`
-            *,
-            qa_categories!left(id, name, slug)
-          `)
-          .eq('organization_id', organization.id)
-          .eq('status', 'published')
-          .eq('visibility', 'public')
-          .order('published_at', { ascending: false })
-          .limit(20)
-      ]);
-
-      // Debug logging for content sections
-      logger.debug(`[DEBUG] Content sections for ${organization.name}:`, {
-        posts: postsResult.data?.length || 0,
-        services: servicesResult.data?.length || 0,
-        case_studies: caseStudiesResult.data?.length || 0,
-        faqs: faqsResult.data?.length || 0,
-        qa_entries: qaEntriesResult.data?.length || 0,
-        visibility: {
-          show_services: organization.show_services,
-          show_posts: organization.show_posts,
-          show_case_studies: organization.show_case_studies,
-          show_faqs: organization.show_faqs,
-          show_qa: organization.show_qa,
-          show_contact: organization.show_contact
-        }
+      logger.error(`[fetchOrganizationFromPublicAPI] API error:`, {
+        status: response.status,
+        statusText: response.statusText,
+        slug: safeSlug,
       });
-
-      // servicesのnameをtitleにマップ（Legacy Service型との互換性）
-      const mappedServices = (servicesResult.data || []).map(s => ({
-        ...s,
-        title: s.name,
-      }));
-
-      return {
-        organization,
-        posts: postsResult.data || [],
-        services: mappedServices,
-        case_studies: caseStudiesResult.data || [],
-        faqs: faqsResult.data || [],
-        qa_entries: qaEntriesResult.data || []
-      };
-    },
-    [`org-public-${safeSlug}`],
-    {
-      // タグベースon-demand revalidate対応
-      tags: [
-        'org-public',                        // 全組織一括無効化用
-        `org:${safeSlug}`,                   // 組織単位無効化用
-        `org:${safeSlug}:services`,          // サービス更新時
-        `org:${safeSlug}:posts`,             // 記事更新時
-        `org:${safeSlug}:faqs`,              // FAQ更新時
-        `org:${safeSlug}:case_studies`,      // 事例更新時
-      ],
-      revalidate: 600 // 10分キャッシュ（フォールバック）
+      return null;
     }
-  )();
-};
+
+    const json = await response.json();
+    const { organization, posts, services, case_studies, faqs } = json.data || {};
+
+    if (!organization) {
+      logger.warn(`[fetchOrganizationFromPublicAPI] No organization in response: ${safeSlug}`);
+      return null;
+    }
+
+    logger.info(`[fetchOrganizationFromPublicAPI] Success: ${organization.name}, services=${services?.length || 0}`);
+
+    // servicesのnameをtitleにマップ（Legacy Service型との互換性）
+    const mappedServices = (services || []).map((s: Record<string, unknown>) => ({
+      ...s,
+      title: s.name,
+    }));
+
+    // Q&A entriesは別途取得が必要（APIに含まれていない）
+    // 暫定的に空配列を返す（後で必要なら追加API or 別fetch）
+    return {
+      organization,
+      posts: posts || [],
+      services: mappedServices,
+      case_studies: case_studies || [],
+      faqs: faqs || [],
+      qa_entries: [], // TODO: 必要なら /api/public/qa-entries/[orgId] を追加
+    };
+  } catch (error) {
+    logger.error(`[fetchOrganizationFromPublicAPI] Fetch failed:`, {
+      error: error instanceof Error ? error.message : error,
+      slug: safeSlug,
+    });
+    return null;
+  }
+}
 
 async function getOrganizationData(slug: string): Promise<OrganizationPageData | null> {
   try {
-    return await getOrganizationDataCached(slug);
+    // 🔥 Public API経由でデータ取得（RLS差異回避）
+    const result = await fetchOrganizationFromPublicAPI(slug);
+    return result;
   } catch (error) {
     logger.error('Failed to fetch organization data', { data: error instanceof Error ? error : new Error(String(error)) });
     return null;

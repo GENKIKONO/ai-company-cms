@@ -16,9 +16,9 @@ export async function GET(
     const { slug } = await context.params;
     const supabase = await createClient();
     
-    // 企業情報を取得
+    // 企業情報を取得（VIEW経由 - SST強制）
     const { data: organization, error: orgError } = await supabase
-      .from('organizations')
+      .from('v_organizations_public')
       .select('id, name, slug, description, website_url, logo_url, created_at, updated_at')
       .eq('slug', slug)
       .eq('status', 'published')
@@ -28,17 +28,20 @@ export async function GET(
       return new NextResponse('Organization not found', { status: 404 });
     }
 
-    // 企業の公開済み記事を最新10件取得
+    // 企業の公開済み記事を最新10件取得（VIEW経由 - SST強制）
+    // 🔒 select('*') ではなく必要カラムのみ取得（セキュリティ）
     const { data: posts, error: postsError } = await supabase
-      .from('posts')
+      .from('v_posts_public')
       .select(`
-        *,
-        organizations:organization_id (
-          name,
-          slug,
-          url,
-          logo_url
-        )
+        id,
+        title,
+        slug,
+        content_markdown,
+        content_html,
+        status,
+        published_at,
+        created_at,
+        updated_at
       `)
       .eq('organization_id', organization.id)
       .eq('status', 'published')
@@ -53,14 +56,26 @@ export async function GET(
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
     const orgUrl = `${baseUrl}/o/${slug}`;
-    
+
+    // PostWithOrg形式に変換（generateRssの期待する型）
+    const postsWithOrg = (posts || []).map(post => ({
+      id: post.id,
+      title: post.title || '',
+      slug: post.slug || '',
+      content: post.content_html || post.content_markdown || '',
+      pub_date: post.published_at || '',
+      org_slug: organization.slug,
+      org_name: organization.name,
+      org_url: organization.website_url || null,
+    }));
+
     // RSS 2.0 フィード生成
     const rssXml = generateRss({
       title: `${organization.name} - 最新記事`,
       description: organization.description || `${organization.name}の最新記事とお知らせ`,
       link: orgUrl,
       language: 'ja',
-      posts: posts || [],
+      posts: postsWithOrg,
       baseUrl,
       organizationSlug: slug
     });
