@@ -1,6 +1,25 @@
 # CLAUDE.MD
 
+## 🔴 最重要: 変更前の必須確認
+
+**Claude Code は任意のコード変更を行う前に、必ず以下を確認すること：**
+
+### [ARCHITECTURE_INDEX.md](ARCHITECTURE_INDEX.md) - マスターインデックス
+
+このファイルには「何を変更するとき、何を確認すべきか」が全て記載されています。
+- §1: 変更対象別チェックリスト
+- §2: PageShell選択ルール
+- §3: 認証パターン
+- §4: 機能ゲート
+- §5: UIコンポーネント
+- §9: 検証コマンド一覧
+
+**変更前に必ず該当セクションを確認し、検証コマンドを実行すること。**
+
+---
+
 ## プロジェクト概要
+- **[アーキテクチャインデックス](ARCHITECTURE_INDEX.md)** 🔴 ← **変更前に必ず確認**
 - [要件定義（ビジネス視点）](docs/requirements_business.md)
 - [要件定義（システム/技術視点）](docs/requirements_system.md)
 - [実装ガイドライン](docs/implementation.md)
@@ -82,3 +101,50 @@ UI変更・コンポーネント追加時は **[AI実装ガード](docs/ai-imple
 - 日付は実際の開発日または過去の日付のみを使用する
 
 このルールにより、LLMが将来的に勝手に虚偽の情報を生成することを防ぎます。
+
+---
+
+## 🔒 アーキテクチャ整合性チェック
+
+### 変更前の必須手順
+
+1. **ARCHITECTURE_INDEX.md を確認**
+   - 変更対象ファイルに該当するセクションを特定
+   - 必須確認ドキュメントを読む
+   - 禁止事項を確認
+
+2. **検証コマンドを実行**
+   ```bash
+   # 一括検証（推奨）
+   npm run check:integrity
+
+   # 個別検証
+   npm run typecheck          # 型チェック
+   npm run check:architecture # アーキテクチャ違反
+   npm run check:tailwind     # UI違反
+   ```
+
+3. **変更後の確認**
+   - 同じ検証コマンドを再実行
+   - 新しいエラーが出ていないことを確認
+
+### ファイル種別ごとの参照先
+
+| 変更ファイル | 参照先 |
+|-------------|--------|
+| `src/app/dashboard/**` | ARCHITECTURE_INDEX.md §2.1, §3.1 |
+| `src/app/admin/**` | ARCHITECTURE_INDEX.md §2.2, §3.2 |
+| `src/app/api/**` | ARCHITECTURE_INDEX.md §3.3, §4.2 |
+| `src/components/**` | ARCHITECTURE_INDEX.md §5, DESIGN_SYSTEM.md |
+| `src/lib/featureGate.ts` | ARCHITECTURE_INDEX.md §4.1, §8.1 |
+| `supabase/migrations/**` | ARCHITECTURE_INDEX.md §4.2, §6.2 |
+
+### CI必須チェック
+
+PRマージ前に以下が自動実行されます：
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+- `npm run check:architecture`
+
+**これらが通らない変更はマージできません。**
