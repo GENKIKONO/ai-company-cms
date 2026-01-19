@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
-import { requireAdminPermission } from '@/lib/auth/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
+import { handleApiError, handleDatabaseError } from '@/lib/api/error-responses';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  try {
-    await requireAdminPermission();
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
+  try {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -16,19 +21,11 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase.rpc('get_billing_summary');
     if (error) {
-      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json(data);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Authentication required') {
-        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-      }
-      if (error.message === 'Admin permission required') {
-        return NextResponse.json({ error: 'Admin permission required' }, { status: 403 });
-      }
-    }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }

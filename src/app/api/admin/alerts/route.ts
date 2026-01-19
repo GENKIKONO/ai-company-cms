@@ -8,12 +8,17 @@
  * DB Schema:
  * public.alert_rules: id, name, description, is_active, severity, channel[], condition jsonb
  * public.alerts: id, rule_id, status, payload jsonb, created_at
+ *
+ * ⚠️ Requires site_admin authentication.
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError, handleZodError } from '@/lib/api/error-responses';
 import { z } from 'zod';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -35,14 +40,15 @@ const createAlertSchema = z.object({
 
 // GET - アラートまたはルール一覧取得
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // 認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = authResult.userId;
 
     const url = new URL(request.url);
     const type = url.searchParams.get('type');
@@ -51,17 +57,17 @@ export async function GET(request: NextRequest) {
 
     if (type === 'rules') {
       // Alert Rules
-      return await getAlertRules(supabase, url, limit, offset, user.id);
+      return await getAlertRules(supabase, url, limit, offset, userId);
     } else {
       // Alerts
-      return await getAlerts(supabase, url, limit, offset, user.id);
+      return await getAlerts(supabase, url, limit, offset, userId);
     }
 
   } catch (error) {
     logger.error('[Alerts API] Unexpected error in GET', {
       error: error instanceof Error ? error.message : String(error)
     });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }
 
@@ -105,7 +111,7 @@ async function getAlertRules(
       });
     }
 
-    return NextResponse.json({ error: 'Failed to fetch rules' }, { status: 500 });
+    return handleDatabaseError(error);
   }
 
   logger.info('[Alerts API] Rules fetched', { user_id: userId, count: rules?.length });
@@ -172,7 +178,7 @@ async function getAlerts(
       });
     }
 
-    return NextResponse.json({ error: 'Failed to fetch alerts' }, { status: 500 });
+    return handleDatabaseError(error);
   }
 
   logger.info('[Alerts API] Alerts fetched', { user_id: userId, count: alerts?.length });
@@ -191,25 +197,15 @@ async function getAlerts(
 
 // POST - アラートまたはルール作成
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // 認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Admin権限チェック（v_app_users_compat2 互換ビュー使用）
-    const { data: userProfile } = await supabase
-      .from('v_app_users_compat2')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (userProfile?.role !== 'admin' && userProfile?.role !== 'super_admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
+    const userId = authResult.userId;
 
     const url = new URL(request.url);
     const type = url.searchParams.get('type');
@@ -217,17 +213,17 @@ export async function POST(request: NextRequest) {
 
     if (type === 'rules') {
       // Create Alert Rule
-      return await createAlertRule(supabase, body, user.id);
+      return await createAlertRule(supabase, body, userId);
     } else {
       // Create Alert
-      return await createAlert(supabase, body, user.id);
+      return await createAlert(supabase, body, userId);
     }
 
   } catch (error) {
     logger.error('[Alerts API] Unexpected error in POST', {
       error: error instanceof Error ? error.message : String(error)
     });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }
 
@@ -236,10 +232,7 @@ async function createAlertRule(supabase: SupabaseClient, body: unknown, userId: 
   const validation = createRuleSchema.safeParse(body);
 
   if (!validation.success) {
-    return NextResponse.json(
-      { error: 'Invalid request data', details: validation.error.flatten().fieldErrors },
-      { status: 400 }
-    );
+    return handleZodError(validation.error);
   }
 
   const ruleData = {
@@ -256,7 +249,7 @@ async function createAlertRule(supabase: SupabaseClient, body: unknown, userId: 
 
   if (error) {
     logger.error('[Alerts API] Rule insert error', { error: error.message });
-    return NextResponse.json({ error: 'Failed to create rule' }, { status: 500 });
+    return handleDatabaseError(error);
   }
 
   logger.info('[Alerts API] Rule created', {
@@ -277,10 +270,7 @@ async function createAlert(supabase: SupabaseClient, body: unknown, userId: stri
   const validation = createAlertSchema.safeParse(body);
 
   if (!validation.success) {
-    return NextResponse.json(
-      { error: 'Invalid request data', details: validation.error.flatten().fieldErrors },
-      { status: 400 }
-    );
+    return handleZodError(validation.error);
   }
 
   const alertData = {
@@ -296,7 +286,7 @@ async function createAlert(supabase: SupabaseClient, body: unknown, userId: stri
 
   if (error) {
     logger.error('[Alerts API] Alert insert error', { error: error.message });
-    return NextResponse.json({ error: 'Failed to create alert' }, { status: 500 });
+    return handleDatabaseError(error);
   }
 
   logger.info('[Alerts API] Alert created', {

@@ -1,30 +1,36 @@
-/* eslint-disable no-console */
 /**
  * Feature Management Admin API
  * プラン機能設定の管理
- * 
+ *
  * TODO: [SUPABASE_FEATURE_MIGRATION] 現在の戦略との整合性
  * - Admin API: feature_registry, plan_features の直接管理（このファイル）
  * - Client API: get_effective_org_features RPC 使用
  * - Quota API: get_org_quota_usage RPC 使用
  * 将来的にはRPC ベースに統一することを検討
+ *
+ * ⚠️ Requires site_admin authentication.
  */
+/* eslint-disable no-console */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import { createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
 import { FeatureManagementGetResponse, FeatureManagementUpdateRequest, FeatureManagementUpdateResponse } from '@/types/feature-management';
 
-export const dynamic = 'force-dynamic';
-
 // GET - 機能レジストリとプラン設定を取得
 export async function GET() {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // 管理者認証チェック（テスト用に一時無効化）
-    // TODO: 本番環境では認証チェックを有効化すること
 
     // feature_registry 取得
     const { data: features, error: featuresError } = await supabase
@@ -73,11 +79,15 @@ export async function GET() {
 
 // POST - プラン機能設定を一括更新
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // 管理者認証チェック（テスト用に一時無効化）
-    // TODO: 本番環境では認証チェックを有効化すること
+    const userId = authResult.userId;
 
     const body: FeatureManagementUpdateRequest = await request.json();
 
@@ -133,7 +143,7 @@ export async function POST(request: NextRequest) {
     const auditLogData = {
       action: 'update_plan_features',
       target_type: 'plan_features',
-      user_id: 'test-user', // authData.user.id,
+      user_id: userId,
       before_state: currentSettings,
       after_state: body.updates,
       metadata: {

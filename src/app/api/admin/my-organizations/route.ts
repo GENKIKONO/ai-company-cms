@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
-import { getUserWithClient } from '@/lib/core/auth-state';
-import { requireAdminPermission } from '@/lib/auth/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/log';
+import { handleApiError, handleDatabaseError, unauthorizedError } from '@/lib/api/error-responses';
 
 type OrganizationData = {
   id: string;
@@ -23,15 +23,14 @@ type MyOrganization = {
 };
 
 export async function GET(request: NextRequest) {
-  try {
-    // Admin permission check
-    await requireAdminPermission();
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
-    // Get current user
-    const user = await getUserWithClient(supabaseAdmin);
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+  try {
+    const userId = authResult.userId;
 
     // Get user's organizations where they have admin or owner role
     // Note: supabaseAdmin is already untyped (SupabaseClient<any>) so no cast needed
@@ -46,16 +45,16 @@ export async function GET(request: NextRequest) {
           company_name
         )
       `)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .in('role', ['admin', 'owner']);
 
     if (error) {
       logger.error('Error fetching user organizations', {
         component: 'my-organizations-api',
-        userId: user.id,
+        userId,
         error: error.message
       });
-      return NextResponse.json({ error: 'Failed to fetch organizations' }, { status: 500 });
+      return handleDatabaseError(error);
     }
 
     // Transform data for response
@@ -64,9 +63,9 @@ export async function GET(request: NextRequest) {
       .map(item => {
         // Handle case where organization might be an array (due to Supabase joins)
         const org = Array.isArray(item.organization) ? item.organization[0] : item.organization;
-        
+
         if (!org) return null;
-        
+
         return {
           id: org.id,
           name: org.name || org.company_name || org.id,
@@ -77,17 +76,17 @@ export async function GET(request: NextRequest) {
 
     logger.info('User organizations retrieved successfully', {
       component: 'my-organizations-api',
-      userId: user.id,
+      userId,
       organizationCount: userOrganizations.length
     });
 
     return NextResponse.json({ data: userOrganizations });
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Unexpected error in GET my organizations', {
       component: 'my-organizations-api',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }

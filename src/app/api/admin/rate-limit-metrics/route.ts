@@ -12,8 +12,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserFullWithClient } from '@/lib/core/auth-state';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError } from '@/lib/api/error-responses';
 
 // 固定メタ情報（DB紐付けビュー相当）
 const WRITE_PATHS_META = [
@@ -47,29 +48,14 @@ const WRITE_PATHS_META = [
 ];
 
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // 認証確認（Admin限定）
-    const user = await getUserFullWithClient(supabase);
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    const userRole = (user.user_metadata?.role as string) ||
-                     (user.app_metadata?.role as string) ||
-                     user.app_role;
-
-    if (!['super_admin', 'admin'].includes(userRole || '')) {
-      return NextResponse.json(
-        { error: 'Admin privileges required' },
-        { status: 403 }
-      );
-    }
-
     const now = new Date();
     const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
     const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
@@ -186,12 +172,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('Rate limit metrics API error:', { data: error });
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to fetch rate limit metrics',
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

@@ -1,28 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/utils/logger';
+import {
+  unauthorizedError,
+  forbiddenError,
+  validationError,
+  handleApiError,
+} from '@/lib/api/error-responses';
 
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // Admin authentication check
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Admin role check - untyped client, no cast needed
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || userOrg?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     // Get the form data
     const formData = await request.formData();
@@ -30,17 +25,17 @@ export async function POST(request: NextRequest) {
     const organizationId = formData.get('organizationId') as string;
 
     if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+      return validationError([{ field: 'file', message: 'ファイルが指定されていません' }]);
     }
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'File must be an image' }, { status: 400 });
+      return validationError([{ field: 'file', message: 'ファイルは画像形式である必要があります' }]);
     }
 
     // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 });
+      return validationError([{ field: 'file', message: 'ファイルサイズは5MB以下にしてください' }]);
     }
 
     // Generate unique filename
@@ -61,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('[Logo Upload] Upload failed', { error });
-      return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+      return handleApiError(new Error('ファイルのアップロードに失敗しました'));
     }
 
     // Get public URL
@@ -79,6 +74,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('[Logo Upload] Unexpected error', { error });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }

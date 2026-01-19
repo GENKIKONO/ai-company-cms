@@ -2,14 +2,19 @@
  * P4-8: Content Refresh管理API
  * GET /api/admin/content-refresh - 履歴取得
  * POST /api/admin/content-refresh - 再実行トリガー
- * 
+ *
  * admin-rpc.tsからAPI route経由パターンに移行
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserFullWithClient } from '@/lib/core/auth-state';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/utils/logger';
+import {
+  handleApiError,
+  handleDatabaseError,
+  validationError,
+} from '@/lib/api/error-responses';
 
 // admin-rpc.tsから移行した型定義
 interface ContentRefreshHistoryItem {
@@ -41,28 +46,14 @@ interface ContentRefreshHistoryParams {
 
 // 履歴取得
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // Super Admin権限チェック（Core経由）
-    const user = await getUserFullWithClient(supabase);
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    const userRole = (user.user_metadata?.role as string) ||
-                     (user.app_metadata?.role as string) ||
-                     user.app_role;
-
-    if (userRole !== 'super_admin') {
-      return NextResponse.json(
-        { error: 'Super admin privileges required' },
-        { status: 403 }
-      );
-    }
 
     // クエリパラメータ解析
     const { searchParams } = new URL(request.url);
@@ -77,13 +68,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('getContentRefreshHistory error:', { data: error });
-      return NextResponse.json(
-        {
-          error: 'Failed to fetch content refresh history',
-          details: error.message
-        },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -93,50 +78,28 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('Content refresh history API error:', { data: error });
-    return NextResponse.json(
-      { 
-        error: 'Failed to fetch content refresh history',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // 再実行トリガー
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
-    const supabase = await createClient();
-
-    // Super Admin権限チェック（Core経由）
-    const user = await getUserFullWithClient(supabase);
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    const userRole = (user.user_metadata?.role as string) ||
-                     (user.app_metadata?.role as string) ||
-                     user.app_role;
-
-    if (userRole !== 'super_admin') {
-      return NextResponse.json(
-        { error: 'Super admin privileges required' },
-        { status: 403 }
-      );
-    }
-
     // リクエストボディ解析
     const body = await request.json();
     const { entity_type, entity_id, target_languages, force_refresh, skip_embedding, skip_cache_purge } = body;
 
     if (!entity_type || !entity_id) {
-      return NextResponse.json(
-        { error: 'entity_type and entity_id are required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'entity_type', message: 'entity_type is required' },
+        { field: 'entity_id', message: 'entity_id is required' }
+      ]);
     }
 
     // admin-rpc.tsと同じEdge Function呼び出し
@@ -161,13 +124,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      return NextResponse.json(
-        {
-          error: `Content refresh trigger failed: ${response.status} ${errorText}`,
-          code: 'TRIGGER_FAILED'
-        },
-        { status: 500 }
-      );
+      return handleApiError(new Error(`Content refresh trigger failed: ${response.status} ${errorText}`));
     }
 
     const result = await response.json();
@@ -175,12 +132,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('Content refresh trigger API error:', { data: error });
-    return NextResponse.json(
-      { 
-        error: 'Failed to trigger content refresh',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

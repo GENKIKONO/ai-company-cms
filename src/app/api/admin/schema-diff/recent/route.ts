@@ -1,16 +1,21 @@
 /**
  * Schema Diff Recent API
  * EPIC 3-7: 統合観測性ダッシュボード用 - 最新スキーマ変更取得
- * 
+ *
  * GET /api/admin/schema-diff/recent
  * - 過去24時間のスキーマDiff履歴取得
  * - job_runs_v2との連携でジョブ実行状況も含める
+ *
+ * ⚠️ Requires site_admin authentication.
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError } from '@/lib/api/error-responses';
 
 interface SchemaDiffSummary {
   id: string;
@@ -24,23 +29,17 @@ interface SchemaDiffSummary {
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    // ============================================
-    // 1. 認証確認（Core経由）
-    // ============================================
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
+  try {
     const supabase = await createClient();
 
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
     // ============================================
-    // 2. 最新スキーマDiff履歴取得
+    // 最新スキーマDiff履歴取得
     // ============================================
     
     const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -54,10 +53,7 @@ export async function GET(request: NextRequest) {
 
     if (diffError) {
       logger.error('Failed to fetch schema diffs:', { data: diffError });
-      return NextResponse.json(
-        { error: 'Failed to fetch schema diff history' },
-        { status: 500 }
-      );
+      return handleDatabaseError(diffError);
     }
 
     // ============================================
@@ -141,13 +137,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('Schema diff recent API error:', { data: error });
-    return NextResponse.json(
-      { 
-        success: false,
-        error: 'Internal server error',
-        diffs: []
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

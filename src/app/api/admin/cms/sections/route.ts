@@ -1,30 +1,27 @@
-// CMS セクション管理 API
+/**
+ * CMS セクション管理 API
+ *
+ * ⚠️ Requires site_admin authentication.
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError, validationError } from '@/lib/api/error-responses';
 
 // セクション一覧取得
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || !userOrg || userOrg.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     const url = new URL(request.url);
     const pageKey = url.searchParams.get('page_key');
@@ -57,10 +54,7 @@ export async function GET(request: NextRequest) {
         });
       }
       
-      return NextResponse.json(
-        { error: 'Failed to fetch sections' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -71,34 +65,20 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('[CMS Sections] Unexpected error', { data: error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // セクション作成・更新
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || !userOrg || userOrg.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     const body = await request.json();
     const { 
@@ -112,10 +92,9 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!page_key || !section_key || !section_type) {
-      return NextResponse.json(
-        { error: 'page_key, section_key, and section_type are required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'page_key', message: 'page_key, section_key, and section_type are required' }
+      ]);
     }
 
     const sectionData = {
@@ -147,10 +126,7 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      return NextResponse.json(
-        { error: 'Failed to save section' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -161,44 +137,29 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('[CMS Sections] POST error', { data: error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // セクション削除
 export async function DELETE(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || !userOrg || userOrg.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     const url = new URL(request.url);
     const pageKey = url.searchParams.get('page_key');
     const sectionKey = url.searchParams.get('section_key');
 
     if (!pageKey || !sectionKey) {
-      return NextResponse.json(
-        { error: 'page_key and section_key are required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'page_key', message: 'page_key and section_key are required' }
+      ]);
     }
 
     const { error } = await supabase
@@ -209,10 +170,7 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       logger.error('[CMS Sections] Failed to delete section', { data: error });
-      return NextResponse.json(
-        { error: 'Failed to delete section' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -222,9 +180,6 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     logger.error('[CMS Sections] DELETE error', { data: error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

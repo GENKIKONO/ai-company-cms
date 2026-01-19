@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
-import { requireAdminPermission, getServerUser } from '@/lib/auth/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
+import { handleApiError, handleDatabaseError, validationError } from '@/lib/api/error-responses';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  try {
-    // 管理者権限チェック
-    await requireAdminPermission();
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
+  try {
     const supabase = await createClient();
 
     // リンク一覧を取得
@@ -33,56 +37,39 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Failed to fetch billing checkout links', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json(
-        { error: 'Failed to fetch links' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({ data });
 
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Authentication required') {
-        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-      }
-      if (error.message === 'Admin permission required') {
-        return NextResponse.json({ error: 'Admin permission required' }, { status: 403 });
-      }
-    }
-
     logger.error('GET /api/admin/billing-links error', { data: error instanceof Error ? error : new Error(String(error)) });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    // 管理者権限チェック
-    await requireAdminPermission();
-    const adminUser = await getServerUser();
-    
-    if (!adminUser) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
+  try {
     const supabase = await createClient();
 
     const body = await request.json();
     const { label, plan_type, stripe_price_id, stripe_checkout_url, discount_rate, campaign_type, start_at, end_at, is_public } = body;
 
     // 必須フィールドチェック
-    if (!label || !plan_type || !stripe_price_id || !campaign_type) {
-      return NextResponse.json(
-        { error: 'Missing required fields: label, plan_type, stripe_price_id, campaign_type' },
-        { status: 400 }
-      );
+    const missingFields: { field: string; message: string }[] = [];
+    if (!label) missingFields.push({ field: 'label', message: 'Label is required' });
+    if (!plan_type) missingFields.push({ field: 'plan_type', message: 'Plan type is required' });
+    if (!stripe_price_id) missingFields.push({ field: 'stripe_price_id', message: 'Stripe price ID is required' });
+    if (!campaign_type) missingFields.push({ field: 'campaign_type', message: 'Campaign type is required' });
+
+    if (missingFields.length > 0) {
+      return validationError(missingFields);
     }
 
     // 新規リンク作成 - untyped client, no cast needed
@@ -98,35 +85,20 @@ export async function POST(request: NextRequest) {
         start_at,
         end_at,
         is_public: is_public !== false,
-        created_by: adminUser.id
+        created_by: authResult.userId
       }])
       .select()
       .single();
 
     if (error) {
       logger.error('Failed to create billing checkout link', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json(
-        { error: 'Failed to create link' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({ data }, { status: 201 });
 
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Authentication required') {
-        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-      }
-      if (error.message === 'Admin permission required') {
-        return NextResponse.json({ error: 'Admin permission required' }, { status: 403 });
-      }
-    }
-
     logger.error('POST /api/admin/billing-links error', { data: error instanceof Error ? error : new Error(String(error)) });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

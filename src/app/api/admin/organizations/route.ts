@@ -1,24 +1,27 @@
 /**
  * Admin Organizations API
  * P4-3/P4-4: 組織一覧取得（翻訳・Embedding一括処理用）
+ *
+ * ⚠️ Requires site_admin authentication.
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError } from '@/lib/api/error-responses';
 
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック（必須）
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    );
+    const supabase = await createClient();
 
     const { data: organizations, error } = await supabase
       .from('organizations')
@@ -27,8 +30,17 @@ export async function GET(request: NextRequest) {
       .order('name', { ascending: true });
 
     if (error) {
-      throw error;
+      logger.error('[Admin Organizations API] Database error', {
+        userId: authResult.userId,
+        error: { code: error.code, message: error.message }
+      });
+      return handleDatabaseError(error);
     }
+
+    logger.debug('[Admin Organizations API] Fetched organizations', {
+      userId: authResult.userId,
+      count: organizations?.length || 0
+    });
 
     return NextResponse.json({
       success: true,
@@ -36,10 +48,9 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('[Admin Organizations API] Error:', { data: error });
-    return NextResponse.json({
-      success: false,
-      message: error instanceof Error ? error.message : 'Internal server error'
-    }, { status: 500 });
+    logger.error('[Admin Organizations API] Unexpected error', {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return handleApiError(error);
   }
 }

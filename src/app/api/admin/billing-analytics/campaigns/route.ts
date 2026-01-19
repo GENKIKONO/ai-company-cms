@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
-import { requireAdminPermission } from '@/lib/auth/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
+import { handleApiError, handleDatabaseError } from '@/lib/api/error-responses';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  try {
-    await requireAdminPermission();
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
+  try {
     const { searchParams } = new URL(request.url);
     const campaign_type = searchParams.get('campaign_type');
     const plan_type = searchParams.get('plan_type');
@@ -24,19 +29,11 @@ export async function GET(request: NextRequest) {
     });
 
     if (error) {
-      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({ campaigns: data || [] });
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Authentication required') {
-        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-      }
-      if (error.message === 'Admin permission required') {
-        return NextResponse.json({ error: 'Admin permission required' }, { status: 403 });
-      }
-    }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }

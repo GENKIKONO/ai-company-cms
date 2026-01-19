@@ -1,9 +1,14 @@
 /**
  * Admin Embeddings API
  * P4-4: Embedding ジョブ管理API
+ *
+ * ⚠️ Requires site_admin authentication.
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import {
   enqueueEmbeddingJobServer,
   drainEmbeddingJobsServer,
@@ -11,8 +16,15 @@ import {
   type EmbeddingJobRequest
 } from '@/server/embedding-admin-client';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, validationError } from '@/lib/api/error-responses';
 
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const body = await request.json();
     const { action } = body;
@@ -21,10 +33,9 @@ export async function POST(request: NextRequest) {
       case 'enqueue': {
         const { job } = body;
         if (!job) {
-          return NextResponse.json({
-            success: false,
-            message: 'Embedding job data required'
-          }, { status: 400 });
+          return validationError([
+            { field: 'job', message: 'Embedding job data required' }
+          ]);
         }
 
         const result = await enqueueEmbeddingJobServer(job);
@@ -41,10 +52,9 @@ export async function POST(request: NextRequest) {
         };
 
         if (!drainParams.organization_id) {
-          return NextResponse.json({
-            success: false,
-            message: 'Missing organization_id for drain operation'
-          }, { status: 400 });
+          return validationError([
+            { field: 'organization_id', message: 'Missing organization_id for drain operation' }
+          ]);
         }
 
         const result = await drainEmbeddingJobsServer(drainParams);
@@ -52,17 +62,16 @@ export async function POST(request: NextRequest) {
       }
 
       case 'bulk_enqueue': {
-        const { 
-          organization_id, 
+        const {
+          organization_id,
           content_types = ['posts', 'services', 'faqs', 'case_studies', 'products'],
-          priority = 5 
+          priority = 5
         } = body;
 
         if (!organization_id) {
-          return NextResponse.json({
-            success: false,
-            message: 'Organization ID required'
-          }, { status: 400 });
+          return validationError([
+            { field: 'organization_id', message: 'Organization ID required' }
+          ]);
         }
 
         const result = await enqueueOrganizationEmbeddingsServer(
@@ -74,16 +83,12 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        return NextResponse.json({
-          success: false,
-          message: `Unknown action: ${action}`
-        }, { status: 400 });
+        return validationError([
+          { field: 'action', message: `Unknown action: ${action}` }
+        ]);
     }
   } catch (error) {
     logger.error('[Admin Embeddings API] Error:', { data: error });
-    return NextResponse.json({
-      success: false,
-      message: error instanceof Error ? error.message : 'Internal server error'
-    }, { status: 500 });
+    return handleApiError(error);
   }
 }

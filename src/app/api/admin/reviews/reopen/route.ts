@@ -1,8 +1,17 @@
+/**
+ * Admin Reviews Reopen API
+ *
+ * ⚠️ Requires site_admin authentication.
+ */
 /* eslint-disable no-console */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError, handleZodError, notFoundError, validationError } from '@/lib/api/error-responses';
 import { z } from 'zod';
 import type { ReopenRequest } from '@/lib/types/review';
 
@@ -15,35 +24,29 @@ const reopenSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // Check authentication and admin role
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = authResult.userId;
 
-    // Verify admin role（v_app_users_compat2 互換ビュー使用）
-    const { data: userProfile, error: profileError } = await supabase
+    // Get user profile for audit logging
+    const { data: userProfile } = await supabase
       .from('v_app_users_compat2')
-      .select('role, full_name')
-      .eq('id', user.id)
+      .select('full_name')
+      .eq('id', userId)
       .maybeSingle();
-
-    if (profileError || userProfile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     // Parse and validate request body
     const body = await request.json();
     const validation = reopenSchema.safeParse(body);
     
     if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request data', details: validation.error.errors },
-        { status: 400 }
-      );
+      return handleZodError(validation.error);
     }
 
     const { organization_id, reason, category, notes } = validation.data;
@@ -57,10 +60,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (orgError || !organization) {
-      return NextResponse.json(
-        { error: 'Organization not found' },
-        { status: 404 }
-      );
+      return notFoundError('Organization');
     }
 
     // Get current organization status
@@ -78,10 +78,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       logger.error('[Reviews Reopen] Failed to update organization status', { data: updateError });
-      return NextResponse.json(
-        { error: 'Failed to update organization status' },
-        { status: 500 }
-      );
+      return handleDatabaseError(updateError);
     }
 
     // Create audit log entry
@@ -90,7 +87,7 @@ export async function POST(request: NextRequest) {
       .from('review_audit')
       .insert({
         organization_id,
-        reviewer_id: user.id,
+        reviewer_id: userId,
         action: 'reopen',
         previous_status: currentStatus,
         new_status: 'under_review',
@@ -106,9 +103,9 @@ export async function POST(request: NextRequest) {
       // Note: We don't fail the request if audit logging fails
     }
 
-    logger.info(`[Reviews Reopen] Organization ${organization.name} reopened for review by ${userProfile.full_name}`, {
+    logger.info(`[Reviews Reopen] Organization ${organization.name} reopened for review by ${userProfile?.full_name}`, {
       organization_id,
-      reviewer_id: user.id,
+      reviewer_id: userId,
       reason,
       category,
       previous_status: currentStatus
@@ -129,44 +126,28 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('[Reviews Reopen] Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
-    
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // GET endpoint to check if an organization can be reopened
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // Check authentication and admin role
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Verify admin role（v_app_users_compat2 互換ビュー使用）
-    const { data: userProfile, error: profileError } = await supabase
-      .from('v_app_users_compat2')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (profileError || userProfile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     const url = new URL(request.url);
     const organizationId = url.searchParams.get('organization_id');
 
     if (!organizationId) {
-      return NextResponse.json(
-        { error: 'organization_id parameter is required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'organization_id', message: 'organization_id parameter is required' }
+      ]);
     }
 
     // Get organization details
@@ -178,10 +159,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (orgError || !organization) {
-      return NextResponse.json(
-        { error: 'Organization not found' },
-        { status: 404 }
-      );
+      return notFoundError('Organization');
     }
 
     // Check if organization can be reopened
@@ -202,10 +180,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('[Reviews Reopen Check] Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
-    
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

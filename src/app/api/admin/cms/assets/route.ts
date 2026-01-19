@@ -1,31 +1,20 @@
 // CMS アセット管理 API
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError, validationError } from '@/lib/api/error-responses';
 
 // アセット一覧取得
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || !userOrg || userOrg.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
-
     const url = new URL(request.url);
     const activeOnly = url.searchParams.get('active_only') === 'true';
     const mimeType = url.searchParams.get('mime_type');
@@ -59,10 +48,7 @@ export async function GET(request: NextRequest) {
         });
       }
       
-      return NextResponse.json(
-        { error: 'Failed to fetch assets' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -78,35 +64,20 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('[CMS Assets] Unexpected error', { data: error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // アセット作成・登録
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || !userOrg || userOrg.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
-
     const body = await request.json();
     const { 
       filename, 
@@ -121,10 +92,9 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!filename || !file_path) {
-      return NextResponse.json(
-        { error: 'filename and file_path are required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'filename', message: 'filename and file_path are required' }
+      ]);
     }
 
     const assetData = {
@@ -156,10 +126,7 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      return NextResponse.json(
-        { error: 'Failed to save asset' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -170,43 +137,27 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('[CMS Assets] POST error', { data: error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // アセット削除
 export async function DELETE(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || !userOrg || userOrg.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
-
     const url = new URL(request.url);
     const assetId = url.searchParams.get('id');
 
     if (!assetId) {
-      return NextResponse.json(
-        { error: 'Asset ID is required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'id', message: 'Asset ID is required' }
+      ]);
     }
 
     const { error } = await supabase
@@ -216,10 +167,7 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       logger.error('[CMS Assets] Failed to delete asset', { data: error });
-      return NextResponse.json(
-        { error: 'Failed to delete asset' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -229,9 +177,6 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     logger.error('[CMS Assets] DELETE error', { data: error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

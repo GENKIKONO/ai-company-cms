@@ -1,9 +1,19 @@
+/**
+ * AI Visibility Run API
+ *
+ * ⚠️ Requires site_admin authentication.
+ */
 /* eslint-disable no-console */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { updateLastCheck } from '@/lib/ai-visibility-config';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/log';
+import { handleApiError } from '@/lib/api/error-responses';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 // =====================================================
@@ -74,15 +84,15 @@ function translateIssue(issue: string): string {
 
 // AI Visibility Monitoring System
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = supabaseAdmin;
-    
-    // Check authentication (admin only)
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
+
     const body = await request.json().catch(() => ({}));
     const isDryRun = body.dryRun || false;
     const urls = body.urls || getDefaultUrls();
@@ -111,15 +121,18 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     logger.error('AI Visibility check error', { data: error instanceof Error ? error : new Error(String(error)) });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // GET endpoint for dry run
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const url = new URL(request.url);
     const isDryRun = true; // GET is always dry run
@@ -136,10 +149,7 @@ export async function GET(request: NextRequest) {
     
   } catch (error) {
     logger.error('AI Visibility dry run error', { data: error instanceof Error ? error : new Error(String(error)) });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 

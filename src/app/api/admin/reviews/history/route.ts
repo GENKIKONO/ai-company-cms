@@ -1,30 +1,28 @@
+/**
+ * Admin Reviews History API
+ *
+ * ⚠️ Requires site_admin authentication.
+ */
 /* eslint-disable no-console */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError, validationError } from '@/lib/api/error-responses';
 import type { ReviewAuditWithDetails } from '@/lib/types/review';
 
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // Check authentication and admin role
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Verify admin role（v_app_users_compat2 互換ビュー使用）
-    const { data: userProfile, error: profileError } = await supabase
-      .from('v_app_users_compat2')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (profileError || userProfile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     const url = new URL(request.url);
     const organizationId = url.searchParams.get('organization_id');
@@ -32,10 +30,9 @@ export async function GET(request: NextRequest) {
     const offset = Math.max(parseInt(url.searchParams.get('offset') || '0'), 0);
 
     if (!organizationId) {
-      return NextResponse.json(
-        { error: 'organization_id parameter is required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'organization_id', message: 'organization_id parameter is required' }
+      ]);
     }
 
     // Fetch review history with reviewer details
@@ -67,10 +64,7 @@ export async function GET(request: NextRequest) {
 
     if (historyError) {
       logger.error('[Reviews History] Failed to fetch review history', { data: historyError });
-      return NextResponse.json(
-        { error: 'Failed to fetch review history' },
-        { status: 500 }
-      );
+      return handleDatabaseError(historyError);
     }
 
     // Transform the data to match the expected interface
@@ -114,10 +108,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('[Reviews History] Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
-    
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

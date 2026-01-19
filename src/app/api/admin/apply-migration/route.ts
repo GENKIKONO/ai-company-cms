@@ -1,36 +1,55 @@
-/* eslint-disable no-console */
+/**
+ * Admin Migration API
+ *
+ * ⚠️ CRITICAL: This endpoint can execute database migrations.
+ * Requires site_admin authentication.
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError, validationError } from '@/lib/api/error-responses';
 
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック（必須）
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
-    logger.debug('Applying coordinate fields migration...');
-    
+    logger.info('[Admin Migration] Migration initiated', {
+      userId: authResult.userId,
+      timestamp: new Date().toISOString()
+    });
+
     // Service Role クライアント作成
     const supabase = supabaseAdmin;
 
     // Execute the migration SQL directly
     const migrationSQL = `
       -- Add coordinate fields
-      ALTER TABLE public.organizations 
+      ALTER TABLE public.organizations
       ADD COLUMN IF NOT EXISTS lat DOUBLE PRECISION,
       ADD COLUMN IF NOT EXISTS lng DOUBLE PRECISION;
 
       -- Add check constraints to ensure coordinates are within reasonable bounds
       -- Japan's approximate bounds: lat 24-46, lng 123-146
-      DO $$ 
+      DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'check_latitude_range') THEN
-          ALTER TABLE public.organizations 
+          ALTER TABLE public.organizations
           ADD CONSTRAINT check_latitude_range CHECK (lat IS NULL OR (lat >= 20 AND lat <= 50));
         END IF;
       END $$;
 
-      DO $$ 
+      DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'check_longitude_range') THEN
-          ALTER TABLE public.organizations 
+          ALTER TABLE public.organizations
           ADD CONSTRAINT check_longitude_range CHECK (lng IS NULL OR (lng >= 120 AND lng <= 150));
         END IF;
       END $$;
@@ -45,27 +64,27 @@ export async function POST(request: NextRequest) {
     } as never);
 
     if (migrationError) {
-      logger.error('Migration SQL execution failed:', { data: migrationError });
-      
+      logger.error('[Admin Migration] SQL execution failed', {
+        userId: authResult.userId,
+        error: { code: migrationError.code, message: migrationError.message }
+      });
+
       // Try alternative approach using individual queries
       const { error: alterError1 } = await supabase
         .from('organizations')
         .select('id')
         .limit(1);
-      
+
       if (alterError1) {
-        return NextResponse.json({ 
-          success: false, 
-          error: `Migration failed: ${migrationError.message}`,
-          details: migrationError,
-          fallbackError: alterError1
-        }, { status: 500 });
+        return handleDatabaseError(alterError1);
       }
     }
 
-    logger.debug('Migration applied successfully');
+    logger.info('[Admin Migration] Migration applied successfully', {
+      userId: authResult.userId
+    });
 
-    // Test the migration by updating an organization with coordinates
+    // Test the migration by checking if an organization exists
     const { data: testOrg, error: testOrgError } = await supabase
       .from('organizations')
       .select('id')
@@ -73,43 +92,41 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (testOrgError || !testOrg) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'No organizations found to test with'
-      }, { status: 400 });
+      return validationError([{ field: 'organizations', message: 'No organizations found to verify migration' }]);
     }
 
-    // Test coordinate field update - untyped client, no cast needed
+    // Test coordinate field update
     const { error: updateError } = await supabase
       .from('organizations')
-      .update({ 
-        lat: 35.6762, // Tokyo Station coordinates
-        lng: 139.6503 
+      .update({
+        lat: 35.6762,
+        lng: 139.6503
       })
       .eq('id', (testOrg as { id: string }).id);
 
     if (updateError) {
-      logger.error('Coordinate field update test failed:', { data: updateError });
-      return NextResponse.json({ 
-        success: false, 
-        error: `Coordinate fields test failed: ${updateError.message}`,
-        details: updateError
-      }, { status: 500 });
+      logger.error('[Admin Migration] Coordinate field test failed', {
+        userId: authResult.userId,
+        error: { code: updateError.code, message: updateError.message }
+      });
+      return handleDatabaseError(updateError);
     }
 
-    logger.debug('Migration verification successful');
+    logger.info('[Admin Migration] Verification successful', {
+      userId: authResult.userId,
+      testOrgId: (testOrg as { id: string }).id
+    });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Coordinate fields migration applied and verified successfully',
       testOrgId: (testOrg as { id: string }).id
     });
 
-  } catch (error: any) {
-    logger.error('Migration API error', { data: error instanceof Error ? error : new Error(String(error)) });
-    return NextResponse.json({ 
-      success: false, 
-      error: error.message || 'Migration failed' 
-    }, { status: 500 });
+  } catch (error) {
+    logger.error('[Admin Migration] Unexpected error', {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return handleApiError(error);
   }
 }

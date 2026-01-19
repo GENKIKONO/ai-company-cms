@@ -1,29 +1,17 @@
 /* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError } from '@/lib/api/error-responses';
 
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
-    const supabase = await createClient();
-    
-    // 認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者チェック（v_app_users_compat2 互換ビュー使用）
-    const { data: userData, error: userError } = await supabase
-      .from('v_app_users_compat2')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (userError || !userData || userData.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
 
     // お問合せ一覧を取得（現在はダミーデータ）
     // TODO: 実際のお問合せテーブルから取得するように実装
@@ -53,6 +41,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }

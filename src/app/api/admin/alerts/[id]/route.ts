@@ -5,9 +5,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/utils/logger';
 import { z } from 'zod';
+import { handleApiError, handleDatabaseError, handleZodError, notFoundError } from '@/lib/api/error-responses';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -19,34 +20,21 @@ const updateAlertSchema = z.object({
 
 // PATCH - アラートステータス更新
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const { id } = await params;
     const supabase = await createClient();
-
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Admin権限チェック（v_app_users_compat2 互換ビュー使用）
-    const { data: userProfile } = await supabase
-      .from('v_app_users_compat2')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (userProfile?.role !== 'admin' && userProfile?.role !== 'super_admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     const body = await request.json();
     const validation = updateAlertSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request data', details: validation.error.flatten().fieldErrors },
-        { status: 400 }
-      );
+      return handleZodError(validation.error);
     }
 
     const { data: updatedAlert, error } = await supabase
@@ -58,16 +46,16 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (error) {
       if (error.code === 'PGRST116') {
-        return NextResponse.json({ error: 'Alert not found' }, { status: 404 });
+        return notFoundError('Alert');
       }
       logger.error('[Alerts API] PATCH error', { error: error.message });
-      return NextResponse.json({ error: 'Failed to update alert' }, { status: 500 });
+      return handleDatabaseError(error);
     }
 
     logger.info('[Alerts API] Alert status updated', {
       alert_id: id,
       new_status: validation.data.status,
-      updated_by: user.id
+      updated_by: authResult.userId
     });
 
     return NextResponse.json({
@@ -80,6 +68,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     logger.error('[Alerts API] Unexpected error in PATCH', {
       error: error instanceof Error ? error.message : String(error)
     });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }

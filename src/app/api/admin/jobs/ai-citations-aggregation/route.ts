@@ -4,33 +4,37 @@ import {
   runWeeklyAiCitationsAggregation,
   type AiCitationsAggregationJobInput
 } from '@/lib/jobs/ai-citations-aggregation-job';
-import { requireSuperAdminUser } from '@/lib/auth/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, validationError } from '@/lib/api/error-responses';
 
 /**
  * AI Citations Aggregation Job API
  * Phase 3 Addendum: ai_quotes_* 集計ジョブAPI
  */
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
-    // Super Admin認証
-    const user = await requireSuperAdminUser();
-    
     const body = await request.json();
-    
+
     // ジョブタイプ判定
     const jobType = body.job_type || 'custom';
-    
+
     if (jobType === 'weekly') {
       // 週次集計の実行
       const result = await runWeeklyAiCitationsAggregation(
         request,
         body.organization_id
       );
-      
+
       return NextResponse.json({
         success: result.success,
-        message: result.success 
+        message: result.success
           ? 'Weekly AI citations aggregation completed'
           : 'Weekly AI citations aggregation failed',
         data: {
@@ -45,11 +49,11 @@ export async function POST(request: NextRequest) {
         },
         error: result.error,
         timestamp: new Date().toISOString()
-      }, { 
-        status: result.success ? 200 : 500 
+      }, {
+        status: result.success ? 200 : 500
       });
     }
-    
+
     // カスタム期間集計
     const jobInput: AiCitationsAggregationJobInput = {
       target_period_start: body.target_period_start,
@@ -58,44 +62,41 @@ export async function POST(request: NextRequest) {
       refresh_mv: body.refresh_mv || false,
       request_id: body.request_id || crypto.randomUUID()
     };
-    
+
     // 期間バリデーション
     if (jobInput.target_period_start && jobInput.target_period_end) {
       const startDate = new Date(jobInput.target_period_start);
       const endDate = new Date(jobInput.target_period_end);
-      
+
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        return NextResponse.json(
-          { error: 'Invalid date format for target_period_start or target_period_end' },
-          { status: 400 }
-        );
+        return validationError([
+          { field: 'target_period', message: 'Invalid date format for target_period_start or target_period_end' }
+        ]);
       }
-      
+
       if (startDate >= endDate) {
-        return NextResponse.json(
-          { error: 'target_period_start must be before target_period_end' },
-          { status: 400 }
-        );
+        return validationError([
+          { field: 'target_period', message: 'target_period_start must be before target_period_end' }
+        ]);
       }
-      
+
       // 期間制限（最大90日）
       const daysDiff = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
       if (daysDiff > 90) {
-        return NextResponse.json(
-          { error: 'Period cannot exceed 90 days' },
-          { status: 400 }
-        );
+        return validationError([
+          { field: 'target_period', message: 'Period cannot exceed 90 days' }
+        ]);
       }
     }
-    
+
     // ジョブ実行
     const result = await runAiCitationsAggregationJob(jobInput, request);
-    
+
     const httpStatus = result.success ? 200 : 500;
-    
+
     return NextResponse.json({
       success: result.success,
-      message: result.success 
+      message: result.success
         ? 'AI citations aggregation job completed'
         : 'AI citations aggregation job failed',
       data: {
@@ -111,19 +112,10 @@ export async function POST(request: NextRequest) {
       error: result.error,
       timestamp: new Date().toISOString()
     }, { status: httpStatus });
-    
+
   } catch (error) {
     logger.error('AI Citations Aggregation API error:', { data: error });
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -131,10 +123,13 @@ export async function POST(request: NextRequest) {
  * 組織別集計状況の取得API
  */
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
-    // Super Admin認証
-    const user = await requireSuperAdminUser();
-    
     const url = new URL(request.url);
     const organizationId = url.searchParams.get('organization_id');
     const startDate = url.searchParams.get('start_date');
@@ -226,15 +221,6 @@ export async function GET(request: NextRequest) {
     
   } catch (error) {
     logger.error('AI Citations Aggregation status API error:', { data: error });
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

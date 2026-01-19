@@ -1,28 +1,31 @@
-/* eslint-disable no-console */
 /**
  * Organization Feature Overrides API
  * 組織別機能オーバーライド
  * 2024-12: feature_overrides テーブル存在確認済み（Supabaseアシスタント）
+ *
+ * ⚠️ Requires site_admin authentication.
  */
+/* eslint-disable no-console */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
-import { createAuthError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import { createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
-
-export const dynamic = 'force-dynamic';
+import { handleDatabaseError, validationError } from '@/lib/api/error-responses';
 
 // GET - 組織別オーバーライド一覧取得
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
 
     const url = new URL(request.url);
     const organizationId = url.searchParams.get('organization_id');
@@ -51,10 +54,7 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      return NextResponse.json(
-        { error: 'Failed to fetch overrides' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -73,23 +73,23 @@ export async function GET(request: NextRequest) {
 
 // POST - 組織別オーバーライド作成/更新
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
+    const userId = authResult.userId;
 
     const body = await request.json();
     const { organization_id, feature_key, is_enabled, config, expires_at } = body;
 
     if (!organization_id || !feature_key) {
-      return NextResponse.json(
-        { error: 'organization_id and feature_key are required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'organization_id', message: 'organization_id and feature_key are required' }
+      ]);
     }
 
     const overrideData = {
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       config: config || {},
       expires_at: expires_at || null,
       updated_at: new Date().toISOString(),
-      updated_by: user.id
+      updated_by: userId
     };
 
     const { data, error } = await supabase
@@ -120,10 +120,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return NextResponse.json(
-        { error: 'Failed to save override' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     logger.info('[POST /api/admin/feature-management/overrides] Override saved', {
@@ -147,24 +144,23 @@ export async function POST(request: NextRequest) {
 
 // DELETE - オーバーライド削除
 export async function DELETE(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
 
     const url = new URL(request.url);
     const organizationId = url.searchParams.get('organization_id');
     const featureKey = url.searchParams.get('feature_key');
 
     if (!organizationId || !featureKey) {
-      return NextResponse.json(
-        { error: 'organization_id and feature_key are required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'organization_id', message: 'organization_id and feature_key are required' }
+      ]);
     }
 
     const { error } = await supabase
@@ -175,10 +171,7 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       logger.error('[DELETE /api/admin/feature-management/overrides] Delete error:', { data: { error } });
-      return NextResponse.json(
-        { error: 'Failed to delete override' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({

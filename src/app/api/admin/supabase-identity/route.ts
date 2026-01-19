@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { unauthorizedError, handleDatabaseError } from "@/lib/api/error-responses";
 
 function getServerSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -16,17 +17,14 @@ function getServerSupabase() {
 export async function POST(req: NextRequest) {
   const token = req.headers.get("x-admin-token");
   if (!token || token !== process.env.RLS_REGRESSION_ADMIN_TOKEN) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return unauthorizedError("Invalid admin token");
   }
 
   const supabase = getServerSupabase();
   const { data, error } = await supabase.rpc("debug_rpc_identity");
 
   if (error) {
-    return NextResponse.json(
-      { error: "rpc failed", details: { code: error.code, message: error.message } },
-      { status: 500 }
-    );
+    return handleDatabaseError(error);
   }
 
   return NextResponse.json({ ok: true, identity: data }, { status: 200 });

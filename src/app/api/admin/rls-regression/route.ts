@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import {
+  unauthorizedError,
+  validationError,
+  handleDatabaseError,
+} from "@/lib/api/error-responses";
 
 type Target = "public" | "admin_e2e" | "all";
 
@@ -18,7 +23,7 @@ function getServerSupabase() {
 export async function POST(req: NextRequest) {
   const token = req.headers.get("x-admin-token");
   if (!token || token !== process.env.RLS_REGRESSION_ADMIN_TOKEN) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return unauthorizedError("Invalid admin token");
   }
 
   let body: { target?: Target } = {};
@@ -30,17 +35,14 @@ export async function POST(req: NextRequest) {
 
   const target: Target = body.target ?? "all";
   if (!["public", "admin_e2e", "all"].includes(target)) {
-    return NextResponse.json({ error: "invalid target" }, { status: 400 });
+    return validationError([{ field: "target", message: "Invalid target value" }]);
   }
 
   const supabase = getServerSupabase();
   const { data, error } = await supabase.rpc("run_rls_regression_tests", { target });
 
   if (error) {
-    return NextResponse.json(
-      { error: "rpc failed", details: { code: error.code, message: error.message } },
-      { status: 500 }
-    );
+    return handleDatabaseError(error);
   }
 
   return NextResponse.json({ ok: true, target, result: data }, { status: 200 });

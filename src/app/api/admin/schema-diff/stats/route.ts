@@ -1,16 +1,21 @@
 /**
  * Schema Diff Stats API
  * EPIC 3-7: 統合観測性ダッシュボード用 - スキーマ変更統計
- * 
+ *
  * GET /api/admin/schema-diff/stats
  * - 過去24時間のスキーマ変更統計
  * - 重大度別カウント、監視環境数、ジョブ実行状況等
+ *
+ * ⚠️ Requires site_admin authentication.
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError } from '@/lib/api/error-responses';
 
 interface SchemaDiffStats {
   total_diffs_24h: number;
@@ -25,23 +30,17 @@ interface SchemaDiffStats {
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    // ============================================
-    // 1. 認証確認（Core経由）
-    // ============================================
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
+  try {
     const supabase = await createClient();
 
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
     // ============================================
-    // 2. 基本統計の取得
+    // 基本統計の取得
     // ============================================
     
     const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -56,10 +55,7 @@ export async function GET(request: NextRequest) {
 
     if (diffError) {
       logger.error('Failed to fetch schema diffs for stats:', { data: diffError });
-      return NextResponse.json(
-        { error: 'Failed to fetch schema diff statistics' },
-        { status: 500 }
-      );
+      return handleDatabaseError(diffError);
     }
 
     // ============================================
@@ -157,23 +153,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('Schema diff stats API error:', { data: error });
-    return NextResponse.json(
-      { 
-        success: false,
-        error: 'Internal server error',
-        stats: {
-          total_diffs_24h: 0,
-          error_count_24h: 0,
-          warn_count_24h: 0,
-          info_count_24h: 0,
-          environments_monitored: 0,
-          last_successful_run: null,
-          last_failed_run: null,
-          avg_changes_per_diff: 0,
-          top_affected_schemas: []
-        }
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

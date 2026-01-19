@@ -3,13 +3,10 @@
 // 管理者向け審査キュー管理API
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import {
-  requireAuth,
-  requireAdminAccess,
-  type AuthContext
-} from '@/lib/api/auth-middleware';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import {
   handleApiError,
+  handleDatabaseError,
   validationError,
   notFoundError,
   handleZodError
@@ -32,18 +29,13 @@ const reviewActionSchema = z.object({
 
 // GET - 審査待ち組織一覧取得
 export async function GET(request: NextRequest) {
-  try {
-    // 管理者認証チェック
-    const authResult = await requireAuth(request);
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-    
-    const adminCheck = requireAdminAccess(authResult as AuthContext);
-    if (adminCheck) {
-      return adminCheck;
-    }
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
+  try {
     const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -79,10 +71,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Database query error', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json(
-        { error: 'Failed to fetch pending reviews' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     // 審査履歴も取得
@@ -120,18 +109,13 @@ export async function GET(request: NextRequest) {
 
 // POST - 審査アクション実行（承認/却下）
 export async function POST(request: NextRequest) {
-  try {
-    // 管理者認証チェック
-    const authResult = await requireAuth(request);
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-    
-    const adminCheck = requireAdminAccess(authResult as AuthContext);
-    if (adminCheck) {
-      return adminCheck;
-    }
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
+  try {
     const body = await request.json();
     
     // バリデーション
@@ -188,10 +172,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       logger.error('Organization update error:', { data: updateError });
-      return NextResponse.json(
-        { error: 'Failed to update organization status' },
-        { status: 500 }
-      );
+      return handleDatabaseError(updateError);
     }
 
     // 審査履歴記録
@@ -200,7 +181,7 @@ export async function POST(request: NextRequest) {
       .insert({
         organization_id: organizationId,
         action: `${action}_organization`,
-        admin_user_id: (authResult as AuthContext).user.id,
+        admin_user_id: authResult.userId,
         old_status: org.status,
         new_status: newStatus,
         reason: reason || admin_notes || `Organization ${action}d by admin`

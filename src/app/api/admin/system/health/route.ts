@@ -1,32 +1,26 @@
 /* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError } from '@/lib/api/error-responses';
 import type { SystemHealth, ComponentHealth, ExternalServiceHealth } from '@/lib/monitoring/types';
 
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-
-    const user = await getUserWithClient(supabase);
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check user role from auth state (no additional DB query needed)
-    const userRole = user.app_role || 'user';
-
-    if (userRole !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     // Perform health checks
     const healthData = await performSystemHealthCheck();
 
     logger.info('[System Health] Health check requested', {
-      user_id: user.id,
+      user_id: authResult.userId,
       overall_status: healthData.overall_status,
       active_alerts: healthData.active_alerts,
       component_count: healthData.components.length
@@ -39,11 +33,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('[System Health] Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
-    
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 

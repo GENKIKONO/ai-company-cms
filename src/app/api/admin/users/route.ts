@@ -1,25 +1,27 @@
+/**
+ * Admin Users API
+ *
+ * ⚠️ Requires site_admin authentication.
+ */
 /* eslint-disable no-console */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { getUserFullWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError } from '@/lib/api/error-responses';
 
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 認証チェック
-    const user = await getUserFullWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者チェック - check app_metadata instead of profiles/app_users
-    const isAdmin = user.app_metadata?.role === 'admin';
-    
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
 
     // 二段取得: v_app_users_compat2 + organizations
     // Step 1: ユーザー一覧を取得（v_app_users_compat2 互換ビュー使用）
@@ -30,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Error fetching users', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
+      return handleDatabaseError(error);
     }
 
     // Step 2: organization_id の集合を取得して organizations を一括取得
@@ -59,6 +61,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }

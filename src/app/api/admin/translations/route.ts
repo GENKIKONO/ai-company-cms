@@ -1,11 +1,16 @@
 /**
  * Translation Jobs Management API
  * P4-3: 翻訳ジョブの管理・操作
+ *
+ * ⚠️ Requires site_admin authentication.
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { 
-  getTranslationJobs, 
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
+import {
+  getTranslationJobs,
   getTranslationMetrics,
   type TranslationJobFilter
 } from '@/lib/translation-client';
@@ -17,9 +22,16 @@ import {
   type TranslationJobRequest
 } from '@/server/translation-admin-client';
 import { logger } from '@/lib/log';
+import { handleApiError, handleDatabaseError, validationError } from '@/lib/api/error-responses';
 
 // GET: 翻訳ジョブ一覧取得
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     
@@ -43,10 +55,7 @@ export async function GET(request: NextRequest) {
     
     if (result.error) {
       logger.error('[Translation API] Failed to get jobs:', { data: result.error });
-      return NextResponse.json(
-        { error: 'Failed to fetch translation jobs', details: result.error },
-        { status: 500 }
-      );
+      return handleDatabaseError({ message: result.error, code: 'TRANSLATION_FETCH_ERROR' });
     }
 
     return NextResponse.json({
@@ -57,19 +66,21 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('[Translation API] GET error:', { 
-      data: error instanceof Error ? error : new Error(String(error)) 
+    logger.error('[Translation API] GET error:', {
+      data: error instanceof Error ? error : new Error(String(error))
     });
-    
-    return NextResponse.json(
-      { error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // POST: 翻訳ジョブ操作
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const body = await request.json();
     const { action } = body;
@@ -90,13 +101,16 @@ export async function POST(request: NextRequest) {
         };
 
         // バリデーション
-        if (!jobRequest.organization_id || !jobRequest.source_table || 
-            !jobRequest.source_id || !jobRequest.source_field || 
-            !jobRequest.target_lang || !jobRequest.source_text) {
-          return NextResponse.json(
-            { error: 'Missing required fields for translation job' },
-            { status: 400 }
-          );
+        const missingFields: { field: string; message: string }[] = [];
+        if (!jobRequest.organization_id) missingFields.push({ field: 'organization_id', message: 'organization_id is required' });
+        if (!jobRequest.source_table) missingFields.push({ field: 'source_table', message: 'source_table is required' });
+        if (!jobRequest.source_id) missingFields.push({ field: 'source_id', message: 'source_id is required' });
+        if (!jobRequest.source_field) missingFields.push({ field: 'source_field', message: 'source_field is required' });
+        if (!jobRequest.target_lang) missingFields.push({ field: 'target_lang', message: 'target_lang is required' });
+        if (!jobRequest.source_text) missingFields.push({ field: 'source_text', message: 'source_text is required' });
+
+        if (missingFields.length > 0) {
+          return validationError(missingFields);
         }
 
         const result = await enqueueTranslationJobServer(jobRequest);
@@ -133,10 +147,9 @@ export async function POST(request: NextRequest) {
         };
 
         if (!drainParams.organization_id) {
-          return NextResponse.json(
-            { error: 'Missing organization_id for drain operation' },
-            { status: 400 }
-          );
+          return validationError([
+            { field: 'organization_id', message: 'organization_id is required for drain operation' }
+          ]);
         }
 
         const result = await drainTranslationJobsServer(drainParams);
@@ -174,10 +187,10 @@ export async function POST(request: NextRequest) {
         } = body;
 
         if (!organization_id || !target_languages || !Array.isArray(target_languages)) {
-          return NextResponse.json(
-            { error: 'Missing organization_id or target_languages' },
-            { status: 400 }
-          );
+          return validationError([
+            { field: 'organization_id', message: 'organization_id is required' },
+            { field: 'target_languages', message: 'target_languages array is required' }
+          ]);
         }
 
         const result = await enqueueOrganizationTranslationsServer(
@@ -209,20 +222,15 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid action. Supported: enqueue, drain, bulk_enqueue' },
-          { status: 400 }
-        );
+        return validationError([
+          { field: 'action', message: 'Invalid action. Supported: enqueue, drain, bulk_enqueue' }
+        ]);
     }
 
   } catch (error) {
-    logger.error('[Translation API] POST error:', { 
-      data: error instanceof Error ? error : new Error(String(error)) 
+    logger.error('[Translation API] POST error:', {
+      data: error instanceof Error ? error : new Error(String(error))
     });
-    
-    return NextResponse.json(
-      { error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

@@ -1,9 +1,25 @@
+/**
+ * Admin Migrate API
+ *
+ * ⚠️ CRITICAL: Requires site_admin authentication.
+ */
 /* eslint-disable no-console */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError, validationError } from '@/lib/api/error-responses';
 
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     logger.debug('Starting coordinate fields migration...');
     
@@ -27,10 +43,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (testOrgError || !testOrg) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'No organizations found to test with'
-      }, { status: 400 });
+      return validationError([{ field: 'organizations', message: 'No organizations found to test with' }]);
     }
 
     logger.debug('Testing coordinate field update on organization', testOrg.id);
@@ -46,13 +59,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       logger.error('Coordinate field update failed:', { data: updateError });
-      
-      // もしエラーが発生した場合、フィールドが存在しない可能性がある
-      return NextResponse.json({ 
-        success: false, 
-        error: `Coordinate fields may not exist in database: ${updateError.message}`,
-        details: updateError
-      }, { status: 500 });
+      return handleDatabaseError(updateError);
     }
 
     logger.debug('Successfully updated organization with coordinates');
@@ -64,11 +71,8 @@ export async function POST(request: NextRequest) {
       testOrgId: testOrg.id
     });
 
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Migration API error', { data: error instanceof Error ? error : new Error(String(error)) });
-    return NextResponse.json({ 
-      success: false, 
-      error: error.message || 'Migration failed' 
-    }, { status: 500 });
+    return handleApiError(error);
   }
 }

@@ -1,13 +1,27 @@
+/**
+ * AI Visibility Latest Results API
+ *
+ * ⚠️ Requires site_admin authentication.
+ */
 /* eslint-disable no-console */
-/* eslint-disable no-console */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { getAiVisibilityStatus } from '@/lib/ai-visibility-config';
 import { supabaseAdmin } from '@/lib/supabase-admin-client';
 
 // Get latest AI visibility check results
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   const startTime = Date.now();
-  
+
   try {
     // Test status accessibility first - includes fallback handling
     const status = await getAiVisibilityStatus();

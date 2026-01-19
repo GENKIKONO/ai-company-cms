@@ -1,13 +1,25 @@
 /**
  * Embedding Jobs API
  * P4-4: Embedding ジョブ一覧・詳細取得
+ *
+ * ⚠️ Requires site_admin authentication.
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { getEmbeddingJobs, getEmbeddings } from '@/lib/embedding-client';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError } from '@/lib/api/error-responses';
 
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const type = searchParams.get('type') || 'jobs'; // 'jobs' or 'embeddings'
@@ -72,9 +84,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('[Embedding Jobs API] Error:', { data: error });
-    return NextResponse.json({
-      success: false,
-      message: error instanceof Error ? error.message : 'Internal server error'
-    }, { status: 500 });
+    return handleApiError(error);
   }
 }

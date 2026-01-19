@@ -1,32 +1,29 @@
-// CMS サイト設定 API
-// TODO: [SUPABASE_CMS_MIGRATION] 現在は key-value 形式だが、Supabase の「正」では組織ごとの構造化設定になります
-// 将来的には organization_id ベースの構造化設定 (logo_url, hero_title, seo_title 等) に移行予定
+/**
+ * CMS サイト設定 API
+ * TODO: [SUPABASE_CMS_MIGRATION] 現在は key-value 形式だが、Supabase の「正」では組織ごとの構造化設定になります
+ * 将来的には organization_id ベースの構造化設定 (logo_url, hero_title, seo_title 等) に移行予定
+ *
+ * ⚠️ Requires site_admin authentication.
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError, validationError } from '@/lib/api/error-responses';
 
 // サイト設定一覧取得
 export async function GET(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || !userOrg || userOrg.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     const url = new URL(request.url);
     const isPublicOnly = url.searchParams.get('public_only') === 'true';
@@ -54,10 +51,7 @@ export async function GET(request: NextRequest) {
         });
       }
       
-      return NextResponse.json(
-        { error: 'Failed to fetch site settings' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -68,43 +62,28 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('[CMS Site Settings] Unexpected error', { data: error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // サイト設定更新・作成
 export async function POST(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || !userOrg || userOrg.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     const body = await request.json();
     const { key, value, description, data_type = 'text', is_public = false } = body;
 
     if (!key) {
-      return NextResponse.json(
-        { error: 'Setting key is required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'key', message: 'Setting key is required' }
+      ]);
     }
 
     const settingData = {
@@ -134,10 +113,7 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      return NextResponse.json(
-        { error: 'Failed to save site setting' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -148,43 +124,28 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('[CMS Site Settings] POST error', { data: error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // サイト設定削除
 export async function DELETE(request: NextRequest) {
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
+
   try {
     const supabase = await createClient();
-    
-    // 管理者認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userOrg, error: orgError } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (orgError || !userOrg || userOrg.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
 
     const url = new URL(request.url);
     const key = url.searchParams.get('key');
 
     if (!key) {
-      return NextResponse.json(
-        { error: 'Setting key is required' },
-        { status: 400 }
-      );
+      return validationError([
+        { field: 'key', message: 'Setting key is required' }
+      ]);
     }
 
     const { error } = await supabase
@@ -194,10 +155,7 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       logger.error('[CMS Site Settings] Failed to delete setting', { data: error });
-      return NextResponse.json(
-        { error: 'Failed to delete site setting' },
-        { status: 500 }
-      );
+      return handleDatabaseError(error);
     }
 
     return NextResponse.json({
@@ -207,9 +165,6 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     logger.error('[CMS Site Settings] DELETE error', { data: error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

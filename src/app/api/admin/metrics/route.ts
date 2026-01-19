@@ -8,8 +8,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserFullWithClient } from '@/lib/core/auth-state';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { logger } from '@/lib/utils/logger';
+import { handleApiError, handleDatabaseError } from '@/lib/api/error-responses';
 import type {
   AdminMetricsResponse,
   MetricsApiParams,
@@ -29,35 +30,17 @@ import type {
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 export async function GET(request: NextRequest) {
-  try {
-    // ============================================
-    // 1. 認証確認（Super Admin限定）（Core経由）
-    // ============================================
+  // 管理者認証チェック
+  const authResult = await requireAdmin();
+  if (!isAuthorized(authResult)) {
+    return authResult.response;
+  }
 
+  try {
     const supabase = await createClient();
 
-    const user = await getUserFullWithClient(supabase);
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    // Super Admin権限チェック
-    const userRole = (user.user_metadata?.role as string) ||
-                     (user.app_metadata?.role as string) ||
-                     user.app_role;
-
-    if (userRole !== 'super_admin') {
-      return NextResponse.json(
-        { error: 'Super admin privileges required' },
-        { status: 403 }
-      );
-    }
-
     // ============================================
-    // 2. クエリパラメータ解析
+    // クエリパラメータ解析
     // ============================================
     
     const { searchParams } = new URL(request.url);
@@ -68,7 +51,7 @@ export async function GET(request: NextRequest) {
     if (orgId && orgId !== 'all') {
       // 特定組織を指定している場合は、その組織へのアクセス権限をチェック
       // 現在はSuper Adminなので全組織アクセス可能だが、将来の拡張性のため記載
-      logger.debug('Organization-specific metrics request:', { data: { orgId, user_id: user.id } });
+      logger.debug('Organization-specific metrics request:', { data: { orgId, user_id: authResult.userId } });
     }
 
     // ============================================
@@ -98,14 +81,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logger.error('Admin metrics API error:', { data: error });
-    return NextResponse.json(
-      { 
-        success: false,
-        error: 'Failed to fetch metrics data',
-        data: createEmptyMetricsResponse()
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
