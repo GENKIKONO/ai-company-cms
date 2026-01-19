@@ -1,18 +1,27 @@
 /**
  * GET /api/diag/headers - 診断用: リクエストヘッダー検証
  *
+ * ⚠️ ADMIN ONLY - 管理者認証が必要
+ *
  * 目的: auth-token Cookie 消失問題の切り分け
  * - 受信した request headers のうち cookie の有無/長さ
  * - x-forwarded-* ヘッダーの確認
- *
- * 本番で一時的に使う。後で削除予定。
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 
 export async function GET(request: NextRequest) {
+  // 本番環境では管理者認証必須
+  if (process.env.NODE_ENV === 'production') {
+    const authResult = await requireAdmin();
+    if (!isAuthorized(authResult)) {
+      return authResult.response;
+    }
+  }
+
   const requestId = crypto.randomUUID();
   const sha = process.env.VERCEL_GIT_COMMIT_SHA ||
               process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
@@ -24,45 +33,39 @@ export async function GET(request: NextRequest) {
   const hasCookieHeader = cookieHeader !== null;
   const cookieHeaderLength = cookieHeader?.length || 0;
 
-  // Cookie 名だけ抽出
-  const cookieNames: string[] = [];
+  // Cookie 名だけ抽出（supabase関連のみ）
+  const supabaseCookieNames: string[] = [];
   if (cookieHeader) {
     const pairs = cookieHeader.split(';');
     pairs.forEach(pair => {
       const name = pair.trim().split('=')[0];
-      if (name) cookieNames.push(name);
+      if (name && (name.startsWith('sb-') || name.startsWith('supabase'))) {
+        supabaseCookieNames.push(name);
+      }
     });
   }
 
-  // 重要なヘッダー（診断用）
+  // 診断に必要な最小限のヘッダー情報のみ
   const headers: Record<string, string | null> = {
     host: request.headers.get('host'),
     'x-forwarded-proto': request.headers.get('x-forwarded-proto'),
-    'x-forwarded-host': request.headers.get('x-forwarded-host'),
-    'x-forwarded-for': request.headers.get('x-forwarded-for'),
+    // x-forwarded-for はIPを含むので本番では制限
+    'x-forwarded-for-present': request.headers.get('x-forwarded-for') ? 'yes' : 'no',
     'x-vercel-id': request.headers.get('x-vercel-id'),
-    'x-real-ip': request.headers.get('x-real-ip'),
-    origin: request.headers.get('origin'),
-    referer: request.headers.get('referer'),
-    'user-agent': request.headers.get('user-agent')?.slice(0, 100) || null,
   };
 
   const result = {
     requestId,
-    sha,
+    sha: sha.slice(0, 7),
     timestamp,
-    url: request.url,
     method: request.method,
     cookie: {
       present: hasCookieHeader,
       length: cookieHeaderLength,
-      names: cookieNames,
-      supabaseNames: cookieNames.filter(n => n.startsWith('sb-') || n.startsWith('supabase')),
+      supabaseCount: supabaseCookieNames.length,
     },
     headers,
   };
-
-  console.log('[api/diag/headers] === DIAGNOSTIC ===', result);
 
   return NextResponse.json(result, {
     status: 200,

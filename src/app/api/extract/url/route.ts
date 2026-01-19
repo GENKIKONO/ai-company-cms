@@ -1,9 +1,152 @@
+/**
+ * URL Content Extraction API
+ *
+ * HTMLページからテキストとメタデータを抽出する
+ * SSRF対策: 内部ネットワーク・メタデータサービスへのアクセスをブロック
+ */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { extractionRateLimit } from '@/lib/rate-limit';
-import { trackBusinessEvent, notifyError } from '@/lib/monitoring';
 import { logger } from '@/lib/utils/logger';
+import dns from 'dns';
+import { promisify } from 'util';
+
+const dnsLookup = promisify(dns.lookup);
+
+/**
+ * SSRF対策: 内部IPアドレス/ホスト名をブロック
+ */
+function isInternalOrDangerousHost(hostname: string): boolean {
+  const lowerHostname = hostname.toLowerCase();
+
+  // 危険なホスト名パターン
+  const blockedHostnames = [
+    'localhost',
+    'localhost.localdomain',
+    '127.0.0.1',
+    '0.0.0.0',
+    '::1',
+    '[::1]',
+    // AWS/GCP/Azure メタデータサービス
+    '169.254.169.254',
+    'metadata.google.internal',
+    'metadata.gcp.internal',
+    // Kubernetes
+    'kubernetes.default',
+    'kubernetes.default.svc',
+  ];
+
+  if (blockedHostnames.includes(lowerHostname)) {
+    return true;
+  }
+
+  // *.internal, *.local などの内部ドメイン
+  const blockedSuffixes = ['.internal', '.local', '.localhost', '.localdomain'];
+  if (blockedSuffixes.some(suffix => lowerHostname.endsWith(suffix))) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * SSRF対策: 内部IPアドレスをブロック
+ */
+function isPrivateIP(ip: string): boolean {
+  // IPv4 private ranges
+  const ipv4PrivateRanges = [
+    /^127\./,                     // 127.0.0.0/8 (loopback)
+    /^10\./,                      // 10.0.0.0/8
+    /^172\.(1[6-9]|2[0-9]|3[01])\./, // 172.16.0.0/12
+    /^192\.168\./,                // 192.168.0.0/16
+    /^169\.254\./,                // 169.254.0.0/16 (link-local, AWS metadata)
+    /^0\./,                       // 0.0.0.0/8
+    /^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\./, // 100.64.0.0/10 (Carrier-grade NAT)
+    /^192\.0\.0\./,               // 192.0.0.0/24
+    /^192\.0\.2\./,               // 192.0.2.0/24 (TEST-NET-1)
+    /^198\.51\.100\./,            // 198.51.100.0/24 (TEST-NET-2)
+    /^203\.0\.113\./,             // 203.0.113.0/24 (TEST-NET-3)
+    /^224\./,                     // 224.0.0.0/4 (Multicast)
+    /^240\./,                     // 240.0.0.0/4 (Reserved)
+    /^255\.255\.255\.255$/,       // Broadcast
+  ];
+
+  for (const range of ipv4PrivateRanges) {
+    if (range.test(ip)) {
+      return true;
+    }
+  }
+
+  // IPv6 private/special ranges (simplified check)
+  if (ip.includes(':')) {
+    const lowerIP = ip.toLowerCase();
+    if (
+      lowerIP === '::1' ||           // Loopback
+      lowerIP.startsWith('fe80:') || // Link-local
+      lowerIP.startsWith('fc') ||    // Unique local (fc00::/7)
+      lowerIP.startsWith('fd') ||    // Unique local
+      lowerIP.startsWith('::ffff:127.') || // IPv4-mapped loopback
+      lowerIP.startsWith('::ffff:10.') ||  // IPv4-mapped private
+      lowerIP.startsWith('::ffff:192.168.') // IPv4-mapped private
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * DNSリバインディング対策を含むURL検証
+ */
+async function validateUrlForSSRF(url: string): Promise<{ valid: boolean; error?: string }> {
+  try {
+    const urlObj = new URL(url);
+
+    // プロトコル検証
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      return { valid: false, error: 'Only HTTP/HTTPS protocols are allowed' };
+    }
+
+    // ホスト名検証
+    if (isInternalOrDangerousHost(urlObj.hostname)) {
+      logger.warn('[URL Extract] Blocked internal hostname', { hostname: urlObj.hostname });
+      return { valid: false, error: 'Access to internal resources is not allowed' };
+    }
+
+    // IPアドレス直接指定の検証
+    if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(urlObj.hostname)) {
+      if (isPrivateIP(urlObj.hostname)) {
+        logger.warn('[URL Extract] Blocked private IP', { ip: urlObj.hostname });
+        return { valid: false, error: 'Access to private IP addresses is not allowed' };
+      }
+    }
+
+    // DNS解決してIPアドレスを検証（DNSリバインディング対策）
+    try {
+      const { address } = await dnsLookup(urlObj.hostname);
+      if (isPrivateIP(address)) {
+        logger.warn('[URL Extract] DNS resolved to private IP', {
+          hostname: urlObj.hostname,
+          resolvedIP: address
+        });
+        return { valid: false, error: 'Target resolves to a private IP address' };
+      }
+    } catch (dnsError) {
+      // DNS解決失敗は許可しない
+      logger.warn('[URL Extract] DNS lookup failed', {
+        hostname: urlObj.hostname,
+        error: dnsError instanceof Error ? dnsError.message : String(dnsError)
+      });
+      return { valid: false, error: 'Unable to resolve hostname' };
+    }
+
+    return { valid: true };
+  } catch (error) {
+    return { valid: false, error: 'Invalid URL format' };
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,23 +175,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // URLバリデーション
-    let urlObj;
-    try {
-      urlObj = new URL(url);
-      if (!['http:', 'https:'].includes(urlObj.protocol)) {
-        throw new Error('Invalid protocol');
-      }
-    } catch {
+    // SSRF対策を含むURL検証
+    const urlValidation = await validateUrlForSSRF(url);
+    if (!urlValidation.valid) {
       return NextResponse.json(
-        { error: '有効なURLを入力してください' },
+        { error: urlValidation.error || '無効なURLです' },
         { status: 400 }
       );
     }
 
-    // レート制限チェック（簡易版）
-    const userAgent = 'AIOHub-CMS/1.0 (+https://aiohub.ai)';
-    
+    const userAgent = 'AIOHub-CMS/1.0 (+https://aiohub.jp)';
+
     try {
       // タイムアウト付きでフェッチ
       const controller = new AbortController();
@@ -62,10 +199,26 @@ export async function POST(request: NextRequest) {
           'Accept-Encoding': 'gzip, deflate',
           'Cache-Control': 'no-cache'
         },
-        signal: controller.signal
+        signal: controller.signal,
+        redirect: 'follow', // リダイレクトは自動フォロー（ただし最大5回に制限される）
       });
 
       clearTimeout(timeoutId);
+
+      // リダイレクト先のURLも検証
+      if (response.url !== url) {
+        const redirectValidation = await validateUrlForSSRF(response.url);
+        if (!redirectValidation.valid) {
+          logger.warn('[URL Extract] Redirect to blocked URL', {
+            originalUrl: url,
+            redirectUrl: response.url
+          });
+          return NextResponse.json(
+            { error: 'リダイレクト先が無効です' },
+            { status: 400 }
+          );
+        }
+      }
 
       if (!response.ok) {
         return NextResponse.json(
@@ -83,7 +236,7 @@ export async function POST(request: NextRequest) {
       }
 
       const html = await response.text();
-      
+
       // HTMLからテキストとメタデータを抽出
       const extractedData = extractFromHTML(html, url);
 
@@ -100,7 +253,10 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      logger.error('URL extraction error', { data: error instanceof Error ? error : new Error(String(error)) });
+      logger.error('[URL Extract] Fetch error', {
+        url,
+        error: error instanceof Error ? error.message : String(error)
+      });
       return NextResponse.json(
         { error: 'サイトの内容を取得できませんでした' },
         { status: 500 }
@@ -108,7 +264,9 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    logger.error('URL extraction API error', { data: error instanceof Error ? error : new Error(String(error)) });
+    logger.error('[URL Extract] API error', {
+      error: error instanceof Error ? error.message : String(error)
+    });
     return NextResponse.json(
       { error: 'テキスト抽出に失敗しました' },
       { status: 500 }
@@ -118,7 +276,6 @@ export async function POST(request: NextRequest) {
 
 // HTMLからテキストとメタデータを抽出
 function extractFromHTML(html: string, sourceUrl: string) {
-  // 簡易的なHTMLパースと抽出
   let text = '';
   let title = '';
   const headings: string[] = [];
@@ -198,12 +355,14 @@ function extractFromHTML(html: string, sourceUrl: string) {
     return {
       text,
       title,
-      headings: headings.slice(0, 10), // 最大10個の見出し
+      headings: headings.slice(0, 10),
       sourceUrl
     };
 
   } catch (error) {
-    logger.error('HTML parsing error', { data: error instanceof Error ? error : new Error(String(error)) });
+    logger.error('[URL Extract] HTML parsing error', {
+      error: error instanceof Error ? error.message : String(error)
+    });
     return {
       text: 'テキストの抽出に失敗しました',
       title: title || 'Unknown',

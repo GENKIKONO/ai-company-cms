@@ -6,12 +6,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { DashboardPageShell } from '@/components/dashboard';
+import { DashboardPageShell, useDashboardPageContext } from '@/components/dashboard';
 import {
   DashboardPageHeader,
-  DashboardCard,
-  DashboardCardContent,
-  DashboardButton,
   DashboardAlert,
 } from '@/components/dashboard/ui';
 
@@ -30,20 +27,29 @@ function NewFAQContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { organizationId } = useDashboardPageContext();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    if (!organizationId) {
+      setError('組織情報が取得できません。ページを再読み込みしてください。');
+      setLoading(false);
+      return;
+    }
+
     const formData = new FormData(e.currentTarget);
     const data = {
+      organizationId,
       question: formData.get('question')?.toString() || '',
-      answer: formData.get('answer')?.toString() || ''
+      answer: formData.get('answer')?.toString() || '',
+      category: formData.get('category')?.toString() || ''
     };
 
     try {
-      const response = await fetch('/api/faqs', {
+      const response = await fetch('/api/my/faqs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -51,10 +57,10 @@ function NewFAQContent() {
 
       const result = await response.json();
 
-      if (result.ok) {
+      if (response.ok && result.data) {
         router.replace('/dashboard/faqs');
       } else {
-        setError(result.error || '作成に失敗しました');
+        setError(result.error || result.message || '作成に失敗しました');
       }
     } catch (err) {
       setError('ネットワークエラーが発生しました');
@@ -98,6 +104,19 @@ function NewFAQContent() {
               rows={6}
               className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
               placeholder="回答を入力"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="category" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
+              カテゴリ
+            </label>
+            <input
+              type="text"
+              id="category"
+              name="category"
+              className="w-full px-3 py-2 border border-[var(--input-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--aio-primary)]"
+              placeholder="一般、料金、サポートなど"
             />
           </div>
 

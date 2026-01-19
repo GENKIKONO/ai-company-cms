@@ -1,18 +1,19 @@
 /**
  * GET /api/diag/cookies - 診断用: Cookie + Auth セッション検証
  *
+ * ⚠️ ADMIN ONLY - 管理者認証が必要
+ *
  * 目的: auth-token Cookie 消失問題の切り分け
- * - Request の Cookie 名一覧
+ * - Request の Cookie 名一覧（値は非公開）
  * - Core wrapper経由でセッション取得（user id のみ）
  * - Core wrapper経由でユーザー取得（成功/失敗）
- *
- * 本番で一時的に使う。後で削除予定。
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { requireAdmin, isAuthorized } from '@/lib/auth/require-admin';
 import { getSessionWithClient, getUserWithClient } from '@/lib/core/auth-state';
 
 function getProjectRef(): string {
@@ -22,6 +23,14 @@ function getProjectRef(): string {
 }
 
 export async function GET(request: NextRequest) {
+  // 本番環境では管理者認証必須
+  if (process.env.NODE_ENV === 'production') {
+    const authResult = await requireAdmin();
+    if (!isAuthorized(authResult)) {
+      return authResult.response;
+    }
+  }
+
   const requestId = crypto.randomUUID();
   const sha = process.env.VERCEL_GIT_COMMIT_SHA ||
               process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
@@ -31,6 +40,7 @@ export async function GET(request: NextRequest) {
 
   // Request から Cookie を取得
   const allCookies = request.cookies.getAll();
+  // Cookie値は漏洩防止のため名前のみ
   const cookieNames = allCookies.map(c => c.name);
   const supabaseCookieNames = cookieNames.filter(n => n.startsWith('sb-') || n.startsWith('supabase'));
 
@@ -63,45 +73,42 @@ export async function GET(request: NextRequest) {
       sessionUserId = session.user.id;
     }
   } catch (e) {
-    sessionError = `EXCEPTION: ${e instanceof Error ? e.message : String(e)}`;
+    sessionError = 'Session fetch failed';
   }
 
   // getUser の結果（Core wrapper経由）
   let getUserUserId: string | null = null;
   let getUserError: string | null = null;
-  let getUserErrorCode: string | null = null;
   try {
     const authUser = await getUserWithClient(supabase);
     if (authUser) {
       getUserUserId = authUser.id;
     }
   } catch (e) {
-    getUserError = `EXCEPTION: ${e instanceof Error ? e.message : String(e)}`;
-    getUserErrorCode = 'EXCEPTION';
+    getUserError = 'User fetch failed';
   }
 
   const result = {
     requestId,
-    sha,
+    sha: sha.slice(0, 7), // 短縮版のみ
     timestamp,
     projectRef,
     cookies: {
       total: cookieNames.length,
-      names: cookieNames,
-      supabaseNames: supabaseCookieNames,
+      // Cookie名の一覧（センシティブな情報を含む可能性があるため、supabase関連のみ）
+      supabaseCount: supabaseCookieNames.length,
       hasAuthToken,
       hasRefreshToken,
     },
     getSession: {
       success: sessionUserId !== null,
-      userId: sessionUserId,
+      hasUser: sessionUserId !== null,
       error: sessionError,
     },
     getUser: {
       success: getUserUserId !== null,
-      userId: getUserUserId,
+      hasUser: getUserUserId !== null,
       error: getUserError,
-      errorCode: getUserErrorCode,
     },
     diagnosis: {
       cookieContractValid: hasRefreshToken,
@@ -109,8 +116,6 @@ export async function GET(request: NextRequest) {
       sessionValid: sessionUserId !== null && getUserUserId !== null,
     },
   };
-
-  console.log('[api/diag/cookies] === DIAGNOSTIC ===', result);
 
   return NextResponse.json(result, {
     status: 200,

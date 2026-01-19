@@ -1,10 +1,43 @@
 // 動的セクションレンダリングコンポーネント
 import React from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import { CMSSection, getSectionContent } from '@/lib/cms';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+
+/**
+ * HTMLコンテンツをサニタイズ
+ * XSS攻撃を防ぐためにDOMPurifyを使用
+ */
+function sanitizeHtml(html: string): string {
+  if (!html || typeof html !== 'string') {
+    return '';
+  }
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: [
+      'p', 'br', 'strong', 'em', 'u', 'b', 'i', 's', 'strike',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'ul', 'ol', 'li',
+      'a', 'blockquote', 'code', 'pre',
+      'table', 'thead', 'tbody', 'tr', 'th', 'td',
+      'img', 'figure', 'figcaption',
+      'div', 'span', 'section', 'article',
+      'hr', 'sup', 'sub',
+    ],
+    ALLOWED_ATTR: [
+      'href', 'title', 'target', 'rel',
+      'src', 'alt', 'width', 'height',
+      'class', 'id',
+    ],
+    ALLOW_DATA_ATTR: false,
+    // リンクのセキュリティ
+    ADD_ATTR: ['target'],
+    FORBID_TAGS: ['script', 'style', 'iframe', 'form', 'input', 'button', 'object', 'embed'],
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+  });
+}
 
 interface DynamicSectionProps {
   section: CMSSection;
@@ -96,6 +129,9 @@ const TextBlockSection: React.FC<{ section: CMSSection }> = ({ section }) => {
   const content = getSectionContent(section, 'content', '');
   const backgroundColor = getSectionContent<string>(section, 'background_color', 'white');
 
+  // XSS対策: HTMLコンテンツをサニタイズ
+  const sanitizedContent = sanitizeHtml(content);
+
   return (
     <section className={`py-16 ${backgroundColor === 'gray' ? 'bg-gray-100' : 'bg-white'}`}>
       <div className="container mx-auto px-6">
@@ -106,11 +142,11 @@ const TextBlockSection: React.FC<{ section: CMSSection }> = ({ section }) => {
             </h2>
           </div>
         )}
-        
+
         <div className="max-w-4xl mx-auto">
-          <div 
+          <div
             className="prose prose-lg mx-auto text-gray-600 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
         </div>
       </div>

@@ -98,15 +98,10 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
   const handleInviteMember = async () => {
     if (!inviteEmail) return;
 
-    try {
-      // TODO: 実際のメンバー招待機能を実装
-      // 現状は招待機能が未実装のため、UIのみ表示
-      alert('メンバー招待機能は現在開発中です');
-      setInviteEmail('');
-      setShowInviteForm(false);
-    } catch (err) {
-      logger.error('Failed to invite member', { data: err instanceof Error ? err : new Error(String(err)) });
-    }
+    // 招待機能は今後実装予定
+    // 現状は招待フォームを表示しないようにする
+    setInviteEmail('');
+    setShowInviteForm(false);
   };
 
   const handleRoleChange = async (memberId: string, newRole: UserRole) => {
@@ -232,7 +227,8 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
           </span>
         </div>
         
-        {canManageMembers && (
+        {/* 招待機能は今後実装予定のため一時的に非表示 */}
+        {/* {canManageMembers && (
           <button
             onClick={() => setShowInviteForm(true)}
             className="btn btn-primary btn-small"
@@ -240,11 +236,11 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
             <UserPlus className="w-4 h-4" />
             メンバー招待
           </button>
-        )}
+        )} */}
       </div>
 
-      {/* 招待フォーム */}
-      {showInviteForm && (
+      {/* 招待フォーム - 今後実装予定のため一時的に非表示 */}
+      {/* {showInviteForm && (
         <div className="mb-6 p-4 rounded-lg bg-[var(--aio-info-surface)] border border-[var(--aio-info-border)]">
           <h4 className="font-medium text-neutral-900 mb-3">新しいメンバーを招待</h4>
           <div className="space-y-3">
@@ -260,7 +256,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
                 placeholder="example@company.com"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1">
                 権限
@@ -275,7 +271,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
                 <option value="admin">管理者 - 全権限</option>
               </select>
             </div>
-            
+
             <div className="flex gap-2">
               <button
                 onClick={handleInviteMember}
@@ -294,7 +290,7 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* メンバー一覧 */}
       <div className="space-y-3">

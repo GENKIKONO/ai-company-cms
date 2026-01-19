@@ -184,13 +184,6 @@ interface ServiceListItemProps {
 }
 
 function ServiceListItem({ service, onDelete, isDeleting, canDelete }: ServiceListItemProps) {
-  // price の安全な数値変換（null/NaN/文字列対応）
-  const p = service.price;
-  const priceNumber =
-    typeof p === 'string' ? Number(p) :
-    typeof p === 'number' ? p : null;
-  const hasPrice = priceNumber !== null && !Number.isNaN(priceNumber);
-
   // 日付の安全なフォーマット
   const formatDate = (dateStr: string | null | undefined): string | null => {
     if (!dateStr) return null;
@@ -204,27 +197,28 @@ function ServiceListItem({ service, onDelete, isDeleting, canDelete }: ServiceLi
   const updatedAtFormatted = formatDate(service.updated_at);
   const showUpdatedAt = updatedAtFormatted && service.updated_at !== service.created_at;
 
+  // titleまたはnameを使用（ビューはtitleを返すが、元テーブルはname）
+  const displayTitle = service.title || (service as any).name || '無題';
+  // summaryまたはdescriptionを使用
+  const displaySummary = service.summary || (service as any).description;
+
   return (
     <div className="p-6 hover:bg-[var(--aio-muted)]/50 transition-colors">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-medium text-[var(--color-text-primary)] truncate">
-            {service.title}
+            {displayTitle}
           </h3>
-          {service.description && (
+          {displaySummary && (
             <p className="mt-1 text-sm text-[var(--color-text-secondary)] line-clamp-2">
-              {service.description}
+              {displaySummary}
             </p>
           )}
           <div className="mt-2 flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
-            {service.category && (
-              <DashboardBadge variant="default">{service.category}</DashboardBadge>
-            )}
-            {hasPrice && (
-              <span>価格: ¥{priceNumber.toLocaleString()}</span>
-            )}
-            {service.duration_months && (
-              <span>期間: {service.duration_months}ヶ月</span>
+            {service.is_published ? (
+              <DashboardBadge variant="success">公開中</DashboardBadge>
+            ) : (
+              <DashboardBadge variant="default">非公開</DashboardBadge>
             )}
           </div>
           <div className="mt-2 text-sm text-[var(--color-text-tertiary)]">

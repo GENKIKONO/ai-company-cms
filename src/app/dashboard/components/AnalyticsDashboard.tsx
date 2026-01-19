@@ -15,6 +15,7 @@ import { getTrialStatus, type TrialStatus } from '@/lib/trial-manager';
 import type { Organization } from '@/types/legacy/database';
 import { PLAN_LIMITS } from '@/config/plans';
 import { logger } from '@/lib/utils/logger';
+import { useDashboardPageContextSafe } from '@/components/dashboard/DashboardPageShell';
 
 /** API から返される EffectiveFeature 型 */
 interface EffectiveFeature {
@@ -76,6 +77,11 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
   const [features, setFeatures] = useState<EffectiveFeature[]>([]);
   const [uiLimits, setUiLimits] = useState<PlanUiLimits | null>(null);
 
+  // Phase 3 最適化: DashboardPageContext から contentCounts を取得
+  // /api/dashboard/init で既に取得済みのため、追加APIコールを削減
+  const pageContext = useDashboardPageContextSafe();
+  const contextContentCounts = pageContext?.contentCounts;
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -102,22 +108,30 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
           }
         }
 
-        // /api/dashboard/stats から実際のデータを取得
-        const statsRes = await fetch('/api/dashboard/stats');
+        // Phase 3 最適化: Context からコンテンツ数を取得
+        // フォールバック: Context にデータがない場合のみ /api/dashboard/stats を呼ぶ
         let contentCounts = {
-          services: 0,
-          faqs: 0,
-          caseStudies: 0,
+          services: contextContentCounts?.services ?? 0,
+          faqs: contextContentCounts?.faqs ?? 0,
+          caseStudies: contextContentCounts?.case_studies ?? 0,
         };
 
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          if (statsData.ok && statsData.counts) {
-            contentCounts = {
-              services: statsData.counts.services?.count || 0,
-              faqs: statsData.counts.faqs?.count || 0,
-              caseStudies: statsData.counts.case_studies?.count || 0,
-            };
+        // Context にデータがない場合のみ API を呼ぶ（フォールバック）
+        if (!contextContentCounts) {
+          try {
+            const statsRes = await fetch('/api/dashboard/stats');
+            if (statsRes.ok) {
+              const statsData = await statsRes.json();
+              if (statsData.ok && statsData.counts) {
+                contentCounts = {
+                  services: statsData.counts.services?.count || 0,
+                  faqs: statsData.counts.faqs?.count || 0,
+                  caseStudies: statsData.counts.case_studies?.count || 0,
+                };
+              }
+            }
+          } catch (statsErr) {
+            logger.warn('Failed to fetch stats from API, using context fallback', { error: statsErr });
           }
         }
 
@@ -181,7 +195,7 @@ export default function AnalyticsDashboard({ organization, userRole }: Analytics
     };
 
     fetchDashboardData();
-  }, [organization]);
+  }, [organization, contextContentCounts]);
 
   // NOTE: [FEATUREGATE_PHASE2] featureGate 優先、フォールバックで PLAN_LIMITS
   const staticPlanLimits = PLAN_LIMITS[organization.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.starter;

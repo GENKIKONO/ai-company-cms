@@ -6,12 +6,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { DashboardPageShell } from '@/components/dashboard';
+import { DashboardPageShell, useDashboardPageContext } from '@/components/dashboard';
 import {
   DashboardPageHeader,
-  DashboardCard,
-  DashboardCardContent,
-  DashboardButton,
   DashboardAlert,
 } from '@/components/dashboard/ui';
 import ServiceImageUploader from '@/components/ServiceImageUploader';
@@ -37,14 +34,22 @@ function NewServiceContent() {
   const [ctaUrl, setCtaUrl] = useState<string>('');
   const [publishStatus, setPublishStatus] = useState<'draft' | 'published' | 'private'>('draft');
   const router = useRouter();
+  const { organizationId } = useDashboardPageContext();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    if (!organizationId) {
+      setError('組織情報が取得できません。ページを再読み込みしてください。');
+      setLoading(false);
+      return;
+    }
+
     const formData = new FormData(e.currentTarget);
     const data = {
+      organizationId,
       name: formData.get('name')?.toString() || '',
       summary: formData.get('summary')?.toString() || '',
       description: formData.get('description')?.toString() || '',
@@ -56,7 +61,7 @@ function NewServiceContent() {
     };
 
     try {
-      const response = await fetch('/api/services', {
+      const response = await fetch('/api/my/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -64,12 +69,12 @@ function NewServiceContent() {
 
       if (!response.ok) {
         const result = await response.json().catch(() => ({}));
-        
+
         if (response.status === 401) {
           setError('認証が必要です。ログインし直してください。');
           return;
-        } else if (response.status === 404 && result.error?.includes('Organization not found')) {
-          setError('企業情報が見つかりません。先に企業情報を作成してください。');
+        } else if (response.status === 403) {
+          setError('この操作を行う権限がありません。');
         } else if (response.status === 400 && result.code === 'DUPLICATE_SLUG') {
           setError('このスラッグは既に使用されています。別のスラッグを使用してください。');
         } else if (response.status >= 500) {
@@ -83,7 +88,7 @@ function NewServiceContent() {
       }
 
       const result = await response.json();
-      if (result.ok && result.data) {
+      if (result.data) {
         router.replace('/dashboard/services');
       } else {
         setError(result.error || 'サービスの作成に失敗しました');

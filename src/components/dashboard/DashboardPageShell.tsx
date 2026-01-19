@@ -79,6 +79,13 @@ export interface DashboardPageContext {
   invalidateOrganization: () => Promise<void>;
   /** リクエストID（エラー追跡用） */
   requestId: string;
+  /** コンテンツ数（Phase 3 最適化で追加） */
+  contentCounts?: {
+    services: number;
+    faqs: number;
+    case_studies: number;
+    posts: number;
+  };
 }
 
 /** 拡張ポイント用のレンダー関数型 */
@@ -185,6 +192,8 @@ export function DashboardPageShell({
   const [isDataFetched, setIsDataFetched] = useState(false);
   // ビルドSHA（APIから取得）
   const [buildSha, setBuildSha] = useState<string>('loading...');
+  // Phase 3: コンテンツ数（APIから取得）
+  const [contentCounts, setContentCounts] = useState<DashboardPageContext['contentCounts']>(undefined);
 
   // Fetch counter ref to track current fetch and ignore stale results
   // This prevents race conditions during client-side navigation
@@ -237,6 +246,7 @@ export function DashboardPageShell({
     setFeatureUnavailable(false);
     setFeatureGateInfo(null);
     setIsDataFetched(false);
+    setContentCounts(undefined);
 
     try {
       // Public ページの場合は認証不要
@@ -367,6 +377,11 @@ export function DashboardPageShell({
             setFeatureGateInfo(initData.featureGate);
           }
         }
+      }
+
+      // Phase 3: コンテンツ数を取得
+      if (initData.contentCounts) {
+        setContentCounts(initData.contentCounts);
       }
 
       // Phase 3: メンバーシップに基づいて AuthState を設定
@@ -520,6 +535,7 @@ export function DashboardPageShell({
     refresh: fetchData,
     invalidateOrganization,
     requestId,
+    contentCounts,
   };
 
   /**

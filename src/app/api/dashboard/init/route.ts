@@ -116,6 +116,13 @@ export interface DashboardInitResponse {
     details?: string | null;
     hint?: string | null;
   };
+  /** コンテンツ数（Phase 3 最適化で追加） */
+  contentCounts?: {
+    services: number;
+    faqs: number;
+    case_studies: number;
+    posts: number;
+  };
   requestId: string;
   sha: string;
   timestamp: string;
@@ -414,6 +421,37 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }
     }
 
+    // Phase 3 最適化: コンテンツ数を並列取得
+    // AnalyticsDashboard での追加API呼び出しを削減
+    let contentCounts: DashboardInitResponse['contentCounts'] | undefined;
+    if (orgsData && orgsData.length > 0) {
+      try {
+        whichStep = 'contentCounts';
+        const firstOrgId = orgsData[0].id;
+
+        // 4テーブルを並列でカウント
+        const [servicesResult, faqsResult, caseStudiesResult, postsResult] = await Promise.all([
+          supabase.from('services').select('id', { count: 'exact', head: true }).eq('organization_id', firstOrgId),
+          supabase.from('faqs').select('id', { count: 'exact', head: true }).eq('organization_id', firstOrgId),
+          supabase.from('case_studies').select('id', { count: 'exact', head: true }).eq('organization_id', firstOrgId),
+          supabase.from('posts').select('id', { count: 'exact', head: true }).eq('organization_id', firstOrgId),
+        ]);
+
+        contentCounts = {
+          services: servicesResult.count ?? 0,
+          faqs: faqsResult.count ?? 0,
+          case_studies: caseStudiesResult.count ?? 0,
+          posts: postsResult.count ?? 0,
+        };
+      } catch (err) {
+        // コンテンツ数取得失敗は非致命的、undefined のまま
+        console.warn('[dashboard/init] contentCounts failed', {
+          requestId,
+          error: err instanceof Error ? err.message : 'Unknown',
+        });
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       user: userInfo,
@@ -426,6 +464,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       memberships: memberships.map(m => ({ organization_id: m.organization_id, role: m.role })),
       featureCheck,
       featureGate,
+      contentCounts,
       diagnostics: {
         cookieHeaderPresent,
         cookieNames,
