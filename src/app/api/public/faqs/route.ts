@@ -14,9 +14,13 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
 
     const supabase = await createClient();
-    
+
+    // 公開判定: is_published + published_at + deleted_at
+    const nowISO = new Date().toISOString();
+
+    // VIEW経由で公開FAQを取得（SST強制）
     let query = supabase
-      .from('faqs')
+      .from('v_faqs_public')
       .select(`
         id,
         question,
@@ -27,7 +31,9 @@ export async function GET(request: NextRequest) {
         created_at,
         updated_at
       `, { count: 'exact' })
-      .eq('status', 'published')
+      .eq('is_published', true)
+      .or(`published_at.is.null,published_at.lte.${nowISO}`)
+      .is('deleted_at', null)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true });
 

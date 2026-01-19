@@ -14,10 +14,13 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     const supabase = await createClient();
-    
-    // 公開サービスを取得（実テーブル基準 - 存在するカラムのみ）
+
+    // 公開判定: is_published + published_at + deleted_at
+    const nowISO = new Date().toISOString();
+
+    // 公開サービスを取得（VIEW経由 - SST強制）
     const { data: services, error, count } = await supabase
-      .from('services')
+      .from('v_services_public')
       .select(`
         id,
         name,
@@ -27,7 +30,9 @@ export async function GET(request: NextRequest) {
         updated_at,
         organization_id
       `, { count: 'exact' })
-      .eq('status', 'published')
+      .eq('is_published', true)
+      .or(`published_at.is.null,published_at.lte.${nowISO}`)
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 

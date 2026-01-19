@@ -9,6 +9,46 @@ import { logger } from '@/lib/log';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// ============================================
+// 🔒 Public API Security: Blocklist
+// ============================================
+
+/**
+ * 絶対に公開APIで返さないカラム（sanitize用blocklist）
+ */
+const ORGANIZATION_BLOCKED_KEYS = [
+  'created_by',
+  'user_id',
+  'feature_flags',
+  'plan',
+  'plan_id',
+  'discount_group',
+  'original_signup_campaign',
+  'entitlements',
+  'partner_id',
+  'trial_end',
+  'data_status',
+  'verified_by',
+  'verified_at',
+  'verification_source',
+  'content_hash',
+  'source_urls',
+  'archived',
+  'deleted_at',
+  'keywords',
+] as const;
+
+/**
+ * オブジェクトから秘匿キーを削除する（保険用sanitize）
+ */
+function sanitizeOrganization<T extends Record<string, unknown>>(org: T): T {
+  const sanitized = { ...org };
+  for (const key of ORGANIZATION_BLOCKED_KEYS) {
+    delete sanitized[key];
+  }
+  return sanitized;
+}
+
 /**
  * GET /api/public/organizations
  * 公開組織一覧を取得（JOINなし・2段階取得版）
@@ -29,9 +69,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
     );
 
-    // Step 1: Organizations のみを取得（JOINなしでRLS対応）
+    // Step 1: Organizations のみを取得（VIEW経由 - SST強制）
     const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
+      .from('v_organizations_public')
       .select(`
         id,
         name,
@@ -88,16 +128,22 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // Step 2: Organization IDsを抽出
     const organizationIds = orgData.map(org => org.id);
 
+    // 公開判定: is_published + published_at + deleted_at
+    const nowISO = new Date().toISOString();
+
     // Step 3: Services と Case Studies を別々に取得（エラー耐性あり）
     let servicesData: any[] = [];
     let caseStudiesData: any[] = [];
 
-    // Services取得
+    // Services取得（VIEW経由 - SST強制）
     try {
       const { data: services, error: servicesError } = await supabase
-        .from('services')
+        .from('v_services_public')
         .select('id, name, description, organization_id')
-        .in('organization_id', organizationIds);
+        .in('organization_id', organizationIds)
+        .eq('is_published', true)
+        .or(`published_at.is.null,published_at.lte.${nowISO}`)
+        .is('deleted_at', null);
 
       if (servicesError) {
         logger.warn('[public/organizations] services query failed', { data: { error: servicesError.message } });
@@ -110,12 +156,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       servicesData = [];
     }
 
-    // Case Studies取得
+    // Case Studies取得（VIEW経由 - SST強制）
     try {
       const { data: caseStudies, error: caseStudiesError } = await supabase
-        .from('case_studies')
+        .from('v_case_studies_public')
         .select('id, title, organization_id')
-        .in('organization_id', organizationIds);
+        .in('organization_id', organizationIds)
+        .eq('is_published', true)
+        .or(`published_at.is.null,published_at.lte.${nowISO}`)
+        .is('deleted_at', null);
 
       if (caseStudiesError) {
         logger.warn('[public/organizations] case studies query failed', { data: { error: caseStudiesError.message } });
@@ -144,13 +193,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return acc;
     }, {} as Record<string, any[]>);
 
-    // データ変換（services, case_studiesを追加）
-    const transformedData = orgData.map(org => ({
-      ...org,
-      industries: Array.isArray(org.industries) ? org.industries : [],
-      services: servicesByOrg[org.id] || [],
-      case_studies: caseStudiesByOrg[org.id] || []
-    }));
+    // データ変換（services, case_studiesを追加）+ 🔒 sanitize適用
+    const transformedData = orgData.map(org => {
+      const sanitized = sanitizeOrganization(org as Record<string, unknown>);
+      return {
+        ...sanitized,
+        industries: Array.isArray(org.industries) ? org.industries : [],
+        services: servicesByOrg[org.id] || [],
+        case_studies: caseStudiesByOrg[org.id] || []
+      };
+    });
 
     // Step 5: レスポンス返却
     return NextResponse.json({

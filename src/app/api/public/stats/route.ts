@@ -40,34 +40,42 @@ export async function GET(request: NextRequest) {
           }
         );
 
+        // 公開判定: is_published + published_at + deleted_at
+        const nowISO = new Date().toISOString();
+
         // タイムアウト付きで統計情報を取得 (3秒制限)
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Stats query timeout')), 3000)
         );
 
+        // VIEW経由で統計情報を取得（SST強制）
         const statsPromise = Promise.allSettled([
-          // 公開企業数
+          // 公開企業数（VIEW経由）
           supabase
-            .from('organizations')
+            .from('v_organizations_public')
             .select('id', { count: 'exact', head: true })
             .eq('is_published', true)
             .eq('status', 'published'),
-          
-          // 公開サービス数
+
+          // 公開サービス数（VIEW経由）
           supabase
-            .from('services')
+            .from('v_services_public')
             .select('id', { count: 'exact', head: true })
-            .eq('is_published', true),
-          
-          // 公開導入事例数
+            .eq('is_published', true)
+            .or(`published_at.is.null,published_at.lte.${nowISO}`)
+            .is('deleted_at', null),
+
+          // 公開導入事例数（VIEW経由）
           supabase
-            .from('case_studies')
+            .from('v_case_studies_public')
             .select('id', { count: 'exact', head: true })
-            .eq('is_published', true),
-          
-          // 業界カテゴリー数（organizationsテーブルのindustriesフィールドから）
+            .eq('is_published', true)
+            .or(`published_at.is.null,published_at.lte.${nowISO}`)
+            .is('deleted_at', null),
+
+          // 業界カテゴリー数（VIEW経由）
           supabase
-            .from('organizations')
+            .from('v_organizations_public')
             .select('industries')
             .eq('is_published', true)
             .not('industries', 'is', null)

@@ -32,31 +32,57 @@ export async function GET(
 
     const supabase = supabaseAdmin;
 
-    // If preview mode, check authentication first
+    // 🔒 Preview mode: 認証必須（世界商用レベル）
     let allowDraftAccess = false;
     if (isPreview) {
       const authHeader = request.headers.get('authorization');
-      if (authHeader) {
-        try {
-          const token = authHeader.replace('Bearer ', '');
-          const { user, error: authError } = await getUserFromTokenWithClient(supabase, token);
 
-          if (!authError && user) {
-            // Check if user has access to the organization
-            const { data: orgAccess, error: orgAccessError } = await supabase
-              .from('organizations')
-              .select('id')
-              .eq('slug', slug)
-              .eq('created_by', user.id)
-              .maybeSingle();
-            
-            if (orgAccess) {
-              allowDraftAccess = true;
-            }
-          }
-        } catch (authErr) {
-          logger.debug('Auth check failed for preview', authErr);
+      // プレビューは認証必須
+      if (!authHeader) {
+        logger.warn('[Preview] Unauthorized access attempt - no auth header', { slug, postId });
+        return NextResponse.json(
+          { error: 'Unauthorized', message: 'Preview requires authentication' },
+          { status: 401 }
+        );
+      }
+
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const { user, error: authError } = await getUserFromTokenWithClient(supabase, token);
+
+        if (authError || !user) {
+          logger.warn('[Preview] Invalid token', { slug, postId, error: authError });
+          return NextResponse.json(
+            { error: 'Unauthorized', message: 'Invalid or expired token' },
+            { status: 401 }
+          );
         }
+
+        // Check if user has access to the organization (owner or member)
+        const { data: orgAccess } = await supabase
+          .from('organizations')
+          .select('id')
+          .eq('slug', slug)
+          .eq('created_by', user.id)
+          .maybeSingle();
+
+        if (!orgAccess) {
+          // TODO: 将来的にはorg_membersテーブルもチェック
+          logger.warn('[Preview] Forbidden - user not org owner', { slug, postId, userId: user.id });
+          return NextResponse.json(
+            { error: 'Forbidden', message: 'You do not have permission to preview this post' },
+            { status: 403 }
+          );
+        }
+
+        allowDraftAccess = true;
+        logger.info('[Preview] Authorized access', { slug, postId, userId: user.id });
+      } catch (authErr) {
+        logger.error('[Preview] Auth check failed', { slug, postId, error: authErr });
+        return NextResponse.json(
+          { error: 'Unauthorized', message: 'Authentication failed' },
+          { status: 401 }
+        );
       }
     }
 
