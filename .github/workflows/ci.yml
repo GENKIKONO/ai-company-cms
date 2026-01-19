@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  # Main CI job - this name is used for Required Status Checks
+  ci:
+    name: CI Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeCheck
+        run: npm run typecheck
+
+      - name: Unit Tests
+        run: npm run test:unit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          # Dummy values for build (not used at runtime)
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+
+      - name: Check Public API Security
+        run: npm run check:public-api
+
+      - name: Check Public Views Usage
+        run: npm run check:public-views
+
+      - name: Smoke Test Public Views (optional)
+        if: ${{ env.BASE_URL != '' }}
+        run: npm run smoke:public-views
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+
+  # Summary for PR status
+  ci-success:
+    name: CI Success
+    needs: [ci]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check CI Result
+        run: |
+          if [ "${{ needs.ci.result }}" != "success" ]; then
+            echo "CI failed"
+            exit 1
+          fi
+          echo "✅ All CI checks passed"
