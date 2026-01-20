@@ -153,18 +153,15 @@ export async function middleware(request: NextRequest) {
 
   // =====================================================
   // 5. セッション更新パス: /dashboard, /account, /my
-  //    → Middleware は「交通整理」に徹する
-  //    → Cookie の有無のみチェック、getUser() は Shell に委譲
-  //    → 過剰な検証は一時的なネットワーク問題で誤ログアウトを引き起こす
+  //    → getUser() でセッションリフレッシュを実行（重要！）
+  //    → ただし失敗してもCookieクリアやリダイレクトはしない
+  //    → 詳細なエラーハンドリングは DashboardPageShell に委譲
   // =====================================================
   const sessionRefreshPaths = [ROUTES.dashboard, '/account', '/my'];
   const isSessionRefreshPath = sessionRefreshPaths.some(path => pathname.startsWith(path));
 
   if (isSessionRefreshPath) {
     // Cookie がないのにダッシュボードにアクセス → ログインへ
-    // NOTE: getUser() による検証は DashboardPageShell に委譲
-    //       Middleware での getUser() は一時的なネットワーク問題で
-    //       誤って「壊れたセッション」と判定し、ログアウトを引き起こすため削除
     if (!hasAuthCookie) {
       console.warn('[middleware] No auth cookie - redirecting to login', {
         sha: DEPLOY_SHA,
@@ -182,7 +179,15 @@ export async function middleware(request: NextRequest) {
       redirectResponse.headers.set('x-request-id', requestId);
       return redirectResponse;
     }
-    // Cookie がある場合は通過させ、詳細な認証チェックは Shell に任せる
+
+    // Cookie がある場合: getUser() を呼び出してセッションリフレッシュを実行
+    // これにより refresh-token から auth-token が再生成され、response に設定される
+    // 失敗しても何もしない（Shell に委譲）
+    try {
+      await supabase.auth.getUser();
+    } catch {
+      // セッションリフレッシュ失敗は無視（Shell でハンドリング）
+    }
   }
 
   // =====================================================
