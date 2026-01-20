@@ -11,10 +11,10 @@ import { ROUTES } from '@/lib/routes';
  * - Cookie/RSC の不安定性に依存しない
  *
  * 【責務の分離】
- * - /admin, /management-console → 厳密認証（getUser）
- * - /dashboard, /account, /my → Middleware は何もしない（DashboardPageShell に委譲）
+ * - /admin, /management-console → 厳密認証（getUser で検証、失敗時リダイレクト）
+ * - /dashboard, /account, /my → Cookie なしならログインへリダイレクト
  * - /auth/login 等 → Cookie があれば /dashboard へ
- * - Supabase セッションの Cookie 同期
+ * - 全ページ → Cookie がある場合はセッションリフレッシュ（公開ページでもログイン状態維持）
  *
  * 【ハードコード禁止】
  * - ルート直書きは禁止、必ず ROUTES 定数を使用
@@ -152,41 +152,40 @@ export async function middleware(request: NextRequest) {
   }
 
   // =====================================================
-  // 5. セッション更新パス: /dashboard, /account, /my
-  //    → getUser() でセッションリフレッシュを実行（重要！）
-  //    → ただし失敗してもCookieクリアやリダイレクトはしない
-  //    → 詳細なエラーハンドリングは DashboardPageShell に委譲
+  // 5. セッション更新（全ページ対象）
+  //    → Cookie がある場合、getUser() でセッションリフレッシュを実行
+  //    → これにより公開ページでもログイン状態が正しく表示される
+  //    → ダッシュボード系パスは追加でリダイレクト制御も行う
   // =====================================================
-  const sessionRefreshPaths = [ROUTES.dashboard, '/account', '/my'];
-  const isSessionRefreshPath = sessionRefreshPaths.some(path => pathname.startsWith(path));
+  const protectedPaths = [ROUTES.dashboard, '/account', '/my'];
+  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
 
-  if (isSessionRefreshPath) {
-    // Cookie がないのにダッシュボードにアクセス → ログインへ
-    if (!hasAuthCookie) {
-      console.warn('[middleware] No auth cookie - redirecting to login', {
-        sha: DEPLOY_SHA,
-        requestId,
-        path: pathname,
-      });
+  // 保護パス（ダッシュボード等）: Cookie がなければログインへリダイレクト
+  if (isProtectedPath && !hasAuthCookie) {
+    console.warn('[middleware] No auth cookie - redirecting to login', {
+      sha: DEPLOY_SHA,
+      requestId,
+      path: pathname,
+    });
 
-      const url = request.nextUrl.clone();
-      url.pathname = ROUTES.authLogin;
-      url.searchParams.set('redirect', pathname);
-      url.searchParams.set('reason', 'no_cookie');
-      url.searchParams.set('rid', requestId.slice(0, 8));
+    const url = request.nextUrl.clone();
+    url.pathname = ROUTES.authLogin;
+    url.searchParams.set('redirect', pathname);
+    url.searchParams.set('reason', 'no_cookie');
+    url.searchParams.set('rid', requestId.slice(0, 8));
 
-      const redirectResponse = NextResponse.redirect(url);
-      redirectResponse.headers.set('x-request-id', requestId);
-      return redirectResponse;
-    }
+    const redirectResponse = NextResponse.redirect(url);
+    redirectResponse.headers.set('x-request-id', requestId);
+    return redirectResponse;
+  }
 
-    // Cookie がある場合: getUser() を呼び出してセッションリフレッシュを実行
-    // これにより refresh-token から auth-token が再生成され、response に設定される
-    // 失敗しても何もしない（Shell に委譲）
+  // 全ページ: Cookie がある場合はセッションリフレッシュを実行
+  // これにより公開ページ（TOPページ等）でもログイン状態が正しく維持される
+  if (hasAuthCookie) {
     try {
       await supabase.auth.getUser();
     } catch {
-      // セッションリフレッシュ失敗は無視（Shell でハンドリング）
+      // セッションリフレッシュ失敗は無視（各ページのShellでハンドリング）
     }
   }
 
