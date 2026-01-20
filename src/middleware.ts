@@ -141,14 +141,33 @@ export async function middleware(request: NextRequest) {
 
   // =====================================================
   // 4. 認証ページ: /auth/login 等
-  //    → Cookie があれば /dashboard へ
+  //    → 古いSupabase Cookieをクリアしてログインページを表示
+  //    → これにより常にクリーンな状態でログインできる
   // =====================================================
-  if (isAuthPath && hasAuthCookie) {
-    const url = request.nextUrl.clone();
-    url.pathname = ROUTES.dashboard;
-    const redirectResponse = NextResponse.redirect(url);
-    redirectResponse.headers.set('x-request-id', requestId);
-    return redirectResponse;
+  if (isAuthPath) {
+    // 古いCookieをクリアするためのレスポンスを作成
+    const authResponse = NextResponse.next({
+      request: { headers: request.headers },
+    });
+
+    // Supabase Cookieをすべてクリア
+    sbCookies.forEach(cookie => {
+      authResponse.cookies.set(cookie.name, '', {
+        path: '/',
+        maxAge: 0,
+      });
+    });
+
+    if (sbCookies.length > 0) {
+      console.log('[middleware] Clearing old Supabase cookies on auth page', {
+        requestId,
+        clearedCookies: sbCookies.map(c => c.name),
+      });
+    }
+
+    setSecurityHeaders(authResponse);
+    authResponse.headers.set('x-request-id', requestId);
+    return authResponse;
   }
 
   // =====================================================
