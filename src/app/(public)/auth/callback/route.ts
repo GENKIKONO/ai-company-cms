@@ -54,10 +54,33 @@ export async function GET(request: NextRequest) {
             requestId,
             cookieCount: cookiesToSet.length,
             cookieNames: cookiesToSet.map(c => c.name),
+            cookieDetails: cookiesToSet.map(c => ({
+              name: c.name,
+              valueLength: c.value?.length || 0,
+              options: c.options,
+            })),
           });
 
           cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
+            // Cookie オプションを明示的に設定（Supabase のデフォルトを尊重しつつ確実に動作させる）
+            const cookieOptions = {
+              ...options,
+              // path は必ず / を設定（全ページで有効にする）
+              path: options?.path || '/',
+              // SameSite は lax を推奨
+              sameSite: options?.sameSite || 'lax' as const,
+              // Secure は本番環境のみ
+              secure: options?.secure ?? process.env.NODE_ENV === 'production',
+            };
+
+            console.log('[auth/callback] Setting cookie', {
+              requestId,
+              name,
+              valueLength: value?.length || 0,
+              options: cookieOptions,
+            });
+
+            response.cookies.set(name, value, cookieOptions);
           });
         },
       },
@@ -78,12 +101,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // 成功ログ
+  // 成功ログ: 実際に設定されるCookie名を確認
+  const setCookieHeaders = response.headers.getSetCookie();
   console.log('[auth/callback] Session established', {
     requestId,
     redirectTo: next,
     setCookieCount,
-    setCookieHeaderPresent: response.headers.has('set-cookie'),
+    actualSetCookieCount: setCookieHeaders.length,
+    setCookieNames: setCookieHeaders.map(h => h.split('=')[0]),
   });
 
   return response;
