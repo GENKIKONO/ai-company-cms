@@ -35,11 +35,11 @@ export async function generateStaticParams() {
     );
 
     // 🔒 VIEW経由で公開中の組織slugsを取得（非公開組織は絶対に含まれない）
+    // ⚠️ VIEWは既に is_published=true AND deleted_at IS NULL でフィルター済み
+    //    status/is_published フィルターは不要（VIEWに存在しないカラム）
     const { data: orgs } = await supabase
       .from('v_organizations_public')
       .select('slug')
-      .eq('status', 'published')
-      .eq('is_published', true)
       .limit(200);
 
     if (!orgs) return [];

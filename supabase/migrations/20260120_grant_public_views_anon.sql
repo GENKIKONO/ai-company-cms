@@ -14,5 +14,7 @@ BEGIN;
 GRANT SELECT ON public.v_organizations_public TO anon;
 GRANT SELECT ON public.v_services_public TO anon;
 GRANT SELECT ON public.v_case_studies_public TO anon;
+GRANT SELECT ON public.v_posts_public TO anon;
+GRANT SELECT ON public.v_faqs_public TO anon;
 
 COMMIT;

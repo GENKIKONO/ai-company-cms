@@ -15,21 +15,29 @@ export const dynamic = 'force-dynamic';
 
 /**
  * 公開APIで返却を許可するorganizationカラム
- * ※ select() で使用する
+ * ⚠️ v_organizations_public VIEW に存在するカラムのみ指定すること
+ *
+ * VIEW定義（確定・変更禁止）:
+ *   id, slug, name, description, logo_url, website_url,
+ *   meta_title, meta_description, email_public,
+ *   show_services, show_posts, show_case_studies, show_faqs, show_qa, show_news
  */
 const ORGANIZATION_PUBLIC_COLUMNS = `
-  id, name, slug, description,
-  legal_form, representative_name, corporate_number,
-  established_at, capital, employees,
-  address_country, address_region, address_locality, address_postal_code, address_street,
-  lat, lng,
-  telephone, email, email_public, url, logo_url, website_url,
-  industries, same_as,
-  status, is_published,
-  created_at, updated_at,
-  meta_title, meta_description, meta_keywords,
-  verified,
-  show_services, show_posts, show_case_studies, show_faqs, show_qa, show_news, show_partnership, show_contact
+  id,
+  slug,
+  name,
+  description,
+  logo_url,
+  website_url,
+  meta_title,
+  meta_description,
+  email_public,
+  show_services,
+  show_posts,
+  show_case_studies,
+  show_faqs,
+  show_qa,
+  show_news
 `;
 
 /**
@@ -95,12 +103,12 @@ export async function GET(
 
     // 組織情報を取得（VIEW経由 - SST強制）
     // 🔒 公開APIのため allowlist カラムのみ取得（課金・内部情報は除外）
+    // ⚠️ VIEWは既に is_published=true AND deleted_at IS NULL でフィルター済み
+    //    status/is_published フィルターは不要（VIEWに存在しないカラム）
     const { data: organization, error: orgError } = await supabase
       .from('v_organizations_public')
       .select(ORGANIZATION_PUBLIC_COLUMNS)
       .eq('slug', slug)
-      .eq('is_published', true)
-      .eq('status', 'published')
       .maybeSingle();
 
     if (orgError) {
