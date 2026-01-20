@@ -219,47 +219,17 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }
     );
 
-    // Step 3: セッション取得または復元
-    // refresh-token のみ存在する場合、refreshSession() で明示的に復元を試みる
+    // Step 3: セッション取得
+    // 注意: Middleware が全ページで getUser() を呼び、トークンローテーションを処理済み
+    // ここでは refreshSession() を呼ばない（二重ローテーションでトークン無効化を防ぐ）
     whichStep = 'getSession';
     let session = null;
     let sessionError = null;
 
-    // まず getSession() を試す
+    // getSession() でセッションを取得（ローテーションは行わない）
     const getSessionResult = await supabase.auth.getSession();
     session = getSessionResult.data?.session;
     sessionError = getSessionResult.error;
-
-    // セッションがなく、refresh-token がある場合は refreshSession() を試す
-    if (!session && hasRefreshToken && !sessionError) {
-      whichStep = 'refreshSession';
-
-      // Cookie から refresh_token の値を取得
-      const refreshTokenCookie = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`);
-      const refreshToken = refreshTokenCookie?.value;
-
-      if (refreshToken) {
-        // eslint-disable-next-line no-console
-        console.log('[dashboard/init] No session, trying refreshSession() with token', { requestId });
-
-        // 明示的に refresh_token を渡してセッションを復元
-        const refreshResult = await supabase.auth.refreshSession({ refresh_token: refreshToken });
-        session = refreshResult.data?.session;
-        sessionError = refreshResult.error;
-
-        if (session) {
-          // eslint-disable-next-line no-console
-          console.log('[dashboard/init] refreshSession succeeded', { requestId, userId: session.user?.id });
-        } else if (refreshResult.error) {
-          // eslint-disable-next-line no-console
-          console.warn('[dashboard/init] refreshSession failed', {
-            requestId,
-            errorCode: refreshResult.error.code,
-            errorMessage: refreshResult.error.message,
-          });
-        }
-      }
-    }
 
     // セッションが取得できない場合
     if (sessionError || !session) {
