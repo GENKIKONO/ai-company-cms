@@ -219,18 +219,40 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }
     );
 
-    // Step 3: セッション取得（refresh-token からの復元を含む）
-    // getUser() だけでは auth-token がない場合に失敗するため、
-    // まず getSession() でセッションを確立/リフレッシュする
+    // Step 3: セッション取得または復元
+    // refresh-token のみ存在する場合、refreshSession() で明示的に復元を試みる
     whichStep = 'getSession';
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    let session = null;
+    let sessionError = null;
 
-    // セッションが取得できない場合（refresh-token が無効など）
+    // まず getSession() を試す
+    const getSessionResult = await supabase.auth.getSession();
+    session = getSessionResult.data?.session;
+    sessionError = getSessionResult.error;
+
+    // セッションがなく、refresh-token がある場合は refreshSession() を試す
+    if (!session && hasRefreshToken && !sessionError) {
+      whichStep = 'refreshSession';
+      // eslint-disable-next-line no-console
+      console.log('[dashboard/init] No session, trying refreshSession()', { requestId });
+
+      const refreshResult = await supabase.auth.refreshSession();
+      session = refreshResult.data?.session;
+      sessionError = refreshResult.error;
+
+      if (session) {
+        // eslint-disable-next-line no-console
+        console.log('[dashboard/init] refreshSession succeeded', { requestId, userId: session.user?.id });
+      }
+    }
+
+    // セッションが取得できない場合
     if (sessionError || !session) {
       // eslint-disable-next-line no-console
-      console.warn('[dashboard/init] getSession failed', {
+      console.warn('[dashboard/init] Session recovery failed', {
         requestId,
         hasRefreshToken,
+        whichStep,
         errorCode: sessionError?.code,
         errorMessage: sessionError?.message,
       });
@@ -250,7 +272,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
         error: {
           code: 'NO_SESSION',
           message: 'Could not establish session. Please login again.',
-          whichQuery: 'getSession',
+          whichQuery: whichStep,
           details: sessionError?.message || null,
         },
         requestId,
