@@ -6,48 +6,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/log';
+import {
+  V_ORGANIZATIONS_PUBLIC_SELECT_LIST,
+  sanitizeForPublic,
+} from '@/lib/db/public-view-contracts';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-// ============================================
-// 🔒 Public API Security: Blocklist
-// ============================================
-
-/**
- * 絶対に公開APIで返さないカラム（sanitize用blocklist）
- */
-const ORGANIZATION_BLOCKED_KEYS = [
-  'created_by',
-  'user_id',
-  'feature_flags',
-  'plan',
-  'plan_id',
-  'discount_group',
-  'original_signup_campaign',
-  'entitlements',
-  'partner_id',
-  'trial_end',
-  'data_status',
-  'verified_by',
-  'verified_at',
-  'verification_source',
-  'content_hash',
-  'source_urls',
-  'archived',
-  'deleted_at',
-  'keywords',
-] as const;
-
-/**
- * オブジェクトから秘匿キーを削除する（保険用sanitize）
- */
-function sanitizeOrganization<T extends Record<string, unknown>>(org: T): T {
-  const sanitized = { ...org };
-  for (const key of ORGANIZATION_BLOCKED_KEYS) {
-    delete sanitized[key];
-  }
-  return sanitized;
-}
 
 /**
  * GET /api/public/organizations
@@ -69,26 +34,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
     );
 
-    // Step 1: Organizations のみを取得（VIEW経由 - SST強制）
-    // ⚠️ v_organizations_public に存在するカラムのみ select すること
-    const { data: orgData, error: orgError } = await supabase
+    // ============================================
+    // Step 1: Organizations を取得
+    // ⚠️ 契約: V_ORGANIZATIONS_PUBLIC_SELECT_LIST
+    // ⚠️ VIEWは既に公開済みデータのみ含む（追加フィルター不要）
+    // ============================================
+    const { data: orgDataRaw, error: orgError } = await supabase
       .from('v_organizations_public')
-      .select(`
-        id,
-        name,
-        slug,
-        description,
-        website_url,
-        email_public,
-        logo_url,
-        show_services,
-        show_posts,
-        show_case_studies,
-        show_faqs
-      `)
-      // VIEWは既に is_published=true AND deleted_at IS NULL でフィルター済み
-      // status/is_published フィルターは不要（VIEWに存在しないカラム）
+      .select(V_ORGANIZATIONS_PUBLIC_SELECT_LIST)
       .order('name', { ascending: true });
+
+    // 型アサーション（VIEWの型はSupabaseが推論できないため）
+    const orgData = orgDataRaw as unknown as Array<Record<string, unknown>> | null;
 
     logger.info(`[public/organizations] orgs count: ${orgData?.length || 0}`);
 
@@ -127,81 +84,70 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     // Step 2: Organization IDsを抽出
-    const organizationIds = orgData.map(org => org.id);
+    const organizationIds = orgData.map(org => org.id as string);
 
-    // 公開判定: is_published + published_at + deleted_at
-    const nowISO = new Date().toISOString();
+    // ============================================
+    // Step 3: Services と Case Studies を別々に取得
+    // ⚠️ VIEWは既に公開済みデータのみ含む（追加フィルター不要）
+    // ============================================
+    let servicesData: Array<{ id: string; name: string; description: string | null; organization_id: string }> = [];
+    let caseStudiesData: Array<{ id: string; title: string; organization_id: string }> = [];
 
-    // Step 3: Services と Case Studies を別々に取得（エラー耐性あり）
-    let servicesData: any[] = [];
-    let caseStudiesData: any[] = [];
-
-    // Services取得（VIEW経由 - SST強制）
+    // Services取得
     try {
       const { data: services, error: servicesError } = await supabase
         .from('v_services_public')
         .select('id, name, description, organization_id')
-        .in('organization_id', organizationIds)
-        .eq('is_published', true)
-        .or(`published_at.is.null,published_at.lte.${nowISO}`)
-        .is('deleted_at', null);
+        .in('organization_id', organizationIds);
 
       if (servicesError) {
         logger.warn('[public/organizations] services query failed', { data: { error: servicesError.message } });
-        servicesData = [];
       } else {
         servicesData = services || [];
       }
     } catch (error) {
       logger.warn('[public/organizations] services query error:', { data: error });
-      servicesData = [];
     }
 
-    // Case Studies取得（VIEW経由 - SST強制）
+    // Case Studies取得
     try {
       const { data: caseStudies, error: caseStudiesError } = await supabase
         .from('v_case_studies_public')
         .select('id, title, organization_id')
-        .in('organization_id', organizationIds)
-        .eq('is_published', true)
-        .or(`published_at.is.null,published_at.lte.${nowISO}`)
-        .is('deleted_at', null);
+        .in('organization_id', organizationIds);
 
       if (caseStudiesError) {
         logger.warn('[public/organizations] case studies query failed', { data: { error: caseStudiesError.message } });
-        caseStudiesData = [];
       } else {
         caseStudiesData = caseStudies || [];
       }
     } catch (error) {
       logger.warn('[public/organizations] case studies query error:', { data: error });
-      caseStudiesData = [];
     }
 
     // Step 4: メモリ上でデータを結合
-    // Organization別にサービスと事例をグループ化
     const servicesByOrg = servicesData.reduce((acc, service) => {
       const orgId = service.organization_id;
       if (!acc[orgId]) acc[orgId] = [];
       acc[orgId].push(service);
       return acc;
-    }, {} as Record<string, any[]>);
+    }, {} as Record<string, typeof servicesData>);
 
     const caseStudiesByOrg = caseStudiesData.reduce((acc, caseStudy) => {
       const orgId = caseStudy.organization_id;
       if (!acc[orgId]) acc[orgId] = [];
       acc[orgId].push(caseStudy);
       return acc;
-    }, {} as Record<string, any[]>);
+    }, {} as Record<string, typeof caseStudiesData>);
 
-    // データ変換（services, case_studiesを追加）+ 🔒 sanitize適用
-    // ⚠️ VIEWにないカラム（industries等）は参照しない
+    // データ変換（services, case_studiesを追加）+ sanitize適用
     const transformedData = orgData.map(org => {
-      const sanitized = sanitizeOrganization(org as Record<string, unknown>);
+      const sanitized = sanitizeForPublic(org);
+      const id = org.id as string;
       return {
         ...sanitized,
-        services: servicesByOrg[org.id] || [],
-        case_studies: caseStudiesByOrg[org.id] || []
+        services: servicesByOrg[id] || [],
+        case_studies: caseStudiesByOrg[id] || []
       };
     });
 
@@ -227,11 +173,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   } catch (error) {
     logger.error('[public/organizations] API Error:', { data: error });
-    
+
     return NextResponse.json({
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
-    }, { 
+    }, {
       status: 500,
       headers: {
         'Content-Type': 'application/json'
