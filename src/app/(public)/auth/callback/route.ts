@@ -5,9 +5,19 @@
  * サーバー側でセッション Cookie を発行する。
  *
  * @supabase/ssr の推奨パターンに準拠
+ *
+ * 重要: 古いCookieが残っていると新しいセッションと競合するため、
+ * exchangeCodeForSession の前に古いSupabase Cookieをクリアする
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+
+// Supabase project ref を抽出（URLから取得）
+const getProjectRef = (): string => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match?.[1] || '';
+};
 
 export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID();
@@ -15,6 +25,7 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get('code');
   const next = requestUrl.searchParams.get('next') ?? '/dashboard';
   const origin = requestUrl.origin;
+  const projectRef = getProjectRef();
 
   // 診断ログ: リクエスト情報
   console.log('[auth/callback] Request received', {
@@ -23,6 +34,7 @@ export async function GET(request: NextRequest) {
     origin,
     host: request.headers.get('host'),
     xForwardedProto: request.headers.get('x-forwarded-proto'),
+    projectRef,
   });
 
   if (!code) {
@@ -35,7 +47,30 @@ export async function GET(request: NextRequest) {
   // Cookie を設定するための response を作成
   const response = NextResponse.redirect(`${origin}${next}`);
 
+  // =====================================================
+  // 重要: 古いSupabase Cookieをクリア
+  // 古いセッションのCookieが残っていると、新しいセッションと競合して
+  // トークンローテーションが正しく機能しない
+  // =====================================================
+  const existingCookies = request.cookies.getAll();
+  const supabaseCookiePattern = new RegExp(`^sb-${projectRef}-(auth-token|refresh-token)(\\.\\d+)?$`);
+
+  existingCookies.forEach(cookie => {
+    if (supabaseCookiePattern.test(cookie.name)) {
+      console.log('[auth/callback] Clearing old cookie', {
+        requestId,
+        name: cookie.name,
+      });
+      // 古いCookieを削除（maxAge: 0 で即座に失効させる）
+      response.cookies.set(cookie.name, '', {
+        path: '/',
+        maxAge: 0,
+      });
+    }
+  });
+
   let setCookieCount = 0;
+  const setCookieNames: string[] = [];
 
   // サーバー側 Supabase クライアントを作成
   const supabase = createServerClient(
@@ -44,7 +79,8 @@ export async function GET(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll();
+          // 古いCookieを除外して返す（クリア済みのため新しい値を使用）
+          return [];
         },
         setAll(cookiesToSet) {
           setCookieCount = cookiesToSet.length;
@@ -62,6 +98,8 @@ export async function GET(request: NextRequest) {
           });
 
           cookiesToSet.forEach(({ name, value, options }) => {
+            setCookieNames.push(name);
+
             // Cookie オプションを明示的に設定（Supabase のデフォルトを尊重しつつ確実に動作させる）
             const cookieOptions = {
               ...options,
@@ -71,6 +109,9 @@ export async function GET(request: NextRequest) {
               sameSite: options?.sameSite || 'lax' as const,
               // Secure は本番環境のみ
               secure: options?.secure ?? process.env.NODE_ENV === 'production',
+              // httpOnly は false を明示（クライアント側JSからアクセス可能にする）
+              // Supabaseのデフォルトに従う
+              httpOnly: options?.httpOnly ?? false,
             };
 
             console.log('[auth/callback] Setting cookie', {
@@ -88,7 +129,7 @@ export async function GET(request: NextRequest) {
   );
 
   // code をセッションに交換（これがサーバー側で Cookie を発行）
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
     console.error('[auth/callback] exchangeCodeForSession error', {
@@ -107,8 +148,12 @@ export async function GET(request: NextRequest) {
     requestId,
     redirectTo: next,
     setCookieCount,
+    setCookieNames,
     actualSetCookieCount: setCookieHeaders.length,
-    setCookieNames: setCookieHeaders.map(h => h.split('=')[0]),
+    actualSetCookieNames: setCookieHeaders.map(h => h.split('=')[0]),
+    hasSession: !!data?.session,
+    hasUser: !!data?.user,
+    userId: data?.user?.id,
   });
 
   return response;

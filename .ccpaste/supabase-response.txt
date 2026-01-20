@@ -1,1 +1,168 @@
-{"ok":true,"user":{"id":"f57ee6af-e55e-4852-87db-d5a2c59f64ac","email":"ggg.golf.66@gmail.com","profile":{"full_name":null,"avatar_url":null},"email_verified":true,"created_at":"2025-09-26T10:33:03.851276Z","app_metadata":{"role":"admin"}},"organizations":[{"id":"c53b7fae-1ae3-48f4-98c1-5c3217f9fbb3","name":"LuxuCare株式会社","slug":"luxucare","plan":"business"}],"memberships":[{"organization_id":"c53b7fae-1ae3-48f4-98c1-5c3217f9fbb3","role":"owner"}],"contentCounts":{"services":3,"faqs":0,"case_studies":0,"posts":1},"diagnostics":{"cookieHeaderPresent":true,"cookieNames":["sb-chyicolujwhkycpkxbej-auth-token","sb-chyicolujwhkycpkxbej-refresh-token"],"hasAuthTokenCookie":true,"hasRefreshTokenCookie":true,"whichStep":"contentCounts"},"requestId":"ba3790b2-a7ad-4513-87b7-60f2f538b9fa","sha":"0b6f7c5e10a131ed75216a22296e716ddb7e7236","timestamp":"2026-01-20T04:50:45.256Z"}
+治ってないですこんなエラーが出てますが関係ありますか？
+
+9505-25a63aa9769461a1.js:1 [DashboardPageShell] Query failed: 
+{requestId: '4672eb5a-1b7c-4d48-9435-c3fe39e1e925', route: '/dashboard', queryName: 'refreshSession', clientType: 'createServerClient (API Route)', supabaseError: {…}}
+(anonymous)	@	9505-25a63aa9769461a1.js:1
+await in (anonymous)		
+(anonymous)	@	9505-25a63aa9769461a1.js:1
+o1	@	4bd1b696-bad92808725a934a.js:1
+e	@	4bd1b696-bad92808725a934a.js:1
+e	@	4bd1b696-bad92808725a934a.js:1
+e	@	4bd1b696-bad92808725a934a.js:1
+e	@	4bd1b696-bad92808725a934a.js:1
+e	@	4bd1b696-bad92808725a934a.js:1
+e	@	4bd1b696-bad92808725a934a.js:1
+e	@	4bd1b696-bad92808725a934a.js:1
+e	@	4bd1b696-bad92808725a934a.js:1
+e	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+ux	@	4bd1b696-bad92808725a934a.js:1
+uE	@	4bd1b696-bad92808725a934a.js:1
+i_	@	4bd1b696-bad92808725a934a.js:1
+(anonymous)	@	4bd1b696-bad92808725a934a.js:1
+x	@	16710-ac62b6590a93e4e1.js:10
+﻿
+
+
+{
+    "ok": false,
+    "user": null,
+    "organizations": [],
+    "memberships": [],
+    "diagnostics": {
+        "cookieHeaderPresent": true,
+        "cookieNames": [
+            "sb-chyicolujwhkycpkxbej-refresh-token"
+        ],
+        "hasAuthTokenCookie": false,
+        "hasRefreshTokenCookie": true,
+        "whichStep": "refreshSession"
+    },
+    "error": {
+        "code": "NO_SESSION",
+        "message": "Could not establish session. Please login again.",
+        "whichQuery": "refreshSession",
+        "details": "Invalid Refresh Token: Refresh Token Not Found"
+    },
+    "requestId": "4672eb5a-1b7c-4d48-9435-c3fe39e1e925",
+    "sha": "e63effd0c99499882c1b6b7c9edc207fb8c1c94a",
+    "timestamp": "2026-01-20T07:44:56.764Z"
+}
