@@ -177,39 +177,68 @@ export async function POST(request: NextRequest) {
       noSessionResponse.headers.set('x-debug-route', 'api-auth-login');
       noSessionResponse.headers.set('x-debug-sha', sha);
       noSessionResponse.headers.set('x-debug-request-id', requestId);
-      noSessionResponse.headers.set('x-debug-set-cookie-names', '');
-      noSessionResponse.headers.set('x-debug-has-auth-token-set-cookie', 'false');
-      noSessionResponse.headers.set('x-debug-has-refresh-token-set-cookie', 'false');
       return noSessionResponse;
     }
 
     // ========================================
-    // A-2: Cookie 検証（refresh-token のみ必須）
-    // Supabase v2 では auth-token は Cookie に常在しない（正常動作）
+    // セッションCookieを明示的に設定
+    // signInWithPasswordはsetAllを呼ばない場合があるため、
+    // 成功時は常に手動でCookieを設定する
     // ========================================
-    const finalCookies = response.cookies.getAll();
-    const finalCookieNames = finalCookies.map(c => c.name);
-    const finalHasRefreshToken = hasRefreshTokenCookie(finalCookieNames, projectRef);
+    const session = data.session;
 
-    console.log('[api/auth/login] Cookie verification (refresh-token only)', {
-      requestId,
-      finalCookieNames,
-      hasRefreshToken: finalHasRefreshToken,
-      supabaseSetCookieNames,
-    });
+    // auth-token: access_tokenを含むセッション情報（チャンク化対応）
+    const sessionData = {
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+      expires_at: session.expires_at,
+      expires_in: session.expires_in,
+      token_type: session.token_type,
+      user: data.user,
+    };
+    const sessionJson = JSON.stringify(sessionData);
 
-    // refresh-token がない場合のみフォールバック
-    if (!finalHasRefreshToken && data.session.refresh_token) {
-      console.log('[api/auth/login] refresh-token missing, force setting', { requestId });
-
-      response.cookies.set(`sb-${projectRef}-refresh-token`, data.session.refresh_token, {
+    // Cookieサイズ制限（約4KB）対応: 大きすぎる場合はチャンク化
+    const CHUNK_SIZE = 3500; // 安全マージンを持たせる
+    if (sessionJson.length <= CHUNK_SIZE) {
+      response.cookies.set(`sb-${projectRef}-auth-token`, sessionJson, {
         path: '/',
         secure: isSecure,
         sameSite: 'lax',
         httpOnly: false,
-        maxAge: 60 * 60 * 24 * 365, // 1年
+        maxAge: session.expires_in || 3600,
+      });
+    } else {
+      // チャンク化が必要
+      const chunks = [];
+      for (let i = 0; i < sessionJson.length; i += CHUNK_SIZE) {
+        chunks.push(sessionJson.slice(i, i + CHUNK_SIZE));
+      }
+      chunks.forEach((chunk, index) => {
+        response.cookies.set(`sb-${projectRef}-auth-token.${index}`, chunk, {
+          path: '/',
+          secure: isSecure,
+          sameSite: 'lax',
+          httpOnly: false,
+          maxAge: session.expires_in || 3600,
+        });
       });
     }
+
+    // refresh-token
+    response.cookies.set(`sb-${projectRef}-refresh-token`, session.refresh_token, {
+      path: '/',
+      secure: isSecure,
+      sameSite: 'lax',
+      httpOnly: false,
+      maxAge: 60 * 60 * 24 * 365, // 1年
+    });
+
+    console.log('[api/auth/login] Session cookies set manually', {
+      requestId,
+      userId: data.user?.id,
+      expiresAt: session.expires_at,
+    });
 
     // ========================================
     // 診断: 実際の Set-Cookie ヘッダーを取得
@@ -221,34 +250,12 @@ export async function POST(request: NextRequest) {
       return match ? match[1] : 'unknown';
     });
 
-    // 各 Cookie の属性をパース（診断用）
-    const cookieAttributes = actualSetCookies.map(sc => {
-      const parts = sc.split(';').map(p => p.trim());
-      const nameValue = parts[0];
-      const name = nameValue.split('=')[0];
-      const attrs: Record<string, string> = { name };
-      parts.slice(1).forEach(attr => {
-        const [key, val] = attr.split('=');
-        attrs[key.toLowerCase()] = val || 'true';
-      });
-      return attrs;
-    });
-
     console.log('[api/auth/login] === DIAGNOSTIC: Set-Cookie Analysis ===', {
       requestId,
       userId: data.user?.id,
       supabaseSetAllNames: supabaseSetCookieNames,
-      responseCookiesGetAllNames: finalCookieNames,
       actualSetCookieHeaders: actualSetCookieNames,
-      cookieAttributes: cookieAttributes.map(a => ({
-        name: a.name,
-        path: a.path,
-        secure: a.secure,
-        samesite: a.samesite,
-        domain: a.domain,
-        httponly: a.httponly,
-        'max-age': a['max-age'],
-      })),
+      cookieCount: actualSetCookieNames.length,
     });
 
     // デバッグヘッダを付与（指定された名前で）
