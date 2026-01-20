@@ -143,9 +143,26 @@ export async function middleware(request: NextRequest) {
   // 4. 認証ページ: /auth/login 等
   //    → 古いSupabase Cookieをクリアしてログインページを表示
   //    → これにより常にクリーンな状態でログインできる
+  //
+  // 重要: prefetchリクエスト時はCookieをクリアしない
+  // Next.jsのLinkコンポーネントはprefetchを行い、その際もMiddlewareが実行される
+  // prefetch時にCookieをクリアすると、ログイン中のユーザーのセッションが破壊される
   // =====================================================
   if (isAuthPath) {
-    // 古いCookieをクリアするためのレスポンスを作成
+    // prefetchリクエストかどうかを判定
+    // Next.js App Router: 'Next-Router-Prefetch' ヘッダー
+    // Next.js Pages Router: 'Purpose: prefetch' ヘッダー
+    const isPrefetch =
+      request.headers.get('Next-Router-Prefetch') === '1' ||
+      request.headers.get('Purpose') === 'prefetch' ||
+      request.headers.get('Sec-Purpose') === 'prefetch';
+
+    if (isPrefetch) {
+      // prefetchリクエストの場合はCookieをクリアせずに通過
+      return NextResponse.next();
+    }
+
+    // 実際のナビゲーション時のみCookieをクリア
     const authResponse = NextResponse.next({
       request: { headers: request.headers },
     });
