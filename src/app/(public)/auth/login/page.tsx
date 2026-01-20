@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { createClient } from "@/lib/supabase/server"
 import { getUserWithClient } from '@/lib/core/auth-state';
@@ -8,6 +9,13 @@ import { logger } from '@/lib/utils/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+// Supabase project ref を抽出
+const getProjectRef = (): string => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match?.[1] || '';
+};
 
 interface LoginPageProps {
   searchParams: Promise<{
@@ -19,12 +27,29 @@ interface LoginPageProps {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const resolvedSearchParams = await searchParams;
-  
-  // SSRでセッション確認
+  const cookieStore = await cookies();
+  const projectRef = getProjectRef();
+
+  // =====================================================
+  // 古いSupabase Cookieをクリア
+  // ログインページに来た = 新規ログインしたい or セッション切れ
+  // どちらの場合も古いCookieは不要なのでクリア
+  // =====================================================
+  const allCookies = cookieStore.getAll();
+  const supabaseCookiePattern = new RegExp(`^sb-${projectRef}-(auth-token|refresh-token)(\\.\\d+)?$`);
+
+  for (const cookie of allCookies) {
+    if (supabaseCookiePattern.test(cookie.name)) {
+      logger.info('[Login] Clearing old Supabase cookie', { data: { name: cookie.name } });
+      cookieStore.delete(cookie.name);
+    }
+  }
+
+  // SSRでセッション確認（Cookieクリア後なので、有効なセッションがあれば新しいもの）
   try {
     const supabase = await createClient();
     const user = await getUserWithClient(supabase);
-    
+
     // ログイン済みなら /dashboard に redirect
     if (user) {
       const redirectUrl = resolvedSearchParams.redirect || '/dashboard';
