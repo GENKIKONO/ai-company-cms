@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '24'
+  NODE_VERSION: '22'
 
 jobs:
   # Main CI job - this name is used for Required Status Checks
@@ -46,9 +46,11 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Dummy values for build (not used at runtime)
-          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          # Build-time only dummy values (not used at runtime)
+          # These are intentionally fake but syntactically valid to satisfy Next.js build
+          # Real values are injected at deploy time by Vercel
+          NEXT_PUBLIC_SUPABASE_URL: https://ci-build-dummy.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjaS1idWlsZCIsInJvbGUiOiJhbm9uIn0.ci-build-dummy-key
 
       - name: Check Public API Security
         run: npm run check:public-api
