@@ -70,6 +70,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     );
 
     // Step 1: Organizations のみを取得（VIEW経由 - SST強制）
+    // ⚠️ v_organizations_public に存在するカラムのみ select すること
     const { data: orgData, error: orgError } = await supabase
       .from('v_organizations_public')
       .select(`
@@ -79,15 +80,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         description,
         website_url,
         email_public,
-        email,
-        industries,
-        address_region,
-        address_locality,
-        logo_url
+        logo_url,
+        show_services,
+        show_posts,
+        show_case_studies,
+        show_faqs
       `)
-      .eq('status', 'published')
-      .eq('is_published', true)
-      .order('created_at', { ascending: false });
+      // VIEWは既に is_published=true AND deleted_at IS NULL でフィルター済み
+      // status/is_published フィルターは不要（VIEWに存在しないカラム）
+      .order('name', { ascending: true });
 
     logger.info(`[public/organizations] orgs count: ${orgData?.length || 0}`);
 
@@ -194,11 +195,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }, {} as Record<string, any[]>);
 
     // データ変換（services, case_studiesを追加）+ 🔒 sanitize適用
+    // ⚠️ VIEWにないカラム（industries等）は参照しない
     const transformedData = orgData.map(org => {
       const sanitized = sanitizeOrganization(org as Record<string, unknown>);
       return {
         ...sanitized,
-        industries: Array.isArray(org.industries) ? org.industries : [],
         services: servicesByOrg[org.id] || [],
         case_studies: caseStudiesByOrg[org.id] || []
       };
