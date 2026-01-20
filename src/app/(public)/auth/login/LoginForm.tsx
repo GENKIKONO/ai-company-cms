@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/utils/logger';
 
 interface LoginFormProps {
@@ -21,7 +20,6 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
   const [showResendConfirmation, setShowResendConfirmation] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
-  const router = useRouter();
 
   // Task B: 診断用 - 最後に発火したリクエストの情報
   const [lastRequestId, setLastRequestId] = useState<string | null>(null);
@@ -88,12 +86,11 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
 
       logger.debug('[LoginForm] ログイン成功（200 + ok:true）、リダイレクト開始', { requestId: result.requestId });
 
-      // Cookie が設定された状態でリダイレクト
-      // router.refresh() で RSC を再取得してからナビゲーション
-      router.refresh();
-
+      // Cookie が設定された状態でダッシュボードへ遷移
+      // 注意: router.refresh()は現在ページ(/auth/login)をリフレッシュするため、
+      // Middlewareが再度Cookieをクリアしてしまう。直接遷移する。
       const targetUrl = result.redirectTo || '/dashboard';
-      router.replace(targetUrl); // replace で履歴を汚さない
+      window.location.href = targetUrl; // 完全なページ遷移でCookieを確実に保持
 
     } catch (err) {
       logger.error('Login error:', { data: err });
