@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect , useCallback} from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -86,111 +85,23 @@ export default function SecurityDashboard() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [activeTab, setActiveTab] = useState('incidents');
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
+  // サーバーサイドAPIからセキュリティメトリクスを取得
   const fetchSecurityMetrics = useCallback(async () => {
     try {
-      const now = new Date();
-      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-
-      // Get security incidents
-      const { data: incidents } = await supabase
-        .from('security_incidents')
-        .select('id, ip_address, incident_type, severity, risk_level, blocked, metadata, created_at')
-        .gte('created_at', oneHourAgo.toISOString())
-        .order('created_at', { ascending: false });
-
-      // Get rate limit requests
-      const { data: rateLimitRequests } = await supabase
-        .from('rate_limit_requests')
-        .select('id, ip_address, endpoint, path, is_suspicious, created_at')
-        .gte('created_at', oneHourAgo.toISOString());
-
-      // Calculate metrics
-      const totalRequests = rateLimitRequests?.length || 0;
-      const blockedRequests = incidents?.filter(i => i.blocked).length || 0;
-      const suspiciousActivity = rateLimitRequests?.filter(r => r.is_suspicious).length || 0;
-
-      // Top attackers
-      const ipCounts: Record<string, { count: number; risk: string }> = {};
-      incidents?.forEach(incident => {
-        const ip = incident.ip_address;
-        if (!ipCounts[ip]) {
-          ipCounts[ip] = { count: 0, risk: incident.risk_level };
+      const response = await fetch('/api/admin/security-metrics');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setMetrics(result.data.metrics);
+          setServiceRoleStats(result.data.serviceRoleStats);
         }
-        ipCounts[ip].count++;
-        // Update to highest risk level
-        if (getRiskPriority(incident.risk_level) > getRiskPriority(ipCounts[ip].risk)) {
-          ipCounts[ip].risk = incident.risk_level;
-        }
-      });
-
-      const topAttackers = Object.entries(ipCounts)
-        .map(([ip, data]) => ({ ip, ...data }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
-
-      // Top paths
-      const pathCounts: Record<string, number> = {};
-      rateLimitRequests?.forEach(req => {
-        pathCounts[req.path] = (pathCounts[req.path] || 0) + 1;
-      });
-
-      const topPaths = Object.entries(pathCounts)
-        .map(([path, count]) => ({ path, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
-
-      setMetrics({
-        totalRequests,
-        blockedRequests,
-        suspiciousActivity,
-        activeThreats: topAttackers.filter(a => a.risk === 'critical' || a.risk === 'high').length,
-        topAttackers,
-        recentIncidents: incidents?.slice(0, 20) || [],
-        rateLimitStats: {
-          totalRequests,
-          blockedRequests,
-          topPaths
-        }
-      });
-
+      } else {
+        logger.error('Security metrics API returned error status:', { data: response.status });
+      }
     } catch (error) {
       logger.error('Error fetching security metrics:', { data: error });
     }
-  }, [supabase]);
-
-  const fetchServiceRoleStats = useCallback(async () => {
-    try {
-      // Call the service role usage stats function
-      const { data: stats, error } = await supabase.rpc('get_service_role_usage_stats');
-      
-      if (error) {
-        logger.error('Error fetching service role stats:', { data: error });
-        return;
-      }
-
-      // Call anomaly detection
-      const { data: anomalies, error: anomalyError } = await supabase.rpc('detect_service_role_anomalies');
-      
-      if (anomalyError) {
-        logger.error('Error fetching anomalies:', { data: anomalyError });
-        return;
-      }
-
-      setServiceRoleStats({
-        totalOperations: stats?.summary?.total_operations || 0,
-        highRiskOperations: stats?.summary?.high_risk_operations || 0,
-        recentAnomalies: anomalies?.anomalies || []
-      });
-
-    } catch (error) {
-      logger.error('Error fetching service role stats:', { data: error });
-    }
-  }, [supabase]);
+  }, []);
 
   const fetchRateLimitMetrics = useCallback(async () => {
     try {
@@ -210,12 +121,11 @@ export default function SecurityDashboard() {
     setLoading(true);
     await Promise.all([
       fetchSecurityMetrics(),
-      fetchServiceRoleStats(),
       fetchRateLimitMetrics()
     ]);
     setLastUpdate(new Date());
     setLoading(false);
-  }, [fetchSecurityMetrics, fetchServiceRoleStats, fetchRateLimitMetrics]);
+  }, [fetchSecurityMetrics, fetchRateLimitMetrics]);
 
   useEffect(() => {
     fetchAllData();

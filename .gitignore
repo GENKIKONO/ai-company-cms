@@ -80,3 +80,4 @@ scripts/*.js
 # Temporary SQL files
 sql/migrations/
 
+.env.vercel

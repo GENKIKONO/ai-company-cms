@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Users, UserPlus, Shield, Crown, Edit3, Eye, Trash2, Mail } from 'lucide-react';
-import { createBrowserClient } from '@supabase/ssr';
 import type { UserRole } from '@/types/utils/database';
 import { logger } from '@/lib/utils/logger';
 
@@ -33,63 +32,31 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
   const [inviteRole, setInviteRole] = useState<UserRole>('viewer');
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
+  // サーバーサイドAPIからチームメンバーを取得
   const fetchTeamMembers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // 現在のユーザーIDを取得
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setCurrentUserId(user.id);
+      const response = await fetch('/api/my/team');
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch team members');
       }
 
-      // organization_members と profiles を JOIN して取得
-      const { data: membersData, error: membersError } = await supabase
-        .from('organization_members')
-        .select(`
-          id,
-          user_id,
-          role,
-          created_at,
-          profiles (
-            email,
-            full_name,
-            avatar_url
-          )
-        `)
-        .eq('organization_id', organizationId);
+      const result = await response.json();
+      const { members: fetchedMembers, currentUserId: userId } = result.data;
 
-      if (membersError) {
-        throw membersError;
-      }
-
-      // データを TeamMember 形式に変換
-      const teamMembers: TeamMember[] = (membersData || []).map((member: any) => ({
-        id: member.id,
-        user_id: member.user_id,
-        email: member.profiles?.email || '',
-        full_name: member.profiles?.full_name || undefined,
-        role: member.role as UserRole,
-        avatar_url: member.profiles?.avatar_url || undefined,
-        created_at: member.created_at,
-        last_active: undefined, // 実際の last_active は別テーブルで管理
-        status: 'active' as const,
-      }));
-
-      setMembers(teamMembers);
+      setCurrentUserId(userId);
+      setMembers(fetchedMembers);
     } catch (err) {
       logger.error('Failed to fetch team members', { data: err instanceof Error ? err : new Error(String(err)) });
       setError('チームメンバーの取得に失敗しました');
     } finally {
       setLoading(false);
     }
-  }, [organizationId, supabase]);
+  }, []);
 
   useEffect(() => {
     fetchTeamMembers();
@@ -104,15 +71,18 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
     setShowInviteForm(false);
   };
 
+  // サーバーサイドAPI経由でロール変更
   const handleRoleChange = async (memberId: string, newRole: UserRole) => {
     try {
-      const { error: updateError } = await supabase
-        .from('organization_members')
-        .update({ role: newRole })
-        .eq('id', memberId);
+      const response = await fetch(`/api/my/team/${memberId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole }),
+      });
 
-      if (updateError) {
-        throw updateError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update role');
       }
 
       setMembers(members.map(member =>
@@ -124,17 +94,18 @@ export function TeamManagement({ organizationId, currentUserRole, className = ''
     }
   };
 
+  // サーバーサイドAPI経由でメンバー削除
   const handleRemoveMember = async (memberId: string) => {
     if (!confirm('このメンバーを削除しますか？')) return;
 
     try {
-      const { error: deleteError } = await supabase
-        .from('organization_members')
-        .delete()
-        .eq('id', memberId);
+      const response = await fetch(`/api/my/team/${memberId}`, {
+        method: 'DELETE',
+      });
 
-      if (deleteError) {
-        throw deleteError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete member');
       }
 
       setMembers(members.filter(member => member.id !== memberId));
