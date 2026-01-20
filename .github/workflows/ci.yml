@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '22'
+  NODE_VERSION: '22.22.0'
 
 jobs:
   # Main CI job - this name is used for Required Status Checks
@@ -78,3 +78,4 @@ jobs:
             exit 1
           fi
           echo "✅ All CI checks passed"
+
