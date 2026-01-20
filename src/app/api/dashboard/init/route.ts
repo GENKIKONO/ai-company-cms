@@ -219,14 +219,52 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }
     );
 
-    // Step 3: getUser（直接呼び出し - 完全なUserオブジェクトが必要）
-    // Phase 1 最適化: DashboardPageShell での getCurrentUser() 削減のため
-    // email_confirmed_at, created_at, app_metadata を取得する必要がある
+    // Step 3: セッション取得（refresh-token からの復元を含む）
+    // getUser() だけでは auth-token がない場合に失敗するため、
+    // まず getSession() でセッションを確立/リフレッシュする
+    whichStep = 'getSession';
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    // セッションが取得できない場合（refresh-token が無効など）
+    if (sessionError || !session) {
+      // eslint-disable-next-line no-console
+      console.warn('[dashboard/init] getSession failed', {
+        requestId,
+        hasRefreshToken,
+        errorCode: sessionError?.code,
+        errorMessage: sessionError?.message,
+      });
+
+      const noSessionHeaders = {
+        ...responseHeaders,
+        'x-auth-recover': 'clear-cookies-and-relogin',
+        'x-auth-reason': 'no_session',
+      };
+
+      return NextResponse.json({
+        ok: false,
+        user: null,
+        organizations: [],
+        memberships: [],
+        diagnostics: { ...diagnostics, whichStep },
+        error: {
+          code: 'NO_SESSION',
+          message: 'Could not establish session. Please login again.',
+          whichQuery: 'getSession',
+          details: sessionError?.message || null,
+        },
+        requestId,
+        sha,
+        timestamp,
+      }, { status: 401, headers: noSessionHeaders });
+    }
+
+    // Step 4: getUser（セッション確立後に完全なUserオブジェクトを取得）
     whichStep = 'getUser';
     const { data: { user: rawUser }, error: userError } = await supabase.auth.getUser();
 
     if (userError || !rawUser) {
-      // Cookie あるが user なし = 壊れたセッション
+      // セッションはあるが user 取得失敗（稀なケース）
       const noUserHeaders = {
         ...responseHeaders,
         'x-auth-recover': 'clear-cookies-and-relogin',
@@ -241,8 +279,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
         diagnostics: { ...diagnostics, whichStep },
         error: {
           code: 'NO_USER_SESSION',
-          message: 'Cookie present but no user session. Please login again.',
+          message: 'Session exists but could not get user. Please login again.',
           whichQuery: 'getUser',
+          details: userError?.message || null,
         },
         requestId,
         sha,
