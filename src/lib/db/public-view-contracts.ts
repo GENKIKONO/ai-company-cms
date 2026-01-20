@@ -47,6 +47,11 @@ export const V_ORGANIZATIONS_PUBLIC_COLUMNS = [
   'show_news',
   'show_partnership',
   'show_contact',
+  // 住所カラム
+  'address_region',
+  'address_locality',
+  'address_street',
+  'address_postal_code',
   'created_at',
   'updated_at',
 ] as const;

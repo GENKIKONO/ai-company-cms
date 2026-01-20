@@ -57,6 +57,8 @@
 | `src/types/database.types.ts` | DB型定義 |
 | `src/types/legacy/database.ts` | レガシー型（互換用） |
 | `src/config/data-sources.ts` | テーブル/ビュー/カラム設定 |
+| `src/lib/db/public-view-contracts.ts` | **公開VIEW契約（カラム定義）** |
+| `supabase/migrations/` | **DBマイグレーション（VIEW作成含む）** |
 
 ---
 
@@ -86,6 +88,19 @@
 - [ ] **セキュアビュー使用**
   - Dashboard GET操作は `v_dashboard_*_secure` ビュー経由
   - 書き込みは `writeTable` 設定のベーステーブルへ
+
+### DB VIEW/マイグレーション（重要）
+- [ ] **VIEW参照コードを書いたらマイグレーションも作成**
+  - `public-view-contracts.ts` のカラム定義だけでは不十分
+  - `supabase/migrations/` にVIEW作成SQLが必須
+
+- [ ] **カラム追加時は両方更新**
+  - TypeScript側（`public-view-contracts.ts`）
+  - DB側（マイグレーションSQL）
+
+- [ ] **VIEWが実際に存在するか確認**
+  - Supabase SQL Editorで `SELECT * FROM v_xxx_public LIMIT 1` を実行
+  - エラーが出たらVIEW未作成の可能性
 
 ---
 
@@ -425,6 +440,104 @@ if (!currentUser) {
 ```
 
 **重要**: `DashboardPageShell` 内で `router.push('/auth/login')` を**絶対に使わない**。Middlewareが認証リダイレクトの唯一の責任者。
+
+---
+
+## 11. データベースVIEW・マイグレーション管理（重要教訓）
+
+> **背景**: 2026-01-20に発生した本番障害の教訓。APIコードがVIEWを参照していたが、VIEW自体がDBに存在せず「column does not exist」エラーが発生。認証エラーに見えたが、根本原因はDB側のVIEW未作成だった。
+
+### 公開VIEW契約の仕組み
+
+```
+src/lib/db/public-view-contracts.ts  ←  カラム定義（TypeScript）
+        ↓
+        ↓  参照
+        ↓
+src/app/api/public/*/route.ts        ←  APIがVIEWをクエリ
+        ↓
+        ↓  クエリ
+        ↓
+Supabase: v_organizations_public     ←  実際のVIEW（DBに存在必須）
+```
+
+### 禁止事項
+
+- [ ] **TypeScriptの契約ファイルだけ作成してVIEWを作らない**
+  - `public-view-contracts.ts` はカラム定義のみ
+  - **実際のVIEWは `supabase/migrations/` で作成が必須**
+
+- [ ] **VIEWのカラムを変更してマイグレーションを作らない**
+  - コード側でカラムを追加 → DBのVIEWにもカラム追加が必要
+  - 片方だけ変更すると「column does not exist」エラー
+
+- [ ] **認証エラーだと思い込んで調査を進める**
+  - 「NO_SESSION」「Database Error」は**DB側の問題の可能性**がある
+  - まずVIEWの存在とカラム一致を確認
+
+### VIEW変更時の必須手順
+
+```
+1. src/lib/db/public-view-contracts.ts のカラム定義を更新
+2. supabase/migrations/ にマイグレーションSQLを作成
+   - カラム追加: ALTER TABLE ... ADD COLUMN IF NOT EXISTS
+   - VIEW再作成: DROP VIEW IF EXISTS + CREATE VIEW
+3. Supabase SQL Editorでマイグレーション実行
+4. NOTIFY pgrst, 'reload schema' を実行
+5. 本番で動作確認
+```
+
+### VIEW関連ファイル一覧
+
+| ファイル | 役割 |
+|---------|------|
+| `src/lib/db/public-view-contracts.ts` | カラム定義・SELECT文生成 |
+| `supabase/migrations/20260120_create_public_views.sql` | VIEW作成・カラム追加 |
+
+### VIEWが存在するか確認するSQL
+
+```sql
+-- VIEWの存在確認
+SELECT table_name FROM information_schema.views
+WHERE table_schema = 'public' AND table_name LIKE 'v_%_public';
+
+-- VIEWのカラム確認
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'v_organizations_public';
+```
+
+### トラブルシューティング
+
+| 症状 | 原因 | 対処 |
+|------|------|------|
+| `column X does not exist` | VIEWにカラムがない | マイグレーションでVIEW再作成 |
+| `relation v_xxx_public does not exist` | VIEWが未作成 | マイグレーションでVIEW作成 |
+| `permission denied for view` | 権限未付与 | `GRANT SELECT ON ... TO anon/authenticated` |
+| VIEW変更後も古いスキーマ | キャッシュ | `NOTIFY pgrst, 'reload schema'` |
+
+---
+
+## 12. エラー診断の優先順位
+
+認証・データベースエラーが発生した場合の調査順序：
+
+```
+1. DB/VIEW問題か？
+   └─ VIEWが存在するか確認
+   └─ VIEWのカラムが契約と一致するか確認
+   └─ RLSポリシーが正しいか確認
+
+2. 認証問題か？
+   └─ Cookieが存在するか確認（DevTools → Application → Cookies）
+   └─ auth-token と refresh-token の両方があるか
+   └─ トークンが有効か（Supabase Dashboard → Authentication → Users）
+
+3. コード問題か？
+   └─ デプロイされたコードが最新か（sha確認）
+   └─ APIルートのクエリが契約に準拠しているか
+```
+
+**重要**: 「認証エラー」に見えても、**まずDB/VIEW問題を疑う**。VIEWクエリ失敗が認証エラーとして表示されることがある。
 
 ---
 
