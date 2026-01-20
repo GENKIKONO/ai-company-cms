@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { diagGuard, diagErrorResponse } from '@/lib/api/diag-guard';
 
-import { logger } from '@/lib/log';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -36,9 +36,14 @@ interface Issue {
  * 全診断機能を実行し、総合的なシステム健全性レポートを生成
  */
 export async function GET(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   const startTime = Date.now();
   const baseUrl = new URL(request.url).origin;
-  
+
   try {
     // 各診断APIを並列実行
     const diagnosticPromises = [
@@ -213,15 +218,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('Comprehensive diagnostic failed:', { data: error });
-    
-    return NextResponse.json({
-      success: false,
-      overall: 'critical',
-      error: 'Failed to run comprehensive diagnostic',
-      diagnosticTime: Date.now() - startTime,
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return diagErrorResponse(error, 'Comprehensive diagnostic');
   }
 }
 

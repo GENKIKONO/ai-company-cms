@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import { diagGuard, diagErrorResponse, getSafeEnvironmentInfo } from '@/lib/api/diag-guard';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,12 @@ function maskHeaderValue(name: string, value: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  // 本番環境では管理者認証必須
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   try {
     const hdrs = await headers();
     
@@ -114,10 +121,7 @@ export async function POST(request: NextRequest) {
         cookieCount: parsedCookies.length,
         likely_credentials_include: !!hdrs.get('cookie') && supabaseAuthCookies.length > 0,
       },
-      environment: {
-        nodeEnv: process.env.NODE_ENV,
-        vercelEnv: process.env.VERCEL_ENV,
-      }
+      environment: getSafeEnvironmentInfo(guardResult.isProduction)
     };
 
     return NextResponse.json(echoResponse, { 
@@ -133,27 +137,7 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    const errorResponse = {
-      timestamp: new Date().toISOString(),
-      error: {
-        code: 'ECHO_ERROR',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-      },
-      request: {
-        method: 'POST',
-        url: request.url,
-        cookieHeaderLength: (await headers()).get('cookie')?.length || 0,
-      }
-    };
-    
-    return NextResponse.json(errorResponse, { 
-      status: 500,
-      headers: {
-        'Cache-Control': 'no-store, must-revalidate',
-        'Content-Type': 'application/json'
-      }
-    });
+    return diagErrorResponse(error, 'echo');
   }
 }
 

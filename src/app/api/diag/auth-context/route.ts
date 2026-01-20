@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { diagGuard, diagErrorResponse } from '@/lib/api/diag-guard';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,12 +14,18 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 export async function GET(request: NextRequest) {
-  // 集約先エンドポイントにリダイレクト（mode=full）
-  const url = new URL(request.url);
-  const baseUrl = `${url.protocol}//${url.host}`;
-  const diagUrl = `${baseUrl}/api/diag/auth?mode=full`;
+  // diagGuard による認証チェック
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
 
   try {
+    // 集約先エンドポイントにリダイレクト（mode=full）
+    const url = new URL(request.url);
+    const baseUrl = `${url.protocol}//${url.host}`;
+    const diagUrl = `${baseUrl}/api/diag/auth?mode=full`;
+
     const response = await fetch(diagUrl, {
       headers: {
         'Cookie': request.headers.get('cookie') || '',
@@ -37,10 +44,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    return NextResponse.json({
-      error: 'Delegation failed',
-      message: error instanceof Error ? error.message : 'Unknown error',
-      delegatedTo: '/api/diag/auth?mode=full'
-    }, { status: 500 });
+    return diagErrorResponse(error, '/api/diag/auth-context');
   }
 }

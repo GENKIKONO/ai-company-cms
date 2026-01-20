@@ -1,6 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { diagGuard, diagErrorResponse } from '@/lib/api/diag-guard';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   try {
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     
@@ -63,12 +69,6 @@ export async function GET() {
     });
     
   } catch (error) {
-    return NextResponse.json(
-      { 
-        error: 'Diagnostics failed',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    return diagErrorResponse(error, 'Stripe diagnostic');
   }
 }

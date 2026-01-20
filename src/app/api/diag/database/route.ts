@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { env } from '@/lib/env';
+import { diagGuard, diagErrorResponse } from '@/lib/api/diag-guard';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,9 +21,14 @@ interface DiagnosticResult {
 }
 
 export async function GET(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   const startTime = Date.now();
   const diagnosticResults: DiagnosticResult[] = [];
-  
+
   try {
     // Supabaseクライアント作成テスト
     diagnosticResults.push({
@@ -232,13 +238,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      status: 'error',
-      error: 'Database diagnostic failed',
-      totalDuration: Date.now() - startTime,
-      details: error instanceof Error ? error.message : 'Unknown error',
-      partialResults: diagnosticResults
-    }, { status: 500 });
+    return diagErrorResponse(error, 'Database diagnostic');
   }
 }

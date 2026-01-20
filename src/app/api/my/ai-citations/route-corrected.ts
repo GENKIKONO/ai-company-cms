@@ -411,16 +411,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     logger.error('AI citations API error', {
-      error: error.message,
-      stack: error.stack,
+      data: error instanceof Error ? error : new Error(String(error)),
       url: request.url
     });
 
     return NextResponse.json({
       success: false,
       code: 'INTERNAL_SERVER_ERROR',
-      message: '内部サーバーエラーが発生しました',
-      details: error.message
+      message: '内部サーバーエラーが発生しました'
     } as AICitationsApiResponse<never>, { status: 500 });
   }
 }

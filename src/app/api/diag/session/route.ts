@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { diagGuard, diagErrorResponse } from '@/lib/api/diag-guard';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,11 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 export async function GET(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   // 集約先エンドポイントにリダイレクト（mode=session）
   const url = new URL(request.url);
   const baseUrl = `${url.protocol}//${url.host}`;
@@ -37,10 +43,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    return NextResponse.json({
-      error: 'Delegation failed',
-      message: error instanceof Error ? error.message : 'Unknown error',
-      delegatedTo: '/api/diag/auth?mode=session'
-    }, { status: 500 });
+    return diagErrorResponse(error, 'Session diagnostic');
   }
 }

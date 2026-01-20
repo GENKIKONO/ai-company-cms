@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { diagGuard, diagErrorResponse } from '@/lib/api/diag-guard';
 
 import { logger } from '@/lib/log';
 export const runtime = 'nodejs';
@@ -34,8 +35,13 @@ interface Recommendation {
  * システムのリアルタイム状態を監視し、健全性メトリクスを提供
  */
 export async function GET(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   const startTime = Date.now();
-  
+
   try {
     // システムリソース情報
     const systemMetrics = {
@@ -209,15 +215,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('Monitoring API failed:', { data: error });
-    
-    return NextResponse.json({
-      success: false,
-      status: 'critical',
-      responseTime: Date.now() - startTime,
-      error: 'Failed to get monitoring data',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return diagErrorResponse(error, 'Monitoring');
   }
 }
 
@@ -225,6 +223,11 @@ export async function GET(request: NextRequest) {
  * 監視設定の更新
  */
 export async function POST(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   try {
     const body = await request.json();
     const { action, component, threshold } = body;
@@ -256,10 +259,6 @@ export async function POST(request: NextRequest) {
     }, { status: 400 });
 
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to update monitoring settings',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return diagErrorResponse(error, 'Monitoring settings update');
   }
 }

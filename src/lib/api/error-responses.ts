@@ -163,9 +163,15 @@ export function handleDatabaseError(error: any): NextResponse<ApiErrorResponse> 
 
 /**
  * 汎用エラーハンドラー
+ *
+ * セキュリティ: エラー詳細はログに記録し、クライアントには汎用メッセージのみ返却
  */
-export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
-  logger.error('API Error', { data: error instanceof Error ? error : new Error(String(error)) });
+export function handleApiError(error: unknown, context?: string): NextResponse<ApiErrorResponse> {
+  // ログには詳細情報を記録（スタックトレース含む）
+  logger.error(`API Error${context ? ` [${context}]` : ''}`, {
+    data: error instanceof Error ? error : new Error(String(error)),
+    stack: error instanceof Error ? error.stack : undefined
+  });
 
   if (error instanceof ZodError) {
     return handleZodError(error);
@@ -175,9 +181,16 @@ export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
     return handleDatabaseError(error);
   }
 
-  if (error instanceof Error) {
-    return createErrorResponse('INTERNAL_ERROR', error.message, 500);
-  }
+  // セキュリティ: クライアントにはerror.messageを返却しない（内部情報漏洩防止）
+  return createErrorResponse('INTERNAL_ERROR', 'サーバーエラーが発生しました', 500);
+}
 
-  return createErrorResponse('UNKNOWN_ERROR', 'An unknown error occurred', 500);
+/**
+ * 安全なエラーレスポンス生成（スタックトレース漏洩防止）
+ *
+ * 既存コードの移行用ヘルパー
+ * 使用例: return safeErrorResponse(error, 'MyAPI');
+ */
+export function safeErrorResponse(error: unknown, context?: string): NextResponse<ApiErrorResponse> {
+  return handleApiError(error, context);
 }

@@ -115,13 +115,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   } catch (error: any) {
     logger.error('Material download API error:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      cause: error.cause
+      data: error instanceof Error ? error : new Error(String(error))
     });
-    return NextResponse.json({ 
-      error: 'Internal server error' 
+    return NextResponse.json({
+      error: 'Internal server error'
     }, { status: 500 });
   }
 }

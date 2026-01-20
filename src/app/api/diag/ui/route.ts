@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { diagGuard, diagErrorResponse } from '@/lib/api/diag-guard';
 
 import { logger } from '@/lib/log';
 export const dynamic = 'force-dynamic';
@@ -46,7 +47,12 @@ const componentRegistry = {
   }
 };
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   try {
     const diagnosis = {
       commit: process.env.VERCEL_GIT_COMMIT_SHA || null,
@@ -89,21 +95,17 @@ export async function GET() {
       }
     });
 
-  } catch (error: any) {
-    return NextResponse.json({
-      error: error?.message || 'Unknown error',
-      commit: process.env.VERCEL_GIT_COMMIT_SHA || null,
-      deployId: process.env.VERCEL_DEPLOYMENT_ID || null,
-      timestamp: new Date().toISOString(),
-      flags: {
-        layoutHasSafeHeader: true
-      },
-      recentErrors: []
-    }, { status: 200 });
+  } catch (error) {
+    return diagErrorResponse(error, 'UI diagnostic');
   }
 }
 
 export async function POST(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   try {
     const body = await request.json();
     
@@ -137,12 +139,7 @@ export async function POST(request: NextRequest) {
       totalLogs: errorLogs.length
     }, { status: 201 });
 
-  } catch (error: any) {
-    logger.error('[DIAG] Failed to log error:', { data: error });
-    
-    return NextResponse.json({
-      success: false,
-      error: error?.message || 'Failed to log error'
-    }, { status: 500 });
+  } catch (error) {
+    return diagErrorResponse(error, 'UI diagnostic log');
   }
 }

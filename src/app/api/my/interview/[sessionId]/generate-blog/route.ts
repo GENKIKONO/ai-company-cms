@@ -155,24 +155,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
   } catch (error: any) {
     const processingTime = Date.now() - startTime;
-    
+
     logger.error('Blog generation failed', {
-      error: error.message,
+      data: error instanceof Error ? error : new Error(String(error)),
       sessionId: sessionId,
       jobId,
-      processingTime,
-      stack: error.stack
+      processingTime
     });
 
-    // ジョブにエラー記録
+    // ジョブにエラー記録（内部用のみスタックトレースを保持）
     if (jobId) {
       try {
         await updateGenerationJob(jobId, {
           error_message: error.message,
           meta: {
             failed_at: new Date().toISOString(),
-            processing_time_ms: processingTime,
-            error_details: error.stack
+            processing_time_ms: processingTime
           }
         });
       } catch (updateError) {
@@ -183,23 +181,26 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // エラーレスポンス
     let errorCode: string = 'GENERATION_ERROR';
     let statusCode = 500;
+    let userMessage = 'ブログ生成中にエラーが発生しました';
 
     if (error.message.includes('Session not found')) {
       errorCode = 'SESSION_NOT_FOUND';
       statusCode = 404;
+      userMessage = 'セッションが見つかりません';
     } else if (error.message.includes('OpenAI')) {
       errorCode = 'OPENAI_ERROR';
+      userMessage = 'AI処理中にエラーが発生しました';
     } else if (error.message.includes('save content')) {
       errorCode = 'CONTENT_SAVE_ERROR';
+      userMessage = 'コンテンツの保存に失敗しました';
     }
 
     const errorResponse: GenerateContentError = {
       success: false,
       code: errorCode,
-      message: error.message,
+      message: userMessage,
       details: {
-        job_id: jobId || undefined,
-        openai_error: error.message.includes('OpenAI') ? error.message : undefined
+        job_id: jobId || undefined
       }
     };
 

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/utils/logger';
+import { validateImageFile, getFileExtension } from '@/lib/security/file-validation';
 
 // Organization logo upload API with Service Role bypass (fixed auth)
 export async function POST(request: NextRequest) {
@@ -29,21 +30,15 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // ファイル検証
+    // ファイル検証（MIMEタイプ + マジックバイト二重検証）
     const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
     const maxSize = 1 * 1024 * 1024; // 1MB
 
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Only PNG, JPG, and WebP files are allowed' 
-      }, { status: 400 });
-    }
-
-    if (file.size > maxSize) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'File size must be less than 1MB' 
+    const validationResult = await validateImageFile(file, allowedTypes, maxSize);
+    if (!validationResult.valid) {
+      return NextResponse.json({
+        success: false,
+        error: validationResult.error
       }, { status: 400 });
     }
 
@@ -84,14 +79,7 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // ファイル拡張子の決定
-    const getFileExtension = (fileType: string): string => {
-      if (fileType === 'image/png') return '.png';
-      if (fileType === 'image/jpeg') return '.jpg';
-      if (fileType === 'image/webp') return '.webp';
-      return '.png'; // fallback
-    };
-
+    // ファイル拡張子の決定（ユーティリティ使用）
     const fileExtension = getFileExtension(file.type);
     const fileName = `${organizationId}/logo${fileExtension}`;
 
@@ -149,16 +137,14 @@ export async function POST(request: NextRequest) {
       message: 'Logo uploaded successfully'
     });
 
-  } catch (error: any) {
+  } catch (error) {
+    // セキュリティ: ログには詳細を記録、クライアントには汎用メッセージ
     logger.error('Logo upload API error:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      cause: error.cause
+      data: error instanceof Error ? error : new Error(String(error))
     });
-    return NextResponse.json({ 
-      success: false, 
-      error: error.message || 'Internal server error' 
+    return NextResponse.json({
+      success: false,
+      error: 'ロゴのアップロードに失敗しました'
     }, { status: 500 });
   }
 }

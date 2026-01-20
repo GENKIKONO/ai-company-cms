@@ -31,6 +31,7 @@ import {
   getSessionWithClient,
   type AuthUserFull,
 } from '@/lib/core/auth-state';
+import { diagGuard, diagErrorResponse, getSafeEnvironmentInfo } from '@/lib/api/diag-guard';
 import type { Session } from '@supabase/supabase-js';
 
 export const runtime = 'nodejs';
@@ -51,6 +52,12 @@ const NO_CACHE_HEADERS = {
 };
 
 export async function GET(request: NextRequest) {
+  // diagGuard による認証チェック
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   const { searchParams } = new URL(request.url);
   const mode = searchParams.get('mode') || 'session';
 
@@ -64,7 +71,7 @@ export async function GET(request: NextRequest) {
     // モード別レスポンス生成
     switch (mode) {
       case 'full':
-        return handleFullMode(request, user, session);
+        return handleFullMode(request, user, session, guardResult.isProduction);
       case 'session':
         return handleSessionMode(request, user, session);
       case 'simple':
@@ -76,7 +83,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    return handleError(request, error);
+    return diagErrorResponse(error, '/api/diag/auth');
   }
 }
 
@@ -88,7 +95,8 @@ export async function GET(request: NextRequest) {
 async function handleFullMode(
   request: NextRequest,
   user: AuthUserFull | null,
-  session: Session | null
+  session: Session | null,
+  isProduction: boolean
 ) {
   const cookieStore = await cookies();
   const hdrs = await headers();
@@ -146,11 +154,7 @@ async function handleFullMode(
         sessionExpiresAt: session?.expires_at,
       }
     },
-    environment: {
-      nodeEnv: process.env.NODE_ENV,
-      vercelEnv: process.env.VERCEL_ENV,
-      deploymentUrl: process.env.VERCEL_URL,
-    }
+    environment: getSafeEnvironmentInfo(isProduction)
   };
 
   return NextResponse.json(diagnosticResponse, {
@@ -261,27 +265,6 @@ async function handleWhoamiMode(
     orgProbe,
     error: null,  // Phase 20: Core wrapperはエラー詳細を返さない
     timestamp: new Date().toISOString()
-  });
-}
-
-/**
- * エラーハンドリング
- */
-async function handleError(request: NextRequest, error: unknown) {
-  const cookieHeader = request.headers.get('cookie') || '';
-  const hasAccessTokenCookie = /sb-[^=;]+-auth-token=/.test(cookieHeader);
-  const hasPersistentCookie = /sb-[^=;]+-auth-token\.persistent=/.test(cookieHeader);
-
-  return NextResponse.json({
-    authenticated: false,
-    hasAccessTokenCookie,
-    hasPersistentCookie,
-    cookieHeaderLength: cookieHeader.length,
-    timestamp: new Date().toISOString(),
-    error: error instanceof Error ? error.message : 'Unknown error',
-  }, {
-    status: 200,
-    headers: NO_CACHE_HEADERS
   });
 }
 

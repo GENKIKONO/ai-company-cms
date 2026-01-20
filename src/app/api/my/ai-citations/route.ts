@@ -346,21 +346,19 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   } catch (error) {
     // 認証・認可エラーの場合
-    const err = error as { code?: string; message?: string; stack?: string };
+    const err = error as { code?: string; message?: string };
     if (err.code === 'AUTH_REQUIRED' || err.code === 'ORG_ACCESS_DENIED') {
       return createAuthErrorResponse(error);
     }
 
     logger.error('AI citations API error', {
-      error: err.message ?? String(error),
-      stack: err.stack
+      data: error instanceof Error ? error : new Error(String(error))
     });
 
     return NextResponse.json({
       success: false,
       code: 'INTERNAL_SERVER_ERROR',
-      message: '内部サーバーエラーが発生しました',
-      details: error.message
+      message: '内部サーバーエラーが発生しました'
     } as AICitationsApiResponse<never>, { status: 500 });
   }
 }

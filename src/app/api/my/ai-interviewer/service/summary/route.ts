@@ -116,14 +116,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Unexpected error in AI interviewer summary API', {
       component: 'ai-interviewer-api',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+      data: error instanceof Error ? error : new Error(String(error))
     });
 
     return NextResponse.json(
-      { 
-        ok: false, 
-        errorMessage: 'Internal server error' 
+      {
+        ok: false,
+        errorMessage: 'Internal server error'
       } satisfies ServiceInterviewSummaryResponse,
       { status: 500 }
     );

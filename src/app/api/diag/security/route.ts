@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { env } from '@/lib/env';
+import { diagGuard, diagErrorResponse } from '@/lib/api/diag-guard';
 
-import { logger } from '@/lib/log';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -11,8 +11,13 @@ export const dynamic = 'force-dynamic';
  * アプリケーションのセキュリティ設定と脆弱性をチェック
  */
 export async function GET(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   const startTime = Date.now();
-  
+
   try {
     const headersList = await headers();
     const requestHeaders = Object.fromEntries(headersList.entries());
@@ -226,13 +231,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('Security diagnostic failed:', { data: error });
-    
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to run security diagnostic',
-      diagnosticTime: Date.now() - startTime,
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return diagErrorResponse(error, 'Security diagnostic');
   }
 }

@@ -1,11 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { PLAN_LIMITS } from '@/config/plans';
+import { diagGuard, diagErrorResponse } from '@/lib/api/diag-guard';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const guardResult = await diagGuard(request);
+  if (!guardResult.authorized) {
+    return guardResult.response!;
+  }
+
   try {
     const diagnostics = {
       timestamp: new Date().toISOString(),
@@ -169,14 +175,6 @@ export async function GET() {
     return NextResponse.json(diagnostics);
 
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: 'Billing diagnostics failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString(),
-        overall_status: 'critical'
-      },
-      { status: 500 }
-    );
+    return diagErrorResponse(error, 'Billing diagnostic');
   }
 }

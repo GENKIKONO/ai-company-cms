@@ -192,14 +192,11 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     logger.error('Document upload API error:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      cause: error.cause
+      data: error instanceof Error ? error : new Error(String(error))
     });
-    return NextResponse.json({ 
-      success: false, 
-      error: error.message || 'Internal server error' 
+    return NextResponse.json({
+      success: false,
+      error: 'Internal server error'
     }, { status: 500 });
   }
 }
@@ -290,14 +287,11 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     logger.error('Document list API error:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      cause: error.cause
+      data: error instanceof Error ? error : new Error(String(error))
     });
-    return NextResponse.json({ 
-      success: false, 
-      error: error.message || 'Internal server error' 
+    return NextResponse.json({
+      success: false,
+      error: 'Internal server error'
     }, { status: 500 });
   }
 }

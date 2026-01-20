@@ -3,8 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 import { getUserWithClient } from '@/lib/core/auth-state';
 import sharp from 'sharp';
 import { logger } from '@/lib/utils/logger';
+import { validateImageFile } from '@/lib/security/file-validation';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 const MAX_WIDTH = 1600;
 const QUALITY = 80;
 
@@ -39,18 +41,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ファイルサイズチェック
-    if (file.size > MAX_FILE_SIZE) {
+    // ファイル検証（MIMEタイプ + マジックバイト二重検証）
+    const validationResult = await validateImageFile(file, ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE);
+    if (!validationResult.valid) {
       return NextResponse.json(
-        { error: 'ファイルサイズが大きすぎます（10MB以下）' },
-        { status: 400 }
-      );
-    }
-
-    // 画像ファイルチェック
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json(
-        { error: '画像ファイルを指定してください' },
+        { error: validationResult.error },
         { status: 400 }
       );
     }

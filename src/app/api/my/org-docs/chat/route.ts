@@ -277,14 +277,11 @@ ${query}
   } catch (error: any) {
     logger.error('Chat API error:', {
       component: 'org-docs-chat',
-      error: error.message,
-      stack: error.stack,
-      name: error.name,
-      cause: error.cause
+      data: error instanceof Error ? error : new Error(String(error))
     });
-    return NextResponse.json({ 
-      success: false, 
-      error: 'AIチャットの生成中にエラーが発生しました。しばらく後でお試しください。' 
+    return NextResponse.json({
+      success: false,
+      error: 'AIチャットの生成中にエラーが発生しました。しばらく後でお試しください。'
     }, { status: 500 });
   }
 }
