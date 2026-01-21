@@ -40,7 +40,26 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
     setLastRequestId(clientRequestId);
 
     try {
-      // Route Handler 経由でサーバーサイドログイン（Cookie を確実に発行）
+      // Step 1: 古いSupabase Cookieをクリア
+      // MiddlewareではなくAPIで明示的にクリアすることで、
+      // prefetchによる意図しないCookieクリアを防ぐ
+      try {
+        const clearResponse = await fetch('/api/auth/clear-session', {
+          method: 'POST',
+          credentials: 'include',
+        });
+        const clearResult = await clearResponse.json();
+        if (clearResult.cleared?.length > 0) {
+          logger.debug('[LoginForm] Cleared old cookies before login', {
+            cleared: clearResult.cleared,
+          });
+        }
+      } catch (clearErr) {
+        // クリア失敗は致命的ではないので続行
+        logger.warn('[LoginForm] Failed to clear old cookies', { error: clearErr });
+      }
+
+      // Step 2: Route Handler 経由でサーバーサイドログイン（Cookie を確実に発行）
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {

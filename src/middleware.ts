@@ -141,62 +141,20 @@ export async function middleware(request: NextRequest) {
 
   // =====================================================
   // 4. 認証ページ: /auth/login 等
-  //    → 古いSupabase Cookieをクリアしてログインページを表示
-  //    → これにより常にクリーンな状態でログインできる
+  //    → Cookieクリアは行わない（LoginFormから/api/auth/clear-sessionを呼ぶ）
+  //    → prefetchでもCookieが消えないようにするため
   //
-  // 重要: prefetchリクエスト時はCookieをクリアしない
-  // Next.jsのLinkコンポーネントはprefetchを行い、その際もMiddlewareが実行される
-  // prefetch時にCookieをクリアすると、ログイン中のユーザーのセッションが破壊される
+  // 重要: MiddlewareでのCookieクリアは廃止
+  // 理由: Next.jsのLinkコンポーネントのprefetchでもMiddlewareが実行され、
+  //       ハンバーガーメニュー展開時などに意図せずCookieがクリアされてしまうため
   // =====================================================
   if (isAuthPath) {
-    // prefetchリクエストかどうかを判定
-    // Next.js App Router: 'Next-Router-Prefetch' ヘッダー
-    // Next.js Pages Router: 'Purpose: prefetch' ヘッダー
-    // RSC: 1 はReact Server Components リクエスト
-    const prefetchHeader = request.headers.get('Next-Router-Prefetch');
-    const purposeHeader = request.headers.get('Purpose');
-    const secPurposeHeader = request.headers.get('Sec-Purpose');
-    const rscHeader = request.headers.get('RSC');
-
-    const isPrefetch =
-      prefetchHeader === '1' ||
-      purposeHeader === 'prefetch' ||
-      secPurposeHeader === 'prefetch' ||
-      rscHeader === '1';
-
-    if (isPrefetch) {
-      // prefetchリクエストの場合はCookieをクリアせずに通過
-      const prefetchResponse = NextResponse.next();
-      prefetchResponse.headers.set('x-middleware-prefetch-skip', 'true');
-      return prefetchResponse;
-    }
-
-    // 実際のナビゲーション時のみCookieをクリア
+    // 認証ページでもセキュリティヘッダーは付与
     const authResponse = NextResponse.next({
       request: { headers: request.headers },
     });
-
-    // Supabase Cookieをすべてクリア
-    sbCookies.forEach(cookie => {
-      authResponse.cookies.set(cookie.name, '', {
-        path: '/',
-        maxAge: 0,
-      });
-    });
-
-    if (sbCookies.length > 0) {
-      console.log('[middleware] Clearing old Supabase cookies on auth page', {
-        requestId,
-        clearedCookies: sbCookies.map(c => c.name),
-      });
-    }
-
     setSecurityHeaders(authResponse);
     authResponse.headers.set('x-request-id', requestId);
-    // 診断用: どのヘッダーを受け取ったかを返す
-    authResponse.headers.set('x-middleware-prefetch-header', prefetchHeader || 'null');
-    authResponse.headers.set('x-middleware-rsc-header', rscHeader || 'null');
-    authResponse.headers.set('x-middleware-purpose-header', purposeHeader || 'null');
     return authResponse;
   }
 

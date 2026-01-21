@@ -59,7 +59,6 @@ export async function POST(request: NextRequest) {
   const host = request.headers.get('host') || 'unknown';
   const proto = request.headers.get('x-forwarded-proto') || 'unknown';
   const projectRef = getProjectRef();
-  const isSecure = proto === 'https';
 
   // 診断用: Supabase SSR が setAll で設定しようとした Cookie 名を記録
   const supabaseSetCookieNames: string[] = [];
@@ -181,63 +180,14 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // セッションCookieを明示的に設定
-    // signInWithPasswordはsetAllを呼ばない場合があるため、
-    // 成功時は常に手動でCookieを設定する
+    // Supabase SSRがsetAllでCookieを設定済み
+    // 手動設定は削除 - Supabase SSRの形式に任せる
     // ========================================
-    const session = data.session;
-
-    // auth-token: access_tokenを含むセッション情報（チャンク化対応）
-    const sessionData = {
-      access_token: session.access_token,
-      refresh_token: session.refresh_token,
-      expires_at: session.expires_at,
-      expires_in: session.expires_in,
-      token_type: session.token_type,
-      user: data.user,
-    };
-    const sessionJson = JSON.stringify(sessionData);
-
-    // Cookieサイズ制限（約4KB）対応: 大きすぎる場合はチャンク化
-    const CHUNK_SIZE = 3500; // 安全マージンを持たせる
-    if (sessionJson.length <= CHUNK_SIZE) {
-      response.cookies.set(`sb-${projectRef}-auth-token`, sessionJson, {
-        path: '/',
-        secure: isSecure,
-        sameSite: 'lax',
-        httpOnly: false,
-        maxAge: session.expires_in || 3600,
-      });
-    } else {
-      // チャンク化が必要
-      const chunks = [];
-      for (let i = 0; i < sessionJson.length; i += CHUNK_SIZE) {
-        chunks.push(sessionJson.slice(i, i + CHUNK_SIZE));
-      }
-      chunks.forEach((chunk, index) => {
-        response.cookies.set(`sb-${projectRef}-auth-token.${index}`, chunk, {
-          path: '/',
-          secure: isSecure,
-          sameSite: 'lax',
-          httpOnly: false,
-          maxAge: session.expires_in || 3600,
-        });
-      });
-    }
-
-    // refresh-token
-    response.cookies.set(`sb-${projectRef}-refresh-token`, session.refresh_token, {
-      path: '/',
-      secure: isSecure,
-      sameSite: 'lax',
-      httpOnly: false,
-      maxAge: 60 * 60 * 24 * 365, // 1年
-    });
-
-    console.log('[api/auth/login] Session cookies set manually', {
+    console.log('[api/auth/login] signInWithPassword success, cookies set by Supabase SSR', {
       requestId,
       userId: data.user?.id,
-      expiresAt: session.expires_at,
+      expiresAt: data.session.expires_at,
+      setAllCalledWith: supabaseSetCookieNames,
     });
 
     // ========================================

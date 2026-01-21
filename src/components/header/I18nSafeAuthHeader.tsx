@@ -25,70 +25,57 @@ export default function I18nSafeAuthHeader({
   const [authStateChecked, setAuthStateChecked] = useState(false);
 
   // 認証状態の整合性チェック
+  // 重要: サーバー側の認証状態を信頼する
+  // クライアント側のSupabase getUser()は初期化タイミングにより失敗することがある
+  // 「不整合」でCookieをクリアするのは危険なため廃止
   useEffect(() => {
     let mounted = true;
-    
+
     const checkAuthState = async () => {
       try {
         logger.debug('[I18nSafeAuthHeader] Checking auth state...');
-        
-        // クライアント側の実際の認証状態を確認
-        const currentUser = await getCurrentUserClient();
-        const actuallyAuthenticated = !!currentUser;
-        
-        logger.debug('[I18nSafeAuthHeader] Auth state check', {
-          propsIsAuthenticated: isAuthenticated,
-          actuallyAuthenticated,
-          hasUser: !!currentUser,
-          propsUser: !!user
-        });
-        
+
+        // サーバー側の認証状態をそのまま信頼する
+        // クライアント側での再検証は補助的な情報としてのみ使用
         if (mounted) {
-          setActualAuthState(actuallyAuthenticated);
+          // サーバーから渡された認証状態を優先
+          setActualAuthState(isAuthenticated);
           setAuthStateChecked(true);
-          
-          // 不整合検出時の自動修正
-          if (isAuthenticated && !actuallyAuthenticated) {
-            logger.warn('[I18nSafeAuthHeader] Auth state mismatch detected - forcing full logout');
-            try {
-              // 認証Cookieも明示的にクリア
-              document.cookie.split(";").forEach(function(c) { 
-                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-              });
-              
-              await signOutClient();
-              
-              // ローカルストレージもクリア
-              localStorage.clear();
-              sessionStorage.clear();
-              
-              // 少し待機してからリダイレクト
-              setTimeout(() => {
-                window.location.href = '/';
-              }, 100);
-            } catch (error) {
-              logger.error('[I18nSafeAuthHeader] Auto logout failed', { data: error instanceof Error ? error : new Error(String(error)) });
-              
-              // 強制的にCookieクリア + リロード
-              document.cookie.split(";").forEach(function(c) { 
-                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-              });
-              
-              setTimeout(() => {
-                window.location.reload();
-              }, 100);
+
+          // クライアント側でも確認（ログ用のみ、Cookieクリアは行わない）
+          try {
+            const currentUser = await getCurrentUserClient();
+            const clientAuthenticated = !!currentUser;
+
+            logger.debug('[I18nSafeAuthHeader] Auth state comparison', {
+              serverIsAuthenticated: isAuthenticated,
+              clientIsAuthenticated: clientAuthenticated,
+              hasUser: !!currentUser,
+              propsUser: !!user
+            });
+
+            // 不整合があってもCookieクリアは行わない
+            // サーバー側が正しい状態を持っているため、ページリロードで解決する
+            if (isAuthenticated && !clientAuthenticated) {
+              logger.warn('[I18nSafeAuthHeader] Auth state mismatch detected - server says authenticated but client cannot verify. NOT clearing cookies (server state is authoritative).');
             }
+          } catch (clientError) {
+            // クライアント側確認失敗は無視（サーバー状態を信頼）
+            logger.debug('[I18nSafeAuthHeader] Client auth check failed, trusting server state', {
+              error: clientError instanceof Error ? clientError.message : 'Unknown'
+            });
           }
         }
       } catch (error) {
         logger.error('[I18nSafeAuthHeader] Auth state check failed', { data: error instanceof Error ? error : new Error(String(error)) });
         if (mounted) {
-          setActualAuthState(false);
+          // エラー時もサーバー状態を信頼
+          setActualAuthState(isAuthenticated);
           setAuthStateChecked(true);
         }
       }
     };
-    
+
     // 初回チェック
     checkAuthState();
 
