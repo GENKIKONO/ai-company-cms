@@ -152,14 +152,23 @@ export async function middleware(request: NextRequest) {
     // prefetchリクエストかどうかを判定
     // Next.js App Router: 'Next-Router-Prefetch' ヘッダー
     // Next.js Pages Router: 'Purpose: prefetch' ヘッダー
+    // RSC: 1 はReact Server Components リクエスト
+    const prefetchHeader = request.headers.get('Next-Router-Prefetch');
+    const purposeHeader = request.headers.get('Purpose');
+    const secPurposeHeader = request.headers.get('Sec-Purpose');
+    const rscHeader = request.headers.get('RSC');
+
     const isPrefetch =
-      request.headers.get('Next-Router-Prefetch') === '1' ||
-      request.headers.get('Purpose') === 'prefetch' ||
-      request.headers.get('Sec-Purpose') === 'prefetch';
+      prefetchHeader === '1' ||
+      purposeHeader === 'prefetch' ||
+      secPurposeHeader === 'prefetch' ||
+      rscHeader === '1';
 
     if (isPrefetch) {
       // prefetchリクエストの場合はCookieをクリアせずに通過
-      return NextResponse.next();
+      const prefetchResponse = NextResponse.next();
+      prefetchResponse.headers.set('x-middleware-prefetch-skip', 'true');
+      return prefetchResponse;
     }
 
     // 実際のナビゲーション時のみCookieをクリア
@@ -184,6 +193,10 @@ export async function middleware(request: NextRequest) {
 
     setSecurityHeaders(authResponse);
     authResponse.headers.set('x-request-id', requestId);
+    // 診断用: どのヘッダーを受け取ったかを返す
+    authResponse.headers.set('x-middleware-prefetch-header', prefetchHeader || 'null');
+    authResponse.headers.set('x-middleware-rsc-header', rscHeader || 'null');
+    authResponse.headers.set('x-middleware-purpose-header', purposeHeader || 'null');
     return authResponse;
   }
 
