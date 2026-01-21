@@ -180,10 +180,23 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // Supabase SSRがsetAllでCookieを設定済み
-    // 手動設定は削除 - Supabase SSRの形式に任せる
+    // 明示的にセッションを設定してsetAllをトリガー
+    // signInWithPasswordだけではsetAllが呼ばれない場合があるため
     // ========================================
-    console.log('[api/auth/login] signInWithPassword success, cookies set by Supabase SSR', {
+    const { error: setSessionError } = await supabase.auth.setSession({
+      access_token: data.session.access_token,
+      refresh_token: data.session.refresh_token,
+    });
+
+    if (setSessionError) {
+      console.error('[api/auth/login] setSession error', {
+        requestId,
+        errorCode: setSessionError.code,
+        errorMessage: setSessionError.message,
+      });
+    }
+
+    console.log('[api/auth/login] signInWithPassword + setSession success', {
       requestId,
       userId: data.user?.id,
       expiresAt: data.session.expires_at,
