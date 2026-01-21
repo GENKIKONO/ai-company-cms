@@ -5,9 +5,6 @@ import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import { User } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
-import { supabaseBrowser } from '@/lib/supabase/client';
-import { signOutClient, onAuthChangeClient, getCurrentUserClient } from '@/lib/core/auth-state.client';
-import { logger } from '@/lib/utils/logger';
 
 interface I18nSafeAuthHeaderProps {
   user?: User | null;
@@ -24,81 +21,11 @@ export default function I18nSafeAuthHeader({
   const [actualAuthState, setActualAuthState] = useState<boolean>(isAuthenticated);
   const [authStateChecked, setAuthStateChecked] = useState(false);
 
-  // 認証状態の整合性チェック
-  // 重要: サーバー側の認証状態を信頼する
-  // クライアント側のSupabase getUser()は初期化タイミングにより失敗することがある
-  // 「不整合」でCookieをクリアするのは危険なため廃止
+  // 認証状態はサーバーから渡されたものを信頼
   useEffect(() => {
-    let mounted = true;
-
-    const checkAuthState = async () => {
-      try {
-        logger.debug('[I18nSafeAuthHeader] Checking auth state...');
-
-        // サーバー側の認証状態をそのまま信頼する
-        // クライアント側での再検証は補助的な情報としてのみ使用
-        if (mounted) {
-          // サーバーから渡された認証状態を優先
-          setActualAuthState(isAuthenticated);
-          setAuthStateChecked(true);
-
-          // クライアント側でも確認（ログ用のみ、Cookieクリアは行わない）
-          try {
-            const currentUser = await getCurrentUserClient();
-            const clientAuthenticated = !!currentUser;
-
-            logger.debug('[I18nSafeAuthHeader] Auth state comparison', {
-              serverIsAuthenticated: isAuthenticated,
-              clientIsAuthenticated: clientAuthenticated,
-              hasUser: !!currentUser,
-              propsUser: !!user
-            });
-
-            // 不整合があってもCookieクリアは行わない
-            // サーバー側が正しい状態を持っているため、ページリロードで解決する
-            if (isAuthenticated && !clientAuthenticated) {
-              logger.warn('[I18nSafeAuthHeader] Auth state mismatch detected - server says authenticated but client cannot verify. NOT clearing cookies (server state is authoritative).');
-            }
-          } catch (clientError) {
-            // クライアント側確認失敗は無視（サーバー状態を信頼）
-            logger.debug('[I18nSafeAuthHeader] Client auth check failed, trusting server state', {
-              error: clientError instanceof Error ? clientError.message : 'Unknown'
-            });
-          }
-        }
-      } catch (error) {
-        logger.error('[I18nSafeAuthHeader] Auth state check failed', { data: error instanceof Error ? error : new Error(String(error)) });
-        if (mounted) {
-          // エラー時もサーバー状態を信頼
-          setActualAuthState(isAuthenticated);
-          setAuthStateChecked(true);
-        }
-      }
-    };
-
-    // 初回チェック
-    checkAuthState();
-
-    // 認証状態変更のリスナー（Core正本経由）
-    let subscription: { unsubscribe: () => void } | null = null;
-
-    const setupAuthListener = async () => {
-      const result = await onAuthChangeClient((event, session) => {
-        logger.debug(`[I18nSafeAuthHeader] Auth state changed: ${event}, session: ${!!session}`);
-        if (mounted) {
-          setActualAuthState(!!session);
-        }
-      });
-      subscription = result.data.subscription;
-    };
-
-    setupAuthListener();
-
-    return () => {
-      mounted = false;
-      subscription?.unsubscribe();
-    };
-  }, [isAuthenticated, user]);
+    setActualAuthState(isAuthenticated);
+    setAuthStateChecked(true);
+  }, [isAuthenticated]);
 
   // 認証状態チェック前は何も表示しない（フラッシュ防止）
   if (!authStateChecked) {

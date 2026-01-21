@@ -141,15 +141,10 @@ export async function middleware(request: NextRequest) {
 
   // =====================================================
   // 4. 認証ページ: /auth/login 等
-  //    → Cookieクリアは行わない（LoginFormから/api/auth/clear-sessionを呼ぶ）
-  //    → prefetchでもCookieが消えないようにするため
-  //
-  // 重要: MiddlewareでのCookieクリアは廃止
-  // 理由: Next.jsのLinkコンポーネントのprefetchでもMiddlewareが実行され、
-  //       ハンバーガーメニュー展開時などに意図せずCookieがクリアされてしまうため
+  //    → Cookieクリアはしない（LoginFormで明示的に行う）
+  //    → prefetchでCookieが消える問題を防ぐため
   // =====================================================
   if (isAuthPath) {
-    // 認証ページでもセキュリティヘッダーは付与
     const authResponse = NextResponse.next({
       request: { headers: request.headers },
     });
@@ -186,15 +181,9 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  // 全ページ: Cookie がある場合はセッションリフレッシュを実行
-  // これにより公開ページ（TOPページ等）でもログイン状態が正しく維持される
-  if (hasAuthCookie) {
-    try {
-      await supabase.auth.getUser();
-    } catch {
-      // セッションリフレッシュ失敗は無視（各ページのShellでハンドリング）
-    }
-  }
+  // 全ページ: セッションリフレッシュは行わない
+  // 理由: getUser()がCookieを検証し、形式が異なる場合にクリアしてしまうため
+  // セッションの検証は各ページのShellで行う
 
   // =====================================================
   // 6. セキュリティヘッダー追加

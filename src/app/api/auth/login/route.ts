@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
   const host = request.headers.get('host') || 'unknown';
   const proto = request.headers.get('x-forwarded-proto') || 'unknown';
   const projectRef = getProjectRef();
+  const isSecure = proto === 'https';
 
   // 診断用: Supabase SSR が setAll で設定しようとした Cookie 名を記録
   const supabaseSetCookieNames: string[] = [];
@@ -180,27 +181,63 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // 明示的にセッションを設定してsetAllをトリガー
-    // signInWithPasswordだけではsetAllが呼ばれない場合があるため
+    // セッションCookieを明示的に設定
+    // signInWithPasswordはsetAllを呼ばない場合があるため、
+    // 成功時は常に手動でCookieを設定する
     // ========================================
-    const { error: setSessionError } = await supabase.auth.setSession({
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token,
-    });
+    const session = data.session;
 
-    if (setSessionError) {
-      console.error('[api/auth/login] setSession error', {
-        requestId,
-        errorCode: setSessionError.code,
-        errorMessage: setSessionError.message,
+    // auth-token: access_tokenを含むセッション情報（チャンク化対応）
+    const sessionData = {
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+      expires_at: session.expires_at,
+      expires_in: session.expires_in,
+      token_type: session.token_type,
+      user: data.user,
+    };
+    const sessionJson = JSON.stringify(sessionData);
+
+    // Cookieサイズ制限（約4KB）対応: 大きすぎる場合はチャンク化
+    const CHUNK_SIZE = 3500; // 安全マージンを持たせる
+    if (sessionJson.length <= CHUNK_SIZE) {
+      response.cookies.set(`sb-${projectRef}-auth-token`, sessionJson, {
+        path: '/',
+        secure: isSecure,
+        sameSite: 'lax',
+        httpOnly: false,
+        maxAge: session.expires_in || 3600,
+      });
+    } else {
+      // チャンク化が必要
+      const chunks = [];
+      for (let i = 0; i < sessionJson.length; i += CHUNK_SIZE) {
+        chunks.push(sessionJson.slice(i, i + CHUNK_SIZE));
+      }
+      chunks.forEach((chunk, index) => {
+        response.cookies.set(`sb-${projectRef}-auth-token.${index}`, chunk, {
+          path: '/',
+          secure: isSecure,
+          sameSite: 'lax',
+          httpOnly: false,
+          maxAge: session.expires_in || 3600,
+        });
       });
     }
 
-    console.log('[api/auth/login] signInWithPassword + setSession success', {
+    // refresh-token
+    response.cookies.set(`sb-${projectRef}-refresh-token`, session.refresh_token, {
+      path: '/',
+      secure: isSecure,
+      sameSite: 'lax',
+      httpOnly: false,
+      maxAge: 60 * 60 * 24 * 365, // 1年
+    });
+
+    console.log('[api/auth/login] Session cookies set manually', {
       requestId,
       userId: data.user?.id,
-      expiresAt: data.session.expires_at,
-      setAllCalledWith: supabaseSetCookieNames,
+      expiresAt: session.expires_at,
     });
 
     // ========================================
