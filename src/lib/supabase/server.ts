@@ -32,15 +32,10 @@ export const createClient = async () => {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set({ name, value, ...options });
-            });
-          } catch {
-            // Server Component内ではCookieを設定できない場合がある
-            // Middlewareがセッション更新を担当するため、ここでは無視
-          }
+        setAll() {
+          // 読み取り専用: Cookie の変更を許可しない
+          // ログイン時のクッキー設定は /api/auth/login で手動で行う
+          // それ以外の場所ではクッキーを変更しない
         },
       },
     }
@@ -69,15 +64,10 @@ export const createTypedClient = async () => {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set({ name, value, ...options });
-            });
-          } catch {
-            // Server Component内ではCookieを設定できない場合がある
-            // Middlewareがセッション更新を担当するため、ここでは無視
-          }
+        setAll() {
+          // 読み取り専用: Cookie の変更を許可しない
+          // ログイン時のクッキー設定は /api/auth/login で手動で行う
+          // それ以外の場所ではクッキーを変更しない
         },
       },
     }

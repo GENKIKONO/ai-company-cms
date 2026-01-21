@@ -46,11 +46,6 @@ export async function GET() {
   });
 }
 
-// Cookie 判定ヘルパー（refresh-token のみ必須）
-function hasRefreshTokenCookie(cookieNames: string[], projectRef: string): boolean {
-  return cookieNames.includes(`sb-${projectRef}-refresh-token`);
-}
-
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
   const sha = process.env.VERCEL_GIT_COMMIT_SHA ||
@@ -182,8 +177,10 @@ export async function POST(request: NextRequest) {
 
     // ========================================
     // セッションCookieを明示的に設定
-    // signInWithPasswordはsetAllを呼ばない場合があるため、
-    // 成功時は常に手動でCookieを設定する
+    //
+    // 理由: Supabase SSR の onAuthStateChange は非同期で、
+    // レスポンスが返る前に setAll() が呼ばれない可能性がある。
+    // 確実に Cookie を設定するため、手動で設定する。
     // ========================================
     const session = data.session;
 

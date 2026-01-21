@@ -16,23 +16,16 @@ export function createClient(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          // ✅ Supabase提供のCookieオプションを完全に保持
-          // SameSite、HttpOnly、Secure等の属性を一切上書きしない
-          cookiesToSet.forEach(({ name, value, options }) => {
-            // optionsが存在する場合はそのまま使用、存在しない場合はundefinedを渡す
-            // これによりNext.jsのデフォルト値適用を防ぐ
-            if (options) {
-              response.cookies.set(name, value, options);
-            } else {
-              // optionsが未定義の場合、明示的にSupabaseのデフォルトに近い設定
-              response.cookies.set(name, value, {
-                httpOnly: false, // Supabaseのauth tokenはクライアントアクセス可能
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax', // Supabaseのデフォルト
-              });
-            }
-          });
+        setAll() {
+          // 読み取り専用: Cookie の変更を許可しない
+          //
+          // 理由: ログイン API が手動で設定した Cookie 形式と
+          //       Supabase SSR が期待する形式が異なるため、
+          //       Supabase が「修正」しようとして Cookie を上書き/削除してしまう。
+          //       これがダッシュボードアクセス時に Cookie が消える原因。
+          //
+          // ログイン時のクッキー設定は /api/auth/login で手動で行う。
+          // それ以外の場所ではクッキーを変更しない。
         },
       },
     }

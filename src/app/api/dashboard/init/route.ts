@@ -196,7 +196,13 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }, { status: 401, headers: responseHeaders });
     }
 
-    // Step 2: Supabase クライアント作成
+    // Step 2: Supabase クライアント作成（読み取り専用）
+    //
+    // 重要: setAll() を空にして Cookie の変更を防ぐ
+    // 理由: ログイン API が手動で設定した Cookie 形式と
+    //       Supabase SSR が期待する形式が異なる場合、
+    //       getSession() が「修正」しようとして Cookie を上書き/削除する
+    //       これがダッシュボードアクセス時に Cookie が消える原因
     whichStep = 'supabase_client';
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -206,14 +212,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
           getAll() {
             return allCookies;
           },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // Server Component での cookie 設定エラーをハンドル
-            }
+          setAll() {
+            // 読み取り専用: Cookie の変更を許可しない
+            // ログインAPIで設定した Cookie を保持するため
           },
         },
       }

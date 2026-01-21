@@ -68,14 +68,9 @@ export async function determineAuthState(): Promise<AuthStateResult> {
         getAll() {
           return allCookies;
         },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Server Component での cookie 設定エラーをハンドル
-          }
+        setAll() {
+          // 読み取り専用: Cookie の変更を許可しない
+          // ログイン時のクッキー設定は /api/auth/login で手動で行う
         },
       },
     }
