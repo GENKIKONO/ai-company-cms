@@ -1,168 +1,51 @@
-治ってないですこんなエラーが出てますが関係ありますか？
+診断実行結果
+VIEW 定義の確認
+v_dashboard_services_secure は単純に services を投影しています。
+定義: SELECT id, name AS title, slug, is_published, published_at, organization_id, status, created_at, updated_at, summary FROM services s;
+よって、エラー源はこのビュー自体ではなく、基礎テーブル services 側のRLSである可能性が高いです。
+services の RLS（SELECT）の USING 条件
+services_anon_public_read_v1（TO anon）
+公開かつ organizations 側も公開・published を要求
+services_auth_read_v1（TO authenticated）
+条件: deleted_at IS NULL AND (is_published = true OR created_by = auth.uid() OR 組織メンバー)
+services_public_read（TO public）
+公開かつ orgが公開
+services_public_read_unified（TO anon, authenticated）
+util.is_public_content(...) かつ orgが公開・未削除・show_services
+重要:
 
-9505-25a63aa9769461a1.js:1 [DashboardPageShell] Query failed: 
-{requestId: '4672eb5a-1b7c-4d48-9435-c3fe39e1e925', route: '/dashboard', queryName: 'refreshSession', clientType: 'createServerClient (API Route)', supabaseError: {…}}
-(anonymous)	@	9505-25a63aa9769461a1.js:1
-await in (anonymous)		
-(anonymous)	@	9505-25a63aa9769461a1.js:1
-o1	@	4bd1b696-bad92808725a934a.js:1
-e	@	4bd1b696-bad92808725a934a.js:1
-e	@	4bd1b696-bad92808725a934a.js:1
-e	@	4bd1b696-bad92808725a934a.js:1
-e	@	4bd1b696-bad92808725a934a.js:1
-e	@	4bd1b696-bad92808725a934a.js:1
-e	@	4bd1b696-bad92808725a934a.js:1
-e	@	4bd1b696-bad92808725a934a.js:1
-e	@	4bd1b696-bad92808725a934a.js:1
-e	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-ux	@	4bd1b696-bad92808725a934a.js:1
-uE	@	4bd1b696-bad92808725a934a.js:1
-i_	@	4bd1b696-bad92808725a934a.js:1
-(anonymous)	@	4bd1b696-bad92808725a934a.js:1
-x	@	16710-ac62b6590a93e4e1.js:10
-﻿
+authenticated 向けの services_auth_read_v1 が「公開 or 自分作成 or 組織メンバー」でアクセス可に設定されています。今回のユーザーは3条件すべて満たします。
+ユーザーを模擬してビューにアクセス
+request.jwt.claim.sub を対象ユーザーに設定して SELECT 実行
+結果: v_dashboard_services_secure から1件以上取得成功（少なくとも1件は返却）
+すなわち、このユーザーの権限で当該ビューを読むこと自体は可能で、RLSが一律に拒否している状況ではありません。
+結論
+
+42501 は再現できませんでした。ユーザー f57ee6af-e55e-4852-87db-d5a2c59f64ac は、services と、その投影ビュー v_dashboard_services_secure を SELECT 可能です。
+したがって、実行時に 42501 が出るのは次のケースが濃厚です。
+リクエストがサーバー（あるいはクライアント）から anon で到達するパスがある
+例: SSR や API 経由時に Auth ヘッダーの付与が漏れる、Edge/中間層で setAuth 未実施
+別の関連テーブル参照があるクエリ（アプリの実装上）で、そのテーブルのRLSに引っかかっている
+今回のビューは services 単体参照ですが、アプリ側クエリが別のビュー/関数/CTEを使っており、そちらの RLS で拒否
+実環境での JWT に sub はあるが、他の claim が想定外（例えばテナント/ロールのカスタムクレームを参照する関数経由で失敗）
+次の切り分け提案
+
+実際に 42501 が出ているリクエストの「正確な SQL」を取得したいです。
+ダッシュボードの「プロジェクト → ログ → Postgres」または get_logs(api/postgres) で該当時刻のクエリを確認
+もしくは、アプリ側でエラー発生時のクエリ/ビュー名をログ出力
+もしクライアントが v_dashboard_services_secure 以外も JOIN して取得しているなら、その参照先テーブルの RLS を列挙・確認します。
+すぐできる追加診断（提案）
+
+実行してよければ、以下を行い、関連テーブルの RLS を洗い出します。
+services 以外に同画面で参照しているテーブル名（例: organizations, categories, media など）をご提示ください。私から各テーブルの RLS と、該当ユーザーでの最小再現 SELECT を実施します。
+もしくは、実エラーが出た「APIエンドポイント/画面」で発行されている SQL を共有いただければ、そのまま request.jwt.claim.sub を固定して再現・特定します。
+補足（anon経路の再点検ポイント）
+
+SSR/API ルートで supabase-js を使う場合:
+createClient(..., { global: { headers: { Authorization: Bearer ${access_token} } } }) または Auth ヘルパーの getUser/setSession を適切に使用
+Realtime 経由の取得や RPC 呼び出し時にも setAuth の呼び出しを忘れない
+もし Tokens を Cookie のみで保持している場合、サーバー間フェッチで Cookie が引き継がれているかを確認
+ご希望があれば、実クエリの特定と、関連テーブルの RLS 一括点検をこちらで続行します。どの画面/エンドポイントで 42501 が発生しているか、または該当 SQL をお知らせください。
 
 
-{
-    "ok": false,
-    "user": null,
-    "organizations": [],
-    "memberships": [],
-    "diagnostics": {
-        "cookieHeaderPresent": true,
-        "cookieNames": [
-            "sb-chyicolujwhkycpkxbej-refresh-token"
-        ],
-        "hasAuthTokenCookie": false,
-        "hasRefreshTokenCookie": true,
-        "whichStep": "refreshSession"
-    },
-    "error": {
-        "code": "NO_SESSION",
-        "message": "Could not establish session. Please login again.",
-        "whichQuery": "refreshSession",
-        "details": "Invalid Refresh Token: Refresh Token Not Found"
-    },
-    "requestId": "4672eb5a-1b7c-4d48-9435-c3fe39e1e925",
-    "sha": "e63effd0c99499882c1b6b7c9edc207fb8c1c94a",
-    "timestamp": "2026-01-20T07:44:56.764Z"
-}
+

@@ -158,8 +158,12 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
   try {
     // Step 1: Cookie の取得と診断
     const cookieStore = await cookies();
-    const allCookies = cookieStore.getAll();
-    cookieNames = allCookies.map(c => c.name);
+    // 重要: mutable な配列を使用して setAll → getAll の整合性を保つ
+    // 以前は静的スナップショットを使用しており、トークンリフレッシュ時に
+    // setAll で更新された新トークンが getAll で返されず、
+    // getUser() が古い（無効化された）トークンを使用してしまう問題があった
+    const mutableCookies = [...cookieStore.getAll()];
+    cookieNames = mutableCookies.map(c => c.name);
     hasAuthToken = hasAuthTokenCookie(cookieNames, projectRef);
     hasRefreshToken = hasRefreshTokenCookie(cookieNames, projectRef);
 
@@ -174,11 +178,13 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
     // ========================================
     // Cookie 契約チェック（最優先）
     // ========================================
-    // Supabase Auth v2 仕様: refresh-token Cookie があれば認証可能
-    // auth-token Cookie は常在しない（getUser() で都度取得される）
+    // Supabase SSR 公式仕様:
+    // - sb-*-auth-token の単一Cookieにセッション全体（refresh_token含む）が格納される
+    // - sb-*-refresh-token という別Cookieは使用しない
+    // - auth-token Cookieがあれば認証可能
 
-    // refresh-token Cookie がない場合のみ未認証扱い
-    if (!hasRefreshToken) {
+    // auth-token Cookie がない場合のみ未認証扱い
+    if (!hasAuthToken) {
       whichStep = 'no_cookies';
       return NextResponse.json({
         ok: false,
@@ -196,29 +202,52 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }, { status: 401, headers: responseHeaders });
     }
 
-    // Step 2: Supabase クライアント作成（読み取り専用）
+    // Step 2: Supabase クライアント作成
     //
-    // 重要: setAll() を空にして Cookie の変更を防ぐ
-    // 理由: ログイン API が手動で設定した Cookie 形式と
-    //       Supabase SSR が期待する形式が異なる場合、
-    //       getSession() が「修正」しようとして Cookie を上書き/削除する
-    //       これがダッシュボードアクセス時に Cookie が消える原因
+    // 重要: setAll() を有効にしてトークンリフレッシュを許可する
+    // 以前は読み取り専用にしていたが、それが原因で getUser() が
+    // "Auth session missing" エラーを返していた。
+    // トークンのリフレッシュが必要な場合、setAll() でレスポンスに
+    // 新しいクッキーをセットできるようにする。
     whichStep = 'supabase_client';
+
+    // setAll で設定されたクッキーを追跡
+    const cookiesToSetOnResponse: Array<{ name: string; value: string; options: Record<string, unknown> }> = [];
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           getAll() {
-            return allCookies;
+            return mutableCookies;
           },
-          setAll() {
-            // 読み取り専用: Cookie の変更を許可しない
-            // ログインAPIで設定した Cookie を保持するため
+          setAll(cookiesToSet) {
+            // トークンリフレッシュ時にクッキーを追跡
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookiesToSetOnResponse.push({ name, value, options: { ...options, path: '/' } });
+
+              // 重要: mutableCookies も更新して getAll() との整合性を保つ
+              // これにより setAll → getAll の呼び出しで新しいトークンが返される
+              const existingIndex = mutableCookies.findIndex(c => c.name === name);
+              if (existingIndex !== -1) {
+                mutableCookies[existingIndex] = { name, value };
+              } else {
+                mutableCookies.push({ name, value });
+              }
+            });
           },
         },
       }
     );
+
+    // ヘルパー関数: レスポンスにクッキーを追加
+    const addCookiesToResponse = <T>(response: NextResponse<T>): NextResponse<T> => {
+      cookiesToSetOnResponse.forEach(({ name, value, options }) => {
+        response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2]);
+      });
+      return response;
+    };
 
     // Step 3: セッション取得
     // 注意: Middleware が全ページで getUser() を呼び、トークンローテーションを処理済み
@@ -499,7 +528,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }
     }
 
-    return NextResponse.json({
+    const successResponse = NextResponse.json({
       ok: true,
       user: userInfo,
       organizations: (orgsData || []).map(org => ({
@@ -523,6 +552,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       sha,
       timestamp,
     }, { status: 200, headers: responseHeaders });
+
+    // setAll で設定されたクッキーをレスポンスに追加
+    return addCookiesToResponse(successResponse);
 
   } catch (error) {
     console.error('[dashboard/init] Error:', {

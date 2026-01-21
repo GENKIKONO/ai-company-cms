@@ -95,7 +95,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // Supabaseクライアント作成（Cookieの同期処理込み）
-  const { supabase, response } = createClient(request);
+  // 重要: createClient は supabase と getResponse を返す
+  // setAll で response が再生成されるため、常に getResponse() で最新の response を取得
+  const { supabase, getResponse } = createClient(request);
 
   // =====================================================
   // 2. パス分類
@@ -135,6 +137,13 @@ export async function middleware(request: NextRequest) {
 
       const redirectResponse = NextResponse.redirect(url);
       redirectResponse.headers.set('x-request-id', requestId);
+
+      // 重要: setAll で設定された Set-Cookie を redirect response にコピー
+      const currentResponse = getResponse();
+      currentResponse.cookies.getAll().forEach(cookie => {
+        redirectResponse.cookies.set(cookie.name, cookie.value);
+      });
+
       return redirectResponse;
     }
   }
@@ -154,43 +163,88 @@ export async function middleware(request: NextRequest) {
   }
 
   // =====================================================
-  // 5. セッション更新（全ページ対象）
-  //    → Cookie がある場合、getUser() でセッションリフレッシュを実行
-  //    → これにより公開ページでもログイン状態が正しく表示される
-  //    → ダッシュボード系パスは追加でリダイレクト制御も行う
+  // 5. セッション同期（最重要：判定前に実行）
+  //    → 先にセッション同期を行い、必要な Set-Cookie を response に積む
+  //    → getClaims() は getUser() より軽量で、セッション更新時も setAll が発火
+  //    → これがないと Cookie が消失する
+  // =====================================================
+  const claimsResult = await supabase.auth.getClaims();
+
+  // 診断ログ: getClaims の結果と setAll で設定された Cookie
+  const responseAfterClaims = getResponse();
+  const setCookiesAfterClaims = responseAfterClaims.cookies.getAll();
+  console.log('[middleware] getClaims result', {
+    sha: DEPLOY_SHA,
+    requestId,
+    path: pathname,
+    hasAuthCookie,
+    claimsError: claimsResult.error?.code || null,
+    setCookieCount: setCookiesAfterClaims.length,
+    setCookieNames: setCookiesAfterClaims.map(c => c.name),
+  });
+
+  // =====================================================
+  // 5.5 保護パスの認証チェック（セッション同期後に判定）
+  //     → 同期後に getUser() で実際のユーザー存在を確認
+  //     → Cookie の有無ではなく、実際のセッション有効性で判定
   // =====================================================
   const protectedPaths = [ROUTES.dashboard, '/account', '/my'];
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
 
-  // 保護パス（ダッシュボード等）: Cookie がなければログインへリダイレクト
-  if (isProtectedPath && !hasAuthCookie) {
-    console.warn('[middleware] No auth cookie - redirecting to login', {
+  if (isProtectedPath) {
+    const { data: { user }, error: getUserError } = await supabase.auth.getUser();
+
+    // 診断ログ: getUser の結果
+    const responseAfterGetUser = getResponse();
+    const setCookiesAfterGetUser = responseAfterGetUser.cookies.getAll();
+    console.log('[middleware] getUser result', {
       sha: DEPLOY_SHA,
       requestId,
       path: pathname,
+      hasAuthCookie,
+      hasUser: !!user,
+      getUserError: getUserError?.code || null,
+      getUserErrorMsg: getUserError?.message || null,
+      setCookieCount: setCookiesAfterGetUser.length,
+      setCookieNames: setCookiesAfterGetUser.map(c => c.name),
     });
 
-    const url = request.nextUrl.clone();
-    url.pathname = ROUTES.authLogin;
-    url.searchParams.set('redirect', pathname);
-    url.searchParams.set('reason', 'no_cookie');
-    url.searchParams.set('rid', requestId.slice(0, 8));
+    if (!user) {
+      console.warn('[middleware] No valid session - redirecting to login', {
+        sha: DEPLOY_SHA,
+        requestId,
+        path: pathname,
+        hasAuthCookie,
+        getUserError: getUserError?.code || null,
+      });
 
-    const redirectResponse = NextResponse.redirect(url);
-    redirectResponse.headers.set('x-request-id', requestId);
-    return redirectResponse;
+      const url = request.nextUrl.clone();
+      url.pathname = ROUTES.authLogin;
+      url.searchParams.set('redirect', pathname);
+      url.searchParams.set('reason', 'no_session');
+      url.searchParams.set('rid', requestId.slice(0, 8));
+
+      const redirectResponse = NextResponse.redirect(url);
+      redirectResponse.headers.set('x-request-id', requestId);
+
+      // 重要: setAll で設定された Set-Cookie を redirect response にコピー
+      // これがないと、セッション更新/削除の Cookie が失われる
+      const currentResponse = getResponse();
+      currentResponse.cookies.getAll().forEach(cookie => {
+        redirectResponse.cookies.set(cookie.name, cookie.value);
+      });
+
+      return redirectResponse;
+    }
   }
-
-  // 全ページ: セッションリフレッシュは行わない
-  // 理由: getUser()がCookieを検証し、形式が異なる場合にクリアしてしまうため
-  // セッションの検証は各ページのShellで行う
 
   // =====================================================
   // 6. セキュリティヘッダー追加
   // =====================================================
-  setSecurityHeaders(response);
-  response.headers.set('x-request-id', requestId);
-  return response;
+  const finalResponse = getResponse();
+  setSecurityHeaders(finalResponse);
+  finalResponse.headers.set('x-request-id', requestId);
+  return finalResponse;
 }
 
 export const config = {

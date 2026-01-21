@@ -17,13 +17,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
-// Supabase プロジェクト参照を環境変数から取得
-function getProjectRef(): string {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
-  return match ? match[1] : 'unknown';
-}
-
 /**
  * GET /api/auth/login - 診断用エンドポイント
  */
@@ -53,8 +46,6 @@ export async function POST(request: NextRequest) {
               'unknown';
   const host = request.headers.get('host') || 'unknown';
   const proto = request.headers.get('x-forwarded-proto') || 'unknown';
-  const projectRef = getProjectRef();
-  const isSecure = proto === 'https';
 
   // 診断用: Supabase SSR が setAll で設定しようとした Cookie 名を記録
   const supabaseSetCookieNames: string[] = [];
@@ -104,16 +95,19 @@ export async function POST(request: NextRequest) {
               // 診断用: Supabase SSR が設定しようとした Cookie 名を記録
               supabaseSetCookieNames.push(name);
 
-              response.cookies.set(name, value, {
-                ...options,
-                path: '/',  // 必ず "/" にする
-              });
-            });
+              const opts = { ...options, path: '/' };
 
-            console.log('[api/auth/login] setAll called', {
-              requestId,
-              count: cookiesToSet.length,
-              names: cookiesToSet.map(c => c.name),
+              // 診断ログ（Supabase アシスタント指示: 属性とランタイムを記録）
+              console.log('[auth/login] setAll', {
+                name,
+                opts,
+                runtime: (globalThis as Record<string, unknown>).EdgeRuntime ? 'edge' : 'node',
+                valueLength: value?.length || 0,
+                hasMaxAge: 'maxAge' in (options || {}),
+                maxAge: (options as Record<string, unknown>)?.maxAge,
+              });
+
+              response.cookies.set(name, value, opts);
             });
           },
         },
@@ -176,73 +170,17 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // セッションCookieを明示的に設定
+    // Cookie設定は setAll に完全に委譲（Supabase SSR公式推奨）
     //
-    // 重要: Supabase SSR / createBrowserClient と同じ形式で設定する
-    // フォーマット: "base64-" + base64url(JSON)
-    //
-    // この形式にしないと、クライアントサイドの Supabase が
-    // Cookie を読み取った時に形式不一致でセッション無効と判断し、
-    // Cookie をクリアしてしまう
+    // signInWithPassword 成功時、Supabase SSR が自動的に
+    // setAll を呼び出し、正しい形式で Cookie を設定する。
+    // 手動での Cookie 設定は不要（二重管理を避ける）。
     // ========================================
-    const session = data.session;
-
-    // auth-token: Supabase SSR が期待する形式でエンコード
-    const sessionData = {
-      access_token: session.access_token,
-      refresh_token: session.refresh_token,
-      expires_at: session.expires_at,
-      expires_in: session.expires_in,
-      token_type: session.token_type,
-      user: data.user,
-    };
-    const sessionJson = JSON.stringify(sessionData);
-
-    // Supabase SSR と同じ形式: "base64-" + base64url(JSON)
-    const BASE64_PREFIX = 'base64-';
-    const encodedSession = BASE64_PREFIX + Buffer.from(sessionJson).toString('base64url');
-
-    // Cookieサイズ制限（約4KB）対応: エンコード後のサイズでチェック
-    const CHUNK_SIZE = 3500; // 安全マージンを持たせる
-    if (encodedSession.length <= CHUNK_SIZE) {
-      response.cookies.set(`sb-${projectRef}-auth-token`, encodedSession, {
-        path: '/',
-        secure: isSecure,
-        sameSite: 'lax',
-        httpOnly: false,
-        maxAge: session.expires_in || 3600,
-      });
-    } else {
-      // チャンク化が必要（エンコード後の値をチャンク化）
-      const chunks = [];
-      for (let i = 0; i < encodedSession.length; i += CHUNK_SIZE) {
-        chunks.push(encodedSession.slice(i, i + CHUNK_SIZE));
-      }
-      chunks.forEach((chunk, index) => {
-        response.cookies.set(`sb-${projectRef}-auth-token.${index}`, chunk, {
-          path: '/',
-          secure: isSecure,
-          sameSite: 'lax',
-          httpOnly: false,
-          maxAge: session.expires_in || 3600,
-        });
-      });
-    }
-
-    // refresh-token: 同じくbase64url形式でエンコード
-    const encodedRefreshToken = BASE64_PREFIX + Buffer.from(session.refresh_token).toString('base64url');
-    response.cookies.set(`sb-${projectRef}-refresh-token`, encodedRefreshToken, {
-      path: '/',
-      secure: isSecure,
-      sameSite: 'lax',
-      httpOnly: false,
-      maxAge: 60 * 60 * 24 * 365, // 1年
-    });
-
-    console.log('[api/auth/login] Session cookies set manually', {
+    console.log('[api/auth/login] Login successful - cookies delegated to setAll', {
       requestId,
       userId: data.user?.id,
-      expiresAt: session.expires_at,
+      expiresAt: data.session.expires_at,
+      supabaseSetCookieNames,
     });
 
     // ========================================
