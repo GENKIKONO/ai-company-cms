@@ -178,13 +178,16 @@ export async function POST(request: NextRequest) {
     // ========================================
     // セッションCookieを明示的に設定
     //
-    // 理由: Supabase SSR の onAuthStateChange は非同期で、
-    // レスポンスが返る前に setAll() が呼ばれない可能性がある。
-    // 確実に Cookie を設定するため、手動で設定する。
+    // 重要: Supabase SSR / createBrowserClient と同じ形式で設定する
+    // フォーマット: "base64-" + base64url(JSON)
+    //
+    // この形式にしないと、クライアントサイドの Supabase が
+    // Cookie を読み取った時に形式不一致でセッション無効と判断し、
+    // Cookie をクリアしてしまう
     // ========================================
     const session = data.session;
 
-    // auth-token: access_tokenを含むセッション情報（チャンク化対応）
+    // auth-token: Supabase SSR が期待する形式でエンコード
     const sessionData = {
       access_token: session.access_token,
       refresh_token: session.refresh_token,
@@ -195,10 +198,14 @@ export async function POST(request: NextRequest) {
     };
     const sessionJson = JSON.stringify(sessionData);
 
-    // Cookieサイズ制限（約4KB）対応: 大きすぎる場合はチャンク化
+    // Supabase SSR と同じ形式: "base64-" + base64url(JSON)
+    const BASE64_PREFIX = 'base64-';
+    const encodedSession = BASE64_PREFIX + Buffer.from(sessionJson).toString('base64url');
+
+    // Cookieサイズ制限（約4KB）対応: エンコード後のサイズでチェック
     const CHUNK_SIZE = 3500; // 安全マージンを持たせる
-    if (sessionJson.length <= CHUNK_SIZE) {
-      response.cookies.set(`sb-${projectRef}-auth-token`, sessionJson, {
+    if (encodedSession.length <= CHUNK_SIZE) {
+      response.cookies.set(`sb-${projectRef}-auth-token`, encodedSession, {
         path: '/',
         secure: isSecure,
         sameSite: 'lax',
@@ -206,10 +213,10 @@ export async function POST(request: NextRequest) {
         maxAge: session.expires_in || 3600,
       });
     } else {
-      // チャンク化が必要
+      // チャンク化が必要（エンコード後の値をチャンク化）
       const chunks = [];
-      for (let i = 0; i < sessionJson.length; i += CHUNK_SIZE) {
-        chunks.push(sessionJson.slice(i, i + CHUNK_SIZE));
+      for (let i = 0; i < encodedSession.length; i += CHUNK_SIZE) {
+        chunks.push(encodedSession.slice(i, i + CHUNK_SIZE));
       }
       chunks.forEach((chunk, index) => {
         response.cookies.set(`sb-${projectRef}-auth-token.${index}`, chunk, {
@@ -222,8 +229,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // refresh-token
-    response.cookies.set(`sb-${projectRef}-refresh-token`, session.refresh_token, {
+    // refresh-token: 同じくbase64url形式でエンコード
+    const encodedRefreshToken = BASE64_PREFIX + Buffer.from(session.refresh_token).toString('base64url');
+    response.cookies.set(`sb-${projectRef}-refresh-token`, encodedRefreshToken, {
       path: '/',
       secure: isSecure,
       sameSite: 'lax',
