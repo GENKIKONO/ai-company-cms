@@ -54,6 +54,11 @@ jobs:
       - name: 🌐 Origin Safety Check
         run: npm run check:origin-safety
 
+      - name: 🔥 App Route Smoke Test (v1.1)
+        run: npm run check:app-routes
+        env:
+          SMOKE_TEST_URL: ${{ secrets.SMOKE_TEST_URL || '' }}
+
       - name: 🏗️ Build (no warnings)
         run: |
           BUILD_OUTPUT=$(npm run build 2>&1) || exit 1

@@ -14,6 +14,7 @@
 | オリジン安全性 | `npm run check:origin-safety` | exit 0 | 自動 | CI (quality-gate.yml) |
 | Tailwind直書き | `npm run check:tailwind` | exit 0 | 自動 | CI (quality-gate.yml) |
 | Lint | `npm run lint` | warning 0 | 自動 | CI (quality-gate.yml) |
+| App Route Smoke | `npm run check:app-routes` | 404 ゼロ | 自動 | CI (quality-gate.yml) |
 
 ---
 
@@ -37,6 +38,21 @@
 | CSP `connect-src` に `'self'` がない | 内部APIがブロックされる |
 
 **背景**: Vercel preview URL で CSP blocked が発生。絶対URLがブロックされた。
+
+### 3. App Route 存在チェック (`check:app-routes`)
+
+| 違反 | 説明 |
+|------|------|
+| API ルートが 404 を返す | ルートが存在しない、またはビルドに含まれていない |
+
+**背景**: 2026-01-22 に `/api/ops_audit_simple` が 404 を返す障害が発生。
+
+**必要な Secrets**:
+| Secret 名 | 用途 |
+|-----------|------|
+| `SMOKE_TEST_URL` | テスト対象の URL（例: `https://aiohub.jp`） |
+
+> **注意**: `SMOKE_TEST_URL` が未設定の場合、このチェックはスキップされる（fail しない）。
 
 ---
 
@@ -75,6 +91,49 @@ quality-gate.yml 実行
 
 ---
 
+## Gate v2: Required Status Checks 有効化手順
+
+> **目的**: CI が失敗したら PR をマージできなくする（手動マージ防止）
+
+### 設定場所
+
+1. GitHub リポジトリ → **Settings** → **Branches**
+2. **Branch protection rules** → **Add rule** または **Edit**（main ブランチ）
+3. **Branch name pattern**: `main`
+
+### 設定項目
+
+| 設定 | 値 | 説明 |
+|------|-----|------|
+| Require a pull request before merging | ✅ ON | PR 必須 |
+| Require status checks to pass before merging | ✅ ON | CI 必須 |
+| Status checks that are required | `🚦 Quality Gate` | workflow の job 名を選択 |
+| Require branches to be up to date before merging | 任意 | main との同期を強制 |
+
+### 必須チェック名
+
+```
+🚦 Quality Gate
+```
+
+> **注意**: workflow の `name:` ではなく、`jobs:` 配下の job 名（`quality-gate`）が表示される場合もある。Actions の実行結果で確認すること。
+
+### 有効化後の運用
+
+| シナリオ | 対応 |
+|----------|------|
+| 通常の PR | CI pass 後にマージ可能 |
+| Hotfix（緊急） | Admin でルールを一時無効化、または別ブランチで対応 |
+| CI が壊れた場合 | Admin で強制マージ可能（要記録） |
+
+### Gate v2 有効化チェックリスト
+
+- [ ] Branch protection rule を main に設定
+- [ ] `🚦 Quality Gate` を Required に追加
+- [ ] テスト PR で CI 失敗時にマージボタンがグレーアウトすることを確認
+
+---
+
 ## ローカルでの事前確認
 
 ```bash
@@ -91,3 +150,10 @@ npm run check:origin-safety
 
 - [AI実装ガード](ai-implementation-guard.md) - 実装時の禁止事項
 - [ARCHITECTURE_INDEX.md](../ARCHITECTURE_INDEX.md) - アーキテクチャ整合性
+
+---
+
+## Gate v1 検証履歴
+
+- 2026-01-22: Gate v1 有効化（commit 16c6d38d）
+- 2026-01-22: 実動確認PR作成（このPRで検証）
