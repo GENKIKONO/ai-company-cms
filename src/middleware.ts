@@ -194,6 +194,18 @@ export async function middleware(request: NextRequest) {
   if (isProtectedPath) {
     const { data: { user }, error: getUserError } = await supabase.auth.getUser();
 
+    // =====================================================
+    // 事実取得専用ログ（原因特定用）
+    // =====================================================
+    console.error('[middleware][auth-check]', {
+      pathname,
+      hasCookies: hasAuthCookie,
+      cookieKeys: allCookies.map(c => c.name),
+      userId: user?.id || null,
+      getUserError: getUserError?.name || null,
+      getUserErrorMessage: getUserError?.message || null,
+    });
+
     // 診断ログ: getUser の結果
     const responseAfterGetUser = getResponse();
     const setCookiesAfterGetUser = responseAfterGetUser.cookies.getAll();
