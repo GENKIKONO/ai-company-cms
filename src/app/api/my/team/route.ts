@@ -1,40 +1,36 @@
 /**
- * Team Management API
- * GET: チームメンバー一覧取得
+ * /api/my/team - チームメンバー管理API
  *
- * セキュリティ: ブラウザからの直接DB接続を禁止し、サーバー側で認証・認可を実施
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { requireAuth } from '@/lib/api/auth-middleware';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/log';
-
-export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    // 認証チェック
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) {
-      return authResult;
-    }
-
-    const userId = authResult.user.id;
-    const supabase = await createClient();
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     // ユーザーが所属する組織を取得
     const { data: membership, error: membershipError } = await supabase
       .from('organization_members')
       .select('organization_id, role')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (membershipError || !membership) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { error: 'Organization not found' },
         { status: 404 }
-      );
+      ));
     }
 
     const organizationId = membership.organization_id;
@@ -57,36 +53,40 @@ export async function GET(request: NextRequest) {
       .eq('organization_id', organizationId);
 
     if (membersError) {
-      logger.error('Failed to fetch team members', { data: membersError });
-      return NextResponse.json(
+      logger.error('[my/team] Failed to fetch team members', { data: membersError });
+      return applyCookies(NextResponse.json(
         { error: 'Failed to fetch team members' },
         { status: 500 }
-      );
+      ));
     }
 
     // データ変換
-    const members = (membersData || []).map((member: any) => ({
+    const members = (membersData || []).map((member: Record<string, unknown>) => ({
       id: member.id,
       user_id: member.user_id,
-      email: member.profiles?.email || '',
-      full_name: member.profiles?.full_name || undefined,
+      email: (member.profiles as Record<string, unknown> | null)?.email || '',
+      full_name: (member.profiles as Record<string, unknown> | null)?.full_name || undefined,
       role: member.role,
-      avatar_url: member.profiles?.avatar_url || undefined,
+      avatar_url: (member.profiles as Record<string, unknown> | null)?.avatar_url || undefined,
       created_at: member.created_at,
       status: 'active',
     }));
 
-    return NextResponse.json({
+    return applyCookies(NextResponse.json({
       data: {
         members,
-        currentUserId: userId,
+        currentUserId: user.id,
         currentUserRole,
         organizationId,
       }
-    });
+    }, { status: 200 }));
 
   } catch (error) {
-    logger.error('Team API error', { data: error });
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[GET /api/my/team] Unexpected error', { data: error });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

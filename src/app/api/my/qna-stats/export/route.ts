@@ -1,8 +1,20 @@
-import { NextRequest } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+/**
+ * /api/my/qna-stats/export - Q&A統計エクスポートAPI
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/utils/logger';
-import { 
+import {
   createErrorResponse,
   generateQADailyCSV,
   generateQAEntriesCSV,
@@ -13,13 +25,7 @@ import {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    // ユーザー認証チェック
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createErrorResponse('Authentication required', 401);
-    }
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
 
     // ユーザーの所属組織を確認（organization_members経由）
     const { data: membershipData, error: membershipError } = await supabase
@@ -31,11 +37,11 @@ export async function GET(request: NextRequest) {
 
     if (membershipError) {
       logger.error('Error fetching user organization membership:', { data: membershipError });
-      return createErrorResponse('Failed to fetch organization membership', 500);
+      return applyCookies(createErrorResponse('Failed to fetch organization membership', 500));
     }
 
     if (!membershipData) {
-      return createErrorResponse('Organization membership not found', 404);
+      return applyCookies(createErrorResponse('Organization membership not found', 404));
     }
 
     const url = new URL(request.url);
@@ -46,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     // パラメータ検証
     if (!type || !['daily', 'byQNA'].includes(type)) {
-      return createErrorResponse('Invalid export type. Must be "daily" or "byQNA"', 400);
+      return applyCookies(createErrorResponse('Invalid export type. Must be "daily" or "byQNA"', 400));
     }
 
     // 日付範囲の設定
@@ -56,7 +62,7 @@ export async function GET(request: NextRequest) {
 
     const dateValidation = validateDateRange(dateFrom, dateTo);
     if (!dateValidation.valid) {
-      return createErrorResponse(dateValidation.error || 'Invalid date range', 400);
+      return applyCookies(createErrorResponse(dateValidation.error || 'Invalid date range', 400));
     }
 
     // Q&A統計データを取得（同じAPIを内部使用）
@@ -78,7 +84,7 @@ export async function GET(request: NextRequest) {
     const statsResponse = await getMyQAStats(statsRequest);
     
     if (!statsResponse.ok) {
-      return createErrorResponse('Failed to fetch Q&A stats for export', 500);
+      return applyCookies(createErrorResponse('Failed to fetch Q&A stats for export', 500));
     }
 
     const statsData = await statsResponse.json();
@@ -97,7 +103,7 @@ export async function GET(request: NextRequest) {
     }
 
     // CSVレスポンスの生成
-    return new Response(csvContent, {
+    const response = new NextResponse(csvContent, {
       status: 200,
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
@@ -106,8 +112,12 @@ export async function GET(request: NextRequest) {
         'Pragma': 'no-cache'
       }
     });
+    return applyCookies(response);
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
     logger.error('Company Q&A Stats Export API error', { data: error instanceof Error ? error : new Error(String(error)) });
     return createErrorResponse('Internal server error', 500);
   }

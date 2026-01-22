@@ -1,19 +1,24 @@
+/**
+ * /api/my/reports/monthly - レポート一覧取得
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
+
 import { canUseFeature } from '@/lib/featureGate';
 import { logger } from '@/lib/utils/logger';
 
 // レポート一覧取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
 
     // ユーザーの組織メンバーシップを取得（Supabase Q1回答準拠）
     const { data: membershipData } = await supabase
@@ -23,7 +28,9 @@ export async function GET(request: NextRequest) {
       .maybeSingle();
 
     if (!membershipData?.organization_id) {
-      return NextResponse.json({ error: 'Organization membership not found' }, { status: 404 });
+      return applyCookies(
+        NextResponse.json({ error: 'Organization membership not found' }, { status: 404 })
+      );
     }
 
     const organizationId = membershipData.organization_id;
@@ -31,25 +38,29 @@ export async function GET(request: NextRequest) {
     // AIレポート機能のアクセス制御チェック
     try {
       const canUse = await canUseFeature(organizationId, 'ai_reports');
-      
+
       if (!canUse) {
-        return NextResponse.json(
-          {
-            error: 'FeatureNotAvailable',
-            message: 'ご利用中のプランではAIレポート機能はご利用いただけません。'
-          },
-          { status: 403 }
+        return applyCookies(
+          NextResponse.json(
+            {
+              error: 'FeatureNotAvailable',
+              message: 'ご利用中のプランではAIレポート機能はご利用いただけません。'
+            },
+            { status: 403 }
+          )
         );
       }
     } catch (error) {
       logger.error('AI reports feature check failed:', { data: error });
       // NOTE: AIレポート機能チェックでエラー時は禁止側に倒す
-      return NextResponse.json(
-        {
-          error: 'FeatureCheckFailed',
-          message: '機能チェックに失敗しました。しばらくしてからお試しください。'
-        },
-        { status: 403 }
+      return applyCookies(
+        NextResponse.json(
+          {
+            error: 'FeatureCheckFailed',
+            message: '機能チェックに失敗しました。しばらくしてからお試しください。'
+          },
+          { status: 403 }
+        )
       );
     }
 
@@ -78,24 +89,33 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Failed to query ai_monthly_reports:', { data: error });
-      return NextResponse.json(
-        { 
-          error: 'Failed to fetch reports',
-          details: error.message 
-        },
-        { status: 500 }
+      return applyCookies(
+        NextResponse.json(
+          {
+            error: 'Failed to fetch reports',
+            details: error.message
+          },
+          { status: 500 }
+        )
       );
     }
 
-    return NextResponse.json({
-      reports: reports || [],
-      organization_id: organizationId,
-    });
+    return applyCookies(
+      NextResponse.json({
+        reports: reports || [],
+        organization_id: organizationId,
+      })
+    );
 
   } catch (error) {
+    // ApiAuthException のハンドリング
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     logger.error('Failed to fetch monthly reports:', { data: error });
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to fetch reports',
         details: error instanceof Error ? error.message : 'Unknown error'
       },

@@ -151,6 +151,7 @@ export interface InterviewContentUnit {
 export interface InterviewSessionData {
   id: string;
   organization_id: string;
+  user_id: string | null;  // DBカラム: user_id uuid (nullable)
   answers: Record<string, string>;
   generated_content: string | null;
   generated_content_json: Record<string, any> | null;

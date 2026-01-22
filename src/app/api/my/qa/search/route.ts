@@ -1,16 +1,21 @@
+/**
+ * /api/my/qa/search - QAエントリ検索
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(req: NextRequest) {
-  const supabase = await createClient();
-  
   try {
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { supabase, user, applyCookies } = await createApiAuthClient(req);
 
     // ユーザーの企業IDを取得（単一組織モード）
     const { data: organization, error: orgError } = await supabase
@@ -20,7 +25,7 @@ export async function GET(req: NextRequest) {
       .single();
 
     if (orgError || !organization) {
-      return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'User organization not found' }, { status: 400 }));
     }
 
     const { searchParams } = new URL(req.url);
@@ -30,10 +35,10 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status') || 'published';
 
     if (!query || query.trim().length === 0) {
-      return NextResponse.json({ 
+      return applyCookies(NextResponse.json({
         data: [],
-        message: 'Search query is required' 
-      });
+        message: 'Search query is required'
+      }));
     }
 
     let searchQuery = supabase
@@ -61,7 +66,7 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       logger.error('Error searching entries', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json({ error: 'Search failed' }, { status: 500 });
+      return applyCookies(NextResponse.json({ error: 'Search failed' }, { status: 500 }));
     }
 
     // Add search relevance highlighting (simple implementation)
@@ -69,7 +74,7 @@ export async function GET(req: NextRequest) {
     const processedEntries = entries?.map(entry => {
       let questionHighlight = entry.question;
       let answerHighlight = entry.answer;
-      
+
       searchTerms.forEach(term => {
         const regex = new RegExp(`(${term})`, 'gi');
         questionHighlight = questionHighlight.replace(regex, '<mark>$1</mark>');
@@ -83,13 +88,16 @@ export async function GET(req: NextRequest) {
       };
     }) || [];
 
-    return NextResponse.json({
+    return applyCookies(NextResponse.json({
       data: processedEntries,
       query: query.trim(),
       total: processedEntries.length
-    });
+    }));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
     logger.error('Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

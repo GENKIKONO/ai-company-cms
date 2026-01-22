@@ -4,6 +4,52 @@
  * @note このファイルはサーバーサイド専用です。
  *       クライアントコンポーネント（hooks/components）からは
  *       @/lib/supabase/client を使用してください。
+ *
+ * ============================================================
+ * 【重要】使用場所の制限
+ * ============================================================
+ *
+ * ✅ 使用可能:
+ * - Server Components（ページ、レイアウト）
+ * - Server Actions
+ *
+ * ❌ 使用禁止（API Routes - /api/**）:
+ * - createClient（このファイル）
+ * - createTypedClient（このファイル）
+ * - supabase.auth.getSession()
+ * - supabase.auth.getClaims()
+ *
+ * → API Routes では @/lib/supabase/api-auth.ts を使用すること
+ *
+ * ============================================================
+ * 【理由】
+ * ============================================================
+ * - このファイルの setAll は try/catch で握り潰すため、
+ *   トークンリフレッシュ時の Cookie がレスポンスに反映されない
+ * - Server Component では cookies().set() が例外を投げるのは想定内だが、
+ *   API Routes では Cookie をレスポンスに明示的に反映する必要がある
+ * - getSession()/getClaims() はサーバーサイドで不正確な可能性がある
+ *   → getUser() が唯一の Source of Truth
+ *
+ * ============================================================
+ * 【API Routes での正しい実装】
+ * ============================================================
+ * ```typescript
+ * import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
+ *
+ * export async function GET(request: NextRequest) {
+ *   try {
+ *     const { supabase, user, applyCookies } = await createApiAuthClient(request);
+ *     // ... ビジネスロジック ...
+ *     return applyCookies(NextResponse.json({ data }));
+ *   } catch (e) {
+ *     if (e instanceof ApiAuthException) return e.toResponse();
+ *     throw e;
+ *   }
+ * }
+ * ```
+ *
+ * @see src/lib/supabase/api-auth.ts - API Routes 用の認証ヘルパー
  */
 import 'server-only';
 

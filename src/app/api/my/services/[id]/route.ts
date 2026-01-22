@@ -1,33 +1,25 @@
-// Single-Org Mode API: /api/my/services/[id]
-// 個別サービスの更新・削除API
+/**
+ * /api/my/services/[id] - 個別サービスの管理API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import type { ServiceFormData } from '@/types/domain/content';
-import { normalizeServicePayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import { normalizeServicePayload } from '@/lib/utils/data-normalization';
 import {
   validateFilesForPublish,
   extractImageUrlsFromService,
 } from '@/lib/file-scan';
 import { logger } from '@/lib/utils/logger';
-
-async function logErrorToDiag(errorInfo: any) {
-  try {
-    await fetch('/api/diag/ui', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'server_error',
-        ...errorInfo
-      }),
-      cache: 'no-store'
-    });
-  } catch {
-    // 診断ログ送信失敗は無視
-  }
-}
-
-export const dynamic = 'force-dynamic';
 
 // GET - 個別サービスを取得
 export async function GET(
@@ -36,13 +28,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-
-    // 認証（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     // Get user organization first for RLS compliance
     const { data: organization, error: orgError } = await supabase
@@ -52,7 +38,10 @@ export async function GET(
       .maybeSingle();
 
     if (orgError || !organization) {
-      return createNotFoundError('Organization');
+      return applyCookies(NextResponse.json(
+        { error: 'NOT_FOUND', message: '組織が見つかりません' },
+        { status: 404 }
+      ));
     }
 
     // RLS compliance: check both organization ownership and created_by
@@ -65,28 +54,33 @@ export async function GET(
       .maybeSingle();
 
     if (error) {
-      return NextResponse.json(
+      logger.error('[my/services/[id]] Failed to fetch service', {
+        userId: user.id,
+        serviceId: id,
+        error: error.message
+      });
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
-      );
+      ));
     }
 
     if (!data) {
-      return createNotFoundError('Service');
+      return applyCookies(NextResponse.json(
+        { error: 'NOT_FOUND', message: 'サービスが見つかりません' },
+        { status: 404 }
+      ));
     }
 
-    return NextResponse.json({ data });
+    return applyCookies(NextResponse.json({ data }, { status: 200 }));
 
   } catch (error) {
-    const errorId = generateErrorId('get-service');
-    logErrorToDiag({
-      errorId,
-      endpoint: 'GET /api/my/services/[id]',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[GET /api/my/services/[id]] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -97,13 +91,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     const body: Partial<ServiceFormData> = await request.json();
 
@@ -115,11 +103,13 @@ export async function PUT(
       .maybeSingle();
 
     if (orgError || !organization) {
-      return createNotFoundError('Organization');
+      return applyCookies(NextResponse.json(
+        { error: 'NOT_FOUND', message: '組織が見つかりません' },
+        { status: 404 }
+      ));
     }
 
     // RLS compliance: check both organization ownership and created_by
-    // is_publishedと画像フィールドもファイルスキャン用に取得
     const { data: existingService, error: fetchError } = await supabase
       .from('services')
       .select('id, is_published, image_url, thumbnail_url, media')
@@ -129,14 +119,22 @@ export async function PUT(
       .maybeSingle();
 
     if (fetchError) {
-      return NextResponse.json(
+      logger.error('[my/services/[id]] Failed to fetch service for update', {
+        userId: user.id,
+        serviceId: id,
+        error: fetchError.message
+      });
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: fetchError.message },
         { status: 500 }
-      );
+      ));
     }
 
     if (!existingService) {
-      return createNotFoundError('Service');
+      return applyCookies(NextResponse.json(
+        { error: 'NOT_FOUND', message: 'サービスが見つかりません' },
+        { status: 404 }
+      ));
     }
 
     // データ正規化
@@ -151,7 +149,6 @@ export async function PUT(
       (updateData.is_published === true && existingService.is_published !== true);
 
     if (isBecomingPublished) {
-      // 更新データと既存データを合わせて画像URLを抽出
       const mergedData = { ...existingService, ...updateData };
       const imageUrls = extractImageUrlsFromService(mergedData as Record<string, unknown>);
 
@@ -159,21 +156,21 @@ export async function PUT(
         const scanResult = await validateFilesForPublish(supabase, imageUrls);
 
         if (!scanResult.valid) {
-          logger.warn('[my/services/update] File scan validation failed for publish', {
+          logger.warn('[my/services/[id]] File scan validation failed for publish', {
             userId: user.id,
             serviceId: id,
             failedPaths: scanResult.failedPaths,
           });
-          return NextResponse.json({
+          return applyCookies(NextResponse.json({
             error: 'ファイルのスキャンが完了していないため公開できません',
             code: 'FILE_SCAN_VALIDATION_FAILED',
             failedPaths: scanResult.failedPaths,
-          }, { status: 422 });
+          }, { status: 422 }));
         }
       }
     }
 
-    // Update with RLS compliance: both organization_id and created_by filters
+    // Update with RLS compliance
     const { data, error } = await supabase
       .from('services')
       .update(updateData)
@@ -184,24 +181,35 @@ export async function PUT(
       .maybeSingle();
 
     if (error) {
-      return NextResponse.json(
+      logger.error('[my/services/[id]] Failed to update service', {
+        userId: user.id,
+        serviceId: id,
+        error: error.message
+      });
+
+      // RLS エラーの場合は 403 を返す
+      if (error.code === '42501' || error.message?.includes('RLS')) {
+        return applyCookies(NextResponse.json({
+          error: 'RLS_FORBIDDEN',
+          message: 'Row Level Security によって拒否されました'
+        }, { status: 403 }));
+      }
+
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
-      );
+      ));
     }
 
-    return NextResponse.json({ data });
+    return applyCookies(NextResponse.json({ data }, { status: 200 }));
 
   } catch (error) {
-    const errorId = generateErrorId('put-service');
-    logErrorToDiag({
-      errorId,
-      endpoint: 'PUT /api/my/services/[id]',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[PUT /api/my/services/[id]] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -212,13 +220,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     // Get user organization first for RLS compliance
     const { data: organization, error: orgError } = await supabase
@@ -228,7 +230,10 @@ export async function DELETE(
       .maybeSingle();
 
     if (orgError || !organization) {
-      return createNotFoundError('Organization');
+      return applyCookies(NextResponse.json(
+        { error: 'NOT_FOUND', message: '組織が見つかりません' },
+        { status: 404 }
+      ));
     }
 
     // RLS compliance: check both organization ownership and created_by
@@ -241,17 +246,25 @@ export async function DELETE(
       .maybeSingle();
 
     if (fetchError) {
-      return NextResponse.json(
+      logger.error('[my/services/[id]] Failed to fetch service for delete', {
+        userId: user.id,
+        serviceId: id,
+        error: fetchError.message
+      });
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: fetchError.message },
         { status: 500 }
-      );
+      ));
     }
 
     if (!existingService) {
-      return createNotFoundError('Service');
+      return applyCookies(NextResponse.json(
+        { error: 'NOT_FOUND', message: 'サービスが見つかりません' },
+        { status: 404 }
+      ));
     }
 
-    // Delete with RLS compliance: both organization_id and created_by filters
+    // Delete with RLS compliance
     const { error } = await supabase
       .from('services')
       .delete()
@@ -260,23 +273,34 @@ export async function DELETE(
       .eq('created_by', user.id);
 
     if (error) {
-      return NextResponse.json(
+      logger.error('[my/services/[id]] Failed to delete service', {
+        userId: user.id,
+        serviceId: id,
+        error: error.message
+      });
+
+      // RLS エラーの場合は 403 を返す
+      if (error.code === '42501' || error.message?.includes('RLS')) {
+        return applyCookies(NextResponse.json({
+          error: 'RLS_FORBIDDEN',
+          message: 'Row Level Security によって拒否されました'
+        }, { status: 403 }));
+      }
+
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
-      );
+      ));
     }
 
-    return NextResponse.json({ message: 'Service deleted successfully' });
+    return applyCookies(NextResponse.json({ message: 'Service deleted successfully' }, { status: 200 }));
 
   } catch (error) {
-    const errorId = generateErrorId('delete-service');
-    logErrorToDiag({
-      errorId,
-      endpoint: 'DELETE /api/my/services/[id]',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[DELETE /api/my/services/[id]] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,5 +1,10 @@
 /**
- * Monthly Reports - Server Action API Route Template
+ * /api/my/reports/monthly/[period]/server-action - Server Action API Route Template
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ * @see src/lib/supabase/api-auth.ts
  *
  * このファイルは、サーバー専用処理が必要な場合のテンプレートです。
  * 例: サーバー署名、batch処理、機密データの処理
@@ -15,29 +20,28 @@
  * 将来の reports スキーマ移行時:
  * - このルートは変更不要（public.* が thin-wrapper として機能）
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { canUseFeature } from '@/lib/featureGate';
 import { logger } from '@/lib/utils/logger';
+import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 interface RouteParams {
   params: Promise<{ period: string }>;
 }
 
 // =====================================================
-// Shared: Authentication & Authorization
+// Shared: Authorization
 // =====================================================
 
-async function getAuthorizedOrganization(supabase: Awaited<ReturnType<typeof createClient>>) {
-  // 1. Get authenticated user（Core経由）
-  const user = await getUserWithClient(supabase);
-  if (!user) {
-    return { organizationId: null, error: 'Unauthorized', status: 401 };
-  }
-
-  // 2. Get user's organization membership
+async function getAuthorizedOrganization(
+  supabase: SupabaseClient,
+  user: User
+): Promise<{ organizationId: string | null; error: string | null; status: number }> {
+  // 1. Get user's organization membership
   const { data: membership } = await supabase
     .from('organization_members')
     .select('organization_id')
@@ -48,7 +52,7 @@ async function getAuthorizedOrganization(supabase: Awaited<ReturnType<typeof cre
     return { organizationId: null, error: 'Organization membership not found', status: 404 };
   }
 
-  // 3. Check feature access
+  // 2. Check feature access
   const canUse = await canUseFeature(membership.organization_id, 'ai_reports');
   if (!canUse) {
     return {
@@ -104,21 +108,25 @@ function parsePeriod(period: string): {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = await createClient();
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
     const { period } = await params;
 
     // 1. Authorization
-    const { organizationId, error, status } = await getAuthorizedOrganization(supabase);
+    const { organizationId, error, status } = await getAuthorizedOrganization(supabase, user);
     if (!organizationId) {
-      return NextResponse.json({ error }, { status });
+      return applyCookies(
+        NextResponse.json({ error }, { status })
+      );
     }
 
     // 2. Parse period
     const parsedPeriod = parsePeriod(period);
     if (!parsedPeriod) {
-      return NextResponse.json(
-        { error: 'Invalid period format. Use YYYY-MM or YYYY-MM-DD_YYYY-MM-DD' },
-        { status: 400 }
+      return applyCookies(
+        NextResponse.json(
+          { error: 'Invalid period format. Use YYYY-MM or YYYY-MM-DD_YYYY-MM-DD' },
+          { status: 400 }
+        )
       );
     }
 
@@ -133,15 +141,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // - Trigger batch job with elevated permissions
 
     // Placeholder response
-    return NextResponse.json({
-      success: true,
-      message: 'Server action completed',
-      organizationId,
-      period: parsedPeriod,
-      // Add actual response data here
-    });
+    return applyCookies(
+      NextResponse.json({
+        success: true,
+        message: 'Server action completed',
+        organizationId,
+        period: parsedPeriod,
+        // Add actual response data here
+      })
+    );
 
   } catch (error) {
+    // ApiAuthException のハンドリング
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     logger.error('Server action failed:', { data: error });
     return NextResponse.json(
       {
@@ -163,21 +178,25 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = await createClient();
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
     const { period } = await params;
 
     // 1. Authorization
-    const { organizationId, error, status } = await getAuthorizedOrganization(supabase);
+    const { organizationId, error, status } = await getAuthorizedOrganization(supabase, user);
     if (!organizationId) {
-      return NextResponse.json({ error }, { status });
+      return applyCookies(
+        NextResponse.json({ error }, { status })
+      );
     }
 
     // 2. Parse period
     const parsedPeriod = parsePeriod(period);
     if (!parsedPeriod) {
-      return NextResponse.json(
-        { error: 'Invalid period format' },
-        { status: 400 }
+      return applyCookies(
+        NextResponse.json(
+          { error: 'Invalid period format' },
+          { status: 400 }
+        )
       );
     }
 
@@ -185,14 +204,21 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // TODO: Implement actual logic
     // Example: Generate signed URL for report download
 
-    return NextResponse.json({
-      success: true,
-      organizationId,
-      period: parsedPeriod,
-      // Add signed URL or other server-generated data
-    });
+    return applyCookies(
+      NextResponse.json({
+        success: true,
+        organizationId,
+        period: parsedPeriod,
+        // Add signed URL or other server-generated data
+      })
+    );
 
   } catch (error) {
+    // ApiAuthException のハンドリング
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     logger.error('Server action GET failed:', { data: error });
     return NextResponse.json(
       { error: 'ServerActionFailed' },

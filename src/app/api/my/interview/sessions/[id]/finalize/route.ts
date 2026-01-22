@@ -1,14 +1,21 @@
 /**
- * Phase 2-3: AI Interview Session Finalize API
- * 
- * OpenAI統合による本格的なコンテンツ生成と統一レスポンス形式
+ * /api/my/interview/sessions/[id]/finalize - AIインタビューセッション完了API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuthUser, requireOrgMember } from '@/lib/auth/server';
-import { createClient } from '@/lib/supabase/server';
+import { createApiAuthClient, ApiAuthException, ApiAuthFailure } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/utils/logger';
-import { generateInterviewContent, type CitationItem, type FinalizeResult } from '@/lib/ai/openai-interview';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
+import { generateInterviewContent, type CitationItem } from '@/lib/ai/openai-interview';
 import { logFinalizeResult, logContentUnits } from '@/lib/ai/logAiResponseWithCitations';
 import { logInterviewQuestionBatch, generateLogEntriesFromAnswers, type QuestionLogEntry } from '@/lib/interview/question-logging';
 import type { InterviewAnswersJson } from '@/types/interview-session';
@@ -21,8 +28,8 @@ import { checkMonthlyQuestionUsage } from '@/lib/billing/interview-credits';
  * JSON形式判定: 新形式（InterviewAnswersJson）か旧形式（Record<string, unknown>）かを判定
  */
 function isNewAnswersFormat(answers: any): answers is InterviewAnswersJson {
-  return answers && 
-         typeof answers === 'object' && 
+  return answers &&
+         typeof answers === 'object' &&
          Array.isArray(answers.questions);
 }
 
@@ -51,12 +58,11 @@ interface RouteParams {
 export async function POST(
   request: NextRequest,
   { params }: RouteParams
-): Promise<NextResponse<FinalizeSessionResponse>> {
+): Promise<NextResponse<FinalizeSessionResponse | ApiAuthFailure>> {
   const startTime = Date.now();
-  
+
   try {
-    // 認証確認
-    const user = await requireAuthUser();
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
     const { id: sessionId } = await params;
 
     // リクエストボディ検証
@@ -64,52 +70,50 @@ export async function POST(
     try {
       requestBody = await request.json();
     } catch (e) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: 'INVALID_JSON',
           message: 'Invalid JSON in request body'
         } satisfies FinalizeSessionResponse,
         { status: 400 }
-      );
+      ));
     }
 
     // sessionId validation (URL paramsとbodyの一致確認)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(sessionId)) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: 'INVALID_SESSION_ID',
           message: 'Invalid session ID format'
         } satisfies FinalizeSessionResponse,
         { status: 400 }
-      );
+      ));
     }
 
     if (requestBody.sessionId && requestBody.sessionId !== sessionId) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: 'SESSION_ID_MISMATCH',
           message: 'Session ID in URL and body do not match'
         } satisfies FinalizeSessionResponse,
         { status: 400 }
-      );
+      ));
     }
-
-    const supabase = await createClient();
 
     // セッション取得と権限確認
     const { data: session, error: fetchError } = await supabase
       .from('ai_interview_sessions')
       .select(`
-        id, 
-        organization_id, 
-        user_id, 
+        id,
+        organization_id,
+        user_id,
         content_type,
-        status, 
-        answers, 
+        status,
+        answers,
         generated_content,
         generated_content_json,
         version,
@@ -120,80 +124,82 @@ export async function POST(
       .maybeSingle();
 
     if (fetchError) {
-      logger.error('Failed to fetch session for finalize:', { 
-        sessionId, 
-        error: fetchError 
+      logger.error('Failed to fetch session for finalize:', {
+        sessionId,
+        error: fetchError
       });
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: 'DATABASE_ERROR',
           message: 'Failed to fetch session'
         } satisfies FinalizeSessionResponse,
         { status: 500 }
-      );
+      ));
     }
 
     if (!session) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: 'NOT_FOUND',
           message: 'Session not found or has been deleted'
         } satisfies FinalizeSessionResponse,
         { status: 404 }
-      );
+      ));
     }
 
     // 権限チェック
     if (session.organization_id) {
       try {
-        await requireOrgMember(session.organization_id);
+        await validateOrgAccess(session.organization_id, user.id, 'write');
       } catch (error) {
-        logger.warn('Unauthorized access to session for finalize:', { 
-          sessionId, 
-          userId: user.id, 
-          organizationId: session.organization_id,
-          error 
-        });
-        return NextResponse.json(
-          {
-            success: false,
-            code: 'FORBIDDEN',
-            message: 'Access denied'
-          } satisfies FinalizeSessionResponse,
-          { status: 403 }
-        );
+        if (error instanceof OrgAccessError) {
+          logger.warn('Unauthorized access to session for finalize:', {
+            sessionId,
+            userId: user.id,
+            organizationId: session.organization_id
+          });
+          return applyCookies(NextResponse.json(
+            {
+              success: false,
+              code: 'FORBIDDEN',
+              message: 'Access denied'
+            } satisfies FinalizeSessionResponse,
+            { status: error.statusCode }
+          ));
+        }
+        throw error;
       }
     } else {
       // 組織に属さないセッションの場合、作成者本人のみアクセス可能
       if (session.user_id !== user.id) {
-        logger.warn('Unauthorized access to personal session for finalize:', { 
-          sessionId, 
-          userId: user.id, 
-          sessionUserId: session.user_id 
+        logger.warn('Unauthorized access to personal session for finalize:', {
+          sessionId,
+          userId: user.id,
+          sessionUserId: session.user_id
         });
-        return NextResponse.json(
+        return applyCookies(NextResponse.json(
           {
             success: false,
             code: 'FORBIDDEN',
             message: 'Access denied'
           } satisfies FinalizeSessionResponse,
           { status: 403 }
-        );
+        ));
       }
     }
 
     // 既に完了済みの場合は既存のコンテンツを返却（再生成しない）
     if (session.status === 'completed' && session.generated_content) {
-      logger.info('Returning existing generated content', { 
-        sessionId, 
-        userId: user.id 
+      logger.info('Returning existing generated content', {
+        sessionId,
+        userId: user.id
       });
 
       // 既存のcitationsがあればログから取得（簡易実装として空配列）
       // TODO: 既存のcitations_responsesから取得するクエリを実装するか検討
-      return NextResponse.json({
+      return applyCookies(NextResponse.json({
         success: true,
         content: session.generated_content,
         citations: [], // 既存セッションのcitationsは未実装
@@ -201,13 +207,13 @@ export async function POST(
         inputTokens: 0,
         outputTokens: 0,
         durationMs: Date.now() - startTime
-      } satisfies FinalizeSessionResponse);
+      } satisfies FinalizeSessionResponse));
     }
 
     // 【プラン制限チェック】組織セッションでコンテンツ生成時の最終的な質問数制限確認
     if (session.organization_id) {
       const usageCheck = await checkMonthlyQuestionUsage(supabase, session.organization_id);
-      
+
       if (usageCheck.isExceeded || !usageCheck.allowed) {
         logger.warn('Question quota exceeded during finalize', {
           sessionId,
@@ -218,8 +224,8 @@ export async function POST(
           isExceeded: usageCheck.isExceeded,
           allowed: usageCheck.allowed
         });
-        
-        return NextResponse.json(
+
+        return applyCookies(NextResponse.json(
           {
             success: false,
             code: 'QUOTA_EXCEEDED',
@@ -231,9 +237,9 @@ export async function POST(
             }
           } satisfies FinalizeSessionResponse,
           { status: 402 } // Payment Required
-        );
+        ));
       }
-      
+
       logger.debug('Finalize quota check passed', {
         sessionId,
         organizationId: session.organization_id,
@@ -245,31 +251,31 @@ export async function POST(
 
     // 回答の有無確認
     const answersObj = session.answers as Record<string, unknown>;
-    const validAnswers = Object.values(answersObj || {}).filter(answer => 
-      answer !== undefined && 
-      answer !== null && 
+    const validAnswers = Object.values(answersObj || {}).filter(answer =>
+      answer !== undefined &&
+      answer !== null &&
       String(answer).trim() !== ''
     );
-    
+
     if (validAnswers.length === 0) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: 'NO_ANSWERS',
           message: 'No answers provided. Please answer at least one question.'
         } satisfies FinalizeSessionResponse,
         { status: 400 }
-      );
+      ));
     }
 
     // TODO: 生成中ステータスの更新（ENUMに 'generating' を追加した場合）
     // await supabase.from('ai_interview_sessions').update({ status: 'generating' }).eq('id', sessionId)
 
     // Phase 2-3: OpenAI によるコンテンツ生成
-    logger.info('Starting AI content generation', { 
-      sessionId, 
+    logger.info('Starting AI content generation', {
+      sessionId,
       userId: user.id,
-      answersCount: validAnswers.length 
+      answersCount: validAnswers.length
     });
 
     const generationResult = await generateInterviewContent({
@@ -285,7 +291,7 @@ export async function POST(
     if (!generationResult.success) {
       // 型の絞り込みのため、失敗タイプであることを明確にする
       const failedResult = generationResult as { success: false; code: string; message: string; detail?: any };
-      
+
       // ログ保存（失敗）
       await logFinalizeResult({
         sessionId,
@@ -297,7 +303,7 @@ export async function POST(
       // TODO: セッションステータスを 'failed' に更新（ENUMに追加した場合）
       // await supabase.from('ai_interview_sessions').update({ status: 'failed' }).eq('id', sessionId)
 
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: failedResult.code,
@@ -305,13 +311,13 @@ export async function POST(
           detail: failedResult.detail
         } satisfies FinalizeSessionResponse,
         { status: 502 } // Bad Gateway - 外部サービス（OpenAI）エラー
-      );
+      ));
     }
 
     // 【質問ログ記録】セッション完了時に回答済みの質問をすべてログに記録（fire-and-forget）
     if (session.organization_id && answersObj) {
       let logEntries: QuestionLogEntry[] = [];
-      
+
       // 新旧形式対応でのログエントリ生成
       if (isNewAnswersFormat(answersObj)) {
         // 新形式（InterviewAnswersJson）の場合
@@ -320,9 +326,9 @@ export async function POST(
           sessionId,
           answersObj as InterviewAnswersJson
         );
-        logger.debug('Generated log entries from new format answers', { 
-          sessionId, 
-          logEntriesCount: logEntries.length 
+        logger.debug('Generated log entries from new format answers', {
+          sessionId,
+          logEntriesCount: logEntries.length
         });
       } else {
         // 旧形式（Record<string, unknown>）の場合
@@ -336,12 +342,12 @@ export async function POST(
             });
           }
         });
-        logger.debug('Generated log entries from old format answers', { 
-          sessionId, 
-          logEntriesCount: logEntries.length 
+        logger.debug('Generated log entries from old format answers', {
+          sessionId,
+          logEntriesCount: logEntries.length
         });
       }
-      
+
       if (logEntries.length > 0) {
         logInterviewQuestionBatch(supabase, logEntries);
       }
@@ -380,14 +386,14 @@ export async function POST(
         }
       });
 
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: 'SESSION_UPDATE_ERROR',
           message: 'Failed to save generated content'
         } satisfies FinalizeSessionResponse,
         { status: 500 }
-      );
+      ));
     }
 
     // ai_content_units への分割保存（確定仕様対応）
@@ -408,8 +414,8 @@ export async function POST(
       finalizeResult: generationResult
     });
 
-    logger.info('Interview session finalized successfully', { 
-      sessionId, 
+    logger.info('Interview session finalized successfully', {
+      sessionId,
       userId: user.id,
       model: generationResult.usedModel,
       inputTokens: generationResult.inputTokens,
@@ -420,7 +426,7 @@ export async function POST(
     });
 
     // 成功レスポンス（確定仕様準拠）
-    return NextResponse.json({
+    return applyCookies(NextResponse.json({
       success: true,
       content: generationResult.content,
       citations: generationResult.citations,
@@ -428,40 +434,19 @@ export async function POST(
       inputTokens: generationResult.inputTokens,
       outputTokens: generationResult.outputTokens,
       durationMs: generationResult.durationMs
-    } satisfies FinalizeSessionResponse);
+    } satisfies FinalizeSessionResponse));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     const durationMs = Date.now() - startTime;
-    
+
     logger.error('Finalize interview session API error', {
-      sessionId: 'params' in error ? undefined : 'unknown',
       error: error instanceof Error ? error.message : error,
       durationMs
     });
-
-    // 認証エラーの場合
-    if (error instanceof Error && error.message.includes('Authentication')) {
-      return NextResponse.json(
-        {
-          success: false,
-          code: 'AUTHENTICATION_REQUIRED',
-          message: 'Authentication required'
-        } satisfies FinalizeSessionResponse,
-        { status: 401 }
-      );
-    }
-
-    // 組織メンバーアクセスエラーの場合
-    if (error instanceof Error && (error.message.includes('Organization') || error.message.includes('Forbidden'))) {
-      return NextResponse.json(
-        {
-          success: false,
-          code: 'FORBIDDEN',
-          message: 'Access denied'
-        } satisfies FinalizeSessionResponse,
-        { status: 403 }
-      );
-    }
 
     // 内部サーバーエラー
     return NextResponse.json(

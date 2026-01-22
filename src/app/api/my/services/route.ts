@@ -1,30 +1,32 @@
+/**
+ * /api/my/services - ユーザーのサービス管理API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/log';
 
 // GET - ユーザーのサービスを取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      logger.debug('[my/services] Not authenticated');
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     // organizationId クエリパラメータ必須チェック
     const url = new URL(request.url);
     const organizationId = url.searchParams.get('organizationId');
-    
+
     if (!organizationId) {
       logger.debug('[my/services] organizationId parameter required');
-      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 }));
     }
 
     // 組織メンバーシップチェック（RLSモデルに準拠）
@@ -36,30 +38,29 @@ export async function GET(request: NextRequest) {
       .maybeSingle();
 
     if (membershipError) {
-      logger.error('[my/services] Organization membership check failed', { 
-        userId: user.id, 
+      logger.error('[my/services] Organization membership check failed', {
+        userId: user.id,
         organizationId,
-        error: membershipError.message 
+        error: membershipError.message
       });
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: 'メンバーシップ確認に失敗しました' 
-      }, { status: 500 });
+      return applyCookies(NextResponse.json({
+        error: 'INTERNAL_ERROR',
+        message: 'メンバーシップ確認に失敗しました'
+      }, { status: 500 }));
     }
 
     if (!membership) {
-      logger.warn('[my/services] User not a member of organization', { 
-        userId: user.id, 
-        organizationId 
+      logger.warn('[my/services] User not a member of organization', {
+        userId: user.id,
+        organizationId
       });
-      return NextResponse.json({ 
-        error: 'FORBIDDEN', 
-        message: 'この組織のメンバーではありません' 
-      }, { status: 403 });
+      return applyCookies(NextResponse.json({
+        error: 'FORBIDDEN',
+        message: 'この組織のメンバーではありません'
+      }, { status: 403 }));
     }
 
-    // サービス取得（セキュアビュー経由、RLSにより組織メンバーのみアクセス可能）
-    // NOTE: v_dashboard_services_secure には description, duration_months, category, price カラムがないため除外
+    // サービス取得（セキュアビュー経由）
     const { data: services, error: servicesError } = await supabase
       .from('v_dashboard_services_secure')
       .select('id, title, slug, status, is_published, published_at, organization_id, created_at, updated_at, summary')
@@ -67,17 +68,21 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (servicesError) {
-      logger.error('[my/services] Failed to fetch services', { 
+      logger.error('[my/services] Failed to fetch services', {
         data: servicesError,
         userId: user.id,
-        organizationId 
+        organizationId
       });
-      return NextResponse.json({ message: 'Failed to fetch services' }, { status: 500 });
+      return applyCookies(NextResponse.json({ message: 'Failed to fetch services' }, { status: 500 }));
     }
 
-    return NextResponse.json({ data: services || [] }, { status: 200 });
+    return applyCookies(NextResponse.json({ data: services || [] }, { status: 200 }));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     logger.error('[GET /api/my/services] Unexpected error', { data: error });
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
@@ -86,26 +91,19 @@ export async function GET(request: NextRequest) {
 // POST - Create a new service
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    // Authentication check（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      logger.debug('[my/services] POST Not authenticated');
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     const body = await request.json();
 
     // organizationId 必須チェック
     if (!body.organizationId) {
       logger.debug('[my/services] POST organizationId required');
-      return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'organizationId is required' }, { status: 400 }));
     }
 
     // Basic validation
     if (!body.name || !body.name.trim()) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'Name is required' }, { status: 400 }));
     }
 
     // 組織メンバーシップチェック（RLSモデルに準拠）
@@ -117,15 +115,15 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (membershipError || !membership) {
-      logger.error('[my/services] POST Organization membership check failed', { 
-        userId: user.id, 
+      logger.error('[my/services] POST Organization membership check failed', {
+        userId: user.id,
         organizationId: body.organizationId,
-        error: membershipError?.message 
+        error: membershipError?.message
       });
-      return NextResponse.json({ 
-        error: 'FORBIDDEN', 
-        message: 'この組織のメンバーではありません' 
-      }, { status: 403 });
+      return applyCookies(NextResponse.json({
+        error: 'FORBIDDEN',
+        message: 'この組織のメンバーではありません'
+      }, { status: 403 }));
     }
 
     // 組織情報取得（キャッシュ無効化用）
@@ -136,29 +134,29 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (orgError || !organization) {
-      logger.error('[my/services] POST Organization data fetch failed', { 
-        userId: user.id, 
+      logger.error('[my/services] POST Organization data fetch failed', {
+        userId: user.id,
         organizationId: body.organizationId,
-        error: orgError?.message 
+        error: orgError?.message
       });
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: '組織情報の取得に失敗しました' 
-      }, { status: 500 });
+      return applyCookies(NextResponse.json({
+        error: 'INTERNAL_ERROR',
+        message: '組織情報の取得に失敗しました'
+      }, { status: 500 }));
     }
 
     // Prepare service data with RLS compliance
     const serviceData = {
       organization_id: body.organizationId,
-      created_by: user.id, // Required for RLS policy
+      created_by: user.id,
       name: body.name.trim(),
       summary: body.summary || null,
       description: body.description || null,
       price: body.price ? parseInt(body.price, 10) : null,
       duration_months: body.duration_months ? parseInt(body.duration_months, 10) : null,
       category: body.category || null,
-      is_published: true, // 作成されたサービスは即座に公開対象とする
-      status: 'published', // 公開状態を明示的に設定
+      is_published: true,
+      status: 'published',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -170,7 +168,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (error) {
-      logger.error('[my/services] POST Failed to create service', { 
+      logger.error('[my/services] POST Failed to create service', {
         data: error,
         userId: user.id,
         organizationId: body.organizationId,
@@ -179,49 +177,51 @@ export async function POST(request: NextRequest) {
         details: error.details,
         hint: error.hint
       });
-      
+
       // RLS エラーの場合は 403 を返す
       if (error.code === '42501' || error.message?.includes('RLS')) {
-        return NextResponse.json({ 
-          error: 'RLS_FORBIDDEN', 
-          message: 'Row Level Security によって拒否されました' 
-        }, { status: 403 });
+        return applyCookies(NextResponse.json({
+          error: 'RLS_FORBIDDEN',
+          message: 'Row Level Security によって拒否されました'
+        }, { status: 403 }));
       }
-      
-      return NextResponse.json({ 
-        error: 'Failed to create service', 
-        details: error.message 
-      }, { status: 500 });
+
+      return applyCookies(NextResponse.json({
+        error: 'Failed to create service',
+        details: error.message
+      }, { status: 500 }));
     }
 
     // キャッシュ無効化（公開ページの即座反映用）
     try {
       const { revalidatePath } = await import('next/cache');
-      
-      // 関連ページのキャッシュを無効化
+
       revalidatePath('/dashboard');
       revalidatePath(`/organizations/${organization.id}`);
       if (organization.slug) {
         revalidatePath(`/o/${organization.slug}`);
       }
-      
+
       logger.debug('[my/services] POST Cache revalidation successful', {
         userId: user.id,
         orgId: organization.id,
         orgSlug: organization.slug
       });
     } catch (revalidateError) {
-      // キャッシュ無効化エラーは非ブロッキング
-      logger.warn('[my/services] POST Cache revalidation failed', { 
+      logger.warn('[my/services] POST Cache revalidation failed', {
         userId: user.id,
         orgId: organization.id,
-        error: revalidateError instanceof Error ? revalidateError.message : revalidateError 
+        error: revalidateError instanceof Error ? revalidateError.message : revalidateError
       });
     }
 
-    return NextResponse.json({ data }, { status: 201 });
+    return applyCookies(NextResponse.json({ data }, { status: 201 }));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     logger.error('[POST /api/my/services] Unexpected error', { data: error });
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }

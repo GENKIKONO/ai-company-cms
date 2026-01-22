@@ -1,9 +1,22 @@
+/**
+ * /api/my/interview/sessions - AIインタビューセッション一覧/作成API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireAuthUser, requireOrgMember } from '@/lib/auth/server';
-import { createClient } from '@/lib/supabase/server';
+import { createApiAuthClient, ApiAuthException, ApiAuthFailure } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/utils/logger';
-import type { SessionListResponse, SessionListParams, InterviewAnswersJson } from '@/types/interview-session';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
+import type { SessionListResponse, InterviewAnswersJson } from '@/types/interview-session';
 import { isFeatureQuotaLimitReached } from '@/lib/featureGate';
 
 const SessionListParamsSchema = z.object({
@@ -13,10 +26,9 @@ const SessionListParamsSchema = z.object({
   page_size: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-export async function GET(request: NextRequest): Promise<NextResponse<SessionListResponse>> {
+export async function GET(request: NextRequest): Promise<NextResponse<SessionListResponse | ApiAuthFailure>> {
   try {
-    // 認証確認
-    const user = await requireAuthUser();
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
 
     // URL パラメータの解析
     const { searchParams } = new URL(request.url);
@@ -30,7 +42,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<SessionLis
     // バリデーション
     const validationResult = SessionListParamsSchema.safeParse(rawParams);
     if (!validationResult.success) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           data: [],
           page: 1,
@@ -38,17 +50,30 @@ export async function GET(request: NextRequest): Promise<NextResponse<SessionLis
           total: 0,
         },
         { status: 400 }
-      );
+      ));
     }
 
     const { organization_id, status, page, page_size } = validationResult.data;
 
     // 組織メンバーチェック（organization_id が指定されている場合）
     if (organization_id) {
-      await requireOrgMember(organization_id);
+      try {
+        await validateOrgAccess(organization_id, user.id, 'read');
+      } catch (error) {
+        if (error instanceof OrgAccessError) {
+          return applyCookies(NextResponse.json(
+            {
+              data: [],
+              page: 1,
+              pageSize: 20,
+              total: 0,
+            },
+            { status: error.statusCode }
+          ));
+        }
+        throw error;
+      }
     }
-
-    const supabase = await createClient();
 
     // クエリベース構築
     let query = supabase
@@ -77,7 +102,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<SessionLis
 
     if (error) {
       logger.error('Failed to fetch interview sessions:', error);
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           data: [],
           page: 1,
@@ -85,7 +110,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<SessionLis
           total: 0,
         },
         { status: 500 }
-      );
+      ));
     }
 
     const response: SessionListResponse = {
@@ -95,37 +120,14 @@ export async function GET(request: NextRequest): Promise<NextResponse<SessionLis
       total: count || 0,
     };
 
-    return NextResponse.json(response);
+    return applyCookies(NextResponse.json(response));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     logger.error('Session list API error:', error);
-
-    // 認証エラーの場合
-    if (error instanceof Error && error.message.includes('Authentication')) {
-      return NextResponse.json(
-        {
-          data: [],
-          page: 1,
-          pageSize: 20,
-          total: 0,
-        },
-        { status: 401 }
-      );
-    }
-
-    // 組織メンバーアクセスエラーの場合
-    if (error instanceof Error && (error.message.includes('Organization') || error.message.includes('Forbidden'))) {
-      return NextResponse.json(
-        {
-          data: [],
-          page: 1,
-          pageSize: 20,
-          total: 0,
-        },
-        { status: 403 }
-      );
-    }
-
     return NextResponse.json(
       {
         data: [],
@@ -139,12 +141,11 @@ export async function GET(request: NextRequest): Promise<NextResponse<SessionLis
 }
 
 // セッション作成（新統一API）
-export async function POST(request: NextRequest): Promise<NextResponse<{ success: boolean; sessionId?: string; error?: string; }>> {
+export async function POST(request: NextRequest): Promise<NextResponse<{ success: boolean; sessionId?: string; error?: string; } | ApiAuthFailure>> {
   const requestId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   try {
-    // 認証確認
-    const user = await requireAuthUser();
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
 
     // リクエストボディ解析
     const body = await request.json();
@@ -158,19 +159,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<{ success
 
     const validationResult = createSessionSchema.safeParse(body);
     if (!validationResult.success) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           error: `Validation failed: ${validationResult.error.errors.map(e => e.message).join(', ')}`
         },
         { status: 400 }
-      );
+      ));
     }
 
     const { organizationId, contentType, questionIds } = validationResult.data;
 
-    const supabase = await createClient();
-    
     // Phase 5-A: AI面接 quota チェック（新しい統一システムを使用）
     if (organizationId) {
       try {
@@ -181,8 +180,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<{ success
             userId: user.id,
             requestedQuestions: questionIds.length
           });
-          
-          return NextResponse.json(
+
+          return applyCookies(NextResponse.json(
             {
               success: false,
               error: 'quota_exceeded',
@@ -190,9 +189,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<{ success
               message: 'AI面接の利用上限に達しています。プランの見直しまたは管理者への連絡をご検討ください。',
             },
             { status: 429 }
-          );
+          ));
         }
-        
+
         logger.info('[QUOTA] AI interview quota check passed', {
           organizationId,
           userId: user.id,
@@ -212,7 +211,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<{ success
     const initialAnswers: InterviewAnswersJson = {
       questions: []  // 空の配列から開始、質問回答時に順次追加
     };
-    
+
     const sessionData = {
       organization_id: organizationId,
       user_id: user.id,
@@ -235,39 +234,34 @@ export async function POST(request: NextRequest): Promise<NextResponse<{ success
 
     if (createError) {
       logger.error('Failed to create interview session:', createError);
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { success: false, error: 'Failed to create session' },
         { status: 500 }
-      );
+      ));
     }
 
-    logger.info('Interview session created via unified API', { 
-      sessionId: session.id, 
+    logger.info('Interview session created via unified API', {
+      sessionId: session.id,
       userId: user.id,
       organizationId,
       contentType,
       questionCount: questionIds.length
     });
 
-    return NextResponse.json({
+    return applyCookies(NextResponse.json({
       success: true,
       sessionId: session.id
-    });
+    }));
 
   } catch (error) {
-    logger.error('Create interview session API error', error);
-
-    // 認証エラーの場合
-    if (error instanceof Error && error.message.includes('Authentication')) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      );
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
     }
 
+    logger.error('Create interview session API error', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: 'Internal server error',
         code: 'SESSION_CREATE_ERROR',
         timestamp: new Date().toISOString()

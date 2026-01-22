@@ -1,27 +1,32 @@
+/**
+ * /api/my/qa/categories - QAカテゴリ一覧取得・新規作成
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
-import type { QACategoryFormData } from '@/types/domain/qa-system';;
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
+
+import type { QACategoryFormData } from '@/types/domain/qa-system';
 import { logger } from '@/lib/utils/logger';
 import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 
 export async function GET(req: NextRequest) {
-  const supabase = await createClient();
-
   try {
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { supabase, user, applyCookies } = await createApiAuthClient(req);
 
     // organizationId クエリパラメータ必須チェック（他のAPIと統一）
     const { searchParams } = new URL(req.url);
     const organizationId = searchParams.get('organizationId');
-    
+
     if (!organizationId) {
       logger.debug('[my/qa/categories] organizationId parameter required');
-      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 }));
     }
 
 
@@ -30,15 +35,15 @@ export async function GET(req: NextRequest) {
       await validateOrgAccess(organizationId, user.id, 'read');
     } catch (error) {
       if (error instanceof OrgAccessError) {
-        return NextResponse.json({ 
-          error: error.code, 
-          message: error.message 
-        }, { status: error.statusCode });
+        return applyCookies(NextResponse.json({
+          error: error.code,
+          message: error.message
+        }, { status: error.statusCode }));
       }
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: 'メンバーシップ確認に失敗しました' 
-      }, { status: 500 });
+      return applyCookies(NextResponse.json({
+        error: 'INTERNAL_ERROR',
+        message: 'メンバーシップ確認に失敗しました'
+      }, { status: 500 }));
     }
 
     // 対象テーブル単体＋organization_idフィルタで取得
@@ -58,37 +63,34 @@ export async function GET(req: NextRequest) {
           hint: error.hint
         }
       });
-      return NextResponse.json({ 
-        error: 'Failed to fetch categories', 
+      return applyCookies(NextResponse.json({
+        error: 'Failed to fetch categories',
         message: error.message,
-        details: error.details 
-      }, { status: 500 });
+        details: error.details
+      }, { status: 500 }));
     }
 
-    return NextResponse.json({ data: categories });
+    return applyCookies(NextResponse.json({ data: categories }));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
     logger.error('Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
-
   try {
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { supabase, user, applyCookies } = await createApiAuthClient(req);
 
     const body: QACategoryFormData & { organizationId?: string } = await req.json();
 
     // organizationId 必須チェック（他のAPIと統一）
     if (!body.organizationId) {
       logger.debug('[my/qa/categories] POST organizationId required');
-      return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'organizationId is required' }, { status: 400 }));
     }
 
     // validateOrgAccessでメンバーシップ確認
@@ -96,19 +98,19 @@ export async function POST(req: NextRequest) {
       await validateOrgAccess(body.organizationId, user.id, 'write');
     } catch (error) {
       if (error instanceof OrgAccessError) {
-        return NextResponse.json({ 
-          error: error.code, 
-          message: error.message 
-        }, { status: error.statusCode });
+        return applyCookies(NextResponse.json({
+          error: error.code,
+          message: error.message
+        }, { status: error.statusCode }));
       }
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: 'メンバーシップ確認に失敗しました' 
-      }, { status: 500 });
+      return applyCookies(NextResponse.json({
+        error: 'INTERNAL_ERROR',
+        message: 'メンバーシップ確認に失敗しました'
+      }, { status: 500 }));
     }
-    
+
     if (!body.name?.trim() || !body.slug?.trim()) {
-      return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'Name and slug are required' }, { status: 400 }));
     }
 
     const categoryData = {
@@ -131,16 +133,16 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       if (error.code === '23505') {
-        return NextResponse.json({ error: 'Category slug already exists' }, { status: 409 });
+        return applyCookies(NextResponse.json({ error: 'Category slug already exists' }, { status: 409 }));
       }
       logger.error('Error creating category', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });
+      return applyCookies(NextResponse.json({ error: 'Failed to create category' }, { status: 500 }));
     }
 
     // .maybeSingle()はデータなしでもerrorにならないため明示的null分岐
     if (!category) {
       logger.error('Error creating category: no data returned from insert');
-      return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });
+      return applyCookies(NextResponse.json({ error: 'Failed to create category' }, { status: 500 }));
     }
 
     // Log the creation
@@ -155,9 +157,12 @@ export async function POST(req: NextRequest) {
         metadata: { ip: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown", user_agent: req.headers.get('user-agent') }
       });
 
-    return NextResponse.json({ data: category }, { status: 201 });
+    return applyCookies(NextResponse.json({ data: category }, { status: 201 }));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
     logger.error('Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

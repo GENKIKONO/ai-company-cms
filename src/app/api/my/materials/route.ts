@@ -1,56 +1,67 @@
 /**
- * 営業資料管理API
- * プラン制限に基づく営業資料のアップロード・管理
+ * /api/my/materials - 営業資料管理API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { getOrgFeatureLimit as getFeatureLimit } from '@/lib/featureGate';
-import { createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
 import { logger } from '@/lib/utils/logger';
-import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
-
-export const dynamic = 'force-dynamic';
 
 // GET - ユーザー企業の営業資料一覧を取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     // organizationId クエリパラメータ必須チェック
     const url = new URL(request.url);
     const organizationId = url.searchParams.get('organizationId');
-    
+
     if (!organizationId) {
       logger.debug('[my/materials] organizationId parameter required');
-      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 }));
     }
 
-    // validateOrgAccessでメンバーシップ確認
-    try {
-      await validateOrgAccess(organizationId, user.id, 'read');
-    } catch (error) {
-      if (error instanceof OrgAccessError) {
-        return NextResponse.json({ 
-          error: error.code, 
-          message: error.message 
-        }, { status: error.statusCode });
-      }
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: 'メンバーシップ確認に失敗しました' 
-      }, { status: 500 });
+    // 組織メンバーシップチェック（RLSモデルに準拠）
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', organizationId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (membershipError) {
+      logger.error('[my/materials] Organization membership check failed', {
+        userId: user.id,
+        organizationId,
+        error: membershipError.message
+      });
+      return applyCookies(NextResponse.json({
+        error: 'INTERNAL_ERROR',
+        message: 'メンバーシップ確認に失敗しました'
+      }, { status: 500 }));
     }
 
-    // 対象テーブル単体＋organization_idフィルタで取得
-    // NOTE: DBスキーマに合わせたカラム名を使用
+    if (!membership) {
+      logger.warn('[my/materials] User not a member of organization', {
+        userId: user.id,
+        organizationId
+      });
+      return applyCookies(NextResponse.json({
+        error: 'FORBIDDEN',
+        message: 'この組織のメンバーではありません'
+      }, { status: 403 }));
+    }
+
+    // 営業資料取得
     const { data, error } = await supabase
       .from('sales_materials')
       .select('id, organization_id, title, description, file_path, mime_type, size_bytes, is_public, status, created_by, created_at')
@@ -58,103 +69,93 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      logger.error('[MATERIALS_DEBUG] supabase error', {
-        data: {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        }
+      logger.error('[my/materials] Failed to fetch materials', {
+        userId: user.id,
+        organizationId,
+        error: error.message
       });
-      return NextResponse.json(
-        { error: 'Database error', message: error.message, details: error.details },
+      return applyCookies(NextResponse.json(
+        { error: 'Database error', message: error.message },
         { status: 500 }
-      );
+      ));
     }
 
-    return NextResponse.json({ data: data || [] });
+    return applyCookies(NextResponse.json({ data: data || [] }, { status: 200 }));
 
   } catch (error) {
-    const errorId = generateErrorId('get-materials');
-    logger.error('[GET /api/my/materials] Unexpected error:', { data: { errorId, error } });
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[GET /api/my/materials] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 
-// POST - 新しい営業資料を作成（プラン制限チェック）
+// POST - 新しい営業資料を作成
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     const body = await request.json();
 
     // 必須フィールドの検証
     if (!body.title || !body.file_path) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { error: 'Validation error', message: 'Title and file_path are required' },
         { status: 400 }
-      );
+      ));
     }
 
     // organizationId 必須チェック
     if (!body.organizationId) {
       logger.debug('[my/materials] POST organizationId required');
-      return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'organizationId is required' }, { status: 400 }));
     }
 
-    // validateOrgAccessでメンバーシップ確認
-    try {
-      await validateOrgAccess(body.organizationId, user.id, 'write');
-    } catch (error) {
-      if (error instanceof OrgAccessError) {
-        return NextResponse.json({ 
-          error: error.code, 
-          message: error.message 
-        }, { status: error.statusCode });
-      }
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: 'メンバーシップ確認に失敗しました' 
-      }, { status: 500 });
+    // 組織メンバーシップチェック（RLSモデルに準拠）
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', body.organizationId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (membershipError || !membership) {
+      logger.error('[my/materials] POST Organization membership check failed', {
+        userId: user.id,
+        organizationId: body.organizationId,
+        error: membershipError?.message
+      });
+      return applyCookies(NextResponse.json({
+        error: 'FORBIDDEN',
+        message: 'この組織のメンバーではありません'
+      }, { status: 403 }));
     }
 
     // 組織情報取得（プラン制限チェック用）
-    const { data: orgs, error: orgError } = await supabase
+    const { data: orgData, error: orgError } = await supabase
       .from('organizations')
       .select('id, plan')
-      .eq('id', body.organizationId);
+      .eq('id', body.organizationId)
+      .maybeSingle();
 
-    if (orgError) {
+    if (orgError || !orgData) {
       logger.error('[my/materials] POST Organization data fetch failed', {
         userId: user.id,
         organizationId: body.organizationId,
-        error: orgError?.message 
+        error: orgError?.message
       });
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: '組織情報の取得に失敗しました' 
-      }, { status: 500 });
+      return applyCookies(NextResponse.json({
+        error: 'INTERNAL_ERROR',
+        message: '組織情報の取得に失敗しました'
+      }, { status: 500 }));
     }
 
-    const orgData = orgs?.[0];
-    if (!orgData) {
-      return NextResponse.json({ 
-        error: 'ORGANIZATION_NOT_FOUND', 
-        message: '組織が見つかりません' 
-      }, { status: 404 });
-    }
-
-    // プラン制限チェック（effective-features使用）
+    // プラン制限チェック
     try {
       const featureLimit = await getFeatureLimit(orgData.id, 'materials');
-      
-      // null/undefined は無制限扱い
+
       if (featureLimit !== null && featureLimit !== undefined) {
         const { count: currentCount, error: countError } = await supabase
           .from('sales_materials')
@@ -162,15 +163,15 @@ export async function POST(request: NextRequest) {
           .eq('organization_id', orgData.id);
 
         if (countError) {
-          logger.error('Error counting materials:', { data: countError });
-          return NextResponse.json(
+          logger.error('[my/materials] Error counting materials', { data: countError });
+          return applyCookies(NextResponse.json(
             { error: 'Database error', message: countError.message },
             { status: 500 }
-          );
+          ));
         }
 
         if ((currentCount || 0) >= featureLimit) {
-          return NextResponse.json(
+          return applyCookies(NextResponse.json(
             {
               error: 'LimitExceeded',
               message: 'ご契約プランの上限に達しています。プランをアップグレードしてください。',
@@ -179,16 +180,14 @@ export async function POST(request: NextRequest) {
               plan: orgData.plan || 'trial'
             },
             { status: 403 }
-          );
+          ));
         }
       }
     } catch (error) {
-      logger.error('Feature limit check failed, allowing creation:', { data: error });
-      // TODO: ここは後で要確認 - effective-features エラー時のフォールバック挙動
+      logger.error('[my/materials] Feature limit check failed, allowing creation', { data: error });
     }
 
     // 営業資料データの作成
-    // NOTE: DBスキーマに合わせたカラム名を使用
     const materialData = {
       organization_id: orgData.id,
       title: body.title,
@@ -204,18 +203,34 @@ export async function POST(request: NextRequest) {
       .select();
 
     if (error) {
-      logger.error('Database error', { data: error instanceof Error ? error : new Error(String(error)) });
-      return NextResponse.json(
+      logger.error('[my/materials POST] Failed to create material', {
+        userId: user.id,
+        orgId: orgData.id,
+        error: error.message
+      });
+
+      // RLS エラーの場合は 403 を返す
+      if (error.code === '42501' || error.message?.includes('RLS')) {
+        return applyCookies(NextResponse.json({
+          error: 'RLS_FORBIDDEN',
+          message: 'Row Level Security によって拒否されました'
+        }, { status: 403 }));
+      }
+
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
-      );
+      ));
     }
 
-    return NextResponse.json({ data }, { status: 201 });
+    return applyCookies(NextResponse.json({ data }, { status: 201 }));
 
   } catch (error) {
-    const errorId = generateErrorId('post-materials');
-    logger.error('[POST /api/my/materials] Unexpected error:', { data: { errorId, error } });
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[POST /api/my/materials] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }

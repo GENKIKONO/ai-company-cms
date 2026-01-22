@@ -1,8 +1,20 @@
-import { NextRequest } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+/**
+ * /api/my/qna-stats - Q&A統計API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/utils/logger';
-import { 
+import {
   createErrorResponse,
   createSuccessResponse,
   validateDateRange,
@@ -10,7 +22,7 @@ import {
   normalizeUserAgent,
   debugLog
 } from '@/lib/qna-stats';
-import type { 
+import type {
   QAStatsResponse,
   QAStatsTotals,
   QAStatsDailyPoint,
@@ -20,13 +32,7 @@ import type {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // ユーザー認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createErrorResponse('Authentication required', 401);
-    }
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
 
     // ユーザーの所属組織IDを取得（organization_members経由）
     const { data: membershipData, error: membershipError } = await supabase
@@ -38,11 +44,11 @@ export async function GET(request: NextRequest) {
 
     if (membershipError) {
       logger.error('Error fetching user organization membership:', { data: membershipError });
-      return createErrorResponse('Failed to fetch organization membership', 500);
+      return applyCookies(createErrorResponse('Failed to fetch organization membership', 500));
     }
 
     if (!membershipData) {
-      return createErrorResponse('Organization membership not found', 404);
+      return applyCookies(createErrorResponse('Organization membership not found', 404));
     }
 
     const organizationId = membershipData.organization_id;
@@ -62,7 +68,7 @@ export async function GET(request: NextRequest) {
     // 日付バリデーション
     const dateValidation = validateDateRange(dateFrom, dateTo);
     if (!dateValidation.valid) {
-      return createErrorResponse(dateValidation.error || 'Invalid date range', 400);
+      return applyCookies(createErrorResponse(dateValidation.error || 'Invalid date range', 400));
     }
 
     debugLog('Company Q&A Stats request', { organizationId, dateFrom, dateTo, qnaId, categoryId });
@@ -97,7 +103,7 @@ export async function GET(request: NextRequest) {
 
     if (statsError) {
       logger.error('Error fetching company Q&A stats:', { data: statsError });
-      return createErrorResponse('Failed to fetch Q&A stats', 500);
+      return applyCookies(createErrorResponse('Failed to fetch Q&A stats', 500));
     }
 
     // データが空の場合のデフォルトレスポンス
@@ -110,7 +116,7 @@ export async function GET(request: NextRequest) {
         userAgents: { Chrome: 0, Safari: 0, Firefox: 0, Edge: 0, Other: 0 },
         period: { from: dateFrom, to: dateTo }
       };
-      return createSuccessResponse(emptyResponse);
+      return applyCookies(createSuccessResponse(emptyResponse));
     }
 
     // 1. 総計の計算
@@ -220,9 +226,12 @@ export async function GET(request: NextRequest) {
     };
 
     debugLog('Company Q&A Stats response', response);
-    return createSuccessResponse(response);
+    return applyCookies(createSuccessResponse(response));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
     logger.error('Company Q&A Stats API error', { data: error instanceof Error ? error : new Error(String(error)) });
     return createErrorResponse('Internal server error', 500);
   }

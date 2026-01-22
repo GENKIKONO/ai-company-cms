@@ -1,28 +1,21 @@
-// Single-Org Mode API: /api/my/faqs/[id]
-// 個別FAQの更新・削除API
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
-import type { FAQFormData } from '@/types/domain/content';;
-import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
-
-async function logErrorToDiag(errorInfo: any) {
-  try {
-    await fetch('/api/diag/ui', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'server_error',
-        ...errorInfo
-      }),
-      cache: 'no-store'
-    });
-  } catch {
-    // 診断ログ送信失敗は無視
-  }
-}
-
+/**
+ * /api/my/faqs/[id] - 個別FAQの管理API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
+import type { FAQFormData } from '@/types/domain/content';
+import { normalizeFAQPayload } from '@/lib/utils/data-normalization';
+import { logger } from '@/lib/utils/logger';
 
 // GET - 個別FAQを取得
 export async function GET(
@@ -31,14 +24,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
-    // 認証（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
-
+    // FAQを取得（RLSで組織メンバーのみアクセス可能）
     const { data, error } = await supabase
       .from('faqs')
       .select('id, organization_id, service_id, question, answer, category, order_index, is_published, created_at, updated_at')
@@ -46,28 +34,33 @@ export async function GET(
       .maybeSingle();
 
     if (error) {
-      return NextResponse.json(
+      logger.error('[my/faqs/[id]] Failed to fetch FAQ', {
+        userId: user.id,
+        faqId: id,
+        error: error.message
+      });
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
-      );
+      ));
     }
 
     if (!data) {
-      return createNotFoundError('FAQ');
+      return applyCookies(NextResponse.json(
+        { error: 'NOT_FOUND', message: 'FAQが見つかりません' },
+        { status: 404 }
+      ));
     }
 
-    return NextResponse.json({ data });
+    return applyCookies(NextResponse.json({ data }, { status: 200 }));
 
   } catch (error) {
-    const errorId = generateErrorId('get-faq');
-    logErrorToDiag({
-      errorId,
-      endpoint: 'GET /api/my/faqs/[id]',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[GET /api/my/faqs/[id]] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -78,25 +71,54 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     const body: Partial<FAQFormData> = await request.json();
 
-    // 存在確認
+    // 存在確認（RLSで組織メンバーのみアクセス可能）
     const { data: existingFAQ, error: fetchError } = await supabase
       .from('faqs')
-      .select('id')
+      .select('id, organization_id')
       .eq('id', id)
       .maybeSingle();
 
-    if (fetchError || !existingFAQ) {
-      return createNotFoundError('FAQ');
+    if (fetchError) {
+      logger.error('[my/faqs/[id]] Failed to fetch FAQ for update', {
+        userId: user.id,
+        faqId: id,
+        error: fetchError.message
+      });
+      return applyCookies(NextResponse.json(
+        { error: 'Database error', message: fetchError.message },
+        { status: 500 }
+      ));
+    }
+
+    if (!existingFAQ) {
+      return applyCookies(NextResponse.json(
+        { error: 'NOT_FOUND', message: 'FAQが見つかりません' },
+        { status: 404 }
+      ));
+    }
+
+    // 組織メンバーシップチェック
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', existingFAQ.organization_id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (membershipError || !membership) {
+      logger.warn('[my/faqs/[id]] User not authorized to update FAQ', {
+        userId: user.id,
+        faqId: id,
+        organizationId: existingFAQ.organization_id
+      });
+      return applyCookies(NextResponse.json({
+        error: 'FORBIDDEN',
+        message: 'この組織のメンバーではありません'
+      }, { status: 403 }));
     }
 
     // データ正規化
@@ -114,24 +136,35 @@ export async function PUT(
       .maybeSingle();
 
     if (error) {
-      return NextResponse.json(
+      logger.error('[my/faqs/[id]] Failed to update FAQ', {
+        userId: user.id,
+        faqId: id,
+        error: error.message
+      });
+
+      // RLS エラーの場合は 403 を返す
+      if (error.code === '42501' || error.message?.includes('RLS')) {
+        return applyCookies(NextResponse.json({
+          error: 'RLS_FORBIDDEN',
+          message: 'Row Level Security によって拒否されました'
+        }, { status: 403 }));
+      }
+
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
-      );
+      ));
     }
 
-    return NextResponse.json({ data });
+    return applyCookies(NextResponse.json({ data }, { status: 200 }));
 
   } catch (error) {
-    const errorId = generateErrorId('put-faq');
-    logErrorToDiag({
-      errorId,
-      endpoint: 'PUT /api/my/faqs/[id]',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[PUT /api/my/faqs/[id]] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -142,23 +175,52 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    
-    // 認証チェック（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
-    // 存在確認
+    // 存在確認（RLSで組織メンバーのみアクセス可能）
     const { data: existingFAQ, error: fetchError } = await supabase
       .from('faqs')
-      .select('id')
+      .select('id, organization_id')
       .eq('id', id)
       .maybeSingle();
 
-    if (fetchError || !existingFAQ) {
-      return createNotFoundError('FAQ');
+    if (fetchError) {
+      logger.error('[my/faqs/[id]] Failed to fetch FAQ for delete', {
+        userId: user.id,
+        faqId: id,
+        error: fetchError.message
+      });
+      return applyCookies(NextResponse.json(
+        { error: 'Database error', message: fetchError.message },
+        { status: 500 }
+      ));
+    }
+
+    if (!existingFAQ) {
+      return applyCookies(NextResponse.json(
+        { error: 'NOT_FOUND', message: 'FAQが見つかりません' },
+        { status: 404 }
+      ));
+    }
+
+    // 組織メンバーシップチェック
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', existingFAQ.organization_id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (membershipError || !membership) {
+      logger.warn('[my/faqs/[id]] User not authorized to delete FAQ', {
+        userId: user.id,
+        faqId: id,
+        organizationId: existingFAQ.organization_id
+      });
+      return applyCookies(NextResponse.json({
+        error: 'FORBIDDEN',
+        message: 'この組織のメンバーではありません'
+      }, { status: 403 }));
     }
 
     const { error } = await supabase
@@ -167,23 +229,34 @@ export async function DELETE(
       .eq('id', id);
 
     if (error) {
-      return NextResponse.json(
+      logger.error('[my/faqs/[id]] Failed to delete FAQ', {
+        userId: user.id,
+        faqId: id,
+        error: error.message
+      });
+
+      // RLS エラーの場合は 403 を返す
+      if (error.code === '42501' || error.message?.includes('RLS')) {
+        return applyCookies(NextResponse.json({
+          error: 'RLS_FORBIDDEN',
+          message: 'Row Level Security によって拒否されました'
+        }, { status: 403 }));
+      }
+
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
-      );
+      ));
     }
 
-    return NextResponse.json({ message: 'FAQ deleted successfully' });
+    return applyCookies(NextResponse.json({ message: 'FAQ deleted successfully' }, { status: 200 }));
 
   } catch (error) {
-    const errorId = generateErrorId('delete-faq');
-    logErrorToDiag({
-      errorId,
-      endpoint: 'DELETE /api/my/faqs/[id]',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[DELETE /api/my/faqs/[id]] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }

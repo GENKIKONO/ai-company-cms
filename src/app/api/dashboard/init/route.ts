@@ -5,18 +5,22 @@
  * DashboardPageShell がクライアントサイドで organizations を取得すると
  * auth.uid() が NULL になり RLS で弾かれる問題を解決
  *
- * 方針（診断型）:
- * - Cookie 契約が壊れている場合は明確にエラーを返す
- * - 無理な復旧ロジックは最小限に
- * - UI 側で「ログインし直し」を表示できるようにする
+ * 方針:
+ * - createApiAuthClient で認証・Cookie 同期を統一
+ * - getUser() が唯一の Source of Truth
+ * - getSession() は使用禁止（削除済み）
+ *
+ * @see src/lib/supabase/api-auth.ts
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createServerClient } from '@supabase/ssr';
-import { canUseFeature } from '@/lib/featureGate';
+import {
+  createApiAuthClient,
+  ApiAuthException,
+} from '@/lib/supabase/api-auth';
 import { getFeatureGateInfo } from '@/lib/feature-metadata';
 import type { FeatureGateInfo } from '@/types/feature-metadata';
 import type { PlanType } from '@/config/plans';
@@ -29,12 +33,6 @@ function getProjectRef(): string {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
   return match ? match[1] : 'unknown';
-}
-
-// Cookie 判定ヘルパー
-function hasAuthTokenCookie(cookieNames: string[], projectRef: string): boolean {
-  const pattern = new RegExp(`^sb-${projectRef}-auth-token(\\.\\d+)?$`);
-  return cookieNames.some(name => pattern.test(name));
 }
 
 function hasRefreshTokenCookie(cookieNames: string[], projectRef: string): boolean {
@@ -50,12 +48,10 @@ export interface DashboardInitResponse {
   user: {
     id: string;
     email: string | null;
-    /** プロフィール情報（Phase 1 最適化で追加） */
     profile?: {
       full_name: string | null;
       avatar_url: string | null;
     };
-    /** 認証メタデータ */
     email_verified: boolean;
     created_at: string;
     app_metadata?: {
@@ -72,12 +68,10 @@ export interface DashboardInitResponse {
     organization_id: string;
     role: string;
   }>;
-  /** 機能チェック結果（featureCheckクエリパラメータ指定時のみ） - Legacy */
   featureCheck?: {
     key: string;
     available: boolean;
   };
-  /** 機能ゲート情報（featureCheckクエリパラメータ指定時のみ） - 拡張版 */
   featureGate?: {
     key: string;
     available: boolean;
@@ -116,7 +110,6 @@ export interface DashboardInitResponse {
     details?: string | null;
     hint?: string | null;
   };
-  /** コンテンツ数（Phase 3 最適化で追加） */
   contentCounts?: {
     services: number;
     faqs: number;
@@ -133,201 +126,52 @@ export interface DashboardInitResponse {
 // =====================================================
 
 export async function GET(request: NextRequest): Promise<NextResponse<DashboardInitResponse>> {
-  const requestId = crypto.randomUUID();
   const sha = process.env.VERCEL_GIT_COMMIT_SHA ||
               process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
               'unknown';
   const projectRef = getProjectRef();
-
-  // 機能チェック用クエリパラメータ（早期プラン判定用）
-  const featureCheckKey = request.nextUrl.searchParams.get('featureCheck');
-
-  const responseHeaders = {
-    'Cache-Control': 'no-store, must-revalidate',
-    'Content-Type': 'application/json',
-    'x-request-id': requestId,
-  };
-
   const timestamp = new Date().toISOString();
   const cookieHeaderPresent = request.headers.has('cookie');
-  let cookieNames: string[] = [];
-  let hasAuthToken = false;
-  let hasRefreshToken = false;
+
+  // Cookie 診断用（エラー時にも返す）
+  const cookieStore = await cookies();
+  const allCookies = cookieStore.getAll();
+  const cookieNames = allCookies.map(c => c.name);
+  const hasAuthToken = cookieNames.some(name =>
+    new RegExp(`^sb-${projectRef}-auth-token(\\.\\d+)?$`).test(name)
+  );
+  const hasRefreshToken = hasRefreshTokenCookie(cookieNames, projectRef);
+
   let whichStep = 'init';
 
+  const makeDiagnostics = () => ({
+    cookieHeaderPresent,
+    cookieNames,
+    hasAuthTokenCookie: hasAuthToken,
+    hasRefreshTokenCookie: hasRefreshToken,
+    whichStep,
+  });
+
+  const featureCheckKey = request.nextUrl.searchParams.get('featureCheck');
+
   try {
-    // Step 1: Cookie の取得と診断
-    const cookieStore = await cookies();
-    // 重要: mutable な配列を使用して setAll → getAll の整合性を保つ
-    // 以前は静的スナップショットを使用しており、トークンリフレッシュ時に
-    // setAll で更新された新トークンが getAll で返されず、
-    // getUser() が古い（無効化された）トークンを使用してしまう問題があった
-    const mutableCookies = [...cookieStore.getAll()];
-    cookieNames = mutableCookies.map(c => c.name);
-    hasAuthToken = hasAuthTokenCookie(cookieNames, projectRef);
-    hasRefreshToken = hasRefreshTokenCookie(cookieNames, projectRef);
+    // =====================================================
+    // 認証（createApiAuthClient で統一）
+    // - getUser() のみ使用（getSession 禁止）
+    // - Cookie 同期は applyCookies で行う
+    // =====================================================
+    whichStep = 'auth';
+    const { supabase, user: rawUser, applyCookies, requestId } = await createApiAuthClient(request);
 
-    const diagnostics = {
-      cookieHeaderPresent,
-      cookieNames,
-      hasAuthTokenCookie: hasAuthToken,
-      hasRefreshTokenCookie: hasRefreshToken,
-      whichStep,
+    const responseHeaders = {
+      'Cache-Control': 'no-store, must-revalidate',
+      'Content-Type': 'application/json',
+      'x-request-id': requestId,
     };
 
-    // ========================================
-    // Cookie 契約チェック（最優先）
-    // ========================================
-    // Supabase SSR 公式仕様:
-    // - sb-*-auth-token の単一Cookieにセッション全体（refresh_token含む）が格納される
-    // - sb-*-refresh-token という別Cookieは使用しない
-    // - auth-token Cookieがあれば認証可能
-
-    // auth-token Cookie がない場合のみ未認証扱い
-    if (!hasAuthToken) {
-      whichStep = 'no_cookies';
-      return NextResponse.json({
-        ok: false,
-        user: null,
-        organizations: [],
-        memberships: [],
-        diagnostics: { ...diagnostics, whichStep },
-        error: {
-          code: 'NO_AUTH_COOKIE',
-          message: 'No auth cookie found. Please login.',
-        },
-        requestId,
-        sha,
-        timestamp,
-      }, { status: 401, headers: responseHeaders });
-    }
-
-    // Step 2: Supabase クライアント作成
-    //
-    // 重要: setAll() を有効にしてトークンリフレッシュを許可する
-    // 以前は読み取り専用にしていたが、それが原因で getUser() が
-    // "Auth session missing" エラーを返していた。
-    // トークンのリフレッシュが必要な場合、setAll() でレスポンスに
-    // 新しいクッキーをセットできるようにする。
-    whichStep = 'supabase_client';
-
-    // setAll で設定されたクッキーを追跡
-    const cookiesToSetOnResponse: Array<{ name: string; value: string; options: Record<string, unknown> }> = [];
-
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return mutableCookies;
-          },
-          setAll(cookiesToSet) {
-            // トークンリフレッシュ時にクッキーを追跡
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookiesToSetOnResponse.push({ name, value, options: { ...options, path: '/' } });
-
-              // 重要: mutableCookies も更新して getAll() との整合性を保つ
-              // これにより setAll → getAll の呼び出しで新しいトークンが返される
-              const existingIndex = mutableCookies.findIndex(c => c.name === name);
-              if (existingIndex !== -1) {
-                mutableCookies[existingIndex] = { name, value };
-              } else {
-                mutableCookies.push({ name, value });
-              }
-            });
-          },
-        },
-      }
-    );
-
-    // ヘルパー関数: レスポンスにクッキーを追加
-    const addCookiesToResponse = <T>(response: NextResponse<T>): NextResponse<T> => {
-      cookiesToSetOnResponse.forEach(({ name, value, options }) => {
-        response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2]);
-      });
-      return response;
-    };
-
-    // Step 3: セッション取得
-    // 注意: Middleware が全ページで getUser() を呼び、トークンローテーションを処理済み
-    // ここでは refreshSession() を呼ばない（二重ローテーションでトークン無効化を防ぐ）
-    whichStep = 'getSession';
-    let session = null;
-    let sessionError = null;
-
-    // getSession() でセッションを取得（ローテーションは行わない）
-    const getSessionResult = await supabase.auth.getSession();
-    session = getSessionResult.data?.session;
-    sessionError = getSessionResult.error;
-
-    // セッションが取得できない場合
-    if (sessionError || !session) {
-      // eslint-disable-next-line no-console
-      console.warn('[dashboard/init] Session recovery failed', {
-        requestId,
-        hasRefreshToken,
-        whichStep,
-        errorCode: sessionError?.code,
-        errorMessage: sessionError?.message,
-      });
-
-      const noSessionHeaders = {
-        ...responseHeaders,
-        'x-auth-recover': 'clear-cookies-and-relogin',
-        'x-auth-reason': 'no_session',
-      };
-
-      return NextResponse.json({
-        ok: false,
-        user: null,
-        organizations: [],
-        memberships: [],
-        diagnostics: { ...diagnostics, whichStep },
-        error: {
-          code: 'NO_SESSION',
-          message: 'Could not establish session. Please login again.',
-          whichQuery: whichStep,
-          details: sessionError?.message || null,
-        },
-        requestId,
-        sha,
-        timestamp,
-      }, { status: 401, headers: noSessionHeaders });
-    }
-
-    // Step 4: getUser（セッション確立後に完全なUserオブジェクトを取得）
-    whichStep = 'getUser';
-    const { data: { user: rawUser }, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !rawUser) {
-      // セッションはあるが user 取得失敗（稀なケース）
-      const noUserHeaders = {
-        ...responseHeaders,
-        'x-auth-recover': 'clear-cookies-and-relogin',
-        'x-auth-reason': 'no_user_session',
-      };
-
-      return NextResponse.json({
-        ok: false,
-        user: null,
-        organizations: [],
-        memberships: [],
-        diagnostics: { ...diagnostics, whichStep },
-        error: {
-          code: 'NO_USER_SESSION',
-          message: 'Session exists but could not get user. Please login again.',
-          whichQuery: 'getUser',
-          details: userError?.message || null,
-        },
-        requestId,
-        sha,
-        timestamp,
-      }, { status: 401, headers: noUserHeaders });
-    }
-
-    // Step 3.5: profiles テーブルからプロフィール情報を取得（Phase 1 最適化）
-    // DashboardPageShell での getCurrentUser() 呼び出しを削減するため
+    // =====================================================
+    // プロフィール取得
+    // =====================================================
     whichStep = 'profile';
     const { data: profileData } = await supabase
       .from('profiles')
@@ -335,7 +179,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       .eq('id', rawUser.id)
       .maybeSingle();
 
-    // ユーザー情報を構築（profile情報を含む）
     const userInfo = {
       id: rawUser.id,
       email: rawUser.email ?? null,
@@ -350,8 +193,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       } : undefined,
     };
 
-    // Step 4: organization_members + organizations を JOIN で一括取得（Phase 2A 最適化）
-    // 以前: 2回のDB往復 → 現在: 1回のDB往復
+    // =====================================================
+    // 組織メンバーシップ取得（JOIN で一括）
+    // =====================================================
     whichStep = 'membership_with_orgs';
     const { data: membershipWithOrgs, error: membershipError } = await supabase
       .from('organization_members')
@@ -368,12 +212,12 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       .eq('user_id', rawUser.id);
 
     if (membershipError) {
-      return NextResponse.json({
+      const errorResponse = NextResponse.json({
         ok: false,
         user: userInfo,
         organizations: [],
         memberships: [],
-        diagnostics: { ...diagnostics, whichStep },
+        diagnostics: makeDiagnostics(),
         error: {
           code: membershipError.code || 'MEMBERSHIP_ERROR',
           message: membershipError.message,
@@ -385,25 +229,28 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
         sha,
         timestamp,
       }, { status: 200, headers: responseHeaders });
+      return applyCookies(errorResponse);
     }
 
     // メンバーシップなし
     if (!membershipWithOrgs || membershipWithOrgs.length === 0) {
       whichStep = 'success_no_org';
-      return NextResponse.json({
+      const noOrgResponse = NextResponse.json({
         ok: true,
         user: userInfo,
         organizations: [],
         memberships: [],
-        diagnostics: { ...diagnostics, whichStep },
+        diagnostics: makeDiagnostics(),
         requestId,
         sha,
         timestamp,
       }, { status: 200, headers: responseHeaders });
+      return applyCookies(noOrgResponse);
     }
 
-    // JOINデータを分解
-    // Supabase の nested select では many-to-one は単一オブジェクトを返す
+    // =====================================================
+    // JOIN データを分解
+    // =====================================================
     interface OrgData {
       id: string;
       name: string;
@@ -416,13 +263,10 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       role: m.role,
     }));
 
-    // organizations は単一オブジェクト（many-to-one）、null の場合もある
-    // Supabase の型推論が配列を返すが、実際は単一オブジェクト
     const orgsData: OrgData[] = membershipWithOrgs
       .map(m => {
         const org = m.organizations;
         if (!org) return null;
-        // Supabase が配列として型推論するケースへの対応
         if (Array.isArray(org)) {
           return org[0] as OrgData | undefined ?? null;
         }
@@ -430,37 +274,31 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       })
       .filter((org): org is OrgData => org !== null);
 
-    // 成功
     whichStep = 'success';
-    // eslint-disable-next-line no-console
     console.log('[dashboard/init] Success', {
       requestId,
       userId: rawUser.id,
       orgCount: orgsData?.length || 0,
     });
 
+    // =====================================================
     // 機能チェック（オプション）
-    // featureCheckクエリパラメータが指定されている場合、最初の組織で機能が使えるかチェック
+    // =====================================================
     let featureCheck: { key: string; available: boolean } | undefined;
     let featureGate: DashboardInitResponse['featureGate'] | undefined;
     if (featureCheckKey && orgsData && orgsData.length > 0) {
       try {
         whichStep = 'featureCheck';
         const firstOrg = orgsData[0];
-        const firstOrgId = firstOrg.id;
         const currentPlan = (firstOrg.plan || 'trial') as PlanType;
 
-        // 拡張版: FeatureGateInfo を取得
         const gateInfo: FeatureGateInfo = await getFeatureGateInfo(
-          firstOrgId,
+          firstOrg.id,
           featureCheckKey,
           currentPlan
         );
 
-        // Legacy互換: featureCheck も返す
         featureCheck = { key: featureCheckKey, available: gateInfo.available };
-
-        // 拡張版: featureGate を返す
         featureGate = {
           key: featureCheckKey,
           available: gateInfo.available,
@@ -486,26 +324,24 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
           } : undefined,
         };
       } catch (err) {
-        // 機能チェック失敗時はavailable: falseにしてフェイルセーフ
         console.warn('[dashboard/init] featureCheck failed', {
           requestId,
           featureKey: featureCheckKey,
           error: err instanceof Error ? err.message : 'Unknown',
         });
         featureCheck = { key: featureCheckKey, available: false };
-        // featureGate は undefined のまま（エラー時はLegacy APIのみ）
       }
     }
 
-    // Phase 3 最適化: コンテンツ数を並列取得
-    // AnalyticsDashboard での追加API呼び出しを削減
+    // =====================================================
+    // コンテンツ数（並列取得）
+    // =====================================================
     let contentCounts: DashboardInitResponse['contentCounts'] | undefined;
     if (orgsData && orgsData.length > 0) {
       try {
         whichStep = 'contentCounts';
         const firstOrgId = orgsData[0].id;
 
-        // 4テーブルを並列でカウント
         const [servicesResult, faqsResult, caseStudiesResult, postsResult] = await Promise.all([
           supabase.from('services').select('id', { count: 'exact', head: true }).eq('organization_id', firstOrgId),
           supabase.from('faqs').select('id', { count: 'exact', head: true }).eq('organization_id', firstOrgId),
@@ -520,7 +356,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
           posts: postsResult.count ?? 0,
         };
       } catch (err) {
-        // コンテンツ数取得失敗は非致命的、undefined のまま
         console.warn('[dashboard/init] contentCounts failed', {
           requestId,
           error: err instanceof Error ? err.message : 'Unknown',
@@ -528,6 +363,10 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       }
     }
 
+    // =====================================================
+    // 成功レスポンス
+    // =====================================================
+    whichStep = 'success';
     const successResponse = NextResponse.json({
       ok: true,
       user: userInfo,
@@ -541,22 +380,56 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       featureCheck,
       featureGate,
       contentCounts,
-      diagnostics: {
-        cookieHeaderPresent,
-        cookieNames,
-        hasAuthTokenCookie: hasAuthToken,
-        hasRefreshTokenCookie: hasRefreshToken,
-        whichStep,
-      },
+      diagnostics: makeDiagnostics(),
       requestId,
       sha,
       timestamp,
     }, { status: 200, headers: responseHeaders });
 
-    // setAll で設定されたクッキーをレスポンスに追加
-    return addCookiesToResponse(successResponse);
+    // 【重要】applyCookies で Set-Cookie を反映
+    return applyCookies(successResponse);
 
   } catch (error) {
+    // =====================================================
+    // 認証エラー（ApiAuthException）
+    // =====================================================
+    if (error instanceof ApiAuthException) {
+      console.warn('[dashboard/init] Auth failed', {
+        requestId: error.requestId,
+        code: error.code,
+        message: error.message,
+      });
+
+      return NextResponse.json({
+        ok: false,
+        user: null,
+        organizations: [],
+        memberships: [],
+        diagnostics: makeDiagnostics(),
+        error: {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+        },
+        requestId: error.requestId,
+        sha,
+        timestamp,
+      }, {
+        status: 401,
+        headers: {
+          'Cache-Control': 'no-store, must-revalidate',
+          'Content-Type': 'application/json',
+          'x-request-id': error.requestId,
+          'x-auth-recover': 'clear-cookies-and-relogin',
+          'x-auth-reason': error.code.toLowerCase(),
+        },
+      });
+    }
+
+    // =====================================================
+    // その他のエラー
+    // =====================================================
+    const requestId = crypto.randomUUID();
     console.error('[dashboard/init] Error:', {
       requestId,
       whichStep,
@@ -568,13 +441,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       user: null,
       organizations: [],
       memberships: [],
-      diagnostics: {
-        cookieHeaderPresent,
-        cookieNames,
-        hasAuthTokenCookie: hasAuthToken,
-        hasRefreshTokenCookie: hasRefreshToken,
-        whichStep,
-      },
+      diagnostics: makeDiagnostics(),
       error: {
         code: 'EXCEPTION',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -582,6 +449,13 @@ export async function GET(request: NextRequest): Promise<NextResponse<DashboardI
       requestId,
       sha,
       timestamp,
-    }, { status: 500, headers: responseHeaders });
+    }, {
+      status: 500,
+      headers: {
+        'Cache-Control': 'no-store, must-revalidate',
+        'Content-Type': 'application/json',
+        'x-request-id': requestId,
+      },
+    });
   }
 }

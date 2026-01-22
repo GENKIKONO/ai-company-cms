@@ -1,14 +1,22 @@
 /**
  * determineAuthState - 認証状態を一元的に判定する関数
  *
- * 【重要】この関数が唯一の認証状態判定ロジック
- * - Cookie の有無
- * - supabase.auth.getUser() の結果
- * - organization_membership の有無
- * → ここで AuthState を1つ返す
+ * 【⚠️ DEPRECATED - 削除予定】
  *
- * dashboard / posts / services / faqs すべてこの戻り値だけを見る。
- * 個別に supabase を叩くことは禁止。
+ * この関数は以下の理由で非推奨です:
+ * 1. setAll が空で Cookie 更新が不可能
+ * 2. トークンリフレッシュ時に新 Cookie がレスポンスに反映されない
+ * 3. 結果として NO_USER_SESSION エラーの原因となる
+ *
+ * 【代替】
+ * - API Routes: @/lib/supabase/api-auth.ts の createApiAuthClient を使用
+ * - /api/health/auth-snapshot は既に移行済み
+ *
+ * 【削除条件】
+ * - この関数を使用している箇所がなくなったら削除可能
+ * - 現在の使用箇所: なし（auth-snapshot は移行済み）
+ *
+ * @deprecated api-auth.ts を使用してください
  */
 
 import { cookies } from 'next/headers';

@@ -1,19 +1,27 @@
 /**
- * P2-4: Interview質問UI拡張API
+ * /api/my/interview/questions - Interview質問UI拡張API
+ *
  * 軸ごとのグルーピング / キーワード連動機能
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuthUser, requireOrgMember, createAuthErrorResponse } from '@/lib/auth/server';
-import { createClient } from '@/lib/supabase/server';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/utils/logger';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type {
   InterviewQuestionsResponse,
-  InterviewQuestionsQuery,
   AxisGroup,
   InterviewQuestionItem,
-  OrganizationKeyword,
   InterviewContentType
 } from '@/types/interview';
 
@@ -192,9 +200,8 @@ function groupQuestionsByAxis(
 
 export async function GET(request: NextRequest) {
   try {
-    // 認証確認
-    const user = await requireAuthUser();
-    
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
+
     // クエリパラメータ取得
     const { searchParams } = new URL(request.url);
     const contentType = searchParams.get('content_type') as InterviewContentType;
@@ -203,30 +210,38 @@ export async function GET(request: NextRequest) {
 
     // パラメータ検証
     if (!contentType || !isValidContentType(contentType)) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { error: 'Invalid or missing content_type parameter' },
         { status: 400 }
-      );
+      ));
     }
 
     if (!lang) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { error: 'Missing lang parameter' },
         { status: 400 }
-      );
+      ));
     }
 
     if (!orgId) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { error: 'Missing orgId parameter' },
         { status: 400 }
-      );
+      ));
     }
 
     // 組織メンバーシップ確認
-    const { organization } = await requireOrgMember(orgId);
-
-    const supabase = await createClient();
+    try {
+      await validateOrgAccess(orgId, user.id, 'read');
+    } catch (error) {
+      if (error instanceof OrgAccessError) {
+        return applyCookies(NextResponse.json({
+          error: error.code,
+          message: error.message
+        }, { status: error.statusCode }));
+      }
+      throw error;
+    }
 
     // 並行して組織キーワードと質問データを取得
     const [orgKeywords, { axes, questions }] = await Promise.all([
@@ -257,22 +272,21 @@ export async function GET(request: NextRequest) {
       orgKeywords: response.orgKeywordsCount
     });
 
-    return NextResponse.json(response);
+    return applyCookies(NextResponse.json(response));
 
   } catch (error) {
-    // 認証・認可エラーの場合は専用のレスポンスを返す
-    const err = error as { code?: string; message?: string; stack?: string };
-    if (err.code === 'AUTH_REQUIRED' || err.code === 'ORG_ACCESS_DENIED') {
-      return createAuthErrorResponse(error);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
     }
 
+    const err = error as { message?: string; stack?: string };
     logger.error('Interview questions API error', {
       error: err.message ?? String(error),
       stack: err.stack
     });
 
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         code: 'INTERVIEW_QUESTIONS_FETCH_ERROR',
         timestamp: new Date().toISOString()

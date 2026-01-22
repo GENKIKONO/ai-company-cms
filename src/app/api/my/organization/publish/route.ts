@@ -5,8 +5,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
+
 import { handleApiError, validationError, notFoundError } from '@/lib/api/error-responses';
 import { logger } from '@/lib/utils/logger';
 import { isFeatureQuotaLimitReached } from '@/lib/featureGate';
@@ -57,16 +57,8 @@ export const fetchCache = 'force-no-store';
 export async function PUT(request: NextRequest) {
   try {
     logger.debug('[my/organization/publish] PUT handler start');
-    
-    // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await createClient();
 
-    // 認証ユーザー取得（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      logger.warn('[my/organization/publish] PUT Not authenticated');
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
 
     // リクエストボディの検証
     let body: z.infer<typeof publishStatusSchema>;

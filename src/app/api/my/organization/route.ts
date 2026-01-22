@@ -1,5 +1,13 @@
 // Single-Org Mode API: /api/my/organization
 // 各ユーザーが自分の企業情報を管理するためのAPI
+//
+// 【認証方式】
+// - createApiAuthClient を使用（統一認証ヘルパー）
+// - getUser() が唯一の Source of Truth
+// - Cookie 同期は applyCookies で行う
+//
+// @see src/lib/supabase/api-auth.ts
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -9,31 +17,23 @@ import { z } from 'zod';
 import type { Organization } from '@/types/legacy/database';
 import type { OrganizationFormData } from '@/types/domain/organizations';;
 import { PUBLISH_ON_SAVE } from '@/config/feature-flags';
-import { 
-  organizationCreateSchema, 
+import {
+  organizationCreateSchema,
   organizationUpdateSchema,
-  type OrganizationCreate 
+  type OrganizationCreate
 } from '@/lib/schemas/organization';
-import { 
-  requireAuth, 
-  requireSelfServeAccess, 
-  type AuthContext 
-} from '@/lib/api/auth-middleware';
 import {
   handleApiError,
   validationError,
   conflictError,
   notFoundError,
   handleZodError,
-  unauthorizedError,
-  createErrorResponse
 } from '@/lib/api/error-responses';
 import { normalizeOrganizationPayload } from '@/lib/utils/data-normalization';
 import { normalizePayload, normalizeDateFields, normalizeForInsert } from '@/lib/utils/payload-normalizer';
 import { findEmptyDateFields, nullifyEmptyDateFields } from '@/lib/types/normalizers';
 import { buildOrgInsert } from '@/lib/utils/org-whitelist';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient, getUserFullWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/log';
 
 // デバッグモード判定関数
@@ -101,18 +101,11 @@ export const fetchCache = 'force-no-store';
 export async function GET(request: NextRequest) {
   try {
     logger.debug('[my/organization] GET handler start');
-    
-    // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await createClient();
 
-    // 認証ユーザー取得（Core経由）
-    const user = await getUserWithClient(supabase);
+    // ✅ 統一認証ヘルパー（createApiAuthClient）
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
-    logger.debug(`[my/organization] user = ${user?.id || null}`);
-
-    if (!user) {
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
+    logger.debug(`[my/organization] user = ${user.id}`);
 
     // Phase 2A 最適化: JOINで1回のクエリに統合
     // 以前: organization_members + organizations で2回のDB往復
@@ -141,18 +134,18 @@ export async function GET(request: NextRequest) {
 
     if (membershipError) {
       logger.error('[my/organization] membership query error', { data: membershipError instanceof Error ? membershipError : new Error(String(membershipError)) });
-      return NextResponse.json({ data: null, message: 'Query error' }, { status: 500 });
+      return applyCookies(NextResponse.json({ data: null, message: 'Query error' }, { status: 500 }));
     }
 
     if (!membershipWithOrg) {
       logger.debug(`[my/organization] No organization membership found for user: ${user.id}`);
-      return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
+      return applyCookies(NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 }));
     }
 
     // ownerロール必須チェック
     if (membershipWithOrg.role !== 'owner') {
       logger.warn(`[my/organization] User is not owner: ${user.id}, role: ${membershipWithOrg.role}`);
-      return NextResponse.json({ data: null, message: 'Owner permission required' }, { status: 403 });
+      return applyCookies(NextResponse.json({ data: null, message: 'Owner permission required' }, { status: 403 }));
     }
 
     // 組織データを取得（JOINから）
@@ -160,16 +153,21 @@ export async function GET(request: NextRequest) {
 
     if (!data) {
       logger.debug(`[my/organization] No organization found for id: ${membershipWithOrg.organization_id}`);
-      return NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 });
+      return applyCookies(NextResponse.json({ data: null, message: 'No organization found' }, { status: 200 }));
     }
 
     logger.debug('[my/organization] Organization found', { id: data.id, name: data.name });
-    return NextResponse.json({ data }, { status: 200 });
+    return applyCookies(NextResponse.json({ data }, { status: 200 }));
 
   } catch (error) {
+    // ✅ 認証エラー（ApiAuthException）
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     const errorId = `get-org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     logger.error('[GET /api/my/organization] Unexpected error:', { data: { errorId, error } });
-    
+
     // エラーログを診断APIに送信
     logErrorToDiag({
       errorId,
@@ -178,7 +176,7 @@ export async function GET(request: NextRequest) {
       stack: error instanceof Error ? error.stack : undefined,
       timestamp: new Date().toISOString()
     });
-    
+
     return handleApiError(error);
   }
 }
@@ -186,25 +184,21 @@ export async function GET(request: NextRequest) {
 // POST - 新しい企業を作成（ユーザーが企業を持っていない場合のみ）
 export async function POST(request: NextRequest) {
   let body: OrganizationFormData | null = null;
+  let applyCookiesFunc: (<T>(response: NextResponse<T>) => NextResponse<T>) | null = null;
+
   try {
     logger.debug('[my/organization] POST handler start');
-    
-    // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await createClient();
 
-    // 認証ユーザー取得（Core経由 - user_metadata必要）
-    const user = await getUserFullWithClient(supabase);
+    // ✅ 統一認証ヘルパー（createApiAuthClient）
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
+    applyCookiesFunc = applyCookies;
 
-    logger.debug(`[my/organization] user = ${user?.id || null}`);
+    logger.debug(`[my/organization] user = ${user.id}`);
     logger.debug('[my/organization] user details =', {
-      id: user?.id,
-      email: user?.email,
-      created_at: user?.created_at
+      id: user.id,
+      email: user.email,
+      created_at: user.created_at
     });
-
-    if (!user) {
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
 
     // ユーザーIDをログに出力して確認
     logger.debug(`[my/organization] Current user ID: ${user.id}`);
@@ -718,17 +712,12 @@ async function revalidateOrgCache(userId: string, orgSlug?: string, oldSlug?: st
 // PUT - 既存の企業情報を更新（トランザクション強化）
 export async function PUT(request: NextRequest) {
   const transaction: any = null;
+  let applyCookiesFunc: (<T>(response: NextResponse<T>) => NextResponse<T>) | null = null;
+
   try {
-    // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await createClient();
-
-    // 認証ユーザー取得（Core経由）
-    const user = await getUserWithClient(supabase);
-
-    if (!user) {
-      logger.warn('[my/organization] PUT Not authenticated');
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
+    // ✅ 統一認証ヘルパー（createApiAuthClient）
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
+    applyCookiesFunc = applyCookies;
 
     const body: Partial<OrganizationFormData> = await request.json();
 
@@ -950,17 +939,12 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - 企業を削除（必要に応じて）
 export async function DELETE(request: NextRequest) {
+  let applyCookiesFunc: (<T>(response: NextResponse<T>) => NextResponse<T>) | null = null;
+
   try {
-    // ✅ 統一されたサーバーサイドSupabaseクライアント
-    const supabase = await createClient();
-
-    // 認証ユーザー取得（Core経由）
-    const user = await getUserWithClient(supabase);
-
-    if (!user) {
-      logger.warn('[my/organization] DELETE Not authenticated');
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
+    // ✅ 統一認証ヘルパー（createApiAuthClient）
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
+    applyCookiesFunc = applyCookies;
 
     // ユーザーの所属組織を取得（organization_members経由、ownerロール必須）
     const { data: membershipData, error: membershipError } = await supabase

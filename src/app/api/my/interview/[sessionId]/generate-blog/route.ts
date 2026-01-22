@@ -1,12 +1,20 @@
 /**
- * P2-8: AIインタビューからブログ生成API
- * POST /api/my/interview/[sessionId]/generate-blog
+ * /api/my/interview/[sessionId]/generate-blog - AIインタビューからブログ生成API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth, requireOrgOwner } from '@/lib/api/auth-middleware';
-import { createClient } from '@/lib/supabase/server';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/utils/logger';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 import {
   fetchInterviewData,
   generatePrompt,
@@ -20,8 +28,7 @@ import {
 } from '@/lib/interview-generation';
 import type {
   GenerateContentApiResponse,
-  GenerateContentError,
-  GENERATION_ERROR_CODES
+  GenerateContentError
 } from '@/types/interview-generated';
 
 interface RouteParams {
@@ -36,26 +43,38 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   let sessionId: string = 'unknown';
 
   try {
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
+
     const resolvedParams = await params;
     sessionId = resolvedParams.sessionId;
-
-    // 認証チェック
-    const authResult = await requireAuth(request);
-    if (authResult instanceof Response) {
-      return authResult; // 認証エラー
-    }
 
     // インタビューデータ取得
     const { session, contentUnits } = await fetchInterviewData(sessionId);
 
     // 組織アクセスチェック
-    const orgAccessError = requireOrgOwner(authResult, session.organization_id);
-    if (orgAccessError) {
-      return orgAccessError; // 認可エラー
+    if (session.organization_id) {
+      try {
+        await validateOrgAccess(session.organization_id, user.id, 'write');
+      } catch (error) {
+        if (error instanceof OrgAccessError) {
+          return applyCookies(NextResponse.json({
+            success: false,
+            code: error.code,
+            message: error.message
+          } as GenerateContentError, { status: error.statusCode }));
+        }
+        throw error;
+      }
+    } else {
+      // 組織に属さないセッションの場合、作成者本人のみアクセス可能
+      if (session.user_id !== user.id) {
+        return applyCookies(NextResponse.json({
+          success: false,
+          code: 'FORBIDDEN',
+          message: 'Access denied'
+        } as GenerateContentError, { status: 403 }));
+      }
     }
-
-    // Supabase クライアント作成
-    const supabase = await createClient();
 
     // コンテンツの十分性チェック
     if (!session.answers || Object.keys(session.answers).length === 0) {
@@ -64,22 +83,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         code: 'INSUFFICIENT_CONTENT',
         message: 'Interview session has no answers to generate content from'
       };
-      return NextResponse.json(error, { status: 400 });
+      return applyCookies(NextResponse.json(error, { status: 400 }));
     }
 
     // 生成ジョブ作成
     jobId = await createGenerationJob(session.organization_id, sessionId, 'blog');
-    
+
     // プロンプト生成
     const prompt = generatePrompt('blog', session, contentUnits);
-    
+
     // OpenAI呼び出し
     const { generatedText, usage } = await generateContentWithOpenAI(prompt);
     const cost = calculateOpenAICost(usage);
 
     // 生成テキストを解析
     const parsedContent = parseGeneratedContent(generatedText, 'blog');
-    
+
     // バリデーション
     if (!parsedContent.title || !parsedContent.content) {
       throw new Error('Generated content is incomplete');
@@ -151,9 +170,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       processingTime: Date.now() - startTime
     });
 
-    return NextResponse.json(response);
+    return applyCookies(NextResponse.json(response));
 
   } catch (error: any) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     const processingTime = Date.now() - startTime;
 
     logger.error('Blog generation failed', {

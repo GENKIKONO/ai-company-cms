@@ -1,11 +1,23 @@
+/**
+ * /api/my/interview/sessions/[id]/answers/diff - AIインタビュー差分保存API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireAuthUser, requireOrgMember } from '@/lib/auth/server';
-import { createClient } from '@/lib/supabase/server';
+import { createApiAuthClient, ApiAuthException, ApiAuthFailure } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/utils/logger';
+import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
 import { logInterviewQuestion } from '@/lib/interview/question-logging';
-import type { 
-  SaveAnswerDiffRequest,
+import type {
   SaveAnswerDiffResponse,
   InterviewAnswersJson,
   InterviewAnswerQuestion,
@@ -22,8 +34,8 @@ interface RouteParams {
  * JSON形式判定: 新形式（InterviewAnswersJson）か旧形式（Record<string, unknown>）かを判定
  */
 function isNewAnswersFormat(answers: any): answers is InterviewAnswersJson {
-  return answers && 
-         typeof answers === 'object' && 
+  return answers &&
+         typeof answers === 'object' &&
          Array.isArray(answers.questions);
 }
 
@@ -31,8 +43,8 @@ function isNewAnswersFormat(answers: any): answers is InterviewAnswersJson {
  * 新形式用: 特定questionIdの回答を差分更新
  */
 function updateNewFormatAnswers(
-  currentAnswers: InterviewAnswersJson, 
-  questionId: string, 
+  currentAnswers: InterviewAnswersJson,
+  questionId: string,
   newAnswer: string | null,
   contentType: string
 ): InterviewAnswersJson {
@@ -43,7 +55,7 @@ function updateNewFormatAnswers(
 
   // 既存の question を探す
   const questionIndex = updatedAnswers.questions.findIndex(q => q.question_id === questionId);
-  
+
   if (newAnswer === null || newAnswer === '') {
     // 回答削除の場合
     if (questionIndex >= 0) {
@@ -95,26 +107,26 @@ function updateOldFormatAnswers(
   newAnswer: string | null
 ): Record<string, unknown> {
   const updatedAnswers = { ...currentAnswers };
-  
+
   if (newAnswer === null || newAnswer === '') {
     delete updatedAnswers[questionId];
   } else {
     updatedAnswers[questionId] = newAnswer;
   }
-  
+
   return updatedAnswers;
 }
 
 /**
  * EPIC 2-2: 差分保存API with 楽観ロック
- * 
+ *
  * セッション全体ではなく、特定のquestionIdの回答のみを差分更新します。
- * 
+ *
  * 【楽観ロックの理由】
  * - 「後から保存した方が必ず勝つ」ではなく、「最新状態を持っているクライアントだけが保存できる」ルール
  * - なぜ previousUpdatedAt を送っているのか: 他のタブや他のユーザーが同時に編集している可能性があるため
  * - なぜ 409 を返すのか: クライアントに「他で変更されているので再読み込みしてください」と伝えるため
- * 
+ *
  * 【複数タブの競合ルール】
  * - 常に「最新の updated_at を持っているクライアントだけが保存できる」
  * - 409 Conflict 時は UI でダイアログ表示: 「他の画面で更新されました。再読み込みして最新の内容を確認してください」
@@ -129,23 +141,22 @@ const SaveAnswerDiffSchema = z.object({
 export async function POST(
   request: NextRequest,
   { params }: RouteParams
-): Promise<NextResponse<SaveAnswerDiffResponse>> {
+): Promise<NextResponse<SaveAnswerDiffResponse | ApiAuthFailure>> {
   try {
-    // 認証確認
-    const user = await requireAuthUser();
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
     const { id } = await params;
 
     // UUID形式チェック
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(id)) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          code: 'validation_error', 
-          message: 'Invalid session ID format' 
+      return applyCookies(NextResponse.json(
+        {
+          success: false,
+          code: 'validation_error',
+          message: 'Invalid session ID format'
         },
         { status: 400 }
-      );
+      ));
     }
 
     // リクエストボディの解析・バリデーション
@@ -153,19 +164,17 @@ export async function POST(
     const validationResult = SaveAnswerDiffSchema.safeParse(body);
 
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          code: 'validation_error', 
-          message: 'Invalid request body: ' + validationResult.error.message 
+      return applyCookies(NextResponse.json(
+        {
+          success: false,
+          code: 'validation_error',
+          message: 'Invalid request body: ' + validationResult.error.message
         },
         { status: 400 }
-      );
+      ));
     }
 
     const { questionId, newAnswer, previousUpdatedAt } = validationResult.data;
-
-    const supabase = await createClient();
 
     // 【ステップ1】セッション取得と権限チェック
     const { data: session, error: fetchError } = await supabase
@@ -177,74 +186,76 @@ export async function POST(
 
     if (fetchError) {
       logger.error('Failed to fetch session for diff save:', fetchError);
-      return NextResponse.json(
-        { 
-          success: false, 
-          code: 'database_error', 
-          message: 'Failed to fetch session' 
+      return applyCookies(NextResponse.json(
+        {
+          success: false,
+          code: 'database_error',
+          message: 'Failed to fetch session'
         },
         { status: 500 }
-      );
+      ));
     }
 
     if (!session) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          code: 'not_found', 
-          message: 'Session not found' 
+      return applyCookies(NextResponse.json(
+        {
+          success: false,
+          code: 'not_found',
+          message: 'Session not found'
         },
         { status: 404 }
-      );
+      ));
     }
 
     // セッションがcompletedの場合は編集不可
     if (session.status === 'completed') {
-      return NextResponse.json(
-        { 
-          success: false, 
-          code: 'readonly_session', 
-          message: 'Cannot modify completed session' 
+      return applyCookies(NextResponse.json(
+        {
+          success: false,
+          code: 'readonly_session',
+          message: 'Cannot modify completed session'
         },
         { status: 400 }
-      );
+      ));
     }
 
     // 権限チェック
     if (session.organization_id) {
       try {
-        await requireOrgMember(session.organization_id);
+        await validateOrgAccess(session.organization_id, user.id, 'write');
       } catch (error) {
-        logger.warn('Unauthorized access to session for diff save:', { 
-          sessionId: id, 
-          userId: user.id, 
-          organizationId: session.organization_id,
-          error 
-        });
-        return NextResponse.json(
-          { 
-            success: false, 
-            code: 'forbidden', 
-            message: 'Forbidden' 
-          },
-          { status: 403 }
-        );
+        if (error instanceof OrgAccessError) {
+          logger.warn('Unauthorized access to session for diff save:', {
+            sessionId: id,
+            userId: user.id,
+            organizationId: session.organization_id
+          });
+          return applyCookies(NextResponse.json(
+            {
+              success: false,
+              code: 'forbidden',
+              message: 'Forbidden'
+            },
+            { status: error.statusCode }
+          ));
+        }
+        throw error;
       }
     } else {
       if (session.user_id !== user.id) {
-        logger.warn('Unauthorized access to personal session for diff save:', { 
-          sessionId: id, 
-          userId: user.id, 
-          sessionUserId: session.user_id 
+        logger.warn('Unauthorized access to personal session for diff save:', {
+          sessionId: id,
+          userId: user.id,
+          sessionUserId: session.user_id
         });
-        return NextResponse.json(
-          { 
-            success: false, 
-            code: 'forbidden', 
-            message: 'Forbidden' 
+        return applyCookies(NextResponse.json(
+          {
+            success: false,
+            code: 'forbidden',
+            message: 'Forbidden'
           },
           { status: 403 }
-        );
+        ));
       }
     }
 
@@ -261,7 +272,7 @@ export async function POST(
         serverUpdatedAt
       });
 
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: 'conflict',
@@ -274,7 +285,7 @@ export async function POST(
           }
         },
         { status: 409 }
-      );
+      ));
     }
 
     // 【ステップ3】差分更新: 新旧形式対応で answers の特定キーのみ更新
@@ -284,8 +295,8 @@ export async function POST(
     if (isNewAnswersFormat(currentAnswers)) {
       // 新形式（InterviewAnswersJson）の場合
       updatedAnswers = updateNewFormatAnswers(
-        currentAnswers as InterviewAnswersJson, 
-        questionId, 
+        currentAnswers as InterviewAnswersJson,
+        questionId,
         newAnswer,
         session.content_type
       );
@@ -319,14 +330,14 @@ export async function POST(
 
     if (updateError) {
       logger.error('Failed to update session answers:', updateError);
-      return NextResponse.json(
-        { 
-          success: false, 
-          code: 'database_error', 
-          message: 'Failed to update session' 
+      return applyCookies(NextResponse.json(
+        {
+          success: false,
+          code: 'database_error',
+          message: 'Failed to update session'
         },
         { status: 500 }
-      );
+      ));
     }
 
     if (!updatedSession) {
@@ -346,17 +357,17 @@ export async function POST(
         .maybeSingle();
 
       if (latestError || !latest) {
-        return NextResponse.json(
-          { 
-            success: false, 
-            code: 'database_error', 
-            message: 'Failed to fetch latest session data' 
+        return applyCookies(NextResponse.json(
+          {
+            success: false,
+            code: 'database_error',
+            message: 'Failed to fetch latest session data'
           },
           { status: 500 }
-        );
+        ));
       }
 
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         {
           success: false,
           code: 'conflict',
@@ -369,7 +380,7 @@ export async function POST(
           }
         },
         { status: 409 }
-      );
+      ));
     }
 
     // 【ステップ5】質問ログ記録（fire-and-forget）
@@ -394,45 +405,24 @@ export async function POST(
       updatedAt: updatedSession.updated_at
     });
 
-    return NextResponse.json({
+    return applyCookies(NextResponse.json({
       ok: true,
       updatedAt: updatedSession.updated_at,
       answers: updatedSession.answers,
       version: updatedSession.version
-    });
+    }));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
     logger.error('Session diff save API error:', error);
-
-    // 認証エラーの場合
-    if (error instanceof Error && error.message.includes('Authentication')) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          code: 'authentication_required', 
-          message: 'Authentication required' 
-        },
-        { status: 401 }
-      );
-    }
-
-    // 組織メンバーアクセスエラーの場合
-    if (error instanceof Error && (error.message.includes('Organization') || error.message.includes('Forbidden'))) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          code: 'forbidden', 
-          message: 'Forbidden' 
-        },
-        { status: 403 }
-      );
-    }
-
     return NextResponse.json(
-      { 
-        success: false, 
-        code: 'internal_error', 
-        message: 'Internal server error' 
+      {
+        success: false,
+        code: 'internal_error',
+        message: 'Internal server error'
       },
       { status: 500 }
     );
@@ -442,44 +432,44 @@ export async function POST(
 // GET, PUT, PATCH, DELETE メソッドは許可しない
 export async function GET() {
   return NextResponse.json(
-    { 
-      success: false, 
-      code: 'method_not_allowed', 
-      message: 'Method not allowed' 
-    }, 
+    {
+      success: false,
+      code: 'method_not_allowed',
+      message: 'Method not allowed'
+    },
     { status: 405 }
   );
 }
 
 export async function PUT() {
   return NextResponse.json(
-    { 
-      success: false, 
-      code: 'method_not_allowed', 
-      message: 'Method not allowed' 
-    }, 
+    {
+      success: false,
+      code: 'method_not_allowed',
+      message: 'Method not allowed'
+    },
     { status: 405 }
   );
 }
 
 export async function PATCH() {
   return NextResponse.json(
-    { 
-      success: false, 
-      code: 'method_not_allowed', 
-      message: 'Method not allowed' 
-    }, 
+    {
+      success: false,
+      code: 'method_not_allowed',
+      message: 'Method not allowed'
+    },
     { status: 405 }
   );
 }
 
 export async function DELETE() {
   return NextResponse.json(
-    { 
-      success: false, 
-      code: 'method_not_allowed', 
-      message: 'Method not allowed' 
-    }, 
+    {
+      success: false,
+      code: 'method_not_allowed',
+      message: 'Method not allowed'
+    },
     { status: 405 }
   );
 }

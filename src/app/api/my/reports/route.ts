@@ -1,6 +1,18 @@
+/**
+ * /api/my/reports - レポートAPI
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
 import { logger } from '@/lib/utils/logger';
 import {
   getMonthlyReportsListByYearMonth,
@@ -14,13 +26,7 @@ import {
 // Get monthly reports for authenticated organization
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Get authenticated user and organization（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
 
     // Get user's organization（v_app_users_compat2 互換ビュー使用）
     const { data: userProfiles, error: profileError } = await supabase
@@ -30,12 +36,12 @@ export async function GET(request: NextRequest) {
 
     if (profileError) {
       logger.error('[Reports API] Failed to fetch user profile', { data: profileError });
-      return NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 });
+      return applyCookies(NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 }));
     }
 
     const userProfile = userProfiles?.[0];
     if (!userProfile?.organization_id) {
-      return NextResponse.json({
+      return applyCookies(NextResponse.json({
         success: true,
         data: [],
         pagination: {
@@ -44,7 +50,7 @@ export async function GET(request: NextRequest) {
           offset: 0,
           has_more: false
         }
-      });
+      }));
     }
 
     const organizationId = userProfile.organization_id;
@@ -77,14 +83,14 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('[Reports API] Failed to fetch reports via service', { data: error });
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { error: 'Failed to fetch reports' },
         { status: 500 }
-      );
+      ));
     }
 
     // Return reports in new schema format (period_start, metrics)
-    return NextResponse.json({
+    return applyCookies(NextResponse.json({
       success: true,
       data: reports,
       pagination: {
@@ -93,9 +99,12 @@ export async function GET(request: NextRequest) {
         offset,
         has_more: total > offset + limit
       }
-    });
+    }));
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
     logger.error('[Reports API] Unexpected error', { data: error instanceof Error ? error : new Error(String(error)) });
 
     return NextResponse.json(
@@ -108,13 +117,7 @@ export async function GET(request: NextRequest) {
 // Generate a new monthly report on-demand (for current or previous months only)
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Get authenticated user and organization（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { supabase, user, applyCookies } = await createApiAuthClient(request);
 
     // Get user's organization（v_app_users_compat2 互換ビュー使用）
     const { data: userProfiles, error: profileError } = await supabase
@@ -124,12 +127,12 @@ export async function POST(request: NextRequest) {
 
     if (profileError) {
       logger.error('[Reports API] Failed to fetch user profile in POST', { data: profileError });
-      return NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 });
+      return applyCookies(NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 }));
     }
 
     const userProfile = userProfiles?.[0];
     if (!userProfile?.organization_id) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+      return applyCookies(NextResponse.json({ error: 'Organization not found' }, { status: 404 }));
     }
 
     // 二段取得: organizations から plan_id を取得
@@ -153,10 +156,10 @@ export async function POST(request: NextRequest) {
     const { year, month } = body;
 
     if (!year || !month || month < 1 || month > 12) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { error: 'Valid year and month (1-12) are required' },
         { status: 400 }
-      );
+      ));
     }
 
     // Validate that requested month is not in the future
@@ -165,10 +168,10 @@ export async function POST(request: NextRequest) {
     const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     if (requestedDate > currentMonth) {
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { error: 'Cannot generate reports for future months' },
         { status: 400 }
-      );
+      ));
     }
 
     // Check if report already exists using service layer
@@ -180,23 +183,23 @@ export async function POST(request: NextRequest) {
 
     if (checkError) {
       logger.error('[Reports API] Error checking existing report', { data: checkError });
-      return NextResponse.json(
+      return applyCookies(NextResponse.json(
         { error: 'Failed to check existing reports' },
         { status: 500 }
-      );
+      ));
     }
 
     if (existingReport) {
       if (existingReport.status === 'generating') {
-        return NextResponse.json(
+        return applyCookies(NextResponse.json(
           { error: 'Report generation is already in progress' },
           { status: 409 }
-        );
+        ));
       } else if (existingReport.status === 'completed') {
-        return NextResponse.json(
+        return applyCookies(NextResponse.json(
           { error: 'Report already exists for this period' },
           { status: 409 }
-        );
+        ));
       }
       // If status is 'failed' or 'pending', we'll regenerate it
     }
@@ -214,20 +217,20 @@ export async function POST(request: NextRequest) {
 
       if (!success) {
         logger.error('[Reports API] Failed to update report status', { data: updateError });
-        return NextResponse.json(
+        return applyCookies(NextResponse.json(
           { error: 'Failed to start report generation' },
           { status: 500 }
-        );
+        ));
       }
 
       logger.info(`[Reports API] Report regeneration started for org ${organizationId}`, { period: `${year}-${month}` });
 
-      return NextResponse.json({
+      return applyCookies(NextResponse.json({
         success: true,
         message: 'Report generation started',
         report_id: existingReport.id,
         status: 'generating'
-      });
+      }));
     } else {
       // Create new report record using service layer
       const { id: reportId, error: insertError } = await saveMonthlyReport({
@@ -250,10 +253,10 @@ export async function POST(request: NextRequest) {
 
       if (insertError || !reportId) {
         logger.error('[Reports API] Failed to create report record', { data: insertError });
-        return NextResponse.json(
+        return applyCookies(NextResponse.json(
           { error: 'Failed to start report generation' },
           { status: 500 }
-        );
+        ));
       }
 
       logger.info(`[Reports API] Report generation started for org ${organizationId}`, { period: `${year}-${month}` });
@@ -263,15 +266,18 @@ export async function POST(request: NextRequest) {
         logger.error('[Reports API] Edge Function trigger failed (non-blocking)', { error: err.message });
       });
 
-      return NextResponse.json({
+      return applyCookies(NextResponse.json({
         success: true,
         message: 'Report generation started',
         report_id: reportId,
         status: 'generating'
-      });
+      }));
     }
 
   } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
     logger.error('[Reports API] Unexpected error in POST', { data: error instanceof Error ? error : new Error(String(error)) });
 
     return NextResponse.json(

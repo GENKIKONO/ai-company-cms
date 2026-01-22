@@ -1,44 +1,27 @@
-// Single-Org Mode API: /api/my/faqs
-// ユーザーの企業のFAQを管理するためのAPI
+/**
+ * /api/my/faqs - ユーザーのFAQ管理API
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
-import type { FAQ } from '@/types/legacy/database';
-import type { FAQFormData } from '@/types/domain/content';;
-import { normalizeFAQPayload, createAuthError, createNotFoundError, createInternalError, generateErrorId } from '@/lib/utils/data-normalization';
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
+import type { FAQFormData } from '@/types/domain/content';
 import { getOrgFeatureLimit as getFeatureLimit } from '@/lib/featureGate';
 import { getEffectiveFeatures, canExecute, type Subject, type QuotaResult } from '@/lib/featureGate';
 import { logger } from '@/lib/utils/logger';
-import { validateOrgAccess, OrgAccessError } from '@/lib/utils/org-access';
-
-async function logErrorToDiag(errorInfo: any) {
-  try {
-    await fetch('/api/diag/ui', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'server_error',
-        ...errorInfo
-      }),
-      cache: 'no-store'
-    });
-  } catch {
-    // 診断ログ送信失敗は無視
-  }
-}
-
-export const dynamic = 'force-dynamic';
 
 // GET - ユーザー企業のFAQ一覧を取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    // 認証（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return createAuthError();
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     // organizationId クエリパラメータ必須チェック
     const url = new URL(request.url);
@@ -46,33 +29,41 @@ export async function GET(request: NextRequest) {
 
     if (!organizationId) {
       logger.debug('[my/faqs] organizationId parameter required');
-      return NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'organizationId parameter is required' }, { status: 400 }));
     }
 
-    // 組織アクセス権限チェック（validate_org_access RPC使用）
-    try {
-      await validateOrgAccess(organizationId, user.id);
-    } catch (error) {
-      if (error instanceof OrgAccessError) {
-        return NextResponse.json({ 
-          error: error.code, 
-          message: error.message 
-        }, { status: error.statusCode });
-      }
-      
-      // Unexpected error
-      logger.error('[my/faqs] Unexpected org access validation error', {
+    // 組織メンバーシップチェック（RLSモデルに準拠）
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', organizationId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (membershipError) {
+      logger.error('[my/faqs] Organization membership check failed', {
         userId: user.id,
         organizationId,
-        error: error instanceof Error ? error.message : error
+        error: membershipError.message
       });
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: 'メンバーシップ確認に失敗しました' 
-      }, { status: 500 });
+      return applyCookies(NextResponse.json({
+        error: 'INTERNAL_ERROR',
+        message: 'メンバーシップ確認に失敗しました'
+      }, { status: 500 }));
     }
 
-    // FAQs取得（セキュアビュー経由、RLSにより組織メンバーのみアクセス可能）
+    if (!membership) {
+      logger.warn('[my/faqs] User not a member of organization', {
+        userId: user.id,
+        organizationId
+      });
+      return applyCookies(NextResponse.json({
+        error: 'FORBIDDEN',
+        message: 'この組織のメンバーではありません'
+      }, { status: 403 }));
+    }
+
+    // FAQs取得（セキュアビュー経由）
     const { data, error } = await supabase
       .from('v_dashboard_faqs_secure')
       .select('id, question, slug, is_published, published_at, organization_id, status, answer, category, created_at, updated_at')
@@ -80,75 +71,66 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json(
+      logger.error('[my/faqs] Failed to fetch FAQs', {
+        userId: user.id,
+        organizationId,
+        error: error.message
+      });
+      return applyCookies(NextResponse.json(
         { error: 'Database error', message: error.message },
         { status: 500 }
-      );
+      ));
     }
 
-    return NextResponse.json({ data: data || [] });
+    return applyCookies(NextResponse.json({ data: data || [] }, { status: 200 }));
 
   } catch (error) {
-    const errorId = generateErrorId('get-faqs');
-    logErrorToDiag({
-      errorId,
-      endpoint: 'GET /api/my/faqs',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[GET /api/my/faqs] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 
 // POST - 新しいFAQを作成
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // 認証（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({
-        error: '認証が必要です'
-      }, { status: 401 });
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     const body: FAQFormData & { organizationId?: string } = await request.json();
 
     // organizationId 必須チェック
     if (!body.organizationId) {
       logger.debug('[my/faqs] POST organizationId required');
-      return NextResponse.json({ error: 'organizationId is required' }, { status: 400 });
+      return applyCookies(NextResponse.json({ error: 'organizationId is required' }, { status: 400 }));
     }
 
     if (!body.question || !body.answer) {
-      return NextResponse.json({
+      return applyCookies(NextResponse.json({
         error: '質問と回答は必須です'
-      }, { status: 400 });
+      }, { status: 400 }));
     }
 
-    // 組織アクセス権限チェック（validate_org_access RPC使用）
-    try {
-      await validateOrgAccess(body.organizationId, user.id);
-    } catch (error) {
-      if (error instanceof OrgAccessError) {
-        return NextResponse.json({ 
-          error: error.code, 
-          message: error.message 
-        }, { status: error.statusCode });
-      }
-      
-      // Unexpected error
-      logger.error('[my/faqs] POST Unexpected org access validation error', {
+    // 組織メンバーシップチェック（RLSモデルに準拠）
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('organization_id', body.organizationId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (membershipError || !membership) {
+      logger.error('[my/faqs] POST Organization membership check failed', {
         userId: user.id,
         organizationId: body.organizationId,
-        error: error instanceof Error ? error.message : error 
+        error: membershipError?.message
       });
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: 'メンバーシップ確認に失敗しました' 
-      }, { status: 500 });
+      return applyCookies(NextResponse.json({
+        error: 'FORBIDDEN',
+        message: 'この組織のメンバーではありません'
+      }, { status: 403 }));
     }
 
     // 組織情報取得（プラン制限チェック用）
@@ -162,12 +144,12 @@ export async function POST(request: NextRequest) {
       logger.error('[my/faqs] POST Organization data fetch failed', {
         userId: user.id,
         organizationId: body.organizationId,
-        error: orgError?.message 
+        error: orgError?.message
       });
-      return NextResponse.json({ 
-        error: 'INTERNAL_ERROR', 
-        message: '組織情報の取得に失敗しました' 
-      }, { status: 500 });
+      return applyCookies(NextResponse.json({
+        error: 'INTERNAL_ERROR',
+        message: '組織情報の取得に失敗しました'
+      }, { status: 500 }));
     }
 
     // プラン制限チェック（Subject型 FeatureGate API使用）
@@ -180,7 +162,7 @@ export async function POST(request: NextRequest) {
 
       if (faqFeature && (faqFeature.is_enabled === false || faqFeature.enabled === false)) {
         logger.info('[my/faqs] FAQ module disabled for org', { orgId: orgData.id });
-        return NextResponse.json(
+        return applyCookies(NextResponse.json(
           {
             error: 'Feature disabled',
             code: 'DISABLED',
@@ -188,11 +170,10 @@ export async function POST(request: NextRequest) {
             plan: orgData.plan || 'trial'
           },
           { status: 403 }
-        );
+        ));
       }
 
       // 2. Quota実行時強制: canExecute で消費チェック
-      // idempotency_key で二重消費を防止（タイムスタンプ+ユーザーID+ランダム）
       const idempotencyKey = `faq-create-${user.id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
       const quotaResult: QuotaResult = await canExecute(supabase, {
@@ -200,7 +181,7 @@ export async function POST(request: NextRequest) {
         feature_key: 'faq_module',
         limit_key: 'max_count',
         amount: 1,
-        period: 'total', // FAQは総数制限
+        period: 'total',
         idempotency_key: idempotencyKey,
       });
 
@@ -212,7 +193,6 @@ export async function POST(request: NextRequest) {
 
       // 3. Quota判定結果で分岐
       if (!quotaResult.ok) {
-        // QuotaResultCode に応じたHTTPステータス
         const statusMap: Record<string, number> = {
           NO_PLAN: 402,
           DISABLED: 403,
@@ -231,7 +211,7 @@ export async function POST(request: NextRequest) {
           limit: quotaResult.limit
         });
 
-        return NextResponse.json(
+        return applyCookies(NextResponse.json(
           {
             error: 'Quota exceeded',
             code: quotaResult.code,
@@ -243,7 +223,7 @@ export async function POST(request: NextRequest) {
             plan: orgData.plan || 'trial'
           },
           { status }
-        );
+        ));
       }
 
       logger.debug('[my/faqs] Quota check passed', {
@@ -253,7 +233,7 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (error) {
-      // canExecute RPC が存在しない場合のフォールバック: 旧方式で制限チェック
+      // canExecute RPC が存在しない場合のフォールバック
       logger.warn('[my/faqs] canExecute failed, falling back to legacy check', { error });
 
       try {
@@ -266,7 +246,7 @@ export async function POST(request: NextRequest) {
             .eq('organization_id', orgData.id);
 
           if (!countError && (currentCount || 0) >= featureLimit) {
-            return NextResponse.json(
+            return applyCookies(NextResponse.json(
               {
                 error: 'Plan limit exceeded',
                 code: 'EXCEEDED',
@@ -276,7 +256,7 @@ export async function POST(request: NextRequest) {
                 plan: orgData.plan || 'trial'
               },
               { status: 429 }
-            );
+            ));
           }
         }
       } catch (fallbackError) {
@@ -292,13 +272,13 @@ export async function POST(request: NextRequest) {
       answer: body.answer,
       category: body.category || null,
       sort_order: body.sort_order || 1,
-      is_published: true, // 作成されたFAQは即座に公開対象とする
-      status: 'published', // 公開状態を明示的に設定
+      is_published: true,
+      status: 'published',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
 
-    // PGRST204対策: INSERT とSELECTを分離して安全に処理
+    // INSERT
     const { data: insertData, error: insertError } = await supabase
       .from('faqs')
       .insert(faqData)
@@ -316,15 +296,24 @@ export async function POST(request: NextRequest) {
         hint: insertError.hint,
         message: insertError.message
       });
-      return NextResponse.json({
+
+      // RLS エラーの場合は 403 を返す
+      if (insertError.code === '42501' || insertError.message?.includes('RLS')) {
+        return applyCookies(NextResponse.json({
+          error: 'RLS_FORBIDDEN',
+          message: 'Row Level Security によって拒否されました'
+        }, { status: 403 }));
+      }
+
+      return applyCookies(NextResponse.json({
         error: 'FAQの作成に失敗しました',
         code: insertError.code,
         details: insertError.details,
         hint: insertError.hint
-      }, { status: 500 });
+      }, { status: 500 }));
     }
 
-    // INSERT成功後、改めてSELECTで取得（RLSポリシー対応）
+    // INSERT成功後、改めてSELECTで取得
     let data = null;
     if (insertData?.id) {
       const { data: selectData, error: selectError } = await supabase
@@ -341,28 +330,22 @@ export async function POST(request: NextRequest) {
           faqId: insertData.id,
           selectError: selectError.code
         });
-        // SELECT失敗でもINSERT成功なら201を返す
         data = { id: insertData.id, ...faqData };
       } else {
         data = selectData;
       }
     } else {
-      // INSERT成功したがIDが返ってこない場合
       data = faqData;
     }
 
-
-    return NextResponse.json({ data }, { status: 201 });
+    return applyCookies(NextResponse.json({ data }, { status: 201 }));
 
   } catch (error) {
-    const errorId = generateErrorId('post-faqs');
-    logErrorToDiag({
-      errorId,
-      endpoint: 'POST /api/my/faqs',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-    
-    return createInternalError(errorId);
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[POST /api/my/faqs] Unexpected error', { data: error });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }

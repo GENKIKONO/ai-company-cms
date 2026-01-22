@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { logger } from '@/lib/utils/logger';
 
 /**
@@ -263,8 +264,8 @@ export function generateExportFileName(type: 'daily' | 'byMaterial', from: strin
 /**
  * API エラーレスポンス生成
  */
-export function createErrorResponse(message: string, status: number = 400) {
-  return Response.json(
+export function createErrorResponse(message: string, status: number = 400): NextResponse {
+  return NextResponse.json(
     { error: message },
     { status }
   );
@@ -273,8 +274,8 @@ export function createErrorResponse(message: string, status: number = 400) {
 /**
  * API 成功レスポンス生成
  */
-export function createSuccessResponse(data: any, status: number = 200) {
-  return Response.json(data, { status });
+export function createSuccessResponse(data: unknown, status: number = 200): NextResponse {
+  return NextResponse.json(data, { status });
 }
 
 /**
