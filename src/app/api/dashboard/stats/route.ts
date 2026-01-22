@@ -1,10 +1,18 @@
-// ダッシュボード用統計データAPI
+/**
+ * /api/dashboard/stats - ダッシュボード用統計データAPI
+ *
+ * 【認証方式】
+ * - createApiAuthClient を使用（統一認証ヘルパー）
+ * - getUser() が唯一の Source of Truth
+ * - Cookie 同期は applyCookies で行う
+ *
+ * @see src/lib/supabase/api-auth.ts
+ */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getUserWithClient } from '@/lib/core/auth-state';
+import { createApiAuthClient, ApiAuthException, ApiAuthFailure } from '@/lib/supabase/api-auth';
 import { hasEntitlement } from '@/lib/feature-flags/gate';
 import { logger } from '@/lib/log';
 
@@ -30,19 +38,12 @@ interface StatsResponse {
   };
   missingTables: string[];
   error?: string;
+  requestId?: string;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse<StatsResponse | ApiAuthFailure>> {
   try {
-    const supabase = await createClient();
-
-    // ユーザー認証とorg取得（Core経由）
-    const user = await getUserWithClient(supabase);
-    if (!user) {
-      return NextResponse.json({
-        error: 'Unauthorized - Authentication required'
-      }, { status: 401 });
-    }
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
 
     // 組織情報取得（organization_members経由）
     const { data: membershipData, error: membershipError } = await supabase
@@ -53,16 +54,43 @@ export async function GET(request: NextRequest) {
       .maybeSingle();
 
     if (membershipError) {
-      logger.error('Error fetching organization membership:', { data: membershipError });
-      return NextResponse.json({
-        error: 'Failed to fetch organization membership'
-      }, { status: 500 });
+      logger.error('[stats] Error fetching organization membership', {
+        requestId,
+        userId: user.id,
+        error: membershipError.message,
+      });
+      return applyCookies(NextResponse.json({
+        ok: false,
+        error: 'Failed to fetch organization membership',
+        counts: {
+          services: { count: null, missing: true },
+          case_studies: { count: null, missing: true },
+          posts: { count: null, missing: true },
+          faqs: { count: null, missing: true },
+          contacts: { count: null, missing: true },
+        },
+        analytics: { pageViews: 0, avgDurationSec: 0, conversionRate: 0 },
+        missingTables: [],
+        requestId,
+      }, { status: 500 }));
     }
 
     if (!membershipData) {
-      return NextResponse.json({
-        error: 'Organization membership not found for user'
-      }, { status: 403 });
+      logger.warn('[stats] No organization membership found', { requestId, userId: user.id });
+      return applyCookies(NextResponse.json({
+        ok: false,
+        error: 'Organization membership not found for user',
+        counts: {
+          services: { count: null, missing: true },
+          case_studies: { count: null, missing: true },
+          posts: { count: null, missing: true },
+          faqs: { count: null, missing: true },
+          contacts: { count: null, missing: true },
+        },
+        analytics: { pageViews: 0, avgDurationSec: 0, conversionRate: 0 },
+        missingTables: [],
+        requestId,
+      }, { status: 403 }));
     }
 
     const orgId = membershipData.organization_id;
@@ -160,19 +188,33 @@ export async function GET(request: NextRequest) {
       orgId,
       counts,
       analytics,
-      missingTables
+      missingTables,
+      requestId,
     };
 
-    return NextResponse.json(response, {
+    logger.info('[stats] Success', {
+      requestId,
+      userId: user.id,
+      orgId,
+      missingTables,
+    });
+
+    return applyCookies(NextResponse.json(response, {
       status: 200,
       headers: {
         'Cache-Control': 'no-store, must-revalidate',
         'Content-Type': 'application/json'
       }
-    });
+    }));
 
   } catch (error) {
-    logger.error('Dashboard stats error', { data: error instanceof Error ? error : new Error(String(error)) });
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+
+    logger.error('[stats] Unexpected error', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -189,6 +231,6 @@ export async function GET(request: NextRequest) {
         conversionRate: 0
       },
       missingTables: ['services', 'case_studies', 'posts', 'faqs', 'contacts']
-    }, { status: 200 });
+    }, { status: 500 });
   }
 }
