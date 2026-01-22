@@ -3,21 +3,22 @@ import { createClient } from '@/utils/supabase/middleware';
 import { ROUTES } from '@/lib/routes';
 
 /**
- * 認証ミドルウェア（世界商用レベル）
+ * 認証ミドルウェア（Supabase SSR 公式パターン準拠）
  *
  * 【設計原則】
- * - Middleware は「交通整理」に徹する（門番ではない）
- * - 認証の責務は各領域の Shell に委譲
- * - Cookie/RSC の不安定性に依存しない
+ * - getUser() が唯一の Source of Truth
+ * - 全パスで getUser() を1回呼び、Cookie 同期（setAll）を発火させる
+ * - レスポンスは必ず getResponse() から取得して返す
+ * - NextResponse.next() を直接返すのは静的アセットのみ
  *
- * 【責務の分離】
- * - /admin, /management-console → 厳密認証（getUser で検証、失敗時リダイレクト）
- * - /dashboard, /account, /my → Cookie なしならログインへリダイレクト
- * - /auth/login 等 → Cookie があれば /dashboard へ
- * - 全ページ → Cookie がある場合はセッションリフレッシュ（公開ページでもログイン状態維持）
+ * 【責務】
+ * 1. Cookie 同期: getUser() 呼び出しで setAll が発火し、トークンリフレッシュ後の Cookie が response に反映
+ * 2. 認証ゲート: 保護パスで user がいなければログインへリダイレクト
  *
- * 【ハードコード禁止】
- * - ルート直書きは禁止、必ず ROUTES 定数を使用
+ * 【パス分類】
+ * - 静的アセット → NextResponse.next() で即座返却（Cookie 不要）
+ * - /api/* → NextResponse.next() で即座返却（API は別途認証）
+ * - それ以外 → getUser() で Cookie 同期後、認証判定
  */
 
 const DEPLOY_SHA = process.env.VERCEL_GIT_COMMIT_SHA ||
@@ -25,30 +26,22 @@ const DEPLOY_SHA = process.env.VERCEL_GIT_COMMIT_SHA ||
                    'unknown';
 
 // =====================================================
-// セキュリティヘッダー設定（世界商用レベル）
+// セキュリティヘッダー設定
 // =====================================================
 function setSecurityHeaders(response: NextResponse): void {
-  // XSS対策
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('X-Content-Type-Options', 'nosniff');
-
-  // クリックジャッキング対策
   response.headers.set('X-Frame-Options', 'SAMEORIGIN');
 
-  // HTTPS強制（本番環境のみ）
   if (process.env.NODE_ENV === 'production') {
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }
 
-  // リファラーポリシー
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-  // 権限ポリシー（不要な機能を無効化）
   response.headers.set('Permissions-Policy',
     'camera=(), microphone=(), geolocation=(), interest-cohort=()'
   );
 
-  // Content Security Policy
   const cspDirectives = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://vercel.live https://*.vercel-scripts.com",
@@ -64,8 +57,6 @@ function setSecurityHeaders(response: NextResponse): void {
     "upgrade-insecure-requests",
   ];
   response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
-
-  // キャッシュ制御（セキュリティ関連ページ）
   response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   response.headers.set('Pragma', 'no-cache');
   response.headers.set('Expires', '0');
@@ -77,30 +68,45 @@ export async function middleware(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   // =====================================================
-  // 1. スルーするパス（認証チェック不要）
+  // 1. 静的アセット・API は即座に返却（Cookie 同期不要）
+  //    理由: これらは認証不要、かつ getUser() を呼ぶ必要がない
   // =====================================================
-  if (
+  const isStaticAsset =
     pathname.startsWith('/_next/') ||
-    pathname.startsWith('/api/') ||
     pathname.startsWith('/static/') ||
     pathname.includes('.') ||
     pathname === '/favicon.ico' ||
     pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml' ||
-    pathname === '/auth/callback' ||
-    pathname === '/auth/confirm' ||
-    pathname === '/auth/reset-password-confirm'
-  ) {
+    pathname === '/sitemap.xml';
+
+  const isApiPath = pathname.startsWith('/api/');
+
+  if (isStaticAsset || isApiPath) {
     return NextResponse.next();
   }
 
-  // Supabaseクライアント作成（Cookieの同期処理込み）
-  // 重要: createClient は supabase と getResponse を返す
-  // setAll で response が再生成されるため、常に getResponse() で最新の response を取得
+  // =====================================================
+  // 2. Supabase クライアント作成
+  //    重要: setAll で response が再生成されるため、
+  //    常に getResponse() で最新の response を取得する
+  // =====================================================
   const { supabase, getResponse } = createClient(request);
 
   // =====================================================
-  // 2. パス分類
+  // 3. getUser() を1回呼び、Cookie 同期を発火
+  //    理由: トークンリフレッシュが必要な場合、ここで setAll が呼ばれ、
+  //    更新された Cookie が response に反映される
+  //    以降の分岐では user を再取得せず、この結果を使い回す
+  // =====================================================
+  const { data: { user }, error: getUserError } = await supabase.auth.getUser();
+
+  // Cookie 存在チェック（ログ用）
+  const allCookies = request.cookies.getAll();
+  const sbCookies = allCookies.filter(c => c.name.startsWith('sb-') || c.name.startsWith('supabase-'));
+  const hasAuthCookie = sbCookies.length > 0;
+
+  // =====================================================
+  // 4. パス分類
   // =====================================================
   const strictAuthPaths = [ROUTES.admin, ROUTES.managementConsole];
   const isStrictAuthPath = strictAuthPaths.some(path => pathname.startsWith(path));
@@ -108,25 +114,24 @@ export async function middleware(request: NextRequest) {
   const authPaths = [ROUTES.authLogin, ROUTES.authSignin, ROUTES.login, ROUTES.signin];
   const isAuthPath = authPaths.some(path => pathname.startsWith(path));
 
-  // Cookie 存在チェック（認証ページのリダイレクト判定用）
-  const allCookies = request.cookies.getAll();
-  const sbCookies = allCookies.filter(c => c.name.startsWith('sb-') || c.name.startsWith('supabase-'));
-  const hasAuthCookie = sbCookies.length > 0;
+  const authCallbackPaths = ['/auth/callback', '/auth/confirm', '/auth/reset-password-confirm'];
+  const isAuthCallbackPath = authCallbackPaths.some(path => pathname === path);
+
+  const protectedPaths = [ROUTES.dashboard, '/account', '/my'];
+  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
 
   // =====================================================
-  // 3. 厳密認証パス: /admin, /management-console
-  //    → getUser() で検証、失敗なら /auth/login
+  // 5. 厳密認証パス: /admin, /management-console
+  //    → user がいなければログインへリダイレクト
+  //    注意: getUser() は上で1回呼び済み。ここでは呼ばない
   // =====================================================
   if (isStrictAuthPath) {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    const isLoggedIn = user && !error;
-
-    if (!isLoggedIn) {
+    if (!user) {
       console.warn('[middleware] strict-auth redirect', {
         sha: DEPLOY_SHA,
         requestId,
         path: pathname,
-        errorCode: error?.code,
+        errorCode: getUserError?.code,
       });
 
       const url = request.nextUrl.clone();
@@ -138,7 +143,7 @@ export async function middleware(request: NextRequest) {
       const redirectResponse = NextResponse.redirect(url);
       redirectResponse.headers.set('x-request-id', requestId);
 
-      // 重要: setAll で設定された Set-Cookie を redirect response にコピー
+      // 重要: setAll で設定された Cookie を redirect response にコピー
       const currentResponse = getResponse();
       currentResponse.cookies.getAll().forEach(cookie => {
         redirectResponse.cookies.set(cookie.name, cookie.value);
@@ -149,54 +154,35 @@ export async function middleware(request: NextRequest) {
   }
 
   // =====================================================
-  // 4. 認証ページ: /auth/login 等
-  //    → Cookieクリアはしない（LoginFormで明示的に行う）
-  //    → prefetchでCookieが消える問題を防ぐため
+  // 6. 認証コールバック: /auth/callback 等
+  //    → Cookie 同期のみ（認証チェックなし）
+  //    理由: コールバック処理中はまだセッションが確立していない
   // =====================================================
-  if (isAuthPath) {
-    const authResponse = NextResponse.next({
-      request: { headers: request.headers },
-    });
-    setSecurityHeaders(authResponse);
-    authResponse.headers.set('x-request-id', requestId);
-    return authResponse;
+  if (isAuthCallbackPath) {
+    const response = getResponse();
+    response.headers.set('x-request-id', requestId);
+    return response;
   }
 
   // =====================================================
-  // 5. セッション同期（最重要：判定前に実行）
-  //    → 先にセッション同期を行い、必要な Set-Cookie を response に積む
-  //    → getClaims() は getUser() より軽量で、セッション更新時も setAll が発火
-  //    → これがないと Cookie が消失する
+  // 7. 認証ページ: /auth/login 等
+  //    → Cookie 同期済みの response を返す
+  //    注意: NextResponse.next() を直接返さない（setAll の結果が失われる）
   // =====================================================
-  const claimsResult = await supabase.auth.getClaims();
-
-  // 診断ログ: getClaims の結果と setAll で設定された Cookie
-  const responseAfterClaims = getResponse();
-  const setCookiesAfterClaims = responseAfterClaims.cookies.getAll();
-  console.log('[middleware] getClaims result', {
-    sha: DEPLOY_SHA,
-    requestId,
-    path: pathname,
-    hasAuthCookie,
-    claimsError: claimsResult.error?.code || null,
-    setCookieCount: setCookiesAfterClaims.length,
-    setCookieNames: setCookiesAfterClaims.map(c => c.name),
-  });
+  if (isAuthPath) {
+    const response = getResponse();
+    setSecurityHeaders(response);
+    response.headers.set('x-request-id', requestId);
+    return response;
+  }
 
   // =====================================================
-  // 5.5 保護パスの認証チェック（セッション同期後に判定）
-  //     → 同期後に getUser() で実際のユーザー存在を確認
-  //     → Cookie の有無ではなく、実際のセッション有効性で判定
+  // 8. 保護パス: /dashboard, /account, /my
+  //    → user がいなければログインへリダイレクト
+  //    注意: getUser() は上で1回呼び済み。ここでは呼ばない
   // =====================================================
-  const protectedPaths = [ROUTES.dashboard, '/account', '/my'];
-  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
-
   if (isProtectedPath) {
-    const { data: { user }, error: getUserError } = await supabase.auth.getUser();
-
-    // =====================================================
-    // 事実取得専用ログ（原因特定用）
-    // =====================================================
+    // 診断ログ
     console.error('[middleware][auth-check]', {
       pathname,
       hasCookies: hasAuthCookie,
@@ -206,7 +192,6 @@ export async function middleware(request: NextRequest) {
       getUserErrorMessage: getUserError?.message || null,
     });
 
-    // 診断ログ: getUser の結果
     const responseAfterGetUser = getResponse();
     const setCookiesAfterGetUser = responseAfterGetUser.cookies.getAll();
     console.log('[middleware] getUser result', {
@@ -239,8 +224,7 @@ export async function middleware(request: NextRequest) {
       const redirectResponse = NextResponse.redirect(url);
       redirectResponse.headers.set('x-request-id', requestId);
 
-      // 重要: setAll で設定された Set-Cookie を redirect response にコピー
-      // これがないと、セッション更新/削除の Cookie が失われる
+      // 重要: setAll で設定された Cookie を redirect response にコピー
       const currentResponse = getResponse();
       currentResponse.cookies.getAll().forEach(cookie => {
         redirectResponse.cookies.set(cookie.name, cookie.value);
@@ -251,7 +235,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // =====================================================
-  // 6. セキュリティヘッダー追加
+  // 9. その他のパス（公開ページ等）
+  //    → Cookie 同期済みの response を返す
+  //    理由: 公開ページでもログイン状態を維持するため、
+  //    トークンリフレッシュ後の Cookie を返す必要がある
   // =====================================================
   const finalResponse = getResponse();
   setSecurityHeaders(finalResponse);
