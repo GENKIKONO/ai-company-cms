@@ -40,6 +40,20 @@ jobs:
       - name: 🧹 ESLint (no warnings)
         run: npm run lint -- --max-warnings 0
 
+      - name: 🔐 API Auth Pattern Check
+        run: |
+          OUTPUT=$(npm run check:api-auth 2>&1)
+          ERROR_COUNT=$(echo "$OUTPUT" | grep -oP '\d+(?= error\(s\))' | head -1 || echo "0")
+          if [ "$ERROR_COUNT" != "0" ] && [ -n "$ERROR_COUNT" ]; then
+            echo "❌ API Auth violations: $ERROR_COUNT error(s)"
+            echo "$OUTPUT" | tail -30
+            exit 1
+          fi
+          echo "✅ API Auth check passed"
+
+      - name: 🌐 Origin Safety Check
+        run: npm run check:origin-safety
+
       - name: 🏗️ Build (no warnings)
         run: |
           BUILD_OUTPUT=$(npm run build 2>&1) || exit 1

@@ -5,9 +5,143 @@
 
 ---
 
-## 使用方法
+## 0. Claude Code 運用ルール（最重要）
 
-重要な実装タスクの前にこのファイルの内容を参照させてください。
+このセクションはClaude Codeで開発する際の必須運用ルールです。
+
+### 0-0. 変更開始の停止条件（Gate）【必読・必守】
+
+**以下の条件を満たすまで、コード修正に入ってはならない：**
+
+1. **推測禁止**
+   - 根拠（ファイル/ログ/SQL結果）なしの断定は禁止
+   - 不明な点は「不明」と明記し、ユーザーに確認を求める
+   - 「〜だろう」「〜はず」での修正開始は禁止
+
+2. **棚卸し表なしの部分修正禁止**
+   - 原因経路が複数あり得る問題（認証/CSP/DB/Cookie等）では、以下の棚卸し表を出すまで修正に入らない：
+     | 項目 | 確認内容 |
+     |------|----------|
+     | 影響API | どのAPIが問題か |
+     | 呼び出し元 | クライアント/サーバー/どのコンポーネントか |
+     | オリジン | 同一オリジンか、絶対URLか |
+     | Cookie同期 | applyCookiesを使っているか |
+     | CSP | connect-srcにブロックされていないか |
+
+3. **検証なしCommit/Deploy禁止**
+   - 以下の検証コマンド結果を貼るまでcommit/deployしない：
+   ```bash
+   npm run typecheck
+   npm run build
+   npm run check:api-auth
+   npm run check:origin-safety
+   ```
+
+4. **成功条件（Gate）未定義なら開始禁止**
+   - 作業開始前に成功条件を明文化する（例）：
+     - 「Dashboard→Posts遷移で401ゼロ」
+     - 「Console にCSP blocked ゼロ」
+     - 「NetworkタブでAPIリクエストが出ている」
+   - 成功条件がなければユーザーに確認を求める
+
+### 0-1. Verifyできる形で依頼する（最優先）
+
+**作業完了条件を必ず明示する：**
+
+```bash
+# 最低限の検証コマンド（全タスク共通）
+npm run typecheck        # 型エラー確認
+npm run build            # ビルド成功確認
+npm run check:api-auth   # API認証パターン違反検出
+npm run check:origin-safety  # オリジン安全性チェック
+```
+
+**UI/認証関連の確認観点（必須チェック）：**
+- DevTools Network で 401 が出ないこと
+- DevTools Network で `/api/` のリクエストが**実際に出ている**こと
+  - **リクエストが出ていない** → CSP blocked または絶対URL使用を疑う
+- DevTools Application → Cookies で Set-Cookie が設定されること
+- DevTools Console に `blocked connect-src` が**0件**であること
+  - 1件でもあれば API リクエストがブロックされている
+- 内部APIは同一オリジンの相対パス（`/api/...`）で叩いていること
+  - NG: `fetch('https://aiohub.jp/api/...')` ← CSPでブロックされる
+  - OK: `fetch('/api/...')` または `serverFetch()` を使用
+
+**「直して終わり」ではなく「検証コマンド実行 → 結果報告」を必須とする。**
+
+### 0-2. Explore → Plan → Implement → Commit の分離
+
+| フェーズ | 内容 | 判断基準 |
+|---------|------|----------|
+| **Explore** | コードベース調査、既存パターン確認 | 常に最初に行う |
+| **Plan** | 変更方針の策定、影響範囲の特定 | 差分が1文で言えない場合は必須 |
+| **Implement** | 実装、修正 | Plan完了後に実行 |
+| **Commit** | コミット、デプロイ | 検証完了後に実行 |
+
+**即実装OKの判断基準：**
+- 差分が1文で説明できる（例：「typo修正」「import追加」）
+- 既存パターンの単純な複製
+- 1ファイル・10行以下の変更
+
+**Plan必須の判断基準：**
+- 複数ファイルにまたがる変更
+- 新しいパターンの導入
+- 認証・セキュリティ関連の変更
+- DB/マイグレーション関連の変更
+
+### 0-3. 具体的コンテキストの渡し方
+
+```
+# 優先順位（上から優先）
+1. @ でファイル参照: @src/middleware.ts を見て
+2. エラーログを貼る: 以下のエラーが出ている [ログ貼付]
+3. スクショを貼る: [画像添付]
+4. "どこを見れば答えがあるか" を最初に指定
+```
+
+**NGパターン：**
+- 「認証がおかしい」（→ 具体的なエラーログを貼る）
+- 「直して」（→ 何をどう直すか、完了条件を明示）
+
+### 0-4. セッション/コンテキスト管理（必須運用）
+
+| 状況 | コマンド | 説明 |
+|------|----------|------|
+| 無関係な作業に入る前 | `/clear` | コンテキストをクリア |
+| Context low が出たら | `/compact` | コンテキストを圧縮（失敗したら `/rewind` or `--resume`） |
+| ダメだった変更を戻す | `/rewind` | チェックポイントに戻る（二回Escでも可） |
+| セッション再開 | `claude --continue` / `claude --resume` | 前回のセッションを継続 |
+| セッション名変更 | `/rename` | 識別しやすい名前に変更 |
+
+**巨大タスクの分割ルール：**
+- マイグレーションは1テーブル/1VIEW単位で分割
+- 調査だけをサブエージェントに投げる（本体のコンテキストを汚さない）
+- 100行超の変更は分割を検討
+
+### 0-5. サブエージェント活用（調査と実装の分離）
+
+```
+# 調査をサブエージェントに委譲する例
+「この問題の原因を調査して」→ サブエージェントで調査
+「調査結果を元に修正して」→ 本体で実装
+
+# 別セッションでレビュー
+「このPRをレビューして」→ 新しいセッションで客観的にレビュー
+```
+
+**方針**: 調査は本体のコンテキストを汚しやすいので、サブエージェントに分離する。
+
+### 0-6. 権限/危険操作のガード
+
+**禁止：**
+- `--dangerously-skip-permissions` フラグの使用
+- `git push --force` to main/master
+- `DROP TABLE` / `TRUNCATE` の直接実行
+
+**推奨：**
+- 外部操作は CLI 優先（例: `gh pr create`）
+- DB操作は Supabase SQL Editor で確認後に実行
+- 破壊的変更はPRレビュー必須
 
 ---
 
@@ -59,6 +193,7 @@
 | `src/config/data-sources.ts` | テーブル/ビュー/カラム設定 |
 | `src/lib/db/public-view-contracts.ts` | **公開VIEW契約（カラム定義）** |
 | `supabase/migrations/` | **DBマイグレーション（VIEW作成含む）** |
+| `src/lib/supabase/api-auth.ts` | **API認証ヘルパー（必読）** |
 
 ---
 
@@ -102,6 +237,29 @@
   - Supabase SQL Editorで `SELECT * FROM v_xxx_public LIMIT 1` を実行
   - エラーが出たらVIEW未作成の可能性
 
+### APIセキュリティ（重要）
+
+- [ ] **`SUPABASE_SERVICE_ROLE_KEY` の直接使用は原則禁止**
+  - 例外：バッチ処理、Admin専用API（理由とレビュー必須）
+  - 通常のAPIでは RLS + authenticated クライアントを使用
+
+- [ ] **orgId をクエリパラメータから受けるだけで権限検証しない禁止**
+  - 必ずサーバー側で `organization_members` テーブルを照会して所属確認
+  - 例: `supabase.from('organization_members').select().eq('user_id', user.id).eq('organization_id', orgId)`
+
+- [ ] **認証必須APIは `createApiAuthClient` を使用**
+  - `@/lib/supabase/api-auth` からインポート
+  - 全レスポンスを `applyCookies()` でラップ
+  - `ApiAuthException` を catch して `error.toResponse()` を返す
+
+- [ ] **認証任意APIは `createApiAuthClientOptional` を使用**
+  - 公開APIでもユーザー情報が欲しい場合に使用
+
+- [ ] **内部APIは絶対URLで叩かない**
+  - NG: `fetch('https://aiohub.jp/api/...')`
+  - OK: `fetch('/api/...')` または `serverFetch()` を使用
+  - 理由: CSPブロック、Cookie不一致の原因になる
+
 ---
 
 ## 4. 実装手順
@@ -111,7 +269,26 @@
 2. 確認   → 既存の類似実装パターンを探す
 3. 質問   → 不明点は実装前にユーザーに確認
 4. 実装   → 参照した内容に忠実に実装
-5. 検証   → npm run typecheck で型エラー確認
+5. 検証   → 以下のコマンドを実行して結果を報告
+6. 報告   → 検証結果をユーザーに報告
+```
+
+**必須検証コマンド（省略禁止）：**
+
+```bash
+npm run typecheck        # 型エラー確認
+npm run build            # ビルド成功確認
+npm run check:api-auth   # API認証パターン違反検出（API変更時）
+npm run check:origin-safety  # オリジン安全性チェック（fetch変更時）
+```
+
+**検証結果の報告フォーマット：**
+
+```markdown
+## 検証結果
+- typecheck: ✅ 通過 / ❌ エラー（詳細）
+- build: ✅ 通過 / ❌ エラー（詳細）
+- check:api-auth: ✅ 0件 / ⚠️ N件（該当箇所）
 ```
 
 ---
@@ -314,6 +491,11 @@ import { LinkButton } from '@/components/ui/button';
 - 使用したCSS変数: [変数名一覧]
 - 使用した既存コンポーネント: [コンポーネント名]
 - 直書き確認: なし / あり（理由: ）
+
+## 検証結果
+- typecheck: ✅ / ❌
+- build: ✅ / ❌
+- check:api-auth: ✅ / ⚠️ N件
 ```
 
 ---
@@ -352,6 +534,49 @@ import { DashboardCard } from '@/components/dashboard/ui';
 <div className="bg-[var(--dashboard-card-bg)] border border-[var(--dashboard-card-border)] rounded-lg shadow-[var(--dashboard-card-shadow)]">
 ```
 
+### API認証実装
+
+```tsx
+// NG: createClient (server.ts) を直接使用
+import { createClient } from '@/lib/supabase/server';
+const supabase = await createClient();
+const { data: { user } } = await supabase.auth.getUser();
+
+// NG: orgIdをクエリから受けて検証しない
+const orgId = searchParams.get('orgId');
+const { data } = await supabase.from('posts').select().eq('organization_id', orgId);
+
+// OK: createApiAuthClient を使用
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
+
+    // orgIdの検証
+    const { data: membership } = await supabase
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .eq('organization_id', orgId)
+      .maybeSingle();
+
+    if (!membership) {
+      return applyCookies(NextResponse.json({ error: 'Forbidden' }, { status: 403 }));
+    }
+
+    // ... 処理 ...
+
+    return applyCookies(NextResponse.json({ data }));
+  } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+    throw error;
+  }
+}
+```
+
 ---
 
 ## 10. Dashboard認証アーキテクチャ
@@ -363,6 +588,47 @@ import { DashboardCard } from '@/components/dashboard/ui';
 | Middleware | `src/middleware.ts` | **主認証ゲート** - 未認証ユーザーをログインへリダイレクト |
 | Layout | `src/app/dashboard/layout.tsx` | **UIシェル提供のみ** - 認証チェックは行わない |
 | Page Shell | `DashboardPageShell` | **ページレベル認証** - 組織・権限チェック |
+
+### 10-1. API認証はmiddlewareに依存しない（必須ルール）
+
+> **背景**: 2026-01-22に発生した障害の教訓。「middlewareがCookie同期するからAPIは何もしなくていい」という誤解が原因で、セッション切れ時にAPIが401を返す事故が発生。
+
+**明文化されたルール：**
+
+| 対象 | 責務 | ファイル |
+|------|------|----------|
+| ページ遷移の認証リダイレクト | **middleware** が担う | `src/middleware.ts` |
+| API Routesの認証・Cookie同期 | **API自身** が担う | `src/lib/supabase/api-auth.ts` |
+
+**禁止事項（過去に事故を起こした）：**
+- ❌ 「middlewareが処理済みだからAPIはrefresh不要」と考えること
+- ❌ APIで `createClient`（server.ts）を直接使うこと
+- ❌ APIで認証チェック後に `applyCookies` を省略すること
+
+**必須事項：**
+- ✅ 認証必須APIは `createApiAuthClient(request)` を使用
+- ✅ すべてのレスポンスを `applyCookies()` でラップ
+- ✅ 例外は `ApiAuthException` で catch して `error.toResponse()` を返す
+
+```tsx
+// 正しいAPI認証パターン
+import { createApiAuthClient, ApiAuthException } from '@/lib/supabase/api-auth';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
+    // ... 処理 ...
+    return applyCookies(NextResponse.json({ data }));
+  } catch (error) {
+    if (error instanceof ApiAuthException) {
+      return error.toResponse();
+    }
+    throw error;
+  }
+}
+```
+
+**理由**: MiddlewareはAPIパス（`/api/*`）を `NextResponse.next()` でスキップする設計。APIはmiddlewareの認証処理に依存してはならない。
 
 ### 重要な注意点
 
@@ -522,22 +788,66 @@ WHERE table_schema = 'public' AND table_name = 'v_organizations_public';
 認証・データベースエラーが発生した場合の調査順序：
 
 ```
-1. DB/VIEW問題か？
+1. CSP / connect-src 問題か？（最初に確認）
+   └─ Console に "blocked connect-src" が出ていないか
+   └─ Network タブに リクエストが出ているか（出ていなければCSPブロック）
+   └─ API呼び出し先が 同一オリジン か確認（絶対URL禁止）
+
+2. DB/VIEW問題か？
    └─ VIEWが存在するか確認
    └─ VIEWのカラムが契約と一致するか確認
    └─ RLSポリシーが正しいか確認
 
-2. 認証問題か？
+3. 認証問題か？
    └─ Cookieが存在するか確認（DevTools → Application → Cookies）
    └─ auth-token と refresh-token の両方があるか
    └─ トークンが有効か（Supabase Dashboard → Authentication → Users）
 
-3. コード問題か？
+4. コード問題か？
    └─ デプロイされたコードが最新か（sha確認）
    └─ APIルートのクエリが契約に準拠しているか
 ```
 
-**重要**: 「認証エラー」に見えても、**まずDB/VIEW問題を疑う**。VIEWクエリ失敗が認証エラーとして表示されることがある。
+### CSP / connect-src のトラブルシューティング
+
+| 症状 | 原因 | 対処 |
+|------|------|------|
+| Console に "blocked connect-src" | CSPでAPIリクエストがブロック | `src/middleware.ts` の `connect-src` に必要なオリジンを追加 |
+| Network に リクエストが出ない | 同上、または絶対URL使用 | 絶対URL → 相対パス（`/api/...`）に変更 |
+| Vercel preview で認証失敗 | API呼び出し先が本番固定 | `serverFetch()` を使用（現在のオリジンを自動検出） |
+
+**重要**:
+- 「認証エラー」に見えても、**まずCSP/オリジン問題を疑う**
+- 次に **DB/VIEW問題を疑う**
+- VIEWクエリ失敗が認証エラーとして表示されることがある
+
+---
+
+## 13. 実装前チェックリスト（このファイルを読んでから実装）
+
+実装を始める前に以下を確認：
+
+### 必須確認
+- [ ] 変更対象ファイルの既存パターンを Read で確認した
+- [ ] 類似の実装が既に存在しないか Grep で確認した
+- [ ] 差分が1文で説明できる小修正か、Plan が必要な大きい変更か判断した
+- [ ] 完了条件（検証コマンド）を理解した
+
+### API変更時の追加確認
+- [ ] `createApiAuthClient` / `applyCookies` を使用する
+- [ ] orgId の権限検証をサーバー側で行う
+- [ ] 絶対URL（`https://aiohub.jp/api/...`）を使用しない
+
+### DB/VIEW変更時の追加確認
+- [ ] TypeScript側とDB側の両方を更新する
+- [ ] マイグレーションSQLを作成する
+- [ ] `NOTIFY pgrst, 'reload schema'` を実行する
+
+### 実装完了時
+- [ ] `npm run typecheck` を実行して通過した
+- [ ] `npm run build` を実行して通過した
+- [ ] `npm run check:api-auth` を実行して違反0件（またはスコープ外）
+- [ ] 検証結果をユーザーに報告した
 
 ---
 

@@ -17,8 +17,11 @@
 
 > If any exception added, explain why:
 
-## Commands run
+## Commands run (Gate v1)
 - [ ] `npm run typecheck` PASS
+- [ ] `npm run build` PASS
+- [ ] `npm run check:api-auth` PASS (error 0)
+- [ ] `npm run check:origin-safety` PASS
 - [ ] `npm run check:architecture` PASS
 
 ## Manual smoke (if applicable)
