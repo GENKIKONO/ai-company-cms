@@ -238,6 +238,7 @@ jobs:
     steps:
       - name: 💬 Comment merge block details
         uses: actions/github-script@v7
+        continue-on-error: true  # 403 Resource not accessible by integration 回避（通知は非必須）
         with:
           script: |
             const comment = `## 🚫 MAIN BRANCH MERGE BLOCKED

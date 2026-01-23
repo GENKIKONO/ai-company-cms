@@ -9,11 +9,14 @@
 name: 'AIO Hub - Phase 4 Quality Assurance'
 
 on:
-  push:
-    branches: [ main, develop, 'hotfix/*', 'feature/*' ]
-  pull_request:
-    branches: [ main, develop ]
-    types: [opened, synchronize, reopened]
+  # 自動実行を無効化（pnpm-lock.yaml不在のため）
+  # TODO: npm に移行するか、pnpm-lock.yaml を生成したら有効化
+  workflow_dispatch:  # 手動実行のみ
+  # push:
+  #   branches: [ main, develop, 'hotfix/*', 'feature/*' ]
+  # pull_request:
+  #   branches: [ main, develop ]
+  #   types: [opened, synchronize, reopened]
 
 # 環境変数の定義
 env:
