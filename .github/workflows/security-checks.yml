@@ -67,17 +67,18 @@ jobs:
           echo "🔍 Checking for sensitive data in code..."
 
           # ハードコードされた認証情報の検索 (実際の値が入っているパターンのみ)
-          # 除外: process.env, 型定義, URL, プレースホルダー, コメント
-          SENSITIVE_PATTERN='(api_key|secret_key|api_secret)\s*[:=]\s*["\x27][a-zA-Z0-9_\-]{20,}["\x27]'
-          if grep -r -E "$SENSITIVE_PATTERN" src/ --include="*.ts" --include="*.tsx" | grep -v "process\.env\|example\|placeholder\|test_\|dummy" | head -3; then
+          # ダブルクォート内の20文字以上の値を検出
+          secrets=$(grep -rE '(api_key|secret_key|api_secret)\s*[:=]\s*"[a-zA-Z0-9_-]{20,}"' src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v 'process\.env\|example\|placeholder\|test_\|dummy' | head -3 || true)
+          if [ -n "$secrets" ]; then
+            echo "$secrets"
             echo "❌ Hardcoded API keys/secrets found"
             exit 1
           fi
 
           # ハードコードされたパスワード（実際の値が代入されているパターン）
-          # 型定義 (password: string) やURL (/reset-password) は除外
-          PASSWORD_PATTERN='password\s*=\s*["\x27][^"\x27]{8,}["\x27]'
-          if grep -r -E "$PASSWORD_PATTERN" src/ --include="*.ts" --include="*.tsx" | grep -v "process\.env\|example\|placeholder\|test\|: string" | head -3; then
+          passwords=$(grep -rE 'password\s*=\s*"[^"]{8,}"' src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v 'process\.env\|example\|placeholder\|test' | head -3 || true)
+          if [ -n "$passwords" ]; then
+            echo "$passwords"
             echo "❌ Hardcoded passwords found"
             exit 1
           fi
