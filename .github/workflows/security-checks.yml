@@ -47,10 +47,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        env:
+          HUSKY: 0
         run: |
-          npm ci --only=production
+          npm ci --omit=dev --ignore-scripts
           # セキュリティ監査専用の依存関係
-          npm install --no-save audit-ci eslint-plugin-security
+          npm install --no-save --ignore-scripts audit-ci eslint-plugin-security
 
       - name: Run npm audit
         run: |
