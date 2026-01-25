@@ -26,6 +26,7 @@
     "check:public-views": "node scripts/check-no-direct-public-table-access.mjs",
     "check:api-auth": "node scripts/check-api-auth-violations.mjs",
     "check:origin-safety": "node scripts/check-origin-safety.mjs",
+    "check:app-routes": "node scripts/check-app-routes.mjs",
     "smoke:public-views": "node scripts/smoke-public-api-views.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "typecheck:strict": "tsc --noEmit -p tsconfig.strict.json",
@@ -224,5 +225,9 @@
     "typescript": "^5.9.3",
     "typescript-language-server": "^5.1.3",
     "wait-on": "^7.2.0"
+  },
+  "overrides": {
+    "@modelcontextprotocol/sdk": "1.25.3",
+    "tar": "7.5.6"
   }
 }

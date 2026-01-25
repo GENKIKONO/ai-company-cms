@@ -51,6 +51,10 @@ jobs:
           # Real values are injected at deploy time by Vercel
           NEXT_PUBLIC_SUPABASE_URL: https://ci-build-dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjaS1idWlsZCIsInJvbGUiOiJhbm9uIn0.ci-build-dummy-key
+          # Required for adminClient.ts which throws at module evaluation if missing
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # Required for interview-generation.ts which initializes OpenAI client at module level
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Check Public API Security
         run: npm run check:public-api

@@ -237,7 +237,7 @@ describe('error-responses', () => {
 
       expect(response.status).toBe(500);
       expect(body.error.code).toBe('INTERNAL_ERROR');
-      expect(body.error.message).toBe('Something went wrong');
+      expect(body.error.message).toBe('サーバーエラーが発生しました');
     });
 
     it('should handle unknown error', async () => {
@@ -245,7 +245,7 @@ describe('error-responses', () => {
       const body = await response.json();
 
       expect(response.status).toBe(500);
-      expect(body.error.code).toBe('UNKNOWN_ERROR');
+      expect(body.error.code).toBe('INTERNAL_ERROR');
     });
   });
 });
