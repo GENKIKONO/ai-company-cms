@@ -34,18 +34,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Debug - Show baseline file content
-        run: |
-          echo "=== Debug: Baseline file content ==="
-          echo "HEAD commit:"
-          git log -1 --oneline
-          echo ""
-          echo "Baseline file first 10 lines:"
-          head -10 scripts/crash-vectors.baseline.json
-          echo ""
-          echo "throwError count:"
-          grep -o '"count": [0-9]*' scripts/crash-vectors.baseline.json | head -1
-
       - name: TypeCheck
         run: npm run typecheck
 

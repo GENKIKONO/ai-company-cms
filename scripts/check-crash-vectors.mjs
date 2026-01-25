@@ -21,8 +21,10 @@ import { globSync } from 'glob';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.dirname(__dirname);
-const baselineFile = path.join(projectRoot, 'scripts', 'crash-vectors.baseline.json');
-const allowlistFile = path.join(projectRoot, 'scripts', 'crash-vectors.allowlist.json');
+
+// These will be set based on --scan-root argument
+let baselineFile = path.join(projectRoot, 'scripts', 'crash-vectors.baseline.json');
+let allowlistFile = path.join(projectRoot, 'scripts', 'crash-vectors.allowlist.json');
 
 // Exclusion patterns - always ignored
 const excludePatterns = [
@@ -271,22 +273,11 @@ async function scanServerClientBoundary(pattern, scanRoot = projectRoot) {
  * Load baseline violations
  */
 async function loadBaseline() {
-  // Debug: output the file path being read
-  console.log(`[DEBUG] Loading baseline from: ${baselineFile}`);
-  console.log(`[DEBUG] projectRoot: ${projectRoot}`);
-  console.log(`[DEBUG] __dirname: ${__dirname}`);
-
   try {
     const baselineContent = await fs.readFile(baselineFile, 'utf8');
-    const parsed = JSON.parse(baselineContent);
-
-    // Debug: output the parsed count
-    console.log(`[DEBUG] Parsed baseline throwError.count: ${parsed.throwError?.count}`);
-
-    return parsed;
+    return JSON.parse(baselineContent);
   } catch (error) {
     console.warn('No baseline file found, treating all violations as new');
-    console.log(`[DEBUG] Error reading baseline: ${error.message}`);
     return {
       throwError: { count: 0, violations: [] },
       responseJson: { count: 0, violations: [] },
@@ -308,7 +299,11 @@ async function saveBaseline(results) {
       violations: result.violations
     };
   }
-  
+
+  // Ensure parent directory exists (for custom scan-root scenarios)
+  const baselineDir = path.dirname(baselineFile);
+  await fs.mkdir(baselineDir, { recursive: true });
+
   await fs.writeFile(baselineFile, JSON.stringify(baselineData, null, 2));
   console.log(`Baseline saved to ${baselineFile}`);
 }
@@ -358,7 +353,14 @@ async function main() {
   const args = process.argv.slice(2);
   const isUpdateBaseline = args.includes('--update-baseline');
   const scanRoot = args.find(arg => arg.startsWith('--scan-root='))?.split('=')[1] || projectRoot;
-  
+
+  // IMPORTANT: When --scan-root is specified, use that root's scripts directory for baseline/allowlist
+  // This prevents tests from overwriting the project's actual baseline file
+  if (scanRoot !== projectRoot) {
+    baselineFile = path.join(scanRoot, 'scripts', 'crash-vectors.baseline.json');
+    allowlistFile = path.join(scanRoot, 'scripts', 'crash-vectors.allowlist.json');
+  }
+
   console.log('🔍 Scanning for crash vectors...\n');
   
   // Load allowlist
