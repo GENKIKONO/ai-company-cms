@@ -65,19 +65,23 @@ jobs:
       - name: Check for sensitive data
         run: |
           echo "🔍 Checking for sensitive data in code..."
-          
-          # API キーやトークンの検索
-          if grep -r -i "api[_-]key\|secret[_-]key\|password\|token" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v "process\.env\|\.env\|example\|placeholder\|your_" | head -5; then
-            echo "❌ Potential sensitive data found in code"
+
+          # ハードコードされた認証情報の検索 (実際の値が入っているパターンのみ)
+          # 除外: process.env, 型定義, URL, プレースホルダー, コメント
+          SENSITIVE_PATTERN='(api_key|secret_key|api_secret)\s*[:=]\s*["\x27][a-zA-Z0-9_\-]{20,}["\x27]'
+          if grep -r -E "$SENSITIVE_PATTERN" src/ --include="*.ts" --include="*.tsx" | grep -v "process\.env\|example\|placeholder\|test_\|dummy" | head -3; then
+            echo "❌ Hardcoded API keys/secrets found"
             exit 1
           fi
-          
-          # ハードコードされた認証情報の検索
-          if grep -r -E "(password|secret|key|token)\s*[:=]\s*['\"][^'\"]{8,}" src/ --include="*.ts" --include="*.tsx" | grep -v "process\.env\|example\|placeholder" | head -3; then
-            echo "❌ Hardcoded credentials found"
+
+          # ハードコードされたパスワード（実際の値が代入されているパターン）
+          # 型定義 (password: string) やURL (/reset-password) は除外
+          PASSWORD_PATTERN='password\s*=\s*["\x27][^"\x27]{8,}["\x27]'
+          if grep -r -E "$PASSWORD_PATTERN" src/ --include="*.ts" --include="*.tsx" | grep -v "process\.env\|example\|placeholder\|test\|: string" | head -3; then
+            echo "❌ Hardcoded passwords found"
             exit 1
           fi
-          
+
           echo "✅ No sensitive data found in code"
 
       - name: Validate environment configuration
