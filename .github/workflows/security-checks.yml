@@ -229,6 +229,8 @@ jobs:
           EOF
 
       - name: Build application
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           echo "🏗️ Building application with security validation..."
           npm run build
