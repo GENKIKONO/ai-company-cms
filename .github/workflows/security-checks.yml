@@ -114,9 +114,11 @@ jobs:
           echo "✅ Environment configuration valid"
 
       - name: Security-focused ESLint
+        env:
+          ESLINT_USE_FLAT_CONFIG: "false"
         run: |
           echo "🔍 Running security-focused ESLint..."
-          
+
           # セキュリティ特化のESLint設定を作成
           cat > .eslintrc.security.json << EOF
           {
