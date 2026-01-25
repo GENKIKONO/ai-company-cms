@@ -151,7 +151,7 @@ function hasAuthTokenCookie(cookieNames: string[], projectRef: string): boolean 
  *   try {
  *     const { supabase, user, applyCookies, requestId } = await createApiAuthClient(request);
  *
- *     const { data, error } = await supabase.from('posts').select('*');
+ *     const { data, error } = await supabase.from('posts').select('id, title, created_at');
  *
  *     const response = NextResponse.json({ data });
  *     return applyCookies(response);
