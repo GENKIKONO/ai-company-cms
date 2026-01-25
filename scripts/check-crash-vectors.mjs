@@ -271,11 +271,22 @@ async function scanServerClientBoundary(pattern, scanRoot = projectRoot) {
  * Load baseline violations
  */
 async function loadBaseline() {
+  // Debug: output the file path being read
+  console.log(`[DEBUG] Loading baseline from: ${baselineFile}`);
+  console.log(`[DEBUG] projectRoot: ${projectRoot}`);
+  console.log(`[DEBUG] __dirname: ${__dirname}`);
+
   try {
     const baselineContent = await fs.readFile(baselineFile, 'utf8');
-    return JSON.parse(baselineContent);
+    const parsed = JSON.parse(baselineContent);
+
+    // Debug: output the parsed count
+    console.log(`[DEBUG] Parsed baseline throwError.count: ${parsed.throwError?.count}`);
+
+    return parsed;
   } catch (error) {
     console.warn('No baseline file found, treating all violations as new');
+    console.log(`[DEBUG] Error reading baseline: ${error.message}`);
     return {
       throwError: { count: 0, violations: [] },
       responseJson: { count: 0, violations: [] },
